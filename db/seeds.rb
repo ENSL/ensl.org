@@ -60,7 +60,7 @@ Option.create!(option: "Option 1", poll: Poll.first)
 Option.create!(option: "Option 2", poll: Poll.first)
 
 # Base Forums
-Forum.create!(title: "General Discussion", description: "Anything that doesn't belong in the other forums", catrgory_id: Category.where(domain: Category::DOMAIN_FORUMS).first)
+Forum.create!(title: "General Discussion", description: "Anything that doesn't belong in the other forums", category: Category.where(domain: Category::DOMAIN_FORUMS).first)
 
 # Example Topic
 Topic.create!(title: "Hello World!", forum_id: Forum.first.id, user: User.first, first_post: "Hello World!")

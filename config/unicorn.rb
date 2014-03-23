@@ -2,6 +2,9 @@ worker_processes Integer(ENV['UNICORN_WORKERS'] || 3)
 timeout 30
 preload_app true
 
+listen ENV['UNICORN_PORT']
+listen ENV['UNICORN_SOCKET']
+
 before_fork do |server, worker|
   Signal.trap 'TERM' do
     puts 'Unicorn master intercepting TERM and sending myself QUIT instead'
