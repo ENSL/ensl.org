@@ -1,0 +1,30 @@
+<h1>
+  Issue: <%= h @issue %> (created <%= @issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %>)
+</h1>
+
+<h3><%= link_to "Back to the list of issues", issues_path %></h3>
+
+<div class="wide box">
+  <%= cascade @issue, [:author, :assigned, :category, "status_s"] %>
+
+  <p>
+    <% if @issue.can_update? cuser%>
+      <%= link_to 'Edit', edit_issue_path(@issue) %> |
+    <% end %>
+    <%= link_to 'Back', issues_path %>
+  </p>
+
+  <h3>
+    Issue details:
+  </h3>
+  <%= raw @issue.text_parsed %>
+
+  <% if @issue.solution and !@issue.solution.empty? %>
+    <h3>
+      Solution:
+    </h3>
+    <%= raw RbbCode::Parser.new.parse(@issue.solution) %>
+  <% end %>
+</div>
+
+<%= add_comments @issue %>

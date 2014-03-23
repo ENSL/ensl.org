@@ -1,0 +1,71 @@
+<div class="wide box">
+  <%= form_for(@forum) do |f| %>
+    <div id="error_explanation">
+      <ul>
+        <% @forum.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <p>
+      <%= f.label :title %><br />
+      <%= f.text_field :title %>
+    </p>
+    <p>
+      <%= f.label :description %><br />
+      <%= f.text_field :description %>
+    </p>
+    <p>
+      <%= f.label :category %><br />
+      <%= f.select :category_id, Category.domain(Category::DOMAIN_FORUMS).ordered.collect{|c| [c, c.id]} %>
+    </p>
+    <p>
+      <%= f.submit 'Save' %>
+    </p>
+  <% end %>
+</div>
+
+<% unless @forum.new_record? %>
+  <div class="wide box">
+    <h2>
+      Access Rights
+    </h2>
+
+    If no groups are specified, everyone is allowed for the specific access type.
+
+    <table class="data">
+      <tr>
+        <th>Group</th>
+        <th>Access Level</th>
+        <th>Options</th>
+      </tr>
+
+      <% @forum.forumers.each do |forumer| %>
+        <tr class="<%= cycle('even', 'odd') %>">
+          <%= form_for forumer do |g| %>
+            <td><%= namelink forumer.group %></td>
+            <td>
+              <%= g.select :access, forumer.accesses.invert, :size => 20 %>
+            </td>
+            <td>
+              <%= link_to_function "Update", "$('edit_forumer_#{forumer.id}').submit()" %>
+              <%= link_to "Remove", forumer, :method => :delete %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+
+    <%= form_for @forum.forumers.build do |f| %>
+      <%= f.error_messages %>
+      <%= f.hidden_field :forum_id %>
+      <p>
+        <%= f.label :group_id %><br />
+        <%= f.select :group_id, Group.all.collect{|g| [g, g.id]} %>
+        <%= f.select :access, f.object.accesses.invert, :size => 20 %>
+        <%= f.submit "Add" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,40 @@
+<h1>Editing: <%= h @contester.team.name %> in <%= h @contester.contest.name %></h1>
+
+<div class="wide box">
+  <%= form_for(@contester) do |f| %>
+    <div id="error_explanation">
+      <ul>
+        <% @contester.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <p>
+      <%= f.label :extra, "Extra Points" %><br />
+      <%= f.text_field :extra, :size => 5 %>
+    </p>
+    <p>
+      <%= f.label :score %><br />
+      <%= f.text_field :score, :size => 5 %>
+    </p>
+    <p>
+      <%= f.label :win %><br />
+      <%= f.text_field :win, :size => 5 %>
+    </p>
+    <p>
+      <%= f.label :loss %><br />
+      <%= f.text_field :loss, :size => 5 %>
+    </p>
+    <p>
+      <%= f.label :draw %><br />
+      <%= f.text_field :draw, :size => 5 %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Show', @contester %> |
+<%= link_to 'Back', @contester.contest %>

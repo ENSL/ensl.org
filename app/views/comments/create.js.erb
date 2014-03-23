@@ -1,0 +1,2 @@
+$("div.commentNew").hide();
+$("div.comments").append("<%= escape_javascript(render("comment", :comment => @comment)) %>");

@@ -1,0 +1,7 @@
+<h4>
+  <%= h @user.firstname %> "<%= h @user.username %>" <%= h @user.lastname %>
+</h4>
+(<%= time_ago_in_words(Time.now - ((Time.now - gatherer.user.lastvisit.to_time).round).seconds, true) %> )
+<p>
+  <%= if @user.team then namelink @user.team end %>
+  </p>

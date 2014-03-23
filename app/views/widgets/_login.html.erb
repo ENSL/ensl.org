@@ -1,0 +1,21 @@
+<div>
+  <%= form_tag :controller => "users", :action => "login" do %>
+    <table>
+      <tr>
+        <td id="links">
+          <%= link_to "Register", new_user_path %> <br />
+          <%= link_to "Forgot Password?", "/users/forgot/1" %>
+        </td>
+        <td>
+          <%= text_field "login", "username" %>
+        </td>
+        <td>
+          <%= password_field "login", "password" %>
+        </td>
+        <td>
+          <%= submit_tag raw("&#187;") %>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</div>

@@ -1,0 +1,38 @@
+<%= form_for(@poll) do |f| %>
+  <%= f.error_messages %>
+
+  <div class="box wide">
+    <p>
+      <%= f.label :question %><br />
+      <%= f.text_field :question %>
+    </p>
+    <p>
+      <%= f.label :end_date %><br />
+      <%= f.datetime_select :end_date %>
+    </p>
+    <br />
+  </div>
+
+  <div class="wide box">
+    <h3>
+      Options
+    </h3>
+
+    <div id="options">
+      <%= f.fields_for :options do |opt| %>
+        <%= render "option", :f => opt %>
+      <% end %>
+    </div>
+
+    <p>
+      <%= link_to_add_fields "Add an Option", f, :options %>
+    </p>
+
+  </div>
+
+  <p>
+    <%= f.submit 'Save' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', polls_path %>

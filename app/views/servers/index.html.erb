@@ -1,0 +1,35 @@
+<h1>
+  Listing servers
+</h1>
+
+<div id="serversTab">
+  <ul id="serversTab-nav" class="tabs">
+    <li><a href="#officials">ENSL NS2 Servers</a></li>
+    <li><a href="#ns2">All NS2 Servers</a></li>
+    <li><a href="#ns1">NS1 Servers</a></li>
+    <li><a href="#hltvs">HLTVs</a></li>
+  </ul>
+
+  <div class="box wide tabs">
+    <div class="tab" id="officials">
+      <%= render :partial => "server", :collection => @officials %>
+    </div>
+    <div class="tab" id="ns2">
+      <%= render :partial => "server", :collection => @ns2 %>
+    </div>
+
+    <div class="tab" id="ns1">
+      <%= render :partial => "server", :collection => @servers %>
+    </div>
+
+    <div class="tab" id="hltvs">
+      <%= render :partial => "server", :collection => @hltvs %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var tabber1 = new Yetii({id: 'serversTab'});
+</script>
+
+<%= link_to 'New server', new_server_path %>

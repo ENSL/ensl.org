@@ -1,0 +1,27 @@
+<table class="data">
+  <tr>
+    <th>Title</th>
+    <th>Category</th>
+    <th>Date</th>
+    <th>Author</th>
+    <th>Cmts.</th>
+    <th></th>
+  </tr>
+
+  <% articles.each do |article| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= namelink article, 35 %></td>
+      <td><%= namelink article.category %></td>
+      <td><%= shortdate article.created_at %></td>
+      <td><%= namelink article.user %></td>
+      <td><%= h article.comments.count %></td>
+      <td>
+        <% if article.can_update? cuser %>
+          <%= link_to 'Edit', edit_article_path(article) %>
+          <% end; if article.can_destroy? cuser %>
+          <%= link_to 'Destroy', article, :confirm => 'Are you sure?', :method => :delete %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

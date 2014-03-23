@@ -1,0 +1,13 @@
+<%= form_for(@post) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :topic_id %>
+  <p>
+    Topic: <%= namelink @post.topic %>
+</p>
+<p>
+  <%= f.text_area :text, :rows => 15, :cols => 108 %>
+</p>
+<p>
+  <%= f.submit 'Save' %>
+</p>
+<% end %>

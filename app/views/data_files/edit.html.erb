@@ -1,0 +1,59 @@
+<h1>Editing file</h1>
+
+<div class="wide box">
+  <%= form_for(@file) do |f| %>
+    <%= f.error_messages %>
+
+    <%= cascade @file, ["name", "size_s", "md5_s"] %>
+
+    <p>
+      <%= f.label :description %><br />
+      <%= f.text_field :description %>
+    </p>
+
+    <p>
+      <%= f.label :directory_id %><br />
+      <%= f.select :directory_id, Directory.all.collect{|c| ["#{c.path} - #{c.name}", c.id]} %>
+    </p>
+
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+</div>
+
+<div class="wide box">
+  <h3>
+    Related Files
+  </h3>
+
+  <table class="data">
+    <tr>
+      <th>Name</th>
+      <th>Size</th>
+      <th>Action</th>
+    </tr>
+    <% @file.related_files.each do |related| %>
+      <tr>
+        <td>
+          <%= h related.name.filename %>
+        </td>
+        <td>
+          <%= related.size_s %> MB
+        </td>
+        <td>
+          <%= link_to "Remove", :controller => "data_files", :action => "delFile", :id => @file, "related_id" => related %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+
+  <%= form_for @file, :url => {:action => "addFile", :id => @file} do |f| %>
+    <p>
+      <%= f.select :related_id, @file.directory.files.not(@file).collect {|file| [file, file.id]} %>
+      <%= f.submit "Add" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Show', @file %>

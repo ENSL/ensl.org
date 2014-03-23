@@ -1,0 +1,90 @@
+<div class="box wide center">
+  <h1 class="center">
+    Challenge:<br />
+    <%= namelink @challenge.contester1.team %>
+    vs
+    <%= namelink @challenge.contester2.team %>
+  </h1>
+
+  <% if @challenge.mandatory %>
+    <%= cascade @challenge, ["match_time", "default_time", "mandatory", :server] %>
+  <% else %>
+    <%= cascade @challenge, ["match_time", "mandatory", :server] %>
+  <% end %>
+
+  <p>
+    <b>Contest:</b>
+    <%= namelink @challenge.contester1.contest %>
+  </p>
+
+  <p>
+    <b>Maps:</b>
+    <%= namelink @challenge.map1 %>
+    <% if @challenge.map2 %>
+      , <%= namelink @challenge.map2 %>
+  <% end %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <% if @challenge.match %>
+    <%= link_to @challenge.statuses[@challenge.status], @challenge.match %>
+  <% else %>
+    <%= @challenge.statuses[@challenge.status] %>
+  <% end %>
+</p>
+
+<% if @challenge.contester1.team.is_leader? cuser and @challenge.response %>
+  <p>
+    <b>Details:</b><br />
+    <%= @challenge.response.bbcode_to_html %>
+  </p>
+<% elsif @challenge.contester2.team.is_leader? cuser and @challenge.details %>
+  <p>
+    <b>Details:</b><br />
+    <%= @challenge.details.bbcode_to_html %>
+  </p>
+<% end %>
+
+<% if @challenge.status == Challenge::STATUS_PENDING and @challenge.mandatory %>
+  <p>
+    <% if @challenge.autodefault.future? %>
+      Match will be forfeited for <%= namelink @challenge.contester1.team %> on <%= longtime @challenge.autodefault %>
+  <% elsif @challenge.status == Challenge::STATUS_ACCEPTED %>
+    Match was accepted and match arranged.
+  <% elsif @challenge.status == Challenge::STATUS_FORFEIT %>
+    Match was forfeited for <%= namelink @challenge.contester2.team %>.
+  <% end %>
+</p>
+        <% end %>
+
+        <br />
+
+        <% if @challenge.can_destroy? cuser %>
+          <p>
+            <%= link_to "Cancel challenge", @challenge, :confirm => 'Are you sure?', :method => :delete %>
+          </p>
+        <% end %>
+
+        <% if @challenge.can_update? cuser %>
+          <%= form_for @challenge do |f| %>
+            <p>
+              <%= f.label :response %><br />
+              <%= f.text_area :response, :rows => 5, :cols => 40 %>
+            </p>
+            <p>
+              <%= f.label :map2_id, "Your Map" %><br />
+              <%= f.select :map2_id, @challenge.contester1.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+            </p>
+            <%= submit_tag "Accept" %>
+            <% if @challenge.mandatory %>
+              <%= submit_tag "Default time" %>
+              <%= submit_tag "Forfeit" %>
+            <% else%>
+              <%= submit_tag "Decline" %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%= link_to 'Back to the contest', @challenge.contester1.contest %>

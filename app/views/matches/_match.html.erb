@@ -1,0 +1,27 @@
+<table id="matches" class="data">
+  <tr>
+    <th>Date and Time</th>
+    <th>Contest</th>
+    <th>Team 1</th>
+    <th>Team 2</th>
+    <th>Maps</th>
+    <th>Predictions</th>
+    <th>Score</th>
+  </tr>
+  <% matches.each do |match| %>
+    <tr class="<%=cycle('even', 'odd') %>">
+      <td><%= shorttime match.match_time%></td>
+      <td><%= link_to match.contest.short_name, :controller => :contests, :action => :show, :id => match.contest.id %></td>
+      <td><%= link_to match.contester1.team.tag, :controller => :contesters, :action => :show, :id => match.contester1 %></td>
+      <td><%= link_to match.contester2.team.tag, :controller => :contesters, :action => :show, :id => match.contester2 %></td>
+      <td><% if match.map1 and match.map2 %>
+        <%= link_to match.map1, :controller => :maps, :action => :show, :id => match.map1 %>, 
+        <%= link_to match.map2, :controller => :maps, :action => :show, :id => match.map2 %>
+      <% end %></td>
+    <td><%= match.preds(1) %>% - <%= match.preds(2) %>%</td>
+    <td><%= link_to match, :class => "bold #{match.score_color}" do %>
+      <%= h match.score1 %> - <%= h match.score2 %>
+    <% end %></td>
+</tr>
+  <% end %>
+</table>

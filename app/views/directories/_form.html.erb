@@ -1,0 +1,30 @@
+<div class="wide box">
+  <%= form_for @directory do |f| %>
+    <div id="error_explanation">
+      <ul>
+        <% @directory.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+    <% if @directory.new_record? %>
+      <%= f.hidden_field :parent_id %>
+    <% end %>
+
+    <p>
+      <b>Parent:</b> <%= @directory.parent.path %>
+  </p>
+
+  <p>
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </p>
+  <p>
+    <%= f.label :hidden %><br />
+    <%= f.check_box :hidden %>
+  </p>
+  <p>
+    <%= f.submit %>
+  </p>
+<% end %>
+</div>

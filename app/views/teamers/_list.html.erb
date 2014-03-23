@@ -1,0 +1,38 @@
+<table class="data">
+  <tr>
+    <th>&nbsp;</th>
+    <th>Member</th>
+    <% if cuser %>
+      <th>Name</th>
+    <% end %>
+    <th>Age</th>
+    <th>SteamID</th>
+    <th>Rank</th>
+    <% if comment %>
+      <th>Comment</th>
+    <% end %>
+    <th>Joined</th>
+  </tr>
+  <% teamers.each do |member| %>
+    <% next if blacklist and blacklist.exists? :user_id => member.user_id %>
+    <% next if member.user.nil? %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= flag member.user.country %></td>
+      <td><%= namelink member.user %></td>
+      <% if cuser %>
+        <td><%= h member.user.realname %></td>
+      <% end %>
+      <td><%= h member.user.age %></td>
+      <td><%= h member.user.steamid %></td>
+      <% if member.rank == Teamer::RANK_REMOVED %>
+        <td>Ex-Member</td>
+      <% else %>
+        <td><%= member.ranks[member.rank] %></td>
+      <% end %>
+      <% if comment %>
+        <td><%= h member.comment %></td>
+      <% end %>
+      <td><%= shortdate member.created_at %></td>
+    </tr>
+  <% end %>
+</table>

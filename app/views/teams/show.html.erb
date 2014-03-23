@@ -1,0 +1,108 @@
+<h1 class="center">
+  <%= h @team.name %>
+</h1>
+
+<% if @team.logo %>
+  <%= image_tag @team.logo.url, :class => "centered" %>
+<% end %>
+
+<br />
+
+<div id="teamTab">
+  <ul id="teamTab-nav" class="tabs">
+    <li><a href="#general">General</a></li>
+    <li><a href="#members">Members</a></li>
+    <li><a href="#matches">Matches</a></li>
+    <li><a href="#statistics">Statistics</a></li>
+  </ul>
+
+  <div class="box wide tabs">
+    <div class="tab" id="general">
+      <table class="split">
+        <tr>
+          <th>Irc:</th>
+          <td><%= h @team.irc %></td>
+        </tr>
+
+        <tr>
+          <th>Web:</th>
+          <td><%= h @team.web %></td>
+        </tr>
+
+        <tr>
+          <th>Tag:</th>
+          <td><%= h @team.tag %></td>
+        </tr>
+
+        <tr>
+          <th>Country:</th>
+          <td><%= h @team.country %></td>
+        </tr>
+
+        <tr>
+          <th>Founder:</th>
+          <td><%= namelink @team.founder %></td>
+        </tr>
+
+        <tr>
+          <th>Comment:</th>
+          <td><%= h @team.comment %></td>
+        </tr>
+
+        <% if @team.recruiting %>
+        <tr>
+          <th>Recruiting:</th>
+          <td><%= h @team.recruiting %></td>
+        </tr>
+      <% end %>
+      </table>
+
+      <p class="center">
+        <%= link_to "Send a message", :controller => "messages", :action => "new", :id => "Team", :id2 => @team %>
+      </p>
+    </div>
+
+    <div class="tab" id="members">
+      <h3 class="center">
+        Current Members
+      </h3>
+
+      <%= render :partial => "teamers/list", :locals => {:teamers => @team.teamers.active.ordered.distinct, :blacklist => false, :comment => true } %>
+
+      <h3 class="center">
+        Past Members
+      </h3>
+
+      <%= render :partial => "teamers/list", :locals => {:teamers => @team.teamers.past.distinct, :blacklist => @team.teamers.active.ordered.distinct, :comment => false} %>
+    </div>
+
+    <div class="tab" id="matches">
+      <% @team.contesters.chronological.each do |contester| %>
+        <% next if Match.finished.ordered.of_contester(contester).count == 0 %>
+        <h3>
+          <%= link_to contester.contest, contester.contest, :name => "contest_#{contester.contest.id}" %>
+        </h3>
+
+        <%= render :partial => "matches/list",
+          :locals => {:matches => Match.finished.ordered.of_contester(contester), :friendly => contester.team, :contest => false} %>
+      <% end %>
+    </div>
+
+    <div class="tab" id="matches">
+      <p>
+        <b>Matches:</b> <%= @team.matches_finished.count %> played  / <%=  @team.matches.count %> total<br />
+        - <b>Won:</b> <%=  @team.matches_won.count %> (<%= 100.0*@team.matches_won.count/@team.matches_finished.count %> %) <br />
+        - <b>Lost:</b> <%=  @team.matches_lost.count %> (<%= 100.0*@team.matches_lost.count/@team.matches_finished.count %> %) <br />
+        - <b>Draw:</b> <%=  @team.matches_draw.count %> (<%= 100.0*@team.matches_draw.count/@team.matches_finished.count %> %) <br />
+      </p>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var tabber1 = new Yetii({id: 'teamTab', active: 2});
+</script>
+
+<% if cuser and @team.can_update? cuser %>
+  <%= link_to 'Edit', edit_team_path(@team) %>
+<% end %>

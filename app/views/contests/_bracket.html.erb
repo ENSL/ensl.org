@@ -1,0 +1,30 @@
+
+<% if contest.status == Contest::STATUS_OPEN %>
+  <h3 class="center">
+    Signups
+  </h3>
+
+  <table class="data">
+    <tr>
+      <th width="5%">&nbsp;</th>
+      <th width="70%">Team</th>
+      <th>Founder</th>
+      <th>Members</th>
+    </tr>
+
+    <% contest.contesters.active.each do |contester| %>
+      <tr class="<%= cycle('even', 'odd') %>" height="18">
+        <td><%= flag contester.team.country %></td>
+        <td><%= link_to (h contester.team.name), contester %></td>
+        <td><%= namelink contester.team.founder %></td>
+        <td><%= contester.team.teamers.active.count %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<%= render :partial => "brackets/bracket", :collection => contest.brackets %>
+
+<% if cuser and cuser.admin? and params[:action] != "historical" %>
+  <%= link_to 'Edit', edit_contest_path(contest) %>
+<% end %>

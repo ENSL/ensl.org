@@ -1,0 +1,26 @@
+<div class="wide box">
+  <%= form_for(@week) do |f| %>
+    <%= f.error_messages %>
+    <%= f.hidden_field :contest_id %>
+
+    <p>
+      <%= f.label :name %><br />
+      <%= f.text_field :name %>
+    </p>
+    <p>
+      <%= f.label :start_date %><br />
+      <%= f.date_select :start_date %>
+    </p>
+    <p>
+      <%= f.label :map1_id, "1st map" %><br />
+      <%= f.select :map1_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+    </p>
+    <p>
+      <%= f.label :map2_id, "2nd map" %><br />
+      <%= f.select :map2_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+    </p>
+    <p>
+      <%= f.submit 'Save' %>
+    </p>
+  <% end %>
+</div>

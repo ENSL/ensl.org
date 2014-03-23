@@ -1,0 +1,69 @@
+<% if n > 0 or n == -1 %>
+  <tr>
+    <th class="seperator" colspan="2">
+    </th>
+  </tr>
+<% end %>
+
+<tr>
+  <td class="avatar" rowspan="2">
+    <h3 class="center">
+      <%= link_to post.user, post.user, :class => (post.user.admin? ? "red" : "") %>
+    </h3>
+
+    <%= image_tag post.user.profile.avatar.url, :class => "centered" %>
+
+    <% if post.user.team %>
+      <p class="center">
+        <%= namelink post.user.team %>
+      </p>
+    <% end %>
+    <%= cascade post.user, [["Posts", "posts.count"], "from", "joined"] %>
+  </td>
+
+  <th class="header">
+    <div class="left">
+      <a name="post_<%= post.id %>">
+        <%= longtime post.created_at %>
+      </a>
+    </div>
+
+    <div class="right">
+      <%= post.number @posts, n %>
+    </div>
+
+    <div class="clear"></div>
+  </th>
+</tr>
+
+<tr>
+  <td class="text" id="post_<%= post.id %>">
+    <%= raw post.text_parsed %>
+  </td>
+</tr>
+
+<tr>
+  <td class="actions center">
+    <%= link_to "Send PM", :controller => "messages", :action => "new", :id => "User", :id2 => post.user %>
+  </td>
+
+  <td class="signature">
+    <div class="left">
+      <%= raw post.user.profile.signature_parsed if post.user.profile.signature_parsed %>
+    </div>
+
+    <div class="right">
+      <% if post.topic.posts.build.can_create? cuser %>
+        <%= link_to_function 'QuoteReply', "QuoteText(#{post.id}); $('tr#reply').fadeIn('slow');" %>
+      <% end %>
+      <% if post.can_update? cuser %>
+        <%= link_to 'Edit', edit_post_path(post) %>
+      <% end %>
+      <% if post.can_destroy? cuser %>
+        <%= link_to 'Delete', post, :confirm => 'Are you sure?', :method => :delete %>
+      <% end %>
+    </div>
+
+    <div class="clear"></div>
+  </td>
+</tr>

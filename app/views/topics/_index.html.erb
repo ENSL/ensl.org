@@ -1,0 +1,7 @@
+<ol>
+  <% Topic.basic.recent.latest_page(page).each do |topic| %>
+    <li class="bold">
+      <%= link_to (h topic), lastpost(topic) %>
+    </li>
+  <% end %>
+</ol>

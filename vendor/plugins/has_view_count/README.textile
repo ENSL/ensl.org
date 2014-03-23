@@ -1,0 +1,53 @@
+h1. HasViewCount
+
+h3. Adds a polymorphic association that allows any model to have a unique visitor count (based on IP address)
+	
+
+
+h2. Installation
+
+<pre><code>script/plugin install git://github.com/citrus/has_view_count.git
+- or -
+git submodule add git://github.com/citrus/has_view_count.git vendor/plugins/has_view_count
+
+script/generate has_view_count
+rake db:migrate
+restart mongrel
+</code></pre>
+		
+_This will generate_
+		
+<pre><code>db/migrate/XXXXXXXXXXXXXX_has_view_count_migration.rb
+app/models/view_count.rb
+</code></pre>
+
+
+***************************************************************************	
+
+h2. Example
+
+
+h4. Model:
+
+<pre><code>class Post < ActiveRecord::Base
+  has_view_count
+end
+</code></pre>
+
+
+h4. Controller:
+
+<pre><code>class PostsController < ApplicationController
+	after_filter :record_view_count, :only => :show
+	...
+	...
+	...
+	private
+  def record_view_count
+  	@post.record_view_count(request.remote_ip, logged_in?) # use logged_in? if you have restful_authentication installed
+  end
+end
+</code></pre>
+
+
+_Copyright (c) 2009 Citrus Media Group / Spencer Steffen, released under the MIT license_

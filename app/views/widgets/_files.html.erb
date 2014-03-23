@@ -1,0 +1,10 @@
+<p class="bold">
+  Newest demos
+</p>
+<ul style="overflow: hidden;">
+  <% DataFile.demos.recent.each do |file| %>
+    <li><%= namelink file %></li>
+  <% end%>
+</ul>
+
+<%= link_to "More..", directories_path %>

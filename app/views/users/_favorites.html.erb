@@ -1,0 +1,7 @@
+<h2>
+  Favorites
+</h2>
+
+<div class="userFields">
+  <%= cascade @user.profile, ["hobby", "singleplayer", "multiplayer", "food", "beverage", "music", "book", "movie", "tvseries"] %>
+</div>

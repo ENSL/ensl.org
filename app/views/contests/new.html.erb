@@ -1,0 +1,36 @@
+<h1>New Contest</h1>
+
+<div class="box wide">
+  <%= form_for @contest do |f| %>
+    <%= f.error_messages %>
+    <p>
+      <%= f.label :name %><br />
+      <%= f.text_field :name %>
+    </p>
+    <p>
+      <%= f.label :contest_type %><br />
+      <%= f.select :contest_type, @contest.types.invert %>
+    </p>
+    <p>
+      <%= f.label :start %><br />
+      <%= f.datetime_select :start %>
+    </p>
+    <p>
+      <%= f.label :end %><br />
+      <%= f.datetime_select :end %>
+    </p>
+    <p>
+      <%= f.label :status %><br />
+      <%= f.select :status, @contest.statuses.invert %>
+    </p>
+    <p>
+      <%= f.label :default_time %><br />
+      <%= f.time_select :default_time %>
+    </p>
+    <p>
+      <%= f.submit 'Save' %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Back', contests_path %>

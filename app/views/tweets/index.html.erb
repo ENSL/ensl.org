@@ -1,0 +1,12 @@
+<% @tweets.each do |item| %>
+
+  <div class="box wide">
+    <h3>
+      <%= link_to (longtime item.created_at), item.link %>
+    </h3>
+    <p>
+      <%= raw h item.msg %>
+    </p>
+    <%= link_to "Comments: #{item.comments.count}", item %>
+  </div>
+<% end  %>

@@ -1,0 +1,119 @@
+<h4>Users / Age</h4>
+
+<table class="data">
+  <tr>
+    <th>Age</th>
+    <th>Number</th>
+  </tr>
+  <% User.with_age.each do |age| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= age.aged %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => age.num %>
+        <%= age.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h4>
+  Users / Country
+</h4>
+
+<table class="data">
+  <tr>
+    <th>Country</th>
+    <th>Number</th>
+  </tr>
+  <% User.country_stats.each do |user| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= user.country_s %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => user.num %>
+        <%= user.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h4>
+  Matches / Map
+</h4>
+
+<table class="data">
+  <tr>
+    <th>Map</th>
+    <th>Number</th>
+  </tr>
+  <% Match.map_stats.each do |item| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= h item.name %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => item.num %>
+        <%= item.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h4>
+  Matches / Years
+</h4>
+
+<table class="data">
+  <tr>
+    <th>Year</th>
+    <th>Number</th>
+  </tr>
+  <% Match.year_stats.each do |item| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= h item.year %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => item.num %>
+        <%= item.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h4>
+  Matches / Months
+</h4>
+
+<table class="data">
+  <tr>
+    <th>Year</th>
+    <th>Number</th>
+  </tr>
+  <% Match.month_stats.each do |item| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= h item.month %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => item.num %>
+        <%= item.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h4>
+  Matches / Player
+</h4>
+Up to May 2011.
+<table class="data">
+  <tr>
+    <th>Player</th>
+    <th>Number</th>
+  </tr>
+  <% Matcher.stats.each do |item| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= link_to (h item.username), user_path(item.user_id) %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => item.num %>
+        <%= item.num %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+

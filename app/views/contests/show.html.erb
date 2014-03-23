@@ -1,0 +1,190 @@
+<h1>
+  <%=h @contest.name %>
+</h1>
+
+<div class="box small right">
+  <h3 class="center">
+    Details
+  </h3>
+
+  <p>
+  <strong>From-to</strong>:<br />
+  <%= longdate @contest.start %> <br /> <%= longdate @contest.end %>
+  </p>
+
+  <p>
+  <strong>Rules</strong>:<br />
+  <%= namelink @contest.rules %>
+  </p>
+
+  <p>
+  <b>Status:</b><br />
+  <%= @contest.statuses[@contest.status] %>
+  </p>
+
+  <p>
+  <b>Default:</b><br />
+  Sunday: <%= h @contest.default_time.strftime("%H:%M") %>
+  </p>
+
+  <% if @contest.contest_type == Contest::TYPE_LADDER %>
+    <%= link_to "Scoring", "/contests/#{@contest}/score" %>
+  <% end %>
+
+  <% if cuser and cuser.admin? %>
+    <%= link_to 'Edit', edit_contest_path(@contest) %>
+  <% end %>
+</div>
+
+
+<% if @contest.contest_type == Contest::TYPE_BRACKET %>
+  <%= render :partial => "bracket", :locals => {:contest => @contest} %>
+<% else %>
+  <%= render :partial => "normal" %>
+<% end %>
+
+
+
+
+<div id="contestTab" class="clear wide">
+  <ul id="contestTab-nav" class="tabs">
+    <li><a href="#results">Matches</a></li>
+    <li><a href="#predictions">Predictions</a></li>
+    <li><a href="#maps">Maps</a></li>
+  </ul>
+
+  <div class="box wide2 tabs">
+    <div class="tab" id="results">
+      <h3>
+        Matches Played
+      </h3>
+
+      <% if @contest.weeks.count > 0 %>
+        <table class="data">
+          <% @contest.weeks.ordered.each do |week| %>
+            <% next if week.matches.count == 0 %>
+            <tr>
+              <th><%= week.name %></th>
+              <th>Date</th>
+              <th>Score</th>
+              <% if @contest.contest_type == Contest::TYPE_LADDER %>
+                <th>Points</th>
+              <% end %>
+            </tr>
+            <% week.matches.realfinished.ordered.reverse_each do |match| %>
+              <tr>
+                <td>
+                  <%= namelink match.contester1.team if match.contester1 %>
+                  vs
+                  <%= namelink match.contester2.team if match.contester1 %>
+                </td>
+                <td>
+                  <%= shorttime match.match_time %>
+                </td>
+                <td>
+                  <%= link_to match, :class => "bold #{match.score_color}" do %>
+                    <b><%= h match.score1 %> - <%= h match.score2 %></b>
+                  <% end %>
+
+                </td>
+                <% if @contest.contest_type == Contest::TYPE_LADDER %>
+                  <td>
+                    <%= match.points1 %> / <%= match.points2 %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          <% end %>
+        </table>
+      <% else %>
+        <table class="data">
+          <tr>
+            <th>Teams</th>
+            <th>Date</th>
+            <th>Score</th>
+            <% if @contest.contest_type == Contest::TYPE_LADDER %>
+              <th>Points</th>
+            <% end %>
+          </tr>
+
+          <% @contest.matches.realfinished.ordered.each do |match| %>
+            <tr>
+              <td>
+                <%= namelink match.contester1.team %>
+                vs
+                <%= namelink match.contester2.team %>
+              </td>
+              <td>
+                <%= shorttime match.match_time %>
+              </td>
+              <td>
+                <%= link_to(match) do %>
+                  <b><%= h match.score1 %> - <%= h match.score2 %></b>
+                <% end %>
+
+              </td>
+              <% if @contest.contest_type == Contest::TYPE_LADDER %>
+                <td>
+                  <%= match.points1 %> / <%= match.points2 %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      <% end %>
+
+      <% if @contest.matches.unfinished.ordered.count > 0 %>
+        <h3>
+          Matches to be played
+        </h3>
+
+        <table class="data">
+          <tr>
+            <th>Teams</th>
+            <th>Date</th>
+          </tr>
+
+          <% @contest.matches.unfinished.ordered.reverse_each do |match| %>
+            <tr>
+              <td>
+                <%= namelink match.contester1.team if match.contester1 %>
+                vs
+                <%= namelink match.contester2.team if match.contester2 %>
+              </td>
+              <td>
+                <%= link_to shorttime(match.match_time), match %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      <% end %>
+    </div>
+
+    <div class="tab" id="predictions">
+      <table class="data">
+        <tr>
+          <th>User</th>
+          <th>Result</th>
+        </tr>
+        <% @contest.preds_with_score.each do |prediction| %>
+          <tr>
+            <td><%= namelink prediction.user %></td>
+            <td><%= prediction.correct %> / <%= prediction.total %> correct (<%= prediction.score.to_f.round(2) %>%)</td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <div class="tab" id="maps">
+      <ul>
+        <% @contest.maps.each do |map| %>
+          <li><%= map %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var tabber1 = new Yetii({id: 'contestTab'});
+</script>

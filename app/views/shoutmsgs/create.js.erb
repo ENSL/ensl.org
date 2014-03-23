@@ -1,0 +1,8 @@
+<% if @shoutmsg.domain == "shoutbox" %>
+  $("div#shoutbox").prepend("<%= escape_javascript(render("shoutmsg", :shoutmsg => @shoutmsg)) %>");
+  $("form#new_shoutbox")[0].reset();
+<% else %>
+  $("div#<%= @shoutmsg.domain %>").append("<%= escape_javascript(render("shoutmsg", :shoutmsg => @shoutmsg)) %>");
+  $("div#<%= @shoutmsg.domain %>").scrollTop($("div#<%= @shoutmsg.domain %>")[0].scrollHeight);
+  $("form#new_<%= @shoutmsg.domain %>")[0].reset();
+<% end %>

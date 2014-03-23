@@ -1,0 +1,75 @@
+<p>
+  <%= link_to "Forums", :action => "index" %> &#187; <%= namelink @forum %>
+</p>
+
+<p>
+  <% if @forum.topics.build.can_create? cuser %>
+    <%= link_to 'New Topic', new_topic_url(:id => @forum.id) %>
+  <% end %>
+  <% if @forum.can_update? cuser %>
+    | <%= link_to 'Edit Forum', edit_forum_path(@forum) %>
+<% end %>
+<% if @forum.can_destroy? cuser %>
+  | <%= link_to 'Destroy Forum', @forum, :confirm => 'Are you sure?', :method => :delete %>
+<% end %>
+</p>
+
+
+<div class="forums">
+  <div class="category">
+    <table class="body">
+      <tr>
+        <th colspan="5" class="header">
+          <%= h @forum.title %>
+        </th>
+      </tr>
+      <tr>
+        <th width="50%">Topic</th>
+        <th class="center" width="15%">Author</th>
+        <th class="center" width="5%">Replies</th>
+        <th class="center" width="5%">Views</th>
+        <th class="center" width="15%">Last Post</th>
+      </tr>
+      <% @forum.topics.basic.ordered.each do |topic| %>
+        <tr>
+          <td>
+            <h3>
+              <% if topic.state == Topic::STATE_STICKY %>
+                <b>Sticky: </b>
+              <% elsif topic.lock %>
+                <b>Locked: </b>
+              <% end %>
+              <%= link_to (h topic), topic, :class => ((cuser and !topic.read_by? cuser) ? "red" : "") %>
+              <% if topic.posts.count > Topic::POSTS_PAGE %>
+                [
+                <% (1..((topic.posts.count/Topic::POSTS_PAGE).ceil+1)).to_a.each do |page| %>
+                  <%= ", " unless page == 1 %>
+                  <%= link_to page, topic_url(topic, :page => page) %>
+                <% end %>
+                ]
+              <% end %>
+            </h3>
+          </td>
+          <td><%= namelink topic.user %></td>
+          <td><%= h topic.posts.count-1 %></td>
+          <td><%= h topic.view_count %></td>
+          <td>
+            <%= link_to raw("#{h topic.posts.last.user} <br />#{shortdate topic.posts.last.created_at}"), lastpost(topic) %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <p>
+    <% if @forum.topics.build.can_create? cuser %>
+      <%= link_to 'New Topic', new_topic_url(:id => @forum.id) %>
+    <% end %>
+    <% if @forum.can_update? cuser %>
+      | <%= link_to 'Edit Forum', edit_forum_path(@forum) %>
+  <% end %>
+  <% if @forum.can_destroy? cuser %>
+    | <%= link_to 'Destroy Forum', @forum, :confirm => 'Are you sure?', :method => :delete %>
+<% end %>
+  </p>
+</div>

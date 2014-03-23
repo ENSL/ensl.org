@@ -1,0 +1,3 @@
+$("div#indexLatest").hide();
+$("div#indexLatest").html("<%= escape_javascript(render("widgets/#{@latest}")) %>");
+$("div#indexLatest").fadeIn();

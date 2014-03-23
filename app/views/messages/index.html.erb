@@ -1,0 +1,39 @@
+<h1>Received Messages (<%= cuser.new_messages.count %> unread / <%= cuser.received_messages.count %> total)</h1>
+
+<% cuser.received_messages.reverse_each do |message| %>
+  <div class="indented">
+    <div class="left">
+      <% if cuser.new_messages.include?(message) %>
+        <p class = "bold">
+        <% end %>
+        <%= namelink message %>
+        <span class="description">
+          <%= sanitize message.text[0, 20] %>
+        </span>
+        <% if cuser.new_messages.include?(message) %>
+        </p>
+      <% end %>
+    </div>
+    <div class="right">
+      (<%= namelink message.sender %> on <%= longdate message.created_at %>)
+    </div>
+    <br class="clear" />
+  </div>
+<% end %>
+
+<h1>Sent Messages (<%= cuser.sent_messages.count %> total)</h1>
+
+<% cuser.sent_messages.reverse_each do |message| %>
+  <div class="indented">
+    <div class="left">
+      <%= namelink message %>
+      <span class="description">
+        <%= sanitize message.text[0, 20] %>
+      </span>
+    </div>
+    <div class="right">
+      (<%= namelink message.recipient %> on <%= longdate message.created_at %>)
+    </div>
+    <br class="clear" />
+  </div>
+<% end %>

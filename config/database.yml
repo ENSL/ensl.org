@@ -1,0 +1,23 @@
+base: &db
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  host: localhost
+  username: <%= ENV['MYSQL_USERNAME'] %>
+  password: <%= ENV['MYSQL_PASSWORD'] %>
+
+development:
+  <<: *db
+  database: ensl_development
+
+test:
+  <<: *db
+  database: ensl_test
+
+staging:
+  database: ensl
+  <<: *db
+
+production:
+  database: ensl
+  <<: *db

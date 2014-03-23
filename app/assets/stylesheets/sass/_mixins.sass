@@ -1,0 +1,36 @@
+$text: #333333
+$bg_box: #fbfbfb
+$bg_sub: #fdfdfd
+
+@mixin header
+ font-weight: bold
+ margin: 0
+
+@mixin thin
+ padding: 0
+ margin: 0
+
+@mixin rounded-corners
+ border: 1px solid #cecece
+ border-radius: 5px
+
+@mixin shadow
+ -moz-box-shadow: 0 0 5px #cbcbcb
+ -webkit-box-shadow: 0 0 5px #cbcbcb
+ box-shadow: 0 0 5px #cbcbcb
+
+@mixin shadow-10px
+ -moz-box-shadow: 0 0 10px #cbcbcb
+ -webkit-box-shadow: 0 0 10px #cbcbcb
+ box-shadow: 0 0 10px #cbcbcb
+
+@mixin shadow-none
+ -moz-box-shadow: none
+ -webkit-box-shadow: none
+ box-shadow: none
+
+@mixin shaded-top
+ padding: 5px 10px 0px 10px
+ border-radius: 5px 5px 0px 0px
+ background: url('/images/icons/article_head.png') repeat-x
+ color: #ffffff

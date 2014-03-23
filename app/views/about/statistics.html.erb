@@ -1,0 +1,35 @@
+<h2 class="center">
+  Statistics
+</h2>
+
+<div class="wide box">
+  <div id="statsTab">
+    <ul id="statsTab-nav" class="tabs">
+      <li><a href="#GeneralTab">General</a></li>
+      <li><a href="#NS1Seasons">NS1 Seasons</a></li>
+      <li><a href="#NSLS1Tab">NSL S1</a></li>
+      <li><a href="#NSLS2Tab">NSL S2</a></li>
+    </ul>
+    <div class="box wide tabs">
+      <div class="tab" id="GeneralTab">
+        <h3 class="center">General Statistics</h3>
+        <%= render :partial => "about/general", :locals => {} %>
+      </div>
+      <div class="tab" id="NS1Seasons">
+        <h3 class="center">NS1 Seasons statistics</h3>
+        <%= render :partial => "about/contests", :locals => {:contests => Contest.ns1seasons} %>
+      </div>
+      <div class="tab" id="NSLS1Tab">
+        <h3 class="center">NSL Season 1 Statistics</h3>
+        <%= render :partial => "about/contests", :locals => {:contests => Contest.nsls1} %>
+      </div>
+      <div class="tab" id="NSLS2Tab">
+        <h3 class="center">NSL Season 2 Statistics</h3>
+        <%= render :partial => "about/contests", :locals => {:contests => Contest.nsls2} %>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    var tabber1 = new Yetii({id: 'statsTab'});
+    </script>
+  </div>

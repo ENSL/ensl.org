@@ -1,0 +1,21 @@
+<div class="commentBox centered">
+  <h5>
+    By: <%= namelink comment.user %>
+  <% if comment.user.team %>
+    ( <%= namelink comment.user.team %> )
+  <% end %>
+  on <%= shorttime comment.created_at %>
+<% if cuser %>
+  [ <%= link_to_function 'Q', "QuoteText('comments', #{comment.id}, '#{comment.user}')" %>
+<% if comment.can_update? cuser %>
+  <%= link_to 'E', edit_comment_path(comment) %>
+  <% end; if comment.can_destroy? cuser %>
+  <%= link_to 'D', comment, :confirm => 'Are you sure?', :method => :delete %>
+<% end %>
+]
+                <% end %>
+              </h5>
+              <div id="comment_<%= comment.id %>">
+                <%= raw comment.text_parsed %>
+              </div>
+            </div>

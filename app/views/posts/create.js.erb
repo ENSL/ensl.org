@@ -1,0 +1,2 @@
+$("tr#reply").hide();
+$("tbody#posts").append("<%= escape_javascript(render(:partial => "post", :locals => {:post => @post, :n => -1})) %>");

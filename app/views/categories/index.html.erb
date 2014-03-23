@@ -1,0 +1,29 @@
+<h1>Listing categories</h1>
+
+<% Category.new.domains.each do |key, domain| %>
+  <h3 class="center">
+    <%= h domain %>
+  </h3>
+
+  <table class="data">
+    <tr>
+      <th width="70%">Name</th>
+      <th width="30%">Options</th>
+    </tr>
+    <% @categories.each do |category| %>
+      <% if category.domain == key %>
+        <tr>
+          <td><%= h category.name %></td>
+          <td>
+            <%= link_to 'Edit', edit_category_path(category) %>
+            <%= link_to 'Up', :controller => :categories, :action => "up", :id => category.id %>
+            <%= link_to 'Down', :controller => :categories, :action => "down", :id => category.id %>
+            <%= link_to 'Delete', category, :confirm => 'Are you sure?', :method => :delete %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+<% end %>
+
+<%= link_to 'New category', new_category_path %>

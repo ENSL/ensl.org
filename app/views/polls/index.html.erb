@@ -1,0 +1,34 @@
+<h1>Listing polls</h1>
+
+<table class="data">
+  <tr>
+    <th>Question</th>
+    <th>End date</th>
+    <th>Votes</th>
+    <th>User</th>
+    <% if cuser and cuser.admin? %>
+      <th>Options</th>
+    <% end %>
+  </tr>
+
+  <% @polls.reverse_each do |poll| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= link_to (h poll.question), poll %></td>
+      <td><%= longtime poll.end_date %></td>
+      <td><%= h poll.votes %></td>
+      <td><%= h poll.user %></td>
+      <% if cuser and cuser.admin? %>
+        <td>
+          <%= link_to 'Edit', edit_poll_path(poll) %>
+          <%= link_to 'Destroy', poll, :confirm => 'Are you sure?', :method => :delete %>
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+
+<br />
+
+<% if cuser and cuser.admin? %>
+  <%= link_to 'New poll', new_poll_path %>
+<% end %>

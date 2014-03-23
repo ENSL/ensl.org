@@ -1,0 +1,11 @@
+<div class="wide">
+  <h1>
+    News Archive
+  </h1>
+
+  <%= render :partial => "list", :locals => {:articles => @news} %>
+
+  <% if cuser and cuser.admin? %>
+    <%= link_to 'New News', new_article_path %>
+  <% end %>
+</div>

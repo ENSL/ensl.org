@@ -1,0 +1,21 @@
+<h1>
+  <%=h @map.name %>
+</h1>
+
+<div class="wide box">
+  <p class="bold">
+    Download: <%= link_to (h @map.download), (h @map.download) %>
+</p>
+
+<p class="bold">
+  Used in contests:
+</p>
+<ul>
+  <% @map.contests.each do |contest| %>
+    <li><%= namelink contest %></li>
+  <% end %>
+</ul>
+</div>
+
+<%= link_to 'Edit', edit_map_path(@map) %> |
+<%= link_to 'Back', maps_path %>

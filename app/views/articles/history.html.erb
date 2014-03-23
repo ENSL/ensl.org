@@ -1,0 +1,19 @@
+<div class="box wide">
+  <h1>
+    History for <%= h @article.title %>
+</h1>
+
+<% @versions.each do |version| %>
+  <div class="indented">
+    <div class="left <%= "bold" if @article.version == version.version %>">
+      <%= link_to (h @article.title), article_version_url(@article, version) %>
+    </div>
+    <div class="right">
+      (<%= longtime version.updated_at %>)
+    </div>
+    <div class="clear">
+    </div>
+  </div>
+<% end %>
+<br />
+</div>

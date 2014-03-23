@@ -1,0 +1,89 @@
+<p>These statistics need to be taken lightly as people are allowed to join and quit teams at will, change nationality, etc... Especially the further in the past the contests, the more errors we get especially for teams which have played through multiple contests. Still, they provide an interesting imprecise overview.</p>
+
+<h4>
+  Overall statistics:
+</h4>
+
+<ul>
+  <li>Number of predictions:
+    <%= contests.all.inject(0) {|total_number, contest| total_number + contest.predictions.count}%>
+  </li>
+  <li>Total number of matches:
+    <%= contests.all.inject(0) {|total_number, contest| total_number + contest.matches.count}%>
+  </li>
+  <li>Number of matches actually played:
+    <%= contests.all.inject(0) {|total_number, contest| total_number + contest.matches.realfinished.count}%>
+  </li>
+  <li>Number of teams involved:
+    <% contesters = contests.collect{|contest| contest.contesters}.flatten! %>
+    <% contesters.uniq!{|c| c.team}%>
+    <%= contesters.count %>
+  </li>
+  <li>Number of players involved:
+    <% contesters_with_team = contesters.select{|contester| contester.team} %>
+    <%# teamers = contesters_with_teamers.collect {|contester| contester.team.teamers.active}.flatten! %>
+    <% teams_involved = contesters_with_team.collect{|contester| contester.team} %>
+
+    <% teamers_at_start = []%><% teamers_at_end = []%>
+    <% teams_involved.each do |team| %>
+      <% team.teamers.each do |teamer| %>
+        <% if teamer.user and teamer.user.id %>
+          <% teamers_at_start += Teamer.historic(teamer.user, contests.first.end) %>
+          <% teamers_at_end += Teamer.historic(teamer.user, contests.last.end) %>
+        <% end %>
+      <% end %>
+    <% end %>
+    <% teamers = (teamers_at_start + teamers_at_end) %>
+    <% total_users = teamers.collect{|teamer| teamer.user}.uniq %>
+  <%= total_users.count %>
+</li>
+</ul>
+
+<h4>
+  More statistics:
+</h4>
+
+<table class="data">
+  <tr>
+    <th>Age</th>
+    <th>Number</th>
+  </tr>
+  <% users = teamers.collect{|teamer| teamer.user} %>
+  <% ages = users.collect{|user| user.age} %>
+  <% User.with_age.each do |age| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= age.aged %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => ages.count(age.aged) %>
+        <%= ages.count(age.aged) %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<table class="data">
+  <tr>
+    <th>Country</th>
+    <th>Number</th>
+  </tr>
+  <% countries = users.collect{|user| user.country} %>
+  <% User.country_stats.each do |user| %>
+    <tr class="<%= cycle('odd', 'even')%>">
+      <td><%= user.country_s %></td>
+      <td>
+        <%= image_tag "/images/icons/article_head.png", :height => 6, :width => countries.count(user.country) %>
+        <%= countries.count(user.country) %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+
+<h4>
+  Contests used for the above statistics:
+</h4>
+<ul>
+  <% contests.each do |contest| %>
+    <li><%= link_to (h contest.name), contest %></li>
+  <% end %>
+</ul>

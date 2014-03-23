@@ -1,0 +1,24 @@
+<div class="box gatherLeftBox left">
+  <h2 class="center">
+    Signed Up
+  </h2>
+
+  <table id="gatherersTable">
+
+    <% @gather.gatherers.each do |gatherer| %>
+      <tr class="<%= cycle('even', 'odd') %>" height="18">
+        <td><%= flag gatherer.user.country %></td>
+        <td><%= namelink gatherer.user %></td>
+
+        <%# if gatherer.can_destroy? cuser %>
+        <% if cuser and cuser.admin? %>
+          <td>[<%= link_to "X", gatherer, :method => :delete %>]</td>
+        <% end %>
+      <% end %>
+
+    </table>
+  </div>
+
+  <%= render :partial => "votes" %>
+
+  <%= render :partial => "status" %>

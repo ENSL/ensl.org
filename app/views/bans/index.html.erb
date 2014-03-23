@@ -1,0 +1,11 @@
+<h1>Active bans</h1>
+
+<%= render :partial => "list", :locals => {:bans => @bans.effective} %>
+
+<br />
+
+<h1>Ban history</h1>
+
+<%= render :partial => "list", :locals => {:bans => @bans.ineffective} %>
+
+<%= link_to 'New ban', new_ban_path %>

@@ -1,0 +1,23 @@
+<% @contests.each do |contest| %>
+  <% next if contest.matches.finished.count == 0 %>
+  <div class="wide box">
+    <h2 class="center">
+      <%= namelink contest %>
+    </h2>
+    <div class="center">
+      <%= longdate contest.start %> - <%= longdate contest.end %>
+    </div>
+
+    <div class="wide centered">
+      <% if contest.contest_type == Contest::TYPE_BRACKET %>
+        <%= render :partial => "bracket", :locals => {:contest => contest} %>
+      <% else %>
+        <%= render :partial => "contesters/list", :locals => {:contesters => contest.contesters.active.ordered, :actions => false} %>
+      <% end %>
+    </div>
+
+    <div class="clear">
+    </div>
+  </div>
+  <br />
+<% end %>

@@ -1,0 +1,11 @@
+<h2>
+  Match History
+</h2>
+
+<% @user.match_teams.each do |team| %>
+  <h3>
+    <%= namelink team %>
+  </h3>
+
+  <%= render :partial => "matches/list", :locals => {:matches => Match.finished.ordered.of_userteam(@user, team), :friendly => team, :contest => true, :exclude_maps => true} %>
+<% end %>

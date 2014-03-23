@@ -1,0 +1,17 @@
+<div class="header">Latest articles</div>
+<div class="body">
+  <div class="content">
+    <h3>
+      Latest articles
+    </h3>
+    <ul>
+      <% Article.articles.nodrafts.nospecial.recent.each do |article| %>
+        <li class="<%= 'bold' if cuser and !article.read_by? cuser %>">
+          <%= namelink article %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<%= link_to "More..", articles_path %>

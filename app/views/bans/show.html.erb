@@ -1,0 +1,9 @@
+<h1>
+  Ban: <%= @ban.user %>
+</h1>
+
+<div class="wide box">
+  <%= cascade @ban, ["steamid", :user, "addr", :server, "expiry", "reason_b", "created_at"] %>
+</div>
+
+<%= link_to "Back", bans_url %>

@@ -1,0 +1,32 @@
+<table class="data">
+  <tr>
+    <th></th>
+    <th>Name</th>
+    <th>Irc</th>
+    <th>Members</th>
+    <% if cuser and cuser.admin? %>
+      <th>Options</th>
+    <% end %>
+  </tr>
+
+  <% for team in teams %>
+    <% if team.teamers_num > 0 %>
+      <tr class="<%= cycle('even', 'odd') %>">
+        <td><%= flag team.country %></td>
+        <td><%= namelink team %></td>
+        <td><%= h team.irc[0,15] if team.irc %></td>
+        <td><%= h team.teamers_num %></td>
+        <% if cuser and cuser.admin? %>
+          <td>
+            <%= link_to 'Edit', edit_team_path(team) %>
+            <% if team.active %>
+              <%= link_to 'Destroy', team, :confirm => 'Are you sure?', :method => :delete %>
+            <% else %>
+              <%= link_to 'Recover', :action => "recover", :id => team %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
