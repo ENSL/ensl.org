@@ -1,0 +1,34 @@
+<h1>
+  Draft Articles
+</h1>
+
+<% @articles.each do |key, articles| %>
+  <div class="box wide">
+    <h3>
+      <%= h key %>
+    </h3>
+
+    <table class="data">
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Created</th>
+        <th>Author</th>
+        <th>Options</th>
+      </tr>
+
+      <% for article in articles %>
+        <tr class="<%= cycle('even', 'odd') %>">
+          <td><%= namelink article %></td>
+          <td><%= h article.category %></td>
+          <td><%= shorttime article.created_at %></td>
+          <td><%= namelink article.user %></td>
+          <td>
+            <%= link_to 'Edit', edit_article_path(article) %>
+            <%= link_to 'Destroy', article, :confirm => 'Are you sure?', :method => :delete %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<% end %>

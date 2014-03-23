@@ -1,0 +1,22 @@
+<h2>
+  Predictions
+</h2>
+
+<div class="userData">
+  <table class="data">
+    <tr>
+      <th>Contest</th>
+      <th>Match</th>
+      <th>Predicted</th>
+    </tr>
+    <% @user.predictions.with_contest.each do |prediction| %>
+      <tr>
+        <td><%= namelink prediction.match.contest %></td>
+        <td><%= namelink prediction.match, 30 %></td>
+        <td class="bold <%= prediction.result == 1 ? 'green' : 'red' %>">
+          <%= prediction.score1 %> - <%= prediction.score2 %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

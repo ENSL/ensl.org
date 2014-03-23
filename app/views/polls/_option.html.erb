@@ -1,0 +1,8 @@
+<div class="option">
+  <p>
+    <%= f.hidden_field :poll_id %>
+    <%= f.text_field :option %>
+    <%= f.check_box :_destroy %>
+    <%= link_to_function "remove", "$(this).up('.option').remove()" %>
+  </p>
+</div>

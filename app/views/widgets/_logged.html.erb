@@ -1,0 +1,19 @@
+<div class="logged">
+  <%= form_tag :controller => "users", :action => "logout" do %>
+    <div class="button">
+      <%= link_to 'Profile', edit_user_path(cuser) %>
+    </div>
+    <div class="button">
+      <%= link_to 'Agenda', "/users/agenda/#{cuser.id}" %>
+    </div>
+    <div class="button">
+      <%= link_to 'PMs', messages_path() %>
+      <% if c = cuser.new_messages.count > 0 %>
+        (<%= cuser.new_messages.count %>)
+      <% end %>
+    </div>
+    <div class="button">
+      <%= link_to_function "Logout", '$(this).closest("form").submit();' %>
+    </div>
+  <% end %>
+</div>

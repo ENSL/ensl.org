@@ -1,0 +1,71 @@
+<h1>Editing group: <%= h @group.name %></h1>
+
+<div id="groupTab">
+  <ul id="groupTab-nav" class="tabs">
+    <li><a href="#groupTabGeneral">General</a></li>
+    <li><a href="#groupTabMembers">Members</a></li>
+  </ul>
+
+  <div class="box wide tabs">
+    <div class="tab" id="groupTabGeneral">
+      <%= form_for(@group) do |f| %>
+        <%= f.error_messages %>
+        <p>
+          <%= f.label :name %><br />
+          <%= f.text_field :name %>
+        </p>
+        <p>
+          <%= f.submit "Update" %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="tab" id="groupTabMembers">
+      <table class="data">
+        <tr>
+          <th>Username</th>
+          <th>Real Name</th>
+          <th>Task</th>
+          <th>Options</th>
+        </tr>
+
+        <% # TODO fixaa tämä
+          @group.groupers.each do |grouper| %>
+          <tr class="<%= cycle('even', 'odd') %>">
+            <%= form_for grouper do |g| %>
+              <td><%= namelink grouper.user %></td>
+              <td><%= h grouper.user.realname %></td>
+              <td>
+                <%= g.text_field :task, :size => 20 %>
+              </td>
+              <td>
+                <%#= link_to_function "Update", "$('edit_grouper_#{grouper.id}').submit()" %>
+                <%#= link_to "Update", group_path(@group, grouper => { :task => "truc" }), :method => :put %>
+                <%= g.submit "Update" %>
+                <%= link_to "Remove", grouper, :method => :delete %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+
+      <%= form_for @group.groupers.build do |f| %>
+        <%= f.hidden_field :group_id %>
+        <p>
+          Add a <%= link_to_function 'user', "findUser('username')" %>:
+          <%= f.text_field :username %></p>
+        <%= f.label :task %>
+        <%= f.text_field :task %>
+        <%= f.submit "Add" %>
+      </p>
+    <% end %>
+  </div>
+</div>
+</div>
+
+<script type="text/javascript">
+  var tabber1 = new Yetii({id: 'groupTab'});
+</script>
+
+<%= link_to 'Show', @group %> |
+<%= link_to 'Back', groups_path %>

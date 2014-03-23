@@ -1,0 +1,21 @@
+<h1>
+  Server Log: <%= h @server %>
+</h1>
+
+<div class="box wide">
+  <table class="data">
+    <tr>
+      <th width="10%">Date</th>
+      <th width="10%">Type</th>
+      <th width="80%">Message</th>
+    </tr>
+
+    <% @server.logs.each do |log| %>
+      <tr class="<%= cycle('even', 'odd') %>">
+        <td><%= shorttime log.created_at %></td>
+        <td><%= log.domains[log.domain] %></td>
+        <td><%= h log.text %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

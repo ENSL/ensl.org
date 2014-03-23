@@ -1,0 +1,19 @@
+<h2>
+  Articles
+</h2>
+
+<div class="userFields">
+  <% Category.of_user(@user).all.each do |category| %>
+    <h3>
+      <%= category %>
+    </h3>
+    <% @user.articles.category(category).ordered.limit(10).each do |article| %>
+      <div class="indented">
+        <div class="left">
+          <%= namelink article %>
+        </div>
+        <br class="clear" />
+      </div>
+    <% end %>
+  <% end %>
+</div>

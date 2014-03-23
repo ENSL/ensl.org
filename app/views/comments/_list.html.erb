@@ -1,0 +1,3 @@
+<% @comments.reverse_each do |comment| %>
+  <%= namelink comment.user %>: <%= comment.text_parsed %><br />
+<% end %>

@@ -1,0 +1,10 @@
+<ol>
+  <% Comment.recent3.filtered.each do |comment| %>
+    <li>
+      <b>
+        <%= namelink comment.commentable, 15 %>
+      </b>
+      by <%= namelink comment.user, 8 %>
+  </li>
+<% end %>
+</ol>

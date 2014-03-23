@@ -1,0 +1,36 @@
+@import _mixins.sass
+
+table
+  &.data
+    @include shadow
+    width: 100%
+    margin: 5px 3px 8px 3px
+    border-collapse: collapse
+    background-color: #fafafa
+    text-align: left
+    border: 1px solid #cecece
+    th
+      color: white
+      background-image: url('/images/icons/article_head.png')
+      background-repeat: repeat-x
+      a
+        color: white
+    tr
+      &.odd
+        background-color: #b0d1e8
+      &.even
+        background-color: #FFFFFF
+    td, th
+      padding: 2px 5px 2px 5px
+    tr
+      &.red
+        background-color: #FFC0CB
+        color: black
+      &.green
+        background-color: #bfffbf
+        color: black
+  &.split
+    width: 100%
+    th
+      text-align: right
+      width: 50%

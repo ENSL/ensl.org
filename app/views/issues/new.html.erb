@@ -1,0 +1,9 @@
+<h1>
+  <%= cuser and cuser.admin? ? "New Issue" : "Contact Form" %>
+</h1>
+
+<p>Do not forget to include contact details like a mail address or a steam account in case you do not own an ensl account.</p>
+
+<%= render :partial => "form" %>
+
+<%= link_to 'Back', issues_path %>

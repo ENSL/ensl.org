@@ -1,0 +1,40 @@
+# Rails, etc
+/coverage/
+/log/*
+/tmp/*
+/spec/tmp/*
+.env
+.tmp*
+.rspec
+.sass-cache
+*.sassc
+*.rbc
+*.sassc
+
+# OS X
+.DS_Store
+
+# Assets
+/public/system/*
+/public/files
+/public/files/*
+/public/local
+
+# RubyMine
+/.idea
+
+# VIM
+**.swp
+
+# Git junk
+**.orig
+
+# Bundler
+/.bundle
+/vendor/bundle/
+.bundle
+
+# Misc
+/index/*
+rerun.txt
+pickle-email-*.html

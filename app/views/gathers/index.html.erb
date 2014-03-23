@@ -1,0 +1,46 @@
+<h1>Gather Archive</h1>
+<h3>Players in bold were captains for their respective teams.</h3>
+
+<table class="data">
+  <tr>
+    <th>Date</th>
+    <th>Team1</th>
+    <th>Team2</th>
+    <th>Map</th>
+    <th>Server</th>
+  </tr>
+
+  <% @gathers.each do |gather| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= link_to gather.updated_at.strftime("%Y/%m/%d %H:%M:%S"), gather %></td>
+      <td>
+        <% gather.gatherers.each do |gatherer| %>
+          <% if gatherer.team == 1 %>
+            <% if gather.captain1 == gatherer %>
+              <b>
+              <% end %>
+              <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
+              <% if gather.captain1 == gatherer %>
+              </b>
+            <% end %>
+          <% end %>
+        <% end %>
+      </td>
+      <td>
+        <% gather.gatherers.each do |gatherer| %>
+          <% if gatherer.team == 2 %>
+            <% if gather.captain2 == gatherer %>
+              <b>
+              <% end %>
+              <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
+              <% if gather.captain2 == gatherer %>
+              </b>
+            <% end %>
+          <% end %>
+        <% end %>
+      </td>
+      <td><%= gather.map1 %></td>
+      <td><%= gather.server %></td>
+    </tr>
+  <% end %>
+</table>

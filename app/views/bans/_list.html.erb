@@ -1,0 +1,35 @@
+<table class="data">
+  <tr>
+    <th>User</th>
+    <th>Type</th>
+    <th>Expiry</th>
+    <th>Reason</th>
+    <% if cuser and cuser.admin? %>
+      <th>Actions</th>
+    <% end %>
+  </tr>
+
+  <% bans.each do |ban| %>
+    <tr class="<%= ban.color %>">
+      <td>
+        <% if ban.user %>
+          <%= link_to "#{ban.user}", ban %>
+        <% else %>
+          <%= link_to "# #{ban.id}", ban %>
+        <% end  %>
+      </td>
+      <td><%= ban.types[ban.ban_type] %></td>
+      <td><%= shorttime ban.expiry %></td>
+      <td><%= shorten ban.reason, 30 %> </td>
+      <% if cuser and cuser.admin? %>
+        <td>
+          <% if ban.can_update? cuser %>
+            <%= link_to 'E', edit_ban_path(ban) %>
+            <% end; if ban.can_destroy? cuser %>
+            <%= link_to 'D', ban, :confirm => 'Are you sure?', :method => :delete %>
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>

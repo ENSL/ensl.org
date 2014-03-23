@@ -1,0 +1,25 @@
+<div class="wide box">
+  <%= form_for @map, :html => { :multipart => true } do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :name %><br />
+      <%= f.text_field :name %>
+    </p>
+    <p>
+      <%= f.label :category_id %><br />
+      <%= f.select :category_id, Category.ordered.domain(Category::DOMAIN_GAMES).collect{|c| [c, c.id]} %>
+    </p>
+    <p>
+      <%= f.label :download %><br />
+      <%= f.text_field :download %>
+    </p>
+    <p>
+      <%= f.label :picture %><br />
+      <%= f.file_field :picture %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+</div>

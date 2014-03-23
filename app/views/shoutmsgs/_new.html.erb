@@ -1,0 +1,17 @@
+<% if cuser %>
+  <% if cuser.banned? Ban::TYPE_MUTE %>
+    You have been muted.
+  <% else %>
+    <% scroll = shoutmsg.domain == "shoutbox" ? "" : "$('#{shoutmsg.domain}').scrollTop = $('#{shoutmsg.domain}').scrollHeight;" %>
+    <%= form_for(shoutmsg, :remote => true, :html => {:id => "new_#{shoutmsg.domain}"}) do |f| %>
+      <% if shoutmsg.shoutable %>
+        <%= f.hidden_field :shoutable_type %>
+        <%= f.hidden_field :shoutable_id %>
+      <% end %>
+      <p>
+        <%= f.text_field :text, :size => 12, :id => "#{shoutmsg.domain}_text" %>
+        <%= submit_tag "Shout!" %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>

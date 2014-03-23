@@ -1,0 +1,17 @@
+<h1>
+  Recent comments
+</h1>
+
+<% @comments.each do |comment| %>
+  <div class="box wide">
+    <h3>
+      <%= namelink comment.user %>
+      on <%= namelink comment.commentable %>
+    ( <%= longtime comment.created_at %> )
+  </h3>
+
+  <p>
+    <%= comment.text_parsed %>
+  </p>
+</div>
+<% end %>

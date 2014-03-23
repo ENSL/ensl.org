@@ -1,0 +1,45 @@
+<table class="brackets">
+  <% rows = bracket.slots*2-1 %>
+  <% cols = 2+(bracket.slots/4) %>
+  <% content = Array.new((bracket.slots*2-1)/4) %>
+  <% (0..rows).each do |row| %>
+    <tr>
+      <% (0..cols).each do |col| %>
+        <% exp = 2**(col+1) %>
+        <% element_class = "empty" %>
+        <% bracketer = bracket.get_bracketer(row, col) %>
+
+        <% if (row % exp) == exp/2 %>
+          <% if bracketer %>
+            <% element_class = "team" %>
+          <% else %>
+            <% element_class = "empty" %>
+          <% end %>
+        <% elsif ( (((row+exp/2) - (row+exp/2) % exp) / exp) % 2 == 1 ) and col < cols-1 %>
+          <% if ( (((row+exp/2) - (row+exp/2) % exp) / exp) % 2 == 1 ) and col < cols-1 %>
+            <% element_class = "connector" %>
+          <% end %>
+        <% end %>
+
+        <td class="<%= element_class %>">
+          <% if element_class == "team" %>
+            <% if params[:action] == "edit" %>
+              <%= select_tag "cell[#{row}][#{col}]", options_for_select(bracket.options, :selected => bracket.default(row, col)) %>
+            <% elsif bracketer %>
+              <% if bracketer.match %>
+                <%= link_to bracketer, bracketer.match %>
+              <% elsif bracketer.contester %>
+                <table>
+                  <tr></tr>
+                  <td><%= flag bracketer.contester.team.country %></td>
+                  <td><%= link_to bracketer, bracketer.contester %></td>
+                </table>
+              <% end %>
+            <% end %>
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+
+</table>

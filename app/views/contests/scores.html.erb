@@ -1,0 +1,53 @@
+<div class="wide box">
+  <%= form_tag do %>
+    <%= label_tag :friendly, "Friendly team" %>
+    <%= select_tag :friendly, options_from_collection_for_select(@contest.contesters, :id, :to_s) %>
+    <%= label_tag :weight %>
+    <%= text_field_tag :weight, @weight %>
+    <br />
+    <b>Modulus for score difference (R)</b>:
+    <%= label_tag "rounds[0]", "Even" %>
+    <%= text_field_tag "rounds[0]", @rounds[0], :size => 1	%>
+    <%= label_tag "rounds[1]", "3-1" %>
+    <%= text_field_tag "rounds[1]", @rounds[1], :size => 1 %>
+    <%= label_tag "rounds[2]", "4-0" %>
+    <%= text_field_tag "rounds[2]", @rounds[2], :size => 1 %>
+    <%= submit_tag "Calculate" %>
+  <% end %>
+  <table class="data">
+    <tr>
+      <th>Team</th>
+      <th>Score</th>
+      <th>4-0</th>
+      <th>3-1</th>
+      <th>2-2</th>
+      <th>1-3</th>
+      <th>0-4</th>
+    </tr>
+    <% @contest.contesters.active.ordered.each do |contester| %>
+      <tr>
+        <td>
+          <%= namelink contester %>
+        </td>
+        <td>
+          <%= contester.total %>
+        </td>
+        <td>
+          <%= (@contest.elo_score 4, 0, contester.score-@friendly.score, @contest.modulus_base, @weight, @rounds).round + @contest.modulus_base/10 %>
+        </td>
+        <td>
+          <%= (@contest.elo_score 3, 1, contester.score-@friendly.score, @contest.modulus_base, @weight, @rounds).round + @contest.modulus_base/10 %>
+        </td>
+        <td>
+          <%= (@contest.elo_score 2, 2, contester.score-@friendly.score, @contest.modulus_base, @weight, @rounds).round + @contest.modulus_base/10 %>
+        </td>
+        <td>
+          <%= (@contest.elo_score 1, 3, contester.score-@friendly.score, @contest.modulus_base, @weight, @rounds).round + @contest.modulus_base/10 %>
+        </td>
+        <td>
+          <%= (@contest.elo_score 0, 4, contester.score-@friendly.score, @contest.modulus_base, @weight, @rounds).round + @contest.modulus_base/10 %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

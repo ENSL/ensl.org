@@ -1,0 +1,16 @@
+<div class="header">Latest Movies</div>
+<div class="body">
+  <div class="content">
+    <% Movie.recent.ordered.limit(3).each do |movie| %>
+      <div class="movie">
+        <p>
+          <%= image_tag movie.picture.url, :width => 100, :height => 75 %>
+        </p>
+        <%= namelink movie %>
+      </div>
+    <% end %>
+    <p>
+      <%= link_to "More..", movies_path %>
+    </p>
+  </div>
+</div>

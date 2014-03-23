@@ -1,0 +1,20 @@
+<div class="wide box">
+  <h1>
+    Admin Menu
+  </h1>
+  <ul>
+    <li><%= link_to 'New Article', new_article_path %></li>
+    <li><%= link_to "Article Admin", :controller => "articles", :action => "admin" %></li>
+    <li><%= link_to "File Admin", :controller => "files", :action => "admin" %></li>
+    <li><%= link_to issues_path do %>
+      Issues (<%= Issue.with_status(0).count %>)
+    <% end %></li>
+  <li><%= link_to "Bans", bans_path %></li>
+  <li><%= link_to "Groups", groups_path %></li>
+  <li><%= link_to "Categories", categories_path %></li>
+  <li><%= link_to "Polls", polls_path %></li>
+  <li><%= link_to "Contests", contests_path %></li>
+  <li><%= link_to "Challenges", challenges_path %></li>
+  <li><%= link_to "Maps", maps_path %></li>
+</ul>
+</div>

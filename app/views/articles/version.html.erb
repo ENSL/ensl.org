@@ -1,0 +1,12 @@
+<div class="article">
+  <div class="box">
+    <% if @version.text_coding == Article::CODING_HTML %>
+      <%= raw @version.text %>
+    <% else %>
+      <%= raw @version.text_parsed %>
+    <% end %>
+  </div>
+  <% if @article.can_update? cuser %>
+    <%= link_to "Revert", article_version_url(@article, @version), :method => :put %>
+  <% end %>
+</div>

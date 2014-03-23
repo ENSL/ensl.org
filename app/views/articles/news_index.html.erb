@@ -1,0 +1,11 @@
+<div class="clear" id="newsContent">
+  <% @news.each do |n| %>
+    <%= render :partial => "article", :locals => {:article => n} %>
+  <% end %>
+</div>
+
+<%= link_to 'Archive', '/news/archive' %>
+
+<% if cuser and cuser.admin? %>
+  | <%= link_to 'New News', new_article_path %>
+<% end %>

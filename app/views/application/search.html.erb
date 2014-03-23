@@ -1,0 +1,25 @@
+<h1>
+  ENSL Search
+</h1>
+
+<div class="wide box">
+  <%= form_tag :remote => true,
+    :update => 'searchResults',
+    :before => "Element.show('spinner')",
+    :success => "Element.hide('spinner')" do |f| %>
+    <%= select_tag :domain, options_for_select({"Articles" => "articles", "Comments" => "comments", "Forums" => "forums"}) %>
+    <%= label_tag :query, "Search:" %>
+    <%= text_field_tag "query", params['query'], :size => 30 %>
+  <% end %>
+
+  <%= image_tag "icons/spinner.gif",
+    :align => "absmiddle",
+    :id => "spinner",
+    :style =>"display: none;" %>
+
+  <div id="searchResults">
+    <% unless @results.nil? %>
+      <%= render :partial => "results" %>
+    <% end %>
+  </div>
+</div>

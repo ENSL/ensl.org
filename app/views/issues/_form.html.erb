@@ -1,0 +1,36 @@
+<div class="wide box">
+  <%= form_for(@issue) do |f| %>
+    <%= f.error_messages %>
+    <p>
+      <%= f.label :title %><br />
+      <%= f.text_field :title %>
+    </p>
+    <% if cuser and cuser.admin? %>
+      <p>
+        <%= f.label :status %><br />
+        <%= f.select :status, @issue.statuses.invert %>
+      </p>
+      <p>
+        <%= link_to_function 'Assigned', "findUser('assigned')" %><br />
+        <%= f.text_field :assigned_name, {:value => User.first(:conditions => {:id => @issue.assigned})} %>
+      </p>
+    <% end %>
+    <p>
+      <%= f.label :category_id %><br />
+      <%= f.select :category_id, Category.domain(Category::DOMAIN_ISSUES).ordered.collect{|c| [c, c.id]} %>
+    </p>
+    <p>
+      <%= f.label :text %><br />
+      <%= f.text_area :text %>
+    </p>
+    <% if cuser and cuser.admin? %>
+      <p>
+        <%= f.label :solution %><br />
+        <%= f.text_area :solution %>
+      </p>
+    <% end %>
+    <p>
+      <%= f.submit 'Save' %>
+    </p>
+  <% end %>
+</div>

@@ -1,0 +1,93 @@
+<h1>Files</h1>
+
+<% active = 1; n = 1; %>
+
+<div id="filesTab">
+  <ul id="filesTab-nav" class="tabs">
+    <% @directories.each do |dir| %>
+      <li><a href="#dir_<%= dir.id %>"><%= h dir.name %></a></li>
+    <% end %>
+  </ul>
+
+  <div class="tabs">
+    <% @directories.each do |dir| %>
+      <div class="box wide tab" id="dir_<%= dir.id %>">
+        <%
+            if @directory.path.include?(dir.path)
+              dir = @directory
+              active = n
+        end
+        n = n + 1
+      %>
+
+    <% if !dir.subdirs.ordered.empty? or dir.parent.id != Directory::ROOT %>
+      <h3>
+        Directories
+      </h3>
+    <% end %>
+
+    <% if dir.parent.id != Directory::ROOT %>
+      <div class="box sub wide">
+        <h3>
+          <%= link_to "Parent", dir.parent %>
+        </h3>
+      </div>
+    <% end %>
+
+    <% dir.subdirs.ordered.each do |subdir| %>
+      <div class="box sub wide">
+        <h3>
+          <%= namelink subdir %>
+        </h3>
+      </div>
+    <% end %>
+
+    <div></div>
+    <h3>
+      Files
+    </h3>
+
+    <% dir.files.unrelated.each do |file| %>
+      <div class="box sub wide">
+        <div class="left">
+          <h3>
+            <%= namelink file %>
+          </h3>
+
+          <p>
+            <b>Size: </b> <%= file.size_s %> MB, <b>Comments: </b> <%= file.comments.count %> <br />
+            <b>MD5: </b> <%= file.md5_s %><br />
+          </p>
+
+          <%= link_to "Direct Download", file.url, :class => "green" %>
+
+          <% if file.can_update? cuser %>
+            [ <%= link_to 'Edit', edit_data_file_path(file) %> ]
+            <% end; if file.can_destroy? cuser %>
+            [ <%= link_to 'Destroy', file, :confirm => 'Are you sure?', :method => :delete %> ]
+          <% end %>
+        </div>
+        <div class="clear"></div>
+      </div>
+    <% end %>
+
+    <% if dir.files.empty? %>
+      <p>Empty directory.</p>
+    <% end %>
+
+    <% if cuser and cuser.admin? %>
+      <p>
+        <%= link_to "Edit Directory", edit_directory_path(dir) %> |
+        <%= link_to "Delete Directory", dir, :confirm => "Are you REALLY sure?", :method => :delete %> |
+        <%= link_to "New Directory", :controller => "directories", :action => "new", :id => dir %> |
+        <%= link_to "New File", :controller => "data_files", :action => "new", :id => dir %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        var tabber1 = new Yetii({ id: 'filesTab', active: <%= active %>});
+      </script>

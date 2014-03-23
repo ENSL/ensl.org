@@ -1,0 +1,25 @@
+<h1>Editing topic</h1>
+
+<div class="wide box">
+  <%= form_for(@topic) do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :title %><br />
+      <%= f.text_field :title %>
+    </p>
+    <p>
+      <%= f.label :forum_id %><br />
+      <%= f.select :forum_id, Forum.all.collect{|forum| [forum, forum.id]} %>
+    </p>
+    <p>
+      <%= f.label :state %><br />
+      <%= f.select :state, f.object.states.invert %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Back', @topic %>

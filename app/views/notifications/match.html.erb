@@ -1,0 +1,9 @@
+There are is a new <%= link_to "match", "http://www.ensl.org/matches/#{@match.id}" %> on ENSL.<br />
+<br />
+<b>Contest:<b/> <%= link_to (h @match.contest), "http://www.ensl.org/contests/#{@match.contest.id}" %><br />
+    <b>Teams</b> <%= h @match.to_s %><br />
+    <b>Date:</b> <%= @match.match_time.strftime("%d %B %y %H:%M") %><br />
+    <br />
+    <% if @match.hltv %>
+      <b>HLTV: </b> <%= h @match.hltv.addr %> (<%= link_to (h @match.hltv), "http://www.ensl.org/servers/#{@match.hltv.id}" %>)
+    <% end %>

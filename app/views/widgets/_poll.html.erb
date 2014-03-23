@@ -1,0 +1,7 @@
+<div class="header">Poll</div>
+<div class="body">
+  <div class="content">
+    <% @poll = Poll.first :order => "created_at DESC" %>
+    <%= render :partial => "polls/show" %>
+  </div>
+</div>

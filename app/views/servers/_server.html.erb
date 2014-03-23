@@ -1,0 +1,48 @@
+<div class="wide sub box">
+  <div class="small2 left">
+    <h3 class="center">
+      <%= namelink server %>
+    </h3>
+
+    <% if m = Map.find_by_name(server.map) and m.picture %>
+      <%= image_tag m.picture.url, :width => 140, :height => 90, :class => "centered" %>
+    <% else %>
+      <b>Description: </b><%= server.description %>
+  <% end %>
+</div>
+
+<div class="small2 left">
+  <h3 class="center">
+    Details
+  </h3>
+
+  <p>
+    <b>IP:</b>
+    <%= h server.ip %>:<%= h server.port %>
+  </p>
+
+  <%= cascade server, ["dns", "password", "irc", ["Owner", :user]] %>
+  <% if server.domain == Server::DOMAIN_HLDS or server.domain == Server::DOMAIN_HLTV %>
+    <%= link_to "Click to connect", "steam://connect/#{server.addr}" %>
+  <% else %>
+    <%= link_to "Click to connect", "steam://run/4920//connect #{server.ip} #{server.password}" %>
+  <% end %> 
+</div>
+
+<div class="small2 left">
+  <h3 class="center">
+    Stats
+  </h3>
+
+  <% if server.domain == Server::DOMAIN_HLDS or server.reservation %>
+    <%= cascade server, ["ping", "map", "players_s", "recording_s", ["Connected to", "reservation_s"]] %>
+  <% end %>
+</div>
+
+<div class="clear center">
+  <% if cuser and server.can_update? cuser %>
+    <%= link_to "Edit", edit_server_path(server) %>
+  <% end %>
+</div>
+
+</div>

@@ -1,0 +1,32 @@
+<% captain = team == 1 ? @gather.captain1 : @gather.captain2 %>
+<% pick = false %>
+
+<h2 class="center">
+  <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
+  </h2>
+
+  <%= form_tag("/gathers/pick/#{@gather.id}") do %>
+
+    <table id="gatherersTable">
+      <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
+        <tr height="10">
+          <% if @gatherer and gatherer.can_update? cuser, {:team => @gatherer.team} %>
+            <% pick = true %>
+            <td><%= radio_button_tag :player, gatherer.id %><%= flag gatherer.user.country %></td>
+            <td><%= namelink gatherer.user %></td>
+          <% else %>
+            <td><%= flag gatherer.user.country %></td>
+            <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
+              <td>&#187;
+              <% else %>
+                <td>
+                <% end %>
+                <%= namelink gatherer.user %><%= " (C)" if gatherer == captain %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        <% if pick %>
+          >> <a href="javascript:;" class="submit">Pick</a>
+        <% end %>
+      </table>
+    <% end %>

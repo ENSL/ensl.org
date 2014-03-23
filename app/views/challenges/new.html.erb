@@ -1,0 +1,48 @@
+<h1>
+  New challenge
+</h1>
+
+<div class="wide box">
+  <%= form_for @challenge do |f| %>
+    <%= f.error_messages %>
+    <%= f.hidden_field :contester1_id %>
+    <%= f.hidden_field :contester2_id %>
+
+    <div class="contentWide">
+      <% if @challenge.errors.empty? or @challenge.server %>
+        <h3 class="center">
+          <%= namelink @challenge.contester1.team %>
+          vs
+          <%= namelink @challenge.contester2.team %>
+        </h3>
+
+        <p>
+          <%= f.label :match_time %><br />
+          <%= f.datetime_select :match_time %>
+        </p>
+        <p>
+          <%= f.check_box :mandatory %>
+          <%= f.label :mandatory %>
+          ( Default time will be following Sunday <%= @challenge.contester1.contest.default_time.strftime("%H:%M") %> )
+        </p>
+        <p>
+          <%= f.label :server_id %><br />
+          <%= f.select :server_id, Server.hlds.active.collect{|c| [c.name, c.id]} %>
+        </p>
+        <p>
+          <%= f.label :map1_id, "Your Map" %><br />
+          <%= f.select :map1_id, @challenge.contester1.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+        </p>
+        <p>
+          <%= f.label :details, "Information for the opponent" %><br />
+          <%= f.text_area :details, :cols => 40, :rows => 7 %>
+        </p>
+        <p>
+          <%= f.submit 'Create' %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%= link_to 'Back', @challenge.contester1.contest %>

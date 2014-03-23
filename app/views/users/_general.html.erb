@@ -1,0 +1,89 @@
+<h2>
+  General information
+</h2>
+
+<div class="userFields">
+  <%= cascade @user, ["steamid"] %> 
+  <%= link_to "http://steamidfinder.com/?STEAM_#{@user.steamid}" do %>
+    <small>Search for corresponding Steam account</small>
+  <% end %>
+  <%= cascade @user, ["age"] %>
+  <%= cascade @user, ["country"] %>
+  <%= cascade @user.profile, ["town"] %>
+</div>
+
+<h3>
+  Miscellaneous
+</h3>
+
+<div class="userFields">
+  <p>
+    <b>Joined:</b> <%= longtime @user.created_at %>
+</p>
+
+<p>
+  <b>Lastvisit:</b> <%= longtime @user.lastvisit %>
+  </p>
+
+  <% if cuser and cuser.admin? %>
+    <p>
+      <b>Last ip</b> <%= @user.lastip %>
+  </p>
+<% end %>
+
+<%= cascade @user, [ ["Comments", "posted_comments.count"], ["Matches", "matches.count"]] %>
+
+<% if @user.groups.count > 0 %>
+  <p>
+    <b>Groups:</b>
+    <% for group in @user.groups.all %>
+      <%= namelink group %>
+    <% end %>
+  </p>
+<% end %>
+
+<% if @user.teamers.active.count > 0 %>
+  <p>
+    Teams:
+    <% @user.teamers.active.each do |teamer| %>
+      <%= namelink teamer.team %>
+    <% end %>
+  </p>
+<% end %>
+</div>
+
+<h3>
+  Contact
+</h3>
+
+<div class="userFields">
+  <%= cascade @user.profile, ["irc", "msn", "icq", "web"] %>
+
+  <% if cuser and cuser.admin? or @user.public_email %>
+    <%= cascade @user, ["email_s"] %>
+  <% end %>
+  <% if @user.profile.steam_profile and @user.profile.steam_profile != "" %>
+    <p>
+      <b>Steam:</b>
+      <% if @user.profile.steam_profile.match(/\A[0-9]*\z/) %>
+        <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/profiles/#{@user.profile.steam_profile}" %>
+      <% elsif @user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
+        <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/id/#{@user.profile.steam_profile}" %>
+      <% end %>
+    </p>
+  <% end %>
+
+  <p>
+    <%= link_to "Send PM", :controller => "messages", :action => "new", :id => "User", :id2 => @user %>
+  </p>
+</div>
+
+<% if @user.profile.achievements and !@user.profile.achievements.empty? %>
+  <h3>
+    Achievements
+  </h3>
+
+  <div class="userFields">
+    <%= raw @user.profile.achievements_parsed %>
+  </div>
+<% end %>

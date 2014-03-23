@@ -1,0 +1,40 @@
+div
+  &#roundEvents
+    margin: 0 auto 0 auto
+    width: 530px
+  &#roundTimeline
+    background-color: black
+    background-image: url('/images/icons/round_timeline.gif')
+    background-repeat: repeat-y
+    width: 5px
+    height: 100px
+    margin-top: 0
+    float: left
+  &#roundAliens, &#roundMarines
+    float: left
+    width: 250px
+    background-color: black
+  &.roundEvent
+    height: 15px
+    width: 100px
+    padding: 0 2px 0 2px
+    font-size: 8px
+    text-align: center
+    overflow: visible
+    white-space: nowrap
+    vertical-align: middle
+    background: black
+  &.roundFrag
+    span
+      display: inline-block
+      padding-top: 2px
+      vertical-align: top
+    img
+      padding: 0 1px 0 1px
+      margin: 0
+  &#roundAliens div.roundEvent
+    color: #fdbf31
+    text-align: right
+  &#roundMarines div.roundEvent
+    color: #0080c0
+    text-align: left

@@ -1,0 +1,28 @@
+<div class="wide box">
+  <h2>Registration</h2>
+  <%= form_for @user do |f| %>
+    <%= f.error_messages %>
+    <p>
+      <%= f.label :username %><br />
+      <%= f.text_field :username %>
+    </p>
+    <p>
+      <%= f.label :raw_password, "Password" %><br />
+      <%= f.password_field :raw_password %>
+    </p>
+    <p>
+      <%= f.label :email %><br />
+      <%= f.text_field :email %>
+    </p>
+    <p>
+      <%= f.label :steamid %> <em>(e.g. 0:1:23456789)</em><br>
+      <%= f.text_field :steamid %><br />
+      <%= link_to "You can use this tool to find out", "/files/client/steamid_finder.exe" %>
+    </p>
+    <p>
+      <%= f.label :birthdate %><br />
+      <%= date_select :user, :birthdate, :order => [:year, :month, :day], :start_year => 1950 %>
+    </p>
+    <%= f.submit "Register" %>
+  <% end %>
+</div>

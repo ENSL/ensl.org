@@ -1,0 +1,12 @@
+<p class="bold">
+  Newest interviews
+</p>
+<ul>
+  <% Article.nodrafts.interviews.recent.each do |article| %>
+    <li class="<%= 'bold' if cuser and !article.read_by? cuser %>">
+      <%= namelink article %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to "More..", articles_path %>

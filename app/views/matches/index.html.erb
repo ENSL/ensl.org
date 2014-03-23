@@ -1,0 +1,36 @@
+<h2 class="center">
+  Matches
+</h2>
+<h3 class="center">
+  Of currently active contests
+</h3>
+
+<div class="wide box">
+  <div id="matchesTab">
+    <ul id="matchesTab-nav" class="tabs">
+      <li><a href="#UpcomingTab">Upcoming</a></li>
+      <li><a href="#RecentTab">Recent</a></li>
+      <li><a href="#YourTab">Your matches</a></li>
+    </ul>
+    <div class="box wide tabs">
+      <div class="tab" id="UpcomingTab">
+        <h3 class="center">Upcoming Matches</h3>
+        <%= render :partial => "matches/match", :locals => {:matches => @matches.unfinished.chrono} %>
+      </div>
+      <div class="tab" id="RecentTab">
+        <h3 class="center">Recent Matches</h3>
+        <%= render :partial => "matches/match", :locals => {:matches => @matches.realfinished.reverse_order.chrono} %>
+      </div>
+      <div class="tab" id="YourTab">
+        <h3 class="center">Your Matches (<%= if cuser then @matches.of_user(cuser).count else 0 end %>)</h3>
+          <% if cuser then %>
+            <%= render :partial => "matches/match", :locals => {:matches => @matches.of_user(cuser).reverse_order.chrono} %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      var tabber1 = new Yetii({id: 'matchesTab'});
+      </script>
+    </div>
+

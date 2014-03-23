@@ -1,0 +1,44 @@
+<div class="wide box sub">
+  <table id="movie">
+    <tr>
+      <td>
+        <br />&nbsp;<br />
+        <% if movie.picture %>
+          <%= image_tag movie.picture.url, :class => "centered" %>
+        <% end %>
+      </td>
+
+      <td>
+        <h3 class="center">
+          <%= namelink movie %>
+        </h3>
+
+        <%= cascade movie, ["content", "format", ["Author", :user], "length_s", ["Views", "view_count"], ["Date", "file.created_at"]] %>
+
+        <% (params[:action] == "show" ? movie.all_files : [movie.file]).each do |file| %>
+          <p>
+            <b>File: </b> <%= link_to File.basename(file.name.to_s), file.url %>
+        </p>
+        <ul>
+          <li>
+            <b>MD5:</b> <%= file.md5_s %>
+        </li>
+        <li>
+          <b>Size:</b> <%= file.size_s %> MB
+        </li>
+      </ul>
+    <% end %>
+
+    <% if cuser and movie.can_update? cuser %>
+      <p>
+        <%= link_to 'Edit', edit_movie_path(movie) %> |
+        <%= link_to 'Make a Preview', :action => "preview", :id => movie %> |
+        <%= link_to 'Destroy', movie, :confirm => 'Are you sure?', :method => :delete %>
+      </p>
+    <% end %>
+  </td>
+</tr>
+  </table>
+  <div class="clear">
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<h3 class="center">
+  <%= namelink @user.username %>
+</h3>
+
+<table class="data">
+  <tr>
+    <th>Username</th>
+    <th>SteamID</th>
+    <th>Last IP</th>
+    <th>Date</th>
+  </tr>
+  <% @user.versions.each do |user| %>
+    <tr>
+      <td><%= h user.username %></td>
+      <td><%= h user.steamid %></td>
+      <td><%= h user.lastip %></td>
+      <td><%= shorttime user.updated_at %></td>
+    </tr>	
+  <% end %>
+</table>

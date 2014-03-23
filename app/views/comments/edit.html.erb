@@ -1,0 +1,23 @@
+<div class="box wide">
+  <h1>Editing comment</h1>
+
+  <%= form_for(@comment) do |f| %>
+    <div id="error_explanation">
+      <ul>
+        <% @comment.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <p>
+      <%= f.label :text %><br />
+      <%= f.text_area :text, :rows => 15, :cols => 60 %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Back', :back %>

@@ -1,0 +1,31 @@
+<table class="data">
+  <tr>
+    <th>Created</th>
+    <th>Title</th>
+    <th>Status</th>
+    <th>Assigned</th>
+    <th>Category</th>
+    <th>Author</th>
+    <th>Actions</th>
+  </tr>
+
+  <% issues.each do |issue| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+      <td><%= namelink issue %></td>
+      <td class="<%= issue.color %>">
+        <%= issue.statuses[issue.status] %>
+      </td>
+      <td><%= namelink issue.assigned %></td>
+      <td><%= h issue.category %></td>
+      <td><%= namelink issue.author %></td>
+      <td>
+        <% if issue.can_update? cuser %>
+          <%= link_to 'Edit', edit_issue_path(issue) %>
+          <% end; if issue.can_destroy? cuser %>
+          <%= link_to 'Destroy', issue, :confirm => 'Are you sure?', :method => :delete %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

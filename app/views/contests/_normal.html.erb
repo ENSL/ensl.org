@@ -1,0 +1,7 @@
+<div class="nbox big left">
+  <%= render :partial => "contesters/list", :locals => {:contesters => @contest.contesters.active.ordered, :actions => true} %>
+</div>
+
+<script type="text/javascript">
+	var tabber1 = new Yetii({id: 'contestTab'});
+</script>

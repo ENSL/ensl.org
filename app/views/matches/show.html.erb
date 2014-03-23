@@ -1,0 +1,90 @@
+<div class="box wide center">
+  <h1>
+    <% if @match.score1 and @match.score2%>
+      <% if @match.score1 > @match.score2; c1 = 'green'; c2 = 'red' end %>
+        <% if @match.score1 < @match.score2; c1 = 'red'; c2 = 'green' end %>
+          <% if @match.score1 == @match.score2; c1 = 'yellow'; c2 = 'yellow' end %>
+            <%= namelink @match.contester1.team if @match.contester1 %>
+            <span class="<%= c1 %>"><%= h @match.score1 %></span>
+            -
+            <span class="<%= c2 %>"><%= h @match.score2 %></span>
+            <%= namelink @match.contester2.team if @match.contester2 %>
+          <% else %>
+            <%= namelink @match.contester1.team if @match.contester1 %>
+            vs
+            <%= namelink @match.contester2.team if @match.contester2 %>
+          <% end %>
+        </h1>
+
+        <h4 class="center">
+          <%= longtime @match.match_time %>
+        </h4>
+
+        <%= cascade @match, [:contest, :server, :hltv, :demo, :referee, [@match.contester1, "team1_lineup"], [@match.contester2, "team2_lineup"], ["Man of the Match", :motm]] %>
+
+        <p>
+          <b>Maps:</b>
+          <%= namelink @match.map1 %>, <%= namelink @match.map2 %>
+        </p>
+
+        <% if @match.hltv %>
+          <p>
+            <%= link_to "Connect to HLTV", "steam://connect/#{@match.hltv.addr}" %>
+          </p>
+        <% end %>
+
+        <%# if cuser and @match.can_update? cuser, [:matchers_attributes] %>
+          <%# if cuser and cuser.admin? %>
+          <!--p-->
+            <%#= link_to "Scoring and lineup", :action => "score", :id => @match %>
+          <!--/p-->
+        <%# end %>
+
+        <% if cuser and @match.can_update? cuser, [:report] %>
+          <p>
+            <%= link_to "Referee (Scoring, Line-Ups, Man of the match)", :controller => :matches, :action => "ref", :id => @match %>
+          </p>
+        <% end %>
+
+        <%# if cuser and @match.can_update? cuser, [:hltv] %>
+          <!--p-->
+            <%#= link_to "Extras", :action => "extra", :id => @match %>
+          <!--/p-->
+        <%# end %>
+
+        <br />
+
+        <h3>
+          Predictions (<%= @match.predictions.count %>)
+        </h3>
+
+        <% if @newpred.can_create? cuser %>
+          <%= form_for @newpred do |f| %>
+            <%= f.hidden_field :match_id %>
+            <%= f.text_field :score1, :size => 1 %> -
+            <%= f.text_field :score2, :size => 1 %>
+            <p>
+              <%= submit_tag "Save Prediction" %>
+            </p>
+          <% end %>
+        <% else %>
+          <p>
+            <b><%= @match.contester1.team if @match.contester1 %></b>: <%= @match.preds(1) %>%<br />
+            <b><%= @match.contester2.team if @match.contester2 %></b>: <%= @match.preds(2) %>%<br />
+          </p>
+        <% end %>
+      </div>
+
+      <% unless @match.report.nil? or @match.report.empty? %>
+        <div class="wide box">
+          <h3>
+            Report
+          </h3>
+
+          <p>
+            <%= raw @match.report %>
+          </p>
+        </div>
+      <% end %>
+
+      <%= add_comments @match %>

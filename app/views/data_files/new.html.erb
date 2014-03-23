@@ -1,0 +1,26 @@
+<h1>New file</h1>
+
+<div class="wide box">
+  <%= form_for @file, :html => { :multipart => true } do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :name %><br />
+      <%= f.file_field :name %>
+    </p>
+
+    <p>
+      <%= f.label :description %><br />
+      <%= f.text_field :description %>
+    </p>
+
+    <p>
+      <%= f.label :directory_id %><br />
+      <%= f.select :directory_id, Directory.all.collect{|c| ["#{c.path} - #{c.name}", c.id]} %>
+    </p>
+
+    <p>
+      <%= f.submit 'Create' %>
+    </p>
+  <% end %>
+</div>

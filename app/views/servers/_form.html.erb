@@ -1,0 +1,52 @@
+<div class="box wide">
+  <%= form_for @server do |f| %>
+    <%= f.error_messages %>
+
+    <div class="left equal">
+      <p>
+        <%= f.label :dns %><br />
+        <%= f.text_field :dns %>
+      </p>
+      <p>
+        <%= f.label :ip %> :
+        <%= f.label :port %><br />
+        <%= f.text_field :ip, :size => 15 %>
+        <%= f.text_field :port, :size => 5 %>
+      </p>
+      <p>
+        <%= f.label :rcon %><br />
+        <%= f.text_field :rcon %>
+      </p>
+      <p>
+        <%= f.label :password %><br />
+        <%= f.text_field :password %>
+      </p>
+    </div>
+    <div class="right equal">
+      <p>
+        <%= f.label :name %><br />
+        <%= f.text_field :name %>
+      </p>
+      <p>
+        <%= f.label :description %><br />
+        <%= f.text_field :description %>
+      </p>
+      <p>
+        <%= f.label :irc %><br />
+        <%= f.text_field :irc %>
+      </p>
+      <p>
+        <%= f.label :domain %><br />
+        <%= f.select :domain, @server.domains.invert %>
+      </p>
+      <p>
+        <%= f.label :official, "Available for ENSL officials?" %><br />
+        <%= f.check_box :official %>
+      </p>
+    </div>
+
+    <p class="clear">
+      <%= f.submit 'Save' %>
+    </p>
+  <% end %>
+</div>

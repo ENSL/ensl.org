@@ -1,0 +1,9 @@
+// TODO: fix domain
+<% if @shoutmsgs.length > 0 %>
+  $('div#<%= @shoutmsgs.first.domain %>').scrollTop = $('div#shoutbox').scrollHeight
+  $("div#<%= @shoutmsgs.first.domain %>").html("<%= escape_javascript(render(:partial => "shoutmsgs/shoutmsg", :collection => @shoutmsgs)) %>");
+
+  <% if @shoutmsgs.first.domain != "shoutbox" %>
+    $("div#<%= @shoutmsgs.first.domain %>").scrollTop($("div#<%= @shoutmsgs.first.domain %>")[0].scrollHeight);
+  <% end %>
+<% end %>

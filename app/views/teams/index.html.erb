@@ -1,0 +1,9 @@
+<h1>Listing teams</h1> <h4>Teams with 0 members are not displayed.</h4>
+
+<div id="box">
+  <%= render :partial => "list", :locals => {:teams => @teams} %>
+</div>
+
+<script type="text/javascript">
+  var tabber1 = new Yetii({id: 'teamsTab'});
+</script>

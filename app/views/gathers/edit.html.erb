@@ -1,0 +1,84 @@
+<h1>
+  Gather admin page for gather #<%= @gather.id %>
+</h1>
+
+<div class="wide box">
+  <h3>
+    Gather Restart
+  </h3>
+  <%= form_for(@gather) do |f| %>
+    <ul>
+      <% @gather.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+    <%= f.hidden_field :admin %>
+    <p>
+      <%= f.label :captain1 %><br />
+      <%= f.select :captain1_id, @gather.gatherers.collect{|c| [c, c.id]} %>
+    </p>
+    <p>
+      <%= f.label :captain2 %><br />
+      <%= f.select :captain2_id, @gather.gatherers.collect{|c| [c, c.id]} %>
+    </p>
+    <p>
+      <%= f.submit 'Restart gather' %>
+    </p>
+  <% end %>
+</div>
+
+<div class="wide box">
+  <h3>
+    Turn change
+  </h3>
+  <%= form_for(@gather) do |f| %>
+    <ul>
+      <% @gather.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+    <p>
+      <%= f.label :turn %><br />
+      <%= f.select :turn, ['1', '2'] %>
+    </p>
+    <p>
+      <%= f.submit 'Change turn' %>
+    </p>
+  <% end %>
+</div>
+
+
+<div class="wide box">
+  <h3>
+    Replace players
+  </h3>
+
+  <% if @gather.gatherers.first %>
+    <%= form_for(@gather.gatherers.first) do |f| %>
+      <p>
+        Select player: <br />
+        <%= f.select :id, @gather.gatherers.collect{|g| [g.user, g.id]} %>
+      </p>
+      <p>
+        Replace with <%= link_to_function 'user', "findUser('username')" %>:
+        <%= f.text_field :username %>
+      </p>
+      <p>
+        <%= f.submit 'Replace player' %>
+      </p>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="wide box">
+  <h3>
+    Start new
+  </h3>
+  <%= form_for(Gather.new) do |f| %>
+    <% f.object.category = @gather.category %>
+    <%= f.hidden_field :category_id %>
+    <p>
+      <%= f.submit "Start next (#{f.object.category})" %>
+    </p>
+  <% end %>
+</div>

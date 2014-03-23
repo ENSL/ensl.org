@@ -1,0 +1,37 @@
+<h2>
+  <%= namelink @match.contester1.team %> vs <%= namelink @match.contester2.team %>
+</h2>
+
+<div class="wide box">
+  <h3>
+    Lineup
+  </h3>
+  <%= form_for @match do |f| %>
+    <%= render :partial => "lineup", :locals => {:contester => @contester} %>
+    <p>
+      <%= f.submit "Save" %>
+    </p>
+  <% end %>
+</div>
+
+<% if @match.can_update? cuser, [:score1, :score2] %>
+  <div class="wide box">
+    <%= form_for(@match) do |f| %>
+      <h3>
+        Scoring
+      </h3>
+
+      <%= f.error_messages %>
+      <p>
+        <%= f.label :score1, "Score" %><br />
+        <%= f.text_field :score1, :size => 1 %>
+        <%= f.text_field :score2, :size => 1 %>
+      </p>
+      <p>
+        <%= f.submit 'Submit' %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+
+<%= link_to "Back", @match %>

@@ -1,0 +1,98 @@
+<h2>
+  <%= namelink @match.contester1.team %> vs <%= namelink @match.contester2.team %>
+</h2>
+
+<%= render :partial => "javascripts/mce_full" %>
+
+<div class="wide box">
+  <h2>
+    Lineup
+  </h2>
+
+  <div class="box center">
+    <%= form_for @match do |f| %>
+    <%= f.error_messages %>
+
+    <% [@match.contester1].each do |contester| %>
+        <%= render :partial => "lineup", :locals => {:contester => contester} %>
+    <% end %>
+    <p class="clear">
+      <%= f.submit "Save" %>
+    </p>
+  <% end %>
+</div>
+<div class="box center">
+  <%= form_for @match do |f| %>
+    <%= f.error_messages %>
+
+    <% [@match.contester2].each do |contester| %>
+        <%= render :partial => "lineup", :locals => {:contester => contester} %>
+    <% end %>
+    <p class="clear">
+      <%= f.submit "Save" %>
+    </p>
+  <% end %>
+</div>
+
+  <p class="clear"></p>
+</div>
+
+<div class="wide box">
+  <%= form_for @match do |f| %>
+    <%= f.error_messages %>
+
+    <h3>
+      Scoring and options
+    </h3>
+
+    <p>
+      <%= f.label :server_id %>
+      <%= f.select :server_id, Server.hlds.active.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
+    </p>
+
+    <p>
+      <%= f.label :forfeit %>
+      <%= f.check_box :forfeit %>
+    </p>
+
+    <p>
+      Score:
+      <%= f.text_field :score1, :size => 1 %>
+      <%= f.text_field :score2, :size => 2 %>
+    </p>
+
+    <p>
+      <%= f.label :demo %>:
+      <%= f.select :demo_id, DataFile.ordered.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
+    </p>
+
+    <p>
+      <%= link_to_function 'Man of the match', "findUser('motm')" %>:
+      <%= f.text_field :motm_name, {:value => User.get(@match.motm_id)} %>
+    </p>
+
+    <p>
+      <%= f.submit "Save" %>
+    </p>
+  <% end %>
+</div>
+
+<div class="wide box">
+  <%= form_for @match do |f| %>
+    <%= f.error_messages %>
+
+    <h3>
+      Report
+    </h3>
+
+    <p>
+      <%= f.text_area :report, :rows => 20, :cols => 60 %>
+    </p>
+
+    <p>
+      <%= f.submit "Save" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "Back", @match %>

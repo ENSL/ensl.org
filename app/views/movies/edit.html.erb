@@ -1,0 +1,60 @@
+<h1>Editing movie</h1>
+
+<%= render :partial => "form" %>
+
+<div class="wide box">
+  <h3>
+    Make a preview
+  </h3>
+
+  <p>
+    This will produce a MP4-version preview of the file. It will take usually 3-4 times the movie length.
+    The program will run in the background and the preview file will automatically added to the movie.
+  </p>
+
+  <%= form_tag :action => "preview", :id => @movie.id do %>
+    <p>
+      Resolution: <%= text_field_tag "x", "800", :size => 2 %> x <%= text_field_tag "y", "600", :size => 2 %>
+  </p>
+
+  <p>
+    <%= submit_tag "Make a preview" %>
+  </p>
+<% end %>
+
+<br />
+
+<h3>
+  Take a snapshot
+</h3>
+
+<%= form_tag :action => "snapshot", :id => @movie.id do %>
+  <p>
+    Secs: <%= text_field_tag "secs" %>
+</p>
+
+<p>
+  <%= submit_tag "Take snapshot" %>
+</p>
+        <% end %>
+
+        <h3>
+          Download (stream)
+        </h3>
+
+        <%= form_tag :action => "download", :id => @movie.id do %>
+          <p>
+            This will start downloading the video from an IP and Port.
+          </p>
+          <p>
+            IP: <%= text_field_tag "ip", "", :size => 12 %> : <%= text_field_tag "port", "", :size => 3 %>
+        </p>
+
+        <p>
+          <%= submit_tag "Download" %>
+        </p>
+      <% end %>
+    </div>
+
+    <%= link_to 'Show', @movie %> |
+    <%= link_to 'Back', movies_path %>
