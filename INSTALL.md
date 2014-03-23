@@ -13,13 +13,17 @@ Create a deploy user. Disable password authentication and add it to the www-data
     sudo passwd -l deploy
     sudo usermod -a -G www-data deploy
 
-Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx and foreman via sudo without a password
+Create a new upstart config and set permissions
+
+    touch /etc/init/ensl.conf
+    chown deploy /etc/init/ensl.conf
+
+Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx, rbenv and upstart via sudo without a password
   
     # /etc/sudoers
-    Cmnd_Alias START_FOREMAN = /sbin/start foreman
-
-    deploy ALL=NOPASSWD:START_FOREMAN
-    deploy ALL=NOPASSWD:/etc/init.d/nginx
+    deploy  ALL=NOPASSWD:/etc/init.d/nginx
+    deploy  ALL=NOPASSWD:/home/deploy/.rbenv/bin/*
+    deploy  ALL=NOPASSWD:/usr/sbin/service ensl start, /usr/sbin/service ensl stop, /usr/sbin/service ensl restart
 
 ## Install MySQL & Memcached
 
@@ -42,11 +46,14 @@ Switch user to deploy, and install rbenv
     su deploy
     cd ~
     git clone git://github.com/sstephenson/rbenv.git .rbenv
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
     echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+    echo 'eval "$(rbenv init -)"' >> ~/.profile
     echo 'eval "$(rbenv init -)"' >> ~/.bashrc
     exec $SHELL
 
     git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.profile
     echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
     exec $SHELL
 
@@ -55,6 +62,11 @@ Switch user to deploy, and install rbenv
 
     echo "gem: --no-ri --no-rdoc" > ~/.gemrc
     gem install bundler
+
+Install the rbenv-sudo plugin
+
+    mkdir ~/.rbenv/plugins
+    git clone git://github.com/dcarley/rbenv-sudo.git ~/.rbenv/plugins/rbenv-sudo
 
 ## Install the ENSL site
 
