@@ -2,15 +2,9 @@ source 'http://rubygems.org'
 
 ruby '2.1.1'
 
-gem 'rails', '~> 3.2.16'
+gem 'rails', '~> 3.2.17'
 gem 'mysql2', '~> 0.3.15'
-
-# Deployment
 gem 'foreman', '~> 0.63.0'
-gem 'capistrano', '~> 3.1.0'
-gem 'capistrano-rbenv', '~> 2.0.2'
-gem 'capistrano-bundler', '~> 1.1.2'
-gem 'capistrano-rails', '~> 1.1'
 
 # Libraries
 gem 'jquery-rails'
@@ -29,17 +23,19 @@ gem 'rmagick', require: false
 gem 'will_paginate', git: 'https://github.com/p7r/will_paginate.git', branch: 'rails3'
 gem 'newrelic_rpm', '~> 3.7.2.195'
 
-group 'staging', 'production' do
-  gem 'kgio', '~> 2.9.2'
-  gem 'dalli', '~> 2.7.0'
-  gem 'unicorn', '~> 4.8.2'
+group :assets do
+  gem 'uglifier', '~> 2.5.0'
 end
 
-group 'development' do
+group :development do
+  gem 'capistrano', '~> 3.1.0'
+  gem 'capistrano-rbenv', '~> 2.0.2'
+  gem 'capistrano-bundler', '~> 1.1.2'
+  gem 'capistrano-rails', '~> 1.1'
   gem 'annotate', '~> 2.6.2'
 end
 
-group 'test' do
+group :test do
   gem 'simplecov', '~> 0.7.1', require: false
   gem 'rspec-rails', '~> 2.14.1'
   gem 'rspec-given', '~> 3.5.4'
@@ -48,7 +44,13 @@ group 'test' do
   gem 'factory_girl_rails', '~> 4.4.1'
 end
 
-group 'development', 'test' do
+group :development, :test do
   gem 'pry-debugger', '~> 0.2.2'
   gem 'dotenv-rails', '~> 0.10.0'
+end
+
+group :staging, :production do
+  gem 'kgio', '~> 2.9.2'
+  gem 'dalli', '~> 2.7.0'
+  gem 'unicorn', '~> 4.8.2'
 end

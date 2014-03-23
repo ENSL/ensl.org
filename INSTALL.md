@@ -58,6 +58,8 @@ Switch user to deploy, and install rbenv
 
 ## Install the ENSL site
 
-Create the `.env` and `config/database.yml` files with the appropriate credentials.
+Create the `.env` file with the appropriate credentials.
 
     mkdir /var/www/virtual/ensl.org/deploy
+    mkdir /var/www/virtual/ensl.org/deploy/shared
+    touch /var/www/virtual/ensl.org/deploy/shared/.env
