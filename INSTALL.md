@@ -21,6 +21,16 @@ Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx a
     deploy ALL=NOPASSWD:START_FOREMAN
     deploy ALL=NOPASSWD:/etc/init.d/nginx
 
+## Install MySQL
+
+    sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+
+Login to mysql as root, and create the database and user account:
+
+    CREATE DATABASE `ensl`;
+    CREATE USER 'xxx'@'localhost' IDENTIFIED BY 'xxx';
+    GRANT ALL PRIVILEGES ON ensl.* TO 'xxx'@'localhost' WITH GRANT OPTION;
+
 ## Install rbenv, ruby and bundler
 
 As root, install dependencies

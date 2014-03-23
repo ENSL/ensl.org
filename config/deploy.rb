@@ -24,22 +24,30 @@ end
 
 namespace :foreman do
   desc "Export the Procfile to Ubuntu's upstart scripts"
-  task :export, :roles => :app do
-    run "cd #{current_path} && #{sudo} foreman export upstart /etc/init -a #{app_name} -u #{user} -l #{fetch(:deploy_to)}/shared/log"
+  task :export do
+    on roles(:app) do |host|
+      run "cd #{current_path} && #{sudo} foreman export upstart /etc/init -a #{app_name} -u #{user} -l #{fetch(:deploy_to)}/shared/log"
+    end
   end
 
   desc "Start the application services"
-  task :start, :roles => :app do
-    run "#{sudo} service #{app_name} start"
+  task :start do
+    on roles(:app) do |host|
+      run "#{sudo} service #{app_name} start"
+    end
   end
 
   desc "Stop the application services"
-  task :stop, :roles => :app do
-    run "#{sudo} service #{app_name} stop"
+  task :stop do
+    on roles(:app) do |host|
+      run "#{sudo} service #{app_name} stop"
+    end
   end
 
   desc "Restart the application services"
-  task :restart, :roles => :app do
-    run "#{sudo} service #{app_name} start || #{sudo} service #{app_name} restart"
+  task :restart do
+    on roles(:app) do |host|
+      run "#{sudo} service #{app_name} start || #{sudo} service #{app_name} restart"
+    end
   end
 end
