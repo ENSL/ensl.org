@@ -21,9 +21,9 @@ Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx a
     deploy ALL=NOPASSWD:START_FOREMAN
     deploy ALL=NOPASSWD:/etc/init.d/nginx
 
-## Install MySQL
+## Install MySQL & Memcached
 
-    sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+    sudo apt-get install mysql-server mysql-client libmysqlclient-dev memcached
 
 Login to mysql as root, and create the database and user account:
 
@@ -31,11 +31,11 @@ Login to mysql as root, and create the database and user account:
     CREATE USER 'xxx'@'localhost' IDENTIFIED BY 'xxx';
     GRANT ALL PRIVILEGES ON ensl.* TO 'xxx'@'localhost' WITH GRANT OPTION;
 
-## Install rbenv, ruby and bundler
+## Install rbenv, ruby, bundler and Image Magick
 
 As root, install dependencies
 
-    sudo apt-get install nginx git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libmysql-ruby libmysqlclient-dev
+    sudo apt-get install nginx git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libmysql-ruby imagemagick libmagickwand-dev
 
 Switch user to deploy, and install rbenv
 
@@ -57,5 +57,7 @@ Switch user to deploy, and install rbenv
     gem install bundler
 
 ## Install the ENSL site
+
+Create the `.env` and `config/database.yml` files with the appropriate credentials.
 
     mkdir /var/www/virtual/ensl.org/deploy
