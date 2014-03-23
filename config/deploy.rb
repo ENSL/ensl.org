@@ -5,7 +5,7 @@ set :scm, :git
 set :repo_url, 'git@github.com:ENSL/ensl.org.git'
 set :keep_releases, 10
 
-set :linked_files, %w{config/database.yml}
+set :linked_files, %w{.env}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 set :normalize_asset_timestamps, %{public/images public/javascripts public/stylesheets}
 
