@@ -1,8 +1,9 @@
-# Rails, etc
+# Rails, Ruby, etc
 /coverage/
 /log/*
 /tmp/*
 /spec/tmp/*
+.ruby-version
 .env
 .tmp*
 .rspec
