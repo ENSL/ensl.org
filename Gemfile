@@ -30,6 +30,8 @@ gem 'will_paginate', git: 'https://github.com/p7r/will_paginate.git', branch: 'r
 gem 'newrelic_rpm', '~> 3.7.2.195'
 
 group 'staging', 'production' do
+  gem 'kgio', '~> 2.9.2'
+  gem 'dalli', '~> 2.7.0'
   gem 'unicorn', '~> 4.8.2'
 end
 
