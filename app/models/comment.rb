@@ -20,8 +20,6 @@ class Comment < ActiveRecord::Base
 
   before_save :parse_text
 
-  # acts_as_indexed :fields => [:text]
-
   def parse_text
     self.text_parsed = RbbCode::Parser.new.parse(text)
   end

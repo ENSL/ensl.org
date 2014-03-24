@@ -1,5 +1,4 @@
 # Rails, Ruby, etc
-/coverage/
 /log/*
 /tmp/*
 /spec/tmp/*
@@ -36,6 +35,8 @@
 .bundle
 
 # Misc
+/coverage/
+/backups
 /index/*
 rerun.txt
 pickle-email-*.html

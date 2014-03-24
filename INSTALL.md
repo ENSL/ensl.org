@@ -18,11 +18,11 @@ Create a new upstart config and set permissions
     touch /etc/init/ensl.conf
     chown deploy /etc/init/ensl.conf
 
-Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx, rbenv and upstart via sudo without a password
+Add the following to `/etc/sudoers` to allow the `deploy` user to manage nginx, rbenv and upstart commands via sudo without a password
   
     # /etc/sudoers
     deploy  ALL=NOPASSWD:/etc/init.d/nginx
-    deploy  ALL=NOPASSWD:/home/deploy/.rbenv/bin/*
+    deploy  ALL=NOPASSWD:/home/deploy/.rbenv/bin/rbenv
     deploy  ALL=NOPASSWD:/usr/sbin/service ensl start, /usr/sbin/service ensl stop, /usr/sbin/service ensl restart
 
 ## Install MySQL & Memcached
