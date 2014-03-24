@@ -34,8 +34,6 @@ class Post < ActiveRecord::Base
     belongs_to :user
     belongs_to :topic
 
-    # acts_as_indexed :fields => [:text]
-
     def number pages, i
       if i != -1
         pages.per_page * (pages.current_page - 1) + i + 1

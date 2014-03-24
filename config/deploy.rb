@@ -2,6 +2,7 @@ lock '3.1.0'
 
 set :application, 'ensl'
 set :deploy_user, 'deploy'
+set :deploy_to, '/var/www/virtual/ensl.org/deploy'
 set :pty, true
 
 set :scm, :git
@@ -16,9 +17,27 @@ set :linked_files, %w{.env}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle 
                      public/system public/local public/uploads}
 
+set :writable_dirs, %w{public tmp}
 set :normalize_asset_timestamps, %{public/images public/javascripts public/stylesheets}
 
 namespace :deploy do
+  namespace :check do
+    desc "Check write permissions"
+    task :permissions do
+      on roles(:all) do |host|
+        fetch(:writable_dirs).each do |dir|
+          path = "#{shared_path}/#{dir}"
+
+          if test("[ -w #{path} ]")
+            info "#{path} is writable on #{host}"
+          else
+            error "#{path} is not writable on #{host}"
+          end
+        end
+      end
+    end
+  end
+
   desc 'Restart application'
   task :restart do
     invoke 'foreman:export'
@@ -33,7 +52,7 @@ namespace :foreman do
   task :export do
     on roles(:app) do |host|
       within release_path do
-        execute "#{fetch(:rbenv_sudo)} bundle exec foreman export upstart /etc/init -a #{fetch(:application)} -u #{fetch(:deploy_user)} -l #{fetch(:deploy_to)}/shared/log"
+        execute fetch(:rbenv_sudo), "bundle exec foreman export upstart /etc/init -a #{fetch(:application)} -u #{fetch(:deploy_user)} -l #{fetch(:deploy_to)}/shared/log"
       end
     end
   end
