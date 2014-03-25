@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - 2.1.1
+env:
+  - MYSQL_USERNAME=travis
+script:
+  - RAILS_ENV=test bundle exec rake db:create db:migrate db:test:prepare
