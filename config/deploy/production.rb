@@ -1,5 +1,6 @@
 set :branch, 'master'
 set :rails_env, 'production'
+set :unicorn_rack_env, fetch(:rails_env)
 
 role :app, %w{deploy@ensl.org}
 role :web, %w{deploy@ensl.org}

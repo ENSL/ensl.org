@@ -12,9 +12,9 @@ set :keep_releases, 10
 
 set :rbenv_type, :user
 set :rbenv_ruby, '2.1.1'
+set :dotenv_role, [:app, :web]
 
 set :unicorn_config_path, "config/unicorn.rb"
-set :unicorn_rack_env, fetch(:rails_env)
 
 set :writable_dirs, %w{public tmp}
 set :linked_files, %w{.env}
