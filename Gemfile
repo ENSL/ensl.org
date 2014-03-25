@@ -4,22 +4,20 @@ ruby '2.1.1'
 
 gem 'rails', '~> 3.2.17'
 gem 'mysql2', '~> 0.3.15'
-gem 'foreman', '~> 0.63.0'
 
 # Libraries
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 2.0.2'
 gem 'sass-rails'
 gem 'coffee-rails'
 gem 'gruff'
 gem 'nokogiri'
-gem 'carrierwave'
 gem 'rbbcode'
-gem 'tinymce-rails'
+gem 'tinymce-rails', '~> 3.5.4.1'
+gem 'carrierwave', '~> 0.10.0'
 gem 'bluecloth', '~> 2.2.0'
-gem 'bb-ruby'
-gem 'therubyracer'
-gem 'acts_as_indexed'
-gem 'rmagick', require: false
+gem 'bb-ruby', '~> 1.0.4'
+gem 'therubyracer', '~> 0.12.1'
+gem 'rmagick', '~> 2.13.2', require: false
 gem 'will_paginate', git: 'https://github.com/p7r/will_paginate.git', branch: 'rails3'
 gem 'newrelic_rpm', '~> 3.7.2.195'
 
@@ -32,6 +30,7 @@ group :development do
   gem 'capistrano-rbenv', '~> 2.0.2'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rails', '~> 1.1'
+  gem 'capistrano3-unicorn', '~> 0.1.1'
   gem 'annotate', '~> 2.6.2'
 end
 
