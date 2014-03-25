@@ -1,6 +1,10 @@
+[![Build Status](https://travis-ci.org/ENSL/ensl.org.svg?branch=master)](https://travis-ci.org/ENSL/ensl.org)
+[![Code Climate](https://codeclimate.com/github/ENSL/ensl.org.png)](https://codeclimate.com/github/ENSL/ensl.org)
+[![Code Climate](https://codeclimate.com/github/ENSL/ensl.org/coverage.png)](https://codeclimate.com/github/ENSL/ensl.org)
+
 # ENSL Website
 
-This is the source code of ENSL website. Currently deployed on [European NS League](http://www.ensl.org).
+This is the source code of ENSL website. Currently deployed on [ensl.org](http://www.ensl.org).
 
 Features:
 
