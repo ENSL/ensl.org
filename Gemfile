@@ -37,6 +37,7 @@ end
 
 group :test do
   gem 'simplecov', '~> 0.7.1', require: false
+  gem 'codeclimate-test-reporter', '~> 0.3.0', require: nil
   gem 'rspec-rails', '~> 2.14.1'
   gem 'rspec-given', '~> 3.5.4'
   gem 'capybara', '~> 2.2.1'

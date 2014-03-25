@@ -3,6 +3,5 @@ require 'verification'
 require 'exceptions'
 require 'extra'
 
-ActiveSupport::Deprecation.silenced = true if ['staging', 'production'].include?(ENV['RAILS_ENV'])
-
+ActiveSupport::Deprecation.silenced = true
 Ensl::Application.initialize!

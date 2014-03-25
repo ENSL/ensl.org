@@ -38,6 +38,7 @@ module Ensl
 
     # il8n fix
     config.i18n.fallbacks = true
+    config.i18n.enforce_available_locales = false
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
