@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: gatherers
+#
+#  id         :integer          not null, primary key
+#  user_id    :integer
+#  gather_id  :integer
+#  team       :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  votes      :integer          default(0), not null
+#
+
 class Gatherer < ActiveRecord::Base
   IDLE_TIME = 600
   EJECT_VOTES = 4

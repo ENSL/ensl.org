@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: maps
+#
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  download    :string(255)
+#  created_at  :datetime
+#  updated_at  :datetime
+#  deleted     :boolean          default(FALSE), not null
+#  picture     :string(255)
+#  category_id :integer
+#
+
 class Map < ActiveRecord::Base
   include Extra
 

@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: rounders
+#
+#  id       :integer          not null, primary key
+#  round_id :integer
+#  user_id  :integer
+#  team     :integer
+#  roles    :string(255)
+#  kills    :integer
+#  deaths   :integer
+#  name     :string(255)
+#  steamid  :string(255)
+#  team_id  :integer
+#
+
 class Rounder < ActiveRecord::Base
   attr_accessor :lifeform
 

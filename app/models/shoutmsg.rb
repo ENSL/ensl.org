@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: shoutmsgs
+#
+#  id             :integer          not null, primary key
+#  user_id        :integer
+#  text           :string(255)
+#  created_at     :datetime
+#  updated_at     :datetime
+#  shoutable_type :string(255)
+#  shoutable_id   :integer
+#
+
 class Shoutmsg < ActiveRecord::Base
   include Extra
 

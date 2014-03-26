@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: categories
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  sort       :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  domain     :integer
+#
+
 class Category < ActiveRecord::Base
   include Extra
 

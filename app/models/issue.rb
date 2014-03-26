@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: issues
+#
+#  id          :integer          not null, primary key
+#  title       :string(255)
+#  status      :integer
+#  assigned_id :integer
+#  category_id :integer
+#  text        :text
+#  author_id   :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  solution    :text
+#  text_parsed :text
+#
+
 require File.join(Rails.root, 'vendor', 'plugins', 'acts-as-readable', 'init.rb')
 require 'rbbcode'
 

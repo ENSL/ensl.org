@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: posts
+#
+#  id          :integer          not null, primary key
+#  text        :text
+#  topic_id    :integer
+#  user_id     :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  text_parsed :text
+#
+
 require 'rbbcode'
 require 'bb-ruby'
 

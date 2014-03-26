@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: servers
+#
+#  id              :integer          not null, primary key
+#  name            :string(255)
+#  description     :string(255)
+#  dns             :string(255)
+#  ip              :string(255)
+#  port            :string(255)
+#  rcon            :string(255)
+#  password        :string(255)
+#  irc             :string(255)
+#  user_id         :integer
+#  official        :boolean
+#  created_at      :datetime
+#  updated_at      :datetime
+#  map             :string(255)
+#  players         :integer
+#  max_players     :integer
+#  ping            :string(255)
+#  version         :integer
+#  domain          :integer          default(0), not null
+#  reservation     :string(255)
+#  recording       :string(255)
+#  idle            :datetime
+#  default_id      :integer
+#  active          :boolean          default(TRUE), not null
+#  recordable_type :string(255)
+#  recordable_id   :integer
+#  category_id     :integer
+#
+
 require "rcon"
 require "yaml"
 

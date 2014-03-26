@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: data_files
+#
+#  id           :integer          not null, primary key
+#  name         :string(255)
+#  description  :string(255)
+#  path         :string(255)
+#  size         :integer          not null
+#  md5          :string(255)
+#  created_at   :datetime
+#  updated_at   :datetime
+#  directory_id :integer
+#  related_id   :integer
+#  article_id   :integer
+#
+
 require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_rateable', 'init.rb')
 require 'digest/md5'
 

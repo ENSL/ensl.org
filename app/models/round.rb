@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: rounds
+#
+#  id           :integer          not null, primary key
+#  server_id    :integer
+#  start        :datetime
+#  end          :datetime
+#  winner       :integer
+#  match_id     :integer
+#  commander_id :integer
+#  team1_id     :integer
+#  team2_id     :integer
+#  map_name     :string(255)
+#  map_id       :integer
+#
+
 class Round < ActiveRecord::Base
   scope :basic, :include => [:commander, :map, :server, :team1, :team2], :order => "start DESC"
   scope :team_stats,

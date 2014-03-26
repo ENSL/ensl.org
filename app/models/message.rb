@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: messages
+#
+#  id             :integer          not null, primary key
+#  sender_type    :string(255)
+#  sender_id      :integer
+#  recipient_type :string(255)
+#  recipient_id   :integer
+#  title          :string(255)
+#  text           :text
+#  created_at     :datetime
+#  updated_at     :datetime
+#  text_parsed    :text
+#
+
 require 'rbbcode'
 
 class Message < ActiveRecord::Base

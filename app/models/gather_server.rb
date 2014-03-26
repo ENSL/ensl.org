@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: gather_servers
+#
+#  id         :integer          not null, primary key
+#  gather_id  :integer
+#  server_id  :integer
+#  votes      :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class GatherServer < ActiveRecord::Base
   scope :ordered, :order => "votes DESC"
 

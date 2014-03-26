@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: contesters
+#
+#  id         :integer          not null, primary key
+#  team_id    :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  score      :integer          default(0), not null
+#  win        :integer          default(0), not null
+#  loss       :integer          default(0), not null
+#  draw       :integer          default(0), not null
+#  contest_id :integer
+#  trend      :integer          not null
+#  extra      :integer          not null
+#  active     :boolean          default(TRUE), not null
+#
+
 class Contester < ActiveRecord::Base
   include Extra
 

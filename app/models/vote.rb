@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: votes
+#
+#  id           :integer          not null, primary key
+#  user_id      :integer
+#  votable_id   :integer
+#  poll_id      :integer
+#  votable_type :string(255)
+#
+
 class Vote < ActiveRecord::Base
   include Extra
 

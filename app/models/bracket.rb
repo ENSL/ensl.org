@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: brackets
+#
+#  id         :integer          not null, primary key
+#  contest_id :integer
+#  slots      :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  name       :string(255)
+#
+
 class Bracket < ActiveRecord::Base
   include Extra
 
