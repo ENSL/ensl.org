@@ -79,6 +79,8 @@ en:
   weeks_create: "Week was successfully created."
   weeks_update: "Week was successfully updated."
   votes_success: "Voted successfully."
+  error: "error"
+  prohibited: "prohibited"
   errors:
     template:
       header: "Please review the following errors:"

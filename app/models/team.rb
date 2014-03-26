@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: teams
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  irc        :string(255)
+#  web        :string(255)
+#  tag        :string(255)
+#  country    :string(255)
+#  comment    :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#  logo       :string(255)
+#  founder_id :integer
+#  active     :boolean          default(TRUE), not null
+#  recruiting :string(255)
+#
+
 class Team < ActiveRecord::Base
   include Extra
 

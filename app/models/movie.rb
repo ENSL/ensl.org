@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: movies
+#
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  content     :string(255)
+#  format      :string(255)
+#  user_id     :integer
+#  file_id     :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  picture     :string(255)
+#  preview_id  :integer
+#  length      :integer
+#  match_id    :integer
+#  status      :integer
+#  category_id :integer
+#
+
 require 'data_file'
 
 class Movie < ActiveRecord::Base

@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: gathers
+#
+#  id          :integer          not null, primary key
+#  status      :integer
+#  captain1_id :integer
+#  captain2_id :integer
+#  map1_id     :integer
+#  map2_id     :integer
+#  server_id   :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  turn        :integer
+#  lastpick1   :datetime
+#  lastpick2   :datetime
+#  votes       :integer          default(0), not null
+#  category_id :integer
+#
+
 class Gather < ActiveRecord::Base
   STATE_RUNNING = 0
   STATE_VOTING = 3

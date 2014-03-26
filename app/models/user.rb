@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id           :integer          not null, primary key
+#  username     :string(255)
+#  password     :string(255)
+#  firstname    :string(255)
+#  lastname     :string(255)
+#  email        :string(255)
+#  steamid      :string(255)
+#  team_id      :integer
+#  lastvisit    :datetime
+#  created_at   :datetime
+#  updated_at   :datetime
+#  lastip       :string(255)
+#  country      :string(255)
+#  birthdate    :date
+#  time_zone    :string(255)
+#  version      :integer
+#  public_email :boolean          default(FALSE), not null
+#
+
 require 'country_code_select/countries'
 require 'digest/md5'
 require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_versioned', 'lib', 'acts_as_versioned.rb')

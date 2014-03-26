@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: contests
+#
+#  id           :integer          not null, primary key
+#  name         :string(255)
+#  start        :datetime
+#  end          :datetime
+#  status       :integer
+#  created_at   :datetime
+#  updated_at   :datetime
+#  default_time :time
+#  contest_type :integer          default(0), not null
+#  winner_id    :integer
+#  demos_id     :integer
+#  short_name   :string(255)
+#  weight       :integer
+#  modulus_base :integer
+#  modulus_even :float
+#  modulus_3to1 :float
+#  modulus_4to0 :float
+#  rules_id     :integer
+#
+
 class Contest < ActiveRecord::Base
   include Extra
 

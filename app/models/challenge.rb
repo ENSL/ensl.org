@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: challenges
+#
+#  id            :integer          not null, primary key
+#  contester1_id :integer
+#  contester2_id :integer
+#  match_time    :datetime
+#  default_time  :datetime
+#  mandatory     :boolean
+#  server_id     :integer
+#  user_id       :integer
+#  details       :string(255)
+#  response      :string(255)
+#  created_at    :datetime
+#  updated_at    :datetime
+#  map1_id       :string(255)
+#  map2_id       :string(255)
+#  status        :integer          default(0), not null
+#
+
 class Challenge < ActiveRecord::Base
   include Extra
 

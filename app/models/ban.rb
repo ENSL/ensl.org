@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: bans
+#
+#  id         :integer          not null, primary key
+#  steamid    :string(255)
+#  user_id    :integer
+#  addr       :string(255)
+#  server_id  :integer
+#  expiry     :datetime
+#  reason     :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#  ban_type   :integer
+#  ip         :string(255)
+#
+
 class Ban < ActiveRecord::Base
   include Extra
 

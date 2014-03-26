@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: directories
+#
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  description :string(255)
+#  path        :string(255)
+#  created_at  :datetime
+#  updated_at  :datetime
+#  parent_id   :integer
+#  hidden      :boolean          default(FALSE), not null
+#
+
 class Directory < ActiveRecord::Base
   include Extra
 

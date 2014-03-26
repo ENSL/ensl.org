@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: groupers
+#
+#  id         :integer          not null, primary key
+#  group_id   :integer
+#  user_id    :integer
+#  task       :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Grouper < ActiveRecord::Base
   attr_protected :id, :created_at, :updated_at
   attr_accessor :username

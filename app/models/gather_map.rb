@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: gather_maps
+#
+#  id        :integer          not null, primary key
+#  gather_id :integer
+#  map_id    :integer
+#  votes     :integer
+#
+
 class GatherMap < ActiveRecord::Base
   scope :ordered, :order => "votes DESC, id DESC"
 

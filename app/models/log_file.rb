@@ -1,4 +1,16 @@
 # encoding: US-ASCII
+# == Schema Information
+#
+# Table name: log_files
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  md5        :string(255)
+#  size       :integer
+#  server_id  :integer
+#  updated_at :datetime
+#
+
 
 require 'digest/md5'
 

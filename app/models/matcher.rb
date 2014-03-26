@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: matchers
+#
+#  id           :integer          not null, primary key
+#  match_id     :integer          not null
+#  user_id      :integer          not null
+#  contester_id :integer          not null
+#  created_at   :datetime
+#  updated_at   :datetime
+#  merc         :boolean          not null
+#
+
 class Matcher < ActiveRecord::Base
   include Extra
 

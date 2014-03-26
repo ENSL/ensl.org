@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: polls
+#
+#  id         :integer          not null, primary key
+#  question   :string(255)
+#  end_date   :datetime
+#  user_id    :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  votes      :integer          default(0), not null
+#
+
 class Poll < ActiveRecord::Base
   include Extra
 

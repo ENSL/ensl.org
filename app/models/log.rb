@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: logs
+#
+#  id          :integer          not null, primary key
+#  server_id   :integer
+#  text        :text
+#  domain      :integer
+#  created_at  :datetime
+#  round_id    :integer
+#  details     :string(255)
+#  actor_id    :integer
+#  target_id   :integer
+#  specifics1  :string(255)
+#  specifics2  :string(255)
+#  log_file_id :integer
+#
+
 class Log < ActiveRecord::Base
   include Extra
   attr_accessor :text

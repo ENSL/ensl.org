@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: forums
+#
+#  id          :integer          not null, primary key
+#  title       :string(255)
+#  description :string(255)
+#  category_id :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  position    :integer
+#
+
 class Forum < ActiveRecord::Base
   include Extra
   BANS = 8

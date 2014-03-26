@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: tweets
+#
+#  id         :integer          not null, primary key
+#  msg        :string(255)
+#  link       :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Tweet < ActiveRecord::Base
   include Extra
 

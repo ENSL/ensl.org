@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: comments
+#
+#  id               :integer          not null, primary key
+#  text             :text
+#  user_id          :integer
+#  commentable_type :string(255)
+#  commentable_id   :integer
+#  created_at       :datetime
+#  updated_at       :datetime
+#  text_parsed      :text
+#
+
 require 'rbbcode'
 
 class Comment < ActiveRecord::Base

@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: predictions
+#
+#  id         :integer          not null, primary key
+#  match_id   :integer
+#  user_id    :integer
+#  score1     :integer
+#  score2     :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  result     :integer
+#
+
 class Prediction < ActiveRecord::Base
   include Extra
 

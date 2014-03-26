@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: teamers
+#
+#  id         :integer          not null, primary key
+#  team_id    :integer          not null
+#  user_id    :integer          not null
+#  comment    :string(255)
+#  rank       :integer          not null
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Teamer < ActiveRecord::Base
   include Extra
 

@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: articles
+#
+#  id          :integer          not null, primary key
+#  title       :string(255)
+#  status      :integer          not null
+#  category_id :integer
+#  text        :text
+#  user_id     :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#  version     :integer
+#  text_parsed :text
+#  text_coding :integer          default(0), not null
+#
+
 require File.join(Rails.root, 'vendor', 'plugins', 'has_view_count', 'init.rb')
 require 'rbbcode'
 

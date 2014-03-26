@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: weeks
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  start_date :date
+#  contest_id :integer
+#  map1_id    :integer
+#  map2_id    :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Week < ActiveRecord::Base
   include Extra
 

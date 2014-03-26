@@ -1,3 +1,32 @@
+# == Schema Information
+#
+# Table name: matches
+#
+#  id            :integer          not null, primary key
+#  contester1_id :integer
+#  contester2_id :integer
+#  score1        :integer
+#  score2        :integer
+#  match_time    :datetime
+#  challenge_id  :integer
+#  contest_id    :integer
+#  report        :text
+#  created_at    :datetime
+#  updated_at    :datetime
+#  map1_id       :integer
+#  map2_id       :integer
+#  server_id     :integer
+#  motm_id       :integer
+#  demo_id       :integer
+#  week_id       :integer
+#  referee_id    :integer
+#  forfeit       :boolean
+#  diff          :integer
+#  points1       :integer
+#  points2       :integer
+#  hltv_id       :integer
+#
+
 class Match < ActiveRecord::Base
   include Extra
 

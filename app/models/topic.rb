@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: topics
+#
+#  id         :integer          not null, primary key
+#  title      :string(255)
+#  user_id    :integer
+#  forum_id   :integer
+#  created_at :datetime
+#  updated_at :datetime
+#  state      :integer          default(0), not null
+#
+
 class Topic < ActiveRecord::Base
   POSTS_PAGE = 30
   STATE_NORMAL = 0

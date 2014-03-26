@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: forumers
+#
+#  id         :integer          not null, primary key
+#  forum_id   :integer
+#  group_id   :integer
+#  access     :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Forumer < ActiveRecord::Base
   ACCESS_READ = 0
   ACCESS_REPLY = 1
