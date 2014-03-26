@@ -3,6 +3,7 @@ base: &db
   encoding: utf8
   pool: 5
   host: localhost
+  database: <%= ENV['MYSQL_DATABASE'] %>
   username: <%= ENV['MYSQL_USERNAME'] %>
   password: <%= ENV['MYSQL_PASSWORD'] %>
 
@@ -15,9 +16,7 @@ test:
   database: ensl_test
 
 staging:
-  database: ensl
   <<: *db
 
 production:
-  database: ensl
   <<: *db
