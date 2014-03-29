@@ -5,6 +5,7 @@ ruby '2.1.1'
 gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.17'
 gem 'mysql2', '~> 0.3.15'
+gem 'oj', '~> 2.5.5'
 
 # Libraries
 gem 'jquery-rails', '~> 2.0.2'
