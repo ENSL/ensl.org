@@ -115,4 +115,10 @@ Ensl::Application.routes.draw do
 	match ':controller/:action/:id'
 	match ':controller/:action/:id.:format'
 	match ':controller/:action/:id/:id2'
+
+  namespace :api do
+    namespace :v1 do
+      resources :users
+    end
+  end
 end
