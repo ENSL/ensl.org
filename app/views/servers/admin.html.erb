@@ -11,7 +11,7 @@
   <%= render :partial => "response" %>
 </div>
 
-<% form_remote_tag :update => 'serverLog',
+<% form_tag remote: true, update: 'serverLog',
   :before => "Element.show('spinner')",
   :success => "Element.hide('spinner'); $('serverLog').scrollTop = $('serverLog').scrollHeight;" do %>
   <%= label_tag :query, "Rcon Command:" %>
