@@ -7,15 +7,12 @@ gem 'rails', '~> 3.2.17'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
 
+gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
-gem 'jquery-rails', '~> 2.0.2'
-gem 'sass-rails', '~> 3.2.5'
-gem 'coffee-rails', '~> 3.2.2'
 gem 'gruff', '~> 0.3.6'
 gem 'nokogiri', '~> 1.6.1'
 gem 'bbcoder', '~> 1.0.1'
 gem 'sanitize', '~> 2.1.0'
-gem 'tinymce-rails', '~> 3.5.4.1'
 gem 'carrierwave', '~> 0.10.0'
 gem 'bluecloth', '~> 2.2.0'
 gem 'therubyracer', '~> 0.12.1'
@@ -24,6 +21,11 @@ gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
 gem 'rmagick', '~> 2.13.2', require: false
+
+gem 'tinymce-rails', '~> 3.5.9'
+gem 'jquery-rails', '~> 2.0.2'
+gem 'sass-rails', '~> 3.2.5'
+gem 'coffee-rails', '~> 3.2.2'
 
 group :assets do
   gem 'uglifier', '~> 2.5.0'
