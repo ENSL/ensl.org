@@ -12,8 +12,6 @@
 #  text_parsed      :text
 #
 
-require 'rbbcode'
-
 class Comment < ActiveRecord::Base
   include Extra
 
@@ -35,28 +33,30 @@ class Comment < ActiveRecord::Base
   before_save :parse_text
 
   def parse_text
-    self.text_parsed = RbbCode::Parser.new.parse(text)
+    if self.text
+      self.text_parsed = bbcode_to_html(self.text)
+    end
   end
 
   def after_create
     #		if commentable_type == "Movie" or commentable_type == "Article" and commentable.user and commentable.user.profile.notify_own_stuff
     #			Notifications.deliver_comments commentable.user, commentable
     #		end
-end
+  end
 
-def can_create? cuser
-  return false unless cuser
-  #errors.add_to_base I18n.t(:comments_locked) if !commentable.lock.nil? and commentable.lock
-  errors.add_to_base I18n.t(:bans_mute) if cuser.banned? Ban::TYPE_MUTE
-  errors.add_to_base I18n.t(:registered_for_week) unless cuser.verified?
-  return errors.count == 0
-end
+  def can_create? cuser
+    return false unless cuser
+    #errors.add_to_base I18n.t(:comments_locked) if !commentable.lock.nil? and commentable.lock
+    errors.add_to_base I18n.t(:bans_mute) if cuser.banned? Ban::TYPE_MUTE
+    errors.add_to_base I18n.t(:registered_for_week) unless cuser.verified?
+    return errors.count == 0
+  end
 
-def can_update? cuser
-  cuser and user == cuser or cuser.admin?
-end
+  def can_update? cuser
+    cuser and user == cuser or cuser.admin?
+  end
 
-def can_destroy? cuser
-  cuser and cuser.admin?
-end
+  def can_destroy? cuser
+    cuser and cuser.admin?
+  end
 end

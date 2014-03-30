@@ -30,8 +30,7 @@ class Topic < ActiveRecord::Base
   has_many :posts, :order => "id ASC", :dependent => :destroy
   has_many :view_counts, :as => :viewable, :dependent => :destroy
 
-  scope :basic,
-    :include => [:latest, {:forum => :forumer}, :user]
+  scope :basic, :include => [:latest, {:forum => :forumer}, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
   scope :recent,
     :conditions => "forumers.id IS NULL AND posts.id = (SELECT id FROM posts AS P WHERE P.topic_id = topics.id ORDER BY id DESC LIMIT 1)",

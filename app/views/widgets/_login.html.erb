@@ -3,8 +3,8 @@
     <table>
       <tr>
         <td id="links">
-          <%= link_to "Register", new_user_path %> <br />
-          <%= link_to "Forgot Password?", "/users/forgot/1" %>
+          <%= link_to I18n.t('helpers.submit.user.create'), new_user_path %> <br />
+          <%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>
         </td>
         <td>
           <%= text_field "login", "username" %>
@@ -13,7 +13,7 @@
           <%= password_field "login", "password" %>
         </td>
         <td>
-          <%= submit_tag raw("&#187;") %>
+          <%= submit_tag I18n.t('helpers.submit.user.login') %>
         </td>
       </tr>
     </table>

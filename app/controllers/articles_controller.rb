@@ -6,9 +6,8 @@ class ArticlesController < ApplicationController
   end
 
   def news_index
-    @cat = params[:cat] ? Category.find(params[:cat]) : Article.onlynews.ordered.first.category
-    @news = Article.with_comments.ordered.limited.nodrafts.category @cat
-    @categories = Category.ordered.domain Category::DOMAIN_NEWS
+    @news = Article.with_comments.ordered.limited.nodrafts.onlynews
+    @categories = Category.ordered.domain(Category::DOMAIN_NEWS)
     @nobody = true
   end
 

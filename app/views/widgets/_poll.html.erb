@@ -2,6 +2,6 @@
 <div class="body">
   <div class="content">
     <% @poll = Poll.first :order => "created_at DESC" %>
-    <%= render :partial => "polls/show" %>
+    <%= render(:partial => "polls/show") if @poll %>
   </div>
 </div>

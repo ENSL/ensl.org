@@ -81,15 +81,23 @@ en:
   votes_success: "Voted successfully."
   error: "error"
   prohibited: "prohibited"
+  sessions:
+    form:
+      forgot_password: "Forgot password?"
   errors:
     template:
       header: "Please review the following errors:"
   helpers:
     submit:
       user:
+        login: "Login"
         create: "Register"
+      post:
+        create: "Create Article"
   activerecord:
     attributes:
+      article:
+        title: "Title"
       user:
         username: "Username"
         email: "Email"

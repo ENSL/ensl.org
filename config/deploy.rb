@@ -19,7 +19,7 @@ set :unicorn_config_path, "config/unicorn.rb"
 set :writable_dirs, %w{public tmp}
 set :linked_files, %w{.env}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle 
-                     public/system public/local public/uploads}
+                     public/system public/local public/uploads public/files}
 
 set :normalize_asset_timestamps, %{public/images 
                                    public/javascripts

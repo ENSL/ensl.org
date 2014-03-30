@@ -1,20 +1,9 @@
 FactoryGirl.define do
-  sequence :username do |n|
-    "Player#{n}"
-  end
-  
-  sequence :email do |n|
-    "player#{n}@ensl.org"
-  end
-
-  sequence :steamid do |n|
-    "0:1:#{n}"
-  end
-
   factory :user do
-    username
-    email
-    steamid
+    sequence(:username) { |n| "Player#{n}" }
+    sequence(:email)    { |n| "player#{n}@ensl.org" }
+    sequence(:steamid)  { |n| "0:1:#{n}" }
+
     firstname "ENSL"
     lastname "Player"
     country "EU"

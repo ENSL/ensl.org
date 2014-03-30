@@ -16,7 +16,6 @@
 #
 
 require File.join(Rails.root, 'vendor', 'plugins', 'has_view_count', 'init.rb')
-require 'rbbcode'
 
 class Article < ActiveRecord::Base
   include Exceptions
@@ -60,7 +59,8 @@ class Article < ActiveRecord::Base
   has_many :files, :class_name => "DataFile", :order => "created_at DESC", :dependent => :destroy
 
   validates_length_of :title, :in => 1..50
-  validates_length_of :text, :in => 1..64000
+  validates_length_of :text, :in => 1..16000000
+
   validates_presence_of :user, :category
   validate :validate_status
 
@@ -104,7 +104,7 @@ class Article < ActiveRecord::Base
 
   def format_text
     if text_coding == CODING_BBCODE
-      self.text_parsed = RbbCode::Parser.new.parse(text)
+      self.text_parsed = bbcode_to_html(text)
     elsif text_coding == CODING_MARKDOWN
       self.text_parsed = BlueCloth.new(text).to_html
     end

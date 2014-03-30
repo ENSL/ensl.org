@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120122001951) do
+ActiveRecord::Schema.define(:version => 20140330152235) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -31,26 +31,26 @@ ActiveRecord::Schema.define(:version => 20120122001951) do
     t.integer  "article_id"
     t.integer  "version"
     t.string   "title"
-    t.text     "text"
+    t.text     "text",        :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "text_parsed"
-    t.integer  "text_coding", :default => 0, :null => false
+    t.text     "text_parsed", :limit => 16777215
+    t.integer  "text_coding",                     :default => 0, :null => false
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
 
   create_table "articles", :force => true do |t|
     t.string   "title"
-    t.integer  "status",                     :null => false
+    t.integer  "status",                                         :null => false
     t.integer  "category_id"
-    t.text     "text"
+    t.text     "text",        :limit => 16777215
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version"
-    t.text     "text_parsed"
-    t.integer  "text_coding", :default => 0, :null => false
+    t.text     "text_parsed", :limit => 16777215
+    t.integer  "text_coding",                     :default => 0, :null => false
   end
 
   add_index "articles", ["category_id"], :name => "index_articles_on_category_id"

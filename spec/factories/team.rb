@@ -1,10 +1,7 @@
 FactoryGirl.define do
-  sequence :name do |n|
-    "Team ##{n}"
-  end
-
   factory :team do
-    name
+    sequence(:name) { |n| "Team ##{n}" }
+    
     irc "#team"
     web "http://team.com"
     tag "[TEAM]"

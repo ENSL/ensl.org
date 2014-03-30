@@ -16,7 +16,6 @@
 #
 
 require File.join(Rails.root, 'vendor', 'plugins', 'acts-as-readable', 'init.rb')
-require 'rbbcode'
 
 class Issue < ActiveRecord::Base
   STATUS_OPEN = 0
@@ -79,7 +78,9 @@ class Issue < ActiveRecord::Base
   end
 
   def parse_text
-    self.text_parsed = RbbCode::Parser.new.parse(text)
+    if self.text
+      self.text_parsed = bbcode_to_html(self.text)
+    end
   end
 
   def remove_readings

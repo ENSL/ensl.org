@@ -14,8 +14,6 @@
 #  text_parsed    :text
 #
 
-require 'rbbcode'
-
 class Message < ActiveRecord::Base
   include Extra
 
@@ -54,7 +52,9 @@ class Message < ActiveRecord::Base
   end
 
   def parse_text
-    self.text_parsed = RbbCode::Parser.new.parse(text)
+    if self.text
+      self.text_parsed = bbcode_to_html(self.text)
+    end
   end
 
   def send_notifications

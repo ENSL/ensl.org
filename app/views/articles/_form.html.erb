@@ -41,7 +41,7 @@
       <%= f.text_area :text, :rows => 30, :cols => 80 %>
     </p>
     <p>
-      <%= f.submit 'Save' %>
+      <%= f.submit %>
     </p>
   <% end %>
 </div>
@@ -52,7 +52,7 @@
 
     <%= render :partial => "data_files/list", :locals => {:files => @article.files} %>
 
-    <% if @file.can_create? cuser %>
+    <% if @file && @file.can_create?(cuser) %>
       <h3>New file</h3>
 
       <div class="wide box">
