@@ -16,7 +16,6 @@
 
 # Assets
 /public/system/*
-/public/files
 /public/files/*
 /public/local
 
