@@ -1,15 +1,14 @@
 base: &db
   adapter: mysql2
   encoding: utf8
-  pool: 5
   host: localhost
   database: <%= ENV['MYSQL_DATABASE'] %>
   username: <%= ENV['MYSQL_USERNAME'] %>
   password: <%= ENV['MYSQL_PASSWORD'] %>
+  pool: <%= Integer(ENV['MYSQL_CONNECTION_POOL'] || 8) %>
 
 development:
   <<: *db
-  database: ensl_development
 
 test:
   <<: *db

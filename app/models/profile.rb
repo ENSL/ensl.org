@@ -54,8 +54,6 @@
 #  signature_parsed    :string(255)
 #
 
-require 'rbbcode'
-
 class Profile < ActiveRecord::Base
   include Extra
 
@@ -92,7 +90,7 @@ class Profile < ActiveRecord::Base
   end
 
   def parse_text
-    self.achievements_parsed = RbbCode::Parser.new.parse(achievements) if self.achievements
-    self.signature_parsed = RbbCode::Parser.new.parse(signature) if self.signature
+    self.achievements_parsed = bbcode_to_html(achievements) if self.achievements
+    self.signature_parsed = bbcode_to_html(signature) if self.signature
   end
 end

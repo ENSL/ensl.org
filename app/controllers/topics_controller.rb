@@ -7,9 +7,8 @@ class TopicsController < ApplicationController
 
   def show
     raise AccessError unless @topic.can_show? cuser
-    @posts = @topic.posts.basic.paginate \
-      :page => params[:page],
-      :per_page => Topic::POSTS_PAGE
+    @posts = @topic.posts.basic.paginate(:page => params[:page], 
+                                         :per_page => Topic::POSTS_PAGE)
 
     return_here
     @topic.record_view_count(request.remote_ip, cuser.nil?)

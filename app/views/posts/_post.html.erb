@@ -38,7 +38,7 @@
 
 <tr>
   <td class="text" id="post_<%= post.id %>">
-    <%= raw post.text_parsed %>
+    <%= post.text_parsed.html_safe %>
   </td>
 </tr>
 

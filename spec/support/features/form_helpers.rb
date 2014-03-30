@@ -6,11 +6,13 @@ module Features
       end
     end
 
+    def fill_tinymce(element, contents)
+      page.execute_script("$('#{element}').tinymce().setContent('#{contents}')")
+    end
+
     def submit(model, action)
       helper_translation(model, action)
     end
-
-    private
 
     def attribute_translation(model, attribute)
       I18n.t("activerecord.attributes.#{model}.#{attribute}")

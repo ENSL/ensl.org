@@ -18,6 +18,10 @@ module Extra
 		{CODING_HTML => "Plain HTML", CODING_BBCODE => "BBCode", CODING_MARKDOWN => "Markdown"}
 	end
 
+  def bbcode_to_html(text)
+    Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, "<br />").html_safe
+  end
+
 	def move_up scope, column = "position"
 		n = 0
 		objects = self.class.all :conditions => scope, :order => column
