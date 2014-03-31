@@ -10,12 +10,12 @@ class RoundsController < ApplicationController
            end
 
     @rounds = Round.basic.paginate \
-      :order => sort,
-      :page => params[:page],
-      :per_page => 30
+      order: sort,
+      page: params[:page],
+      per_page: 30
 
     if params[:ajax]
-      render :partial => "list", :layout => false
+      render partial: 'list', layout: false
       return
     end
   end

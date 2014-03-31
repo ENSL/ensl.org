@@ -1,5 +1,5 @@
 class IssuesController < ApplicationController
-  before_filter :get_issue, :only => [:show, :edit, :update, :destroy]
+  before_filter :get_issue, only: [:show, :edit, :update, :destroy]
 
   def index
     raise AccessError unless cuser and cuser.admin?
@@ -12,9 +12,9 @@ class IssuesController < ApplicationController
            else "created_at DESC"
            end
 
-    @open = Issue.with_status(Issue::STATUS_OPEN).all :order => sort
-    @solved = Issue.with_status(Issue::STATUS_SOLVED).all :order => sort
-    @rejected = Issue.with_status(Issue::STATUS_REJECTED).all :order => sort
+    @open = Issue.with_status(Issue::STATUS_OPEN).all order: sort
+    @solved = Issue.with_status(Issue::STATUS_SOLVED).all order: sort
+    @rejected = Issue.with_status(Issue::STATUS_REJECTED).all order: sort
   end
 
   def show
@@ -44,7 +44,7 @@ class IssuesController < ApplicationController
         redirect_to_home
       end
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -54,7 +54,7 @@ class IssuesController < ApplicationController
       flash[:notice] = t(:issues_update)
       redirect_to(@issue)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

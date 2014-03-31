@@ -64,5 +64,5 @@ Create the `.env` file with the appropriate credentials.
 # Deployment
 
 Use capistrano to deploy:
-    
+
     bundle exec cap production deploy

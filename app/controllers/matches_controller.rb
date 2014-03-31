@@ -1,12 +1,12 @@
 class MatchesController < ApplicationController
-  before_filter :get_match, :except => [:index, :new, :create]
+  before_filter :get_match, except: [:index, :new, :create]
 
   def index
     @matches = Match.active
   end
 
   def show
-    @ownpred = @match.predictions.first :conditions => {:user_id => cuser.id} if cuser
+    @ownpred = @match.predictions.first conditions: {user_id: cuser.id} if cuser
     @newpred = @match.predictions.build
   end
 
@@ -40,9 +40,9 @@ class MatchesController < ApplicationController
 
     if @match.save
       flash[:notice] = t(:matches_create)
-      redirect_to :controller => "contests", :action => "edit", :id => @match.contest
+      redirect_to controller: 'contests', action: 'edit', id: @match.contest
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -69,7 +69,7 @@ class MatchesController < ApplicationController
         end
       end
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -88,13 +88,13 @@ class MatchesController < ApplicationController
       @match.hltv_stop
       flash[:notice] = t(:hltv_stopped)
     end
-    redirect_to :action => "show"
+    redirect_to action: 'show'
   end
 
   def destroy
     raise AccessError unless @match.can_destroy? cuser
     @match.destroy
-    redirect_to :controller => "contests", :action => "edit", :id => @match.contest
+    redirect_to controller: 'contests', action: 'edit', id: @match.contest
   end
 
   private

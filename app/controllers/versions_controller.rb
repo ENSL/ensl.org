@@ -3,13 +3,13 @@ class VersionsController < ApplicationController
 
   def index
     @versions = @article.versions
-    render "articles/history"
+    render 'articles/history'
   end
 
   def show
     @version = @article.versions.find params[:id]
     @nobody = true
-    render "articles/version"
+    render 'articles/version'
   end
 
   def update
