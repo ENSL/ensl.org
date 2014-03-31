@@ -29,16 +29,16 @@ class Ban < ActiveRecord::Base
   attr_protected :id, :created_at, :updated_at
   attr_accessor :ts, :sign, :len, :user_name
 
-  scope :ordered, :order => "created_at DESC"
-  scope :effective, :conditions => "expiry > UTC_TIMESTAMP()"
-  scope :ineffective, :conditions => "expiry < UTC_TIMESTAMP()"
+  scope :ordered, order: "created_at DESC"
+  scope :effective, conditions: "expiry > UTC_TIMESTAMP()"
+  scope :ineffective, conditions: "expiry < UTC_TIMESTAMP()"
 
   validate :validate_ts
   validate :validate_type
   validate :validate_ventban
-  validates_format_of :steamid, :with => /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/, :allow_blank => true
-  validates_format_of :addr, :with => /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, :allow_blank => true
-  validates_length_of :reason, :maximum => 255, :allow_nil => true, :allow_blank => true
+  validates_format_of :steamid, with: /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/, allow_blank: true
+  validates_format_of :addr, with: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
+  validates_length_of :reason, maximum: 255, allow_nil: true, allow_blank: true
 
   before_validation :check_user
 
@@ -78,8 +78,8 @@ class Ban < ActiveRecord::Base
     if user_name
       self.user = User.find_by_username(user_name)
     else
-      self.user = User.first(:conditions => {:steamid => steamid})
-      self.server = Server.first(:conditions => ["CONCAT(ip, ':', port) = ?", addr])
+      self.user = User.first(conditions: { steamid: steamid })
+      self.server = Server.first(conditions: ["CONCAT(ip, ':', port) = ?", addr])
     end
   end
 

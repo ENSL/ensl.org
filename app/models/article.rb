@@ -37,26 +37,26 @@ class Article < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at, :user_id, :version
 
-  scope :recent, :order => "created_at DESC", :limit => 8
+  scope :recent, order: 'created_at DESC', limit: 8
   scope :with_comments,
-    :select => "articles.*, COUNT(C.id) AS comment_num",
-    :joins	=> "LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id",
-    :group => "articles.id"
-  scope :ordered, :order => "articles.created_at DESC"
-  scope :limited, :limit => 5
-  scope :nodrafts, :conditions => {:status => STATUS_PUBLISHED}
-  scope :drafts, :conditions => {:status => STATUS_DRAFT}
-  scope :articles, :conditions => ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]
-  scope :onlynews, :conditions => ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_NEWS]
-  scope :category, lambda { |cat| {:conditions => {:category_id => cat}} }
-  scope :domain, lambda { |domain| {:include => "category", :conditions => {"categories.domain" => domain}} }
-  scope :nospecial, :conditions => ["category_id != ?", Category::SPECIAL]
-  scope :interviews, :conditions => ["category_id = ?", Category::INTERVIEWS]
+    select: "articles.*, COUNT(C.id) AS comment_num",
+    joins: "LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id",
+    group: "articles.id"
+  scope :ordered, order: 'articles.created_at DESC'
+  scope :limited, limit: 5
+  scope :nodrafts, conditions: { status: STATUS_PUBLISHED }
+  scope :drafts, conditions: { status: STATUS_DRAFT }
+  scope :articles, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]
+  scope :onlynews, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_NEWS]
+  scope :category, lambda { |cat| { conditions: { category_id: cat } } }
+  scope :domain, lambda { |domain| { includes: 'category', conditions: { "categories.domain" => domain } } }
+  scope :nospecial, conditions: ["category_id != ?", Category::SPECIAL]
+  scope :interviews, conditions: ["category_id = ?", Category::INTERVIEWS]
 
   belongs_to :user
   belongs_to :category
-  has_many :comments, :as => :commentable, :order => "created_at ASC", :dependent => :destroy
-  has_many :files, :class_name => "DataFile", :order => "created_at DESC", :dependent => :destroy
+  has_many :comments, as: :commentable, order: 'created_at ASC', dependent: :destroy
+  has_many :files, class_name: 'DataFile', order: 'created_at DESC', dependent: :destroy
 
   validates_length_of :title, :in => 1..50
   validates_length_of :text, :in => 1..16000000
@@ -82,11 +82,11 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.first(:conditions => ["id < ?", self.id], :order => "id DESC")
+    category.articles.nodrafts.first(conditions: ["id < ?", self.id], order: "id DESC")
   end
 
   def next_article
-    category.articles.nodrafts.first(:conditions => ["id > ?", self.id], :order => "id ASC")
+    category.articles.nodrafts.first(conditions: ["id > ?", self.id], order: "id ASC")
   end
 
   def statuses
@@ -114,11 +114,11 @@ class Article < ActiveRecord::Base
     if (new_record? or status_changed?) and status == STATUS_PUBLISHED
       case category.domain
       when Category::DOMAIN_NEWS
-        Profile.all(:include => :user, :conditions => "notify_news = 1").each do |p|
+        Profile.all(includes: :user, conditions: "notify_news = 1").each do |p|
           Notifications.news p.user, self if p.user
         end
       when Category::DOMAIN_ARTICLES
-        Profile.all(:include => :user, :conditions => "notify_articles = 1").each do |p|
+        Profile.all(includes: :user, conditions: "notify_articles = 1").each do |p|
           Notifications.article p.user, self if p.user
         end
       end

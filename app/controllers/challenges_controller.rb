@@ -1,5 +1,5 @@
 class ChallengesController < ApplicationController
-  before_filter :get_challenge, :only => ['show', 'edit', 'update', 'destroy']
+  before_filter :get_challenge, only: [:show, :edit, :update, :destroy]
 
   def index
     @challenges = Challenge.all
@@ -14,7 +14,7 @@ class ChallengesController < ApplicationController
       c.destroy
     end
 
-    render :text => t(:challenges_cleared)
+    render text: t(:challenges_cleared)
   end
 
   def new
@@ -34,7 +34,7 @@ class ChallengesController < ApplicationController
       flash[:notice] = t(:challenges_create)
       redirect_to @challenge
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -56,7 +56,7 @@ class ChallengesController < ApplicationController
       flash[:notice] = t(:challenges_update)
     end
 
-    render :action => "show"
+    render :show
   end
 
   def destroy

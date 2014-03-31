@@ -1,13 +1,13 @@
 class TopicsController < ApplicationController
-  before_filter :get_topic, :only => [:show, :reply, :edit, :update, :destroy]
+  before_filter :get_topic, only: [:show, :reply, :edit, :update, :destroy]
 
   def index
-    render :partial => true, :locals => {:page => params[:p].to_i}
+    render partial: true, locals: {page: params[:p].to_i}
   end
 
   def show
     raise AccessError unless @topic.can_show? cuser
-    @posts = @topic.posts.basic.paginate(:page => params[:page], 
+    @posts = @topic.posts.basic.paginate(:page => params[:page],
                                          :per_page => Topic::POSTS_PAGE)
 
     return_here
@@ -18,16 +18,16 @@ class TopicsController < ApplicationController
     @newpost.topic = @topic
     @newpost.user = cuser
     @lock = (@topic.lock ? @topic.lock : Lock.new(:lockable => @topic))
-    render :layout => "forums"
+    render layout: 'forums'
   end
 
   def reply
     @post = @topic.posts.build
     raise AccessError unless @post.can_create? cuser
     if request.xhr?
-      render "quickreply", :layout => false
+      render 'quickreply', layout: false
     else
-      render :layout => "forums"
+      render layout: 'forums'
     end
   end
 
@@ -35,12 +35,12 @@ class TopicsController < ApplicationController
     @topic = Topic.new
     @topic.forum = Forum.find(params[:id])
     raise AccessError unless @topic.can_create? cuser
-    render :layout => "forums"
+    render layout: 'forums'
   end
 
   def edit
     raise AccessError unless @topic.can_update? cuser
-    render :layout => "forums"
+    render layout: 'forums'
   end
 
   def create
@@ -52,7 +52,7 @@ class TopicsController < ApplicationController
       flash[:notice] = t(:topics_create)
       redirect_to(@topic)
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -62,7 +62,7 @@ class TopicsController < ApplicationController
       flash[:notice] = t(:topics_update)
       redirect_to(@topic)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

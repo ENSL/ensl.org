@@ -1,5 +1,5 @@
 class ContestersController < ApplicationController
-  before_filter :get_contester, :only => ['show', 'edit', 'update', :recover, :destroy, :recalc]
+  before_filter :get_contester, only: [:show, :edit, :update, :recover, :destroy, :recalc]
 
   def show
     @matches = Match.future.unfinished.ordered.of_contester @contester
@@ -38,7 +38,7 @@ class ContestersController < ApplicationController
       flash[:notice] = t(:contests_contester_update)
       redirect_to @contester
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

@@ -1,5 +1,5 @@
 class BansController < ApplicationController
-  before_filter :get_ban, :only => [:show, :edit, :update, :destroy]
+  before_filter :get_ban, only: [:show, :edit, :update, :destroy]
 
   def index
     @bans = Ban.ordered
@@ -29,7 +29,7 @@ class BansController < ApplicationController
       flash[:notice] = t(:bans_create)
       redirect_to(@ban)
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -39,7 +39,7 @@ class BansController < ApplicationController
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
