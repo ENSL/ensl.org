@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
-  before_filter :get_article, :only => [:show, :edit, :update, :cleanup, :destroy]
+  before_filter :get_article, only: [:show, :edit, :update, :cleanup, :destroy]
 
   def index
     @categories = Category.ordered.nospecial.domain Category::DOMAIN_ARTICLES
@@ -49,7 +49,7 @@ class ArticlesController < ApplicationController
       flash[:notice] = t(:articles_create)
       redirect_to @article
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -59,7 +59,7 @@ class ArticlesController < ApplicationController
       flash[:notice] = t(:articles_update)
       redirect_to @article
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

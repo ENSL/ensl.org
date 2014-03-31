@@ -3,7 +3,7 @@ require 'open-uri'
 
 class TweetsController < ApplicationController
   def index
-    @tweets = Tweet.all :order => "created_at DESC"
+    @tweets = Tweet.all order: "created_at DESC"
     @nobody = true
   end
 
@@ -24,6 +24,6 @@ class TweetsController < ApplicationController
       end
     end
 
-    render :text => t(:tweets_refresh)
+    render text: t(:tweets_refresh)
   end
 end

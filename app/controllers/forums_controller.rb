@@ -1,5 +1,5 @@
 class ForumsController < ApplicationController
-  before_filter :get_forum, :only => [:show, :edit, :update, :up, :down, :destroy]
+  before_filter :get_forum, only: [:show, :edit, :update, :up, :down, :destroy]
 
   def index
     @categories = Category.domain(Category::DOMAIN_FORUMS).ordered
@@ -30,7 +30,7 @@ class ForumsController < ApplicationController
       flash[:notice] = t(:forums_create)
       redirect_to(@forum)
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -40,7 +40,7 @@ class ForumsController < ApplicationController
       flash[:notice] = t(:forums_update)
       redirect_to(@forum)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

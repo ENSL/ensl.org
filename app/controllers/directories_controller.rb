@@ -1,12 +1,12 @@
 class DirectoriesController < ApplicationController
-  before_filter :get_directory, :except => [:new, :create]
+  before_filter :get_directory, except: [:new, :create]
 
   def show
     if @directory.hidden
       @files = @directory.files
-      render :partial => "data_files/list", :layout => true
+      render partial: 'data_files/list', layout: true
     else
-      @directories = Directory.ordered.filtered.all :conditions => {:parent_id => 1}
+      @directories = Directory.ordered.filtered.all conditions: { parent_id: 1 }
     end
   end
 
@@ -22,7 +22,7 @@ class DirectoriesController < ApplicationController
 
   def refresh
     @directory.process_dir
-    render :text => t(:directories_update)
+    render text: t(:directories_update)
   end
 
   def create
@@ -33,7 +33,7 @@ class DirectoriesController < ApplicationController
       flash[:notice] = t(:directories_create)
       redirect_to(@directory)
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -43,7 +43,7 @@ class DirectoriesController < ApplicationController
       flash[:notice] = t(:directories_update)
       redirect_to @directory
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

@@ -1,5 +1,5 @@
 class GathersController < ApplicationController
-  before_filter :get_gather, :except => [:latest, :index, :create]
+  before_filter :get_gather, except: [:latest, :index, :create]
   respond_to :html, :js
 
   def index

@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  before_filter :get_message, :only => [:show, :edit, :update, :destroy]
+  before_filter :get_message, only: [:show, :edit, :update, :destroy]
 
   def index
     raise AccessError unless cuser
@@ -37,7 +37,7 @@ class MessagesController < ApplicationController
       flash[:notice] = t(:message_create)
       redirect_to(@message)
     else
-      render :action => "new"
+      render :new
     end
   end
 

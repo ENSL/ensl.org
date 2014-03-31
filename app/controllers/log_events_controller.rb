@@ -6,7 +6,7 @@ class LogEventsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @log_events }
+      format.xml  { render xml: @log_events }
     end
   end
 
@@ -17,7 +17,7 @@ class LogEventsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @log_event }
+      format.xml  { render xml: @log_event }
     end
   end
 
@@ -28,7 +28,7 @@ class LogEventsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @log_event }
+      format.xml  { render xml: @log_event }
     end
   end
 
@@ -46,10 +46,10 @@ class LogEventsController < ApplicationController
       if @log_event.save
         flash[:notice] = t(:logevent_create)
         format.html { redirect_to(@log_event) }
-        format.xml  { render :xml => @log_event, :status => :created, :location => @log_event }
+        format.xml  { render xml: @log_event, :status => :created, :location => @log_event }
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @log_event.errors, :status => :unprocessable_entity }
+        format.html { render :new }
+        format.xml  { render xml: @log_event.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -65,8 +65,8 @@ class LogEventsController < ApplicationController
         format.html { redirect_to(@log_event) }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @log_event.errors, :status => :unprocessable_entity }
+        format.html { render :edit }
+        format.xml  { render xml: @log_event.errors, :status => :unprocessable_entity }
       end
     end
   end
