@@ -1,5 +1,5 @@
 class MapsController < ApplicationController
-  before_filter :get_map, :only => [:show, :edit, :update, :destroy]
+  before_filter :get_map, only: [:show, :edit, :update, :destroy]
 
   def index
     @maps = Map.basic
@@ -25,7 +25,7 @@ class MapsController < ApplicationController
       flash[:notice] = t(:maps_create)
       redirect_to @map
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -35,7 +35,7 @@ class MapsController < ApplicationController
       flash[:notice] = t(:maps_update)
       redirect_to @map
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

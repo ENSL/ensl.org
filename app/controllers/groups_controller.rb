@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_filter :get_group, :except => [:index, :new, :create]
+  before_filter :get_group, except: [:index, :new, :create]
 
   def index
     @groups = Group.all
@@ -26,7 +26,7 @@ class GroupsController < ApplicationController
       flash[:notice] = t(:groups_create)
       redirect_to @group
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -36,7 +36,7 @@ class GroupsController < ApplicationController
       flash[:notice] = t(:groups_update)
       redirect_to @group
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -47,12 +47,12 @@ class GroupsController < ApplicationController
   end
 
   def addUser
-    @user = User.first :conditions => {:username => params[:username]}
+    @user = User.first conditions: {username: params[:username]}
     raise AccessError unless @group.can_update? cuser
     raise Error, t(:duplicate_user) if @group.users.include? @user
 
     @group.users << @user if @user
-    redirect_to edit_group_url(@group, :groupTab => "groupTabMembers")
+    redirect_to edit_group_url(@group, groupTab: "groupTabMembers")
   end
 
   def delUser
@@ -60,7 +60,7 @@ class GroupsController < ApplicationController
     raise AccessError unless @group.can_update? cuser
 
     @group.users.delete @user
-    redirect_to edit_group_url(@group, :groupTab => "groupTabMembers")
+    redirect_to edit_group_url(@group, groupTab: "groupTabMembers")
   end
 
   private

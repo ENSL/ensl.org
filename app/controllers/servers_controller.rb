@@ -1,5 +1,5 @@
 class ServersController < ApplicationController
-  before_filter :get_server, :except => [:index, :refresh, :new, :create]
+  before_filter :get_server, except: [:index, :refresh, :new, :create]
 
   def refresh
     Server.refresh
@@ -30,7 +30,7 @@ class ServersController < ApplicationController
     raise AccessError unless @server.can_update? cuser
 
     if request.xhr?
-      render :partial => "response", :layout => false
+      render partial: 'response', layout: false
     end
   end
 
@@ -43,7 +43,7 @@ class ServersController < ApplicationController
       flash[:notice] = t(:server_create)
       redirect_to @server
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -54,14 +54,14 @@ class ServersController < ApplicationController
       flash[:notice] = t(:server_update)
       redirect_to @server
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
   def default
     raise AccessError unless @server.can_update? cuser
     @server.default_record
-    render :text => "Ok"
+    render text: 'Ok'
   end
 
   def destroy

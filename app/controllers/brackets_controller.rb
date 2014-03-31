@@ -1,5 +1,5 @@
 class BracketsController < ApplicationController
-  before_filter :get_bracket, :only => [:show, :edit, :update, :destroy]
+  before_filter :get_bracket, only: [:show, :edit, :update, :destroy]
 
   def edit
     raise AccessError unless @bracket.can_update? cuser
@@ -23,7 +23,7 @@ class BracketsController < ApplicationController
       flash[:notice] = t(:brackets_update)
     end
 
-    render :action => "edit"
+    render :edit
   end
 
   def destroy

@@ -1,5 +1,5 @@
 class GatherersController < ApplicationController
-  before_filter :get_gatherer, :except => [:create]
+  before_filter :get_gatherer, except: [:create]
 
   def create
     Gather.transaction do

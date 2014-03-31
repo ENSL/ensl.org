@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
-  before_filter :get_user, :only => [:show, :history, :popup, :agenda, :edit, :update, :destroy]
+  before_filter :get_user, only: [:show, :history, :popup, :agenda, :edit, :update, :destroy]
   respond_to :html, :js
 
   def index
-    @users = User.search(params[:search]).paginate(:per_page => 40, :page => params[:page])
+    @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
   end
 
   def show
@@ -29,7 +29,7 @@ class UsersController < ApplicationController
   end
 
   def popup
-    render :layout => false
+    render layout: false
   end
 
   def new
@@ -54,10 +54,10 @@ class UsersController < ApplicationController
       @user.profile = Profile.new
       @user.profile.user = @user
       @user.profile.save()
-      redirect_to :action => :show, :id => @user.id
+      redirect_to action: :show, id: @user.id
       save_session @user
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
       flash[:notice] = t(:users_update)
       redirect_to_back
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

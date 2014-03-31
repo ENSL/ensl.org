@@ -38,6 +38,7 @@ group :development do
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano3-unicorn', '~> 0.1.1'
   gem 'annotate', '~> 2.6.2'
+  gem 'quiet_assets'
 end
 
 group :test do

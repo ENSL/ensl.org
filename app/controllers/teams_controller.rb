@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  before_filter :get_team, :only => ['show', 'edit', 'update', 'destroy', 'recover']
+  before_filter :get_team, only: [:show, :edit, :update, :destroy, :recover]
 
   def index
     @teams = Team.with_teamers_num(0).ordered
@@ -26,7 +26,7 @@ class TeamsController < ApplicationController
       flash[:notice] = t(:teams_create)
       redirect_to @team
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -48,7 +48,7 @@ class TeamsController < ApplicationController
       flash[:notice] = t(:teams_update)
       redirect_to edit_team_path(@team)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

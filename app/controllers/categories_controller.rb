@@ -1,11 +1,11 @@
 class CategoriesController < ApplicationController
-  before_filter :get_category, :except => [:index, :new, :create]
+  before_filter :get_category, except: [:index, :new, :create]
 
   def show
     if [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
       @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
       Category.find(params[:id]).read_by! cuser if cuser
-      render :partial => "articles/article", :collection => @articles.to_a
+      render partial: 'articles/article', collection: @articles.to_a
     end
   end
 
