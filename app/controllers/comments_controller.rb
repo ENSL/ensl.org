@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_filter :get_comment, :only => [:raw, 'edit', 'update', 'destroy']
+  before_filter :get_comment, only: [:raw, :edit, :update, :destroy]
   respond_to :html, :js
 
   def index
@@ -7,8 +7,8 @@ class CommentsController < ApplicationController
   end
 
   def show
-    @comments = Comment.recent5.all :conditions => {:commentable_id => params[:id2], :commentable_type => params[:id]}
-    render :partial => 'list', :layout => false
+    @comments = Comment.recent5.all conditions: {commentable_id: params[:id2], commentable_type: params[:id]}
+    render partial: 'list', layout: false
   end
 
   def edit
@@ -23,7 +23,7 @@ class CommentsController < ApplicationController
     respond_to do |format|
       if @comment.save
         flash[:notice] = t(:comments_create)
-        format.js  { render }
+        format.js { render }
       else
         flash[:error] = t(:comments_invalid) + @comment.errors.full_messages.to_s
         format.html { redirect_to(:back)}
@@ -37,7 +37,7 @@ class CommentsController < ApplicationController
       flash[:notice] = t(:comments_update)
       return_to
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :get_post, :except => [:new, :create]
+  before_filter :get_post, except: [:new, :create]
   respond_to :html, :js
 
   def quote
@@ -10,12 +10,12 @@ class PostsController < ApplicationController
     @post = Post.new
     @post.topic = Topic.find(params[:id])
     raise AccessError unless @post.can_create? cuser
-    render :layout => "forums"
+    render layout: 'forums'
   end
 
   def edit
     raise AccessError unless @post.can_update? cuser
-    render :layout => "forums"
+    render layout: 'forums'
   end
 
   def create
@@ -40,7 +40,7 @@ class PostsController < ApplicationController
       flash[:notice] = t(:posts_update)
       redirect_to @post.topic
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

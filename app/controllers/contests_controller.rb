@@ -1,8 +1,8 @@
 class ContestsController < ApplicationController
-  before_filter :get_contest, :only => ['show', 'edit', 'update', 'destroy', 'del_map', 'scores', 'recalc']
+  before_filter :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc]
 
   def index
-    #@contests = Contest.all
+    # @contests = Contest.all
     @contests_active = Contest.active
     @contests_inactive = Contest.inactive
   end
@@ -60,7 +60,7 @@ class ContestsController < ApplicationController
       flash[:notice] = t(:contests_create)
       redirect_to @contest
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -71,11 +71,11 @@ class ContestsController < ApplicationController
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else
-        render :action => "edit"
+        render :edit
       end
     elsif params[:commit] == "Add map"
       @contest.maps << Map.find(params[:map])
-      render :action => "edit"
+      render :edit
     elsif params[:commit] == "Add team"
       contester = Contester.new
       contester.team = Team.find params[:team]
@@ -86,14 +86,14 @@ class ContestsController < ApplicationController
       else
         @contest.errors.add_to_base contester.errors.full_messages.to_s
       end
-      render :action => "edit"
+      render :edit
     end
   end
 
   def del_map
     raise AccessError unless @contest.can_update? cuser
     @contest.maps.delete(Map.find(params[:id2]))
-    render :action => "edit"
+    render :edit
   end
 
   def destroy

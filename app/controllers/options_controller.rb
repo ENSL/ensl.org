@@ -1,5 +1,5 @@
 class PollsController < ApplicationController
-  before_filter :get_poll, :except => [:index, :new, :create]
+  before_filter :get_poll, except: [:index, :new, :create]
   respond_to :js
 
   def add
@@ -14,7 +14,7 @@ class PollsController < ApplicationController
       flash[:notice] = t(:polls_create)
       redirect_to @poll
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -25,7 +25,7 @@ class PollsController < ApplicationController
       flash[:notice] = t(:polls_update)
       redirect_to @poll
     else
-      render :action => "edit"
+      render :edit
     end
   end
 

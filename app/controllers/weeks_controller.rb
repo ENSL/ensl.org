@@ -1,9 +1,9 @@
 class WeeksController < ApplicationController
-  before_filter :get_week, :except => [:new, :create]
+  before_filter :get_week, except: [:new, :create]
 
   def new
     @week = Week.new
-    @week.contest = Contest.find params[:id]
+    @week.contest = Contest.find(params[:id])
     raise AccessError unless @week.can_create? cuser
   end
 
@@ -19,7 +19,7 @@ class WeeksController < ApplicationController
       flash[:notice] = t(:weeks_create)
       redirect_to @week.contest
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -30,7 +30,7 @@ class WeeksController < ApplicationController
       flash[:notice] = t(:weeks_update)
       redirect_to @week.contest
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -43,6 +43,6 @@ class WeeksController < ApplicationController
   private
 
   def get_week
-    @week = Week.find params[:id]
+    @week = Week.find(params[:id])
   end
 end

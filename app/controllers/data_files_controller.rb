@@ -1,5 +1,5 @@
 class DataFilesController < ApplicationController
-  before_filter :get_file, :only => ['show', 'edit', 'update', 'destroy', 'rate', :addFile, :delFile]
+  before_filter :get_file, only: [:show, :edit, :update, :destroy, :rate, :addFile, :delFile]
 
   def show
   end
@@ -41,7 +41,7 @@ class DataFilesController < ApplicationController
         redirect_to @file
       end
     else
-      render :action => "new"
+      render :new
     end
   end
 
@@ -51,7 +51,7 @@ class DataFilesController < ApplicationController
       flash[:notice] = t(:files_update)
       redirect_to(@file)
     else
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -94,7 +94,7 @@ class DataFilesController < ApplicationController
         @result << file.to_s + "<br />"
       end
     end
-    render :text => @result, :layout => true
+    render text: @result, layout: true
   end
 
   private

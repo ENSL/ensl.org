@@ -1,12 +1,12 @@
 class LogFilesController < ApplicationController
   def index
     LogFile.process
-    render :text => "Ok"
+    render text: 'Ok'
   end
 
   def handle
     LogFile.find(params[:id]).deal
-    render :text => "Ok"
+    render text: 'Ok'
   end
 
   def refresh
@@ -16,9 +16,9 @@ class LogFilesController < ApplicationController
   end
 
   def fix
-    Rounder.find_in_batches(:batch_size => 100) do |rounders|
+    Rounder.find_in_batches(batch_size: 100) do |rounders|
       rounders.each do |r|
-        r.team_id = nil 
+        r.team_id = nil
         if r.user and t = Teamer.historic(r.user, r.round.start).first
           r.team_id =  t.team_id
         end
