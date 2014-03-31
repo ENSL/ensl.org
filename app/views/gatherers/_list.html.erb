@@ -15,7 +15,7 @@
             <td><%= radio_button_tag :player, gatherer.id %><%= flag gatherer.user.country %></td>
             <td><%= namelink gatherer.user %></td>
           <% else %>
-            <td><%= flag gatherer.user.country %></td>
+            <td><%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %></td>
             <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
               <td>&#187;
               <% else %>
