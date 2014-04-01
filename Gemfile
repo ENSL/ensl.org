@@ -9,6 +9,7 @@ gem 'dalli', '~> 2.7.0'
 
 gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
+gem 'faraday', '~> 0.9.0'
 gem 'gruff', '~> 0.3.6'
 gem 'nokogiri', '~> 1.6.1'
 gem 'bbcoder', '~> 1.0.1'
@@ -50,6 +51,7 @@ group :test do
   gem 'poltergeist', '~> 1.5.0'
   gem 'selenium-webdriver', '~> 2.41.0'
   gem 'factory_girl_rails', '~> 4.4.1'
+  gem 'timecop', '~> 0.7.1'
 end
 
 group :development, :test do

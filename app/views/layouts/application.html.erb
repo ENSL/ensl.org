@@ -34,6 +34,10 @@
           </div>
 
           <div id="indexRight">
+            <div class="indexBox" id="index-calendar">
+              <%= render :partial => "widgets/calendar" %>
+            </div>
+
             <div class="indexBox">
               <div class="header">Shoutbox & Match search</div>
               <div class="body">
@@ -43,11 +47,9 @@
               </div>
             </div>
 
-            <%# if @current_controller == "contests" %>
             <div class="indexBox" id="indexHighlights">
               <%= render :partial => "widgets/highlights" %>
             </div>
-            <%# end %>
 
             <div class="indexBox" id="indexLatest">
               <%= render :partial => "widgets/posts" %>

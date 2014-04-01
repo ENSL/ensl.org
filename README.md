@@ -32,6 +32,7 @@ Features:
 
 ## Contributors
 
-- [Ari Timonen](https://github.com/jirikivaari) - Original author
-- [Florent Latombe](https://github.com/flatombe) - Improvements
-- [Luke Barratt](https://github.com/lbarratt) - Improvements
+- [Ari Timonen](https://github.com/jirikivaari) (Original Author)
+- [Florent Latombe](https://github.com/flatombe)
+- [Luke Barratt](https://github.com/lbarratt)
+- [Callum Barratt](https://github.com/cbarratt)

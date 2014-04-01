@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Api::V1::UsersCollection do
   let(:collection) { Api::V1::UsersCollection.new }
 

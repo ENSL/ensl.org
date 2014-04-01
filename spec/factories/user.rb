@@ -9,6 +9,10 @@ FactoryGirl.define do
     country "EU"
     raw_password "PasswordABC123"
 
+    after(:create) do |user|
+      create(:profile, user: user)
+    end
+
     factory :user_with_team do
       after(:create) do |user|
         create(:team, founder: user)

@@ -130,4 +130,18 @@ module ApplicationHelper
     end
     link_to_function(name, ("add_fields(this, '#{association}', '#{escape_javascript(fields)}')"))
   end
+
+  def timezone_offset
+    if @cuser
+      @cuser.time_zone
+    else
+      Time.zone.name
+    end
+  end
+
+  def upcoming_matches
+    GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).upcoming.sort_by do |event|
+      event.start
+    end
+  end
 end

@@ -6,7 +6,7 @@
       <ul id="userTab-nav" class="tabs">
         <li><a href="#userTabGeneral">General</a></li>
         <li><a href="#userTabContact">Contact</a></li>
-        <li><a href="#userTabCountry">Locals</a></li>
+        <li><a href="#userTabCountry"><%= t('profile.locals') %></a></li>
         <li><a href="#userTabFavorites">Favorites</a></li>
         <li><a href="#userTabSettings">Settings</a></li>
         <li><a href="#userTabComputer">Computer</a></li>
@@ -279,7 +279,7 @@
         </div>
       </div>
       <p>
-        <%= f.submit "Save" %>
+        <%= f.submit %>
       </p>
     </div>
   <% end %>
