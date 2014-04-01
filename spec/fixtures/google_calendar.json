@@ -1,0 +1,763 @@
+{
+  "kind": "calendar#events",
+  "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/uXUVU6PbSJC9e6cCh7-EC4OsKu0\"",
+  "summary": "NSL Season 4 Confirmed Match Schedule",
+  "description": "",
+  "updated": "2014-04-01T20:18:31.372Z",
+  "timeZone": "America/New_York",
+  "accessRole": "reader",
+  "items": [
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTM1ODMwOTgxMjAwMA\"",
+      "id": "gsq5f4k3mhg4keuqu1hqom1h18",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=Z3NxNWY0azNtaGc0a2V1cXUxaHFvbTFoMTggdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-19T21:40:28.000Z",
+      "updated": "2014-03-20T23:31:49.812Z",
+      "summary": "Div 3A: Silvermoon vs. Frequency (http://twitch.tv/feathermonster)",
+      "description": "http://www.ensl.org/matches/5488\n\nWeek 1 matchup. \n\nReferee: NeXuS\nCaster: Feathermonster\nStream: http://twitch.tv/feathermonster",
+      "creator": {
+        "email": "joeyh89@vt.edu",
+        "displayName": "Joey Hutchins"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Matches",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-20T22:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-21T00:00:00-04:00"
+      },
+      "iCalUID": "gsq5f4k3mhg4keuqu1hqom1h18@google.com",
+      "sequence": 1
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTM1ODM4NTQyMDAwMA\"",
+      "id": "7g1k46eq471fsrsub1hqiqa4do",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=N2cxazQ2ZXE0NzFmc3JzdWIxaHFpcWE0ZG8gdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-19T21:37:32.000Z",
+      "updated": "2014-03-20T23:33:05.420Z",
+      "summary": "Div 2B: WongaNS vs. 2hrsLater (http://hitbox.tv/danjio)",
+      "description": "http://www.ensl.org/matches/5509\n\nWeek 1 matchup. \n\nReferee: Sohma\nCaster: Danjio\nStream: http://hitbox.tv/danjio",
+      "creator": {
+        "email": "joeyh89@vt.edu",
+        "displayName": "Joey Hutchins"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Matches",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-26T15:45:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-26T17:45:00-04:00"
+      },
+      "transparency": "transparent",
+      "iCalUID": "7g1k46eq471fsrsub1hqiqa4do@google.com",
+      "sequence": 4
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTQyMTI1MzAzMDAwMA\"",
+      "id": "4bkilrunk0b0n2bl49v2n2tfok",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=NGJraWxydW5rMGIwbjJibDQ5djJuMnRmb2sgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-19T17:39:23.000Z",
+      "updated": "2014-03-21T17:00:53.030Z",
+      "summary": "Div 1: Gnarcolepsy vs. Singularity (http://www.twitch.tv/gold_n)",
+      "description": "http://www.ensl.org/matches/5545\n\nWeek 1 matchup. \n\nReferee: Jehuty\nCaster: Golden & joshhhy\nStream: http://www.twitch.tv/gold_n",
+      "creator": {
+        "email": "joeyh89@vt.edu",
+        "displayName": "Joey Hutchins"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Matches",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-23T20:00:00-04:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2014-03-23T22:00:00-04:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "transparency": "transparent",
+      "iCalUID": "4bkilrunk0b0n2bl49v2n2tfok@google.com",
+      "sequence": 1
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTQyOTg3NjIwMTAwMA\"",
+      "id": "i8vir19jo5vgsf57qb1gjuldak",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=aTh2aXIxOWpvNXZnc2Y1N3FiMWdqdWxkYWsgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-21T19:23:38.000Z",
+      "updated": "2014-03-21T19:24:36.201Z",
+      "summary": "Div 4B: PinkFluffyGorges vs. FrenchCompany (http://www.twitch.tv/nittai_nev)",
+      "description": "http://www.ensl.org/matches/5582\n\nWeek 1 matchup. \n\nReferee: Yaluzan\nCaster: Nittai\nStream: http://www.twitch.tv/nittai_nev",
+      "creator": {
+        "email": "joeyh89@vt.edu",
+        "displayName": "Joey Hutchins"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-22T16:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-22T18:00:00-04:00"
+      },
+      "iCalUID": "i8vir19jo5vgsf57qb1gjuldak@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTQzODc1MTM2MTAwMA\"",
+      "id": "2m5v78g88hqq02evfhg5vn9ka8",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=Mm01djc4Zzg4aHFxMDJldmZoZzV2bjlrYTggdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-21T21:51:27.000Z",
+      "updated": "2014-03-21T21:52:31.361Z",
+      "summary": "Div 2A: Perfect Peckers vs. Intent (http://www.twitch.tv/vindalo0)",
+      "description": "http://www.ensl.org/matches/5532\n\nWeek 1 matchup. \n\nReferee: Unique\nCaster: Vindaloo\nStream: http://www.twitch.tv/vindalo0",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-22T07:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-22T09:00:00-04:00"
+      },
+      "iCalUID": "2m5v78g88hqq02evfhg5vn9ka8@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTUzNDU1MTgxMTAwMA\"",
+      "id": "i7fh8brdlj7im5c7thivp6hc9g",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=aTdmaDhicmRsajdpbTVjN3RoaXZwNmhjOWcgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-20T19:21:50.000Z",
+      "updated": "2014-03-23T00:29:11.811Z",
+      "summary": "Div 3A: Gorge Busters vs. >>ACV<< ( http://www.hitbox.tv/danjio)",
+      "description": "http://www.ensl.org/matches/5489\n\nWeek 1 matchup. \n\nReferee: \nCaster: Danjio\nStream: http://hitbox.tv/danjio",
+      "creator": {
+        "email": "joeyh89@vt.edu",
+        "displayName": "Joey Hutchins"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Matches",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-23T14:30:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-23T16:30:00-04:00"
+      },
+      "iCalUID": "i7fh8brdlj7im5c7thivp6hc9g@google.com",
+      "sequence": 3
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTU4NDU3Mjc1MjAwMA\"",
+      "id": "jt9upnr744ooit6rhijqs248gc",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=anQ5dXBucjc0NG9vaXQ2cmhpanFzMjQ4Z2MgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-23T14:22:52.000Z",
+      "updated": "2014-03-23T14:22:52.752Z",
+      "summary": "Div 4A: UKTeamplay vs. LuckyFkers (http://www.twitch.tv/ISEGaming)",
+      "description": "http://www.ensl.org/matches/5596\n\nWeek 1 matchup.\n\nReferee: Argosh \nCaster: ItsSuperEffective \nStream: http://www.twitch.tv/ISEGaming",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-23T15:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-23T17:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "jt9upnr744ooit6rhijqs248gc@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTYwMDkwNzc4OTAwMA\"",
+      "id": "mvt93vu72idnqo2p16oklqe5i8",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=bXZ0OTN2dTcyaWRucW8ycDE2b2tscWU1aTggdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-23T00:33:02.000Z",
+      "updated": "2014-03-23T18:55:07.789Z",
+      "summary": "Div 3B: 3hrsLater vs. PowerUP! (http://www.twitch.tv/RIdeOnSkulks)",
+      "description": "http://www.ensl.org/matches/5475\n\nWeek 1 matchup.\n\nReferee: Pelargir\nCaster: RioS \nStream: http://www.twitch.tv/RIdeOnSkulks",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-23T15:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-23T17:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "mvt93vu72idnqo2p16oklqe5i8@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTc0MzY4ODE0NDAwMA\"",
+      "id": "ps74a0vskblsi52i24dkicvklg",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=cHM3NGEwdnNrYmxzaTUyaTI0ZGtpY3ZrbGcgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-25T10:34:48.000Z",
+      "updated": "2014-03-25T10:34:48.144Z",
+      "summary": "Div 1: Joan of Arc™ vs. Virtual Dejection (http://www.hitbox.tv/danjio)",
+      "description": "http://www.ensl.org/matches/5547\n\nWeek 1 Matchup.\n\nReferee: Pelargir\nCaster: Danjio\nStream: http://www.hitbox.tv/danjio",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-29T10:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-29T12:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "ps74a0vskblsi52i24dkicvklg@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTc2NTM5ODQwNzAwMA\"",
+      "id": "aafemih6n92b5v5o70k5imd348",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=YWFmZW1paDZuOTJiNXY1bzcwazVpbWQzNDggdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-25T10:31:01.000Z",
+      "updated": "2014-03-25T16:36:38.407Z",
+      "summary": "Div 4B: [karvalakki] vs. TAWsome (http://www.twitch.tv/ggKaneh)",
+      "description": "http://www.ensl.org/matches/5581\n\nWeek 1 Matchup.\n\nReferee: Pelargir\nCaster: Kaneh\nStream: http://www.twitch.tv/ggKaneh",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-25T15:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-25T17:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "aafemih6n92b5v5o70k5imd348@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTkxODQ5MDc2ODAwMA\"",
+      "id": "mjipkmgdia834bp7f2ksmnf0rk",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=bWppcGttZ2RpYTgzNGJwN2Yya3NtbmYwcmsgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-27T11:08:10.000Z",
+      "updated": "2014-03-27T11:08:10.768Z",
+      "summary": "Div 3B: TAW ♥ vs. HBZ (http://www.twitch.tv/feathermonster)",
+      "description": "http://www.ensl.org/matches/5474\n\nWeek 1 Matchup.\n\nReferee: Pelargir\nCaster: Feathermonster\nStream: http://www.twitch.tv/feathermonster",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-27T15:30:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-27T17:30:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "mjipkmgdia834bp7f2ksmnf0rk@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTkxODUyNjAxMjAwMA\"",
+      "id": "49jnm0eh22lrjgg6738jr85d3k",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=NDlqbm0wZWgyMmxyamdnNjczOGpyODVkM2sgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-25T10:36:45.000Z",
+      "updated": "2014-03-27T11:08:46.012Z",
+      "summary": "Div 2B: Table For Six vs. -/AUS/- (http://www.twitch.tv/schwaschwa)",
+      "description": "http://www.ensl.org/matches/5511\n\nWeek 1 Matchup.\n\nReferee: Tico\nCaster: Schwa\nStream: http://www.twitch.tv/schwaschwa",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-29T22:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T00:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "49jnm0eh22lrjgg6738jr85d3k@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NTkxODk5MzEwMjAwMA\"",
+      "id": "h7k7efkmoorimfolqkcn3833l0",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=aDdrN2Vma21vb3JpbWZvbHFrY24zODMzbDAgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-24T15:12:39.000Z",
+      "updated": "2014-03-27T11:16:33.102Z",
+      "summary": "Div 4A: She-Wolves vs. Diamond Gamers (http://www.twitch.tv/ISEGaming)",
+      "description": "http://www.ensl.org/matches/5597\n\nWeek 1 matchup.\n\nReferee: Tico\nCaster: ItsSuperEffective\nStream: http://www.twitch.tv/ISEGaming",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-31T21:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-31T23:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "h7k7efkmoorimfolqkcn3833l0@google.com",
+      "sequence": 3
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjAxNTI1MDczNTAwMA\"",
+      "id": "gq026ueot20a8hfv8leu66r7g0",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=Z3EwMjZ1ZW90MjBhOGhmdjhsZXU2NnI3ZzAgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-28T14:00:44.000Z",
+      "updated": "2014-03-28T14:00:50.735Z",
+      "summary": "Div 3A: TkMaster vs. Neuromancers (http://www.twitch.tv/sadenki)",
+      "description": "http://www.ensl.org/matches/5493\n\nWeek 2 Matchup.\n\nSTREAM IN FRENCH\n\nReferee:\nCaster: Sadenki\nStream: http://www.twitch.tv/sadenki",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-30T14:30:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T16:30:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "gq026ueot20a8hfv8leu66r7g0@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjA0NDg1OTEyMDAwMA\"",
+      "id": "5kp8kjnmhf0dipvc322quf2f6g",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=NWtwOGtqbm1oZjBkaXB2YzMyMnF1ZjJmNmcgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-27T22:26:55.000Z",
+      "updated": "2014-03-28T22:14:19.120Z",
+      "summary": "Div 3A: TkMaster vs. Vexta Ω (http://www.twitch.tv/sadenki)",
+      "description": "http://www.ensl.org/matches/5490\n\nWeek 1 Matchup.\n\nSTREAM IN FRENCH\n\nReferee: Sohma\nCaster: Sadenki & Mirmouz\nStream: http://www.twitch.tv/sadenki",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-31T14:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-31T16:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "5kp8kjnmhf0dipvc322quf2f6g@google.com",
+      "sequence": 1
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjA4OTY3NjMyMzAwMA\"",
+      "id": "8u7mrqlspe78mia6tu21pbst1k",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=OHU3bXJxbHNwZTc4bWlhNnR1MjFwYnN0MWsgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-29T10:39:01.000Z",
+      "updated": "2014-03-29T10:41:16.323Z",
+      "summary": "Div 1: onFire vs. RaZe (http://www.twitch.tv/ren26)",
+      "description": "http://www.ensl.org/matches/5548\n\nWeek 1 Matchup.\n\nReferee:\nCaster: Ren26\nStream: http://www.twitch.tv/ren26",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-29T19:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-29T21:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "8u7mrqlspe78mia6tu21pbst1k@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjExNTY2Mjc0NDAwMA\"",
+      "id": "c46jqcbqt1kb95roo0gedskhd0",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=YzQ2anFjYnF0MWtiOTVyb28wZ2Vkc2toZDAgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-29T17:54:22.000Z",
+      "updated": "2014-03-29T17:54:22.744Z",
+      "summary": "Div 2A: Vexta vs. Aphex (http://www.twitch.tv/ren26)",
+      "description": "http://www.ensl.org/matches/5531\n\nWeek 1 Matchup.\n\nReferees: Tico & Zebroe\nCaster: Ren26\nStream: http://www.twitch.tv/ren26",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-29T16:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-29T18:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "c46jqcbqt1kb95roo0gedskhd0@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjEyNTcxMzQ1MzAwMA\"",
+      "id": "eeduo3nnj33hci76hff49ii8ts",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=ZWVkdW8zbm5qMzNoY2k3NmhmZjQ5aWk4dHMgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-29T20:41:53.000Z",
+      "updated": "2014-03-29T20:41:53.453Z",
+      "summary": "Premiere: Saunamen vs. iMAGINE (http://www.twitch.tv/ren26)",
+      "description": "http://www.ensl.org/matches/5429\n\nWeek 1 Matchup.\n\nReferee: Pelargir\nCaster: Ren26\nStream: http://www.twitch.tv/ren26",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-30T14:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T16:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "eeduo3nnj33hci76hff49ii8ts@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjE4MDAzODU3ODAwMA\"",
+      "id": "7rdlnhgllqii9582cdtfhki3lc",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=N3JkbG5oZ2xscWlpOTU4MmNkdGZoa2kzbGMgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-27T11:10:53.000Z",
+      "updated": "2014-03-30T11:47:18.578Z",
+      "summary": "Premiere: Legendary Snails vs. Titus Gaming (http://www.twitch.tv/naturalselection2)",
+      "description": "http://www.ensl.org/matches/5428\n\nWeek 1 Matchup.\n\nReferee: Yaluzan\nCaster: WasabiOne & Ren26\nStream: http://www.twitch.tv/naturalselection2",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-30T12:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T14:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "7rdlnhgllqii9582cdtfhki3lc@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjE4MDE0NzAwMzAwMA\"",
+      "id": "aflokq41l64msqdq1q1pmuedqs",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=YWZsb2txNDFsNjRtc3FkcTFxMXBtdWVkcXMgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-28T10:11:46.000Z",
+      "updated": "2014-03-30T11:49:07.003Z",
+      "summary": "Div 4B: TAWsome vs. FrenchCompany (http://www.twitch.tv/feathermonster )",
+      "description": "http://www.ensl.org/matches/5585\n\nWeek 2 Matchup.\n\nReferee:\nCaster: Feathermonster\nStream: http://www.twitch.tv/feathermonster",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-30T15:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T17:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "aflokq41l64msqdq1q1pmuedqs@google.com",
+      "sequence": 4
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjE4MDQ3NDIzMTAwMA\"",
+      "id": "274hn9kkkff6hme7k6de1aun9s",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=Mjc0aG45a2trZmY2aG1lN2s2ZGUxYXVuOXMgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-24T15:28:41.000Z",
+      "updated": "2014-03-30T11:54:34.231Z",
+      "summary": "Div 2B: el'pheer vs. RadicaL (http://www.twitch.tv/feathermonster)",
+      "description": "http://www.ensl.org/matches/5510\n\nWeek 1 matchup.\n\nReferee:\nCaster: Feathermonster\nStream: http://www.twitch.tv/feathermonster",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-04-03T14:30:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-04-03T16:30:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "274hn9kkkff6hme7k6de1aun9s@google.com",
+      "sequence": 2
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjE5MjY3Nzg0MTAwMA\"",
+      "id": "ucrpfl5eeoldr1g29cq35s56o0",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=dWNycGZsNWVlb2xkcjFnMjljcTM1czU2bzAgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-27T22:22:21.000Z",
+      "updated": "2014-03-30T15:17:57.841Z",
+      "summary": "Div 2A:  Cheesecake vs. Gorge Casting Couch (http://www.twitch.tv/ggKaneh)",
+      "description": "http://www.ensl.org/matches/5530\n\nWeek 1 Matchup.\n\nReferee: Danjio\nCaster: Kaneh\nStream: http://www.twitch.tv/ggKaneh",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-03-30T15:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-03-30T17:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "ucrpfl5eeoldr1g29cq35s56o0@google.com",
+      "sequence": 2
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjI3Mzk4OTc0MzAwMA\"",
+      "id": "4dtgq7c1mk583gjglomk60tn80",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=NGR0Z3E3YzFtazU4M2dqZ2xvbWs2MHRuODAgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-31T13:53:09.000Z",
+      "updated": "2014-03-31T13:53:09.743Z",
+      "summary": "Div 3B: OMNOM vs. Mister (twitch.tv/LoopyCaster)",
+      "description": "http://www.ensl.org/matches/5473\n\nWeek 1 Matchup.\n\nReferee: \nCasters! Schwa & Loopy\nStream: http://www.twitch.tv/LoopyCaster",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-04-05T14:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-04-05T16:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "4dtgq7c1mk583gjglomk60tn80@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjI3NDA3NTQzMTAwMA\"",
+      "id": "do011hdp17c36c8rkoobi6lksk",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=ZG8wMTFoZHAxN2MzNmM4cmtvb2JpNmxrc2sgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-24T15:26:11.000Z",
+      "updated": "2014-03-31T13:54:35.431Z",
+      "summary": "Div 1: Gnarcolepsy vs. Ant (http://www.twitch.tv/schwaschwa)",
+      "description": "http://www.ensl.org/matches/5549\n\nWeek 2 matchup.\n\nReferee: \nCaster: Schwa\nStream: http://www.twitch.tv/schwaschwa",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-04-05T15:30:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-04-05T17:30:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "do011hdp17c36c8rkoobi6lksk@google.com",
+      "sequence": 3
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjI3NDE2NTMxMzAwMA\"",
+      "id": "eo46nhg92f1t3domncc0qiejlo",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=ZW80Nm5oZzkyZjF0M2RvbW5jYzBxaWVqbG8gdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-31T13:56:05.000Z",
+      "updated": "2014-03-31T13:56:05.313Z",
+      "summary": "Div 4B: [karvalakki] vs. PinkFluffyGorges (twitch.tv/LoopyCaster)",
+      "description": "http://www.ensl.org/matches/5584\n\nWeek 2 Matchup.\n\nReferee: \nCaster: Loopy\nStream: http://www.ensl.org/matches/5584",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-04-06T14:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-04-06T16:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "eo46nhg92f1t3domncc0qiejlo@google.com",
+      "sequence": 0
+    },
+    {
+      "kind": "calendar#event",
+      "etag": "\"2DaeHpkENZGECFHdcr5l8tYxjD4/MTM5NjI3NDMwNDE1MzAwMA\"",
+      "id": "1lb8cg9d6m2nl0bs0ude42nplc",
+      "status": "confirmed",
+      "htmlLink": "https://www.google.com/calendar/event?eid=MWxiOGNnOWQ2bTJubDBiczB1ZGU0Mm5wbGMgdnQuZWR1X281dHVnc3NqZTRoNnBqbnZ2aHNuNmw3bG9jQGc",
+      "created": "2014-03-31T13:58:24.000Z",
+      "updated": "2014-03-31T13:58:24.153Z",
+      "summary": "Div 3B: Mister vs. HBZ (twitch.tv/vindalo0)",
+      "description": "http://www.ensl.org/matches/5477\n\nWeek 2 Matchup.\n\nReferee:\nCaster: Vindaloo\nStream: http://www.twitch.tv/vindalo0",
+      "creator": {
+        "email": "pelargir.lsa@gmail.com",
+        "displayName": "Pelargir Chazalet"
+      },
+      "organizer": {
+        "email": "vt.edu_o5tugssje4h6pjnvvhsn6l7loc@group.calendar.google.com",
+        "displayName": "NSL Season 4 Confirmed Match Schedule",
+        "self": true
+      },
+      "start": {
+        "dateTime": "2014-04-04T16:00:00-04:00"
+      },
+      "end": {
+        "dateTime": "2014-04-04T18:00:00-04:00"
+      },
+      "visibility": "public",
+      "iCalUID": "1lb8cg9d6m2nl0bs0ude42nplc@google.com",
+      "sequence": 0
+    }
+  ]
+}

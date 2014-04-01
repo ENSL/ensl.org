@@ -1,7 +1,7 @@
 require "dotenv"
 Dotenv.load
 
-base_path = "/var/www/virtual/ensl.org/deploy"
+base_path = (ENV['DEPLOY_PATH'] || Dir.pwd)
 current_path = "#{base_path}/current"
 shared_path = "#{base_path}/shared"
 
@@ -11,7 +11,7 @@ timeout 30
 preload_app true
 
 user ENV['UNICORN_USER'], ENV['UNICORN_GROUP']
-listen Integer(ENV['UNICORN_PORT'] || 4000), :tcp_nopush => true
+listen Integer(ENV['UNICORN_PORT']), :tcp_nopush => true
 listen ENV['UNICORN_SOCKET'], :backlog => 64
  
 stderr_path "#{shared_path}/log/unicorn.stderr.log"

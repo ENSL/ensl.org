@@ -19,14 +19,14 @@
       <% link_to match do %>
         <%= match.contester1 %><br />
         <% if match.score1 > match.score2; c1 = 'green'; c2 = 'red' end %>
-          <% if match.score1 < match.score2; c1 = 'red'; c2 = 'green' end %>
-            <% if match.score1 == match.score2; c1 = 'yellow'; c2 = 'yellow' end %>
-              &nbsp; <span class="<%= c1 %>"><%= h match.score1 %></span>
-              -
-              <span class="<%= c2 %>"><%= h match.score2 %></span>
-              <br />
-              <%= match.contester2 %>
-            <% end %>
-          </p>
-        <% end %>
-      </div>
+        <% if match.score1 < match.score2; c1 = 'red'; c2 = 'green' end %>
+        <% if match.score1 == match.score2; c1 = 'yellow'; c2 = 'yellow' end %>
+        &nbsp; <span class="<%= c1 %>"><%= h match.score1 %></span>
+        -
+        <span class="<%= c2 %>"><%= h match.score2 %></span>
+        <br>
+        <%= match.contester2 %>
+      <% end %>
+    </p>
+  <% end %>
+</div>

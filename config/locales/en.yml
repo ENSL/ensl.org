@@ -81,6 +81,8 @@ en:
   votes_success: "Voted successfully."
   error: "error"
   prohibited: "prohibited"
+  profile:
+    locals: "Locals"
   sessions:
     form:
       forgot_password: "Forgot password?"
@@ -92,6 +94,7 @@ en:
       user:
         login: "Login"
         create: "Register"
+        update: "Update Profile"
       post:
         create: "Create Article"
   activerecord:

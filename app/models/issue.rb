@@ -18,6 +18,8 @@
 require File.join(Rails.root, 'vendor', 'plugins', 'acts-as-readable', 'init.rb')
 
 class Issue < ActiveRecord::Base
+  include Extra
+  
   STATUS_OPEN = 0
   STATUS_SOLVED = 1
   STATUS_REJECTED = 2

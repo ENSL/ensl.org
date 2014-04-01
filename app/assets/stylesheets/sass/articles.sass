@@ -6,8 +6,9 @@ div
  &.article
   @include rounded-corners
   @include shadow
-  width: 650px
+  width: 100%
   padding: 0px
+  margin-right: 0
   margin-bottom: 20px
   border: 1px solid #d7d7d7
   background-color: $bg_box
@@ -16,8 +17,9 @@ div
  &.article
   > h1
    @include shaded-top
+   box-sizing: border-box
    margin: 0
-   width: 630px
+   width: 100%
    font-size: 140%
   h1 a
    color: #ffffff

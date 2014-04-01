@@ -1,8 +1,6 @@
 lock '3.1.0'
 
 set :application, 'ensl'
-set :deploy_user, 'deploy'
-set :deploy_to, '/var/www/virtual/ensl.org/deploy'
 set :deploy_via, :remote_cache
 set :pty, true
 
