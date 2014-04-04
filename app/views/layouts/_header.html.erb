@@ -1,7 +1,7 @@
 <div id="indexBanner">
   <div id="indexLinks">
   <% if cuser %>
-    <span>Logged in as: <%= namelink cuser %></span> |
+    <span><%= t('login_status') %>: <%= namelink(cuser) %></span> |
   <% end %>
   <% if cuser and cuser.admin? %>
     <%= link_to "/about/adminpanel", :style => "color: #CC0000" do %>

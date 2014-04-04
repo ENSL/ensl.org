@@ -258,8 +258,8 @@ class User < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.authenticate username, password
-    User.first :conditions => {:username => username, :password => Digest::MD5.hexdigest(password)}
+  def self.authenticate(username, password)
+    where("LOWER(username) = LOWER(?)", username).where(:password => Digest::MD5.hexdigest(password)).first
   end
 
   def self.get id

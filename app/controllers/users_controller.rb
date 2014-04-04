@@ -80,7 +80,7 @@ class UsersController < ApplicationController
   def login
     return unless request.post?
 
-    if u = User.authenticate(params[:login][:username], params[:login][:password])
+    if u = User.authenticate(params[:login][:username].downcase, params[:login][:password])
       raise Error, t(:accounts_locked) if u.banned? Ban::TYPE_SITE
 
       flash[:notice] = t(:login_successful)

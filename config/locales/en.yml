@@ -74,6 +74,7 @@ en:
   login_successful: "Login Successful"
   login_unsuccessful: "Login Unsuccessful"
   login_out: "Logged out."
+  login_status: "Logged in as"
   passwords_sent: "Password has been sent."
   incorrect_information: "Incorrect Information."
   weeks_create: "Week was successfully created."
@@ -81,6 +82,11 @@ en:
   votes_success: "Voted successfully."
   error: "error"
   prohibited: "prohibited"
+  widget:
+    schedule: "Match Schedule"
+    shoutbox: "Shoutbox & Match search"
+    highlights: "Highlights"
+    posts: "Latest Posts"
   profile:
     locals: "Locals"
   sessions:
