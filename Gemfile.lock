@@ -290,6 +290,7 @@ DEPENDENCIES
   sass-rails (~> 3.2.5)
   selenium-webdriver (~> 2.41.0)
   simplecov (~> 0.7.1)
+  sprockets (~> 2.2.1)
   therubyracer (~> 0.12.1)
   timecop (~> 0.7.1)
   tinymce-rails (~> 3.5.9)

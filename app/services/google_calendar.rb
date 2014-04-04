@@ -20,7 +20,7 @@ class GoogleCalendar
 
   def upcoming
     events.select do |event|
-      event.start >= Time.zone.now
+      event.start >= (Time.zone.now - 2.hours)
     end
   end
 
