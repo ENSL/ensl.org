@@ -23,6 +23,7 @@ gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
 gem 'rmagick', '~> 2.13.2', require: false
 
+gem 'sprockets', '~> 2.2.1'
 gem 'tinymce-rails', '~> 3.5.9'
 gem 'jquery-rails', '~> 2.0.2'
 gem 'sass-rails', '~> 3.2.5'
