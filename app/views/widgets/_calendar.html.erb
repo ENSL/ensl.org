@@ -1,4 +1,4 @@
-<div class="header">Match Schedule</div>
+<div class="header"><%= t('widget.schedule') %></div>
 
 <div class="widget-content-wrapper">
   <% upcoming_matches.group_by{ |e| e.start.month }.each do |month, events| %>
@@ -13,4 +13,3 @@
     <% end %>
   <% end %>
 </div>
-  
