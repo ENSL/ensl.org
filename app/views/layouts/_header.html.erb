@@ -1,3 +1,25 @@
+<header class="navigation">
+  <div class="menu-wrapper">
+    <a href="javascript:void(0)" class="logo">
+      <img src="https://raw.github.com/Magnus-G/Random/master/placeholder_logo_1.png" alt="">
+    </a>
+    <p class="navigation-menu-button" id="js-mobile-menu">MENU</p>
+    <div class="nav">
+      <ul id="navigation-menu">
+        <li><%= link_to "News", controller: "articles", action: "news_index" %></li>
+        <li><%= link_to "Staff", controller: "about", action: "staff" %></li>
+        <li><%= link_to "History", article_url(Article::HISTORY) %></li>
+        <li><%= link_to "Users", controller: "users", action: :index %></li>
+        <% if cuser %>
+          <%= render :partial => "widgets/logged" %>
+        <% else %>
+          <%= render :partial => "widgets/login" %>
+        <% end  %>
+      </ul>
+    </div>
+  </div>
+</header>
+
 <div id="indexBanner">
   <div id="indexLinks">
   <% if cuser %>
@@ -19,14 +41,6 @@
   <%= link_to "Hall of Fame", article_url(Article::HOF) %> |
   <%= link_to "Bans", bans_url() %> |
   <%= link_to "Contact", new_issue_path() %>
-</div>
-
-<div id="indexLogin">
-  <% if cuser %>
-    <%= render :partial => "widgets/logged" %>
-  <% else %>
-    <%= render :partial => "widgets/login" %>
-  <% end  %>
 </div>
 
 <div id="indexMenu">

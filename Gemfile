@@ -26,8 +26,12 @@ gem 'rmagick', '~> 2.13.2', require: false
 gem 'sprockets', '~> 2.2.1'
 gem 'tinymce-rails', '~> 3.5.9'
 gem 'jquery-rails', '~> 2.0.2'
-gem 'sass-rails', '~> 3.2.5'
+gem 'sass-rails', '~> 3.2.6'
 gem 'coffee-rails', '~> 3.2.2'
+
+gem 'bourbon', '~> 3.1.8'
+gem 'neat', '~> 1.6.0'
+gem 'bitters', '~> 0.9.3'
 
 group :assets do
   gem 'uglifier', '~> 2.5.0'

@@ -12,4 +12,4 @@
 //= require tinymce-jquery
 //= require yetii
 //= require local
-
+//= require redesign
