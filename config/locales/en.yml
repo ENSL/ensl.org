@@ -18,6 +18,7 @@ en:
   contests_update: "Contest was successfully updated."
   contests_join: "Team successfully joined contest."
   contests_contester_update: "Contester was successfully updated."
+  gathers_join: "You have joined the Gather."
   files_create: "File was successfully created."
   files_update: "File was successfully updated."
   directories_create: "Directory was successfully created."

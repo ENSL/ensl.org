@@ -1,14 +1,26 @@
+@import "_mixins"
+
 div
-  &#gatherInfo table td
-    vertical-align: top
+  &#gatherInfo
+    margin: 20px 0 0 0
+    table td
+      vertical-align: top
   &.gatherLeftBox
-    width: 170px
+    @include box-sizing(border-box)
+    width: 230px
     height: 320px
+    margin: 10px 10px 10px 0
 
   &.gatherMiddleBox, &.gatherRightBox
-    width: 170px
+    @include box-sizing(border-box)
+    width: 225px
     height: 320px
+  &.gatherMiddleBox
+    margin: 10px 10px 10px 0
+  &.gatherRightBox
+    margin: 10px 0 10px 0
   &#gatherStatus
+    margin: 0 0 5px 0
 
 table
   &#gatherVotes

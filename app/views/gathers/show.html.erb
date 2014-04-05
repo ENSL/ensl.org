@@ -62,7 +62,7 @@
     </div>
   </h2>
 
-  <% if @gather and @gather.created_at > 24.hours.ago and @gather.status != Gather::STATE_FINISHED %>
+  <% if @gather and @gather.status != Gather::STATE_FINISHED %>
     <div class="box wide" id="gatherInfo">
       <h3 class="center">
 

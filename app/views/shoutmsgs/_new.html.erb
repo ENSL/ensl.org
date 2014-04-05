@@ -9,7 +9,7 @@
         <%= f.hidden_field :shoutable_id %>
       <% end %>
       <p>
-        <%= f.text_field :text, :size => 12, :id => "#{shoutmsg.domain}_text" %>
+        <%= f.text_field :text, size: 12, id: "#{shoutmsg.domain}_text", class: "shout_input" %>
         <%= submit_tag "Shout!" %>
       </p>
     <% end %>
