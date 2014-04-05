@@ -23,7 +23,7 @@
     <h3>
       Solution:
     </h3>
-    <%= raw RbbCode::Parser.new.parse(@issue.solution) %>
+    <%= raw @issue.solution_formatted %>
   <% end %>
 </div>
 

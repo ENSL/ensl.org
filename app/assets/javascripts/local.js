@@ -220,12 +220,14 @@ $( function() {
     $('input[type=submit]', this).attr('disabled', 'disabled');
   });
 
-  $('form.new_shoutmsg').submit(function(){
-    $('input[type=submit]', this).attr('disabled', 'disabled');
-  });
+  $('form.new_shoutmsg').on("ajax:complete", function(event, xhr, status){
+    var self = this;
 
-  $('form.new_shoutmsg').live("ajax:complete", function(event,xhr,status){
     $(this)[0].reset();
+
+    setTimeout(function() {
+      $('input[type=submit]', self).removeAttr('disabled');
+    }, 2000);
   });
 
   // User page
