@@ -1,21 +1,16 @@
-<div>
-  <%= form_tag :controller => "users", :action => "login" do %>
-    <table>
-      <tr>
-        <td id="links">
-          <%= link_to I18n.t('helpers.submit.user.create'), new_user_path %> <br />
-          <%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>
-        </td>
-        <td>
-          <%= text_field "login", "username" %>
-        </td>
-        <td>
-          <%= password_field "login", "password" %>
-        </td>
-        <td>
-          <%= submit_tag I18n.t('helpers.submit.user.login') %>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-</div>
+<%= form_tag :controller => "users", :action => "login" do %>
+  <li class="navigation-search-bar">
+    <div class="search-bar">
+      <div class="search-and-submit">
+        <%= text_field "login", "username" %>
+        <%= password_field "login", "password" %>
+      </div>
+    </div>
+  </li>      
+  <li class="sign-up"><%= submit_tag I18n.t('helpers.submit.user.login') %></li>
+<% end %>
+
+<!--
+  <%= link_to I18n.t('helpers.submit.user.create'), new_user_path %>
+  <%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>
+-->
