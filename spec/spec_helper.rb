@@ -14,7 +14,7 @@ Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, :phantomjs_logger => File.open('/dev/null'))
 end
 
-Capybara.javascript_driver = :selenium
+Capybara.javascript_driver = :poltergeist
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -30,7 +30,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     if example.metadata[:type] == :feature
-      Capybara.current_driver = :selenium
+      Capybara.current_driver = :poltergeist
     else
       Capybara.use_default_driver
     end
