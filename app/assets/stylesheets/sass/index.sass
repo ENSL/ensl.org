@@ -11,13 +11,14 @@ div
   position: relative
   margin: 0 auto 0 auto
   width: 1200px
-  padding-bottom: 20px
+  padding-bottom: 20px 
 
  &#logo
   width: 480px
   height: 353px
   position: absolute
   top: 5px
+  z-index: 1
   background: image-url('logo.png') left -85px no-repeat
 
  &#indexBanner
@@ -25,20 +26,9 @@ div
   height: 194px
   position: relative
 
- &#indexLogo
-  position: absolute
-  top: 0px
-  left: 100px
-  width: 330px
-  height: 194px
-  //top: 130px
-  //left: 265px
-  //width: 250px
-  //height: 50px
-  visibility: hidden
-  background-color: transparent
-
  &#indexLinks
+  position: relative
+  z-index: 1000
   width: 850px
   height: 25px
   padding-top: 3px
@@ -144,6 +134,8 @@ div
     color: #d6d5d5
 
  &#indexMainarea
+  position: relative
+  z-index: 1000
   padding: 10px 100px 10px 100px
 
  &#indexContent
