@@ -1,4 +1,4 @@
-<h2><%= link_to 'Back to the Inbox', messages_path() %></h2><br/>
+<h2><%= link_to 'Back to the Inbox', messages_path %></h2><br/>
 
 <% @messages.each do |message| %>
   <div class="article wide">
@@ -6,24 +6,17 @@
       <%= raw("&#187;") if message == @message %>
       <%= namelink message %>
     </h1>
-
     <div class="clear content">
       <%= raw message.text_parsed %>
     </div>
-
     <h4 class="left">
       Sent by: <%= namelink message.sender %>
-    on <%= shortdate message.created_at %>
-</h4>
-
-<h3 class="right">
-  <%= link_to "Reply", :controller => "messages", :action => "new", :id => message.sender_type, :id2 => message.sender_id, :title => message.title %>
-</h3>
-
-<div class="footer">
-</div>
+      on <%= shortdate message.created_at %>
+    </h4>
+    <h3 class="right">
+      <%= link_to "Reply", :controller => "messages", :action => "new", :id => message.sender_type, :id2 => message.sender_id, :title => message.title %>
+    </h3>
   </div>
-
 <% end %>
 
-<h2><%= link_to 'Back to the Inbox', messages_path() %></h2>
+<h2><%= link_to 'Back to the Inbox', messages_path %></h2>

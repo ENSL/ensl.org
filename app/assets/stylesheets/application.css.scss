@@ -1,1 +1,35 @@
-@import "scss/all";
+/*
+  Libraries & Configuration
+*/
+
+@import "bourbon";
+@import "variables";
+@import "neat";
+@import "font-awesome";
+
+/*
+  Mixins
+*/
+
+@import "mixins/buttons";
+@import "mixins/flashes";
+
+/*
+  Components
+*/
+
+@import "components/lists";
+@import "components/tables";
+@import "components/forms";
+@import "components/flashes";
+@import "components/comments";
+
+/*
+  Layout
+*/
+
+@import "layout/typography";
+@import "layout/header";
+@import "layout/navigation";
+@import "layout/body";
+@import "layout/footer";

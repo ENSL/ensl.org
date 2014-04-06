@@ -1,16 +1,10 @@
-<%= form_tag :controller => "users", :action => "login" do %>
-  <li class="navigation-search-bar">
-    <div class="search-bar">
-      <div class="search-and-submit">
-        <%= text_field "login", "username" %>
-        <%= password_field "login", "password" %>
-      </div>
-    </div>
-  </li>      
-  <li class="sign-up"><%= submit_tag I18n.t('helpers.submit.user.login') %></li>
+<%= form_tag({ controller: "users", action: "login" }, { class: "square horizontal" }) do %>
+  <%= text_field "login", "username" %>
+  <%= password_field "login", "password" %>
+  <%= submit_tag I18n.t('helpers.submit.user.login') %>
 <% end %>
 
-<!--
-  <%= link_to I18n.t('helpers.submit.user.create'), new_user_path %>
-  <%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>
--->
+<%= link_to(new_user_path) do %>
+  <button><%= I18n.t('helpers.submit.user.create') %></button>
+<% end %>
+<%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>

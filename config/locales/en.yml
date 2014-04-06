@@ -83,11 +83,15 @@ en:
   votes_success: "Voted successfully."
   error: "error"
   prohibited: "prohibited"
+  gather:
+    status:
+      joined: "You're currently in the Gather."
   widget:
     schedule: "Match Schedule"
     shoutbox: "Shoutbox & Match search"
     highlights: "Highlights"
     posts: "Latest Posts"
+    poll: "Poll"
   profile:
     locals: "Locals"
   sessions:
@@ -105,6 +109,8 @@ en:
       post:
         create: "Create Article"
   activerecord:
+    models:
+      gather: "Gather"
     attributes:
       article:
         title: "Title"

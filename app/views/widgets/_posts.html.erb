@@ -1,27 +1,25 @@
-<div class="header"><%= t('widget.posts') %></div>
-<div class="body">
-  <div class="content">
-    <h3>
-      Latest forum posts
-    </h3>
-    <ol>
-      <% Topic.basic.recent.latest_page(1).each do |topic| %>
-        <li>
-          <%= link_to shorten(topic, 35), lastpost(topic) %>
-        </li>
-      <% end %>
-    </ol>
+<div class="widget posts">
+  <h4><%= t('widget.posts') %></h4>
+  <div class="body">
+    <div class="content">
+      <h5>Latest forum posts</h3>
+      <ol>
+        <% Topic.basic.recent.latest_page(1).each do |topic| %>
+          <li>
+            <%= link_to shorten(topic, 35), lastpost(topic) %>
+          </li>
+        <% end %>
+      </ol>
 
-    <h3>
-      Latest comments
-    </h3>
-    <ol>
-      <% Comment.recent.filtered.each do |comment| %>
-        <li>
-          <%= namelink comment.commentable, 15 %>
-          by <%= namelink comment.user, 15 %>
-      </li>
-    <% end %>
-  </ol>
-</div>
+      <h5>Latest comments</h5>
+      <ol>
+        <% Comment.recent.filtered.each do |comment| %>
+          <li>
+            <%= namelink comment.commentable, 15 %>
+            by <%= namelink comment.user, 15 %>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </div>
 </div>
