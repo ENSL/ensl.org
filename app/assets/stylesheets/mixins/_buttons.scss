@@ -1,0 +1,20 @@
+/*
+  Buttons
+*/
+
+@mixin button($background: $button-primary, $text: $button-text) {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  background-color: $background;
+  color: $text;
+  height: 44px;
+  padding: 11px 22px;
+  float: left;
+  margin: 0 20px 20px 0;
+  border: 0;
+  text-transform: uppercase;
+}
+
+button {
+  @include button;
+}

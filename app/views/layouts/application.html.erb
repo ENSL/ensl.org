@@ -1,70 +1,34 @@
 <!doctype html>
 <html>
   <head>
-    <title>ENSL</title>
+    <title><%= full_title(yield(:title)) %></title>
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <%= stylesheet_link_tag    "application" %>
+    <%= stylesheet_link_tag "application" %>
     <%= javascript_include_tag "application" %>
     <%= csrf_meta_tag %>
   </head>
   <body>
-    <div id="indexContainer">
-      <div id="indexMain">
-        <div id="logo"></div>
-        <%= render :partial => "layouts/header" %>
-
-        <div id="indexMainarea">
-          <div id="indexContent">
-            <% if flash[:notice] %>
-              <div class="flashMsg">
-                <%= flash[:notice] %>
-              </div>
-            <% end %>
-            <% if flash[:error] %>
-              <div class="flashMsg flashError">
-                <%= flash[:error] %>
-              </div>
-            <% end %>
-            <%= yield  %>
+    <div id="container">
+      <%= render partial: "header" %>
+      <div class="wrapper">
+        <%= render partial: "navigation" %>
+        <div id="content">
+          <div id="main">
+            <%= render partial: "messages" %>
+            <%= yield %>
           </div>
-
-          <div id="indexRight">
-            <div class="indexBox" id="index-calendar">
-              <%= render :partial => "widgets/calendar" %>
-            </div>
-
-            <div class="indexBox">
-              <div class="header"><%= t('widget.shoutbox') %></div>
-              <div class="body">
-                <div class="content">
-                  <%= render :partial => "widgets/shoutbox" %>
-                </div>
-              </div>
-            </div>
-
-            <div class="indexBox" id="indexHighlights">
-              <%= render :partial => "widgets/highlights" %>
-            </div>
-
-            <div class="indexBox" id="indexLatest">
-              <%= render :partial => "widgets/posts" %>
-            </div>
-
-
-            <% if @current_action == "news_index" %>
-              <div class="indexBox" id="indexLatest">
-                <%= render :partial => "widgets/poll" %>
-              </div>
+          <div id="sidebar">
+            <% ['calendar', 'shoutbox', 'highlights', 'posts', 'poll'].each do |widget| %>
+              <%= render partial: "widgets/#{widget}" %>  
             <% end %>
           </div>
-
-          <div style="clear:both;"></div>
+          <%= render partial: "gather" %>
         </div>
       </div>
-      <%= render :partial => "layouts/footer" %>
+      <%= render partial: "footer" %>
     </div>
   </body>
 </html>

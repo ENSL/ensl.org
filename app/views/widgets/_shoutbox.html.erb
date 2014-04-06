@@ -1,16 +1,18 @@
-<% shoutbox_new = Shoutmsg.new %>
-
-<div id="shoutbox">
-  <%= render :partial => "shoutmsgs/shoutmsg", :collection => Shoutmsg.recent.box, :locals => {:popup => "$('shoutbox')"} %>
-</div>
-
-<%= render :partial => "shoutmsgs/new", :locals => {:shoutmsg => shoutbox_new} %>
-
-<p>
-  <%= link_to "Shoutbox Recent History", :controller => :shoutmsgs, :action => "index" %><br/>
-  <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
-</p>
-
-<div class="center box" id="userPopup">
-  Fetching user info...
+<div class="widget shoutbox">
+  <h4><%= t('widget.shoutbox') %></h4>
+    <div class="body">
+      <div class="content">
+      <div id="shoutbox">
+        <%= render :partial => "shoutmsgs/shoutmsg", :collection => Shoutmsg.recent.box, :locals => {:popup => "$('shoutbox')"} %>
+      </div>
+      <%= render :partial => "shoutmsgs/new", :locals => { :shoutmsg => Shoutmsg.new } %>
+      <p>
+        <%= link_to "Shoutbox Recent History", :controller => :shoutmsgs, :action => "index" %><br/>
+        <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
+      </p>
+      <div class="center box" id="userPopup">
+        Fetching user info...
+      </div>
+    </div>
+  </div>
 </div>

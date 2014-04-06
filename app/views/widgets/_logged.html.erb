@@ -1,4 +1,7 @@
-<%= form_tag :controller => "users", :action => "logout" do %>
+<ul>
+  <% if cuser %>
+    <%= t('login_status') %>: <%= namelink(cuser) %>
+  <% end %>
   <li><%= link_to 'Profile', edit_user_path(cuser) %></li>
   <li><%= link_to 'Agenda', "/users/agenda/#{cuser.id}" %></li>
   <li>
@@ -7,5 +10,9 @@
       (<%= cuser.new_messages.count %>)
     <% end %>
   </li>
-  <li><%= link_to_function "Logout", '$(this).closest("form").submit();' %></li>
-<% end %>
+  <li>
+    <%= form_tag(controller: "users", action: "logout") do %>
+      <%= link_to_function "Logout", '$(this).closest("form").submit();' %>
+    <% end %>
+  </li>
+</ul>

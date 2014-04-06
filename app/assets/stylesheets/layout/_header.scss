@@ -1,0 +1,131 @@
+nav.top {
+  $navigation-background: $dark-gray;
+  $navigation-color: transparentize(white, 0.3);
+  $navigation-color-hover: white;
+  $navigation-height: 40px;
+
+  background-color: $navigation-background;
+  border-bottom: 1px solid darken($navigation-background, 10);
+  font-family: $monserrat;
+  height: $navigation-height;
+  width: 100%;
+  z-index: 999;
+
+  .menu-wrapper {
+    @include outer-container;
+    @extend %container-padded;
+    position: relative;
+    z-index: 9999;
+  }
+
+  .navigation-menu-button {
+    color: $navigation-color;
+    cursor: pointer;
+    display: block;
+    float: right;
+    font-family: $monserrat;
+    font-weight: 700;
+    line-height: $navigation-height;
+    margin: 0;
+    padding-right: 1em;
+    text-transform: uppercase;
+
+    @include media ($large-screen) {
+      display: none;
+    }
+
+    &:hover {
+      color: $navigation-color-hover;
+    }
+  }
+
+  .nav {
+    @include media ($large-screen) {
+      float: left;
+    }
+  }
+
+  #navigation-menu {
+    @include span-columns(12);
+
+    .gathers {
+      @include span-columns(6);
+    }
+
+    .pages {
+      @include span-columns(6);
+      @include omega;
+
+      text-align: right;
+
+      li:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+
+  #navigation-menu ul {
+    -webkit-transform-style: preserve-3d; // stop webkit flicker
+    display: none;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    z-index: 9999;
+
+    @include media ($large-screen) {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  ul li {
+    background: $navigation-background;
+    display: block;
+    line-height: $navigation-height;
+    overflow: hidden;
+    padding-right: .8em;
+    text-align: right;
+    width: 100%;
+    z-index: 9999;
+
+    @include media ($large-screen) {
+      background: transparent;
+      display: inline;
+      line-height: $navigation-height;
+      padding-right: 2em;
+      text-decoration: none;
+      width: auto;
+    }
+
+    a {
+      font-weight: 400;
+      color: $navigation-color;
+
+      &:hover {
+        color: $navigation-color-hover;
+      }
+    }
+  }
+}
+
+header .banner {
+  #logo {
+    @include span-columns(8);
+    min-height: 200px;
+    position: relative;
+    img {
+      width: 430px;
+      height: 200px;
+      position: absolute;
+      top: 5px;
+      left: 0;
+      z-index: 1;
+    }
+  }
+
+  #authentication {
+    @include span-columns(4); 
+  }
+}

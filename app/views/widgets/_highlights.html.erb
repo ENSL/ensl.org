@@ -1,34 +1,34 @@
-<div class="header"><%= t('widget.highlights') %></div>
-<div class="body">
-  <div class="content">
+<div class="widget highlights">
+  <h4><%= t('widget.highlights') %></h4>
+  <div class="body">
+    <div class="content">
+      <% if cuser and cuser.active_contests.count != 0 then %>
+        <h3>
+          Your contests
+          <%= link_to "(More)", :controller => :matches, :matchesTab => "YourTab" %>
+        </h3>
+        <ol>
+          <% cuser.active_contests.each do |contest| %>
+            <li>
+              <%= namelink contest %>
+              <br />
+            </li>
+          <% end %>
+        </ol>
+      <% end %>
 
-    <% if cuser and cuser.active_contests.count != 0 then %>
-      <h3>
-        Your contests
-        <%= link_to "(More)", :controller => :matches, :matchesTab => "YourTab" %>
-      </h3>
-      <ol>
-        <% cuser.active_contests.each do |contest| %>
-          <li>
-            <%= namelink contest %>
-            <br />
-          </li>
-        <% end %>
-      </ol>
-    <% end %>
-
-    <% if Match.recent.count != 0 then %>
-      <h3>
-        Latest Matches
-        <%= link_to "(More)", :controller => :matches, :matchesTab => "RecentTab" %>
-      </h3>
-      <ol>
-        <% Match.realfinished.reverse_order.recent.chrono.each do |match| %>
-          <li>
-            <%= link_to match, :class => "bold #{match.score_color}" do %>
-              <%= h match.score1 %> - <%= h match.score2 %>
-              <%= link_to match.contester1.team.tag, :controller => :contesters, :action => :show, :id => match.contester1 %> <%= if match.score1 > match.score2 then ">>" elsif match.score2 > match.score1 then "<<" else "==" end %> <%= link_to match.contester2.team.tag, :controller => :contesters, :action => :show, :id => match.contester2 %>
-                (<%= link_to match.contest.short_name, :controller => :contests, :action => :show, :id => match.contest.id %>)
+      <% if Match.recent.count != 0 then %>
+        <h5>
+          Latest Matches
+          <%= link_to "(More)", :controller => :matches, :matchesTab => "RecentTab" %>
+        </h5>
+        <ol>
+          <% Match.realfinished.reverse_order.recent.chrono.each do |match| %>
+            <li>
+              <%= link_to match, :class => "bold #{match.score_color}" do %>
+                <%= h match.score1 %> - <%= h match.score2 %>
+                <%= link_to match.contester1.team.tag, :controller => :contesters, :action => :show, :id => match.contester1 %> <%= if match.score1 > match.score2 then ">>" elsif match.score2 > match.score1 then "<<" else "==" end %> <%= link_to match.contester2.team.tag, :controller => :contesters, :action => :show, :id => match.contester2 %>
+                  (<%= link_to match.contest.short_name, :controller => :contests, :action => :show, :id => match.contest.id %>)
               <% end %>
               <br />
             </li>
@@ -37,10 +37,10 @@
       <% end %>
 
       <% if Match.future5.count != 0 then %>
-        <h3>
+        <h5>
           Upcoming matches
           <%= link_to "(More)", :controller => :matches, :matchesTab => "UpcomingTab" %>
-        </h3>
+        </h5>
         <ol>
           <% Match.future5.chrono.each do |match| %>
             <li>
@@ -52,3 +52,4 @@
       <% end %>
     </div>
   </div>
+</div>

@@ -1,0 +1,31 @@
+/*
+  Flash Messages
+*/
+
+@mixin flash($background: $flash-notice, $text: $flash-text) {
+  background-color: $background;
+  color: $text;
+  font-size: 16px;
+  line-height: 16px;
+  padding: 14px 14px 14px 54px; 
+  position: relative;
+  &:before {    
+    @include box-sizing(border-box);
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 22px;
+    content: "\f05a";
+    background-color: darken($background, 10%);
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    float: left;
+    width: 44px;
+    height: 44px;
+    padding: 9px;
+    line-height: 26px;
+    text-align: center;
+  }
+}

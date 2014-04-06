@@ -1,0 +1,9 @@
+<div class="gather">
+  <% if cuser && (gather = cuser.gathers.active.ordered.first) %>
+    <%= link_to t('gather.status.joined'), gather %>
+  <% elsif Gather.last && (Gather::FULL - Gather.last.gatherers.count) == 12 %>
+    Be first to join the <%= link_to t('activerecord.models.gather'), Gather.last %>!
+  <% elsif Gather.last %>
+    <%= link_to t('activerecord.models.gather'), Gather.last %> running, <%= Gather::FULL - Gather.last.gatherers.count %> more needed.
+  <% end %>
+</div>

@@ -1,0 +1,93 @@
+/*
+  Neat Overrides
+*/
+
+@import "neat-helpers";
+
+$column: 90px;
+$gutter: 30px;
+$grid-columns: 12;
+$max-width: em(1180);
+
+/*
+  Neat Breakpoints
+*/
+
+$medium-screen: em(640);
+$large-screen: em(860);
+
+$medium-screen-up: new-breakpoint(min-width $medium-screen 4);
+$large-screen-up: new-breakpoint(min-width $large-screen 8);
+
+/*
+  Typography
+*/
+
+$open-sans: "Open Sans", sans-serif;
+$monserrat: "Montserrat", sans-serif;
+$sans-serif: $open-sans;
+
+$base-font-family: $sans-serif;
+$header-font-family: $monserrat;
+ 
+/*
+  Sizes
+*/
+
+$base-font-size: 1em;
+$base-line-height: $base-font-size * 1.5;
+$base-border-radius: em(3);
+
+/*
+  Colours
+*/
+ 
+$blue: #6a5a8c;
+$dark-gray: #232323;
+$medium-gray: #999;
+$light-gray: #DDD;
+$light-red: #FBE3E4;
+$light-yellow: #FFF6BF;
+$light-green: #E6EFC2;
+ 
+$base-body-color: white;
+$base-font-color: $dark-gray;
+$base-accent-color: $blue;
+$base-link-color: $base-accent-color;
+$hover-link-color: darken($base-accent-color, 15);
+$base-border-color: $light-gray;
+
+$error-color: $light-red;
+$notice-color: $light-yellow;
+$success-color: $light-green;
+
+$background-primary: #232323;
+$background-secondary: #ece9e1;
+$background-tertiary: #e2dfd8;
+
+$text-primary: #232323;
+$text-secondary: #888888;
+$text-tertiary: #666666;
+
+$link-primary: #285258;
+
+$navbar-primary: #232323;
+$navbar-secondary: #5a9aa8;
+$navbar-border: #2e2e2e;
+$navbar-text: white;
+
+$flash-text: white;
+$flash-notice: #5a9aa8;
+$flash-success: #1f7f5c;
+$flash-warning: #de8650;
+$flash-error: #e56c69;
+
+$input-primary: white;
+$input-secondary: #5a9aa8;
+$input-text: #232323;
+$input-border-width: 3px;
+$input-padding: 11px;
+
+$button-primary: #5a9aa8;
+$button-secondary: #1f7f5c;
+$button-text: white;

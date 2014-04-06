@@ -1,0 +1,30 @@
+/*
+  Flash Messages
+*/
+
+#flash {
+  @include span-columns(12);
+  margin-bottom: 20px;
+  #flash_notice {
+    @include flash;
+  }
+  #flash_success {
+    @include flash($flash-success);
+    &:before {
+      content: "\f00c";
+    }
+  }
+  #flash_error {
+    @include flash($flash-error);
+    &:before {
+      content: "\f00d";
+    }
+  }
+  #flash_warning,
+  #flash_alert {
+    @include flash($flash-warning);
+    &:before {
+      content: "\f071";
+    }
+  }
+}
