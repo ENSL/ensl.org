@@ -114,11 +114,11 @@ class Article < ActiveRecord::Base
     if (new_record? or status_changed?) and status == STATUS_PUBLISHED
       case category.domain
       when Category::DOMAIN_NEWS
-        Profile.all(includes: :user, conditions: "notify_news = 1").each do |p|
+        Profile.includes(:user).all(conditions: "notify_news = 1").each do |p|
           Notifications.news p.user, self if p.user
         end
       when Category::DOMAIN_ARTICLES
-        Profile.all(includes: :user, conditions: "notify_articles = 1").each do |p|
+        Profile.includes(:user).all(conditions: "notify_articles = 1").each do |p|
           Notifications.article p.user, self if p.user
         end
       end
