@@ -1,6 +1,6 @@
 <% if @current_action == "news_index" %>
   <div class="widget poll">
-    <div class="header"><%= t('widget.poll') %></div>
+    <h4><%= t('widget.poll') %></h4>
     <div class="body">
       <div class="content">
         <% @poll = Poll.first(order: "created_at DESC") %>

@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   background: #046;
+  @include background-image(linear-gradient(#046, $medium-gray));
 }
 
 %container-padded {
@@ -30,4 +31,10 @@ body {
 #sidebar {
   @include span-columns(3);
   @include omega();
+}
+
+img.flag {
+  display: inline-block;
+  vertical-align: - em(6);
+  margin-right: em(10);
 }

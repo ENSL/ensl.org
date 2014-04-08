@@ -3,18 +3,20 @@
 */
 
 @mixin button($background: $button-primary, $text: $button-text) {
-  font-family: "Montserrat", sans-serif;
-  font-size: 16px;
+  font-family: $monserrat;
+  font-size: em(16);
   background-color: $background;
   color: $text;
-  height: 44px;
-  padding: 11px 22px;
+  height: em(40);
+  padding: em(9) em(18);
   float: left;
-  margin: 0 20px 20px 0;
+  margin: 0 em(20) em(20) 0;
   border: 0;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
-button {
+button,
+a.button {
   @include button;
 }

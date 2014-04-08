@@ -1,50 +1,36 @@
-<h1>
-  <%=h @contest.name %>
-</h1>
+<h1><%= @contest.name %></h1>
 
-<div class="box small right">
-  <h3 class="center">
-    Details
-  </h3>
-
+<div class="contest info">
+  <h3>Details</h3>
   <p>
-  <strong>From-to</strong>:<br />
-  <%= longdate @contest.start %> <br /> <%= longdate @contest.end %>
+    <strong>From-to</strong>:<br>
+    <%= longdate @contest.start %> <br> <%= longdate @contest.end %>
   </p>
-
   <p>
-  <strong>Rules</strong>:<br />
-  <%= namelink @contest.rules %>
+    <strong>Rules</strong>:<br>
+    <%= namelink @contest.rules %>
   </p>
-
   <p>
-  <b>Status:</b><br />
-  <%= @contest.statuses[@contest.status] %>
+    <b>Status:</b><br>
+    <%= @contest.statuses[@contest.status] %>
   </p>
-
   <p>
-  <b>Default:</b><br />
-  Sunday: <%= h @contest.default_time.strftime("%H:%M") %>
+    <b>Default:</b><br>
+    Sunday: <%= h @contest.default_time.strftime("%H:%M") %>
   </p>
-
   <% if @contest.contest_type == Contest::TYPE_LADDER %>
     <%= link_to "Scoring", "/contests/#{@contest}/score" %>
   <% end %>
-
   <% if cuser and cuser.admin? %>
     <%= link_to 'Edit', edit_contest_path(@contest) %>
   <% end %>
 </div>
-
 
 <% if @contest.contest_type == Contest::TYPE_BRACKET %>
   <%= render :partial => "bracket", :locals => {:contest => @contest} %>
 <% else %>
   <%= render :partial => "normal" %>
 <% end %>
-
-
-
 
 <div id="contestTab" class="clear wide">
   <ul id="contestTab-nav" class="tabs">

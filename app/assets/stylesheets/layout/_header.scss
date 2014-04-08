@@ -2,10 +2,10 @@ nav.top {
   $navigation-background: $dark-gray;
   $navigation-color: transparentize(white, 0.3);
   $navigation-color-hover: white;
-  $navigation-height: 40px;
+  $navigation-height: em(40);
 
   background-color: $navigation-background;
-  border-bottom: 1px solid darken($navigation-background, 10);
+  border-bottom: 1px solid $medium-gray;
   font-family: $monserrat;
   height: $navigation-height;
   width: 100%;
@@ -74,7 +74,7 @@ nav.top {
     z-index: 9999;
 
     @include media ($large-screen) {
-      display: inline-block;
+      display: block;
       margin: 0;
       padding: 0;
     }
@@ -113,19 +113,101 @@ nav.top {
 header .banner {
   #logo {
     @include span-columns(8);
-    min-height: 200px;
+    min-height: em(200);
     position: relative;
+
     img {
-      width: 430px;
-      height: 200px;
+      width: em(430);
+      height: em(200);
       position: absolute;
-      top: 5px;
+      top: em(20);
       left: 0;
       z-index: 1;
     }
   }
 
   #authentication {
-    @include span-columns(4); 
+    @include span-columns(4);
+    height: em(190);
+    margin: em(20) 0;
+    padding: em(20);
+    border: 1px solid $dark-gray;
+    background: $dark-gray;
+    color: white;
+
+    a {
+      color: white;
+    }
+
+    form {
+      display: inline;
+    }
+
+    .fields { 
+      @include span-columns(12);
+
+      input {
+        @include span-columns(6);
+        margin-bottom: em(10);
+      }
+    }
+
+    .controls {
+      margin-top: em(20);
+      text-align: right;
+
+      input {
+        @include span-columns(12);
+        margin-bottom: em(10);
+      }
+
+      a {
+        @include span-columns(12);
+        text-align: left;
+      }
+    }
+
+    .password-reset {
+      float: right;
+    }
+
+    .links,
+    .profile {
+      @include span-columns(6);
+    }
+
+    .links {
+      position: relative;
+
+      h5 {
+        margin-bottom: 1em;
+      }
+
+      li i {
+        display: inline-block;
+        width: 1em;
+        text-align: center;
+        margin-right: em(10);
+      }
+    }
+
+    .profile {
+
+      .avatar {
+        @include span-columns(12);
+        border: 1px solid $medium-gray;
+        background: $medium-gray;
+        margin: 0 em(20) em(20) 0;
+        text-align: center;
+
+        img {
+          padding: em(10);
+        }
+      }
+
+      .timezone {
+        text-align: center;
+      }
+    }
   }
 }

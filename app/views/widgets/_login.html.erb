@@ -1,10 +1,11 @@
-<%= form_tag({ controller: "users", action: "login" }, { class: "square horizontal" }) do %>
-  <%= text_field "login", "username" %>
-  <%= password_field "login", "password" %>
-  <%= submit_tag I18n.t('helpers.submit.user.login') %>
+<%= form_tag({ controller: "users", action: "login" }, { class: "dark" }) do %>
+  <div class="fields">
+    <%= text_field "login", "username" %>
+    <%= password_field "login", "password" %>
+  </div>
+  <div class="controls">  
+    <%= submit_tag t('helpers.submit.user.login') %>
+    <%= link_to t('helpers.submit.user.create'), new_user_path %>
+    <%= link_to t('sessions.form.forgot_password'), "/users/forgot/1", class: "password-reset" %>
+  </div>
 <% end %>
-
-<%= link_to(new_user_path) do %>
-  <button><%= I18n.t('helpers.submit.user.create') %></button>
-<% end %>
-<%= link_to I18n.t('sessions.form.forgot_password'), "/users/forgot/1" %>

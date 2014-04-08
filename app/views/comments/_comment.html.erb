@@ -6,7 +6,7 @@
     <h1>
       <%= flag(comment.user.country) if comment.user.country %>
       <%= namelink(comment.user) %>
-      <% if comment.user.team %> | <%= namelink comment.user.team %><% end %>
+      <% if comment.user.team %> | <%= namelink(comment.user.team) %><% end %>
     </h1>
     <div class="controls">
       <% if cuser %>

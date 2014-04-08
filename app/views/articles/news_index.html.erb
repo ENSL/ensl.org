@@ -1,11 +1,11 @@
-<div class="clear" id="newsContent">
-  <% @news.each do |n| %>
-    <%= render :partial => "article", :locals => {:article => n} %>
+<div id="news">
+  <% @news.each do |item| %>
+    <%= render partial: "article", locals: { article: item } %>
   <% end %>
 </div>
 
-<%= link_to 'Archive', '/news/archive' %>
+<%= link_to t('news.archive'), '/news/archive', class: "button" %>
 
 <% if cuser and cuser.admin? %>
-  | <%= link_to 'New News', new_article_path %>
+  <%= link_to t('helpers.submit.post.new'), new_article_path, class: "button" %>
 <% end %>
