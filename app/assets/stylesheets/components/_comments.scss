@@ -47,6 +47,19 @@
       margin-bottom: .5em;
     }
 
+    a.user,
+    a.team {
+      display: inline-block;
+    }
+
+    a.user {
+      margin-right: em(10);
+    }
+
+    a.team {
+      margin-left: em(10);
+    }
+
     p {
       margin-bottom: .5em;
     }

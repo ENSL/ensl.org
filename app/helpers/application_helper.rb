@@ -1,6 +1,7 @@
 module ApplicationHelper
   def full_title(page_title)
-    base_title = "Wills"
+    base_title = "ENSL"
+
     if page_title.empty?
       base_title
     else
@@ -22,9 +23,9 @@ module ApplicationHelper
             end
     str = model.to_s
     if length and str.length > length
-      link_to raw(str.to_s[0, length] + "..."), model
+      link_to raw(str.to_s[0, length] + "..."), model, class: model.class.to_s.downcase
     else
-      link_to raw(str), model
+      link_to raw(str), model, class: model.class.to_s.downcase
     end
   end
 
@@ -103,10 +104,10 @@ module ApplicationHelper
   end
 
   def flag country
-    if country and country.to_s.length > 0
-      image_tag "/images/flags/" + country.downcase + ".gif", class: "flag"
+    if country and country.to_s.size > 0
+      image_tag "flags/#{country}.png", class: "flag"
     else
-      image_tag "/images/flags/eu.gif"
+      image_tag "flags/EU.png"
     end
   end
 

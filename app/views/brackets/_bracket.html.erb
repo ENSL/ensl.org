@@ -30,9 +30,8 @@
                 <%= link_to bracketer, bracketer.match %>
               <% elsif bracketer.contester %>
                 <table>
-                  <tr></tr>
-                  <td><%= flag bracketer.contester.team.country %></td>
-                  <td><%= link_to bracketer, bracketer.contester %></td>
+                  <td class="flag"><%= flag bracketer.contester.team.country %></td>
+                  <td class="bracket"><%= link_to bracketer.contester, bracketer.contester %></td>
                 </table>
               <% end %>
             <% end %>
@@ -41,5 +40,4 @@
       <% end %>
     </tr>
   <% end %>
-
 </table>

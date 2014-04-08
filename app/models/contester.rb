@@ -82,37 +82,37 @@ class Contester < ActiveRecord::Base
     #				end
     #			end
     #		end
-end
-
-def validate_contest
-  if contest.end.past? or contest.status == Contest::STATUS_CLOSED
-    errors.add :contest, I18n.t(:contests_closed)
   end
-end
 
-def validate_playernumber
-  if team.teamers.active.distinct.count < 6
-    errors.add :team, I18n.t(:contests_join_need6)
+  def validate_contest
+    if contest.end.past? or contest.status == Contest::STATUS_CLOSED
+      errors.add :contest, I18n.t(:contests_closed)
+    end
   end
-end
 
-def destroy
-  update_attribute :active, false
-end
+  def validate_playernumber
+    if team.teamers.active.distinct.count < 6
+      errors.add :team, I18n.t(:contests_join_need6)
+    end
+  end
 
-def can_create? cuser, params = {}
-  return false unless cuser
-  return false if cuser.banned?(Ban::TYPE_LEAGUE)
-  return true if cuser.admin?
-  return true if team.is_leader? cuser and Verification.contain params, [:team_id, :contest_id]
-  return false
-end
+  def destroy
+    update_attribute :active, false
+  end
 
-def can_update? cuser
-  cuser and cuser.admin?
-end
+  def can_create? cuser, params = {}
+    return false unless cuser
+    return false if cuser.banned?(Ban::TYPE_LEAGUE)
+    return true if cuser.admin?
+    return true if team.is_leader? cuser and Verification.contain params, [:team_id, :contest_id]
+    return false
+  end
 
-def can_destroy? cuser
-  cuser and team.is_leader? cuser or cuser.admin?
-end
+  def can_update? cuser
+    cuser and cuser.admin?
+  end
+
+  def can_destroy? cuser
+    cuser and team.is_leader? cuser or cuser.admin?
+  end
 end

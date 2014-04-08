@@ -1,18 +1,36 @@
-<ul>
-  <% if cuser %>
-    <%= t('login_status') %>: <%= namelink(cuser) %>
-  <% end %>
-  <li><%= link_to 'Profile', edit_user_path(cuser) %></li>
-  <li><%= link_to 'Agenda', "/users/agenda/#{cuser.id}" %></li>
-  <li>
-    <%= link_to 'PMs', messages_path() %>
-    <% if c = cuser.new_messages.count > 0 %>
-      (<%= cuser.new_messages.count %>)
-    <% end %>
-  </li>
-  <li>
-    <%= form_tag(controller: "users", action: "logout") do %>
-      <%= link_to_function "Logout", '$(this).closest("form").submit();' %>
-    <% end %>
-  </li>
-</ul>
+<div class="links">
+  <h5><%= namelink(cuser) %></h5>
+  <ul>
+    <li>
+      <%= link_to edit_user_path(cuser) do %>
+        <%= icon 'user' %> Profile
+      <% end %>
+    </li>
+    <li>
+      <%= link_to "/users/agenda/#{cuser.id}" do %>
+        <%= icon 'calendar' %> Agenda
+      <% end %>
+    </li>
+    <li>
+      <%= link_to messages_path do %>
+        <%= icon 'envelope' %> Messages
+      <% end %>
+      <% if c = cuser.new_messages.count > 0 %>
+        (<%= cuser.new_messages.count %>)
+      <% end %>
+    </li>
+    <li>
+      <%= form_tag(controller: "users", action: "logout") do %>
+        <%= link_to "#", id: "logout" do %>
+          <%= icon 'key' %> Logout
+        <% end %>
+      <% end %>
+    </li>
+  </ul>
+</div>
+
+<div class="profile">
+  <div class="avatar">
+    <%= image_tag cuser.profile.avatar.url %>
+  </div>
+</div>

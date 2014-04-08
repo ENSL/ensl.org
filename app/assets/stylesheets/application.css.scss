@@ -23,6 +23,7 @@
 @import "components/forms";
 @import "components/flashes";
 @import "components/comments";
+@import "components/gather";
 
 /*
   Layout
@@ -32,4 +33,11 @@
 @import "layout/header";
 @import "layout/navigation";
 @import "layout/body";
+@import "layout/sidebar";
 @import "layout/footer";
+
+/*
+  Pages
+*/
+
+@import "pages/contests";

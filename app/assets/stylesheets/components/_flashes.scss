@@ -2,26 +2,30 @@
   Flash Messages
 */
 
-#flash {
+.flash {
   @include span-columns(12);
-  margin-bottom: 20px;
-  #flash_notice {
+  margin-bottom: em(20);
+
+  &.notice {
     @include flash;
   }
-  #flash_success {
+
+  &.success {
     @include flash($flash-success);
     &:before {
       content: "\f00c";
     }
   }
-  #flash_error {
+
+  &.error {
     @include flash($flash-error);
     &:before {
       content: "\f00d";
     }
   }
-  #flash_warning,
-  #flash_alert {
+
+  &.warning,
+  &.alert {
     @include flash($flash-warning);
     &:before {
       content: "\f071";

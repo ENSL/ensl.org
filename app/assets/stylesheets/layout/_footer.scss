@@ -4,6 +4,7 @@
   $footer-link-color: transparentize($footer-color, .6);
   $footer-disclaimer-color: transparentize($footer-color, .6);
 
+  @include outer-container;
   background: $footer-background;
   padding: $base-line-height*2 $gutter;
   width: 100%;

@@ -41,19 +41,22 @@ $base-border-radius: em(3);
 /*
   Colours
 */
- 
-$blue: #6a5a8c;
+
+$green: #1f7f5c;
+$blue: #5a9aa8;
+$purple: #6a5a8c;
+$gold: #FFD700;
 $dark-gray: #232323;
-$medium-gray: #999;
+$medium-gray: #2e2e2e;
 $light-gray: #DDD;
-$light-red: #FBE3E4;
+$light-red: #e56c69;
 $light-yellow: #FFF6BF;
-$light-green: #E6EFC2;
+$light-green: #1f7f5c;
  
 $base-body-color: white;
-$base-font-color: $dark-gray;
+$base-font-color: #232323;
 $base-accent-color: $blue;
-$base-link-color: $base-accent-color;
+$base-link-color: #285258;
 $hover-link-color: darken($base-accent-color, 15);
 $base-border-color: $light-gray;
 
@@ -85,8 +88,14 @@ $flash-error: #e56c69;
 $input-primary: white;
 $input-secondary: #5a9aa8;
 $input-text: #232323;
-$input-border-width: 3px;
-$input-padding: 11px;
+$input-border-width: em(3);
+$input-padding: em(11);
+
+$input-dark-background-colour: $dark-gray;
+$input-dark-border-colour: $medium-gray;
+$input-dark-border-width: em(1);
+$input-dark-border-hover-colour: $blue;
+$input-dark-border-focus-colour: $green;
 
 $button-primary: #5a9aa8;
 $button-secondary: #1f7f5c;
