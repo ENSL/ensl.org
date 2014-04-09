@@ -32,3 +32,34 @@
     }
   }
 }
+
+/*
+  Error Messages
+*/
+
+div#errors {
+  @extend .flash.error;
+  @include span-columns(12);
+  margin-bottom: em(20);
+
+  &:before {
+    height: 100%;
+  }
+
+  strong {
+    @include span-columns(12);
+    margin-bottom: em(10);
+  }
+
+  ul.errors {
+    @include span-columns(12);
+
+    li {
+      margin-bottom: .5em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
