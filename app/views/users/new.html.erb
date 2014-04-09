@@ -1,28 +1,35 @@
-<div class="wide box">
-  <h2>Registration</h2>
-  <%= form_for @user do |f| %>
-    <%= f.error_messages %>
-    <p>
-      <%= f.label :username %><br />
-      <%= f.text_field :username %>
-    </p>
-    <p>
-      <%= f.label :raw_password, "Password" %><br />
-      <%= f.password_field :raw_password %>
-    </p>
-    <p>
-      <%= f.label :email %><br />
-      <%= f.text_field :email %>
-    </p>
-    <p>
-      <%= f.label :steamid %> <em>(e.g. 0:1:23456789)</em><br>
-      <%= f.text_field :steamid %><br />
-      <%= link_to "You can use this tool to find out", "/files/client/steamid_finder.exe" %>
-    </p>
-    <p>
-      <%= f.label :birthdate %><br />
-      <%= date_select :user, :birthdate, :order => [:year, :month, :day], :start_year => 1950 %>
-    </p>
-    <%= f.submit "Register" %>
+<div id="registration">
+  <h1>Registration</h1>
+
+  <%= link_to "You can use this tool to find your SteamID.", "/files/client/steamid_finder.exe" %>
+
+  <%= form_for @user, html: { class: "square" } do |f| %>
+    <%= render 'shared/errors', messages: @user.errors.full_messages %>
+
+    <div class="fields">
+      <div class="horizontal text-field">
+        <%= f.label :username %>
+        <%= f.text_field :username %>
+      </div>
+      <div class="horizontal text-field">
+        <%= f.label :raw_password, "Password" %>
+        <%= f.password_field :raw_password %>
+      </div>
+      <div class="horizontal text-field">
+        <%= f.label :email %>
+        <%= f.text_field :email %>
+      </div>
+      <div class="horizontal text-field">
+        <%= f.label :steamid %>
+        <%= f.text_field :steamid, placeholder: "0:1:23456789" %>
+      </div>
+      <div class="horizontal">
+        <%= f.label :birthdate %>
+        <%= date_select :user, :birthdate, order: [:year, :month, :day], start_year: 1950 %>
+      </div>
+    </div>
+    <div class="controls submit-field">
+      <%= f.submit "Register" %>  
+    </div>
   <% end %>
 </div>

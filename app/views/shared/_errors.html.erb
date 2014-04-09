@@ -1,0 +1,11 @@
+<% if messages.size > 0 %>
+  <div id="errors">
+    <strong><%= t('errors.template.header') %></strong>
+
+    <ul class="errors">
+      <% messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

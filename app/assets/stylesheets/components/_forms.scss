@@ -101,26 +101,35 @@ form.dark {
 
 form.square {
   @include span-columns(12);
+  margin: em(20) 0;
 
-  &.small {
-    @include span-columns(6);
-  }
-
-  &.medium {
-    @include span-columns(9);
-  }
-
-  &.large {
+  .horizontal {
     @include span-columns(12);
-  }
+    margin-bottom: em(20);
 
-  > .field_with_errors:first-child,
-  > label {
-    @include span-columns(3);
-  }
+    &.small {
+      @include span-columns(6);
+    }
 
-  input {
-    @include span-columns(9);
+    &.medium {
+      @include span-columns(9);
+    }
+
+    &.large {
+      @include span-columns(12);
+    }
+
+    > .field_with_errors:first-child,
+    > label,
+    > .label {
+      @include span-columns(3);
+      padding: em(11) 0;
+      line-height: em(16);
+    }
+
+    input {
+      @include span-columns(9);
+    }
   }
 
   .controls {
