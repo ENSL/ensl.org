@@ -1,13 +1,18 @@
-<div class="articleLinks">
+<div class="article-links">
   <% if article.previous_article %>
-    <div class="left">
-      <%= link_to "<< #{article.previous_article}", article.previous_article %>
+    <div class="previous">
+      <%= link_to article.previous_article do %>
+        <%= icon 'arrow-left' %>
+        <%= article.previous_article %>
+      <% end %>
     </div>
   <% end %>
-
   <% if article.next_article %>
-    <div class="right">
-      <%= link_to "#{article.next_article} >>", article.next_article %>
+    <div class="next">
+      <%= link_to article.next_article do %>
+        <%= article.next_article %>
+        <%= icon 'arrow-right' %>
+      <% end %>
     </div>
   <% end %>
 </div>

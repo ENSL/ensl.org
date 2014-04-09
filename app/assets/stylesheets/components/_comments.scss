@@ -9,8 +9,9 @@
     @include span-columns(12);
     margin-bottom: em(20);
 
-    h3 {
+    h5 {
       margin-top: 0;
+      margin-bottom: 1em;
     }
 
     .fields {

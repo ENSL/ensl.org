@@ -1,8 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  background: #046;
-  @include background-image(linear-gradient(#046, $medium-gray));
+  background: lighten($blue, 10);
+  @include background-image(linear-gradient(lighten($blue, 10), $medium-gray));
 }
 
 %container-padded {
@@ -20,7 +20,7 @@ body {
 #content,
 #forums {
   @include span-columns(12);
-  background: #F3F3FB;
+  background: $light-blue;
   padding-top: em(20);
 }
 
@@ -37,4 +37,9 @@ img.flag {
   display: inline-block;
   vertical-align: - em(6);
   margin-right: em(10);
+}
+
+.actions-bottom {
+  @include span-columns(12);
+  margin-top: em(20);
 }
