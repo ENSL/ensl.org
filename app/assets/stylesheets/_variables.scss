@@ -46,8 +46,11 @@ $green: #1f7f5c;
 $blue: #5a9aa8;
 $purple: #6a5a8c;
 $gold: #FFD700;
+
 $dark-gray: #232323;
 $medium-gray: #2e2e2e;
+
+$light-blue: #F3F3FB;
 $light-gray: #DDD;
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;
@@ -89,11 +92,12 @@ $input-primary: white;
 $input-secondary: #5a9aa8;
 $input-text: #232323;
 $input-border-width: em(3);
+$input-border-colour: darken($light-blue, 10);
 $input-padding: em(11);
 
 $input-dark-background-colour: $dark-gray;
-$input-dark-border-colour: $medium-gray;
-$input-dark-border-width: em(1);
+$input-dark-border-colour: $light-gray;
+$input-dark-border-width: em(2);
 $input-dark-border-hover-colour: $blue;
 $input-dark-border-focus-colour: $green;
 

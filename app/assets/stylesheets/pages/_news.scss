@@ -9,7 +9,7 @@ div.article {
 
   .content {
     @include span-columns(12);
-    margin-bottom: em(20);
+    margin-bottom: em(40);
   }
 
   .author {
@@ -27,5 +27,27 @@ div.article {
     h1 {
       margin-top: 0;
     }    
+  }
+}
+
+div.article-links {
+  @include span-columns(12);
+
+  .previous {
+    @include span-columns(6);
+
+    .fa {
+      padding-right: em(10);
+    }
+  }
+
+  .next {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+
+    .fa {
+      padding-left: em(10);
+    }
   }
 }

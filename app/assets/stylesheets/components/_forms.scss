@@ -34,25 +34,28 @@ form {
       font-size: em(16);
       padding: $input-padding;
       height: em(40);
-      border: none;
+      border: $input-border-colour solid $input-border-width;
 
       &:hover {
         border: $input-border-width solid lighten($input-secondary, 20%);
-        padding: $input-padding ($input-padding - $input-border-width);
       }
 
       &:focus {
         border: $input-border-width solid $input-secondary;
-        padding: $input-padding ($input-padding - $input-border-width);
         color: $input-secondary;
         outline: none;
         background: transparent;
       }
     }
+
+    textarea {
+      height: auto;
+      width: 100%;
+    }
   }
 
   .controls {
-    margin-bottom: 20px;
+    margin-bottom: em(20);
 
     button,
     input {
@@ -72,12 +75,10 @@ form.dark {
 
       &:hover {
         border: $input-dark-border-width solid $input-dark-border-hover-colour;
-        padding: $input-padding ($input-padding - $input-dark-border-width);
       }
 
       &:focus {
         border: $input-dark-border-width solid $input-dark-border-focus-colour;
-        padding: $input-padding ($input-padding - $input-dark-border-width);
       }
 
       &:-webkit-autofill {

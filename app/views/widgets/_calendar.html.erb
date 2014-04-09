@@ -7,8 +7,8 @@
         <div class="separator"><%= day_events.first.start.strftime("%A, %e %B") %></div>
           <% day_events.each do |event| %>
             <div class="entry">
-              <p><%= event.formatted_summary %></p>
-              <p><%= event.start.strftime("%H:%M %Z") %></p>
+              <p class="summary"><%= event.formatted_summary %></p>
+              <p class="time"><%= event.start.strftime("%H:%M %Z") %></p>
             </div>
           <% end %>
       <% end %>

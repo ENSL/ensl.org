@@ -4,8 +4,10 @@
   <% end %>
 </div>
 
-<%= link_to t('news.archive'), '/news/archive', class: "button" %>
+<div class="actions-bottom">
+  <%= link_to t('news.archive'), '/news/archive', class: "button" %>
 
-<% if cuser and cuser.admin? %>
-  <%= link_to t('helpers.submit.post.new'), new_article_path, class: "button" %>
-<% end %>
+  <% if cuser and cuser.admin? %>
+    <%= link_to t('helpers.submit.post.new'), new_article_path, class: "button" %>
+  <% end %>  
+</div>

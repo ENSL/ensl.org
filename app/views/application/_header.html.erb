@@ -13,13 +13,8 @@
               </li>
             <% end %>
             <li>
-              <%= link_to("/gathers/latest/ns1") do %>
-                NS1 Gather (<%= Gather.player_count_for_game('NS1') %>)
-              <% end %>
-            </li>
-            <li>
               <%= link_to("/gathers/latest/ns2") do %>
-                NS2 Gather (<%= Gather.player_count_for_game('NS2') %>)
+                NS2 Gather (<%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %>)
               <% end %>
             </li>
           </ul>
