@@ -1,3 +1,24 @@
+#comments {
+  @include span-columns(12);
+  
+  h3 {
+    margin: 1em 0;
+  }
+
+  .comment-form {
+    @include span-columns(12);
+    margin-bottom: em(20);
+
+    h3 {
+      margin-top: 0;
+    }
+
+    .fields {
+      margin-bottom: em(20);
+    }    
+  }
+}
+
 .comment {
   $comment-gutter: 1.4em;
   $comment-image-padding: .7em;

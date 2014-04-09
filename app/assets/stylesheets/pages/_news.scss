@@ -1,0 +1,31 @@
+div.article {
+  @include span-columns(12);
+  border-bottom: 1px solid rgba(35, 35, 35, 0.1);
+  padding-bottom: em(20);
+
+  h1 {
+    margin: 1em 0;
+  }
+
+  .content {
+    @include span-columns(12);
+    margin-bottom: em(20);
+  }
+
+  .author {
+    @include span-columns(6);
+  }
+
+  .actions {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+  }
+
+  &:first-child {
+  
+    h1 {
+      margin-top: 0;
+    }    
+  }
+}

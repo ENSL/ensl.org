@@ -3,15 +3,17 @@
     You have been muted.
   <% else %>
     <% scroll = shoutmsg.domain == "shoutbox" ? "" : "$('#{shoutmsg.domain}').scrollTop = $('#{shoutmsg.domain}').scrollHeight;" %>
-    <%= form_for(shoutmsg, :remote => true, :html => {:id => "new_#{shoutmsg.domain}"}) do |f| %>
+    <%= form_for(shoutmsg, remote: true, html: { id: "new_#{shoutmsg.domain}" }) do |f| %>
       <% if shoutmsg.shoutable %>
         <%= f.hidden_field :shoutable_type %>
         <%= f.hidden_field :shoutable_id %>
       <% end %>
-      <p>
+      <div class="fields">
         <%= f.text_field :text, size: 12, id: "#{shoutmsg.domain}_text", class: "shout_input" %>
+      </div>
+      <div class="controls">
         <%= submit_tag "Shout!" %>
-      </p>
+      </div>
     <% end %>
   <% end %>
 <% end %>

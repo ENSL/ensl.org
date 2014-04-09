@@ -12,7 +12,8 @@ form {
 
     > .field_with_errors {
 
-      input {
+      input,
+      textarea {
         border: $input-border-width solid $flash-error;
 
         &:hover,
@@ -26,7 +27,8 @@ form {
       }
     }
 
-    input {
+    input,
+    textarea {
       background-color: $input-primary;
       color: $input-text;
       font-size: em(16);
@@ -36,10 +38,12 @@ form {
 
       &:hover {
         border: $input-border-width solid lighten($input-secondary, 20%);
+        padding: $input-padding ($input-padding - $input-border-width);
       }
 
       &:focus {
         border: $input-border-width solid $input-secondary;
+        padding: $input-padding ($input-padding - $input-border-width);
         color: $input-secondary;
         outline: none;
         background: transparent;
@@ -68,10 +72,12 @@ form.dark {
 
       &:hover {
         border: $input-dark-border-width solid $input-dark-border-hover-colour;
+        padding: $input-padding ($input-padding - $input-dark-border-width);
       }
 
       &:focus {
         border: $input-dark-border-width solid $input-dark-border-focus-colour;
+        padding: $input-padding ($input-padding - $input-dark-border-width);
       }
 
       &:-webkit-autofill {
