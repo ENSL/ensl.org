@@ -1,10 +1,8 @@
-<div class="commentNew center centered">
-  <h3>
-    New comment
-  </h3>
+<div class="comment-form">
+  <h3>New comment</h3>
 
   <% if cuser %>
-    <%= form_for(@comment, :remote => true) do |f| %>
+    <%= form_for(@comment, remote: true) do |f| %>
       <ul>
         <% @comment.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
@@ -12,12 +10,12 @@
       </ul>
       <%= f.hidden_field :commentable_id %>
       <%= f.hidden_field :commentable_type %>
-      <p>
-        <%= f.text_area :text, :rows => 5, :cols => 40, :id => "textArea" %>
-      </p>
-      <p>
+      <div class="fields">
+        <%= f.text_area :text, rows: 5, cols: 40, id: "textArea" %>
+      </div>
+      <div class="controls">
         <%= f.submit 'Post Comment' %>
-      </p>
+      </div>
     <% end %>
   <% else %>
     Please log in or <%= link_to "register", new_user_path %> to post comments.

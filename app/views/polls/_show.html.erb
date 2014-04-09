@@ -1,19 +1,21 @@
-<h5><%= @poll.question %></h5>
+<div class="widget-content-wrapper">
+  <div class="question">
+    <h5><%= @poll.question %></h5>
 
-<div>
-  <% @poll.options.all.each do |opt| %>
-    <p>
-      <% if cuser and !@poll.voted?(cuser) %>
-        <%= link_to (h opt), :controller => "votes", :action => "create", :vote => {:votable_id => opt.id, :votable_type => "Option"} %>
-      <% else %>
-        <%= opt.option %> <br />
-      <% end %>
-      <% if opt.votes > 0 %>
-        <%= image_tag "/images/icons/poll.png", :class => "bar", :height => 6, :width => opt.votes*100/@poll.votes %>
-      <% end %>
-      <span><%= opt.votes %></span>
-    </p>
-  <% end %>
+    <% @poll.options.all.each do |opt| %>
+      <p class="option">
+        <% if cuser and !@poll.voted?(cuser) %>
+          <%= link_to (h opt), controller: "votes", action: "create", vote: { votable_id: opt.id, votable_type: "Option" } %>
+        <% else %>
+          <%= opt.option %> <br />
+        <% end %>
+        <% if opt.votes > 0 %>
+          <%= content_tag :div, "", { class: "bar", style: "width: #{opt.votes*100/@poll.votes}%;" } %>
+        <% end %>
+        <span><%= opt.votes %></span>
+      </p>
+    <% end %>
+  </div>
 </div>
 
-<p><%= link_to "Archive..", polls_path %></p>
+<%= link_to "Archive", polls_path, class: "button" %>

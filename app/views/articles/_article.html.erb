@@ -1,7 +1,7 @@
-<div class="article wide">
+<div class="article">
   <h1><%= namelink article %></h1>
 
-  <div class="clear content">
+  <div class="content">
     <% if article.text_coding == Article::CODING_HTML %>
       <%= article.text.html_safe %>
     <% else %>
@@ -9,9 +9,9 @@
     <% end %>
   </div>
 
-  <h4 class="author">
-    <%= namelink article.user %> on <%= longtime article.created_at %>
-  </h4>
+  <div class="author">
+    <%= flag(article.user.country) %> <%= namelink(article.user) %> on <%= longtime article.created_at %>
+  </div>
 
   <div class="actions">
     <% if article.can_update? cuser %>
