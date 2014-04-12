@@ -1,0 +1,178 @@
+/*
+  Forums
+*/
+
+#forums {
+  /*
+    Buttons
+  */
+
+  .controls {
+    @include span-columns(12);
+  }
+}
+
+/*
+  Categories
+*/
+
+div#categories {
+
+  /*
+    Tables
+  */
+
+  table.category {
+    table-layout: auto;
+  }
+
+  .bullet {
+    width: 10%;
+    background: image-url('layout/forum-category.png') center center no-repeat;
+
+    &.highlight {
+      background-image: image-url('layout/forum-category-highlight.png');
+    }
+  }
+
+  .forum {
+    width: 45%;
+    padding-right: em(10);
+  }
+
+  .actions {
+    width: 10%;
+    text-align: center;
+  }
+
+  .topics,
+  .posts {
+    width: 10%;
+  }
+  
+  .last {
+    width: 15%;
+  }
+}
+
+/*
+  Topics
+*/
+
+#topics {
+  table-layout: auto;
+  margin-bottom: em(40);
+
+  .topic {
+    width: 55%;
+  }
+
+  .author {
+    width: 10%;
+  }
+
+  .replies,
+  .views {
+    width: 10%;
+  }
+
+  .last {
+    width: 15%;
+  }
+}
+
+.statistics {
+  margin: em(20) 0;
+
+  h4 {
+    margin-bottom: 1em;
+  }
+}
+
+#topic {
+
+  .controls {
+    margin-top: em(20);
+  }
+
+  #reply {
+    display: none;
+  }
+}
+
+/*
+  Posts
+*/
+
+#posts {
+  @include span-columns(12);
+  margin-top: em(20);
+
+  .post {
+    @include span-columns(12);
+    border-top: em(3) solid $light-gray;
+    padding: em(20) 0;
+
+    &:last-child {
+      border-bottom: em(3) solid $light-gray;
+      margin-bottom: em(40);
+    }
+
+    .avatar {
+      @include span-columns(3);
+
+      h5 {
+        text-align: center;
+        margin-bottom: 1em;
+      }
+
+      .image,
+      .team {
+        @include span-columns(12);
+        text-align: center;
+        margin-bottom: em(10);
+      }
+
+      .admin {
+        color: $red;
+      }
+    }
+
+    .content {
+      @include span-columns(9);
+      @include omega;
+
+      .text,
+      .signature {
+        @include span-columns(12);
+        padding: em(20) 0;
+      }
+    }
+
+    .header {
+      @include span-columns(12);
+
+      .time {
+        @include span-columns(6);
+      }
+
+      .posts {
+        @include span-columns(6);
+        text-align: right;
+      }
+    }
+
+    .actions {
+      @include span-columns(12);
+
+      .user {
+        @include span-columns(3);
+      }
+
+      .reply {
+        @include span-columns(9);
+        @include omega;
+      }
+    }
+  }
+}

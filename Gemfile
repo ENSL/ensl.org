@@ -21,6 +21,7 @@ gem 'newrelic_rpm', '~> 3.7.2.195'
 gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
+gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.2', require: false
 
 gem 'sprockets', '~> 2.2.1'
@@ -45,8 +46,10 @@ group :development do
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano3-unicorn', '~> 0.1.1'
+  gem 'better_errors', '~> 1.1.0'
+  gem 'binding_of_caller', '~> 0.7.2'
   gem 'annotate', '~> 2.6.2'
-  gem 'quiet_assets'
+  gem 'quiet_assets', '~> 1.0.2'
 end
 
 group :test do

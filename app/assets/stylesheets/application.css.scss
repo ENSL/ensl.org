@@ -24,6 +24,8 @@
 @import "components/flashes";
 @import "components/comments";
 @import "components/gather";
+@import "components/breadcrumbs";
+@import "components/pagination";
 
 /*
   Layout
@@ -35,6 +37,7 @@
 @import "layout/body";
 @import "layout/sidebar";
 @import "layout/footer";
+@import "layout/helpers";
 
 /*
   Pages
@@ -42,3 +45,4 @@
 
 @import "pages/news";
 @import "pages/contests";
+@import "pages/forums";

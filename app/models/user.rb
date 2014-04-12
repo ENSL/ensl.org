@@ -27,6 +27,7 @@ require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_versioned', 'lib', '
 
 class User < ActiveRecord::Base
   include Extra
+  
   VERIFICATION_TIME = 604800
 
   attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version

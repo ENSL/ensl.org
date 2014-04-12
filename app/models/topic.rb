@@ -30,7 +30,7 @@ class Topic < ActiveRecord::Base
   has_many :posts, :order => "id ASC", :dependent => :destroy
   has_many :view_counts, :as => :viewable, :dependent => :destroy
 
-  scope :basic, :include => [:latest, {:forum => :forumer}, :user]
+  scope :basic, :include => [:latest, { forum: :forumer }, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
   scope :recent,
     :conditions => "forumers.id IS NULL AND posts.id = (SELECT id FROM posts AS P WHERE P.topic_id = topics.id ORDER BY id DESC LIMIT 1)",
@@ -39,7 +39,7 @@ class Topic < ActiveRecord::Base
   scope :latest_page,
     lambda { |page| {:limit => "#{(page-1)*LATEST_PER_PAGE}, #{(page-1)*LATEST_PER_PAGE+LATEST_PER_PAGE}"} }
 
-    validates_presence_of :user_id, :forum_id
+  validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50
   validates_length_of :first_post, :in => 1..10000, :on => :create
 

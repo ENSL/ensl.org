@@ -1,0 +1,8 @@
+/*
+  Pagination
+*/
+
+.pagination {
+  @include span-columns(12);
+  margin: em(20) 0;
+}

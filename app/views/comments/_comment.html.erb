@@ -11,7 +11,7 @@
     <div class="controls">
       <% if cuser %>
         [
-        <%= link_to_function 'Q', "QuoteText('comments', #{comment.id}, '#{comment.user}')" %>
+        <%= link_to_function 'Q', "QuoteText(#{comment.id}, 'comments')" %>
         <% if comment.can_update? cuser %>
           <%= link_to 'E', edit_comment_path(comment) %>
         <% end %>

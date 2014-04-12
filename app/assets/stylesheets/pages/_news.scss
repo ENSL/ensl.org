@@ -14,12 +14,26 @@ div.article {
 
   .author {
     @include span-columns(6);
+
+    a {
+      font-weight: bold;
+    }
   }
 
-  .actions {
+  .comments {
     @include span-columns(6);
     @include omega;
     text-align: right;
+
+    .fa {
+      margin-right: em(10);
+    }
+  }
+
+  .actions {
+    @include span-columns(12);
+    @include omega;
+    margin-top: em(10);
   }
 
   &:first-child {

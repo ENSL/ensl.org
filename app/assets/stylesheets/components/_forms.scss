@@ -127,7 +127,8 @@ form.square {
       line-height: em(16);
     }
 
-    input {
+    input,
+    textarea {
       @include span-columns(9);
     }
   }
