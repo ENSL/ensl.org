@@ -1,96 +1,70 @@
-<p>
-  <%= link_to "Forums", forums_url %> &#187; <%= namelink @topic.forum %> &#187; <%= namelink @topic %>
-</p>
+<div id="topic">
+  <%= render partial: 'breadcrumbs', locals: { topic: @topic } %>
 
-<table id="topic">
-  <thead>
-    <tr>
-      <th colspan="2">
-        <div class="left">
-          <%= namelink @topic %>
-          <% if @posts.length > Topic::POSTS_PAGE %>
-            [<%= will_paginate @posts %>]
-          <% end %>
-        </div>
+  <h2><%= namelink @topic %></h2>
 
-        <div class="right">
-          <% if @newpost.can_create? cuser %>
-            <%= link_to 'Reply', new_post_path(@newpost, :id => @topic) %> |
-          <% end %>
-          <% if @topic.can_update? cuser %>
-            <%= link_to 'Edit', edit_topic_path(@topic) %>
-          <% end %>
-        </div>
+  <% if @posts.count > Topic::POSTS_PAGE %>
+    <%= will_paginate @posts %>
+  <% end %>
 
-        <div class="clear"></div>
-      </th>
-    </tr>
-  </thead>
+  <div class="controls">
+    <% if @newpost.can_create? cuser %>
+      <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>
+    <% end %>
+    <% if @topic.can_update? cuser %>
+      <%= link_to 'Edit', edit_topic_path(@topic), class: 'button' %>
+    <% end %>
+  </div>
 
-  <tbody id="posts">
-    <% n = 0; @posts.each do |post| %>
-      <%= render :partial => "posts/post", :locals => {:post => post, :n => n} %>
-      <% n = n + 1 end %>
-      <% if @newpost.errors.count > 0 %>
-        <tr>
-          <td colspan="2" class="center">
-            <% @newpost.error_messages.each do |m| %>
-              <%= h m %><br />
-            <% end %>
-          </td>
-        </tr>
+  <div id="posts">
+    <% @posts.each_with_index do |post, n| %>
+      <%= render partial: "posts/post", locals: { post: post, n: n } %>
+    <% end %>
+
+    <% if @newpost.errors.count > 0 %>
+      <% @newpost.error_messages.each do |m| %>
+        <%= h m %><br>
       <% end %>
-    </tbody>
+    <% end %>
+  </div>
 
-    <tfoot>
-      <tr id="reply">
-        <td colspan="2">
-          <div class="centered center" style="width: 583px;">
-            <%= form_for(@newpost, :remote => true) do |f| %>
-              <%= f.error_messages %>
-              <%= f.hidden_field :topic_id %>
-              <p>
-                <%= f.text_area :text, :rows => 13, :cols => 70, :id => "textArea" %>
-              </p>
-              <p>
-                <%= f.submit 'Post Message' %>
-              </p>
-            <% end %>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <th colspan="2">
-          <div class="left minitext">
-            <%= will_paginate @posts %>
-          </div>
-
-          <div class="right minitext">
-            <% if @newpost.can_create? cuser %>
-              <%= link_to_function 'Fast Reply', "$('tr#reply').fadeIn('slow');" %> |
-              <%= link_to 'Reply', new_post_path(@newpost, :id => @topic) %> |
-            <% end %>
-            <% if @topic.can_update? cuser %>
-              <%= link_to 'Edit', edit_topic_path(@topic) %>
-            <% end %>
-            <% if @lock.new_record? and @lock.can_create? cuser %>
-              <%= form_for @lock, :html => {:style => "display:inline"} do |f| %>
-                <%= f.hidden_field :lockable_type %>
-                <%= f.hidden_field :lockable_id %>
-                | <%= link_to_function "Lock", "this.parentNode.submit()" %>
-            <% end %>
-          <% elsif @lock.can_destroy? cuser %>
-            | <%= link_to 'Unlock', @lock, :confirm => 'Are you sure?', :method => :delete %>
-        <% end %>
+  <div id="reply">
+    <h5>New Reply</h5>
+    
+    <%= form_for(@newpost, remote: true, html: { class: 'square' }) do |f| %>
+      <%= f.error_messages %>
+      <%= f.hidden_field :topic_id %>
+      <div class="fields horizontal">
+        <%= f.label "Enter your post text:" %>
+        <%= f.text_area :text, rows: 10 %>
       </div>
+      <div class="controls horizontal">
+        <%= f.submit 'Post Message' %>
+      </div>
+    <% end %>
+  </div>
 
-      <div class="clear"></div>
-    </th>
-  </tr>
-</tfoot>
-</table>
+  <%= will_paginate @posts %>
 
-<p>
-  <%= link_to "Forums", forums_url %> &#187; <%= namelink @topic.forum %> &#187; <%= namelink @topic %>
-</p>
+  <div class="right minitext">
+    <% if @newpost.can_create? cuser %>
+      <%= link_to_function 'Fast Reply', "$('#reply').fadeIn('slow')", class: 'button' %>
+      <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>
+    <% end %>
+    <% if @topic.can_update? cuser %>
+      <%= link_to 'Edit', edit_topic_path(@topic), class: 'button' %>
+    <% end %>
+
+    <% if @lock.new_record? and @lock.can_create? cuser %>
+      <%= form_for @lock do |f| %>
+        <%= f.hidden_field :lockable_type %>
+        <%= f.hidden_field :lockable_id %>
+        <%= link_to_function "Lock", "this.parentNode.submit()", class: 'button' %>
+      <% end %>
+    <% elsif @lock.can_destroy? cuser %>
+      <%= link_to 'Unlock', @lock, class: 'button', confirm: 'Are you sure?', method: :delete %>
+    <% end %>
+  </div>
+
+  <%= render partial: 'breadcrumbs', locals: { topic: @topic } %>
+</div> 

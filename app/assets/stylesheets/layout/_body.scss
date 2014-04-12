@@ -1,8 +1,22 @@
+/*
+  Main Containers
+*/
+
+html,
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
   background: $dark-blue;
   @include background-image(linear-gradient($dark-blue, $medium-gray));
+}
+
+#container {
+  min-height: 100%;
 }
 
 %container-padded {
@@ -17,11 +31,14 @@ body {
   @extend %container-padded;
 }
 
-#content,
-#forums {
+#content {
   @include span-columns(12);
   background: $light-blue;
   padding-top: em(20);
+}
+
+#forums {
+  @include span-columns(12);
 }
 
 #main {
@@ -31,15 +48,4 @@ body {
 #sidebar {
   @include span-columns(3);
   @include omega();
-}
-
-img.flag {
-  display: inline-block;
-  vertical-align: - em(6);
-  margin-right: em(10);
-}
-
-.actions-bottom {
-  @include span-columns(12);
-  margin-top: em(20);
 }

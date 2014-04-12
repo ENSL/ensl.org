@@ -5,7 +5,7 @@ set :deploy_via, :remote_cache
 set :pty, true
 
 set :scm, :git
-set :repo_url, 'git@github.com:ENSL/ensl.org.git'
+set :repo_url, 'https://github.com/ENSL/ensl.org.git'
 set :keep_releases, 10
 
 set :rbenv_type, :user

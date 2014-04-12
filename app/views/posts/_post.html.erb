@@ -1,69 +1,58 @@
-<% if n > 0 or n == -1 %>
-  <tr>
-    <th class="seperator" colspan="2">
-    </th>
-  </tr>
-<% end %>
+<div id="post_<%= post.id %>" class="post">
+  <div class="avatar" rowspan="2">
+    <h5>
+      <%= link_to post.user, post.user, class: ("admin" if post.user.admin?) %>
+    </h5>
 
-<tr>
-  <td class="avatar" rowspan="2">
-    <h3 class="center">
-      <%= link_to post.user, post.user, :class => (post.user.admin? ? "red" : "") %>
-    </h3>
-
-    <%= image_tag post.user.profile.avatar.url, :class => "centered" %>
+    <div class="image">
+      <%= image_tag post.user.profile.avatar.url %>  
+    </div>
 
     <% if post.user.team %>
-      <p class="center">
-        <%= namelink post.user.team %>
-      </p>
+      <%= namelink post.user.team %>
     <% end %>
+
     <%= cascade post.user, [["Posts", "posts.count"], "from", "joined"] %>
-  </td>
+  </div>
 
-  <th class="header">
-    <div class="left">
-      <a name="post_<%= post.id %>">
-        <%= longtime post.created_at %>
-      </a>
+  <div class="content">
+    <div class="header">
+      <div class="time">
+        <a name="post_<%= post.id %>">
+          <%= longtime(post.created_at) %>
+        </a>
+      </div>
+      <div class="posts">
+        <%= link_to "##{post.number(@posts, n)}", "#post_#{post.id}" %>
+      </div>
     </div>
 
-    <div class="right">
-      <%= post.number @posts, n %>
+    <div class="text">
+      <%= post.text_parsed.html_safe %>  
     </div>
-
-    <div class="clear"></div>
-  </th>
-</tr>
-
-<tr>
-  <td class="text" id="post_<%= post.id %>">
-    <%= post.text_parsed.html_safe %>
-  </td>
-</tr>
-
-<tr>
-  <td class="actions center">
-    <%= link_to "Send PM", :controller => "messages", :action => "new", :id => "User", :id2 => post.user %>
-  </td>
-
-  <td class="signature">
-    <div class="left">
-      <%= raw post.user.profile.signature_parsed if post.user.profile.signature_parsed %>
+    
+    <div class="signature">
+      <%= post.user.profile.signature_parsed.html_safe if post.user.profile.signature_parsed %>
     </div>
+  </div>
 
-    <div class="right">
-      <% if post.topic.posts.build.can_create? cuser %>
-        <%= link_to_function 'QuoteReply', "QuoteText(#{post.id}); $('tr#reply').fadeIn('slow');" %>
-      <% end %>
-      <% if post.can_update? cuser %>
-        <%= link_to 'Edit', edit_post_path(post) %>
-      <% end %>
-      <% if post.can_destroy? cuser %>
-        <%= link_to 'Delete', post, :confirm => 'Are you sure?', :method => :delete %>
-      <% end %>
+  <div class="actions">
+    <div class="user">
+      <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: post.user }, class: 'button tiny' %>  
     </div>
-
-    <div class="clear"></div>
-  </td>
-</tr>
+    
+    <div class="reply">
+      <div class="right">
+        <% if post.topic.posts.build.can_create? cuser %>
+          <%= link_to_function 'Quote Reply', "QuoteText(#{post.id}); $('#reply').fadeIn('slow')", class: 'button tiny' %>
+        <% end %>
+        <% if post.can_update? cuser %>
+          <%= link_to 'Edit', edit_post_path(post), class: 'button tiny' %>
+        <% end %>
+        <% if post.can_destroy? cuser %>
+          <%= link_to 'Delete', post, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

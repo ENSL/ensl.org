@@ -191,10 +191,12 @@ function findUser(source) {
   return false;
 }
 
-function QuoteText(id) {
+function QuoteText(id, type) {
+  type = type || 'posts';
+
   $.ajax({
     type: "GET",
-    url: "/posts/quote/" + id + ".js",
+    url: "/" + type + "/quote/" + id + ".js",
     dataType: "script"
   });
 }

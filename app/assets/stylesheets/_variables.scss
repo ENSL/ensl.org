@@ -42,6 +42,7 @@ $base-border-radius: em(3);
   Colours
 */
 
+$red: #de8650;
 $green: #1f7f5c;
 $blue: #5a9aa8;
 $purple: #6a5a8c;
@@ -87,7 +88,7 @@ $navbar-text: white;
 $flash-text: white;
 $flash-notice: #5a9aa8;
 $flash-success: #1f7f5c;
-$flash-warning: #de8650;
+$flash-warning: $red;
 $flash-error: #e56c69;
 
 $input-primary: white;

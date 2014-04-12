@@ -7,6 +7,7 @@
   background-color: $background-primary;
   height: em(60);
   max-height: em(60);
+  
   nav {
     @include outer-container;
   }
@@ -42,6 +43,7 @@ ul.navigation {
       padding: em(22);
       float: left;
       border-right: em(1) solid $navbar-border;
+
       &:hover,
       &.active {
         background-color: $navbar-secondary;
@@ -85,6 +87,10 @@ ul.navigation {
 
           li {
             border-bottom: em(1) solid lighten($navbar-secondary, 10%);
+
+            &:first-child {
+              border-top: em(1) solid lighten($navbar-secondary, 10%);
+            }
 
             &:last-child {
               border-bottom: none;

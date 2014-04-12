@@ -1,4 +1,4 @@
-<div class="comment-form">
+<div id="reply" class="comment-form">
   <h5>New comment</h5>
 
   <% if cuser %>
@@ -11,7 +11,7 @@
       <%= f.hidden_field :commentable_id %>
       <%= f.hidden_field :commentable_type %>
       <div class="fields">
-        <%= f.text_area :text, rows: 5, cols: 40, id: "textArea" %>
+        <%= f.text_area :text, rows: 5 %>
       </div>
       <div class="controls">
         <%= f.submit 'Post Comment' %>

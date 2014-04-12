@@ -19,4 +19,16 @@
 button,
 a.button {
   @include button;
+
+  &.tiny {
+    background-color: transparentize($green, .5);
+    border-radius: em(14);
+    height: em(25);
+    padding: em(1) em(12);
+    margin: 0 em(10) 0 0;
+
+    &:hover {
+      color: $light-gray;
+    }
+  }
 }

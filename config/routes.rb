@@ -13,6 +13,9 @@ Ensl::Application.routes.draw do
 	resources :categories
 	resources :options
 	resources :polls
+
+  match 'comments/quote'
+
 	resources :comments
 	resources :shoutmsgs
 	resources :teamers
@@ -23,6 +26,10 @@ Ensl::Application.routes.draw do
 	resources :groupers
 	resources :forumers
 	resources :topics
+
+  match 'forums/up'
+  match 'forums/down'
+
 	resources :forums
 	resources :users
 	resources :locks
@@ -46,6 +53,9 @@ Ensl::Application.routes.draw do
 	resources :bans
 	resources :tweets
 	resources :issues
+  
+  match 'posts/quote'
+
 	resources :posts
 	resources :brackets
 
@@ -74,9 +84,6 @@ Ensl::Application.routes.draw do
 
   match 'directories', to: "directories#show", id: 1
 
-  match 'forums/up'
-  match 'forums/down'
-
   match 'gathers/refresh'
   match 'gathers/latest/:game', to: "gathers#latest", via: :get
   match 'gather', to: "gathers#latest", game: "ns2", via: :get  
@@ -100,8 +107,6 @@ Ensl::Application.routes.draw do
   match 'users/agenda'
   match 'users/logout'
   match 'users/login'
-
-  match 'posts/quote'
 
   match 'users/agenda'
   match 'users/login'

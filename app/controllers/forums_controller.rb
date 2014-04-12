@@ -46,13 +46,13 @@ class ForumsController < ApplicationController
 
   def up
     raise AccessError unless @forum.can_update? cuser
-    @forum.move_up :category_id => @forum.category.id
+    @forum.move_up(category_id: @forum.category.id)
     redirect_to_back
   end
 
   def down
     raise AccessError unless @forum.can_update? cuser
-    @forum.move_down :category_id => @forum.category.id
+    @forum.move_down(category_id: @forum.category.id)
     redirect_to_back
   end
 
