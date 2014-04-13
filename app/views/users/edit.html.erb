@@ -2,8 +2,8 @@
 
 <%= form_for @user, :html => { :multipart => true } do |f| %>
   <% f.fields_for :profile do |p| %>
-    <div id="userTab">
-      <ul id="userTab-nav" class="tabs">
+    <div id="user" class="tabbed">
+      <ul id="user-nav" class="tabs">
         <li><a href="#userTabGeneral">General</a></li>
         <li><a href="#userTabContact">Contact</a></li>
         <li><a href="#userTabCountry"><%= t('profile.locals') %></a></li>
@@ -14,7 +14,7 @@
         <li><a href="#notifications">Notify</a></li>
       </ul>
 
-      <div class="box wide tabs">
+      <div class="tabbed-contents">
         <div class="tab" id="userTabGeneral">
           <% if @user.errors.any? %>
             <div id="error_explanation">
@@ -286,5 +286,7 @@
 <% end %>
 
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'userTab'});
+  new Yetii({
+    id: 'user'
+  });
 </script>

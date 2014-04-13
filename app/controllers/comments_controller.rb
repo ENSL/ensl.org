@@ -7,7 +7,7 @@ class CommentsController < ApplicationController
   end
 
   def show
-    @comments = Comment.recent5.all conditions: {commentable_id: params[:id2], commentable_type: params[:id]}
+    @comments = Comment.recent5.all conditions: { commentable_id: params[:id2], commentable_type: params[:id] }
     render partial: 'list', layout: false
   end
 

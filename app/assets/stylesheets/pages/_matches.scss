@@ -1,0 +1,22 @@
+/*
+  Matches Listing
+*/
+
+#matches {
+  table-layout: auto;
+  margin-bottom: em(20);
+
+  .opponent {
+    width: 30%;
+  }
+
+  .date,
+  .maps {
+    width: 20%;
+  }
+
+  .score {
+    width: 10%;
+    text-align: right;
+  }
+}

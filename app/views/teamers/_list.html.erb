@@ -1,38 +1,30 @@
-<table class="data">
+<table id="members" class="<%= 'short' if !comment %>">
   <tr>
-    <th>&nbsp;</th>
-    <th>Member</th>
-    <% if cuser %>
-      <th>Name</th>
-    <% end %>
-    <th>Age</th>
-    <th>SteamID</th>
-    <th>Rank</th>
+    <th class="country"></th>
+    <th class="member">Member</th>
+    <th class="steamid">SteamID</th>
+    <th class="rank">Rank</th>
     <% if comment %>
-      <th>Comment</th>
+      <th class="note">Comment</th>
     <% end %>
-    <th>Joined</th>
+    <th class="joined">Joined</th>
   </tr>
   <% teamers.each do |member| %>
-    <% next if blacklist and blacklist.exists? :user_id => member.user_id %>
+    <% next if blacklist and blacklist.exists? user_id: member.user_id %>
     <% next if member.user.nil? %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= flag member.user.country %></td>
       <td><%= namelink member.user %></td>
-      <% if cuser %>
-        <td><%= h member.user.realname %></td>
-      <% end %>
-      <td><%= h member.user.age %></td>
-      <td><%= h member.user.steamid %></td>
+      <td><%=h member.user.steamid %></td>
       <% if member.rank == Teamer::RANK_REMOVED %>
         <td>Ex-Member</td>
       <% else %>
         <td><%= member.ranks[member.rank] %></td>
       <% end %>
       <% if comment %>
-        <td><%= h member.comment %></td>
+        <td><%=h member.comment %></td>
       <% end %>
-      <td><%= shortdate member.created_at %></td>
+      <td class="joined"><%= shortdate member.created_at %></td>
     </tr>
   <% end %>
 </table>

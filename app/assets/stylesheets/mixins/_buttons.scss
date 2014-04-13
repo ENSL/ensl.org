@@ -3,7 +3,7 @@
 */
 
 @mixin button($background: $button-primary, $text: $button-text) {
-  font-family: $monserrat;
+  font-family: $montserrat;
   font-size: em(16);
   background-color: $background;
   color: $text;

@@ -1,55 +1,47 @@
-<h1>Listing users</h1>
+<h1>Listing Users</h1>
 
-<%= form_tag users_path, :method => 'get' do %>
+<%= form_tag(users_path, method: 'get', class: 'square search') do %>
   <%= hidden_field_tag :direction, params[:direction] %>
   <%= hidden_field_tag :sort, params[:sort] %>
-  <p>
+  <div class="fields query">
     <%= text_field_tag :search, params[:search] %>
-    <%= submit_tag "Search", :name => nil %>
-  </p>
+  </div>
+  <div class="controls">
+    <%= submit_tag "Search", name: nil %>
+  </div>
 <% end %>
 
-<table id="usersTable" class="data">
+<table id="users">
   <tr>
-    <th>
-      Country
-    </th>
-    <th>
-      Username
-    </th>
-    <th>
-      Real name
-    </th>
-    <th>
-      Steam ID
-    </th>
-    <th>
-      Age
-    </th>
+    <th class="country"></th>
+    <th class="username">Username</th>
+    <th class="name">Name</th>
+    <th class="steamid">Steam ID</th>
+    <th class="age">Age</th>
     <% if cuser and cuser.admin? %>
-      <th>
-        Options
-      </th>
+      <th class="actions"></th>
     <% end %>
   </tr>
 
   <% @users.each do |user| %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= flag user.country %></td>
       <td><%= link_to (h user.username), user %></td>
       <td><%= h user.firstname %> <%=h user.lastname %></td>
       <td><%= h user.steamid %></td>
       <td><%= user.age %></td>
       <% if cuser and cuser.admin? %>
-        <td>
-          <%= link_to 'Edit', edit_user_path(user) %>
-          <%= link_to 'Delete', user, :confirm => "Proceed to delete?", :method => :delete %>
+        <td class="actions">
+          <%= link_to edit_user_path(user) do %>
+            <%= icon 'pencil' %> Edit
+          <% end %>
+          <%= link_to user, confirm: "Proceed to delete?", method: :delete do %>
+            <%= icon 'times' %> Delete
+          <% end %>
         </td>
       <% end %>
     </tr>
   <% end %>
 </table>
 
-<p>
-  <%= will_paginate @users %>
-</p>
+<%= will_paginate @users %>

@@ -1,0 +1,56 @@
+/*
+  Breadcrumbs
+*/
+
+.tabbed {
+  $tabs-border-width: em(1);
+  $tabs-padding-vertical: em(8);
+  $tabs-padding-horizontal: em(16);
+
+  ul.tabs {
+    @include span-columns(12);
+    display: block;
+    font-family: $montserrat;
+    height: em(40);
+    max-height: em(40);
+    position: relative;
+
+    li {
+      float: left;
+      display: block;
+      background-color: $background-primary;
+
+      a {
+        border: $tabs-border-width solid $navbar-border;
+        padding: $tabs-padding-vertical $tabs-padding-horizontal;
+        float: left;
+        display: block;
+        color: white;
+      }
+
+      &.activeli {
+        z-index: 100;
+        background-color: $blue;
+
+        a {
+          padding-bottom: $tabs-padding-vertical + $tabs-border-width;
+          border-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .tabbed-contents {
+    @include span-columns(12);  
+    border: $tabs-border-width solid $navbar-border;
+    padding: em(20);
+  }
+
+  @for $i from 1 through $grid-columns {
+    ul.tabs-#{$i} {
+      li {
+        @include span-columns($i);
+      }
+    }
+  }
+}

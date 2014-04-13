@@ -57,7 +57,23 @@ class Topic < ActiveRecord::Base
   end
 
   def view_count
-    self.view_counts.length
+    view_counts.length
+  end
+
+  def cache_key(key)
+    "/topics/#{id}/#{key}"
+  end
+
+  def cached_view_count
+    Rails.cache.fetch(cache_key('view_count'), expires_in: 24.hours) do
+      view_count
+    end
+  end
+
+  def cached_posts_count
+    Rails.cache.fetch(cache_key('posts'), expires_in: 12.hours) do
+      posts.count - 1
+    end
   end
 
   def make_post

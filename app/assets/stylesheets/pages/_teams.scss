@@ -1,0 +1,94 @@
+/*
+  Teams Listing
+*/
+
+#teams {
+  table {
+    table-layout: auto;
+  }
+  
+  .country {
+    width: 5%;
+  }
+
+  .name {
+    width: 45%;
+  }
+
+  .irc {
+    width: 20%;
+  }
+
+  .members {
+    width: 10%;
+  }
+
+  .actions {
+    width: 20%;
+    text-align: right;
+  }
+}
+
+/*
+  Team Profiles
+*/
+
+#team-profile {
+
+  .logo {
+    @include span-columns(12);
+    margin: em(20) 0;
+    text-align: center;
+
+    img {
+      display: inline-block;
+      float: none;
+      width: auto;
+    }
+  }
+
+  .controls {
+    @include span-columns(12);
+    margin: em(20) 0;
+  }
+}
+
+
+#members {
+  table-layout: auto;
+
+  .country,
+  .age {
+    width: 5%;
+  }
+
+  .member {
+    width: 20%;
+  }
+
+  .steamid {
+    width: 15%;
+  }
+
+  .rank {
+    width: 10%;
+  }
+
+  .note {
+    width: 30%;
+  }
+
+  .joined {
+    width: 10%;
+  }
+
+  .joined {
+    text-align: right;
+  }
+
+  &.short {
+    .rank {
+      width: 40%;
+    }
+  }
+}

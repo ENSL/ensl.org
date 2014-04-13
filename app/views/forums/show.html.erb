@@ -6,6 +6,8 @@
 
 <h2><%=h @forum.title %></h2>
 
+<%= will_paginate @topics %>
+
 <table id="topics">
   <tr>
     <th class="topic">Topic</th>
@@ -14,7 +16,7 @@
     <th class="views">Views</th>
     <th class="last">Last Post</th>
   </tr>
-  <% @forum.topics.basic.ordered.each do |topic| %>
+  <% @topics.each do |topic| %>
     <tr>
       <td>
         <h5>
@@ -36,8 +38,8 @@
         <% end %>
       </td>
       <td><%= namelink(topic.user) %></td>
-      <td><%=h topic.posts.count-1 %></td>
-      <td><%=h topic.view_count %></td>
+      <td><%=h topic.cached_posts_count %></td>
+      <td><%=h topic.cached_view_count %></td>
       <td>
         <%= link_to lastpost(topic) do %>
           <%=h topic.posts.last.user %><br>
@@ -47,5 +49,7 @@
     </tr>
   <% end %>
 </table>
+
+<%= will_paginate @topics %>
 
 <%= render partial: 'controls', locals: { forum: @forum } %>

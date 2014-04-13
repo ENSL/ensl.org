@@ -9,10 +9,17 @@
     </div>
 
     <% if post.user.team %>
-      <%= namelink post.user.team %>
+      <strong><%= namelink post.user.team %></strong>
     <% end %>
 
-    <%= cascade post.user, [["Posts", "posts.count"], "from", "joined"] %>
+    <dl>
+      <dt>Posts</dt>
+      <dd><%= post.user.posts.count %></dd>
+      <dt>Location</dt>
+      <dd><%= post.user.from %></dd>
+      <dt>Joined</dt>
+      <dd><%= post.user.joined %></dd>
+    </dl>
   </div>
 
   <div class="content">

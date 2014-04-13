@@ -1,0 +1,21 @@
+#users {
+  table-layout: auto;
+
+  .country,
+  .age {
+    width: 5%;
+  }
+
+  .username,
+  .name {
+    width: 25%;
+  }
+
+  .steamid {
+    width: 20%;
+  }
+
+  .actions {
+    text-align: right;
+  }
+}

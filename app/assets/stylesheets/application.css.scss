@@ -26,6 +26,7 @@
 @import "components/gather";
 @import "components/breadcrumbs";
 @import "components/pagination";
+@import "components/tabs";
 
 /*
   Layout
@@ -46,3 +47,6 @@
 @import "pages/news";
 @import "pages/contests";
 @import "pages/forums";
+@import "pages/teams";
+@import "pages/users";
+@import "pages/matches";
