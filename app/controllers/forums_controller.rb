@@ -8,7 +8,14 @@ class ForumsController < ApplicationController
 
   def show
     raise AccessError unless @forum.can_show? cuser
-    @topics = @forum.topics.all
+
+    @topics = Topic.where(forum_id: @forum.id)
+    .joins(:posts, :user, :users_who_read)
+    .includes(:lock)
+    .group('topics.id')
+    .order('state DESC, posts.id DESC')
+    .paginate(page: params[:page], per_page: 30)
+
     @forum.read_by! cuser if cuser
     @nobody = true
   end

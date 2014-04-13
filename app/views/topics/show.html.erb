@@ -22,9 +22,13 @@
     <% end %>
 
     <% if @newpost.errors.count > 0 %>
-      <% @newpost.error_messages.each do |m| %>
-        <%= h m %><br>
-      <% end %>
+      <div class="flash warning">
+        <ul>
+          <% @newpost.error_messages.each do |m| %>
+            <li><%= h m %></li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
   </div>
 
@@ -46,7 +50,7 @@
 
   <%= will_paginate @posts %>
 
-  <div class="right minitext">
+  <div>
     <% if @newpost.can_create? cuser %>
       <%= link_to_function 'Fast Reply', "$('#reply').fadeIn('slow')", class: 'button' %>
       <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>

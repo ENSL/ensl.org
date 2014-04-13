@@ -27,4 +27,10 @@ Ensl::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Use a different cache store
+  config.cache_store = :dalli_store
+
+  # Enable threaded mode
+  config.threadsafe!
 end

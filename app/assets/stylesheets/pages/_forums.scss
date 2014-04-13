@@ -141,6 +141,7 @@ div#categories {
     .content {
       @include span-columns(9);
       @include omega;
+      background: image-url('images/layout/forum-bg-pattern.png') top left;
 
       .text,
       .signature {

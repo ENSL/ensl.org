@@ -163,7 +163,11 @@ class User < ActiveRecord::Base
   end
 
   def from
-    profile.town ? "#{profile.town}, #{country_s}" : "#{country_s}"
+    if profile.town.length > 0
+      "#{profile.town}, #{country_s}"
+    else
+      "#{country_s}"
+    end
   end
 
   def age

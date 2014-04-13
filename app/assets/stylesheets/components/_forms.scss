@@ -138,3 +138,24 @@ form.square {
     @include shift(3);
   }
 }
+
+form.search {
+
+  .query {
+    @include span-columns(9);
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .controls {
+    @include span-columns(3);
+    @include shift(0);
+    @include omega;
+
+    input {
+      width: 100%;
+    }
+  }
+}
