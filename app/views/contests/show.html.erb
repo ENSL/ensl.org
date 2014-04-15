@@ -2,24 +2,23 @@
 
 <div class="contest info">
   <h3>Details</h3>
-  <p>
-    <strong>From-to</strong>:<br>
-    <%= longdate @contest.start %> <br> <%= longdate @contest.end %>
-  </p>
-  <p>
-    <strong>Rules</strong>:<br>
-    <%= namelink @contest.rules %>
-  </p>
-  <p>
-    <b>Status:</b><br>
-    <%= @contest.statuses[@contest.status] %>
-  </p>
-  <p>
-    <b>Default:</b><br>
-    Sunday: <%= h @contest.default_time.strftime("%H:%M") %>
-  </p>
+
+  <dl>
+    <dt>Start - End</dt>
+    <dd>
+      <%= longdate @contest.start %><br>
+      <%= longdate @contest.end %>
+    </dd>
+    <dt>Rules</dt>
+    <dd><%= namelink @contest.rules %></dd>
+    <dt>Status</dt>
+    <dd><%= @contest.statuses[@contest.status] %></dd>
+    <dt>Default</dt>
+    <dd>Sunday: <%=h @contest.default_time.strftime("%H:%M") %></dd>
+  </dl>
+
   <% if @contest.contest_type == Contest::TYPE_LADDER %>
-    <%= link_to "Scoring", "/contests/#{@contest}/score" %>
+    <%= link_to 'Scoring', "/contests/#{@contest}/score" %>
   <% end %>
   <% if cuser and cuser.admin? %>
     <%= link_to 'Edit', edit_contest_path(@contest) %>
@@ -27,19 +26,19 @@
 </div>
 
 <% if @contest.contest_type == Contest::TYPE_BRACKET %>
-  <%= render :partial => "bracket", :locals => {:contest => @contest} %>
+  <%= render partial: 'bracket', locals: { contest: @contest } %>
 <% else %>
-  <%= render :partial => "normal" %>
+  <%= render partial: 'normal' %>
 <% end %>
 
-<div id="contestTab" class="clear wide">
-  <ul id="contestTab-nav" class="tabs">
+<div id="contest" class="tabbed">
+  <ul id="contest-nav" class="tabs">
     <li><a href="#results">Matches</a></li>
     <li><a href="#predictions">Predictions</a></li>
     <li><a href="#maps">Maps</a></li>
   </ul>
 
-  <div class="box wide2 tabs">
+  <div class="tabbed-contents">
     <div class="tab" id="results">
       <h3>
         Matches Played
@@ -172,5 +171,7 @@
 </div>
 
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'contestTab'});
+  new Yetii({
+    id: 'contest'
+  });
 </script>

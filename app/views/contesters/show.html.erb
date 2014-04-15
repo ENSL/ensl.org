@@ -1,31 +1,33 @@
-<div class="wide" id="matches">
-  <h1 class="center">
-    <%= link_to (h @contester.team.name), team_url(@contester.team, :teamTab => "matches", :anchor => "contest_#{@contester.contest.id}") %>
+<div id="team-profile">
+  <h1 class="fancy">
+    <span>
+      <%= link_to (h @contester.team.name), team_url(@contester.team, team: 'matches', anchor: "contest_#{@contester.contest.id}") %>
+    </span>
   </h1>
-  <h4 class="center">
-    <%= namelink @contester.contest %>
-  </h4>
+
   <% if @contester.team.logo %>
-    <%= image_tag @contester.team.logo.url, :class => "centered" %>
+    <div class="logo">
+      <%= image_tag @contester.team.logo.url, class: 'logo' %>
+    </div>
   <% end %>
 </div>
 
-<div class="wide2" id="matchesTab">
-  <ul id="matchesTab-nav" class="tabs">
+<h4 class="nane"><%= namelink @contester.contest %></h4>
+
+<div id="matches" class="tabbed">
+  <ul id="matches-nav" class="tabs">
     <li><a href="#results">Results</a></li>
     <li><a href="#upcoming">Upcoming</a></li>
     <li><a href="#info>">Info</a></li>
   </ul>
 
-  <div class="box tabs">
+  <div class="tabbed-contents">
     <div class="tab" id="results">
-      <%= render :partial => "matches/list", :locals => {:matches => @results, :friendly => @contester.team, :contest => false} %>
+      <%= render partial: 'matches/list', locals: { matches: @results, friendly: @contester.team, contest: false } %>
     </div>
 
     <div class="tab" id="results">
-      <h3>
-        Upcoming
-      </h3>
+      <h3>Upcoming</h3>
 
       <table class="data">
         <tr>
@@ -48,35 +50,29 @@
     </div>
 
     <div class="tab" id="info">
-      <h3 class="center">
-        Rank
-      </h3>
-
+      <h3>Rank</h3>
       <%= cascade @contester, ["total", "win", "loss", "draw"] %>
 
       <% if !@contester.active %>
-        <p>
-          <b>INACTIVE</b>
-        </p>
+        <p><strong>INACTIVE</strong></p>
       <% end %>
     </div>
   </div>
 </div>
 
-<div class="box wide clear">
-  <h3 class="center">
-    Members
-  </h3>
-
-  <%= render :partial => "teamers/list", :locals => {:teamers => @members, :blacklist => nil, :comment => false} %>
+<div class="members">
+  <h3>Members</h3>
+  <%= render partial: 'teamers/list', locals: { teamers: @members, blacklist: nil, comment: false } %>
 </div>
 
+<%= link_to 'Back', @contester.contest, class: 'button' %>
+
 <% if @contester.can_update? cuser %>
-  <%= link_to 'Edit', edit_contester_path(@contester) %> |
+  <%= link_to 'Edit', edit_contester_path(@contester), class: 'button' %>
 <% end %>
 
-<%= link_to 'Back', @contester.contest %>
-
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'matchesTab'});
+  new Yetii({
+    id: 'matches'
+  });
 </script>

@@ -1,0 +1,16 @@
+/*
+  Shoutbox Messages
+*/
+
+.shoutmsg {
+  margin-bottom: em(5);
+
+  .timestamp {
+    font-size: em(14);
+    border-radius: em(3);
+    background: darken($light-blue, 10);
+    display: inline-block;
+    font-style: italic;
+    padding: 0 em(6);
+  }
+}

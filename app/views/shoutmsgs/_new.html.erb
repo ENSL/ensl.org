@@ -3,7 +3,7 @@
     You have been muted.
   <% else %>
     <% scroll = shoutmsg.domain == "shoutbox" ? "" : "$('#{shoutmsg.domain}').scrollTop = $('#{shoutmsg.domain}').scrollHeight;" %>
-    <%= form_for(shoutmsg, remote: true, html: { id: "new_#{shoutmsg.domain}" }) do |f| %>
+    <%= form_for(shoutmsg, remote: true, html: { id: "new_#{shoutmsg.domain}", class: 'new-shout' }) do |f| %>
       <% if shoutmsg.shoutable %>
         <%= f.hidden_field :shoutable_type %>
         <%= f.hidden_field :shoutable_id %>

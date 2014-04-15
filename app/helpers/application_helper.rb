@@ -155,4 +155,8 @@ module ApplicationHelper
       event.start
     end
   end
+
+  def latest_rules
+    Contest.last.rules
+  end
 end

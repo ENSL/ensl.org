@@ -1,10 +1,12 @@
 <div class="shoutmsg">
   <% if shoutmsg.can_destroy? cuser %>
-    <%= link_to icon('times'), shoutmsg, :method => :delete %>
+    <%= link_to icon('times'), shoutmsg, method: :delete %>
   <% end %>
-  <%# if shoutmsg.domain != "shoutbox" %>
-  [<%= shoutmsg.created_at ? shoutmsg.created_at.strftime("%H:%M") : Time.now.strftime("%H:%M") %>]
-  <%# end %>
+
+  <span class="timestamp">
+    <%= shoutmsg.created_at ? shoutmsg.created_at.strftime("%H:%M") : Time.now.strftime("%H:%M") %>
+  </span>
+
   <%= namelink shoutmsg.user %>:
   <%= shoutmsg.text %><br />
 </div>

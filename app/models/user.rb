@@ -163,7 +163,7 @@ class User < ActiveRecord::Base
   end
 
   def from
-    if profile.town.length > 0
+    if profile.town && profile.town.length > 0
       "#{profile.town}, #{country_s}"
     else
       "#{country_s}"

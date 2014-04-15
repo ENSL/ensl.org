@@ -9,10 +9,10 @@
   });
 </script>
 
-<% shoutmsg_new = Shoutmsg.new(:shoutable_type => object.class.to_s, :shoutable_id => object.id) %>
+<% shoutmsg_new = Shoutmsg.new(shoutable_type: object.class.to_s, shoutable_id: object.id) %>
 
-<div class="wide box shoutmsgBox" id="<%= shoutmsg_new.domain %>">
-  <%= render :partial => "shoutmsgs/shoutmsg", :collection => object.shoutmsgs.recent.reverse, :locals => {:popup => "this"} %>
+<div id="<%= shoutmsg_new.domain %>" class="shoutbox-messages">
+  <%= render partial: "shoutmsgs/shoutmsg", collection: object.shoutmsgs.recent.reverse, locals: { popup: 'this' } %>
 </div>
 
-<%= render :partial => "shoutmsgs/new", :locals => {:shoutmsg => shoutmsg_new, :popup => "this"} %>
+<%= render partial: "shoutmsgs/new", locals: { shoutmsg: shoutmsg_new, popup: "this" } %>

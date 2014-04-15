@@ -105,13 +105,13 @@ $(document).ready(function(){
   });
 });
 
-$( function() {
+$(function() {
   var menuContests;
   var menuGather;
   var menuMaterial;
   var menuForums;
 
-  $( function() {
+  $(function() {
     $('div#indexMenu div.contests').hover(function(){
     });
   });
@@ -123,8 +123,8 @@ $( function() {
 
   // Gather stuff
 
-  $("a#gatherInfoHide").live('click', function() {
-    $("div#gatherInfo").fadeOut('slow', 0);
+  $("a#gather-info-hide").live('click', function() {
+    $("div#gather-info").fadeOut('slow', 0);
   });
 
   $("a#gatherJoinBtn").live('click', function() {
