@@ -88,7 +88,7 @@ $navbar-text: white;
 
 $flash-text: white;
 $flash-notice: #5a9aa8;
-$flash-success: #1f7f5c;
+$flash-success: $green;
 $flash-warning: $red;
 $flash-error: #e56c69;
 
@@ -107,5 +107,5 @@ $input-dark-border-hover-colour: $blue;
 $input-dark-border-focus-colour: $green;
 
 $button-primary: #5a9aa8;
-$button-secondary: #1f7f5c;
+$button-secondary: $green;
 $button-text: white;

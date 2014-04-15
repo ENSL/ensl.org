@@ -1,0 +1,9 @@
+<h5><%= namelink message %></h5>
+
+<p class="preview">
+  <%= sanitize message.text[0, 100] %>...  
+</p>
+
+<p>
+  <%= namelink message.sender %> on <em><%= longdate message.created_at %></em>
+</p>

@@ -12,6 +12,7 @@
 
   &.success {
     @include flash($flash-success);
+    
     &:before {
       content: "\f00c";
     }
@@ -19,6 +20,7 @@
 
   &.error {
     @include flash($flash-error);
+
     &:before {
       content: "\f00d";
     }
@@ -27,6 +29,7 @@
   &.warning,
   &.alert {
     @include flash($flash-warning);
+
     &:before {
       content: "\f071";
     }
@@ -41,10 +44,6 @@ div#errors {
   @extend .flash.error;
   @include span-columns(12);
   margin-bottom: em(20);
-
-  &:before {
-    height: 100%;
-  }
 
   strong {
     @include span-columns(12);

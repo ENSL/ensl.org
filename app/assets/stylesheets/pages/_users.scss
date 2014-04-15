@@ -53,3 +53,80 @@
     }
   }
 }
+
+/*
+  Agenda
+*/
+
+#agenda {
+
+  h4 {
+    margin-bottom: 1em;
+  }
+
+  table {
+    margin-bottom: em(20);
+  }
+
+  form {
+    @include span-columns(12);
+    margin-bottom: em(20);
+  }
+
+  .tab {
+    :last-child {
+      margin-bottom: 0;  
+    }
+  }
+
+  #teams {
+
+    table {
+      margin-bottom: em(40);
+    }
+  }
+}
+
+/*
+  Messages
+*/
+
+#messages {
+  h1 {
+    margin-bottom: 1em;
+  } 
+
+  .tab {
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .message {
+    @include span-columns(12);
+    margin-bottom: em(20);
+
+    .subject {
+      margin-bottom: 1em;
+    }
+
+    .content {
+      margin-bottom: em(20);
+    }
+
+    a.message {
+      display: inline;
+      margin: 0;
+      float: none;
+    }
+
+    &.highlight {
+      font-weight: bold;
+    }
+  }
+
+  .back {
+    margin-top: em(20);
+  }
+}

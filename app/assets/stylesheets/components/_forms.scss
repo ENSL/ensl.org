@@ -3,6 +3,17 @@
 */
 
 form {
+  .inline {
+    float: left;
+    display: inline-block;
+    width: auto;
+    margin-bottom: em(20);
+
+    input {
+      margin-bottom: 0;
+    }
+  }
+
   .fields {
     > .field_with_errors:first-child,
     > label {
@@ -122,10 +133,13 @@ form {
       }
 
       &:hover {
+        border: $input-border-width solid lighten($input-secondary, 20%);
         cursor: pointer;
       }
 
       &:checked {
+        border-color: $button-secondary;
+
         &:after {
           content: $fa-var-check;
           pointer-events: none;
@@ -136,6 +150,7 @@ form {
           font-size: em(22);
           top: em(4);
           left: em(5);
+          color: $button-secondary;
         }
       }
     }

@@ -12,7 +12,7 @@ set :rbenv_type, :user
 set :rbenv_ruby, '2.1.1'
 set :dotenv_role, [:app, :web]
 
-set :puma_config, -> { File.join(shared_path, 'puma.rb') }
+set :puma_config, -> { File.join(current_path, 'config', 'puma.rb') }
 set :puma_pid, -> { File.join(shared_path, 'tmp', 'pids', 'puma.pid') }
 
 set :writable_dirs, %w{public tmp}
