@@ -2,8 +2,8 @@ require "dotenv"
 Dotenv.load
 
 base_path = (ENV['DEPLOY_PATH'] || Dir.pwd)
-current_path = "#{base_path}"
-shared_path = "#{base_path}"
+current_path = "#{base_path}/current"
+shared_path = "#{base_path}/shared"
 stderr_path = "#{shared_path}/log/puma.stderr.log"
 stdout_path = "#{shared_path}/log/puma.stdout.log"
 
@@ -11,7 +11,7 @@ tag 'ENSL'
 
 preload_app!
 daemonize true
-directory base_path
+directory current_path
 pidfile "#{shared_path}/tmp/pids/puma.pid"
 state_path "#{shared_path}/tmp/pids/puma.state"
 stdout_redirect stdout_path, stderr_path
@@ -19,7 +19,7 @@ stdout_redirect stdout_path, stderr_path
 environment ENV['RACK_ENV'] || 'production'
 rackup DefaultRackup
 
-bind "unix://#{shared_path}#{ENV['PUMA_SOCKET']}"
+bind "unix://#{shared_path}/tmp/sockets/puma.sock"
 port Integer(ENV['PUMA_PORT'] || 4000)
 
 worker_timeout Integer(ENV['PUMA_TIMEOUT'] || 30)

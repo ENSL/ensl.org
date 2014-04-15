@@ -46,7 +46,7 @@ en:
   hltv_stopped: "HLTV's stopped. Demos saved."
   hltv_moved: "HLTV moved."
   hltv_movedd: "HLTVs moved to: "
-  messages_create: "Message was successfully created."
+  message_create: "Message was successfully sent."
   movies_create: "Movie was successfully created."
   movies_update: "Movie was successfully updated."
   execute: "Executed: "
