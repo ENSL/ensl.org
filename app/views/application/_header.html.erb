@@ -23,7 +23,7 @@
           <ul>
             <li><%= link_to "Staff", controller: "about", action: "staff" %></li>
             <li><%= link_to "History", article_url(Article::HISTORY) %></li>
-            <li><%= link_to "Rules", article_url(Article::RULES) %></li>
+            <li><%= link_to "Rules", latest_rules %></li>
             <li><%= link_to "Hall of Fame", article_url(Article::HOF) %></li>
             <li><%= link_to "Bans", bans_url %></li>
             <li><%= link_to "Contact", new_issue_path %></li>

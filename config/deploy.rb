@@ -12,7 +12,8 @@ set :rbenv_type, :user
 set :rbenv_ruby, '2.1.1'
 set :dotenv_role, [:app, :web]
 
-set :unicorn_config_path, "config/unicorn.rb"
+set :puma_config, -> { File.join(shared_path, 'puma.rb') }
+set :puma_pid, -> { File.join(shared_path, 'tmp', 'pids', 'puma.pid') }
 
 set :writable_dirs, %w{public tmp}
 set :linked_files, %w{.env}
@@ -42,8 +43,49 @@ namespace :deploy do
   end
 
   task :restart do
-    invoke 'unicorn:restart'
+    invoke 'puma:restart'
   end
 
   after :publishing, :restart
+end
+
+namespace :puma do
+  desc "Start puma"
+  task :start do
+    on roles(:app) do
+      within current_path do
+        execute :bundle, 'exec', :puma, "-C #{fetch(:puma_config)}"
+      end
+    end
+  end
+
+  desc "Restart puma"
+  task :restart do
+    on roles(:app) do
+      within current_path do
+        if valid_pid?
+          execute :kill, "-USR2 $( cat #{fetch(:puma_pid)} )"
+        else
+          execute :bundle, 'exec', :puma, "-C #{fetch(:puma_config)}"
+        end
+      end
+    end
+  end
+
+  desc "Stop puma"
+  task :stop do
+    on roles(:app) do
+      within current_path do
+        if valid_pid?
+          execute :kill, "-INT $( cat #{fetch(:puma_pid)} )"
+        else
+          warn 'Puma does not appear to be running'
+        end
+      end
+    end
+  end
+
+  def valid_pid?
+    test "[ -f #{fetch(:puma_pid)} ]" and test "kill -0 $( cat #{fetch(:puma_pid)} )"
+  end
 end

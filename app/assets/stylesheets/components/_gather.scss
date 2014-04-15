@@ -1,8 +1,167 @@
 /*
-  Gather Status
+  Gather Page
 */
 
 #gather {
+  @include span-columns(12);
+
+  .previous a,
+  .next a {
+    display: inline-block;
+    float: none;
+    margin: 0;
+
+    i {
+      vertical-align: middle;
+    }
+  }
+
+  .previous {
+    @include span-columns(6);
+
+    i {
+      margin-right: em(10);
+    }
+  }
+
+  .next {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+
+    i {
+      margin-left: em(10);
+    }
+  }
+
+  .shoutbox-messages {
+    @include span-columns(12);
+
+    .timestamp {
+      margin: 0 em(5) em(5);
+    }
+  }
+
+  .new-shout {
+    @include span-columns(12);
+    margin: em(20) 0;
+
+    .shout_input {
+      width: em(400);
+      margin-right: em(20);
+    }
+
+    .fields,
+    .controls {
+      float: left;
+      display: block;
+    }
+  }
+}
+
+#gather-info {
+  @include span-columns(12);
+  margin: em(20) 0;
+  border-bottom: em(2) solid $light-gray;
+
+  .info {
+    @include span-columns(4);
+
+    h6 {
+      margin-bottom: em(10);
+    }
+
+    &:nth-child(3) {
+      @include omega;
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+
+    li {
+      margin-left: em(20);
+    }
+  }
+
+  .hide {
+    @include span-columns(12);
+    padding: em(20) 0;
+    text-align: center;
+
+    a {
+      display: inline-block;
+      float: none;
+
+      i {
+        margin-right: em(10);
+      }
+    }   
+  }
+}
+
+#gather-area {
+  @include span-columns(12);
+  margin-top: em(20);
+
+  .data {
+    @include span-columns(4);
+    max-height: em(400);
+    overflow-y: scroll;
+    padding-bottom: em(20);
+
+    h4 {
+      padding-bottom: em(20);
+    }
+
+    &:nth-child(3) {
+      @include omega;
+    }
+
+    ul {
+      margin-bottom: em(10);
+
+      li {
+        margin-bottom: em(5);
+      }
+    }
+  }
+
+  .players {
+
+    .captain {
+      color: $gold;
+      margin: 0 em(10);
+    }
+
+    .delete {
+      display: inline-block;
+      padding: 0 em(10);
+    }
+  }
+}
+
+#gather-stats {
+  @include span-columns(12);
+  padding: em(20) 0;
+  margin: em(20) 0;
+  border-top: em(2) solid $light-gray;
+  border-bottom: em(2) solid $light-gray;
+  position: relative;
+
+  .admin {
+    top: em(20);
+    right: 0;
+    margin: 0;
+    position: absolute;
+  }
+}
+
+/*
+  Gather Status
+*/
+
+#gather-status {
   @include span-columns(12);
   @include flash;
 

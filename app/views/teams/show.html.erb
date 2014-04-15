@@ -20,21 +20,21 @@
     <div class="tabbed-contents">
       <div class="tab" id="general">
         <dl>        
-          <dt>Irc:</dt>
-          <dd><%= h @team.irc %></dd>
+          <dt>IRC:</dt>
+          <dd><%=h @team.irc %></dd>
           <dt>Web:</dt>
-          <dd><%= h @team.web %></dd>
+          <dd><%=h @team.web %></dd>
           <dt>Tag:</dt>
-          <dd><%= h @team.tag %></dd>
+          <dd><%=h @team.tag %></dd>
           <dt>Country:</dt>
-          <dd><%= h @team.country %></dd>
+          <dd><%=h @team.country %></dd>
           <dt>Founder:</dt>
           <dd><%= namelink @team.founder %></dd>
           <dt>Comment:</dt>
-          <dd><%= h @team.comment %></dd>
+          <dd><%=h @team.comment %></dd>
           <% if @team.recruiting %>
             <dt>Recruiting:</dt>
-            <dd><%= h @team.recruiting %></dd>
+            <dd><%=h @team.recruiting %></dd>
           <% end %>
         </dl>
 
@@ -45,8 +45,10 @@
         <h3>Current Members</h3>
         <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.distinct, blacklist: false, comment: true } %>
 
-        <h3>Past Members</h3>
-        <%= render partial: "teamers/list", locals: { teamers: @team.teamers.past.distinct, blacklist: @team.teamers.active.ordered.distinct, comment: false } %>
+        <% if @team.teamers.past.distinct.length > 0 %>
+          <h3>Past Members</h3>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.past.distinct, blacklist: @team.teamers.active.ordered.distinct, comment: false } %>
+        <% end %>
       </div>
 
       <div class="tab" id="matches">
@@ -62,7 +64,7 @@
       <div class="tab" id="matches">
         <dl>
           <dt>Matches:</dt>
-          <dd><%= @team.matches_finished.count %> dllayed / <%= @team.matches.count %> total</dd>
+          <dd><%= @team.matches_finished.count %> played / <%= @team.matches.count %> total</dd>
           <dt>Won:</dt>
           <dd><%= @team.matches_won.count %> (<%= 100.0*@team.matches_won.count/@team.matches_finished.count %> %)</dd>
           <dt>Lost:</dt>

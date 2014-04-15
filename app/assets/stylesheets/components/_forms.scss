@@ -6,8 +6,8 @@ form {
   .fields {
     > .field_with_errors:first-child,
     > label {
-      padding: 11px 0;
-      line-height: 16px;
+      padding: em(11) 0;
+      line-height: em(16);
     }
 
     > .field_with_errors {
@@ -27,11 +27,68 @@ form {
       }
     }
 
-    input,
+    .select-wrapper {
+      $select-padding: em(4);
+
+      background-color: $input-primary;
+      border: $input-border-colour solid $input-border-width;
+      position: relative;
+      display: inline-block;
+      margin-right: em(10);
+
+      select {
+        @include appearance(none);
+        font-size: $input-font-size;
+        font-family: $open-sans;
+        float: left;
+        display: block;
+        width: auto;
+        position: relative;
+        margin-left: 0;
+        border: 0;
+        padding: $select-padding em(45) $select-padding $input-padding;
+        font-size: $input-font-size;
+
+        option {
+          font-size: $input-font-size;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      &:after {
+        font-family: $fontawesome;
+        pointer-events: none;
+        content: $fa-var-chevron-down;
+        font-weight: normal;
+        font-style: normal;
+        position: absolute;
+        top: em(5);
+        right: $input-padding;
+        padding-left: $input-padding;
+        border-left: em(1) solid lighten($input-secondary, 20%);
+      }
+
+      &:hover {
+        border: $input-border-width solid lighten($input-secondary, 20%);
+      }
+
+      &:focus {
+        border: $input-border-width solid $input-secondary;
+        color: $input-secondary;
+        background: transparent;
+      }
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=email],
     textarea {
       background-color: $input-primary;
       color: $input-text;
-      font-size: em(16);
+      font-size: $input-font-size;
       padding: $input-padding;
       height: em(40);
       border: $input-border-colour solid $input-border-width;
@@ -48,6 +105,41 @@ form {
       }
     }
 
+    input[type=checkbox] {
+      @include appearance(none);
+      width: em(40);
+      height: em(40);
+      font-size: $input-font-size;
+      padding: $input-padding;
+      background-color: $input-primary;
+      border: $input-border-colour solid $input-border-width;
+      position: relative;
+      margin: 0;
+      float: left;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:checked {
+        &:after {
+          content: $fa-var-check;
+          pointer-events: none;
+          font-family: $fontawesome;
+          font-weight: normal;
+          font-style: normal;
+          position: absolute;
+          font-size: em(22);
+          top: em(4);
+          left: em(5);
+        }
+      }
+    }
+
     textarea {
       height: auto;
       width: 100%;
@@ -58,7 +150,7 @@ form {
     margin-bottom: em(20);
 
     button,
-    input {
+    input[type=submit] {
       @include button($button-secondary);
       margin-bottom: 0;
       outline: none;
@@ -127,7 +219,10 @@ form.square {
       line-height: em(16);
     }
 
-    input,
+    .inputs,
+    input[type=text],
+    input[type=password],
+    input[type=email],  
     textarea {
       @include span-columns(9);
     }

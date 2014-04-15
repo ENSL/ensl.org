@@ -1,16 +1,16 @@
-<div class="box gatherLeftBox left">
-  <%= render :partial => "gatherers/list", :locals => {:team => nil} %>
+<div class="data players">
+  <%= render partial: "gatherers/list", locals: { team: nil } %>
 </div>
 
-<div class="box gatherMiddleBox left">
-  <%= render :partial => "gatherers/list", :locals => {:team => 1} %>
+<div class="data players">
+  <%= render partial: "gatherers/list", locals: { team: 1 } %>
 </div>
 
-<div class="box gatherRightBox left">
-  <%= render :partial => "gatherers/list", :locals => {:team => 2} %>
+<div class="data players">
+  <%= render partial: "gatherers/list", locals: { team: 2 } %>
 </div>
 
-<%= render :partial => "status" %>
+<%= render partial: "status" %>
 
 <% if @gatherer and @gatherer.user_id = 176 %>
   <div id="gatherStarted"></div>

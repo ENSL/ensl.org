@@ -1,3 +1,7 @@
+/*
+  Users Listing
+*/
+
 #users {
   table-layout: auto;
 
@@ -17,5 +21,35 @@
 
   .actions {
     text-align: right;
+  }
+}
+
+/*
+  Profile
+*/
+
+#user {
+  @include span-columns(12);
+
+  .tabbed-contents {
+    margin-bottom: em(20);
+  }
+}
+
+#profile {
+  
+  .controls {
+    @include shift(0);
+  }
+
+  .tab {
+
+    h4 {
+      margin-bottom: 1em;
+    }
+
+    .fields:last-child {
+      margin-bottom: 0;
+    }
   }
 }

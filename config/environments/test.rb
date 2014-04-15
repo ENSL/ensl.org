@@ -32,7 +32,4 @@ Ensl::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
-
-  # Enable threaded mode
-  config.threadsafe!
 end

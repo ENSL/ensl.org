@@ -1,7 +1,7 @@
 <div class="widget shoutbox">
   <h4><%= t('widget.shoutbox') %></h4>
   <div class="widget-content-wrapper">
-    <div class="transcript">
+    <div id="shoutbox" class="transcript">
       <%= render :partial => "shoutmsgs/shoutmsg", :collection => Shoutmsg.recent.box, :locals => {:popup => "$('shoutbox')"} %>
     </div>
   </div>

@@ -7,6 +7,7 @@ class GathersController < ApplicationController
   end
 
   def show
+    render layout: 'full'
   end
 
   def latest

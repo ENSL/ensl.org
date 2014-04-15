@@ -1,3 +1,16 @@
+/*
+  Contester
+*/
+
+#matches {
+  @include span-columns(12);
+  margin: em(20) 0;
+}
+
+/*
+  Contest List
+*/
+
 table.contest {
   margin-bottom: em(40);
 
@@ -49,6 +62,10 @@ table.contest {
     }
   }
 }
+
+/*
+  Brackets
+*/
 
 table.brackets {
   margin: em(20) 0 em(40) 0;

@@ -1,36 +1,29 @@
-<% if @gatherer and cuser %>
-  <!-- Gather:<%= headers["Gather"] %> -->
-<% end %>
+<div class="data">
+  <h4>Vote Captains</h4>
 
-<div class="box gatherLeftBox left">
-  <h2 class="center">
-    Vote Captains
-  </h2>
-
-  <table id="gatherersTable">
+  <table id="gatherers">
     <% @gather.gatherers.most_voted.each do |gatherer| %>
-      <tr class="<%= cycle('even', 'odd') %>" height="18">
+      <tr>
         <td><%= flag gatherer.user.country %></td>
-        <td>(<%= gatherer.votes %>)
-          <% if @gatherer and gatherer.real_votes.build(:user => cuser).can_create? cuser %>
+        <td>
+          (<%= gatherer.votes %>)
+          <% if @gatherer and gatherer.real_votes.build(user: cuser).can_create? cuser %>
             <%= link_to (h gatherer.user),
-              :controller => "votes", :action => "create",
-              :vote => {:votable_id => gatherer.id, :votable_type => "Gatherer"},
-              :method => "post" %></td>
+              controller: "votes", action: "create",
+              vote: { votable_id: gatherer.id, votable_type: "Gatherer"},
+              method: "post" %>
           <% else %>
-            <%= namelink gatherer.user %></td>
-        <% end %>
+            <%= namelink gatherer.user %>
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </table>
 
   <% if @gatherer %>
-    <p class="center">
-      Click to vote for captain.
-    </p>
+    <p>Click to vote for captain.</p>
   <% end %>
 </div>
 
-<%= render :partial => "votes" %>
-
-<%= render :partial => "status" %>
+<%= render partial: 'votes' %>
+<%= render partial: 'status' %>
