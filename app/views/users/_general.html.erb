@@ -1,8 +1,6 @@
-<h2>
-  General information
-</h2>
+<div class="group">
+  <h4>General information</h4>
 
-<div class="userFields">
   <%= cascade @user, ["steamid"] %> 
   <%= link_to "http://steamidfinder.com/?STEAM_#{@user.steamid}" do %>
     <small>Search for corresponding Steam account</small>
@@ -12,17 +10,17 @@
   <%= cascade @user.profile, ["town"] %>
 </div>
 
-<h3>
-  Miscellaneous
-</h3>
 
-<div class="userFields">
+
+<div class="group">
+  <h4>Miscellaneous</h4>
+  
   <p>
-    <b>Joined:</b> <%= longtime @user.created_at %>
-</p>
+    <strong>Joined:</strong> <%= longtime @user.created_at %>
+  </p>
 
-<p>
-  <b>Lastvisit:</b> <%= longtime @user.lastvisit %>
+  <p>
+    <strong>Last visit:</strong> <%= longtime @user.lastvisit %>
   </p>
 
   <% if cuser and cuser.admin? %>
@@ -31,7 +29,7 @@
   </p>
 <% end %>
 
-<%= cascade @user, [ ["Comments", "posted_comments.count"], ["Matches", "matches.count"]] %>
+<%= cascade @user, [["Comments", "posted_comments.count"], ["Matches", "matches.count"]] %>
 
 <% if @user.groups.count > 0 %>
   <p>
@@ -56,8 +54,8 @@
   Contact
 </h3>
 
-<div class="userFields">
-  <%= cascade @user.profile, ["irc", "msn", "icq", "web"] %>
+<div class="group">
+  <%= cascade @user.profile, ["web"] %>
 
   <% if cuser and cuser.admin? or @user.public_email %>
     <%= cascade @user, ["email_s"] %>
@@ -83,7 +81,7 @@
     Achievements
   </h3>
 
-  <div class="userFields">
+  <div class="group">
     <%= raw @user.profile.achievements_parsed %>
   </div>
 <% end %>

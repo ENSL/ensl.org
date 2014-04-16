@@ -54,18 +54,19 @@ module ApplicationHelper
 
   def printtime time, format
     return unless time
+
     out = ""
     out << '<span style="font-style: italic; ">'
     out <<  time.strftime(format)
     out << '</span>'
-    raw out
+
+    out.html_safe
   end
 
   def cascade model, list
-    out = ""
-
-    list.each do |element|
+    out = list.map do |element|
       name = key = element
+      item = ""
       result = ""
 
       if element.instance_of?(Array)
@@ -91,12 +92,19 @@ module ApplicationHelper
         result << h(str)
       end
 
-      out << "<p>"
-      out << "<b>#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}</b>: "
-      out << result
-      out << "</p>"
+      item << content_tag(:dt) do
+        "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}"
+      end
+      item << content_tag(:dd) do
+        result
+      end
+
+      item
     end
-    raw out
+
+    content_tag(:dl) do
+      out.join.html_safe
+    end
   end
 
   def abslink text, url
