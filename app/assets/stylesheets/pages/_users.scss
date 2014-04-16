@@ -54,6 +54,26 @@
   }
 }
 
+#user-profile {
+
+  .photo {
+    @include span-columns(12);
+    margin: em(20) 0;
+    text-align: center;
+
+    img {
+      display: inline-block;
+      float: none;
+      width: auto;
+    }
+  }
+
+  #user-data {
+    @include span-columns(12);
+    margin-bottom: em(20);
+  }
+}
+
 /*
   Agenda
 */

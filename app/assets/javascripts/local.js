@@ -152,8 +152,8 @@ $(function() {
   });
 
   // User page
-  $("td#userNavi > div > a").click(function(){
-    $("td#userData").fadeOut("fast");
+  $("#user-profile li a").click(function(){
+    $("#user-data").fadeOut("fast");
     $.ajax({
       type: "GET",
       url: window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + ".js?page=" + $(this).attr('id'),
