@@ -27,6 +27,18 @@
     width: 20%;
     text-align: right;
   }
+
+  &.edit {
+    @include span-columns(12);
+
+    h1 {
+      margin-bottom: 1em;
+    }
+
+    .tabbed-contents {
+      margin-bottom: em(20);
+    }
+  }
 }
 
 /*
