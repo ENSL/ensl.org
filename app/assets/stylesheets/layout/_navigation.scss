@@ -3,6 +3,7 @@
 */
 
 #menu {
+  @include span-columns(12);
   font-family: $montserrat;
   background-color: $background-primary;
   height: em(60);

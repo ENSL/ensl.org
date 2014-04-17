@@ -93,10 +93,10 @@ module ApplicationHelper
       end
 
       item << content_tag(:dt) do
-        "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}"
+        "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}".html_safe
       end
       item << content_tag(:dd) do
-        result
+        result.html_safe
       end
 
       item
@@ -165,6 +165,10 @@ module ApplicationHelper
   end
 
   def latest_rules
-    Contest.last.rules
+    if Contest.last
+      Contest.last.rules
+    else
+      article_path(Article::RULES)
+    end
   end
 end

@@ -26,8 +26,8 @@
             <td class="<%= 'current' if teamer.team == @user.team %>">
               <%= link_to (h teamer.team.name), teamer.team %>
             </td>
-            <td><%= h teamer.comment %></td>
-            <td><%= h teamer.ranks[teamer.rank] %></td>
+            <td><%=h teamer.comment %></td>
+            <td><%=h teamer.ranks[teamer.rank] %></td>
             <td>
               <% if @user.team != teamer.team %>
                 <%= form_for @user do |u| %>

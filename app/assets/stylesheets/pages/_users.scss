@@ -71,6 +71,28 @@
   #user-data {
     @include span-columns(12);
     margin-bottom: em(20);
+
+    h2,
+    h3,
+    h4 {
+      margin-bottom: 1em;
+    }
+
+    .group {
+      @include span-columns(6);
+
+      dd a {
+        float: none;
+        display: block;
+      }
+    }
+
+    tbody td {
+      &:first-child,
+      &:nth-child(2) {
+        text-align: left;
+      }
+    }
   }
 }
 

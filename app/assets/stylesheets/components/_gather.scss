@@ -168,5 +168,5 @@
   padding: em(14);
   text-align: center;
   margin-left: - em(20);
-  width: $max-width;
+  width: $max-width + $container-padding*2;
 }
