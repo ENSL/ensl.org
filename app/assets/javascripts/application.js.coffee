@@ -9,7 +9,7 @@
 //= require_self
 
 $ ->
-  $('logout').click ->
+  $('#logout').click ->
     $(this).closest('form').submit()
 
   $('select').each (i, el) ->

@@ -70,7 +70,7 @@ feature 'Google Calendar widget' do
   private
 
   def first_event
-    page.find(:xpath, "//div[@id = 'index-calendar']/div/div[@class = 'content'][1]")
+    first ".widget.calendar .entry"
   end
 
   def timezone_adjusted

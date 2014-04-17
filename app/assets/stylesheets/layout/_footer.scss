@@ -6,11 +6,10 @@
 
   @include outer-container;
   background: $footer-background;
-  padding: $base-line-height*2 $gutter;
-  width: 100%;
+  max-width: $max-width + $container-padding*2;
 
-  .wrapper {
-    @extend %container-padded;
+  .content {
+    padding: $container-padding*2 $container-padding;
   }
 
   .footer-links {
@@ -32,7 +31,7 @@
     text-align: center;
 
     @include media($medium-screen) {
-      text-align: left;
+      text-align: center;
     }
   }
 

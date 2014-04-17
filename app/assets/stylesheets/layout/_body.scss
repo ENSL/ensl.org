@@ -2,6 +2,8 @@
   Main Containers
 */
 
+$container-padding: em(20);
+
 html,
 body {
   margin: 0;
@@ -20,22 +22,15 @@ body {
   min-height: 100%;
 }
 
-%container-padded {
-  padding: 0 em(20);
-}
-
 .wrapper {
   @include outer-container;
-}
-
-#content {
-  @extend %container-padded;
+  max-width: $max-width + $container-padding*2;
 }
 
 #content {
   @include span-columns(12);
   background: $light-blue;
-  padding-top: em(20);
+  padding: $container-padding $container-padding 0 $container-padding;
 }
 
 #forums {
@@ -43,11 +38,11 @@ body {
 }
 
 #main {
-  @include span-columns(9);
+  @include span-columns(9 of 12);
 }
 
 #sidebar {
-  @include span-columns(3);
+  @include span-columns(3 of 12);
   @include omega();
 }
 

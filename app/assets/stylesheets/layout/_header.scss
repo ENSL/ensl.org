@@ -13,7 +13,6 @@ nav.top {
 
   .menu-wrapper {
     @include outer-container;
-    @extend %container-padded;
     position: relative;
     z-index: 9999;
   }
@@ -111,6 +110,8 @@ nav.top {
 }
 
 header .banner {
+  padding: 0 $container-padding;
+  
   #logo {
     @include span-columns(8);
     min-height: em(200);

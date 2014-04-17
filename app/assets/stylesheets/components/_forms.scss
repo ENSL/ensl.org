@@ -252,7 +252,7 @@ form.square {
 form.search {
 
   .query {
-    @include span-columns(9);
+    @include span-columns(7 of 9);
 
     input {
       width: 100%;
@@ -260,7 +260,7 @@ form.search {
   }
 
   .controls {
-    @include span-columns(3);
+    @include span-columns(2 of 9);
     @include shift(0);
     @include omega;
 

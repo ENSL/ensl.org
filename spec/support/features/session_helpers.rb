@@ -17,5 +17,13 @@ module Features
       
       click_button I18n.t('helpers.submit.user.update')
     end
+
+    def user_status
+      find "#authentication"
+    end
+
+    def registration_form
+      find "#new_user"
+    end
   end
 end

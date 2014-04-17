@@ -1,87 +1,85 @@
 <div class="group">
   <h4>General information</h4>
-
-  <%= cascade @user, ["steamid"] %> 
-  <%= link_to "http://steamidfinder.com/?STEAM_#{@user.steamid}" do %>
-    <small>Search for corresponding Steam account</small>
-  <% end %>
-  <%= cascade @user, ["age"] %>
-  <%= cascade @user, ["country"] %>
-  <%= cascade @user.profile, ["town"] %>
-</div>
-
-
-
-<div class="group">
-  <h4>Miscellaneous</h4>
   
-  <p>
-    <strong>Joined:</strong> <%= longtime @user.created_at %>
-  </p>
+  <dl>
+    <dt>Age</dt>
+    <dd><%= @user.age %></dd>
+    <dt>Country</dt>
+    <dd><%= @user.country %></dd>
+    <dt>Town</dt>
+    <dd><%= @user.profile.town %></dd>
+    <dt>SteamID</dt>
+    <dd>
+      <%= @user.steamid %>
+      <%= link_to "Search for Steam Account", "http://steamidfinder.com/?STEAM_#{@user.steamid}" %>
+    </dd>
+  </dl>
 
-  <p>
-    <strong>Last visit:</strong> <%= longtime @user.lastvisit %>
-  </p>
+  <h4>Contact</h4>
 
-  <% if cuser and cuser.admin? %>
-    <p>
-      <b>Last ip</b> <%= @user.lastip %>
-  </p>
-<% end %>
-
-<%= cascade @user, [["Comments", "posted_comments.count"], ["Matches", "matches.count"]] %>
-
-<% if @user.groups.count > 0 %>
-  <p>
-    <b>Groups:</b>
-    <% for group in @user.groups.all %>
-      <%= namelink group %>
+  <dl>
+    <% if !@user.profile.web.blank? %>
+      <dt>Web</dt>
+      <dd><%= @user.profile.web %></dd>
     <% end %>
-  </p>
-<% end %>
 
-<% if @user.teamers.active.count > 0 %>
-  <p>
-    Teams:
-    <% @user.teamers.active.each do |teamer| %>
-      <%= namelink teamer.team %>
+    <% if cuser and cuser.admin? or @user.public_email %>
+      <dt>Email</dt>
+      <dd><%= @user.email_s %></dd>
     <% end %>
-  </p>
-<% end %>
+
+    <% if @user.profile.steam_profile and @user.profile.steam_profile != "" %>
+      <dt>Steam</dt>
+      <dd>
+        <% if @user.profile.steam_profile.match(/\A[0-9]*\z/) %>
+          <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/profiles/#{@user.profile.steam_profile}" %>
+        <% elsif @user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
+          <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/id/#{@user.profile.steam_profile}" %>
+        <% end %>
+      </dd>
+    <% end %>
+  </dl>
+
+  <% if @user.profile.achievements and !@user.profile.achievements.empty? %>
+    <h4>Achievements</h4>
+    <%= @user.profile.achievements_parsed.html_safe %>
+  <% end %>
+
+  <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: @user }, { class: 'button tiny' } %>
 </div>
-
-<h3>
-  Contact
-</h3>
 
 <div class="group">
-  <%= cascade @user.profile, ["web"] %>
+  <h4>Statistics</h4>
+  
+  <dl>
+    <dt>Joined</dt>
+    <dd><%= longtime @user.created_at %></dd>
+    <dt>Last visit</dt>
+    <dd><%= longtime @user.lastvisit %></dd>
+    <dt></dt>  
 
-  <% if cuser and cuser.admin? or @user.public_email %>
-    <%= cascade @user, ["email_s"] %>
-  <% end %>
-  <% if @user.profile.steam_profile and @user.profile.steam_profile != "" %>
-    <p>
-      <b>Steam:</b>
-      <% if @user.profile.steam_profile.match(/\A[0-9]*\z/) %>
-        <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/profiles/#{@user.profile.steam_profile}" %>
-      <% elsif @user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
-        <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/id/#{@user.profile.steam_profile}" %>
+    <% if cuser and cuser.admin? %>
+      <dt>Last IP</dt>
+      <dd><%= @user.lastip %></dd>
+    <% end %>
+
+    <dt>Comments</dt>
+    <dd><%= @user.posted_comments.count %></dd>
+    <dt>Matches</dt>
+    <dd><%= @user.matches.count %></dd>
+
+    <% if @user.groups.count > 0 %>
+      <dt>Groups</dt>
+      <% for group in @user.groups.all %>
+        <dd><%= namelink group %></dd>
       <% end %>
-    </p>
-  <% end %>
+    <% end %>
 
-  <p>
-    <%= link_to "Send PM", :controller => "messages", :action => "new", :id => "User", :id2 => @user %>
-  </p>
+    <% if @user.teamers.active.count > 0 %>
+      <dt>Teams</dt>
+      <% @user.teamers.active.each do |teamer| %>
+        <dd><%= namelink teamer.team %></dd>
+      <% end %>
+    <% end %>
+  </dl>
 </div>
-
-<% if @user.profile.achievements and !@user.profile.achievements.empty? %>
-  <h3>
-    Achievements
-  </h3>
-
-  <div class="group">
-    <%= raw @user.profile.achievements_parsed %>
-  </div>
-<% end %>
