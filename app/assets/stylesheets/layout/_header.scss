@@ -1,5 +1,5 @@
 nav.top {
-  $navigation-background: $dark-gray;
+  $navigation-background: $medium-gray;
   $navigation-color: transparentize(white, 0.3);
   $navigation-color-hover: white;
   $navigation-height: em(40);
@@ -109,11 +109,12 @@ nav.top {
   }
 }
 
-header .banner {
-  padding: 0 $container-padding;
-  
+header .banner {  
+  @include linear-gradient($dark-blue, #12526E);
+  height: em(295);
+
   #logo {
-    @include span-columns(8);
+    @include span-columns(9 of 12);
     min-height: em(200);
     position: relative;
 
@@ -128,12 +129,10 @@ header .banner {
   }
 
   #authentication {
-    @include span-columns(4);
+    @include span-columns(3 of 12);
     height: em(190);
     margin: em(20) 0;
-    padding: em(20);
-    border: 1px solid $dark-gray;
-    background: $dark-gray;
+    padding: em(20) 0;
     color: white;
 
     a {
@@ -196,13 +195,14 @@ header .banner {
 
       .avatar {
         @include span-columns(12);
-        border: 1px solid $medium-gray;
-        background: $medium-gray;
+        background: transparentize($light-gray, 0.5);
         margin: 0 em(20) em(20) 0;
         text-align: center;
+        border-radius: 75px;
 
         img {
           padding: em(10);
+          float: left;
         }
       }
 

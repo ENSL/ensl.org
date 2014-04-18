@@ -5,9 +5,9 @@
 #menu {
   @include span-columns(12);
   font-family: $montserrat;
-  background-color: $background-primary;
   height: em(60);
   max-height: em(60);
+  margin-top: - em(60);
   
   nav {
     @include outer-container;
@@ -19,36 +19,32 @@ ul.navigation {
   margin: 0;
   padding: 0;
   list-style: none;
-  background-color: $navbar-primary;
   float: left;
+  width: 100%;
+  background: transparent;
 
   > li {
     float: left;
-
-    .count {
-      background-color: #6a5a8c;
-      display: inline-block;
-      font-size: em(14);
-      color: white;
-      line-height: em(14);
-      padding: em(5) em(8);
-      margin-left: em(25);
-      margin-top: - em(8);
-    }
+    width: $max-width/7;
+    border-right: em(1) solid transparent;
 
     > a {
-      width: auto;
+      width: 100%;
       color: white;
       height: em(60);
       line-height: em(16);
       padding: em(22);
       float: left;
-      border-right: em(1) solid $navbar-border;
+      background-color: $navbar-primary;
 
       &:hover,
       &.active {
         background-color: $navbar-secondary;
       }
+    }
+
+    &:last-child {
+      border-right: 0;
     }
 
     &.icon {
@@ -81,16 +77,16 @@ ul.navigation {
           top: em(60);
           left: 0;
           min-width: 100%;
-          background-color: $navbar-secondary;
+          background-color: $navbar-primary;
           list-style: none;
           padding: 0;
           margin: 0;
 
           li {
-            border-bottom: em(1) solid lighten($navbar-secondary, 10%);
+            border-bottom: em(1) solid $navbar-secondary;
 
             &:first-child {
-              border-top: em(1) solid lighten($navbar-secondary, 10%);
+              border-top: em(1) solid $navbar-secondary;
             }
 
             &:last-child {
@@ -104,6 +100,10 @@ ul.navigation {
               line-height: em(16);
               padding: em(22);
               color: $navbar-text;
+            }
+
+            &:hover a {
+              background: $light-blue;
             }
           }
         }

@@ -1,4 +1,4 @@
-<%= form_tag({ controller: "users", action: "login" }, { class: "dark" }) do %>
+<%= form_tag controller: "users", action: "login" do %>
   <div class="fields">
     <%= text_field "login", "username", placeholder: "Username" %>
     <%= password_field "login", "password", placeholder: "Password" %>

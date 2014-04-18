@@ -32,16 +32,18 @@
       </div>
     </div>
   </nav>
-  <div class="wrapper banner">
-    <div id="logo">
-      <%= link_to image_tag("logo.png"), root_path %>
-    </div>
-    <div id="authentication">
-      <% if cuser %>
-        <%= render partial: "widgets/logged" %>
-      <% else %>
-        <%= render partial: "widgets/login" %>
-      <% end %>
+  <div class="banner">
+    <div class="wrapper">
+      <div id="logo">
+        <%= link_to image_tag("logo.png"), root_path %>
+      </div>
+      <div id="authentication">
+        <% if cuser %>
+          <%= render partial: "widgets/logged" %>
+        <% else %>
+          <%= render partial: "widgets/login" %>
+        <% end %>
+      </div>
     </div>
   </div>
 </header>

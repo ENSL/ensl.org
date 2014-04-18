@@ -2,9 +2,10 @@
 
   .widget {
     @include span-columns(12);
+    box-shadow: $content-shadow;
     margin-bottom: em(20);
     padding: em(20);
-    background: $light-gray;
+    background: white;
 
     h4 {
       margin-bottom: 20px;
@@ -17,7 +18,7 @@
 
     .separator {
       color: white;
-      background: #5a9aa8;
+      background: $light-blue;
       padding: em(12) em(24);
       margin: 0 -20px;
       margin-bottom: em(12);

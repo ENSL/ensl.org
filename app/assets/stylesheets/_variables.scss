@@ -47,24 +47,24 @@ $base-border-radius: em(3);
 */
 
 $red: #de8650;
-$green: #1f7f5c;
-$blue: #5a9aa8;
+$green: #68cc90;
+$blue: #0A8FC8;
 $purple: #6a5a8c;
 $gold: #FFD700;
 
-$dark-blue: #046;
-$dark-gray: #232323;
+$dark-blue: #0072A6;
+$dark-gray: #21262A;
 
-$medium-gray: #2e2e2e;
+$medium-gray: #2F383D;
 
-$light-blue: #F3F3FB;
-$light-gray: #DDD;
+$light-blue: #2FB0E7;
+$light-gray: #ECF1F5;
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;
 $light-green: #1f7f5c;
  
 $base-body-color: white;
-$base-font-color: #232323;
+$base-font-color: $dark-gray;
 $base-accent-color: $blue;
 $base-link-color: #285258;
 $hover-link-color: darken($base-accent-color, 15);
@@ -74,7 +74,7 @@ $error-color: $light-red;
 $notice-color: $light-yellow;
 $success-color: $light-green;
 
-$background-primary: #232323;
+$background-primary: $medium-gray;
 $background-secondary: #ece9e1;
 $background-tertiary: #e2dfd8;
 
@@ -84,31 +84,37 @@ $text-tertiary: #666666;
 
 $link-primary: #285258;
 
-$navbar-primary: #232323;
-$navbar-secondary: #5a9aa8;
-$navbar-border: #2e2e2e;
+$navbar-primary: $blue;
+$navbar-secondary: $light-blue;
+$navbar-border: lighten($dark-gray, 10);
 $navbar-text: white;
 
 $flash-text: white;
-$flash-notice: #5a9aa8;
+$flash-notice: $blue;
 $flash-success: $green;
 $flash-warning: $red;
 $flash-error: #e56c69;
 
 $input-font-size: em(16);
 $input-primary: white;
-$input-secondary: #5a9aa8;
+$input-secondary: $blue;
 $input-text: #232323;
-$input-border-width: em(3);
-$input-border-colour: darken($light-blue, 10);
+$input-border-width: em(2);
+$input-border-colour: darken($light-gray, 10%);
 $input-padding: em(11);
 
-$input-dark-background-colour: $dark-gray;
+$input-dark-background-colour: $medium-gray;
 $input-dark-border-colour: $light-gray;
 $input-dark-border-width: em(2);
 $input-dark-border-hover-colour: $blue;
 $input-dark-border-focus-colour: $green;
 
-$button-primary: #5a9aa8;
+$button-primary: $blue;
 $button-secondary: $green;
 $button-text: white;
+
+/*
+  Shadows
+*/
+
+$content-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.1);
