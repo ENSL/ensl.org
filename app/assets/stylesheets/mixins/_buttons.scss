@@ -21,7 +21,7 @@ a.button {
   @include button;
 
   &.tiny {
-    background-color: transparentize($green, .5);
+    background-color: $green;
     border-radius: em(14);
     height: em(25);
     padding: em(1) em(12);

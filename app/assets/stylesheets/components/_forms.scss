@@ -39,7 +39,7 @@ form {
     }
 
     .select-wrapper {
-      $select-padding: em(4);
+      $select-padding: em(7);
 
       background-color: $input-primary;
       border: $input-border-colour solid $input-border-width;
@@ -58,7 +58,8 @@ form {
         position: relative;
         margin-left: 0;
         border: 0;
-        padding: $select-padding em(45) $select-padding $input-padding;
+        margin: 0;
+        padding: $select-padding em(50) $select-padding $input-padding;
         font-size: $input-font-size;
 
         option {
@@ -77,20 +78,28 @@ form {
         font-weight: normal;
         font-style: normal;
         position: absolute;
-        top: em(5);
-        right: $input-padding;
-        padding-left: $input-padding;
-        border-left: em(1) solid lighten($input-secondary, 20%);
+        top: 0;
+        right: 0;
+        text-align: center;
+        padding-top: em(6);
+        width: em(36);
+        height: em(32);
+        border-left: $input-border-width solid $input-border-colour;
+        color: $input-border-colour;
       }
 
       &:hover {
         border: $input-border-width solid lighten($input-secondary, 20%);
+
+        &:after {
+          border-left: $input-border-width solid $input-secondary;
+          color: $base-font-color;
+        }
       }
 
       &:focus {
         border: $input-border-width solid $input-secondary;
         color: $input-secondary;
-        background: transparent;
       }
     }
 
@@ -111,9 +120,7 @@ form {
 
       &:focus {
         border: $input-border-width solid $input-secondary;
-        color: $input-secondary;
         outline: none;
-        background: transparent;
       }
     }
 
@@ -202,7 +209,7 @@ form.dark {
 
     button,
     input {
-      background-color: $purple;
+      background-color: $dark-blue;
     }
   }
 }

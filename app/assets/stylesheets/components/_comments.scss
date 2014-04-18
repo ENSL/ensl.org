@@ -25,7 +25,7 @@
   $comment-image-padding: .7em;
   $comment-image-width: 4em;
   $comment-color: $base-font-color;
-  $comment-background: lighten($base-accent-color, 15);
+  $comment-background: $light-gray;
   $comment-detail-color: transparentize($comment-color, .5);
   $comment-image-vert-alignment: top;
 

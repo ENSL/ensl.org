@@ -4,6 +4,7 @@
 
 .tabbed {
   $tabs-border-width: em(1);
+  $tabs-border-colour: darken($light-gray, 10);
   $tabs-padding-vertical: em(8);
   $tabs-padding-horizontal: em(16);
 
@@ -18,14 +19,19 @@
     li {
       float: left;
       display: block;
-      background-color: $background-primary;
+      background-color: $light-blue;
 
       a {
-        border: $tabs-border-width solid $navbar-border;
+        border: $tabs-border-width solid $tabs-border-colour;
+        border-right: 0;
         padding: $tabs-padding-vertical $tabs-padding-horizontal;
         float: left;
         display: block;
         color: white;
+      }
+
+      &:last-child a {
+        border-right: $tabs-border-width solid $tabs-border-colour;
       }
 
       &.activeli {
@@ -42,7 +48,7 @@
 
   .tabbed-contents {
     @include span-columns(12);  
-    border: $tabs-border-width solid $navbar-border;
+    border: $tabs-border-width solid $tabs-border-colour;
     padding: em(20);
   }
 

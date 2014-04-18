@@ -1,15 +1,13 @@
 .footer {
-  $footer-background: $dark-gray;
+  $footer-background: $medium-gray;
   $footer-color: white;
   $footer-link-color: transparentize($footer-color, .6);
   $footer-disclaimer-color: transparentize($footer-color, .6);
 
-  @include outer-container;
   background: $footer-background;
-  max-width: $max-width + $container-padding*2;
 
   .content {
-    padding: $container-padding*2 $container-padding;
+    padding: $container-padding*2 0;
   }
 
   .footer-links {
