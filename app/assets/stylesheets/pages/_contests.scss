@@ -39,6 +39,14 @@ table.contest {
     &:nth-child(4) {
       text-align: left;
     }
+
+    &.actions {
+      text-align: right;
+
+      i {
+        padding-left: em(5);
+      }
+    }
   }
 
   thead {

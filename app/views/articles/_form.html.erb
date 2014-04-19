@@ -1,77 +1,57 @@
 <% if @article.text_coding == Article::CODING_HTML %>
-  <%= render :partial => "javascripts/mce_full" %>
+  <%= render partial: "javascripts/mce_full" %>
 <% end %>
 
-<div class="box wide">
-  <h1>Editing article</h1>
+<h1>Editing Article</h1>
 
-  <%= form_for(@article) do |f| %>
-    <% if @article.errors.any? %>
-      <div id="error_explanation">
-        <h2><%= pluralize(@article.errors.count, t(:error)) %> <%= t(:prohibited) %></h2>
+<%= form_for(@article, html: { class: 'article square' }) do |f| %>
+  <%= render 'shared/errors', messages: @article.errors.full_messages %>
 
-        <ul>
-          <% @article.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <p>
-      <%= f.label :title %><br />
-      <%= f.text_field :title %>
-    </p>
-    <% if cuser.admin? %>
-      <p>
-        <%= f.label :status %><br />
-        <%= f.select :status, @article.statuses.invert %>
-      </p>
-    <% end %>
-    <p>
-      <%= f.label :text_coding %><br />
-      <%= f.select :text_coding, @article.codings.invert %>
-    </p>
-    <p>
-      <%= f.label :category_id %><br />
-      <%= f.select :category_id, Category.ordered.collect{|c| ["#{c.domains[c.domain]} - #{c}", c.id]} %>
-    </p>
-    <p>
-      <%= f.label :text %><br />
-      <%= f.text_area :text, :rows => 30, :cols => 80 %>
-    </p>
-    <p>
-      <%= f.submit %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <% if cuser.admin? %>
+    <div class="fields horizontal">
+      <%= f.label :status %>
+      <%= f.select :status, @article.statuses.invert %>
+    </div>
   <% end %>
-</div>
+  <div class="fields horizontal">
+    <%= f.label :text_coding %>
+    <%= f.select :text_coding, @article.codings.invert %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :category_id %>
+    <%= f.select :category_id, Category.ordered.collect{|c| ["#{c.domains[c.domain]} - #{c}", c.id]} %>
+  </div>
+  <div class="fields horizontal wide">
+    <h4>Content</h4>
+    <%= f.text_area :text, :rows => 30, :cols => 80 %>
+  </div>
+  <div class="controls inline">
+    <%= f.submit %>
+  </div>
+<% end %>
 
 <% unless @article.new_record? %>
-  <div class="box wide">
-    <h3>Files</h3>
+  <h2>Files</h2>
 
-    <%= render :partial => "data_files/list", :locals => {:files => @article.files} %>
+  <%= render partial: "data_files/list", locals: { files: @article.files } %>
 
-    <% if @file && @file.can_create?(cuser) %>
-      <h3>New file</h3>
+  <% if @file && @file.can_create?(cuser) %>
+    <h4>New file</h4>
 
-      <div class="wide box">
-        <%= form_for @file, :html => { :multipart => true } do |f| %>
-          <div id="error_explanation">
-            <ul>
-              <% @file.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-          <%= f.hidden_field :directory_id %>
-          <%= f.hidden_field :article_id %>
+    <%= form_for @file, html: { multipart: true } do |f| %>
+      <%= render 'shared/errors', messages: @file.errors.full_messages %>
 
-          <p>
-            <%= f.file_field :name %> <%= f.submit 'Create' %>
-          </p>
-        <% end %>
-      </div>
+      <%= f.hidden_field :directory_id %>
+      <%= f.hidden_field :article_id %>
+
+      <p>
+        <%= f.file_field :name %>
+        <%= f.submit 'Create' %>
+      </p>
     <% end %>
-  </div>
+  <% end %>
 <% end %>

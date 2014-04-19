@@ -3,7 +3,7 @@
   .widget {
     @include span-columns(12);
     box-shadow: $content-shadow;
-    margin-bottom: em(20);
+    margin-bottom: em(30);
     padding: em(20);
     background: white;
 
@@ -18,10 +18,19 @@
 
     .separator {
       color: white;
-      background: $light-blue;
+      background: $blue;
       padding: em(12) em(24);
       margin: 0 -20px;
       margin-bottom: em(12);
+
+      a {
+        color: white;
+        float: right;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 

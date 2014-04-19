@@ -19,7 +19,7 @@
     li {
       float: left;
       display: block;
-      background-color: $light-blue;
+      background-color: $blue;
 
       a {
         border: $tabs-border-width solid $tabs-border-colour;
@@ -28,6 +28,10 @@
         float: left;
         display: block;
         color: white;
+
+        &:hover {
+          cursor: pointer;
+        }
       }
 
       &:last-child a {
@@ -36,7 +40,7 @@
 
       &.activeli {
         z-index: 100;
-        background-color: $blue;
+        background-color: $light-blue;
 
         a {
           padding-bottom: $tabs-padding-vertical + $tabs-border-width;

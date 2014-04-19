@@ -1,38 +1,68 @@
 <nav id="menu">
   <div class="wrapper">
     <ul class="navigation">
-      <li><%= active_link_to "News", root_path, active: ["articles", "news_index"] %></li>
-      <li class="dropdown">
-        <%= active_link_to "Contests", controller: "contests", action: "current" %>
+      <li class="icon">
+        <%= active_link_to root_path, active: ["articles", "news_index"], class: 'news' do %>
+          News <%= icon 'list-alt' %>
+        <% end %>
+      </li>
+      <li class="dropdown icon">
+        <%= active_link_to controller: "contests", action: "current", class: 'contests' do %>
+          Contests <%= icon 'trophy' %>
+        <% end %>
         <ul>
+          <li><%= link_to "Rules", latest_rules %></li>
           <li><%= link_to "Historical", "/contests" %></li>
           <li><%= link_to "NS1 History", "/contests/historical/NS1" %></li>
           <li><%= link_to "NS2 History", "/contests/historical/NS2" %></li>
         </ul>
       </li>
       <li class="dropdown">
-        <%= active_link_to "Gathers", Gather.last %>
+        <%= active_link_to Gather.last, class: 'gathers' do %>
+          Gathers 
+          <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
+        <% end %>
+        
         <ul>
           <li><%= link_to "Introduction", article_url(464) %></li>
           <li><%= link_to "Archives", "/gathers/" %></li>
         </ul>
       </li>
-      <li class="dropdown">
-        <%= active_link_to "Articles", articles_path %>
+      <li class="dropdown icon">
+        <%= active_link_to articles_path, class: 'articles' do %>
+          Articles <%= icon 'file-text' %>
+        <% end %>
         <ul>
-          <li><%= link_to "NS Movies", movies_url %></li>
+          <li><%= link_to "Hall of Fame", article_url(Article::HOF) %></li>
+          <li><%= link_to "History", article_url(Article::HISTORY) %></li>
+          <li><%= link_to "Movies", movies_url %></li>
           <li><%= link_to "Files", directory_url(Directory::ROOT) %></li>
         </ul>
       </li>
-      <li class="dropdown">
-        <%= active_link_to "Forums", forums_path, active: [["forums", "topics"]] %>
+      <li class="dropdown icon">
+        <%= active_link_to forums_path, active: [["forums", "topics"]], class: 'forums' do %>
+          Forums <%= icon 'comments' %>
+        <% end %>
         <ul>
           <li><%= link_to "Index", forums_path %></li>
           <li><%= link_to "Rules", "/topics/12" %></li>
         </ul>
       </li>
-      <li><%= active_link_to "Teams", controller: "teams", action: :index %></li>
-      <li><%= active_link_to "Users", controller: "users", action: :index %></li>
+      <li class="icon">
+        <%= active_link_to controller: "teams", action: :index, class: 'teams' do %>
+          Teams <%= icon 'users' %>
+        <% end %>
+      </li>
+      <li class="dropdown icon">
+        <%= active_link_to controller: "users", action: :index, class: 'users' do %>
+          Users <%= icon 'user' %>
+        <% end %>
+        <ul>
+          <li><%= link_to "Staff", controller: "about", action: "staff" %></li>
+          <li><%= link_to "Bans", bans_url %></li>
+          <li><%= link_to "Contact", new_issue_path %></li>
+        </ul>
+      </li>
     </ul>
   </div>
 </nav>

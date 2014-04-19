@@ -29,7 +29,7 @@
   $comment-detail-color: transparentize($comment-color, .5);
   $comment-image-vert-alignment: top;
 
-  display: table;
+  position: relative;
   width: 100%;
   margin-bottom: $base-line-height;
   padding-bottom: 1em;
@@ -90,11 +90,12 @@
       font-style: italic;
       font-size: .9em;
       color: $comment-detail-color;
+      margin-top: em(10);
     }
 
     .controls {
       position: absolute;
-      top: 0;
+      top: - em(5);
       right: 0;
     }
   }

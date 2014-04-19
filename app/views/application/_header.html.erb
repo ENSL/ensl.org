@@ -1,43 +1,10 @@
 <header>
-  <nav class="top">
-    <div class="menu-wrapper">
-      <p class="navigation-menu-button" id="js-mobile-menu">MENU</p>
-      <div id="navigation-menu" class="nav">
-        <div class="gathers">
-          <ul>
-            <% if cuser and cuser.admin? %>
-              <li>
-                <%= link_to("/about/adminpanel", class: "admin") do %>
-                  Admin (<%= Issue.with_status(0).count  %>) 
-                <% end %>
-              </li>
-            <% end %>
-            <li>
-              <%= link_to("/gathers/latest/ns2") do %>
-                NS2 Gather (<%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %>)
-              <% end %>
-            </li>
-          </ul>
-        </div>
-        <div class="pages">
-          <ul>
-            <li><%= link_to "Staff", controller: "about", action: "staff" %></li>
-            <li><%= link_to "History", article_url(Article::HISTORY) %></li>
-            <li><%= link_to "Rules", latest_rules %></li>
-            <li><%= link_to "Hall of Fame", article_url(Article::HOF) %></li>
-            <li><%= link_to "Bans", bans_url %></li>
-            <li><%= link_to "Contact", new_issue_path %></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </nav>
   <div class="banner">
     <div class="wrapper">
       <div id="logo">
         <%= link_to image_tag("logo.png"), root_path %>
       </div>
-      <div id="authentication">
+      <div id="authentication" class="<%= 'admin' if cuser && cuser.admin? %>">
         <% if cuser %>
           <%= render partial: "widgets/logged" %>
         <% else %>

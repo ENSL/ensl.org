@@ -40,24 +40,24 @@ $header-font-family: $montserrat;
 
 $base-font-size: 1em;
 $base-line-height: $base-font-size * 1.5;
-$base-border-radius: em(3);
+$base-border-radius: em(5);
 
 /*
   Colours
 */
 
 $red: #de8650;
-$green: #68cc90;
-$blue: #0A8FC8;
-$purple: #6a5a8c;
+$green: darken(#68cc90, 10);
+$blue: darken(#0A8FC8, 10);
 $gold: #FFD700;
 
-$dark-blue: #0072A6;
+$dark-blue: darken(#0072A6, 10);
+$deep-blue: darken(#12526E, 10);
 $dark-gray: #21262A;
 
 $medium-gray: #2F383D;
 
-$light-blue: #2FB0E7;
+$light-blue: darken(#2FB0E7, 10);
 $light-gray: #ECF1F5;
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;
@@ -102,6 +102,7 @@ $input-text: #232323;
 $input-border-width: em(2);
 $input-border-colour: darken($light-gray, 10%);
 $input-padding: em(11);
+$input-border-radius: $base-border-radius;
 
 $input-dark-background-colour: $medium-gray;
 $input-dark-border-colour: $light-gray;

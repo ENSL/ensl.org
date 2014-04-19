@@ -41,6 +41,7 @@ form {
     .select-wrapper {
       $select-padding: em(7);
 
+      border-radius: $input-border-radius;
       background-color: $input-primary;
       border: $input-border-colour solid $input-border-width;
       position: relative;
@@ -92,7 +93,7 @@ form {
         border: $input-border-width solid lighten($input-secondary, 20%);
 
         &:after {
-          border-left: $input-border-width solid $input-secondary;
+          border-left: $input-border-width solid lighten($input-secondary, 20%);
           color: $base-font-color;
         }
       }
@@ -107,10 +108,11 @@ form {
     input[type=password],
     input[type=email],
     textarea {
+      border-radius: $input-border-radius;
       background-color: $input-primary;
       color: $input-text;
       font-size: $input-font-size;
-      padding: $input-padding;
+      padding: 0 $input-padding;
       height: em(40);
       border: $input-border-colour solid $input-border-width;
 
@@ -122,10 +124,24 @@ form {
         border: $input-border-width solid $input-secondary;
         outline: none;
       }
+
+      &[disabled] {
+
+        &:hover {
+          border-color: $input-border-colour;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    textarea {
+      padding: $input-padding;
+      font-family: $open-sans;
     }
 
     input[type=checkbox] {
       @include appearance(none);
+      border-radius: $input-border-radius;
       width: em(40);
       height: em(40);
       font-size: $input-font-size;
@@ -174,7 +190,9 @@ form {
 
     button,
     input[type=submit] {
-      @include button($button-secondary);
+      @include button($button-primary);
+      border-radius: $input-border-radius;
+      border: $input-border-width solid $button-primary;
       margin-bottom: 0;
       outline: none;
     }
@@ -255,6 +273,23 @@ form.square {
       input[type=text],
       input[type=password],
       input[type=email] {
+        width: 100%;
+      }
+    }
+
+
+    &.wide {
+
+      > .field_with_errors {
+        width: 100%;
+      }
+
+      label {
+        width: 100%;
+      }
+
+      textarea,
+      .mceLayout {
         width: 100%;
       }
     }

@@ -1,4 +1,4 @@
-<table>
+<table class="striped">
   <tr>
     <th class="country"></th>
     <th class="name">Name</th>
@@ -19,11 +19,11 @@
         <% if cuser and cuser.admin? %>
           <td class="actions">
             <%= link_to edit_team_path(team) do %>
-              <%= icon 'pencil' %> Edit
+              <%= icon 'pencil' %>
             <% end %>
             <% if team.active %>
               <%= link_to team, confirm: 'Are you sure?', method: :delete do %>
-                <%= icon 'times' %> Delete
+                <%= icon 'times' %>
               <% end %>
             <% else %>
               <%= link_to action: "recover", id: team do %>

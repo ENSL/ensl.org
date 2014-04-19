@@ -11,7 +11,7 @@
   </div>
 <% end %>
 
-<table id="users">
+<table id="users" class="striped">
   <tr>
     <th class="country"></th>
     <th class="username">Username</th>
@@ -33,10 +33,10 @@
       <% if cuser and cuser.admin? %>
         <td class="actions">
           <%= link_to edit_user_path(user) do %>
-            <%= icon 'pencil' %> Edit
+            <%= icon 'pencil' %>
           <% end %>
           <%= link_to user, confirm: "Proceed to delete?", method: :delete do %>
-            <%= icon 'times' %> Delete
+            <%= icon 'times' %>
           <% end %>
         </td>
       <% end %>

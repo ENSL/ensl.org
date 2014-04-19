@@ -2,7 +2,7 @@
   Main Containers
 */
 
-$container-padding: em(20);
+$container-padding: em(30);
 
 html,
 body {
@@ -78,5 +78,26 @@ h1, h2, h3, h4, h5, h6 {
       display: inline-block;
       z-index: 1;
     }
+  }
+}
+
+/*
+  Text
+*/
+
+#main {
+  ul.disc,
+  ol {
+    list-style-type: disc;
+    margin: em(20) 0;
+
+    li {
+      margin-left: em(40);
+      display: list-item;
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
   }
 }

@@ -1,3 +1,7 @@
+/*
+  Generic Tables
+*/
+
 table {
   border-collapse: collapse;
   margin: ($base-line-height / 2) 0;
@@ -20,3 +24,17 @@ td {
 tr, td, th {
   vertical-align: middle;
 }
+
+table.striped > tbody {
+  > tr > td:first-child {
+    padding-left: ($base-line-height / 2);
+  }
+
+  > tr > td:last-child {
+    padding-right: ($base-line-height / 2);
+  }
+
+  > tr:nth-child(2n) td {
+    background-color: transparentize($light-blue, 0.9);
+  }
+} 

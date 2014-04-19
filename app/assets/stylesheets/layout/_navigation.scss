@@ -6,7 +6,6 @@
   @include span-columns(12);
   font-family: $montserrat;
   height: em(60);
-  max-height: em(60);
   margin-top: - em(60);
   
   nav {
@@ -22,11 +21,26 @@ ul.navigation {
   float: left;
   width: 100%;
   background: transparent;
+  overflow: hidden;
+  max-width: $max-width;
+  max-height: em(60);
 
   > li {
     float: left;
-    width: $max-width/7;
+    width: ($max-width - em(1))/7;
     border-right: em(1) solid transparent;
+
+    .count {
+      float: right;
+      font-size: em(14);
+      border-radius: em(25);
+      background-color: $light-blue;
+      display: inline-block;
+      color: white;
+      line-height: em(14);
+      padding: em(5) em(8);
+      margin-top: - em(2);
+    }
 
     > a {
       width: 100%;
@@ -35,11 +49,16 @@ ul.navigation {
       line-height: em(16);
       padding: em(22);
       float: left;
+      position: relative;
       background-color: $navbar-primary;
 
       &:hover,
       &.active {
         background-color: $navbar-secondary;
+
+        .count {
+          background-color: lighten($light-blue, 20);
+        }
       }
     }
 
@@ -49,15 +68,16 @@ ul.navigation {
 
     &.icon {
 
-      > a {
+      i {
+        color: lighten($light-blue, 30);
+        max-height: 60px;
+        position: absolute;
+        top: 0;
+        right: 0;
         font-size: em(24);
-        line-height: em(24);
-        padding: em(18);
-
-        i {
-          width: em(24);
-          height: em(24);
-        }
+        line-height: 1em;
+        padding: em(12);
+        padding-right: em(14);
       }
     }
 
@@ -72,6 +92,7 @@ ul.navigation {
         position: relative;
 
         ul {
+          box-shadow: $content-shadow;
           display: block;
           position: absolute;
           top: em(60);
