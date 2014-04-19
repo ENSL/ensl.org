@@ -1,6 +1,13 @@
 <div class="links">
   <h5><%= namelink(cuser) %></h5>
   <ul>
+    <% if cuser.admin? %>
+      <li>
+        <%= link_to '/about/adminpanel', class: 'admin' do %>
+          <%= icon 'wrench' %> Admin (<%= Issue.with_status(0).count  %>)
+        <% end %>
+      </li>
+    <% end %>
     <li>
       <%= link_to edit_user_path(cuser) do %>
         <%= icon 'user' %> Account

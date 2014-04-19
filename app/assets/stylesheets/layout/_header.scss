@@ -1,116 +1,9 @@
-nav.top {
-  $navigation-background: $medium-gray;
-  $navigation-color: transparentize(white, 0.3);
-  $navigation-color-hover: white;
-  $navigation-height: em(40);
-
-  background-color: $navigation-background;
-  border-bottom: 1px solid $medium-gray;
-  font-family: $montserrat;
-  height: $navigation-height;
-  width: 100%;
-  z-index: 999;
-
-  .menu-wrapper {
-    @include outer-container;
-    position: relative;
-    z-index: 9999;
-  }
-
-  .navigation-menu-button {
-    color: $navigation-color;
-    cursor: pointer;
-    display: block;
-    float: right;
-    font-family: $montserrat;
-    font-weight: 700;
-    line-height: $navigation-height;
-    margin: 0;
-    padding-right: 1em;
-    text-transform: uppercase;
-
-    @include media ($large-screen) {
-      display: none;
-    }
-
-    &:hover {
-      color: $navigation-color-hover;
-    }
-  }
-
-  .nav {
-    @include media ($large-screen) {
-      float: left;
-    }
-  }
-
-  #navigation-menu {
-    @include span-columns(12);
-
-    .gathers {
-      @include span-columns(6);
-    }
-
-    .pages {
-      @include span-columns(6);
-      @include omega;
-
-      text-align: right;
-
-      li:last-child {
-        padding-right: 0;
-      }
-    }
-  }
-
-  #navigation-menu ul {
-    -webkit-transform-style: preserve-3d; // stop webkit flicker
-    display: none;
-    margin: 0 auto;
-    overflow: hidden;
-    padding: 0;
-    width: 100%;
-    z-index: 9999;
-
-    @include media ($large-screen) {
-      display: block;
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  ul li {
-    background: $navigation-background;
-    display: block;
-    line-height: $navigation-height;
-    overflow: hidden;
-    padding-right: .8em;
-    text-align: right;
-    width: 100%;
-    z-index: 9999;
-
-    @include media ($large-screen) {
-      background: transparent;
-      display: inline;
-      line-height: $navigation-height;
-      padding-right: 2em;
-      text-decoration: none;
-      width: auto;
-    }
-
-    a {
-      font-weight: 400;
-      color: $navigation-color;
-
-      &:hover {
-        color: $navigation-color-hover;
-      }
-    }
-  }
-}
+/*
+  Banner
+*/
 
 header .banner {  
-  @include linear-gradient($dark-blue, #12526E);
+  @include linear-gradient($dark-blue, $deep-blue);
   height: em(295);
 
   #logo {
@@ -141,6 +34,14 @@ header .banner {
 
     form {
       display: inline;
+    }
+
+    &.admin {
+      margin-top: em(10);
+
+      .profile {
+        padding-top: em(20);
+      }
     }
 
     .fields { 
@@ -192,17 +93,24 @@ header .banner {
     }
 
     .profile {
+      vertical-align: middle;
 
       .avatar {
         @include span-columns(12);
+        height: em(135);
         background: transparentize($light-gray, 0.5);
-        margin: 0 em(20) em(20) 0;
+        margin: 0 em(20) 0 0;
         text-align: center;
         border-radius: 75px;
+        vertical-align: middle;
 
         img {
           padding: em(10);
           float: left;
+          max-width: em(135);
+          width: 100%;
+          height: auto;
+          border-radius: 75px;
         }
       }
 

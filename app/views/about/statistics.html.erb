@@ -1,35 +1,33 @@
-<h2 class="center">
-  Statistics
-</h2>
+<h2>Statistics</h2>
 
-<div class="wide box">
-  <div id="statsTab">
-    <ul id="statsTab-nav" class="tabs">
-      <li><a href="#GeneralTab">General</a></li>
-      <li><a href="#NS1Seasons">NS1 Seasons</a></li>
-      <li><a href="#NSLS1Tab">NSL S1</a></li>
-      <li><a href="#NSLS2Tab">NSL S2</a></li>
-    </ul>
-    <div class="box wide tabs">
-      <div class="tab" id="GeneralTab">
-        <h3 class="center">General Statistics</h3>
-        <%= render :partial => "about/general", :locals => {} %>
-      </div>
-      <div class="tab" id="NS1Seasons">
-        <h3 class="center">NS1 Seasons statistics</h3>
-        <%= render :partial => "about/contests", :locals => {:contests => Contest.ns1seasons} %>
-      </div>
-      <div class="tab" id="NSLS1Tab">
-        <h3 class="center">NSL Season 1 Statistics</h3>
-        <%= render :partial => "about/contests", :locals => {:contests => Contest.nsls1} %>
-      </div>
-      <div class="tab" id="NSLS2Tab">
-        <h3 class="center">NSL Season 2 Statistics</h3>
-        <%= render :partial => "about/contests", :locals => {:contests => Contest.nsls2} %>
-      </div>
+<div id="stats" class="tabbed">
+  <ul id="stats-nav" class="tabs">
+    <li><a href="#general">General</a></li>
+    <li><a href="#ns1seasons">NS1 Seasons</a></li>
+    <li><a href="#nsls1">NSL S1</a></li>
+    <li><a href="#nsls2">NSL S2</a></li>
+  </ul>
+  <div class="tabbed-contents">
+    <div class="tab" id="general">
+      <h3>General Statistics</h3>
+      <%= render partial: "about/general", locals: {} %>
+    </div>
+    <div class="tab" id="ns1seasons">
+      <h3>NS1 Seasons statistics</h3>
+      <%= render partial: "about/contests", locals: { contests: Contest.ns1seasons } %>
+    </div>
+    <div class="tab" id="nsls1">
+      <h3>NSL Season 1 Statistics</h3>
+      <%= render partial: "about/contests", locals: { contests: Contest.nsls1 } %>
+    </div>
+    <div class="tab" id="nsls2">
+      <h3>NSL Season 2 Statistics</h3>
+      <%= render partial: "about/contests", locals: { contests: Contest.nsls2 } %>
     </div>
   </div>
-  <script type="text/javascript">
-    var tabber1 = new Yetii({id: 'statsTab'});
-    </script>
-  </div>
+</div>
+<script type="text/javascript">
+  new Yetii({
+    id: 'stats'
+  });
+</script>

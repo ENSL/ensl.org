@@ -10,15 +10,13 @@
     </h1>
     <div class="controls">
       <% if cuser %>
-        [
-        <%= link_to_function 'Q', "QuoteText(#{comment.id}, 'comments')" %>
+        <%= link_to_function icon('comment'), "QuoteText(#{comment.id}, 'comments')" %>
         <% if comment.can_update? cuser %>
-          <%= link_to 'E', edit_comment_path(comment) %>
+          <%= link_to icon('pencil'), edit_comment_path(comment) %>
         <% end %>
         <% if comment.can_destroy? cuser %>
-          <%= link_to 'D', comment, :confirm => 'Are you sure?', :method => :delete %>
+          <%= link_to icon('times'), comment, :confirm => 'Are you sure?', :method => :delete %>
         <% end %>
-        ]
       <% end %>
     </div>
     <%= comment.text_parsed.html_safe %>

@@ -3,17 +3,24 @@
 */
 
 @mixin button($background: $button-primary, $text: $button-text) {
+  @include linear-gradient($blue, $dark-blue);
+  border-radius: $base-border-radius;
   font-family: $montserrat;
   font-size: em(16);
   background-color: $background;
   color: $text;
   height: em(40);
-  padding: em(9) em(18);
+  padding: 0 em(18);
+  line-height: em(40);
   float: left;
   margin: 0 em(20) em(20) 0;
   border: 0;
   text-transform: uppercase;
   cursor: pointer;
+
+  &:hover {
+    color: lighten($light-blue, 30);
+  }
 }
 
 button,
@@ -21,14 +28,12 @@ a.button {
   @include button;
 
   &.tiny {
-    background-color: $green;
+    @include linear-gradient($light-blue, $blue);
+    background-color: transparent;
     border-radius: em(14);
+    line-height: em(25);
     height: em(25);
-    padding: em(1) em(12);
+    padding: 0 em(12);
     margin: 0 em(10) 0 0;
-
-    &:hover {
-      color: $light-gray;
-    }
   }
 }

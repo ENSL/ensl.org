@@ -1,4 +1,4 @@
-<table class="contest">
+<table class="contest striped">
   <thead>
     <tr>
       <th class="movement"></th>
@@ -10,7 +10,7 @@
       <th class="loss">Loss</th>
       <th class="draw">Draw</th>
       <% if actions %>
-        <th class="actions">Actions</th>
+        <th class="actions"></th>
       <% end %>
     </tr>
   </thead>
@@ -35,7 +35,7 @@
       <td><%= h contester.loss %></td>
       <td><%= h contester.draw %></td>
       <% if actions %>
-        <td>
+        <td class="actions">
           <% if @friendly %>
             <% challenge = Challenge.new
             challenge.contester1 = @friendly
@@ -45,9 +45,9 @@
             <% end %>
           <% end %>
           <% if cuser and cuser.admin? %>
-            <%= link_to 'E', edit_contester_path(contester) %>
-            <%= link_to 'D', contester, confirm: 'Are you sure?', method: :delete %>
-            <%= link_to 'R', controller: "contesters", action: "recalc", id: contester %>
+            <%= link_to icon('pencil'), edit_contester_path(contester) %>
+            <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
+            <%= link_to icon('refresh'), controller: "contesters", action: "recalc", id: contester %>
           <% end %>
         </td>
       <% end %>

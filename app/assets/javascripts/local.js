@@ -151,9 +151,13 @@ $(function() {
     }, 2000);
   });
 
+  $user_tabs = $("#user-profile .tabs");
+
   // User page
-  $("#user-profile li a").click(function(){
-    $("#user-data").fadeOut("fast");
+  $("#user-profile li a").click(function() {
+    $user_tabs.find("li").removeClass("activeli");
+    $(this).parent().addClass("activeli");
+
     $.ajax({
       type: "GET",
       url: window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + ".js?page=" + $(this).attr('id'),
