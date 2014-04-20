@@ -1,171 +1,174 @@
-<h1>Account: <%= h @user.username %></h1>
+<div id="profile-edit">
+  <h1>Account: <%= h @user.username %></h1>
 
-<%= form_for @user, html: { multipart: true, id: 'profile', class: 'square' } do |f| %>
-  <% f.fields_for :profile do |p| %>
-    <div id="user" class="tabbed">
-      <ul id="user-nav" class="tabs">
-        <li><a href="#account">Account</a></li>
-        <li><a href="#profile">Profile</a></li>
-        <li><a href="#country"><%= t('profile.locals') %></a></li>
-        <li><a href="#notifications">Notifications</a></li>
-      </ul>
+  <%= render 'shared/errors', messages: @user.errors.full_messages %>
 
-      <div class="tabbed-contents">
-        <div class="tab" id="account">
-          <% if @user.errors.any? %>
-            <div id="errors">
-              <strong><%= pluralize(@user.errors.count, t(:error)) %></strong>
-              <ul class="errors">
-                <% @user.errors.full_messages.each do |msg| %>
-                  <li><%= msg %></li>
-                <% end %>
-              </ul>
+  <%= form_for @user, html: { multipart: true, id: 'profile', class: 'square' } do |f| %>
+    <% f.fields_for :profile do |p| %>
+      <div id="user" class="tabbed">
+        <ul id="user-nav" class="tabs">
+          <li><a href="#account">Account</a></li>
+          <li><a href="#profile">Profile</a></li>
+          <li><a href="#country"><%= t('profile.locals') %></a></li>
+          <li><a href="#notifications">Notifications</a></li>
+        </ul>
+
+        <div class="tabbed-contents">
+          <div class="tab" id="account">
+            <div class="fields horizontal">
+              <%= f.label :username, 'Username', class: 'required' %>
+              <%= f.text_field :username %>
             </div>
-          <% end %>
-          <div class="fields horizontal">
-            <%= f.label :username, 'Username', class: 'required' %>
-            <%= f.text_field :username %>
+            <div class="fields horizontal">
+              <%= f.label :raw_password, "Password" %>
+              <%= f.password_field :raw_password %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :email do %>
+                <p>Email</p>
+                <em>(only visible to admins)</em>
+              <% end %>
+              <%= f.text_field :email %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :public_email %>
+              <%= f.check_box :public_email %>
+              <%= f.label :public_email, class: 'checkbox' %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :steamid %>
+              <%= f.text_field :steamid, html: { placeholder: 'http://steamcommunity.com/id/...' } %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :firstname do %>
+                <p>First Name</p>
+                <em>(only visible to members)</em>
+              <% end %>
+              <%= f.text_field :firstname %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :lastname do %>
+                <p>Last Name</p>
+                <em>(only visible to members)</em>
+              <% end %> 
+              <%= f.text_field :lastname %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :birthdate %>
+              <div class="inputs">
+                <%= date_select :user, :birthdate, order: [:year, :month, :day], default: @user.birthdate, start_year: 1950 %>  
+              </div>
+            </div>
           </div>
-          <div class="fields horizontal">
-            <%= f.label :raw_password, "Password" %>
-            <%= f.password_field :raw_password %>
+
+          <div class="tab" id="profile">
+            <div class="fields horizontal">
+              <%= p.label :steam_profile, "Steam Profile URL" %>
+              <%= p.text_field :steam_profile %>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :web %>
+              <%= p.text_field :web %>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :achievements %>
+              <%= p.text_area :achievements, rows: 5 %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :signature %>
+              <%= p.text_area :signature, rows: 5 %>
+            </div>
+
+            <div class="fields horizontal">
+              <label>Avatar</label>
+              <%= p.file_field :avatar %>
+            </div>
           </div>
-          <div class="fields horizontal">
-            <%= f.label :email do %>
-              <p>Email</p>
-              <em>(only visible to admins)</em>
-            <% end %>
-            <%= f.text_field :email %>
+
+          <div class="tab" id="country">
+            <div class="fields horizontal">
+              <%= f.label :country %>
+              <div class="inputs">
+                <%= country_code_select :user, :country %>  
+              </div>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :town %>
+              <%= p.text_field :town %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :time_zone %>
+              <div class="inputs">
+                <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.all %><br><br>
+                <p>Daylight savings will be observed automatically.</p>
+              </div>
+            </div>
           </div>
-          <div class="fields horizontal">
-            <%= f.label :public_email %>
-            <%= f.check_box :public_email %>
-          </div>
-          <div class="fields horizontal">
-            <%= f.label :steamid %>
-            <%= f.text_field :steamid, html: { placeholder: 'http://steamcommunity.com/id/...' } %>
-          </div>
-          <div class="fields horizontal">
-            <%= f.label :firstname do %>
-              <p>First Name</p>
-              <em>(only visible to members)</em>
-            <% end %>
-            <%= f.text_field :firstname %>
-          </div>
-          <div class="fields horizontal">
-            <%= f.label :lastname do %>
-              <p>Last Name</p>
-              <em>(only visible to members)</em>
-            <% end %>
-            <%= f.text_field :lastname %>
-          </div>
-          <div class="fields horizontal">
-            <%= f.label :birthdate %>
-            <div class="inputs">
-              <%= date_select :user, :birthdate, order: [:year, :month, :day], default: @user.birthdate, start_year: 1950 %>  
+
+          <div class="tab" id="notifications">
+            <h4>Notify me when...</h4>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_news, "News item are posted" %>
+              <%= p.check_box :notify_news %>
+              <%= p.label :notify_news, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_articles, "New articles" %>
+              <%= p.check_box :notify_articles %>
+              <%= p.label :notify_articles, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_movies, "New movies" %>
+              <%= p.check_box :notify_movies %>
+              <%= p.label :notify_movies, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_gather, "Gather has 6 players" %>
+              <%= p.check_box :notify_gather %>
+              <%= p.label :notify_gather, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_own_match, "My team's matches" %>
+              <%= p.check_box :notify_own_match %>
+              <%= p.label :notify_own_match, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_any_match, "New matches" %>
+              <%= p.check_box :notify_any_match %>
+              <%= p.label :notify_any_match, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_challenge, "New challenges" %>
+              <%= p.check_box :notify_challenge %>
+              <%= p.label :notify_challenge, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_pms, "Private messages" %>
+              <%= p.check_box :notify_pms %>
+              <%= p.label :notify_pms, class: 'checkbox' %>
             </div>
           </div>
         </div>
 
-        <div class="tab" id="profile">
-          <div class="fields horizontal">
-            <%= p.label :steam_profile, "Steam Profile URL" %>
-            <%= p.text_field :steam_profile %>
-          </div>
-          <div class="fields horizontal">
-            <%= p.label :web %>
-            <%= p.text_field :web %>
-          </div>
-          <div class="fields horizontal">
-            <%= p.label :achievements %>
-            <%= p.text_area :achievements, rows: 5 %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :signature %>
-            <%= p.text_area :signature, rows: 5 %>
-          </div>
-
-          <div class="fields horizontal">
-            <label>Avatar</label>
-            <%= p.file_field :avatar %>
-          </div>
-        </div>
-
-        <div class="tab" id="country">
-          <div class="fields horizontal">
-            <%= f.label :country %>
-            <div class="inputs">
-              <%= country_code_select :user, :country %>  
-            </div>
-          </div>
-          <div class="fields horizontal">
-            <%= p.label :town %>
-            <%= p.text_field :town %>
-          </div>
-          <div class="fields horizontal">
-            <%= f.label :time_zone %>
-            <div class="inputs">
-              <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.all %><br><br>
-              <p>Daylight savings will be observed automatically.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab" id="notifications">
-          <h4>Notify me when...</h4>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_news, "News item are posted" %>
-            <%= p.check_box :notify_news %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_articles, "New articles" %>
-            <%= p.check_box :notify_articles %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_movies, "New movies" %>
-            <%= p.check_box :notify_movies %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_gather, "Gather has 6 players" %>
-            <%= p.check_box :notify_gather %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_own_match, "My team's matches" %>
-            <%= p.check_box :notify_own_match %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_any_match, "New matches" %>
-            <%= p.check_box :notify_any_match %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_challenge, "New challenges" %>
-            <%= p.check_box :notify_challenge %>
-          </div>
-
-          <div class="fields horizontal">
-            <%= p.label :notify_pms, "Private messages" %>
-            <%= p.check_box :notify_pms %>
-          </div>
+        <div class="controls">
+          <%= f.submit %>
         </div>
       </div>
-
-      <div class="controls">
-        <%= f.submit %>
-      </div>
-    </div>
+    <% end %>
   <% end %>
-<% end %>
 
-<script type="text/javascript">
-  new Yetii({
-    id: 'user'
-  });
-</script>
+  <script type="text/javascript">
+    new Yetii({
+      id: 'user'
+    });
+  </script>
+</div>

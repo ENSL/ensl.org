@@ -35,23 +35,27 @@
 <% end %>
 
 <% unless @article.new_record? %>
-  <h2>Files</h2>
+  <div class="files">
+    <h4>Files</h4>
 
-  <%= render partial: "data_files/list", locals: { files: @article.files } %>
+    <%= render partial: "data_files/list", locals: { files: @article.files } %>
 
-  <% if @file && @file.can_create?(cuser) %>
-    <h4>New file</h4>
+    <% if @file && @file.can_create?(cuser) %>
+      <h4>New File</h4>
 
-    <%= form_for @file, html: { multipart: true } do |f| %>
-      <%= render 'shared/errors', messages: @file.errors.full_messages %>
+      <%= form_for @file, html: { multipart: true } do |f| %>
+        <%= render 'shared/errors', messages: @file.errors.full_messages %>
 
-      <%= f.hidden_field :directory_id %>
-      <%= f.hidden_field :article_id %>
+        <%= f.hidden_field :directory_id %>
+        <%= f.hidden_field :article_id %>
 
-      <p>
-        <%= f.file_field :name %>
-        <%= f.submit 'Create' %>
-      </p>
-    <% end %>
-  <% end %>
+        <div class="fields">
+          <%= f.file_field :name %>  
+        </div>
+        <div class="controls">
+          <%= f.submit 'Create' %>  
+        </div>
+      <% end %>
+    <% end %>  
+  </div>  
 <% end %>

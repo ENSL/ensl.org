@@ -1,13 +1,18 @@
-<%= form_for(@post) do |f| %>
-  <%= f.error_messages %>
+<%= form_for(@post, html: { class: 'square' }) do |f| %>
+  <%= render 'shared/errors', messages: @post.errors.full_messages %>
+
   <%= f.hidden_field :topic_id %>
-  <p>
-    Topic: <%= namelink @post.topic %>
-</p>
-<p>
-  <%= f.text_area :text, :rows => 15, :cols => 108 %>
-</p>
-<p>
-  <%= f.submit 'Save' %>
-</p>
+  <div class="square horizontal">
+    <%= f.label :topic %>
+    <div class="inputs">
+      <%= namelink @post.topic %>  
+    </div>
+  </div>
+  <div class="square horizontal">
+    <%= f.label :text %>
+    <%= f.text_area :text, rows: 20 %>
+  </div>
+  <div class="controls">
+    <%= f.submit 'Save Post' %>
+  </div>
 <% end %>

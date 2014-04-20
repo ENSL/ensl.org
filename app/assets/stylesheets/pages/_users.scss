@@ -96,6 +96,17 @@
   }
 }
 
+#profile-edit {
+
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  form {
+    margin-top: 0;
+  }
+}
+
 /*
   Agenda
 */
@@ -170,5 +181,25 @@
 
   .back {
     margin-top: em(20);
+  }
+}
+
+/*
+  Staff List
+*/
+
+table.staff {
+  table-layout: auto;
+
+  .country {
+    width: 6%;
+  }
+
+  .username {
+    width: 20%;
+  }
+
+  .age {
+    width: 5%;
   }
 }

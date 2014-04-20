@@ -26,12 +26,16 @@ tr, td, th {
 }
 
 table.striped > tbody {
-  > tr > td:first-child {
-    padding-left: ($base-line-height / 2);
-  }
+  > tr {
+    td:first-child,
+    th:first-child {
+      padding-left: ($base-line-height / 2);
+    }
 
-  > tr > td:last-child {
-    padding-right: ($base-line-height / 2);
+    td:last-child,
+    th:last-child {
+      padding-right: ($base-line-height / 2);
+    }
   }
 
   > tr:nth-child(2n) td {

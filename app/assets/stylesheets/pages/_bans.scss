@@ -1,0 +1,23 @@
+/*
+  Bans List
+*/
+
+#bans {
+
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  table.bans {
+
+    .type,
+    .expiry {
+      width: 20%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+}

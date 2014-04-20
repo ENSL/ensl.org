@@ -57,6 +57,9 @@ form {
         display: block;
         width: auto;
         position: relative;
+        line-height: em(22);
+        vertical-align: middle;
+        max-height: em(36);
         margin-left: 0;
         border: 0;
         margin: 0;
@@ -139,42 +142,46 @@ form {
       font-family: $open-sans;
     }
 
-    input[type=checkbox] {
-      @include appearance(none);
-      border-radius: $input-border-radius;
+    > label.checkbox {
+      display: none;
+      position: relative;
       width: em(40);
       height: em(40);
-      font-size: $input-font-size;
-      padding: $input-padding;
-      background-color: $input-primary;
-      border: $input-border-colour solid $input-border-width;
-      position: relative;
-      margin: 0;
-      float: left;
+      overflow: hidden;
 
-      &:focus {
-        outline: none;
+      &:before {
+        @include box-sizing(border-box);
+        content: "";
+        display: block;
+        border-radius: $input-border-radius;
+        width: em(40);
+        height: em(40);
+        padding: $input-padding;
+        background-color: $input-primary;
+        border: $input-border-colour solid $input-border-width;
+        margin: 0;
       }
-
+      
       &:hover {
-        border: $input-border-width solid lighten($input-secondary, 20%);
-        cursor: pointer;
+
+        &:before {
+          border: $input-border-width solid lighten($input-secondary, 20%);
+        }
       }
+    }
+
+    input[type=checkbox] {
+      display: none;
 
       &:checked {
-        border-color: $button-secondary;
 
-        &:after {
+        & + label.checkbox:before {
           content: $fa-var-check;
           pointer-events: none;
           font-family: $fontawesome;
           font-weight: normal;
           font-style: normal;
-          position: absolute;
-          font-size: em(22);
-          top: em(4);
-          left: em(5);
-          color: $button-secondary;
+          color: $light-blue;
         }
       }
     }
@@ -258,6 +265,11 @@ form.square {
       @include span-columns(3);
       padding: em(11) 0;
       line-height: em(16);
+
+      &.checkbox {
+        width: em(40);
+        padding: 0;
+      }
     }
 
     input[type=text],
@@ -276,7 +288,6 @@ form.square {
         width: 100%;
       }
     }
-
 
     &.wide {
 
