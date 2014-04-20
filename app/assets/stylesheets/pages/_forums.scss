@@ -176,3 +176,22 @@ div#categories {
     }
   }
 }
+
+/*
+  Forms
+*/
+
+
+#forums .add-acl {
+
+  h4 {
+    margin: 1em 0;
+  }
+
+  .permissions,
+  .controls {
+    display: inline;
+    width: auto;
+    float: none;
+  }
+}

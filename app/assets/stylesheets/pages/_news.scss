@@ -88,3 +88,19 @@ form.article {
     margin-bottom: em(20);
   }
 }
+
+.files {
+
+  .files-list {
+    margin: em(20) 0 em(40);
+  }
+
+  form {
+    @include span-columns(12);
+    margin: em(20) 0;
+
+    .fields {
+      margin-bottom: em(20);
+    }
+  }
+}

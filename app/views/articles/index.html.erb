@@ -1,31 +1,26 @@
-<div class="box wide">
-  <h2>Articles</h2>
+<h1>Articles</h1>
 
-  <% @categories.each do |category| %>
-    <h3>
-      <%= category.name %>
-    </h3>
+<% @categories.each do |category| %>
+  <h3>
+    <%= category.name %>
+  </h3>
 
-    <% category.articles.nodrafts.ordered.each do |article| %>
-      <div class="indented">
-        <div class="left">
-          <% if cuser and !article.read_by? cuser %>
-            <span class="red bold">NEW</span>
-          <% end %>
-          <%= namelink article %>
-        </div>
-        <div class="right">
-          (<%= namelink article.user %> on <%= longdate article.created_at %>)
-        </div>
-        <br class="clear" />
+  <% category.articles.nodrafts.ordered.each do |article| %>
+    <div class="indented">
+      <div class="left">
+        <% if cuser and !article.read_by? cuser %>
+          <span class="red bold">NEW</span>
+        <% end %>
+        <%= namelink article %>
       </div>
-    <% end %>
+      <div class="right">
+        (<%= namelink article.user %> on <%= longdate article.created_at %>)
+      </div>
+      <br class="clear" />
+    </div>
   <% end %>
-  <br />
-</div>
+<% end %>
 
 <% if Article.new.can_create? cuser %>
-  <p>
-    <%= link_to 'New article', new_article_path %>
-  </p>
+  <%= link_to 'New Article', new_article_path, class: 'button' %>
 <% end %>

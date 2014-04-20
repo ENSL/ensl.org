@@ -1,0 +1,12 @@
+/*
+  File Page
+*/
+
+#file {
+
+  .actions,
+  .files-list {
+    @include span-columns(12);
+    margin: em(20) 0;
+  }
+}
