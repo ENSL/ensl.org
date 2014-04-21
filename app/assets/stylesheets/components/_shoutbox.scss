@@ -6,12 +6,6 @@
   margin-bottom: em(5);
 
   .timestamp {
-    font-size: em(14);
-    border-radius: em(3);
-    background: $blue;
-    color: white;
-    display: inline-block;
-    font-style: italic;
-    padding: 0 em(6);
+    @extend .highlight;
   }
 }

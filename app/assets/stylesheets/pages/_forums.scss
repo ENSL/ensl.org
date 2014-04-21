@@ -147,6 +147,17 @@ div#categories {
         @include span-columns(12);
         padding: em(20) 0;
       }
+
+      .text {
+        border-radius: $base-border-radius;
+        background: $light-gray;
+        margin-top: em(20);
+        padding: em(20);
+
+        fieldset {
+          border-color: $light-blue;
+        }
+      }
     }
 
     .header {

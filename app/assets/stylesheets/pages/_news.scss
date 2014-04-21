@@ -16,11 +16,7 @@ div.article {
     margin-bottom: em(40);
 
     ul {
-      list-style-type: disc;
-
-      li {
-        margin-left: em(20);
-      }
+      @extend ul.disc;
     }
   }
 

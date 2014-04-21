@@ -1,35 +1,41 @@
-<h1><%= @contest.name %></h1>
+<h1 class="fancy">
+  <span><%= @contest.name %></span>
+</h1>
 
-<div class="contest info">
-  <h3>Details</h3>
+<% content_for :sidebar do %>
+  <div class="widget contest">
+    <h4>Contest Details</h4>
 
-  <dl>
-    <dt>Start - End</dt>
-    <dd>
-      <%= longdate @contest.start %><br>
-      <%= longdate @contest.end %>
-    </dd>
-    <dt>Rules</dt>
-    <dd><%= namelink @contest.rules %></dd>
-    <dt>Status</dt>
-    <dd><%= @contest.statuses[@contest.status] %></dd>
-    <dt>Default</dt>
-    <dd>Sunday: <%=h @contest.default_time.strftime("%H:%M") %></dd>
-  </dl>
+    <dl>
+      <dt>Start - End</dt>
+      <dd>
+        <%= longdate @contest.start %><br>
+        <%= longdate @contest.end %>
+      </dd>
+      <dt>Rules</dt>
+      <dd><%= namelink @contest.rules %></dd>
+      <dt>Status</dt>
+      <dd><%= @contest.statuses[@contest.status] %></dd>
+      <dt>Default</dt>
+      <dd>Sunday: <%= Time.use_zone(timezone_offset) { @contest.default_time.strftime("%H:%M %Z") } %></dd>
+    </dl>
 
-  <% if @contest.contest_type == Contest::TYPE_LADDER %>
-    <%= link_to 'Scoring', "/contests/#{@contest}/score" %>
-  <% end %>
-  <% if cuser and cuser.admin? %>
-    <%= link_to 'Edit', edit_contest_path(@contest) %>
+    <% if @contest.contest_type == Contest::TYPE_LADDER %>
+      <%= link_to 'Scoring', "/contests/#{@contest}/score", class: 'button' %>
+    <% end %>
+    <% if cuser and cuser.admin? %>
+      <%= link_to 'Edit Contest', edit_contest_path(@contest), class: 'button' %>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="standings">
+  <% if @contest.contest_type == Contest::TYPE_BRACKET %>
+    <%= render partial: 'bracket', locals: { contest: @contest } %>
+  <% else %>
+    <%= render partial: 'normal' %>
   <% end %>
 </div>
-
-<% if @contest.contest_type == Contest::TYPE_BRACKET %>
-  <%= render partial: 'bracket', locals: { contest: @contest } %>
-<% else %>
-  <%= render partial: 'normal' %>
-<% end %>
 
 <div id="contest" class="tabbed">
   <ul id="contest-nav" class="tabs">
@@ -47,7 +53,7 @@
       <% if @contest.weeks.count > 0 %>
         <table class="data">
           <% @contest.weeks.ordered.each do |week| %>
-            <% next if week.matches.count == 0 %>
+            <% next if week.matches.realfinished.size == 0 %>
             <tr>
               <th><%= week.name %></th>
               <th>Date</th>

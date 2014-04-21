@@ -71,6 +71,23 @@ table.contest {
   }
 }
 
+div.widget.contest {
+
+  a.button {
+    margin: em(20) 0 0;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/*
+  Standings
+*/
+
+div.standings {
+  @include span-columns(12);
+}
+
 /*
   Brackets
 */

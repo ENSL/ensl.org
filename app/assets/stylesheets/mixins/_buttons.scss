@@ -24,7 +24,8 @@
 }
 
 button,
-a.button {
+a.button,
+.button {
   @include button;
 
   &.tiny {

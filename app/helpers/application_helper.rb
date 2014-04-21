@@ -49,7 +49,7 @@ module ApplicationHelper
   end
 
   def longdate time
-    printtime time, "%d %B %Y"
+    printtime time, "%e %B %Y"
   end
 
   def printtime time, format

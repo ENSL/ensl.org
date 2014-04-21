@@ -1,4 +1,4 @@
-<table id="matches" class="data">
+<table id="matches" class="striped">
   <tr>
     <th>Date and Time</th>
     <th>Contest</th>
@@ -17,11 +17,14 @@
       <td><% if match.map1 and match.map2 %>
         <%= link_to match.map1, :controller => :maps, :action => :show, :id => match.map1 %>, 
         <%= link_to match.map2, :controller => :maps, :action => :show, :id => match.map2 %>
-      <% end %></td>
-    <td><%= match.preds(1) %>% - <%= match.preds(2) %>%</td>
-    <td><%= link_to match, :class => "bold #{match.score_color}" do %>
-      <%= h match.score1 %> - <%= h match.score2 %>
-    <% end %></td>
-</tr>
+        <% end %>
+      </td>
+      <td><%= match.preds(1) %>% - <%= match.preds(2) %>%</td>
+      <td>
+        <%= link_to match, :class => "bold #{match.score_color}" do %>
+          <%= h match.score1 %> - <%= h match.score2 %>
+        <% end %>
+      </td>
+    </tr>
   <% end %>
 </table>

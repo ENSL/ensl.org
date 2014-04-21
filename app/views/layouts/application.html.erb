@@ -21,6 +21,7 @@
             <%= yield %>
           </div>
           <div id="sidebar">
+            <%= yield :sidebar %>
             <% ['calendar', 'shoutbox', 'highlights', 'posts', 'poll'].each do |widget| %>
               <%= render partial: "widgets/#{widget}" %>  
             <% end %>

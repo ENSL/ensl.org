@@ -5,7 +5,7 @@
 
   <% if @team.logo %>
     <div class="logo">
-      <%= image_tag @team.logo.url, class: 'logo' %>
+      <%= image_tag @team.logo.url, class: 'logo', alt: h(@team.name) %>
     </div>
   <% end %>
 

@@ -47,7 +47,6 @@
           <% if cuser and cuser.admin? %>
             <%= link_to icon('pencil'), edit_contester_path(contester) %>
             <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
-            <%= link_to icon('refresh'), controller: "contesters", action: "recalc", id: contester %>
           <% end %>
         </td>
       <% end %>
