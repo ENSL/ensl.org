@@ -26,7 +26,7 @@ ul.navigation {
 
   > li {
     float: left;
-    width: ($max-width - em(1))/7;
+    width: (100%/7);
     border-right: em(1) solid transparent;
 
     .count {

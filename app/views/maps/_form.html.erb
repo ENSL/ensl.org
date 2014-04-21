@@ -1,25 +1,28 @@
-<div class="wide box">
-  <%= form_for @map, :html => { :multipart => true } do |f| %>
-    <%= f.error_messages %>
+<%= form_for @map, html: { multipart: true, class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @map.errors.full_messages %>
 
-    <p>
-      <%= f.label :name %><br />
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= f.label :category_id %><br />
-      <%= f.select :category_id, Category.ordered.domain(Category::DOMAIN_GAMES).collect{|c| [c, c.id]} %>
-    </p>
-    <p>
-      <%= f.label :download %><br />
-      <%= f.text_field :download %>
-    </p>
-    <p>
-      <%= f.label :picture %><br />
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :category_id %>
+    <%= f.select :category_id, Category.ordered.domain(Category::DOMAIN_GAMES).collect { |c| [c, c.id] } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :download %>
+    <%= f.text_field :download %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :picture %>
+    <div class="inputs">
+      <% if @map.picture.length > 0 %>
+        <%= image_tag @map.picture %><br>
+      <% end %>
       <%= f.file_field :picture %>
-    </p>
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
-  <% end %>
-</div>
+    </div>
+  </div>
+  <div class="controls">
+    <%= f.submit 'Update Map' %>
+  </div>
+<% end %>

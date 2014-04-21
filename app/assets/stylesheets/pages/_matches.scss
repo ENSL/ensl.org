@@ -22,3 +22,208 @@ table#matches {
     text-align: right;
   }
 }
+
+/*
+  Match Page
+*/
+
+div#match {
+  @include span-columns(12);
+  border-bottom: em(3) solid $light-gray;
+
+  .contesters,
+  .details,
+  .referee,
+  .predictions,
+  .report {
+    @include span-columns(12);
+  }
+
+  .contesters {
+    margin-bottom: em(20);
+
+    .vs {
+      margin: 0 auto;
+      display: block;
+      font: 50px $montserrat;
+      border-radius: 50px;
+      background: $blue;
+      width: 100px;
+      height: 100px;
+      text-align: center;
+      line-height: 100px;
+      color: white;
+      font-style: italic;
+      text-transform: uppercase;
+      padding-right: 10px;
+      font-weight: bold;
+    }
+
+    .team-1,
+    .team-2 {
+      max-height: 100px;
+      overflow: hidden;
+    }
+
+    .team-1 {
+      @include span-columns(5);
+      line-height: 100px;
+      text-align: right;
+    }
+
+    .team-2 {
+      @include span-columns(5);
+      line-height: 100px;
+      text-align: left;
+    }
+
+    .versus {
+      @include span-columns(2);
+      position: relative;
+      font-weight: bold;
+
+      &.split:before {
+        content: "";
+        display: block;
+        position: absolute;
+        background: white;
+        width: 1px;
+        height: 100px;
+        margin: 0 auto;
+        left: 50%;
+        top: 0;
+      }
+
+      .score-1,
+      .score-2 {
+        font: 50px $montserrat;
+        color: white;
+        width: 50%;
+        position: absolute;
+        top: 0;
+        text-align: center;
+        line-height: 100px;
+        font-weight: bold;
+      }
+
+      .score-1 {
+        padding-left: 15px;
+        left: 0;
+      }
+      
+      .score-2 {
+        padding-right: 15px;
+        right: 0;
+      }
+    }
+  }
+
+  .details {
+    margin-bottom: em(20);
+    text-align: center;
+
+    .contest,
+    .date {
+      text-align: center;
+    }
+
+    .date {
+      font-style: italic;
+      font-weight: normal;
+    }
+
+    .contest {
+      margin-bottom: em(10);
+    }
+  }
+
+  .lineups {
+    @include span-columns(12);
+    margin: em(20) 0 em(40);
+
+    i {
+      color: $gold;
+    }
+
+    .team-1 {
+      @include span-columns(6);
+      text-align: right;
+
+      .flag {
+        margin: 0 0 0 em(10);
+      }
+    }
+
+    .team-2 {
+      @include span-columns(6);
+      @include omega;
+    }
+
+    &.shift .team-2 {
+      @include shift(6);
+    }
+  }
+
+  .predictions {
+    text-align: center;
+
+    h4 {
+      margin-bottom: 1em;
+    }
+
+    input {
+      text-align: center;
+    }
+
+    .add {
+      @include span-columns(12);
+      text-align: center;
+
+      input {
+        float: none;
+        margin: em(20) 0 0 0;
+      }
+    }
+
+    .team-1 {
+      @include span-columns(6);
+      text-align: right;
+
+      .highlight {
+        margin-left: em(10);
+      }
+    }
+
+    .team-2 {
+      @include span-columns(6);
+      @include omega;
+      text-align: left;
+
+      .highlight {
+        margin-right: em(10);
+      }
+    }
+  }
+
+  .report {
+    margin: em(20) 0;
+    padding-top: em(20);
+    border-top: em(3) solid $light-gray;
+  }
+}
+
+/*
+  Map Page
+*/
+
+div#map {
+
+  .preview {
+    @include span-columns(12);
+    text-align: center;
+
+    img {
+      margin: em(20) 0;
+    }
+  }
+}

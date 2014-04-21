@@ -7,7 +7,7 @@
 
   <% if @contester.team.logo %>
     <div class="logo">
-      <%= image_tag @contester.team.logo.url, class: 'logo' %>
+      <%= image_tag @contester.team.logo.url, class: 'logo', alt: h(@contester.team.name) %>
     </div>
   <% end %>
 </div>
@@ -64,8 +64,6 @@
   <h3>Members</h3>
   <%= render partial: 'teamers/list', locals: { teamers: @members, blacklist: nil, comment: false } %>
 </div>
-
-<%= link_to 'Back', @contester.contest, class: 'button' %>
 
 <% if @contester.can_update? cuser %>
   <%= link_to 'Edit', edit_contester_path(@contester), class: 'button' %>

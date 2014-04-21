@@ -1,24 +1,18 @@
+/*
+  Thread List
+*/
+
 #comments-thread {
   @include span-columns(12);
   
   h3 {
     margin: 1em 0;
   }
-
-  .comment-form {
-    @include span-columns(12);
-    margin-bottom: em(20);
-
-    h5 {
-      margin-top: 0;
-      margin-bottom: 1em;
-    }
-
-    .fields {
-      margin-bottom: em(20);
-    }    
-  }
 }
+
+/*
+  Comment
+*/
 
 .comment {
   $comment-gutter: 1.4em;
@@ -99,4 +93,23 @@
       right: 0;
     }
   }
+}
+
+/*
+  Comment Form
+*/
+
+.comment-form {
+  @include span-columns(12);
+  margin-bottom: em(20);
+
+  h1,
+  h5 {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  .fields {
+    margin-bottom: em(20);
+  }    
 }

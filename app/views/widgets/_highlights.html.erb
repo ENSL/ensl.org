@@ -4,8 +4,8 @@
   <div class="widget-content-wrapper">
     <% if cuser and cuser.active_contests.count != 0 then %>
       <div class="separator">
-        Your contests
-        <%= link_to "(More)", controller: :matches, matchesTab: "YourTab" %>
+        Your Matches
+        <%= link_to "More", controller: :matches, matches: 'your' %>
       </div>
       <ol>
         <% cuser.active_contests.each do |contest| %>
@@ -20,7 +20,7 @@
     <% if Match.recent.count != 0 then %>
       <div class="separator">
         Latest Matches
-        <%= link_to "More", controller: :matches, matchesTab: "RecentTab" %>
+        <%= link_to 'More', controller: :matches, matches: 'recent' %>
       </div>
       <ol>
         <% Match.realfinished.reverse_order.recent.chrono.each do |match| %>
@@ -39,7 +39,7 @@
     <% if Match.future5.count != 0 then %>
       <div class="separator">
         Upcoming matches
-        <%= link_to "More", controller: :matches, matchesTab: "UpcomingTab" %>
+        <%= link_to 'More', controller: :matches, matches: 'upcoming' %>
       </div>
       <ol>
         <% Match.future5.chrono.each do |match| %>
