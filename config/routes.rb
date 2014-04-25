@@ -5,6 +5,10 @@ Ensl::Application.routes.draw do
 		resources :versions
 	end
 
+  match 'contests/del_map'
+  match 'contests/scores'
+  match 'contests/historical', to: "contests#historical"
+
 	resources :contests do
 		get 'current', on: :collection
 	end
@@ -71,16 +75,12 @@ Ensl::Application.routes.draw do
   match 'news/admin', to: "articles#admin"
   match 'articles/cleanup'
 
-  match 'contests/historical', to: "contests#historical"
-
   match 'data_files/admin'
   match 'data_files/addFile'
   match 'data_files/delFile'
   match 'data_files/trash'
 
   match 'contesters/recalc'
-  match 'contests/scores'
-  match 'contests/del_map'
 
   match 'directories', to: "directories#show", id: 1
 
