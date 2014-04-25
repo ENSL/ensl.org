@@ -1,38 +1,38 @@
 <div class="wide box">
-  <%= form_for @match do |f| %>
+  <%= form_for @match, html: { class: 'square' } do |f| %>
     <%= f.error_messages %>
     <%= f.hidden_field :contest_id %>
 
-    <p>
-      <%= f.label :contester1_id, "Team #1" %><br />
+    <div class="fields horizontal">
+      <%= f.label :contester1_id, "Team #1" %>
       <%= f.select :contester1_id, @match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
-    </p>
-    <p>
-      <%= f.label :contester2_id, "Team #2" %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :contester2_id, "Team #2" %>
       <%= f.select :contester2_id, @match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
-    </p>
-    <p>
-      <%= f.label :map1_id, "Team 1's map" %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :map1_id, "Map #1" %>
       <%= f.select :map1_id, @match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
-    </p>
-    <p>
-      <%= f.label :map2_id, "Team 2's map" %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :map2_id, "Map #2" %>
       <%= f.select :map2_id, @match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
-    </p>
-    <p>
-      <%= f.label :match_time %><br />
-      <%= f.datetime_select :match_time %>
-    </p>
-    <p>
-      <%= f.label :referee_id %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :match_time %>
+      <%= f.datetime_select :match_time, datetime_separator: '', time_separator: '' %>
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :referee_id %>
       <%= f.select :referee_id, Group.find(Group::REFEREES).users.collect{|u| [u, u.id]}, {:include_blank => true} %>
-    </p>
-    <p>
-      <%= f.label :week_id %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :week_id %>
       <%= f.select :week_id, @match.contest.weeks.ordered.collect{|w| [w, w.id]}, {:include_blank => true} %>
-    </p>
-    <p>
-      <%= f.submit 'Save' %>
-    </p>
+    </div>
+    <div class="controls">
+      <%= f.submit 'Save Match' %>
+    </div>
   <% end %>
 </div>

@@ -51,15 +51,15 @@
       </h3>
 
       <% if @contest.weeks.count > 0 %>
-        <table class="data">
+        <table class="striped weeks">
           <% @contest.weeks.ordered.each do |week| %>
             <% next if week.matches.realfinished.size == 0 %>
             <tr>
-              <th><%= week.name %></th>
-              <th>Date</th>
-              <th>Score</th>
+              <th class="week"><%= week.name %></th>
+              <th class="date">Date</th>
+              <th class="score">Score</th>
               <% if @contest.contest_type == Contest::TYPE_LADDER %>
-                <th>Points</th>
+                <th class="points">Points</th>
               <% end %>
             </tr>
             <% week.matches.realfinished.ordered.reverse_each do |match| %>
@@ -72,14 +72,14 @@
                 <td>
                   <%= shorttime match.match_time %>
                 </td>
-                <td>
+                <td class="score">
                   <%= link_to match, :class => "bold #{match.score_color}" do %>
                     <b><%= h match.score1 %> - <%= h match.score2 %></b>
                   <% end %>
 
                 </td>
                 <% if @contest.contest_type == Contest::TYPE_LADDER %>
-                  <td>
+                  <td class="points">
                     <%= match.points1 %> / <%= match.points2 %>
                   </td>
                 <% end %>
@@ -88,13 +88,13 @@
           <% end %>
         </table>
       <% else %>
-        <table class="data">
+        <table class="striped teams">
           <tr>
-            <th>Teams</th>
-            <th>Date</th>
-            <th>Score</th>
+            <th class="team">Teams</th>
+            <th class="date">Date</th>
+            <th class="score">Score</th>
             <% if @contest.contest_type == Contest::TYPE_LADDER %>
-              <th>Points</th>
+              <th class="points">Points</th>
             <% end %>
           </tr>
 
@@ -129,10 +129,10 @@
           Matches to be played
         </h3>
 
-        <table class="data">
+        <table class="striped matches">
           <tr>
-            <th>Teams</th>
-            <th>Date</th>
+            <th class="team">Teams</th>
+            <th class="date">Date</th>
           </tr>
 
           <% @contest.matches.unfinished.ordered.reverse_each do |match| %>
@@ -142,7 +142,7 @@
                 vs
                 <%= namelink match.contester2.team if match.contester2 %>
               </td>
-              <td>
+              <td class="date">
                 <%= link_to shorttime(match.match_time), match %>
               </td>
             </tr>
@@ -152,22 +152,22 @@
     </div>
 
     <div class="tab" id="predictions">
-      <table class="data">
+      <table class="striped predictions">
         <tr>
-          <th>User</th>
-          <th>Result</th>
+          <th class="user">User</th>
+          <th class="result">Result</th>
         </tr>
         <% @contest.preds_with_score.each do |prediction| %>
           <tr>
             <td><%= namelink prediction.user %></td>
-            <td><%= prediction.correct %> / <%= prediction.total %> correct (<%= prediction.score.to_f.round(2) %>%)</td>
+            <td class="result"><%= prediction.correct %> / <%= prediction.total %> correct (<%= prediction.score.to_f.round(2) %>%)</td>
           </tr>
         <% end %>
       </table>
     </div>
 
     <div class="tab" id="maps">
-      <ul>
+      <ul class="disc">
         <% @contest.maps.each do |map| %>
           <li><%= map %></li>
         <% end %>
