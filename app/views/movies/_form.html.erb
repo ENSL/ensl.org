@@ -1,49 +1,50 @@
-<div class="wide box">
-  <%= form_for @movie, :html => { :multipart => true } do |f| %>
-    <%= f.error_messages %>
+<%= form_for @movie, html: { multipart: true, class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @movie.errors.full_messages %>
 
-    <% if @movie.file %>
-      <%= link_to "Go to file", edit_data_file_path(@movie.file) %>
-    <% end %>
-
-    <p>
-      <%= f.label :name %><br />
-      <%= f.text_field :name, {:value => @movie.file.to_s} %>
-    </p>
-    <p>
-      <%= f.label :category_id %><br />
-      <%= f.select :category_id, Category.ordered.collect{|c| ["#{c.domains[c.domain]} - #{c}", c.id]} %>
-    </p>
-    <p>
-      <%= f.label :content %><br />
-      <%= f.text_field :content %>
-    </p>
-    <p>
-      <%= f.label :format %><br />
-      <%= f.text_field :format %>
-    </p>
-    <p>
-      <%= f.label :length, "Length in seconds" %><br />
-      <%= f.text_field :length %>
-    </p>
-    <p>
-      <%= link_to_function 'Author', "findUser('movie[user_name]')" %><br />
-      <%= f.text_field :user_name, {:value => @movie.get_user} %>
-    </p>
-    <p>
-      <%= f.label :file %><br />
-      <%= f.select :file_id, DataFile.movies.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
-    </p>
-    <p>
-      <%= f.label :preview_id %><br />
-      <%= f.select :preview_id, @movie.all_files.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
-    </p>
-    <p>
-      <%= f.label :picture %><br />
-      <%= f.file_field :picture %>
-    </p>
-    <p>
-      <%= f.submit 'Save' %>
-    </p>
+  <% if @movie.file %>
+    <%= link_to "View File", edit_data_file_path(@movie.file), class: 'button tiny' %>
   <% end %>
-</div>
+
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.text_field :name, { value: @movie.file.to_s } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :category_id %>
+    <%= f.select :category_id, Category.ordered.collect { |c| ["#{c.domains[c.domain]} - #{c}", c.id] } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :content %>
+    <%= f.text_field :content %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :format %>
+    <%= f.text_field :format %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :length, "Length in seconds" %>
+    <%= f.text_field :length %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :user_name, "Author" %>
+    <%= f.text_field :user_name, { value: @movie.get_user } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :file %>
+    <div class="inputs">
+      <%= f.select :file_id, DataFile.movies.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>  
+    </div>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :preview_id %>
+    <%= f.select :preview_id, @movie.all_files.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :picture %>
+    <%= f.file_field :picture %>
+  </div>
+
+  <div class="controls">
+    <%= f.submit 'Save' %>
+  </div>
+<% end %>

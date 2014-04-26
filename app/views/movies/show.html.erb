@@ -1,32 +1,26 @@
-<div class="box">
-  <h2>
-    <%= namelink @movie %>
-  </h2>
-  <%= render :partial => "movie", :object => @movie %>
+<div class="movie-full">
+  <h1 class="fancy">
+    <span><%= namelink @movie %></span>
+  </h1>
+
+  <%= render partial: "movie", object: @movie %>
 
   <% if @movie.preview %>
-    <div class="nbox wide center">
+    <div class="player">
       <%= javascript_include_tag 'flowplayer' %>
+
       <script>
-        flowplayer("player", "/flash/flowplayer-3.1.3.swf",
-        {
-        clip:
-        {
-        autoPlay: false,
-        autoBuffering: false
-        }
+        flowplayer("player", "/flash/flowplayer-3.1.3.swf", {
+          clip: {
+            autoPlay: false,
+            autoBuffering: false
+          }
         });
       </script>
-      <a
-        href="<%= @movie.preview.url %>"
-        style="display:block;width:520px;height:330px"
-        id="player" class="centered">
-      </a>
 
-      <p>
-        This is a low quality version. Please download better version from above. <br />
-        We recommend <%= link_to "VLC Player", "http://www.videolan.org/vlc/" %> for movie playback.
-      </p>
+      <a id="player" href="<%= @movie.preview.url %>"></a>
+
+      <p>This is a low quality version. Please download better version from above.</p>
     </div>
   <% end %>
 </div>
