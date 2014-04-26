@@ -1,26 +1,24 @@
-<h1>New file</h1>
+<h1 class="title">New File</h1>
 
-<div class="wide box">
-  <%= form_for @file, :html => { :multipart => true } do |f| %>
-    <%= f.error_messages %>
+<%= form_for @file, html: { multipart: true, class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @file.errors.full_messages %>
 
-    <p>
-      <%= f.label :name %><br />
-      <%= f.file_field :name %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.file_field :name %>
+  </div>
 
-    <p>
-      <%= f.label :description %><br />
-      <%= f.text_field :description %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
 
-    <p>
-      <%= f.label :directory_id %><br />
-      <%= f.select :directory_id, Directory.all.collect{|c| ["#{c.path} - #{c.name}", c.id]} %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :directory_id %>
+    <%= f.select :directory_id, Directory.all.collect{|c| ["#{c.path} - #{c.name}", c.id]} %>
+  </div>
 
-    <p>
-      <%= f.submit 'Create' %>
-    </p>
-  <% end %>
-</div>
+  <div class="controls">
+    <%= f.submit 'Create File' %>
+  </div>
+<% end %>

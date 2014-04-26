@@ -10,3 +10,37 @@
     margin: em(20) 0;
   }
 }
+
+/*
+  Files List
+*/
+
+#files {
+
+  .file {
+    @include span-columns(12);
+    padding-top: em(20);
+    margin-bottom: em(20);
+    position: relative;
+    border-top: em(3) solid $light-gray;
+
+    .actions {
+      position: absolute;
+      top: em(20);
+      right: 0;
+    }
+
+    .comments {
+      float: right;
+
+      i {
+        margin-right: em(10);
+      }
+    }
+  }
+
+  .controls {
+    @include span-columns(12);
+    margin-top: em(20);
+  }
+}
