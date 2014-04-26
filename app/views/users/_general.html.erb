@@ -42,7 +42,9 @@
 
   <% if @user.profile.achievements and !@user.profile.achievements.empty? %>
     <h4>Achievements</h4>
-    <%= @user.profile.achievements_parsed.html_safe %>
+    <div class="achievements">
+      <%= @user.profile.achievements_parsed.html_safe %>  
+    </div>
   <% end %>
 
   <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: @user }, { class: 'button tiny' } %>

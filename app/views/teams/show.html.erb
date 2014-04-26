@@ -42,8 +42,10 @@
       </div>
 
       <div class="tab" id="members">
-        <h3>Current Members</h3>
-        <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.distinct, blacklist: false, comment: true } %>
+        <% if @team.teamers.active.ordered.distinct.length > 0 %>
+          <h3>Current Members</h3>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.distinct, blacklist: false, comment: true } %>
+        <% end %>
 
         <% if @team.teamers.past.distinct.length > 0 %>
           <h3>Past Members</h3>

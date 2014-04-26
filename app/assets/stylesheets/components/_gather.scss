@@ -106,7 +106,6 @@
 
   .data {
     @include span-columns(4);
-    max-height: em(400);
     overflow-y: scroll;
     padding-bottom: em(20);
 

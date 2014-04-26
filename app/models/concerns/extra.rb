@@ -32,7 +32,6 @@ module Extra
     def move_up(scope, column = "position")
       n = 0
       objects = self.class.all(conditions: scope, order: column)
-      binding.pry
       objects.each do |item|
         if item.id == id and n > 0
           old_position = item.read_attribute(:column)
@@ -46,7 +45,6 @@ module Extra
     def move_down(scope, column = "position")
       n = 0
       objects = self.class.all(conditions: scope, order: column)
-      binding.pry
       objects.each do |item|
         if item.id == id and n < (objects.length-1)
           old_position = item.read_attribute(:column)

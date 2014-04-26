@@ -1,52 +1,52 @@
-<div class="box wide">
-  <%= form_for @server do |f| %>
-    <%= f.error_messages %>
+<%= form_for @server, html: { class: 'server square' } do |f| %>
+  <%= f.error_messages %>
 
-    <div class="left equal">
-      <p>
-        <%= f.label :dns %><br />
-        <%= f.text_field :dns %>
-      </p>
-      <p>
-        <%= f.label :ip %> :
-        <%= f.label :port %><br />
-        <%= f.text_field :ip, :size => 15 %>
-        <%= f.text_field :port, :size => 5 %>
-      </p>
-      <p>
-        <%= f.label :rcon %><br />
-        <%= f.text_field :rcon %>
-      </p>
-      <p>
-        <%= f.label :password %><br />
-        <%= f.text_field :password %>
-      </p>
+  <div class="fields horizontal">
+    <%= f.label :dns %>
+    <%= f.text_field :dns %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :ip, "IP:Port" %>
+    <div class="inputs">
+      <div class="ip">
+        <%= f.text_field :ip %>
+      </div>
+      <div class="port">
+        <%= f.text_field :port %>
+      </div>      
     </div>
-    <div class="right equal">
-      <p>
-        <%= f.label :name %><br />
-        <%= f.text_field :name %>
-      </p>
-      <p>
-        <%= f.label :description %><br />
-        <%= f.text_field :description %>
-      </p>
-      <p>
-        <%= f.label :irc %><br />
-        <%= f.text_field :irc %>
-      </p>
-      <p>
-        <%= f.label :domain %><br />
-        <%= f.select :domain, @server.domains.invert %>
-      </p>
-      <p>
-        <%= f.label :official, "Available for ENSL officials?" %><br />
-        <%= f.check_box :official %>
-      </p>
-    </div>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :rcon %>
+    <%= f.text_field :rcon %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :password %>
+    <%= f.text_field :password %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :irc %>
+    <%= f.text_field :irc %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :domain %>
+    <%= f.select :domain, @server.domains.invert %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :official, "Available for officials?" %>
+    <%= f.check_box :official %>
+    <%= f.label :official, class: 'checkbox' %>
+  </div>
 
-    <p class="clear">
-      <%= f.submit 'Save' %>
-    </p>
-  <% end %>
-</div>
+  <div class="controls">
+    <%= f.submit 'Save' %>
+  </div>
+<% end %>

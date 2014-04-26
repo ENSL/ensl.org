@@ -87,6 +87,10 @@
       }
     }
 
+    .achievements {
+      margin-bottom: em(20);
+    }
+
     tbody td {
       &:first-child,
       &:nth-child(2) {
