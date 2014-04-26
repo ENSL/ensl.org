@@ -1,0 +1,32 @@
+/*
+  Issues List
+*/
+
+table.issues {
+
+  .date {
+    width: 25%;
+  }
+
+  .title {
+    width: 35%;
+  }
+
+  .assigned,
+  .author {
+    width: 15%;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: right;
+  }
+}
+
+/*
+  Issues Page
+*/
+
+#issue {
+  
+}
