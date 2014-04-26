@@ -129,6 +129,10 @@ table.brackets {
     table {
       margin: 0;
     }
+
+    > a {
+      padding-left: em(10);
+    }
   }
 
   .bracket {
@@ -188,6 +192,144 @@ table.brackets {
     .result {
       width: 50%;
       text-align: right;
+    }
+  }
+}
+
+/*
+  Contest Form Page
+*/
+
+#contest.contest-manage {
+
+  table.maps {
+
+    .name {
+      width: 50%;
+    }
+
+    .download {
+      width: 40%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  table.brackets-list {
+    width: 100%;
+
+    .bracket,
+    .slots {
+      width: 45%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  table.weeks {
+
+    .name {
+      width: 30%;
+    }
+
+    .date,
+    .map1,
+    .map2 {
+      width: 20%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  #matches {
+    margin: 0;
+  }
+
+  table.matches {
+
+    .team {
+      width: 50%;
+    }
+
+    .date {
+      text-align: left;
+      width: 20%;
+    }
+
+    .score {
+      width: 10%;
+    }
+
+    .actions {
+      width: 15%;
+      text-align: right;
+    }
+  }
+}
+
+/*
+  Contest List
+*/
+
+#contests {
+  @include span-columns(12);
+
+  div.current {
+    @include span-columns(12);
+    margin-bottom: em(20);
+
+    table {
+
+      .name {
+        width: 40%;
+      }
+
+      .date {
+        width: 20%;
+      }
+
+      .status {
+        width: 30%;
+      }
+
+      .actions {
+        width: 10%;
+        text-align: right;
+      }
+    }
+  }
+
+  div.previous {
+    @include span-columns(12);
+    margin-bottom: em(20);
+
+    table {
+
+      .name {
+        width: 40%;
+      }
+
+      .date {
+        width: 20%;
+      }
+
+      .winner {
+        width: 30%;
+      }
+      
+      .actions {
+        width: 10%;
+        text-align: right;
+      }
     }
   }
 }

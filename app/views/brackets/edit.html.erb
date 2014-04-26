@@ -1,28 +1,18 @@
-<h1>
-  Editing bracket
-</h1>
+<h1 class="title">Editing Bracket</h1>
 
 <div class="wide box">
   <%= form_for(@bracket) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @bracket.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
+    <%= render 'shared/errors', messages: @bracket.errors.full_messages %>
+
+    <div class="fields">
+      <%= f.label :slots %>
+      <%= f.text_field :slots %>
     </div>
 
-    <p>
-      <%= f.label :slots %><br />
-      <%= f.text_field :slots %>
-    </p>
+    <%= render partial: "bracket", locals: { bracket: @bracket } %>
 
-    <%= render :partial => "bracket", :locals => {:bracket => @bracket} %>
-
-    <p>
+    <div class="controls">
       <%= f.submit 'Update' %>
-    </p>
+    </div>
   <% end %>
 </div>
-
-<%= link_to 'Back', edit_contest_path(@bracket.contest) %>

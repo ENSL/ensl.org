@@ -3,6 +3,7 @@ en:
   articles_article_views: "Views"
   bans_create: "Ban was successfully created."
   bans_update: "Ban was successfully updated."
+  brackets_update: "Bracket was successfully updated."
   articles_create: "Article was successfully created."
   articles_update: "Article was successfully updated."
   articles_revert: "Article reverted to version: {{version}}"

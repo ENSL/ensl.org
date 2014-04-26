@@ -188,3 +188,19 @@
   margin-left: - em(20);
   width: $max-width + $container-padding*2;
 }
+
+/*
+  Gather Archive
+*/
+
+table.gathers {
+
+  .date {
+    width: 30%;
+  }
+
+  .team1,
+  .team2 {
+    width: 35%;
+  }
+}
