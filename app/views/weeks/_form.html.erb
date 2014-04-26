@@ -1,26 +1,26 @@
-<div class="wide box">
-  <%= form_for(@week) do |f| %>
-    <%= f.error_messages %>
-    <%= f.hidden_field :contest_id %>
+<h3><%= @week.contest if @week.contest %></h3>
 
-    <p>
-      <%= f.label :name %><br />
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= f.label :start_date %><br />
-      <%= f.date_select :start_date %>
-    </p>
-    <p>
-      <%= f.label :map1_id, "1st map" %><br />
-      <%= f.select :map1_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
-    </p>
-    <p>
-      <%= f.label :map2_id, "2nd map" %><br />
-      <%= f.select :map2_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
-    </p>
-    <p>
-      <%= f.submit 'Save' %>
-    </p>
-  <% end %>
-</div>
+<%= form_for @week, html: { class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @week.errors.full_messages %>
+  <%= f.hidden_field :contest_id %>
+
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :start_date %>
+    <%= f.date_select :start_date %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :map1_id, "1st map" %>
+    <%= f.select :map1_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :map2_id, "2nd map" %>
+    <%= f.select :map2_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+  </div>
+  <div class="controls">
+    <%= f.submit 'Save Week' %>
+  </div>
+<% end %>
