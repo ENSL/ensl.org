@@ -44,3 +44,47 @@
     margin-top: em(20);
   }
 }
+
+/*
+  Movies List
+*/
+
+#movies {
+
+  .filters {
+    @include span-columns(12);
+    margin-bottom: em(20);
+  }
+}
+
+table.movie {
+
+  .controls {
+    @include span-columns(12);
+    margin: em(20) 0;
+  }
+}
+
+.movie-full {
+
+  .title {
+    display: none;
+  }
+
+  #player {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 0px;
+    padding-bottom: 56%;
+    padding-top: 50px;
+    margin-bottom: em(20);
+
+    object {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+    }
+  }
+}

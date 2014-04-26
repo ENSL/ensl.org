@@ -1,48 +1,51 @@
-<h1>
-  ENSL Movie Archive
-</h1>
+<div id="movies">
+  <h1 class="title">Movie Archive</h1>
+  <p>We recommend <%= link_to "VLC Player", "http://www.videolan.org/vlc/" %> for movie playback.</p>
 
-<p>
-  We recommend <%= link_to "VLC Player", "http://www.videolan.org/vlc/" %> for movie playback.
-</p>
-
-<%= form_tag movies_url(), :method => "get" do %>
-  Limit to:
-  <%= select_tag :filter, options_for_select({"5 stars" => 5, "4 stars" => 4, "3 stars" => 3, "2 stars" => 2, "1 stars" => 1}) %>
-  Order by:
-  <%= select_tag :order, options_for_select({"Ratings" => :ratings, "Date" => :date, "Author" => :author}) %>
-  <%= submit_tag "Filter"  %>
-<% end %>
-
-<br />
-
-<div id="movieTabs">
-  <ul id="movieTabs-nav" class="tabs">
-    <% Category.domain(Category::DOMAIN_MOVIES).ordered.each do |cat| %>
-      <li>
-        <a href="#<%= cat.id %>"><%= cat %></a>
-      </li>
-    <% end %>
-  </ul>
-
-  <div class="box wide tabs">
-    <% Category.domain(Category::DOMAIN_MOVIES).each do |cat| %>
-      <div class="tab" id="<%= cat.id %>">
-        <div id="movieList">
-          <% @movies.each do |m| %>
-            <% next if m.category != cat %>
-            <%= render :partial => "movie", :object => m %>
-          <% end %>
-        </div>
+  <div class="filters">
+    <%= form_tag movies_url, method: "get" do %>
+      <div class="fields">
+        <%= select_tag :filter, options_for_select({"5 stars" => 5, "4 stars" => 4, "3 stars" => 3, "2 stars" => 2, "1 stars" => 1}) %>  
+      </div>
+      
+      <div class="fields">
+        <%= select_tag :order, options_for_select({"Ratings" => :ratings, "Date" => :date, "Author" => :author}) %>  
+      </div>
+      
+      <div class="controls">
+        <%= submit_tag "Filter" %>  
       </div>
     <% end %>
   </div>
+
+  <div id="movie" class="tabbed">
+    <ul id="movie-nav" class="tabs">
+      <% Category.domain(Category::DOMAIN_MOVIES).ordered.each do |cat| %>
+        <li>
+          <a href="#<%= cat.id %>"><%= cat %></a>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="tabbed-contents">
+      <% Category.domain(Category::DOMAIN_MOVIES).each do |cat| %>
+        <div class="tab" id="<%= cat.id %>">
+          <% @movies.each do |m| %>
+            <% next if m.category != cat %>
+            <%= render partial: "movie", object: m %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    new Yetii({
+      id: 'movie'
+    });
+  </script>
+
+  <% if cuser and DataFile.new(directory_id: Directory::MOVIES).can_create? cuser %>
+    <%= link_to "New Movie", { controller: "data_files", action: "new", id: Directory::MOVIES }, { class: 'button' } %>
+  <% end %>
 </div>
-
-<script type="text/javascript">
-  var tabber1 = new Yetii({id: 'movieTabs'});
-</script>
-
-<% if cuser and DataFile.new(:directory_id => Directory::MOVIES).can_create? cuser %>
-  <%= link_to "New Movie", :controller => "data_files", :action => "new", :id => Directory::MOVIES %>
-<% end %>

@@ -1,44 +1,34 @@
-<div class="wide box sub">
-  <table id="movie">
-    <tr>
-      <td>
-        <br />&nbsp;<br />
-        <% if movie.picture %>
-          <%= image_tag movie.picture.url, :class => "centered" %>
-        <% end %>
-      </td>
+<table class="movie">
+  <tr>
+    <td>
+      <% if movie.picture %>
+        <%= image_tag movie.picture.url, :class => "centered" %>
+      <% end %>
+    </td>
 
-      <td>
-        <h3 class="center">
-          <%= namelink movie %>
-        </h3>
+    <td>
+      <h3 class="title"><%= namelink movie %></h3>
+      <%= cascade movie, ["content", "format", ["Author", :user], "length_s", ["Views", "view_count"], ["Date", "file.created_at"]] %>
 
-        <%= cascade movie, ["content", "format", ["Author", :user], "length_s", ["Views", "view_count"], ["Date", "file.created_at"]] %>
-
-        <% (params[:action] == "show" ? movie.all_files : [movie.file]).each do |file| %>
-          <p>
-            <b>File: </b> <%= link_to File.basename(file.name.to_s), file.url %>
-        </p>
+      <% (params[:action] == "show" ? movie.all_files : [movie.file]).each do |file| %>
+        <b>File: </b> <%= link_to File.basename(file.name.to_s), file.url %>
         <ul>
           <li>
-            <b>MD5:</b> <%= file.md5_s %>
-        </li>
-        <li>
-          <b>Size:</b> <%= file.size_s %> MB
-        </li>
-      </ul>
-    <% end %>
+            <strong>MD5:</strong> <%= file.md5_s %>
+          </li>
+          <li>
+            <strong>Size:</strong> <%= file.size_s %> MB
+          </li>
+        </ul>
+      <% end %>
 
-    <% if cuser and movie.can_update? cuser %>
-      <p>
-        <%= link_to 'Edit', edit_movie_path(movie) %> |
-        <%= link_to 'Make a Preview', :action => "preview", :id => movie %> |
-        <%= link_to 'Destroy', movie, :confirm => 'Are you sure?', :method => :delete %>
-      </p>
-    <% end %>
-  </td>
-</tr>
-  </table>
-  <div class="clear">
-  </div>
-</div>
+      <% if cuser and movie.can_update? cuser %>
+        <div class="controls">
+          <%= link_to 'Edit', edit_movie_path(movie), class: 'button tiny' %>
+          <%= link_to 'Make a Preview', { action: "preview", id: movie }, class: 'button tiny' %>
+          <%= link_to 'Destroy', movie, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+</table>
