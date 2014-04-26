@@ -1,21 +1,25 @@
-<div class="data players">
-  <h4>Signed Up</h4>
+<div class="gather-columns">
+  <div class="data players">
+    <h4>Signed Up</h4>
 
 
-  <ul id="gatherers">
-    <% @gather.gatherers.each do |gatherer| %>
-      <li>
-        <%= flag gatherer.user.country %>
-        <%= namelink gatherer.user %>
-        <% if cuser and cuser.admin? %>
-          <%= link_to gatherer, method: :delete, class: 'delete' do %>
-            <%= icon 'times' %>
+    <ul id="gatherers">
+      <% @gather.gatherers.each do |gatherer| %>
+        <li>
+          <%= flag gatherer.user.country %>
+          <%= namelink gatherer.user %>
+          <% if cuser and cuser.admin? %>
+            <%= link_to gatherer, method: :delete, class: 'delete' do %>
+              <%= icon 'times' %>
+            <% end %>
           <% end %>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <%= render partial: 'votes' %>
 </div>
 
-<%= render partial: 'votes' %>
 <%= render partial: 'status' %>
+  
