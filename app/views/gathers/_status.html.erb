@@ -48,18 +48,22 @@
     </p>
 
   <% elsif @gather.status == Gather::STATE_FINISHED and @gather.server %>
-    Gather finished, join the
-    <% if @gather.server and @gather.server.ip and @gather.server.password %>
-      <%= link_to "Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}" %>
-    <% else %>
-      Server
-    <% end %>
-    and TS3. <br>
+    <p>Gather finished, join the Server and TeamSpeak 3.</p>
     
-    Maps: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br>
-    Server: <% if @gather.server %>
-    <%= @gather.server %>
-    (<%= @gather.server.ip %>:<%= @gather.server.port %> ; password = <%= if @gather.server.password then @gather.server.password else "<Password not specified>" end %>)
+    <p>
+      <strong>Maps</strong>: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br>
+      <strong>Server</strong>: 
+      <% if @gather.server %>
+        <%= @gather.server %>
+        (<%= @gather.server.ip %>:<%= @gather.server.port %> ; 
+        password = <%= if @gather.server.password then @gather.server.password else "<Password not specified>" end %>)
+      <% end %>
+    </p>
+
+    <% if @gather.server and @gather.server.ip and @gather.server.password %>
+      <p>
+        <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny' %>
+      </p>
     <% end %>
   <% end %>
 

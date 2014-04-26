@@ -102,27 +102,40 @@
 
 #gather-area {
   @include span-columns(12);
-  margin-top: em(20);
+
+  $column-border-width: em(15);
+  $column-border-radius: em(5);
+
+  .gather-columns {
+    @include span-columns(12);
+    @include row(table);
+    margin-bottom: em(20);
+    margin-left: - $column-border-width;
+    width: $max-width - ($column-border-width*2);
+  }
 
   .data {
     @include span-columns(4);
+    @include pad;
+    border-radius: $column-border-width + $column-border-radius;
     overflow-y: scroll;
     padding-bottom: em(20);
+    background: $light-gray;
+    padding: em(20);
+    border: $column-border-width solid white;
 
     h4 {
       padding-bottom: em(20);
+      text-align: center;
     }
 
     &:nth-child(3) {
+      @include reset-display;
       @include omega;
     }
 
     ul {
       margin-bottom: em(10);
-
-      li {
-        margin-bottom: em(5);
-      }
     }
   }
 
@@ -142,6 +155,8 @@
 
 #gather-stats {
   @include span-columns(12);
+  display: block;
+  clear: both;
   padding: em(20) 0;
   margin: em(20) 0;
   border-top: em(2) solid $light-gray;
@@ -153,6 +168,10 @@
     right: 0;
     margin: 0;
     position: absolute;
+  }
+
+  p {
+    @include clearfix;
   }
 }
 

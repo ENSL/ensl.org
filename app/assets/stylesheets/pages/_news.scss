@@ -100,3 +100,40 @@ form.article {
     }
   }
 }
+
+/*
+  Articles Page
+*/
+
+#articles {
+  @include span-columns(12);
+
+  h3 {
+    @include span-columns(12);
+    margin-top: 1em;
+  }
+
+  .article-list {
+    @include span-columns(12);
+    margin-bottom: em(10);
+
+    .new {
+      @extend .highlight;
+      margin-right: em(10);
+    }
+
+    .title {
+      @include span-columns(6);
+    }
+
+    .meta {
+      @include span-columns(6);
+      @include omega;
+      text-align: right;
+    }
+  }
+
+  .button.new {
+    margin-top: em(20);
+  }
+}
