@@ -1,4 +1,8 @@
 Ensl::Application.routes.draw do
+  %w(403 404 422 500).each do |code|
+    get code, to: 'errors#show', code: code
+  end
+
 	root to: "articles#news_index"
 
 	resources :articles do
