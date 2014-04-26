@@ -1,29 +1,31 @@
-<h1>Listing issues</h1>
+<h1 class="title">Listing Issues</h1>
 
-<div id="issueTabs">
-  <ul id="issueTabs-nav" class="tabs">
+<div id="issues" class="tabbed">
+  <ul id="issues-nav" class="tabs">
     <li><a href="#open">Open</a></li>
     <li><a href="#solved">Solved</a></li>
     <li><a href="#rejected">Rejected</a></li>
   </ul>
 
-  <div class="box wide tabs">
+  <div class="tabbed-contents">
     <div class="tab" id="open">
-      <%= render :partial => "list", :locals => {:issues => @open} %>
+      <%= render partial: "list", locals: { issues: @open } %>
     </div>
 
     <div class="tab" id="solved">
-      <%= render :partial => "list", :locals => {:issues => @solved} %>
+      <%= render partial: "list", locals: { issues: @solved } %>
     </div>
 
     <div class="tab" id="rejected">
-      <%= render :partial => "list", :locals => {:issues => @rejected} %>
+      <%= render partial: "list", locals: { issues: @rejected } %>
     </div>
   </div>
 </div>
 
-<%= link_to 'New issue', new_issue_path %>
+<%= link_to 'New Issue', new_issue_path, class: 'button' %>
 
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'issueTabs'});
+  new Yetii({
+    id: 'issues'
+  });
 </script>
