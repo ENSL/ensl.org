@@ -1,40 +1,32 @@
-<h1>Editing: <%= h @contester.team.name %> in <%= h @contester.contest.name %></h1>
+<div class="contester">
+  <h1>Editing: <%= h @contester.team.name %></h1>
+  <h3 class="title"><%= h @contester.contest.name %></h3>
 
-<div class="wide box">
-  <%= form_for(@contester) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @contester.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
+  <%= form_for @contester, html: { class: 'square' } do |f| %>
+    <%= render 'shared/errors', messages: @contester.errors.full_messages %>
+
+    <div class="fields horizontal">
+      <%= f.label :extra, "Extra Points" %>
+      <%= f.text_field :extra %>
     </div>
-
-    <p>
-      <%= f.label :extra, "Extra Points" %><br />
-      <%= f.text_field :extra, :size => 5 %>
-    </p>
-    <p>
-      <%= f.label :score %><br />
-      <%= f.text_field :score, :size => 5 %>
-    </p>
-    <p>
-      <%= f.label :win %><br />
-      <%= f.text_field :win, :size => 5 %>
-    </p>
-    <p>
-      <%= f.label :loss %><br />
-      <%= f.text_field :loss, :size => 5 %>
-    </p>
-    <p>
-      <%= f.label :draw %><br />
-      <%= f.text_field :draw, :size => 5 %>
-    </p>
-    <p>
+    <div class="fields horizontal">
+      <%= f.label :score %>
+      <%= f.text_field :score %>
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :win %>
+      <%= f.text_field :win %>
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :loss %>
+      <%= f.text_field :loss %>
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :draw %>
+      <%= f.text_field :draw %>
+    </div>
+    <div class="controls">
       <%= f.submit 'Update' %>
-    </p>
+    </div>
   <% end %>
 </div>
-
-<%= link_to 'Show', @contester %> |
-<%= link_to 'Back', @contester.contest %>
