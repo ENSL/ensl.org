@@ -48,11 +48,11 @@ $base-border-radius: em(5);
 
 $red: #de8650;
 $green: darken(#68cc90, 10);
-$blue: darken(#0A8FC8, 10);
+$blue: #3379A9;
 $gold: #FFD700;
 
-$dark-blue: darken(#0072A6, 10);
-$deep-blue: darken(#12526E, 10);
+$dark-blue: darken($blue, 15);
+$deep-blue: darken($dark-blue, 15);
 $dark-gray: #21262A;
 
 $medium-gray: #2F383D;
@@ -66,8 +66,8 @@ $light-green: #1f7f5c;
 $base-body-color: white;
 $base-font-color: $dark-gray;
 $base-accent-color: $blue;
-$base-link-color: #285258;
-$hover-link-color: darken($base-accent-color, 15);
+$base-link-color: $base-accent-color;
+$hover-link-color: lighten($base-accent-color, 15);
 $base-border-color: $light-gray;
 
 $error-color: $light-red;
@@ -75,14 +75,6 @@ $notice-color: $light-yellow;
 $success-color: $light-green;
 
 $background-primary: $medium-gray;
-$background-secondary: #ece9e1;
-$background-tertiary: #e2dfd8;
-
-$text-primary: #232323;
-$text-secondary: #888888;
-$text-tertiary: #666666;
-
-$link-primary: #285258;
 
 $navbar-primary: $blue;
 $navbar-secondary: $light-blue;
@@ -103,12 +95,6 @@ $input-border-width: em(2);
 $input-border-colour: darken($light-gray, 10%);
 $input-padding: em(11);
 $input-border-radius: $base-border-radius;
-
-$input-dark-background-colour: $medium-gray;
-$input-dark-border-colour: $light-gray;
-$input-dark-border-width: em(2);
-$input-dark-border-hover-colour: $blue;
-$input-dark-border-focus-colour: $green;
 
 $button-primary: $blue;
 $button-secondary: $green;

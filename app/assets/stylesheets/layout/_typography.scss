@@ -51,6 +51,7 @@ p {
 a {
   color: $base-link-color;
   text-decoration: none;
+  font-weight: 600;
   @include transition(color 0.1s linear);
 
   &:hover {

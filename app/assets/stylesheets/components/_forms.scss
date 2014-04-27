@@ -209,39 +209,6 @@ form {
   }
 }
 
-form.dark {
-  .fields {
-    input {
-      color: white;
-      background: $input-dark-background-colour;
-      border: $input-dark-border-colour solid $input-dark-border-width;
-
-      &:hover {
-        border: $input-dark-border-width solid $input-dark-border-hover-colour;
-      }
-
-      &:focus {
-        border: $input-dark-border-width solid $input-dark-border-focus-colour;
-      }
-
-      &:-webkit-autofill {
-        -webkit-text-fill-color: white !important;
-        -webkit-box-shadow: 0 0 0px 1000px $input-dark-background-colour inset;
-      }
-    }
-  }
-
-
-  .controls {
-    margin-bottom: 20px;
-
-    button,
-    input {
-      background-color: $dark-blue;
-    }
-  }
-}
-
 form.square {
   @include span-columns(12);
   margin: em(20) 0;
