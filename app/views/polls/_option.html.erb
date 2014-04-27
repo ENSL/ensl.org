@@ -1,8 +1,15 @@
-<div class="option">
-  <p>
-    <%= f.hidden_field :poll_id %>
-    <%= f.text_field :option %>
-    <%= f.check_box :_destroy %>
-    <%= link_to_function "remove", "$(this).up('.option').remove()" %>
-  </p>
+<div class="fields horizontal">
+  <%= f.label :option, "Question" %>
+  <div class="inputs">
+    <div class="question">
+      <%= f.hidden_field :poll_id %>
+      <%= f.text_field :option %>
+    </div>
+      
+    <div class="destroy">
+      <%= f.check_box :_destroy %>
+      <%= f.label :_destroy, class: 'checkbox' %>
+      <%= f.label :_destroy, "Remove", class: 'remove' %>
+    </div>
+  </div>
 </div>

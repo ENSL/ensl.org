@@ -145,6 +145,7 @@ form {
       font-family: $open-sans;
     }
 
+    .inputs label.checkbox,
     > label.checkbox {
       position: relative;
       width: em(40);
