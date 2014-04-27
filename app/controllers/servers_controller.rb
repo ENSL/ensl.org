@@ -66,8 +66,11 @@ class ServersController < ApplicationController
 
   def destroy
     raise AccessError unless @server.can_destroy? cuser
-    @server.destroy
-    redirect_to(servers_url)
+
+    if @server.destroy
+      flash[:notice] = t(:server_destroy)
+      redirect_to servers_url
+    end
   end
 
   private

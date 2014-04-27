@@ -1,5 +1,17 @@
 <h1>Listing teams</h1>
 <p>Teams with no current members are not displayed.</p>
+<p>Search for teams by name:</p>
+
+<%= form_tag(teams_path, method: 'get', class: 'square search') do %>
+  <%= hidden_field_tag :direction, params[:direction] %>
+  <%= hidden_field_tag :sort, params[:sort] %>
+  <div class="fields query">
+    <%= text_field_tag :search, params[:search] %>
+  </div>
+  <div class="controls">
+    <%= submit_tag "Search", name: nil %>
+  </div>
+<% end %>
 
 <div id="teams">
   <%= render partial: 'list', locals: { teams: @teams } %>
