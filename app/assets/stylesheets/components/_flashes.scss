@@ -5,6 +5,7 @@
 .flash {
   @include span-columns(12);
   margin-bottom: em(20);
+  font-weight: 600;
 
   &.notice {
     @include flash;
