@@ -36,3 +36,4 @@ Features:
 - [Florent Latombe](https://github.com/flatombe)
 - [Luke Barratt](https://github.com/lbarratt)
 - [Callum Barratt](https://github.com/cbarratt)
+- [Joseph Hutchins](https://github.com/taekwonjoe01)
