@@ -27,6 +27,7 @@ class PostsController < ApplicationController
       if @post.save
         flash[:notice] = t(:posts_create)
         format.js  { render }
+        format.html { return_to }
       else
         format.html { render :new }
       end

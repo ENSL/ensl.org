@@ -17,6 +17,7 @@
 
 <% if @server.can_update? cuser %>
   <%= link_to 'Edit Server', edit_server_path(@server), class: 'button' %>
+  <%= link_to 'Delete Server', @server, confirm: 'Are you sure?', method: :delete, class: 'button'  %>
   <% if @server.domain == Server::DOMAIN_HLTV %>
     <%= link_to 'Default Record', action: "default", id: @server, class: 'button' %>
   <% end %>
