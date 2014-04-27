@@ -41,4 +41,8 @@ table.striped > tbody {
   > tr:nth-child(2n) td {
     background-color: transparentize($light-blue, 0.9);
   }
+
+  .actions {
+    text-align: right;
+  }
 }
