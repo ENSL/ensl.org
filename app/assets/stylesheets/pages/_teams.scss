@@ -3,6 +3,8 @@
 */
 
 #teams {
+  @include span-columns(12);
+  
   table {
     table-layout: auto;
   }

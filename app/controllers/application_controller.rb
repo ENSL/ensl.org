@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Exceptions
+
   helper :all
   helper_method :cuser, :strip, :return_here
 
@@ -7,10 +9,6 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   respond_to :html, :js
-
-  include Exceptions
-
-  # Global methods
 
   def cuser
     @cuser ||= User.find(session[:user]) if session[:user]
@@ -37,20 +35,19 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_to_home
-    redirect_to :controller => "articles", :action => "news_index"
+    redirect_to controller: "articles", action: "news_index"
   end
 
-  def rescue_action(exception)
-    case exception
-    when AccessError
-      render :text => t(:access_denied), :layout => true
-    when Error
-      render :text => exception.message, :layout => true
-    when ActiveRecord::StaleObjectError
-      render :text => t(:application_stale)
-    else
-      super exception
-    end
+  rescue_from AccessError do |exception|
+    render 'errors/403', status: 403, layout: 'errors'
+  end
+
+  rescue_from Error do |exception|
+    render text: exception.message, layout: true
+  end
+
+  rescue_from ActiveRecord::StaleObjectError do |exception|
+    render text: t(:application_stale)
   end
 
   private
