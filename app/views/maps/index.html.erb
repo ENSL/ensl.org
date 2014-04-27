@@ -4,14 +4,14 @@
   <tr>
     <th>Name</th>
     <th>Download</th>
-    <th>Options</th>
+    <th></th>
   </tr>
 
   <% @maps.each do |map| %>
     <tr>
       <td><%= namelink map %></td>
       <td><%= h map.download %></td>
-      <td>
+      <td class="actions">
         <%= link_to icon('pencil'), edit_map_path(map) %>
         <%= link_to icon('times'), map, confirm: 'Are you sure?', method: :delete %>
       </td>
