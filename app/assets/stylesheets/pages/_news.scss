@@ -137,3 +137,31 @@ form.article {
     margin-top: em(20);
   }
 }
+
+/*
+  Admin Articles Page
+*/
+
+div.admin.articles {
+
+  .title {
+    width: 40%;
+  }
+
+  .category {
+    width: 20%;
+  }
+
+  .created {
+    width: 20%;
+  }
+
+  .author {
+    width: 10%;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: right;
+  }
+}

@@ -1,26 +1,26 @@
-<h1>Listing groups</h1>
+<h1 class="title">Listing Groups</h1>
 
-<table class="data">
+<table class="groups striped">
   <tr>
-    <th>Name</th>
-    <th>Created</th>
-    <th>Founder</th>
-    <th>Options</th>
+    <th class="name">Name</th>
+    <th class="created">Created</th>
+    <th class="founder">Founder</th>
+    <th class="actions"></th>
   </tr>
 
-  <% for group in @groups %>
-    <tr class="<%= cycle('even', 'odd') %>">
+  <% @groups.each do |group| %>
+    <tr>
       <td><%= link_to (h group.name), group %></td>
       <td><%= h group.created_at.strftime("%d %B %y") %></td>
       <td><%= link_to (h group.founder.username), group.founder %></td>
-      <td>
-        <%= link_to 'Edit', edit_group_path(group) %>
-        <%= link_to 'Destroy', group, :confirm => 'Are you sure?', :method => :delete %>
+      <td class="actions">
+        <%= link_to icon('pencil'), edit_group_path(group) %>
+        <% if group.can_destroy? cuser %>
+          <%= link_to icon('times'), group, confirm: 'Are you sure?', method: :delete %>
+        <% end %>
       </td>
     </tr>
   <% end %>
 </table>
 
-<br />
-
-<%= link_to 'New group', new_group_path %>
+<%= link_to 'New Group', new_group_path, class: 'button' %>

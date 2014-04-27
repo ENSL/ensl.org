@@ -1,28 +1,25 @@
-<h1 class="center">
-  <%=h @group.name %>
-</h1>
+<div id="group">
+  <h1><%=h @group.name %></h1>
+  <h3 class="title">Founder: <%=h @group.founder.username %></h3>
 
-<p>
-  <b>Founder:</b>
-  <%=h @group.founder.username %>
-</p>
-
-<table class="data">
-  <tr>
-    <th>Username</th>
-    <th>Real Name</th>
-    <th>SteamID</th>
-  </tr>
-
-  <% for user in @group.users %>
-    <tr class="<%= cycle('even', 'odd') %>">
-      <td><%=link_to (h user.username), user %></td>
-      <td><%=h user.firstname %> <%=h user.lastname %></td>
-      <td><%=h user.steamid %></td>
+  <table class="striped">
+    <tr>
+      <th>Username</th>
+      <th>Real Name</th>
+      <th>SteamID</th>
     </tr>
-  <% end %>
-</table>
 
-<% if cuser and cuser.admin? %>
-  <%= link_to 'Edit', edit_group_path(@group) %>
-<% end %>
+    <% @group.users.each do |user| %>
+      <tr>
+        <td><%=link_to (h user.username), user %></td>
+        <td><%=h user.firstname %> <%=h user.lastname %></td>
+        <td><%=h user.steamid %></td>
+      </tr>
+    <% end %>
+  </table>
+
+  <% if cuser and cuser.admin? %>
+    <%= link_to 'Edit Group', edit_group_path(@group), class: 'button' %>
+  <% end %>
+</div>
+  
