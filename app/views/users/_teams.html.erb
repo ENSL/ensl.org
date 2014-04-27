@@ -1,11 +1,9 @@
-<h3>
-  Team History
-</h3>
+<h3>Team History</h3>
 
-<table class="data">
+<table class="teams striped">
   <tr>
-    <th>Date Joined - Date Left</th>
-    <th>Team</th>
+    <th class="date">Date Joined - Date Left</th>
+    <th class="team">Team</th>
   </tr>
 
   <% @user.teamers.past.each do |teamer| %>
@@ -15,7 +13,7 @@
         -
         <%= longdate teamer.updated_at %>
       </td>
-      <td>
+      <td class="team">
         <%= namelink teamer.team %>
       </td>
     </tr>
