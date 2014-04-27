@@ -29,6 +29,7 @@ en:
   scores_recalc: "All scores recalculated."
   groups_added: "Group added to the list."
   groups_acl_update: "Group ACL updated."
+  groups_user_update: "Group member updated."
   forums_create: "Forum was successfully created."
   forums_update: "Forum was successfully updated."
   errors: "Errors: "

@@ -1,0 +1,57 @@
+/*
+  Groups List
+*/
+
+table.groups {
+
+  .name {
+    width: 50%;
+  }
+
+  .created {
+    width: 20%;
+  }
+
+  .founder {
+    width: 20%;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: right;
+  }
+}
+
+/*
+  Groups Page
+*/
+
+#group {
+
+  table.roles {
+
+    .name,
+    .username {
+      width: 20%;
+    }
+
+    .role {
+      width: 60%;
+    }
+
+    .fields {
+      margin: 0;
+      float: left;
+    }
+
+    .controls {
+      margin: 0;
+      float: right;
+
+      .remove {
+        margin-bottom: 0;
+        margin-right: 0;
+      }
+    }
+  }
+}

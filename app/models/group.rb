@@ -43,7 +43,7 @@ class Group < ActiveRecord::Base
   end
 
   def can_destroy? cuser
-    cuser and cuser.admin?
+    cuser and cuser.admin? and id != Group::ADMINS
   end
 
   def self.staff
