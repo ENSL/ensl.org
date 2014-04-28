@@ -95,21 +95,25 @@ header .banner {
       vertical-align: middle;
 
       .avatar {
-        @include span-columns(12);
-        height: em(135);
-        background: transparentize($light-gray, 0.5);
         margin: 0 em(20) 0 0;
         text-align: center;
-        border-radius: 75px;
+        border-radius: em(100);
+        padding: em(5);
         vertical-align: middle;
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%;
+        float: left;
+        height: 0;
 
         img {
-          padding: em(10);
-          float: left;
-          max-width: em(135);
+          background: transparentize($light-gray, 0.75);
           width: 100%;
-          height: auto;
-          border-radius: 75px;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          border-radius: em(100);
+          padding: em(5);
         }
       }
 

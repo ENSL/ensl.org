@@ -279,10 +279,16 @@ form.square {
   .controls {
     @include span-columns(9);
     @include shift(3);
+    font-weight: 400;
 
     &.inline {
       margin-left: 0;
       width: auto;
+    }
+
+    input[type=submit],
+    button {
+      font-weight: 400;
     }
   }
 }
