@@ -17,6 +17,7 @@
   border: 0;
   text-transform: uppercase;
   cursor: pointer;
+  font-weight: 400;
 
   &:hover {
     color: lighten($light-blue, 30);
