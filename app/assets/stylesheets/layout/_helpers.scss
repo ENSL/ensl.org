@@ -4,17 +4,17 @@
 
 img.flag {
   display: inline-block;
-  vertical-align: - em(6);
-  margin-right: em(10);
+  vertical-align: - 6px;
+  margin-right: 10px;
 }
 
 .actions-bottom {
   @include span-columns(12);
-  margin-top: em(20);
+  margin-top: 20px;
 }
 
 fieldset {
-  border: em(2) solid $light-gray;
+  border: 2px solid $light-gray;
 
   > br:first-child,
   > br:last-child {
@@ -22,7 +22,7 @@ fieldset {
   }
 
   legend {
-    padding: 0 em(10);
+    padding: 0 10px;
 
     &+br {
       display: none;

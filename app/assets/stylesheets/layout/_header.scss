@@ -4,17 +4,17 @@
 
 header .banner {  
   @include linear-gradient($dark-blue, $deep-blue);
-  height: em(295);
+  height: 250px;
 
   #logo {
     @include span-columns(9 of 12);
-    min-height: em(200);
+    min-height: 200px;
     position: relative;
 
     img {
-      height: em(200);
+      height: 180px;
       position: absolute;
-      top: em(20);
+      top: 15px;
       left: 0;
       z-index: 1;
     }
@@ -22,9 +22,8 @@ header .banner {
 
   #authentication {
     @include span-columns(3 of 12);
-    height: em(190);
-    margin: em(20) 0;
-    padding: em(20) 0;
+    margin-top: 10px;
+    padding: 10px 0;
     color: white;
 
     a {
@@ -35,30 +34,22 @@ header .banner {
       display: inline;
     }
 
-    &.admin {
-      margin-top: em(10);
-
-      .profile {
-        padding-top: em(20);
-      }
-    }
-
     .fields { 
       @include span-columns(12);
 
       input {
         @include span-columns(6);
-        margin-bottom: em(10);
+        margin-bottom: 10px;
       }
     }
 
     .controls {
-      margin-top: em(20);
+      margin-top: 10px;
       text-align: right;
 
       input {
         @include span-columns(12);
-        margin-bottom: em(10);
+        margin-bottom: 10px;
       }
 
       a {
@@ -87,7 +78,7 @@ header .banner {
         display: inline-block;
         width: 1em;
         text-align: center;
-        margin-right: em(10);
+        margin-right: 10px;
       }
     }
 
@@ -95,10 +86,10 @@ header .banner {
       vertical-align: middle;
 
       .avatar {
-        margin: 0 em(20) 0 0;
+        margin: 0 10px 0 0;
         text-align: center;
-        border-radius: em(100);
-        padding: em(5);
+        border-radius: 100px;
+        padding: 5px;
         vertical-align: middle;
         position: relative;
         width: 100%;
@@ -112,8 +103,8 @@ header .banner {
           height: 100%;
           position: absolute;
           left: 0;
-          border-radius: em(100);
-          padding: em(5);
+          border-radius: 100px;
+          padding: 5px;
         }
       }
 

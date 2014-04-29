@@ -4,13 +4,13 @@
 
 .breadcrumbs {
   @include span-columns(12);
-  margin-bottom: em(20);
+  margin-bottom: 20px;
 
   a {
     display: inline-block;
   }
 
   .fa {
-    margin: 0 em(10);
+    margin: 0 10px;
   }
 }

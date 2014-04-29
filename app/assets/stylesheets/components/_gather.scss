@@ -20,7 +20,7 @@
     @include span-columns(6);
 
     i {
-      margin-right: em(10);
+      margin-right: 10px;
     }
   }
 
@@ -30,7 +30,7 @@
     text-align: right;
 
     i {
-      margin-left: em(10);
+      margin-left: 10px;
     }
   }
 
@@ -38,17 +38,17 @@
     @include span-columns(12);
 
     .timestamp {
-      margin: 0 em(5) em(5);
+      margin: 0 5px 5px;
     }
   }
 
   .new-shout {
     @include span-columns(12);
-    margin: em(20) 0;
+    margin: 20px 0;
 
     .shout_input {
-      width: em(400);
-      margin-right: em(20);
+      width: 400px;
+      margin-right: 20px;
     }
 
     .fields,
@@ -61,14 +61,14 @@
 
 #gather-info {
   @include span-columns(12);
-  margin: em(20) 0;
-  border-bottom: em(2) solid $light-gray;
+  margin: 20px 0;
+  border-bottom: 2px solid $light-gray;
 
   .info {
     @include span-columns(4);
 
     h6 {
-      margin-bottom: em(10);
+      margin-bottom: 10px;
     }
 
     &:nth-child(3) {
@@ -80,13 +80,13 @@
     list-style-type: disc;
 
     li {
-      margin-left: em(20);
+      margin-left: 20px;
     }
   }
 
   .hide {
     @include span-columns(12);
-    padding: em(20) 0;
+    padding: 20px 0;
     text-align: center;
 
     a {
@@ -94,7 +94,7 @@
       float: none;
 
       i {
-        margin-right: em(10);
+        margin-right: 10px;
       }
     }   
   }
@@ -103,13 +103,13 @@
 #gather-area {
   @include span-columns(12);
 
-  $column-border-width: em(15);
-  $column-border-radius: em(5);
+  $column-border-width: 15px;
+  $column-border-radius: 5px;
 
   .gather-columns {
     @include span-columns(12);
     @include row(table);
-    margin-bottom: em(20);
+    margin-bottom: 20px;
     margin-left: - $column-border-width;
     width: $max-width - ($column-border-width*2);
   }
@@ -118,14 +118,13 @@
     @include span-columns(4);
     @include pad;
     border-radius: $column-border-width + $column-border-radius;
-    overflow-y: scroll;
-    padding-bottom: em(20);
+    padding-bottom: 20px;
     background: $light-gray;
-    padding: em(20);
+    padding: 20px;
     border: $column-border-width solid white;
 
     h4 {
-      padding-bottom: em(20);
+      padding-bottom: 20px;
       text-align: center;
     }
 
@@ -135,7 +134,7 @@
     }
 
     ul {
-      margin-bottom: em(10);
+      margin-bottom: 10px;
     }
   }
 
@@ -143,12 +142,12 @@
 
     .captain {
       color: $gold;
-      margin: 0 em(10);
+      margin: 0 10px;
     }
 
     .delete {
       display: inline-block;
-      padding: 0 em(10);
+      padding: 0 10px;
     }
   }
 }
@@ -157,14 +156,14 @@
   @include span-columns(12);
   display: block;
   clear: both;
-  padding: em(20) 0;
-  margin: em(20) 0;
-  border-top: em(2) solid $light-gray;
-  border-bottom: em(2) solid $light-gray;
+  padding: 20px 0;
+  margin: 20px 0;
+  border-top: 2px solid $light-gray;
+  border-bottom: 2px solid $light-gray;
   position: relative;
 
   .admin {
-    top: em(20);
+    top: 20px;
     right: 0;
     margin: 0;
     position: absolute;
@@ -183,9 +182,9 @@
   @include span-columns(12);
   @include flash;
 
-  padding: em(14);
+  padding: 14px;
   text-align: center;
-  margin-left: - em(20);
+  margin-left: - 20px;
   width: $max-width + $container-padding*2;
 }
 

@@ -3,49 +3,53 @@
 */
 
 .tabbed {
-  $tabs-border-width: em(1);
-  $tabs-border-colour: darken($light-gray, 10);
-  $tabs-padding-vertical: em(8);
-  $tabs-padding-horizontal: em(16);
+  $tabs-border-width: 1px;
+  $tabs-border-colour: lighten($light-blue, 40%);
+  $tabs-padding-horizontal: 16px;
+  $tabs-height: 35px;
 
   ul.tabs {
     @include span-columns(12);
     display: block;
     font-family: $montserrat;
-    height: em(40);
-    max-height: em(40);
+    height: $tabs-height;
+    max-height: $tabs-height;
     position: relative;
 
     li {
       float: left;
       display: block;
-      background-color: $blue;
 
       a {
         border: $tabs-border-width solid $tabs-border-colour;
         border-right: 0;
-        padding: $tabs-padding-vertical $tabs-padding-horizontal;
+        padding: 0 $tabs-padding-horizontal;
         float: left;
         display: block;
         color: white;
         font-weight: 400;
+        line-height: $tabs-height;
+        background-color: $blue;
 
         &:hover {
           cursor: pointer;
         }
       }
 
+      &:first-child a {
+        border-radius: $base-border-radius 0 0 0;
+      }
+
       &:last-child a {
         border-right: $tabs-border-width solid $tabs-border-colour;
+        border-radius: 0 $base-border-radius 0 0;
       }
 
       &.activeli {
         z-index: 100;
-        background-color: $light-blue;
 
         a {
-          padding-bottom: $tabs-padding-vertical + $tabs-border-width;
-          border-bottom: 0;
+          background-color: $light-blue;
         }
       }
     }
@@ -54,7 +58,8 @@
   .tabbed-contents {
     @include span-columns(12);  
     border: $tabs-border-width solid $tabs-border-colour;
-    padding: em(20);
+    border-radius: 0 $base-border-radius $base-border-radius $base-border-radius;
+    padding: 20px;
   }
 
   @for $i from 1 through $grid-columns {

@@ -25,9 +25,9 @@
   <div class="content">
     <div class="header">
       <div class="time">
-        <a name="post_<%= post.id %>">
+        <span id="post_<%= post.id %>">
           <%= longtime(post.created_at) %>
-        </a>
+        </span>
       </div>
       <div class="posts">
         <%= link_to "##{post.number(@posts, n)}", "#post_#{post.id}" %>

@@ -3,8 +3,8 @@
   .widget {
     @include span-columns(12);
     box-shadow: $content-shadow;
-    margin-bottom: em(30);
-    padding: em(20);
+    margin-bottom: $container-padding;
+    padding: 20px;
     background: white;
 
     h4 {
@@ -13,16 +13,17 @@
 
     .widget-content-wrapper {
       @include span-columns(12);
-      font-size: em(14);
+      font-size: 14px;
     }
 
     .separator {
       color: white;
       background: $blue;
-      padding: em(12) em(24);
+      padding: 0 20px;
       margin: 0 -20px;
-      margin-bottom: em(12);
+      margin-bottom: 12px;
       font-weight: 600;
+      line-height: 35px;
 
       a {
         color: white;
@@ -36,7 +37,7 @@
   }
 
   .calendar {
-    max-height: 500px;
+    max-height: 400px;
     overflow-x: scroll;
   }
 
@@ -47,7 +48,7 @@
 
     input {
       @include span-columns(12);
-      margin-bottom: em(10);
+      margin-bottom: 10px;
     }
   }
 
@@ -55,7 +56,7 @@
   .posts {
 
     ol {
-      margin-bottom: em(20);
+      margin-bottom: 20px;
 
       &:last-child {
         margin-bottom: 0;
@@ -66,7 +67,7 @@
   .poll {
     .question {
       @include span-columns(12);
-      margin-bottom: em(20);
+      margin-bottom: 20px;
 
       h5 {
         margin-bottom: 1em;

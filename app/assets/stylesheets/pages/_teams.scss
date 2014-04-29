@@ -38,7 +38,7 @@
     }
 
     .tabbed-contents {
-      margin-bottom: em(20);
+      margin-bottom: 20px;
     }
   }
 }
@@ -51,7 +51,7 @@
 
   .logo {
     @include span-columns(12);
-    margin: em(20) 0;
+    margin: 20px 0;
     text-align: center;
 
     img {
@@ -63,7 +63,7 @@
 
   .controls {
     @include span-columns(12);
-    margin: em(20) 0;
+    margin: 20px 0;
   }
 }
 

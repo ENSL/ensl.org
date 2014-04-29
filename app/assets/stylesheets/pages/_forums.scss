@@ -28,7 +28,11 @@ div#categories {
 
   .bullet {
     width: 10%;
-    background: image-url('layout/forum-category.png') center center no-repeat;
+    background: {
+      image: url('layout/forum-category.png');  
+      position: center center;
+      repeat: no-repeat;
+    }
 
     &.highlight {
       background-image: image-url('layout/forum-category-highlight.png');
@@ -37,7 +41,7 @@ div#categories {
 
   .forum {
     width: 45%;
-    padding-right: em(10);
+    padding-right: 10px;
   }
 
   .actions {
@@ -61,7 +65,7 @@ div#categories {
 
 #topics {
   table-layout: auto;
-  margin-bottom: em(40);
+  margin-bottom: 40px;
 
   .topic {
     width: 55%;
@@ -82,7 +86,7 @@ div#categories {
 }
 
 .statistics {
-  margin: em(20) 0;
+  margin: 20px 0;
 
   h4 {
     margin-bottom: 1em;
@@ -92,7 +96,7 @@ div#categories {
 #topic {
 
   .controls {
-    margin-top: em(20);
+    margin-top: 20px;
   }
 
   #reply {
@@ -106,16 +110,17 @@ div#categories {
 
 #posts {
   @include span-columns(12);
-  margin-top: em(20);
+  margin-top: 20px;
 
   .post {
     @include span-columns(12);
-    border-top: em(3) solid $light-gray;
-    padding: em(20) 0;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: transparentize($light-gray, 0.5);
+    border-radius: 5px;
 
     &:last-child {
-      border-bottom: em(3) solid $light-gray;
-      margin-bottom: em(40);
+      margin-bottom: 40px;
     }
 
     .avatar {
@@ -130,7 +135,7 @@ div#categories {
       .team {
         @include span-columns(12);
         text-align: center;
-        margin-bottom: em(10);
+        margin-bottom: 10px;
       }
 
       .admin {
@@ -145,17 +150,15 @@ div#categories {
       .text,
       .signature {
         @include span-columns(12);
-        padding: em(20) 0;
+        padding: 20px 0;
       }
 
       .text {
-        border-radius: $base-border-radius;
-        background: $light-gray;
-        margin-top: em(20);
-        padding: em(20);
+        margin-top: 20px;
 
         fieldset {
-          border-color: $light-blue;
+          border-color: darken($light-gray, 10);
+          border-radius: $base-border-radius;
         }
       }
     }
