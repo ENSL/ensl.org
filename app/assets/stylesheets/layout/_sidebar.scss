@@ -4,6 +4,7 @@
     @include span-columns(12);
     box-shadow: $content-shadow;
     margin-bottom: $container-padding;
+    border-radius: $base-border-radius;
     padding: 20px;
     background: white;
 
@@ -13,7 +14,7 @@
 
     .widget-content-wrapper {
       @include span-columns(12);
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .separator {

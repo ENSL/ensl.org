@@ -9,6 +9,7 @@ $navigation-height: 50px;
   font-family: $montserrat;
   height: $navigation-height;
   margin-top: - $navigation-height;
+  background: $blue;
   
   nav {
     @include outer-container;
@@ -16,20 +17,19 @@ $navigation-height: 50px;
 }
 
 ul.navigation {
+  z-index: 100;
   position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
-  float: left;
-  width: 100%;
+  float: right;
   background: transparent;
   max-width: $max-width;
   max-height: $navigation-height;
 
   > li {
     float: left;
-    width: (100%/7);
-    border-right: 1px solid transparent;
+    border-left: 1px solid $dark-blue;
 
     .count {
       position: absolute;
@@ -51,7 +51,7 @@ ul.navigation {
       font-size: 15px;
       height: $navigation-height;
       line-height: $navigation-height;
-      padding: 0 20px;
+      padding: 0 50px 0 20px;
     }
 
     > a {
@@ -69,23 +69,27 @@ ul.navigation {
           background-color: lighten($light-blue, 20);
         }
       }
+
+      &.gathers {
+        padding-right: 70px;
+      }
     }
 
     &:last-child {
-      border-right: 0;
+      border-right: 1px solid $dark-blue;
     }
 
     &.icon {
 
       i {
-        color: lighten($light-blue, 30);
+        color: white;
         max-height: $navigation-height;
         position: absolute;
         top: 0;
         right: 0;
-        font-size: 24px;
+        font-size: 18px;
         line-height: 1em;
-        padding: $navigation-height/4;
+        padding: $navigation-height/3;
       }
     }
 
@@ -126,6 +130,7 @@ ul.navigation {
               white-space: nowrap;
               display: block;
               color: $navbar-text;
+              padding: 0 20px;
             }
 
             &:hover a {

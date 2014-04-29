@@ -4,7 +4,7 @@
 
 div.article {
   @include span-columns(12);
-  border-bottom: 1px solid rgba(35, 35, 35, 0.1);
+  border-bottom: 3px solid $light-gray;
   padding-bottom: 20px;
 
   h1 {
@@ -14,10 +14,6 @@ div.article {
   .content {
     @include span-columns(12);
     margin-bottom: 40px;
-
-    * {
-      font-family: $open-sans !important;
-    }
 
     ul {
       @extend ul.disc;

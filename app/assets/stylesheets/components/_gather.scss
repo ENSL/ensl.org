@@ -174,20 +174,6 @@
 }
 
 /*
-  Gather Status
-*/
-
-#gather-status {
-  @include span-columns(12);
-  @include flash;
-
-  padding: 14px;
-  text-align: center;
-  margin-left: - 20px;
-  width: $max-width + $container-padding*2;
-}
-
-/*
   Gather Archive
 */
 

@@ -2,7 +2,9 @@
   <%= link_to "Forums", action: "index" %> <%= icon 'chevron-right' %> <%= namelink @forum %>
 </div>
 
-<%= render partial: 'controls', locals: { forum: @forum } %>
+<div class="topic-controls">
+  <%= render partial: 'controls', locals: { forum: @forum } %>  
+</div>
 
 <h2><%=h @forum.title %></h2>
 
