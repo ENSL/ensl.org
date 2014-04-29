@@ -7,7 +7,7 @@
     <%= will_paginate @posts %>
   <% end %>
 
-  <div class="controls">
+  <div class="topic-controls">
     <% if @newpost.can_create? cuser %>
       <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>
     <% end %>

@@ -16,7 +16,7 @@
 
 .comment {
   $comment-gutter: 1.4em;
-  $comment-image-padding: .7em;
+  $comment-image-padding: 3px;
   $comment-image-width: 4em;
   $comment-color: $base-font-color;
   $comment-background: $light-gray;
@@ -27,7 +27,7 @@
   width: 100%;
   margin-bottom: $base-line-height;
   padding-bottom: 1em;
-  border-bottom: 1px solid transparentize($comment-color, .9);
+  border-bottom: 1px solid $light-gray;
 
   .comment-image,
   .comment-content {

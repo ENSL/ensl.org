@@ -1,43 +1,44 @@
-<div class="links">
-  <h5><%= namelink(cuser) %></h5>
-  <ul>
-    <% if cuser.admin? %>
+<div class="logged">
+  <div class="links">
+    <ul>
+      <% if cuser.admin? %>
+        <li>
+          <%= link_to '/about/adminpanel', class: 'admin' do %>
+            Admin (<%= Issue.with_status(0).count  %>) <%= icon 'wrench' %>
+          <% end %>
+        </li>
+      <% end %>
       <li>
-        <%= link_to '/about/adminpanel', class: 'admin' do %>
-          <%= icon 'wrench' %> Admin (<%= Issue.with_status(0).count  %>)
+        <%= link_to edit_user_path(cuser) do %>
+          Account <%= icon 'user' %>
         <% end %>
       </li>
-    <% end %>
-    <li>
-      <%= link_to edit_user_path(cuser) do %>
-        <%= icon 'user' %> Account
-      <% end %>
-    </li>
-    <li>
-      <%= link_to "/users/agenda/#{cuser.id}" do %>
-        <%= icon 'calendar' %> Agenda
-      <% end %>
-    </li>
-    <li>
-      <%= link_to messages_path do %>
-        <%= icon 'envelope' %> Messages
-      <% end %>
-      <% if c = cuser.new_messages.count > 0 %>
-        (<%= cuser.new_messages.count %>)
-      <% end %>
-    </li>
-    <li>
-      <%= form_tag(controller: "users", action: "logout") do %>
-        <%= link_to "#", id: "logout" do %>
-          <%= icon 'key' %> Logout
+      <li>
+        <%= link_to "/users/agenda/#{cuser.id}" do %>
+          Agenda <%= icon 'calendar' %>
         <% end %>
-      <% end %>
-    </li>
-  </ul>
-</div>
+      </li>
+      <li>
+        <%= link_to messages_path do %>
+          Messages <%= icon 'envelope' %>
+        <% end %>
+        <% if c = cuser.new_messages.count > 0 %>
+          (<%= cuser.new_messages.count %>)
+        <% end %>
+      </li>
+      <li>
+        <%= form_tag(controller: "users", action: "logout") do %>
+          <%= link_to "#", id: "logout" do %>
+            Logout <%= icon 'key' %>
+          <% end %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
 
-<div class="profile">
-  <div class="avatar">
-    <%= image_tag cuser.profile.avatar.url %>
+  <div class="profile">
+    <div class="avatar">
+      <%= image_tag cuser.profile.avatar.url %>
+    </div>
   </div>
 </div>

@@ -3,12 +3,17 @@
 */
 
 #forums {
-  /*
-    Buttons
-  */
+  position: relative;
 
-  .controls {
-    @include span-columns(12);
+  .topic-controls {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: auto;
+
+    a:last-child {
+      margin-right: 0;
+    }
   }
 }
 
@@ -29,6 +34,7 @@ div#categories {
 
   .bullet {
     width: 10%;
+
     background: {
       image: url('layout/forum-category.png');  
       position: center center;
@@ -95,10 +101,7 @@ div#categories {
 }
 
 #topic {
-
-  .controls {
-    margin-top: 20px;
-  }
+  position: relative;
 
   #reply {
     display: none;

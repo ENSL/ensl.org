@@ -28,7 +28,7 @@ table#matches {
 */
 
 div#match {
-  $title-height: 75px;
+  $title-height: 100px;
 
   @include span-columns(12);
   border-bottom: 3px solid $light-gray;
@@ -109,12 +109,12 @@ div#match {
       }
 
       .score-1 {
-        padding-left: $title-height/3;
+        padding-left: $title-height/5;
         left: 0;
       }
       
       .score-2 {
-        padding-right: $title-height/3;
+        padding-right: $title-height/5;
         right: 0;
       }
     }

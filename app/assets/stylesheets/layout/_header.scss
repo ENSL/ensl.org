@@ -4,34 +4,45 @@
 
 header .banner {  
   @include linear-gradient($dark-blue, $deep-blue);
-  height: 250px;
+  height: 170px;
 
   #logo {
     @include span-columns(9 of 12);
-    min-height: 200px;
+    min-height: 220px;
     position: relative;
 
     img {
-      height: 180px;
+      height: 200px;
       position: absolute;
       top: 15px;
-      left: 0;
+      left: -40px;
       z-index: 1;
     }
   }
 
   #authentication {
     @include span-columns(3 of 12);
-    margin-top: 10px;
-    padding: 10px 0;
+    padding: 20px 0;
     color: white;
+
+    .logged {
+      padding-top: 10px;
+    }
 
     a {
       color: white;
+
+      &:hover {
+        color: $light-blue;
+      }
     }
 
     form {
       display: inline;
+    }
+
+    &.admin {
+      
     }
 
     .fields { 
@@ -62,38 +73,32 @@ header .banner {
       float: right;
     }
 
-    .links,
-    .profile {
-      @include span-columns(6);
-    }
-
     .links {
+      @include span-columns(7);
       position: relative;
 
-      h5 {
-        margin-bottom: 1em;
+      li {
+        text-align: right;
       }
 
       li i {
         display: inline-block;
         width: 1em;
         text-align: center;
-        margin-right: 10px;
+        margin: 0 10px;
       }
     }
 
     .profile {
+      @include span-columns(5);
       vertical-align: middle;
 
       .avatar {
-        margin: 0 10px 0 0;
         text-align: center;
-        border-radius: 100px;
-        padding: 5px;
         vertical-align: middle;
         position: relative;
         width: 100%;
-        padding-bottom: 100%;
+        padding-bottom: 96%;
         float: left;
         height: 0;
 
@@ -103,8 +108,8 @@ header .banner {
           height: 100%;
           position: absolute;
           left: 0;
-          border-radius: 100px;
-          padding: 5px;
+          border-radius: 5px;
+          padding: 3px;
         }
       }
 
