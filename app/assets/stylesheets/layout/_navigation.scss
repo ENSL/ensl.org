@@ -2,11 +2,13 @@
   Navigation
 */
 
+$navigation-height: 50px;
+
 #menu {
   @include span-columns(12);
   font-family: $montserrat;
-  height: em(60);
-  margin-top: - em(60);
+  height: $navigation-height;
+  margin-top: - $navigation-height;
   
   nav {
     @include outer-container;
@@ -22,35 +24,39 @@ ul.navigation {
   width: 100%;
   background: transparent;
   max-width: $max-width;
-  max-height: em(60);
+  max-height: $navigation-height;
 
   > li {
     float: left;
     width: (100%/7);
-    border-right: 0.1em solid transparent;
+    border-right: 1px solid transparent;
 
     .count {
-      float: right;
-      font-size: em(14);
-      border-radius: em(25);
+      position: absolute;
+      top: $navigation-height/2 - ($navigation-height/2)/2;
+      right: 12px;
+      border-radius: $navigation-height/2;
       background-color: $light-blue;
       display: inline-block;
       color: white;
-      line-height: em(14);
-      padding: em(5) em(8);
-      margin-top: - em(2);
+      line-height: $navigation-height/2;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: bold;
+      height: $navigation-height/2;
     }
 
     a {
       font-weight: 400;
+      font-size: 15px;
+      height: $navigation-height;
+      line-height: $navigation-height;
+      padding: 0 20px;
     }
 
     > a {
       width: 100%;
       color: white;
-      height: em(60);
-      line-height: em(16);
-      padding: em(22);
       float: left;
       position: relative;
       background-color: $navbar-primary;
@@ -73,14 +79,13 @@ ul.navigation {
 
       i {
         color: lighten($light-blue, 30);
-        max-height: 60px;
+        max-height: $navigation-height;
         position: absolute;
         top: 0;
         right: 0;
-        font-size: em(24);
+        font-size: 24px;
         line-height: 1em;
-        padding: em(12);
-        padding-right: em(14);
+        padding: $navigation-height/4;
       }
     }
 
@@ -98,7 +103,7 @@ ul.navigation {
           box-shadow: $content-shadow;
           display: block;
           position: absolute;
-          top: em(60);
+          top: $navigation-height;
           left: 0;
           min-width: 100%;
           background-color: $navbar-primary;
@@ -107,10 +112,10 @@ ul.navigation {
           margin: 0;
 
           li {
-            border-bottom: em(1) solid $navbar-secondary;
+            border-bottom: 1px solid $navbar-secondary;
 
             &:first-child {
-              border-top: em(1) solid $navbar-secondary;
+              border-top: 1px solid $navbar-secondary;
             }
 
             &:last-child {
@@ -120,9 +125,6 @@ ul.navigation {
             a {
               white-space: nowrap;
               display: block;
-              height: em(60);
-              line-height: em(16);
-              padding: em(22);
               color: $navbar-text;
             }
 

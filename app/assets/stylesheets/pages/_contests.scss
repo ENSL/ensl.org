@@ -4,7 +4,7 @@
 
 div#matches {
   @include span-columns(12);
-  margin: em(20) 0;
+  margin: 20px 0;
 }
 
 /*
@@ -12,7 +12,7 @@ div#matches {
 */
 
 table.contest {
-  margin-bottom: em(40);
+  margin-bottom: 40px;
 
   .fa-chevron-up {
     color: $light-green;
@@ -44,7 +44,7 @@ table.contest {
       text-align: right;
 
       i {
-        padding-left: em(5);
+        padding-left: 5px;
       }
     }
   }
@@ -74,7 +74,7 @@ table.contest {
 div.widget.contest {
 
   a.button {
-    margin: em(20) 0 0;
+    margin: 20px 0 0;
     text-align: center;
     width: 100%;
   }
@@ -93,7 +93,7 @@ div.standings {
 */
 
 table.brackets {
-  margin: em(20) 0 em(40) 0;
+  margin: 20px 0 40px 0;
   width: auto;
 
   td {
@@ -112,16 +112,16 @@ table.brackets {
   }
 
   .flag {
-    width: em(44);
+    width: 44px;
 
     img {
-      width: em(24);
-      margin-left: em(10);
+      width: 24px;
+      margin-left: 10px;
     }
   }
 
   .team {
-    padding: em(5) 0;
+    padding: 5px 0;
     background-color: $light-gray;
     border-right: 1px solid $medium-gray;
     clear: both;
@@ -131,13 +131,13 @@ table.brackets {
     }
 
     > a {
-      padding-left: em(10);
+      padding-left: 10px;
     }
   }
 
   .bracket {
-    padding: 0 em(10) 0 0;
-    width: em(158);
+    padding: 0 10px 0 0;
+    width: 158px;
   }
 
   .connector {
@@ -145,7 +145,7 @@ table.brackets {
   }
 
   > tbody > tr > td {
-    width: em(150);
+    width: 150px;
   }
 }
 
@@ -285,7 +285,7 @@ table.brackets {
 
   div.current {
     @include span-columns(12);
-    margin-bottom: em(20);
+    margin-bottom: 20px;
 
     table {
 
@@ -310,7 +310,7 @@ table.brackets {
 
   div.previous {
     @include span-columns(12);
-    margin-bottom: em(20);
+    margin-bottom: 20px;
 
     table {
 

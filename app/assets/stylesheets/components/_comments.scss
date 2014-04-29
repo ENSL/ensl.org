@@ -69,11 +69,11 @@
     }
 
     a.user {
-      margin-right: em(10);
+      margin-right: 10px;
     }
 
     a.team {
-      margin-left: em(10);
+      margin-left: 10px;
     }
 
     p {
@@ -84,12 +84,12 @@
       font-style: italic;
       font-size: .9em;
       color: $comment-detail-color;
-      margin-top: em(10);
+      margin-top: 10px;
     }
 
     .controls {
       position: absolute;
-      top: - em(5);
+      top: - 5px;
       right: 0;
     }
   }
@@ -101,7 +101,7 @@
 
 .comment-form {
   @include span-columns(12);
-  margin-bottom: em(20);
+  margin-bottom: 20px;
 
   h1,
   h5 {
@@ -110,6 +110,6 @@
   }
 
   .fields {
-    margin-bottom: em(20);
+    margin-bottom: 20px;
   }    
 }

@@ -2,13 +2,15 @@
   Forms
 */
 
+$input-height: 35px;
+
 form {
 
   .inline {
     float: left;
     display: inline-block;
     width: auto;
-    margin-bottom: em(20);
+    margin-bottom: 20px;
 
     input {
       margin-bottom: 0;
@@ -18,8 +20,8 @@ form {
   .fields {
     > .field_with_errors:first-child,
     > label {
-      padding: em(11) 0;
-      line-height: em(16);
+      padding: 9px 0;
+      line-height: $input-font-size;
     }
 
     > .field_with_errors {
@@ -40,14 +42,15 @@ form {
     }
 
     .select-wrapper {
-      $select-padding: em(7);
+      $select-padding: 7px;
+      $select-height: $input-height - 4px;
 
       border-radius: $input-border-radius;
       background-color: $input-primary;
       border: $input-border-colour solid $input-border-width;
       position: relative;
       display: inline-block;
-      margin-right: em(10);
+      margin-right: 10px;
       float: left;
       max-width: 100%;
 
@@ -59,13 +62,13 @@ form {
         display: block;
         width: auto;
         position: relative;
-        line-height: em(22);
+        line-height: $select-height/2 + 4px;
         vertical-align: middle;
-        max-height: em(36);
+        max-height: $select-height;
         margin-left: 0;
         border: 0;
         margin: 0;
-        padding: $select-padding em(50) $select-padding $input-padding;
+        padding: $select-padding ($select-height + 10) $select-padding $input-padding;
         font-size: $input-font-size;
         max-width: 100%;
 
@@ -88,9 +91,9 @@ form {
         top: 0;
         right: 0;
         text-align: center;
-        padding-top: em(6);
-        width: em(36);
-        height: em(32);
+        padding-top: 6px;
+        width: $select-height;
+        height: $select-height - 4px;
         border-left: $input-border-width solid $input-border-colour;
         color: $input-border-colour;
       }
@@ -119,7 +122,7 @@ form {
       color: $input-text;
       font-size: $input-font-size;
       padding: 0 $input-padding;
-      height: em(40);
+      height: $input-height;
       border: $input-border-colour solid $input-border-width;
 
       &:hover {
@@ -148,8 +151,8 @@ form {
     .inputs label.checkbox,
     > label.checkbox {
       position: relative;
-      width: em(40);
-      height: em(40);
+      width: $input-height;
+      height: $input-height;
       overflow: hidden;
 
       &:before {
@@ -157,8 +160,8 @@ form {
         content: "";
         display: block;
         border-radius: $input-border-radius;
-        width: em(40);
-        height: em(40);
+        width: $input-height;
+        height: $input-height;
         padding: $input-padding;
         background-color: $input-primary;
         border: $input-border-colour solid $input-border-width;
@@ -196,7 +199,7 @@ form {
   }
 
   .controls {
-    margin-bottom: em(20);
+    margin-bottom: 20px;
 
     button,
     input[type=submit] {
@@ -204,6 +207,7 @@ form {
       border-radius: $input-border-radius;
       border: $input-border-width solid $button-primary;
       margin-bottom: 0;
+      line-height: 30px;
       outline: none;
     }
   }
@@ -211,11 +215,11 @@ form {
 
 form.square {
   @include span-columns(12);
-  margin: em(20) 0;
+  margin: 20px 0;
 
   .horizontal {
     @include span-columns(12);
-    margin-bottom: em(20);
+    margin-bottom: 20px;
 
     &.small {
       @include span-columns(6);
@@ -233,11 +237,11 @@ form.square {
     > label,
     > .label {
       @include span-columns(3);
-      padding: em(11) 0;
-      line-height: em(16);
+      padding: 9px 0;
+      line-height: $input-font-size;
 
       &.checkbox {
-        width: em(40);
+        width: $input-height;
         padding: 0;
       }
     }

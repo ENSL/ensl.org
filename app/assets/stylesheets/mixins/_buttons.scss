@@ -3,17 +3,19 @@
 */
 
 @mixin button($background: $button-primary, $text: $button-text) {
+  $button-height: 35px;
+
   @include linear-gradient($blue, $dark-blue);
   border-radius: $base-border-radius;
   font-family: $montserrat;
-  font-size: em(16);
+  font-size: 14px;
   background-color: $background;
   color: $text;
-  height: em(40);
-  padding: 0 em(18);
-  line-height: em(40);
+  height: $button-height;
+  padding: 0 $button-height/2;
+  line-height: $button-height;
   float: left;
-  margin: 0 em(20) em(20) 0;
+  margin: 0 $button-height/2 $button-height/2 0;
   border: 0;
   text-transform: uppercase;
   cursor: pointer;
@@ -32,10 +34,10 @@ a.button,
   &.tiny {
     @include linear-gradient($light-blue, $blue);
     background-color: transparent;
-    border-radius: em(14);
-    line-height: em(25);
-    height: em(25);
-    padding: 0 em(12);
-    margin: 0 em(10) 0 0;
+    border-radius: 14px;
+    line-height: 25px;
+    height: 25px;
+    padding: 0 12px;
+    margin: 0 10px 0 0;
   }
 }

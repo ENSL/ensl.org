@@ -3,11 +3,11 @@
 */
 
 @mixin flash($background: $flash-notice, $text: $flash-text) {
+  $flash-height: 35px;
+
   background-color: $background;
   color: $text;
-  font-size: em(16);
-  line-height: em(16);
-  padding: em(14) em(14) em(14) em(54); 
+  padding: 7px 7px 7px 44px; 
   position: relative;
 
   &:before {    
@@ -22,10 +22,9 @@
     top: 0;
     left: 0;
     float: left;
-    width: em(44);
+    width: $flash-height;
     height: 100%;
-    padding: em(9);
-    line-height: em(26);
+    padding: 7px;
     text-align: center;
   }
 }
@@ -35,11 +34,11 @@
 */
 
 .highlight {
-  font-size: em(14);
-  border-radius: em(3);
+  font-size: 14px;
+  border-radius: 3px;
   background: $blue;
   color: white;
   display: inline-block;
   font-style: italic;
-  padding: 0 em(6);
+  padding: 0 6px;
 }

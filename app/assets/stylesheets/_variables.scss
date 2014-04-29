@@ -2,7 +2,8 @@
   Neat Overrides
 */
 
-$max-width: em(1200);
+$max-width: 1140px;
+$gutter: em(20);
 
 /*
   Grid Debugging
@@ -16,8 +17,8 @@ $max-width: em(1200);
   Neat Breakpoints
 */
 
-$medium-screen: em(640);
-$large-screen: em(860);
+$medium-screen: 640px;
+$large-screen: 860px;
 
 $medium-screen-up: new-breakpoint(min-width $medium-screen 4);
 $large-screen-up: new-breakpoint(min-width $large-screen 8);
@@ -38,9 +39,9 @@ $header-font-family: $montserrat;
   Sizes
 */
 
-$base-font-size: 1em;
+$base-font-size: 14px;
 $base-line-height: $base-font-size * 1.5;
-$base-border-radius: em(5);
+$base-border-radius: 3px;
 
 /*
   Colours
@@ -87,13 +88,13 @@ $flash-success: $green;
 $flash-warning: $red;
 $flash-error: #e56c69;
 
-$input-font-size: em(16);
+$input-font-size: $base-font-size;
 $input-primary: white;
 $input-secondary: $blue;
 $input-text: #232323;
-$input-border-width: em(2);
+$input-border-width: 2px;
 $input-border-colour: darken($light-gray, 10%);
-$input-padding: em(11);
+$input-padding: 9px;
 $input-border-radius: $base-border-radius;
 
 $button-primary: $blue;
@@ -104,4 +105,4 @@ $button-text: white;
   Shadows
 */
 
-$content-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.1);
+$content-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.15);

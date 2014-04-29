@@ -5,7 +5,7 @@
 div.article {
   @include span-columns(12);
   border-bottom: 1px solid rgba(35, 35, 35, 0.1);
-  padding-bottom: em(20);
+  padding-bottom: 20px;
 
   h1 {
     margin: 1em 0;
@@ -13,7 +13,7 @@ div.article {
 
   .content {
     @include span-columns(12);
-    margin-bottom: em(40);
+    margin-bottom: 40px;
 
     ul {
       @extend ul.disc;
@@ -34,14 +34,14 @@ div.article {
     text-align: right;
 
     .fa {
-      margin-right: em(10);
+      margin-right: 10px;
     }
   }
 
   .actions {
     @include span-columns(12);
     @include omega;
-    margin-top: em(10);
+    margin-top: 10px;
   }
 
   &:first-child {
@@ -59,7 +59,7 @@ div.article-links {
     @include span-columns(6);
 
     .fa {
-      padding-right: em(10);
+      padding-right: 10px;
     }
   }
 
@@ -69,7 +69,7 @@ div.article-links {
     text-align: right;
 
     .fa {
-      padding-left: em(10);
+      padding-left: 10px;
     }
   }
 }
@@ -81,22 +81,22 @@ div.article-links {
 form.article {
 
   h4 {
-    margin-bottom: em(20);
+    margin-bottom: 20px;
   }
 }
 
 .files {
 
   .files-list {
-    margin: em(20) 0 em(40);
+    margin: 20px 0 40px;
   }
 
   form {
     @include span-columns(12);
-    margin: em(20) 0;
+    margin: 20px 0;
 
     .fields {
-      margin-bottom: em(20);
+      margin-bottom: 20px;
     }
   }
 }
@@ -115,11 +115,11 @@ form.article {
 
   .article-list {
     @include span-columns(12);
-    margin-bottom: em(10);
+    margin-bottom: 10px;
 
     .new {
       @extend .highlight;
-      margin-right: em(10);
+      margin-right: 10px;
     }
 
     .title {
@@ -134,7 +134,7 @@ form.article {
   }
 
   .button.new {
-    margin-top: em(20);
+    margin-top: 20px;
   }
 }
 

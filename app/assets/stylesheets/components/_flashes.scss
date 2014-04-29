@@ -4,7 +4,7 @@
 
 .flash {
   @include span-columns(12);
-  margin-bottom: em(20);
+  margin-bottom: 20px;
   font-weight: 600;
 
   &.notice {
@@ -44,18 +44,18 @@
 div#errors {
   @extend .flash.error;
   @include span-columns(12);
-  margin-bottom: em(20);
+  margin-bottom: 20px;
 
   strong {
     @include span-columns(12);
-    margin-bottom: em(10);
+    margin-bottom: 10px;
   }
 
   ul.errors {
     @include span-columns(12);
 
     li {
-      margin-bottom: .5em;
+      margin-bottom: 0;
 
       &:last-child {
         margin-bottom: 0;

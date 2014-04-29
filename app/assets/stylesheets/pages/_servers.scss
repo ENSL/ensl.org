@@ -4,13 +4,13 @@
 
 #servers {
   @include span-columns(12);
-  margin-bottom: em(20);
+  margin-bottom: 20px;
 
   div.server {
     @include span-columns(12);
-    margin-bottom: em(20);
-    padding-bottom: em(20);
-    border-bottom: em(3) solid $light-gray;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid $light-gray;
     position: relative;
 
     .connect {
