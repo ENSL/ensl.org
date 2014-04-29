@@ -15,6 +15,10 @@ div.article {
     @include span-columns(12);
     margin-bottom: 40px;
 
+    * {
+      font-family: $open-sans !important;
+    }
+
     ul {
       @extend ul.disc;
     }
@@ -44,11 +48,20 @@ div.article {
     margin-top: 10px;
   }
 
-  &:first-child {
-  
+  &.preview {
+    border-radius: $base-border-radius;
+    background: lighten($light-gray, 5%);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: $light-shadow;
+
+    .content {
+      margin-bottom: 10px;
+    }
+
     h1 {
-      margin-top: 0;
-    }    
+      margin: 0 0 .5em 0;
+    }
   }
 }
 

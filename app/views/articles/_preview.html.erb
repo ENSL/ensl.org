@@ -1,0 +1,31 @@
+<div class="article preview">
+  <h1><%= namelink article %></h1>
+
+  <div class="content">
+    <% if article.text_coding == Article::CODING_HTML %>
+      <% 
+        content = article.text.html_safe
+        content = truncate(raw(strip_tags(article.text)), length: 200) if !expanded
+      %>
+
+      <%= content %>
+    <% else %>
+      <% 
+        content = article.text_parsed.html_safe
+        content = truncate(raw(strip_tags(article.text_parsed)), length: 200) if !expanded
+      %>
+
+      <%= content %>
+    <% end %>
+  </div>
+
+  <div class="author">
+    <%= namelink(article.user) %> on <%= longertime article.created_at %>
+  </div>
+
+  <div class="comments">
+    <%= link_to article do %>
+      <%= icon 'comments' %> Comments (<%= article.comments.count %>)
+    <% end %>
+  </div>
+</div>

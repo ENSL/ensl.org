@@ -39,7 +39,7 @@ table.striped > tbody {
   }
 
   > tr:nth-child(2n) td {
-    background-color: transparentize($light-blue, 0.95);
+    background-color: transparentize($light-blue, 0.8);
   }
 
   .actions {

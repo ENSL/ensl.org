@@ -16,7 +16,7 @@
 
         <% forums.each do |forum| %>
           <tr>
-            <td class="bullet <%= "highlight" if cuser and !forum.read_by?(cuser) %>"></td>
+            <td class="bullet <%= "updated" if cuser and !forum.read_by?(cuser) %>"></td>
             <td class="forum">
               <h5><%= namelink(forum) %></h5>
               <%= forum.description %>
