@@ -298,6 +298,7 @@ form.square {
 }
 
 form.search {
+  margin-bottom: 10px;
 
   .query {
     @include span-columns(7 of 9);

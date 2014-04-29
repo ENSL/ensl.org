@@ -4,7 +4,7 @@
 
 .tabbed {
   $tabs-border-width: 1px;
-  $tabs-border-colour: lighten($light-blue, 40%);
+  $tabs-border-colour: $light-blue;
   $tabs-padding-horizontal: 16px;
   $tabs-height: 35px;
 
@@ -21,6 +21,8 @@
       display: block;
 
       a {
+        @include linear-gradient($blue, $dark-blue);
+        background-color: $blue;
         border: $tabs-border-width solid $tabs-border-colour;
         border-right: 0;
         padding: 0 $tabs-padding-horizontal;
@@ -29,7 +31,6 @@
         color: white;
         font-weight: 400;
         line-height: $tabs-height;
-        background-color: $blue;
 
         &:hover {
           cursor: pointer;
@@ -49,6 +50,7 @@
         z-index: 100;
 
         a {
+          @include linear-gradient($light-blue, $blue);
           background-color: $light-blue;
         }
       }
@@ -59,6 +61,8 @@
     @include span-columns(12);  
     border: $tabs-border-width solid $tabs-border-colour;
     border-radius: 0 $base-border-radius $base-border-radius $base-border-radius;
+    background: lighten($light-gray, 10%);
+    box-shadow: $light-shadow;
     padding: 20px;
   }
 
