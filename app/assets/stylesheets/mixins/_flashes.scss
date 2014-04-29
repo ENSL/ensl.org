@@ -34,11 +34,12 @@
 */
 
 .highlight {
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 18px;
   border-radius: 3px;
   background: $blue;
   color: white;
   display: inline-block;
   font-style: italic;
-  padding: 0 6px;
+  padding: 0 3px;
 }

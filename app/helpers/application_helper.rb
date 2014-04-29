@@ -40,6 +40,10 @@ module ApplicationHelper
     printtime time, "%d %B %y %H:%M"
   end
 
+  def longertime time
+    printtime time, "%e %B %Y - %H:%M %Z"
+  end
+
   def shorttime time
     printtime time, "%d/%b/%y %H:%M"
   end
@@ -55,12 +59,9 @@ module ApplicationHelper
   def printtime time, format
     return unless time
 
-    out = ""
-    out << '<span style="font-style: italic; ">'
-    out <<  time.strftime(format)
-    out << '</span>'
-
-    out.html_safe
+    content_tag(:span, style: 'font-style: italic') do
+      Time.use_zone(timezone_offset) { time.strftime(format) }
+    end
   end
 
   def cascade model, list

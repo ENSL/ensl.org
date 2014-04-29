@@ -103,13 +103,12 @@
 #gather-area {
   @include span-columns(12);
 
-  $column-border-width: 15px;
+  $column-border-width: 10px;
   $column-border-radius: 5px;
 
   .gather-columns {
     @include span-columns(12);
     @include row(table);
-    margin-bottom: 20px;
     margin-left: - $column-border-width;
     width: $max-width - ($column-border-width*2);
   }
@@ -119,7 +118,7 @@
     @include pad;
     border-radius: $column-border-width + $column-border-radius;
     padding-bottom: 20px;
-    background: $light-gray;
+    background: lighten($light-gray, 5%);
     padding: 20px;
     border: $column-border-width solid white;
 

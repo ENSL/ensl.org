@@ -1,11 +1,11 @@
 <div id="news">
-  <% @news.each do |item| %>
-    <%= render partial: "article", locals: { article: item } %>
+  <% @news.each_with_index do |item, i| %>
+    <%= render partial: 'preview', locals: { article: item, expanded: (true if i == 0) } %>
   <% end %>
 </div>
 
 <div class="actions-bottom">
-  <%= link_to t('news.archive'), '/news/archive', class: "button" %>
+  <%= link_to t('news.archive'), '/news/archive', class: 'button' %>
 
   <% if cuser and cuser.admin? %>
     <%= link_to t('helpers.submit.post.new'), new_article_path, class: "button" %>

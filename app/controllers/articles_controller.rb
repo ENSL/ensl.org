@@ -6,7 +6,7 @@ class ArticlesController < ApplicationController
   end
 
   def news_index
-    @news = Article.with_comments.ordered.limited.nodrafts.onlynews
+    @news = Article.with_comments.ordered.nodrafts.onlynews.limit(10)
     @categories = Category.ordered.domain(Category::DOMAIN_NEWS)
     @nobody = true
   end
