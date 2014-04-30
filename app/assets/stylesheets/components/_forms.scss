@@ -27,6 +27,7 @@ form {
     > .field_with_errors {
 
       input,
+      input[type=text],
       textarea {
         border: $input-border-width solid $flash-error;
 
