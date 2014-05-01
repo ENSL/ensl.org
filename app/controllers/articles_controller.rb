@@ -24,7 +24,6 @@ class ArticlesController < ApplicationController
     raise AccessError unless @article.can_show? cuser
     @article.read_by! cuser if cuser
     # @article.record_view_count(request.remote_ip, cuser.nil?)
-    @nobody = true
   end
 
   def new

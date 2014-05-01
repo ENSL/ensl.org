@@ -49,6 +49,10 @@ body#tinymce {
   padding: 20px;
 }
 
+#main_nobody {
+  @include span-columns(9 of 12);
+}
+
 #sidebar {
   @include span-columns(3 of 12);
   @include omega();
