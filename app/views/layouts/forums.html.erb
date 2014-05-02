@@ -15,9 +15,9 @@
       <%= render partial: "header" %>
       <%= render partial: "navigation" %>
       <div class="wrapper">
-        <div id="content" class="full">
+        <div id="content" class="full <%= yield :content_class %>">
+          <%= render partial: "messages" %>
           <div id="forums">
-            <%= render partial: "messages" %>
             <%= yield %>
           </div>
           <%= render partial: "gather" %>

@@ -9,7 +9,12 @@
     background: white;
 
     h4 {
+      @include linear-gradient($blue, $dark-blue);
+      border-radius: $base-border-radius $base-border-radius 0 0;
       margin-bottom: 20px;
+      padding: 10px 20px;
+      margin: -20px -20px 20px -20px;
+      color: white;
     }
 
     .widget-content-wrapper {
@@ -18,8 +23,8 @@
     }
 
     .separator {
-      color: white;
-      background: $blue;
+      color: $dark-blue;
+      background: transparentize($light-blue, 0.75);
       padding: 0 20px;
       margin: 0 -20px;
       margin-bottom: 12px;
@@ -27,7 +32,7 @@
       line-height: 35px;
 
       a {
-        color: white;
+        color: $dark-blue;
         float: right;
       }
     }
@@ -38,6 +43,10 @@
   }
 
   .calendar {
+    h4 {
+      margin-bottom: 0;
+    }
+
     max-height: 400px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -56,6 +65,9 @@
 
   .highlights,
   .posts {
+    h4 {
+      margin-bottom: 0;
+    }
 
     ol {
       margin-bottom: 20px;

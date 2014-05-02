@@ -92,8 +92,12 @@ header .banner {
     .profile {
       @include span-columns(5);
       vertical-align: middle;
+      position: relative;
 
       .avatar {
+        box-shadow: $content-shadow;
+        border-radius: $base-border-radius;
+        border: 2px solid $blue;
         text-align: center;
         vertical-align: middle;
         position: relative;
@@ -101,16 +105,12 @@ header .banner {
         padding-bottom: 96%;
         float: left;
         height: 0;
-
-        img {
-          background: transparentize($light-gray, 0.75);
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          left: 0;
-          border-radius: 5px;
-          padding: 3px;
-        }
+        background-size: cover;
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
       }
 
       .timezone {

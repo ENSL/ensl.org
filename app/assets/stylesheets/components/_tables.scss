@@ -29,8 +29,8 @@ tr, td, th {
   Striped Tables
 */
 
-
-table.striped > tbody {
+table.striped > tbody,
+table.striped > thead {
   > tr {
     td:first-child,
     th:first-child {
