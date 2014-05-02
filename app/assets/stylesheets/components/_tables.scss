@@ -25,6 +25,11 @@ tr, td, th {
   vertical-align: middle;
 }
 
+/*
+  Striped Tables
+*/
+
+
 table.striped > tbody {
   > tr {
     td:first-child,
@@ -39,7 +44,7 @@ table.striped > tbody {
   }
 
   > tr:nth-child(2n) td {
-    background-color: transparentize($light-blue, 0.8);
+    background-color: transparentize($light-blue, 0.9);
   }
 
   .actions {

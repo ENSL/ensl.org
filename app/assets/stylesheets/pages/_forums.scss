@@ -120,8 +120,9 @@ div#categories {
     @include span-columns(12);
     padding: 20px;
     margin-bottom: 20px;
-    background: transparentize($light-gray, 0.5);
+    background: transparentize($light-gray, 0.75);
     border-radius: 5px;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
 
     &:last-child {
       margin-bottom: 40px;
