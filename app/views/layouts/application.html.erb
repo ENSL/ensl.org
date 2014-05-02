@@ -16,7 +16,7 @@
       <%= render partial: "navigation" %>
       <div class="wrapper">
         <div id="content">
-          <div id="<%= @nobody ? 'main_nobody' : 'main' %>">
+          <div id="main" class="<%= yield :main_class %>">
             <%= render partial: "messages" %>
             <%= yield %>
           </div>

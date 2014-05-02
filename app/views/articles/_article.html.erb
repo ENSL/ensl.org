@@ -13,12 +13,6 @@
     <%= namelink(article.user) %> on <%= longtime article.created_at %>
   </div>
 
-  <div class="comments">
-    <%= link_to article do %>
-      <%= icon 'comments' %> Comments (<%= article.comments.count %>)
-    <% end %>
-  </div>
-
   <div class="actions">
     <% if article.can_update? cuser %>
       <%= link_to 'Edit', edit_article_path(article), class: 'button tiny' %>

@@ -45,11 +45,13 @@ div.article {
   }
 
   &.preview {
+    @include span-columns(12);
     border-radius: $base-border-radius;
     background: white;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: $light-shadow;
+    border: 0;
 
     .content {
       margin-bottom: 10px;
