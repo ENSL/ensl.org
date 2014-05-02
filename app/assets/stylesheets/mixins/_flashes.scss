@@ -9,9 +9,11 @@
   color: $text;
   padding: 7px 7px 7px 44px; 
   position: relative;
+  border-radius: $base-border-radius;
 
   &:before {    
     @include box-sizing(border-box);
+    border-radius: $base-border-radius 0 0 $base-border-radius;
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
@@ -36,7 +38,7 @@
 .highlight {
   font-size: 12px;
   line-height: 18px;
-  border-radius: 3px;
+  border-radius: $base-border-radius;
   background: $blue;
   color: white;
   display: inline-block;

@@ -15,6 +15,10 @@
       margin-right: 0;
     }
   }
+
+  .pagination {
+    margin-bottom: 20px;
+  }
 }
 
 /*
@@ -23,20 +27,50 @@
 
 div#categories {
 
+  h3 {
+    margin: 0.75em 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
   /*
     Tables
   */
 
   table.category {
     table-layout: auto;
-    margin-bottom: 20px;
+    margin: 0;
+    background: white;
+    padding: 20px;
+    box-shadow: $light-shadow;
+    border-radius: $base-border-radius;
+    border: 0;
+
+    thead th {
+      @include linear-gradient($blue, $dark-blue);
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      font-family: $montserrat;
+      font-size: 16px;
+      color: white;
+
+      &:first-child {
+        border-radius: $base-border-radius 0 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 $base-border-radius 0 0;
+      }
+    }
   }
 
   .bullet {
     width: 10%;
 
     background: {
-      image: url('layout/forum-category.png');  
+      image: image-url('layout/forum-category.png');  
       position: center center;
       repeat: no-repeat;
     }
@@ -72,7 +106,33 @@ div#categories {
 
 #topics {
   table-layout: auto;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  background: white;
+  padding: 20px;
+  box-shadow: $light-shadow;
+  border-radius: $base-border-radius;
+  border: 0;
+
+  .unread {
+    color: $red;
+  }
+
+  thead th {
+    @include linear-gradient($blue, $dark-blue);
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+    font-family: $montserrat;
+    font-size: 16px;
+    color: white;
+
+    &:first-child {
+      border-radius: $base-border-radius 0 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 $base-border-radius 0 0;
+    }
+  }
 
   .topic {
     width: 55%;
@@ -93,7 +153,11 @@ div#categories {
 }
 
 .statistics {
+  padding: 20px;
+  background: white;
   margin: 20px 0;
+  box-shadow: $light-shadow;
+  border-radius: $base-border-radius;
 
   h4 {
     margin-bottom: 1em;
@@ -103,8 +167,30 @@ div#categories {
 #topic {
   position: relative;
 
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .pagination {
+    margin-top: 0;
+  }
+
   #reply {
+    @include span-columns(12);
+    padding: 20px;
+    margin-bottom: 20px;
     display: none;
+    background: white;
+    border-radius: $base-border-radius;
+    box-shadow: $light-shadow;
+
+    form {
+      margin-bottom: 0;
+
+      .controls {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 
@@ -114,19 +200,14 @@ div#categories {
 
 #posts {
   @include span-columns(12);
-  margin-top: 20px;
 
   .post {
     @include span-columns(12);
-    padding: 20px;
     margin-bottom: 20px;
-    background: transparentize($light-gray, 0.75);
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
-
-    &:last-child {
-      margin-bottom: 40px;
-    }
+    border-radius: $base-border-radius;
+    background: white;
+    padding: 20px;
+    box-shadow: $light-shadow;
 
     .avatar {
       @include span-columns(3);
@@ -181,16 +262,29 @@ div#categories {
       }
     }
 
-    .actions {
+    .base {
       @include span-columns(12);
+      padding-top: 20px;
+      border-top: 1px solid $light-gray;
 
       .user {
         @include span-columns(3);
       }
 
-      .reply {
+      .signature {
         @include span-columns(9);
         @include omega;
+        position: relative;
+
+        .controls {
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          a:last-child {
+            margin-right: 0;
+          }
+        }
       }
     }
   }
@@ -199,7 +293,6 @@ div#categories {
 /*
   Forms
 */
-
 
 #forums .add-acl {
 

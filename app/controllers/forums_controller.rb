@@ -1,5 +1,6 @@
 class ForumsController < ApplicationController
   before_filter :get_forum, only: [:show, :edit, :update, :up, :down, :destroy]
+  layout 'forums'
 
   def index
     @categories = Category.domain(Category::DOMAIN_FORUMS).ordered

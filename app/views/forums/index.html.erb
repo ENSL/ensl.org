@@ -1,3 +1,5 @@
+<%= provide :content_class, 'no-body' %>
+
 <div id="categories">
   <% @categories.each do |cat| %>
     <% forums = cuser ? cat.forums.available_to(cuser, Forumer::ACCESS_READ).ordered : cat.forums.public.ordered %>
@@ -6,17 +8,20 @@
     <h3><%=h cat.name %></h3>
     <div class="category">
       <table class="category striped">
-        <tr>
-          <th colspan="2" class="forums">Forums</th>
-          <th class="actions"></th>
-          <th class="topics">Topics</th>
-          <th class="posts">Posts</th>
-          <th class="last">Last Post</th>
-        </tr>
-
+        <thead>
+          <tr>
+            <th></th>
+            <th class="forums">Forums</th>
+            <th class="actions"></th>
+            <th class="topics">Topics</th>
+            <th class="posts">Posts</th>
+            <th class="last">Last Post</th>
+          </tr>  
+        </thead>
+        
         <% forums.each do |forum| %>
           <tr>
-            <td class="bullet <%= "updated" if cuser and !forum.read_by?(cuser) %>"></td>
+            <td class="bullet <%= 'updated' if cuser and !forum.read_by?(cuser) %>"></td>
             <td class="forum">
               <h5><%= namelink(forum) %></h5>
               <%= forum.description %>
@@ -61,6 +66,6 @@
 
 <% if Forum.new.can_create? cuser %>
   <p>
-    <%= link_to 'New forum', new_forum_path, class: "button" %>
+    <%= link_to 'New Forum', new_forum_path, class: 'button' %>
   </p>
 <% end %>

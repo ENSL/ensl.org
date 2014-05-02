@@ -33,17 +33,16 @@ ul.navigation {
 
     .count {
       position: absolute;
-      top: $navigation-height/2 - ($navigation-height/2)/2;
+      top: 16px;
       right: 12px;
-      border-radius: $navigation-height/2;
+      border-radius: $base-border-radius;
       background-color: $light-blue;
       display: inline-block;
       color: white;
-      line-height: $navigation-height/2;
-      padding: 0 8px;
+      line-height: 18px;
+      padding: 0 4px;
       font-size: 12px;
       font-weight: bold;
-      height: $navigation-height/2;
     }
 
     a {
@@ -71,7 +70,7 @@ ul.navigation {
       }
 
       &.gathers {
-        padding-right: 70px;
+        padding-right: 65px;
       }
     }
 
@@ -94,26 +93,31 @@ ul.navigation {
     }
 
     &.dropdown {
+      position: relative;
 
       ul {
-        display: none;
+        position: absolute;
+        box-shadow: $content-shadow;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
         z-index: 10;
+        top: $navigation-height;
+        left: 0;
+        min-width: 100%;
+        background-color: $navbar-primary;
+        list-style: none;
+        padding: 0;
+        margin: 0;
       }
 
       &:hover {
-        position: relative;
 
         ul {
-          box-shadow: $content-shadow;
-          display: block;
-          position: absolute;
-          top: $navigation-height;
-          left: 0;
-          min-width: 100%;
-          background-color: $navbar-primary;
-          list-style: none;
-          padding: 0;
-          margin: 0;
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+
 
           li {
             border-bottom: 1px solid $navbar-secondary;

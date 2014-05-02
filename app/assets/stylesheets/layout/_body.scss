@@ -35,6 +35,12 @@ body#tinymce {
     padding: $container-padding;
     background: white;
   }
+
+  &.no-body.full {
+    background: transparent;
+    box-shadow: none;
+    padding: $container-padding 0;
+  }
 }
 
 #forums {

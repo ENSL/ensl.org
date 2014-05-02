@@ -1,3 +1,5 @@
+<%= provide :content_class, 'no-body' %>
+
 <div class="breadcrumbs">
   <%= link_to "Forums", action: "index" %> <%= icon 'chevron-right' %> <%= namelink @forum %>
 </div>
@@ -11,13 +13,16 @@
 <%= will_paginate @topics %>
 
 <table id="topics" class="striped">
-  <tr>
-    <th class="topic">Topic</th>
-    <th class="author">Author</th>
-    <th class="replies">Replies</th>
-    <th class="views">Views</th>
-    <th class="last">Last Post</th>
-  </tr>
+  <thead>
+    <tr>
+      <th class="topic">Topic</th>
+      <th class="author">Author</th>
+      <th class="replies">Replies</th>
+      <th class="views">Views</th>
+      <th class="last">Last Post</th>
+    </tr>  
+  </thead>
+  
   <% @topics.each do |topic| %>
     <tr>
       <td>

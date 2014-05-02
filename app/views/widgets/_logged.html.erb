@@ -27,8 +27,8 @@
         <% end %>
       </li>
       <li>
-        <%= form_tag(controller: "users", action: "logout") do %>
-          <%= link_to "#", id: "logout" do %>
+        <%= form_tag(controller: 'users', action: 'logout') do %>
+          <%= link_to '#', id: 'logout' do %>
             Logout <%= icon 'key' %>
           <% end %>
         <% end %>
@@ -37,8 +37,6 @@
   </div>
 
   <div class="profile">
-    <div class="avatar">
-      <%= image_tag cuser.profile.avatar.url %>
-    </div>
+    <div class="avatar" style="background-image: url('<%= cuser.profile.avatar.url %>')"></div>
   </div>
 </div>

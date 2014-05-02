@@ -37,19 +37,17 @@
     <div class="text">
       <%= post.text_parsed.html_safe %>  
     </div>
-    
-    <div class="signature">
-      <%= post.user.profile.signature_parsed.html_safe if post.user.profile.signature_parsed %>
-    </div>
   </div>
 
-  <div class="actions">
+  <div class="base">
     <div class="user">
       <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: post.user }, class: 'button tiny' %>  
     </div>
     
-    <div class="reply">
-      <div class="right">
+    <div class="signature">
+      <%= post.user.profile.signature_parsed.html_safe if post.user.profile.signature_parsed %>
+      
+      <div class="controls">
         <% if post.topic.posts.build.can_create? cuser %>
           <%= link_to_function 'Quote Reply', "QuoteText(#{post.id}); $('#reply').fadeIn('slow')", class: 'button tiny' %>
         <% end %>
