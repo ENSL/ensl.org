@@ -1,25 +1,21 @@
-<table class="data">
+<table class="articles archive striped">
   <tr>
-    <th>Title</th>
-    <th>Category</th>
-    <th>Date</th>
-    <th>Author</th>
-    <th>Cmts.</th>
-    <th></th>
+    <th class="title">Title</th>
+    <th class="date">Date</th>
+    <th class="author">Author</th>
+    <th class="actions"></th>
   </tr>
 
   <% articles.each do |article| %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= namelink article, 35 %></td>
-      <td><%= namelink article.category %></td>
       <td><%= shortdate article.created_at %></td>
       <td><%= namelink article.user %></td>
-      <td><%= h article.comments.count %></td>
-      <td>
+      <td class="actions">
         <% if article.can_update? cuser %>
-          <%= link_to 'Edit', edit_article_path(article) %>
+          <%= link_to icon('pencil'), edit_article_path(article) %>
           <% end; if article.can_destroy? cuser %>
-          <%= link_to 'Destroy', article, :confirm => 'Are you sure?', :method => :delete %>
+          <%= link_to icon('times'), article, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>

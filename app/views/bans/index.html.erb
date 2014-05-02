@@ -1,14 +1,14 @@
 <div id="bans">
-  <h1>Active bans</h1>
+  <h1>Active Bans</h1>
 
-  <%= link_to 'New ban', new_ban_path, class: 'button' %>
+  <%= link_to 'New Ban', new_ban_path, class: 'button' %>
 
   <%= render partial: "list", locals: { bans: @bans.effective } %>
 
-  <h1>Ban history</h1>
+  <h1>Ban History</h1>
 
   <%= render partial: "list", locals: { bans: @bans.ineffective } %>
 
-  <%= link_to 'New ban', new_ban_path, class: 'button' %>
+  <%= link_to 'New Ban', new_ban_path, class: 'button' %>
 </div>
   
