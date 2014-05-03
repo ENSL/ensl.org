@@ -86,16 +86,12 @@
   }
 
   .calendar {
-    .widget-content-wrapper {
-      
-    }
-
     &:before {
       display: none;
     }
 
     .entry {
-      margin-bottom: 20px;
+      margin-bottom: 0;
     }
 
     .time {
