@@ -9,12 +9,8 @@
     background: white;
 
     h4 {
-      @include linear-gradient($blue, $dark-blue);
-      border-radius: $base-border-radius $base-border-radius 0 0;
+      @include span-columns(12);
       margin-bottom: 20px;
-      padding: 10px 20px;
-      margin: -20px -20px 20px -20px;
-      color: white;
     }
 
     .widget-content-wrapper {
@@ -43,10 +39,6 @@
   }
 
   .calendar {
-    h4 {
-      margin-bottom: 0;
-    }
-
     max-height: 400px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -65,10 +57,6 @@
 
   .highlights,
   .posts {
-    h4 {
-      margin-bottom: 0;
-    }
-
     ol {
       margin-bottom: 20px;
 
