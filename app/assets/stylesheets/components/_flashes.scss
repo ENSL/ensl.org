@@ -63,3 +63,50 @@ div#errors {
     }
   }
 }
+
+/*
+  Banner flash messages
+*/
+
+#notification {
+  position: absolute;
+  margin: 0 auto;
+  left: 50%;
+  top: 0;
+
+  .message {
+    background: image-url('layout/flash-notice-background.png');
+    position: relative;
+    width: 730px;
+    height: 60px;
+    left: -50%;
+    text-align: center;
+    font-family: $header-font-family;
+    font-size: 22px;
+    color: white;
+    line-height: 45px;
+    padding: 0 100px;
+    z-index: 2;
+
+    &:before {
+      background: image-url('layout/flash-notice-icon.png');
+      content: '';
+      display: block;
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      top: 5px;
+      left: 60px;
+    }
+
+    &.warning,
+    &.error,
+    &.alert {
+      background: image-url('layout/flash-error-background.png');
+
+      &:before {
+        background: image-url('layout/flash-error-icon.png');
+      }
+    }
+  }
+}

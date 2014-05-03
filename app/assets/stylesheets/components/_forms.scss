@@ -298,6 +298,28 @@ form.square {
   }
 }
 
+/*
+  Dark Forms
+*/
+
+form.dark {
+
+  input[type=text],
+  input[type=password] {
+    font-family: $header-font-family;
+    border-radius: 10px;
+    box-shadow: inset 3px 3px 5px 0px transparentize(black, 0.5);
+    border: 1px solid transparentize(#5a8da3, 0.5);
+    background: transparentize(black, 0.5);
+    color: white;
+
+    &:hover,
+    &:focus {
+      border: 1px solid transparentize(#5a8da3, 0.5);
+    }
+  }
+}
+
 form.search {
   margin-bottom: 10px;
 

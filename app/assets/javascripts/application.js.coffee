@@ -26,4 +26,5 @@ $ ->
         $wrapper.removeClass 'disabled'
 
     $select.trigger 'DOMSubtreeModified'
-    
+
+  $('#notification').delay(3000).fadeOut()    

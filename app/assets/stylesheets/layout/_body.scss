@@ -44,7 +44,7 @@ body#tinymce {
 
 #main {
   @include span-columns(9 of 12);
-  padding: 20px 25px 20px 15px;
+  padding: 20px 25px 20px 10px;
 
   &.no-body {
     box-shadow: none;
