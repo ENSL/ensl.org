@@ -25,12 +25,14 @@ ul.navigation {
   list-style: none;
   float: right;
   max-width: $max-width;
-  max-height: $navigation-height;
+  max-height: 60px;
   margin-top: 5px;
 
   > li {
     float: left;
     border: none;
+    height: 60px;
+    position: relative;
 
     a {
       font-weight: 400;
@@ -38,8 +40,19 @@ ul.navigation {
       height: $navigation-height;
       line-height: $navigation-height;
       padding: 0 20px;
-      color: #5f5f5f;
       text-transform: uppercase;
+      color: #5f5f5f;
+
+      &:hover,
+      &.active {
+        color: #3dcfff;
+      }
+    }
+
+    > a {
+      width: 100%;
+      float: left;
+      position: relative;
       border-top: 1px solid #54585b;
 
       &:before,
@@ -62,18 +75,11 @@ ul.navigation {
         @include linear-gradient(#54585b, #15181a);
         right: -1px;
       }
-    }
-
-    > a {
-      width: 100%;
-      float: left;
-      position: relative;
-      border-top: 1px solid #266d98;
 
       &:hover,
       &.active {
         @include background-image(radial-gradient(50% -10%, ellipse cover, transparentize(#2abdfb, 0.6), transparent 60%));
-        color: #3dcfff;
+        border-top: 1px solid #266d98;
 
         &:before,
         &:after {
@@ -87,13 +93,15 @@ ul.navigation {
       position: relative;
 
       ul {
+        background: image-url('layout/drop-menu-background.png') top center repeat-y;
+        width: 130px;
         position: absolute;
         box-shadow: $content-shadow;
         visibility: hidden;
         pointer-events: none;
         opacity: 0;
         z-index: 10;
-        top: $navigation-height;
+        top: 60px;
         left: 0;
         min-width: 100%;
         list-style: none;
@@ -104,17 +112,20 @@ ul.navigation {
       &:hover {
 
         ul {
-          display: none;
+          visibility: visible;
           opacity: 1;
           pointer-events: auto;
+          border-radius: $base-border-radius;
 
           li {
             
             a {
               white-space: nowrap;
               display: block;
-              color: $navbar-text;
               padding: 0 20px;
+              line-height: 40px;
+              height: 40px;
+              font-size: 12px;
             }
 
             &:hover a {

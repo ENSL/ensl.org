@@ -1,11 +1,15 @@
-<%= form_tag controller: "users", action: "login" do %>
+<%= form_tag({ controller: "users", action: "login" }, { class: 'dark' }) do %>
   <div class="fields">
     <%= text_field "login", "username", placeholder: "Username" %>
     <%= password_field "login", "password", placeholder: "Password" %>
   </div>
-  <div class="controls">  
-    <%= submit_tag t('helpers.submit.user.login') %>
-    <%= link_to t('helpers.submit.user.create'), new_user_path %>
-    <%= link_to t('sessions.form.forgot_password'), "/users/forgot/1", class: "password-reset" %>
+  <div class="buttons">
+    <div class="login">
+      <%= submit_tag t('helpers.submit.user.login') %>
+    </div>
+    <div class="register">
+      <%= link_to t('helpers.submit.user.create'), new_user_path %>
+      <%= link_to t('sessions.form.forgot_password'), "/users/forgot/1", class: "password-reset" %>  
+    </div>
   </div>
 <% end %>
