@@ -46,19 +46,27 @@ div.article {
 
   &.preview {
     @include span-columns(12);
-    border-radius: $base-border-radius;
-    background: white;
-    padding: 20px;
+    padding: 20px 20px 20px 20px;
     margin-bottom: 20px;
-    box-shadow: $light-shadow;
+    margin-left: -10px;
+    box-shadow: $content-shadow;
     border: 0;
 
     .content {
       margin-bottom: 10px;
     }
 
+    .author {
+      color: #8f8f8f;
+    }
+
+    .comments a {
+      color: #404040;
+    }
+
     h2 {
       margin: 0 0 .5em 0;
+      font-family: 'Impact';
     }
   }
 }

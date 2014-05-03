@@ -2,19 +2,27 @@
 
   .widget {
     @include span-columns(12);
-    box-shadow: $content-shadow;
     margin-bottom: $container-padding;
-    border-radius: $base-border-radius;
-    padding: 20px;
-    background: white;
+    font-family: $header-font-family;
+    color: white;
+    padding-top: 20px;
+    position: relative;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      width: 265px;
+      height: 75px;
+      background: image-url('layout/sidebar-shadow.png') top center no-repeat;
+      top: 0;
+      right: -15px;
+    }
 
     h4 {
-      @include linear-gradient($blue, $dark-blue);
-      border-radius: $base-border-radius $base-border-radius 0 0;
-      margin-bottom: 20px;
-      padding: 10px 20px;
-      margin: -20px -20px 20px -20px;
-      color: white;
+      font-family: 'Impact';
+      text-align: center;
+      margin-bottom: 25px;
+      color: $light-blue;
     }
 
     .widget-content-wrapper {
@@ -22,19 +30,54 @@
       font-size: 12px;
     }
 
+    a {
+      color: $light-blue;
+    }
+
     .separator {
-      color: $dark-blue;
-      background: transparentize($light-blue, 0.75);
+      border-radius: 10px 0 0 10px;
+      color: white;
+      background: #5a5a5a;
       padding: 0 20px;
-      margin: 0 -20px;
+      margin: 0 -15px 0 0;
       margin-bottom: 12px;
       font-weight: 600;
-      line-height: 35px;
+      line-height: 30px;
+      text-align: right;
+      font-family: $header-font-family;
 
       a {
         color: $dark-blue;
         float: right;
       }
+    }
+
+    input[type=text] {
+      background: #0e1010;
+      border: 1px solid #494949;
+    }
+
+    .controls {
+      text-align: center;
+    }
+
+    .button,
+    .controls input {
+      @include linear-gradient(#585858, #585858);
+      font-family: 'Impact';
+      color: white;
+      border-radius: 10px;
+      background: #585858;
+      border: 0;
+      line-height: 30px;
+      height: 30px;
+      width: 175px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      font-size: 18px;
+      display: inline-block;
+      float: none;
     }
 
     &:last-child {
@@ -43,13 +86,14 @@
   }
 
   .calendar {
-    h4 {
-      margin-bottom: 0;
+    .entry {
+      margin-bottom: 20px;
     }
 
-    max-height: 400px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    .time {
+      float: right;
+      margin-left: 10px;
+    }
   }
 
   .shoutbox {
@@ -61,13 +105,34 @@
       @include span-columns(12);
       margin-bottom: 10px;
     }
+
+    .shoutmsg {
+      display: block;
+      clear: both;
+
+      .user {
+        float: left;
+        padding: 0 5px 5px 0;
+
+        .delete {
+          float: left;
+        }
+
+        .username {
+          clear: right;
+          display: block;
+        }
+
+        .time {
+          clear: left;
+          display: block;
+        }
+      }
+    }
   }
 
   .highlights,
   .posts {
-    h4 {
-      margin-bottom: 0;
-    }
 
     ol {
       margin-bottom: 20px;

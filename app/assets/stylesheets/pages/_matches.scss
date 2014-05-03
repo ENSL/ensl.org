@@ -47,7 +47,7 @@ div#match {
     .vs {
       margin: 0 auto;
       display: block;
-      font: $title-height/2 $montserrat;
+      font: $title-height/2 $header-font-family;
       border-radius: 50px;
       background: $blue;
       width: $title-height;
@@ -98,7 +98,7 @@ div#match {
 
       .score-1,
       .score-2 {
-        font: $title-height/2 $montserrat;
+        font: $title-height/2 $header-font-family;
         color: white;
         width: 50%;
         position: absolute;

@@ -3,12 +3,12 @@
     <ul class="navigation">
       <li class="icon">
         <%= active_link_to root_path, active: ["articles", "news_index"], class: 'news' do %>
-          News <%= icon 'list-alt' %>
+          News
         <% end %>
       </li>
       <li class="dropdown icon">
         <%= active_link_to controller: "contests", action: "current", class: 'contests' do %>
-          Contests <%= icon 'trophy' %>
+          Contests
         <% end %>
         <ul>
           <li><%= link_to "Rules", latest_rules %></li>
@@ -20,7 +20,6 @@
       <li class="dropdown">
         <%= active_link_to Gather.last, class: 'gathers' do %>
           Gathers 
-          <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
         <% end %>
         
         <ul>
@@ -30,7 +29,7 @@
       </li>
       <li class="dropdown icon">
         <%= active_link_to articles_path, class: 'articles' do %>
-          Articles <%= icon 'file-text' %>
+          Articles
         <% end %>
         <ul>
           <li><%= link_to "Hall of Fame", article_url(Article::HOF) %></li>
@@ -41,7 +40,7 @@
       </li>
       <li class="dropdown icon">
         <%= active_link_to forums_path, active: [["forums", "topics"]], class: 'forums' do %>
-          Forums <%= icon 'comments' %>
+          Forums
         <% end %>
         <ul>
           <li><%= link_to "Index", forums_path %></li>
@@ -50,12 +49,12 @@
       </li>
       <li class="icon">
         <%= active_link_to controller: "teams", action: :index, class: 'teams' do %>
-          Teams <%= icon 'users' %>
+          Teams
         <% end %>
       </li>
       <li class="dropdown icon">
         <%= active_link_to controller: "users", action: :index, class: 'users' do %>
-          Users <%= icon 'user' %>
+          Users
         <% end %>
         <ul>
           <li><%= link_to "Staff", controller: "about", action: "staff" %></li>
