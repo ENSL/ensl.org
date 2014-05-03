@@ -3,38 +3,34 @@
 */
 
 header .banner {  
-  @include linear-gradient($dark-blue, $deep-blue);
-  height: 170px;
+  height: 125px;
 
   #logo {
     @include span-columns(9 of 12);
-    min-height: 220px;
+    min-height: 180px;
     position: relative;
 
     img {
-      height: 200px;
+      height: 180px;
       position: absolute;
-      top: 15px;
-      left: -40px;
+      top: 30px;
+      left: -10px;
       z-index: 1;
     }
   }
 
   #authentication {
     @include span-columns(3 of 12);
-    padding: 20px 0;
+    padding: 30px 0;
     color: white;
+    line-height: 16px;
 
     .logged {
-      padding-top: 10px;
+      position: relative;
     }
 
     a {
-      color: white;
-
-      &:hover {
-        color: $light-blue;
-      }
+      color: #497588;
     }
 
     form {
@@ -74,8 +70,9 @@ header .banner {
     }
 
     .links {
-      @include span-columns(7);
+      float: right;
       position: relative;
+      padding-right: 80px;
 
       li {
         text-align: right;
@@ -85,37 +82,27 @@ header .banner {
         display: inline-block;
         width: 1em;
         text-align: center;
-        margin: 0 10px;
+        margin: 0 5px;
       }
     }
 
-    .profile {
-      @include span-columns(5);
+    .avatar {
+      box-shadow: $content-shadow;
+      border-radius: $base-border-radius;
+      border: 1px solid #61beff;
+      text-align: center;
       vertical-align: middle;
       position: relative;
-
-      .avatar {
-        box-shadow: $content-shadow;
-        border-radius: $base-border-radius;
-        border: 2px solid $blue;
-        text-align: center;
-        vertical-align: middle;
-        position: relative;
-        width: 100%;
-        padding-bottom: 96%;
-        float: left;
-        height: 0;
-        background-size: cover;
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        height: 100%;
-        width: 100%;
-      }
-
-      .timezone {
-        text-align: center;
-      }
+      float: left;
+      height: 0;
+      background-size: cover;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 75px;
+      width: 75px;
     }
   }
 }

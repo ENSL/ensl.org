@@ -6,10 +6,11 @@ $navigation-height: 50px;
 
 #menu {
   @include span-columns(12);
-  font-family: $montserrat;
+  font-family: $header-font-family;
   height: $navigation-height;
-  margin-top: - $navigation-height;
-  background: $blue;
+  margin-top: -50px;
+  background: image-url('layout/nav-background.png') top center repeat-x;
+  height: 100px;
   
   nav {
     @include outer-container;
@@ -23,72 +24,62 @@ ul.navigation {
   padding: 0;
   list-style: none;
   float: right;
-  background: transparent;
   max-width: $max-width;
   max-height: $navigation-height;
+  margin-top: 5px;
 
   > li {
     float: left;
-    border-left: 1px solid $dark-blue;
-
-    .count {
-      position: absolute;
-      top: 16px;
-      right: 12px;
-      border-radius: $base-border-radius;
-      background-color: $light-blue;
-      display: inline-block;
-      color: white;
-      line-height: 18px;
-      padding: 0 4px;
-      font-size: 12px;
-      font-weight: bold;
-    }
+    border: none;
 
     a {
       font-weight: 400;
       font-size: 15px;
       height: $navigation-height;
       line-height: $navigation-height;
-      padding: 0 50px 0 20px;
+      padding: 0 20px;
+      color: #5f5f5f;
+      text-transform: uppercase;
+      border-top: 1px solid #54585b;
+
+      &:before,
+      &:after {
+        @include box-sizing(border-box);
+        display: block;
+        content: '';
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        top: 0;
+      }
+      
+      &:before {
+        @include linear-gradient(#54585b, #15181a);
+        left: 0;
+      }
+
+      &:after {
+        @include linear-gradient(#54585b, #15181a);
+        right: -1px;
+      }
     }
 
     > a {
       width: 100%;
-      color: white;
       float: left;
       position: relative;
-      background-color: $navbar-primary;
+      border-top: 1px solid #266d98;
 
       &:hover,
       &.active {
-        background-color: $navbar-secondary;
+        @include background-image(radial-gradient(50% -10%, ellipse cover, transparentize(#2abdfb, 0.6), transparent 60%));
+        color: #3dcfff;
 
-        .count {
-          background-color: lighten($light-blue, 20);
+        &:before,
+        &:after {
+          @include linear-gradient(#266d98, #15181a);
+          z-index: 100;
         }
-      }
-
-      &.gathers {
-        padding-right: 65px;
-      }
-    }
-
-    &:last-child {
-      border-right: 1px solid $dark-blue;
-    }
-
-    &.icon {
-
-      i {
-        color: white;
-        max-height: $navigation-height;
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 18px;
-        line-height: 1em;
-        padding: $navigation-height/3;
       }
     }
 
@@ -105,7 +96,6 @@ ul.navigation {
         top: $navigation-height;
         left: 0;
         min-width: 100%;
-        background-color: $navbar-primary;
         list-style: none;
         padding: 0;
         margin: 0;
@@ -114,21 +104,11 @@ ul.navigation {
       &:hover {
 
         ul {
-          visibility: visible;
+          display: none;
           opacity: 1;
           pointer-events: auto;
 
-
           li {
-            border-bottom: 1px solid $navbar-secondary;
-
-            &:first-child {
-              border-top: 1px solid $navbar-secondary;
-            }
-
-            &:last-child {
-              border-bottom: none;
-            }
             
             a {
               white-space: nowrap;
@@ -138,7 +118,7 @@ ul.navigation {
             }
 
             &:hover a {
-              background: $light-blue;
+              
             }
           }
         }

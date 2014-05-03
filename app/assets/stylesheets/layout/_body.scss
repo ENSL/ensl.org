@@ -18,7 +18,12 @@ body#tinymce {
 
 #container {
   min-height: 100%;
-  background-color: $light-gray;
+  background: {
+    color: $blue;
+    image: image-url('layout/background.jpg');
+    position: top center;
+    repeat: no-repeat;  
+  }
 }
 
 .wrapper {
@@ -27,20 +32,10 @@ body#tinymce {
 
 #content {
   @include span-columns(12);
-  padding: $container-padding 0;
-
-  &.full {
-    box-shadow: $content-shadow;
-    margin: 0;
-    padding: $container-padding;
-    background: white;
-  }
-
-  &.no-body.full {
-    background: transparent;
-    box-shadow: none;
-    padding: $container-padding 0;
-  }
+  box-shadow: $content-shadow;
+  margin-top: -35px;
+  padding: 10px $container-padding $container-padding $container-padding;
+  background: image-url('layout/body-background.png') top center repeat-y;
 }
 
 #forums {
@@ -49,10 +44,7 @@ body#tinymce {
 
 #main {
   @include span-columns(9 of 12);
-  border-radius: $base-border-radius;
-  box-shadow: $content-shadow;
-  background: white;
-  padding: 20px;
+  padding: 20px 25px 20px 15px;
 
   &.no-body {
     box-shadow: none;
@@ -81,7 +73,6 @@ h1, h2, h3, h4, h5, h6 {
     clear: both;
     text-align: center;
     position: relative;
-    background-color: white;
 
     &:before {
       content: "";

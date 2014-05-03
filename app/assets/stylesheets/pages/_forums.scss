@@ -52,7 +52,7 @@ div#categories {
       @include linear-gradient($blue, $dark-blue);
       padding-top: 0.75em;
       padding-bottom: 0.75em;
-      font-family: $montserrat;
+      font-family: $header-font-family;
       font-size: 16px;
       color: white;
 
@@ -121,7 +121,7 @@ div#categories {
     @include linear-gradient($blue, $dark-blue);
     padding-top: 0.75em;
     padding-bottom: 0.75em;
-    font-family: $montserrat;
+    font-family: $header-font-family;
     font-size: 16px;
     color: white;
 

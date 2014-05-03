@@ -1,4 +1,4 @@
-set :branch, 'feature-redesign'
+set :branch, 'feature-redesign-rantology'
 set :deploy_to, '/var/www/virtual/ensl.org/staging/rails'
 
 set :rails_env, 'staging'

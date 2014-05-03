@@ -1,23 +1,19 @@
 .footer {
-  $footer-background: $medium-gray;
-  $footer-color: white;
-  $footer-link-color: transparentize($footer-color, .6);
-  $footer-disclaimer-color: transparentize($footer-color, .6);
+  $footer-link-color: #5a5a5a;
 
-  background: $footer-background;
+  background: image-url('layout/footer-background.png');
+  height: 155px;
+  max-height: 155px;
 
   .content {
-    padding: $container-padding*2 0;
+    padding-top: $container-padding;
   }
 
   .footer-links {
     @include clearfix;
-    margin-bottom: $base-line-height;
   }
 
   ul {
-    margin-bottom: $base-line-height*2;
-
     @include media($medium-screen) {
       @include span-columns(3);
       @include omega(4n);
@@ -35,29 +31,16 @@
 
   li a {
     color: $footer-link-color;
-
-    &:hover {
-      color: transparentize($footer-color, 0);
-    }
   }
 
-  li h3 {
-    color: $footer-color;
-    font-size: 1em;
-    font-weight: 800;
-    margin-bottom: .4em;
+  li h3 a {
+    text-transform: uppercase;
+    color: white;
+    font-size: 20px;
   }  
 
-  hr {
-    border: 1px solid transparentize($footer-disclaimer-color, .3);
-    margin: 0 auto $base-line-height;
-    width: 12em;
-  }
-
   p {
-    color: $footer-disclaimer-color;
-    font-size: .9em;
-    line-height: 1.5em;
+    color: $footer-link-color;
     margin: auto;
     max-width: 35em;
     text-align: center;

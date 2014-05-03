@@ -58,7 +58,7 @@ form {
       select {
         @include appearance(none);
         font-size: $input-font-size;
-        font-family: $open-sans;
+        font-family: $sans-serif;
         float: left;
         display: block;
         width: auto;
@@ -146,7 +146,7 @@ form {
 
     textarea {
       padding: $input-padding;
-      font-family: $open-sans;
+      font-family: $sans-serif;
     }
 
     .inputs label.checkbox,

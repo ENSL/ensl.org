@@ -11,7 +11,7 @@
   ul.tabs {
     @include span-columns(12);
     display: block;
-    font-family: $montserrat;
+    font-family: $header-font-family;
     height: $tabs-height;
     max-height: $tabs-height;
     position: relative;

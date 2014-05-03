@@ -2,7 +2,7 @@
   Neat Overrides
 */
 
-$max-width: 1140px;
+$max-width: 1020px;
 $gutter: em(20);
 
 /*
@@ -27,13 +27,13 @@ $large-screen-up: new-breakpoint(min-width $large-screen 8);
   Typography
 */
 
-$open-sans: 'Open Sans', sans-serif;
-$montserrat: 'Montserrat', sans-serif;
+$inder: 'Inder', sans-serif;
+$electrolize: 'Electrolize', sans-serif;
 $fontawesome: 'FontAwesome';
-$sans-serif: $open-sans;
+$sans-serif: $electrolize;
 
-$base-font-family: $sans-serif;
-$header-font-family: $montserrat;
+$base-font-family: $inder;
+$header-font-family: $electrolize;
  
 /*
   Sizes
@@ -49,7 +49,7 @@ $base-border-radius: 3px;
 
 $red: #de8650;
 $green: darken(#68cc90, 10);
-$blue: #3379A9;
+$blue: #0e4d78;
 $gold: #FFD700;
 
 $dark-blue: darken($blue, 15);
@@ -58,7 +58,7 @@ $dark-gray: #21262A;
 
 $medium-gray: #2F383D;
 
-$light-blue: darken(#2FB0E7, 5);
+$light-blue: #36b1ff;
 $light-gray: darken(#ECF1F5, 5);
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;

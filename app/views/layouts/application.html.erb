@@ -22,7 +22,7 @@
           </div>
           <div id="sidebar">
             <%= yield :sidebar %>
-            <% ['calendar', 'shoutbox', 'highlights', 'posts', 'poll'].each do |widget| %>
+            <% ['calendar', 'shoutbox', 'posts', 'poll'].each do |widget| %>
               <%= render partial: "widgets/#{widget}" %>  
             <% end %>
           </div>
