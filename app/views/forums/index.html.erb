@@ -5,13 +5,11 @@
     <% forums = cuser ? cat.forums.available_to(cuser, Forumer::ACCESS_READ).ordered : cat.forums.public.ordered %>
     <% next if forums.length == 0 %>
 
-    <h3><%=h cat.name %></h3>
     <div class="category">
       <table class="category striped">
         <thead>
           <tr>
-            <th></th>
-            <th class="forums">Forums</th>
+            <th colspan="2" class="forums"><%=h cat.name %></th>
             <th class="actions"></th>
             <th class="topics">Topics</th>
             <th class="posts">Posts</th>

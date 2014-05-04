@@ -27,12 +27,8 @@
 
 div#categories {
 
-  h3 {
-    margin: 0.75em 0;
-
-    &:first-child {
-      margin-top: 0;
-    }
+  div.category {
+    margin-bottom: 20px;
   }
 
   /*
