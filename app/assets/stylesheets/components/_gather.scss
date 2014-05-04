@@ -118,9 +118,8 @@
     @include pad;
     border-radius: $column-border-width + $column-border-radius;
     padding-bottom: 20px;
-    background: lighten($light-gray, 5%);
     padding: 20px;
-    border: $column-border-width solid white;
+    position: relative;
 
     h4 {
       padding-bottom: 20px;

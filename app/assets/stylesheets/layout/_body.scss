@@ -36,6 +36,11 @@ body#tinymce {
   margin-top: -35px;
   padding: 10px $container-padding $container-padding $container-padding;
   background: image-url('layout/body-background.png') top center repeat-y;
+
+  &.full {
+    padding-top: 20px;
+    background-image: image-url('layout/body-background-full.png');
+  }
 }
 
 #forums {

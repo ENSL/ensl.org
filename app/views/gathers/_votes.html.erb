@@ -1,53 +1,57 @@
 <% vote_maps, vote_servers = false %>
 
 <div class="data servers">
-  <h4>Server Votes</h4>
+  <div class="contents">
+    <h4>Server Votes</h4>
 
-  <ul class="votes">
-    <% @gather.gather_servers.ordered.each do |server| %>
-      <li>
-        <span class="count">
-          <%= if server.votes then server.votes else "0" end %>
-        </span>
-        <% if server.real_votes.build(user: cuser).can_create? cuser %>
-          <%= link_to server,
-            controller: "votes", action: "create",
-            vote: { votable_id: server.id, votable_type: "GatherServer" },
-            method: "post" %>
-          <% vote_servers = true else %>
-          <%= server %>
-        <% end %>        
-      </li>
+    <ul class="votes">
+      <% @gather.gather_servers.ordered.each do |server| %>
+        <li>
+          <span class="count">
+            <%= if server.votes then server.votes else "0" end %>
+          </span>
+          <% if server.real_votes.build(user: cuser).can_create? cuser %>
+            <%= link_to server,
+              controller: "votes", action: "create",
+              vote: { votable_id: server.id, votable_type: "GatherServer" },
+              method: "post" %>
+            <% vote_servers = true else %>
+            <%= server %>
+          <% end %>        
+        </li>
+      <% end %>
+    </ul>
+
+    <% if vote_servers %>
+      <p>Click to vote</p>
+      <p><%= link_to "More servers", { controller: :servers }, { class: 'button tiny' } %></p>
     <% end %>
-  </ul>
-
-  <% if vote_servers %>
-    <p>Click to vote</p>
-    <p><%= link_to "More servers", { controller: :servers }, { class: 'button tiny' } %></p>
-  <% end %>
+  </div>
 </div>
 
 <div class="data">
-  <h4>Map Votes</h4>
+  <div class="contents">
+    <h4>Map Votes</h4>
 
-  <ul class="votes">
-    <% @gather.gather_maps.ordered.each do |map| %>
-      <li>
-        <span><%= map.votes %></span>
-        <% if map.real_votes.build(user: cuser).can_create? cuser %>
-          <%= link_to shorten(map, 15),
-            controller: "votes", action: "create",
-            vote: { votable_id: map.id, votable_type: "GatherMap" },
-            method: "post" %>
-          <% vote_maps = true %>
-        <% else %>
-          <%= shorten map, 15 %>
-        <% end %>
-      </li>
+    <ul class="votes">
+      <% @gather.gather_maps.ordered.each do |map| %>
+        <li>
+          <span><%= map.votes %></span>
+          <% if map.real_votes.build(user: cuser).can_create? cuser %>
+            <%= link_to shorten(map, 15),
+              controller: "votes", action: "create",
+              vote: { votable_id: map.id, votable_type: "GatherMap" },
+              method: "post" %>
+            <% vote_maps = true %>
+          <% else %>
+            <%= shorten map, 15 %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if vote_maps %>
+      <p>Click to vote</p>
     <% end %>
-  </ul>
-
-  <% if vote_maps %>
-    <p>Click to vote</p>
-  <% end %>
+  </div>
 </div>
