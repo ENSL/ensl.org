@@ -5,7 +5,10 @@
 #users {
   table-layout: auto;
 
-  .country,
+  .country {
+    width: 7%;
+  }
+
   .age {
     width: 5%;
   }

@@ -27,12 +27,9 @@
 
 div#categories {
 
-  h3 {
-    margin: 0.75em 0;
-
-    &:first-child {
-      margin-top: 0;
-    }
+  .category {
+    @include clearfix;
+    margin: 20px 0;
   }
 
   /*
@@ -45,24 +42,33 @@ div#categories {
     background: white;
     padding: 20px;
     box-shadow: $light-shadow;
-    border-radius: $base-border-radius;
+    border-radius: 10px;
     border: 0;
 
     thead th {
-      @include linear-gradient($blue, $dark-blue);
+      @include linear-gradient(#15181b, #0d1011);
       padding-top: 0.75em;
       padding-bottom: 0.75em;
       font-family: $header-font-family;
       font-size: 16px;
       color: white;
+      border-bottom: 0;
 
       &:first-child {
-        border-radius: $base-border-radius 0 0 0;
+        border-radius: 10px 0 0 10px;
       }
 
       &:last-child {
-        border-radius: 0 $base-border-radius 0 0;
+        border-radius: 0 10px 10px 0;
       }
+    }
+
+    th.category {
+      font-family: 'Impact';
+      color: #36b1ff;
+      font-size: 24px;
+      padding-left: 20px;
+      text-transform: uppercase;
     }
   }
 
@@ -118,7 +124,7 @@ div#categories {
   }
 
   thead th {
-    @include linear-gradient($blue, $dark-blue);
+    @include linear-gradient(#15181b, #0d1011);
     padding-top: 0.75em;
     padding-bottom: 0.75em;
     font-family: $header-font-family;
