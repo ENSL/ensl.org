@@ -53,6 +53,7 @@ div#categories {
       font-size: 16px;
       color: white;
       border-bottom: 0;
+      text-transform: uppercase;
 
       &:first-child {
         border-radius: 10px 0 0 10px;
@@ -68,7 +69,6 @@ div#categories {
       color: #36b1ff;
       font-size: 24px;
       padding-left: 20px;
-      text-transform: uppercase;
     }
   }
 
@@ -130,6 +130,7 @@ div#categories {
     font-family: $header-font-family;
     font-size: 16px;
     color: white;
+    text-transform: uppercase;
 
     &:first-child {
       border-radius: $base-border-radius 0 0 0;
