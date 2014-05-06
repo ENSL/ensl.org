@@ -23,6 +23,7 @@
       text-align: center;
       margin-bottom: 25px;
       color: $light-blue;
+      text-transform: uppercase;
     }
 
     .widget-content-wrapper {
@@ -86,6 +87,10 @@
     }
   }
 
+  /*
+    Calendar
+  */
+
   .calendar {
     &:before {
       display: none;
@@ -96,10 +101,15 @@
     }
 
     .time {
+      color: #5a5a5a;
       float: right;
       margin-left: 10px;
     }
   }
+
+  /*
+    Shoutbox
+  */
 
   .shoutbox {
     .transcript {
@@ -136,6 +146,10 @@
     }
   }
 
+  /*
+    Highlights
+  */
+
   .highlights,
   .posts {
 
@@ -147,6 +161,10 @@
       }
     }
   }
+
+  /*
+    Polls
+  */
 
   .poll {
     .question {
