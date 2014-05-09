@@ -138,6 +138,12 @@
   form {
     @include span-columns(12);
     margin-bottom: 20px;
+
+    &.inline {
+      width: auto;
+      display: inline;
+      margin: 0;
+    }
   }
 
   .tab {

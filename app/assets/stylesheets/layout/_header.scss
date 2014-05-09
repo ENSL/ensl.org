@@ -44,6 +44,10 @@ header .banner {
       font-size: 12px;
       line-height: 14px;
       color: #497588;
+
+      &:hover {
+        color: white;
+      }
     }
 
     form {
@@ -52,6 +56,9 @@ header .banner {
 
     &.admin {
       
+      .links {
+        margin-top: -10px;
+      }
     }
 
     .fields { 

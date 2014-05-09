@@ -31,7 +31,7 @@ div#match {
   $title-height: 100px;
 
   @include span-columns(12);
-  border-bottom: 3px solid $light-gray;
+  border-bottom: 3px solid $medium-gray;
 
   .contesters,
   .details,
@@ -109,12 +109,12 @@ div#match {
       }
 
       .score-1 {
-        padding-left: 10px;
+        padding-left: 5px;
         left: 0;
       }
       
       .score-2 {
-        padding-right: 10px;
+        padding-right: 5px;
         right: 0;
       }
     }
@@ -295,7 +295,7 @@ div#match {
   .report {
     margin: 20px 0;
     padding-top: 20px;
-    border-top: 3px solid $light-gray;
+    border-top: 3px solid $medium-gray;
 
     textarea {
       margin: 20px 0;

@@ -30,8 +30,8 @@
             <td><%=h teamer.ranks[teamer.rank] %></td>
             <td>
               <% if @user.team != teamer.team %>
-                <%= form_for @user do |u| %>
-                  <%= link_to("Set as Primary", user_path(@user, user: { team_id: teamer.team.id }), method: :put, confirm: "Are you sure?") %>
+                <%= form_for @user, html: { class: 'inline' } do |u| %>
+                  <%= link_to "Set as Primary", user_path(@user, user: { team_id: teamer.team.id }), method: :put, confirm: "Are you sure?", class: 'button tiny' %>
                 <% end %>
               <% end %>
 
@@ -215,7 +215,7 @@
     <div class="tab" id="servers">
       <%= render partial: "servers/server", collection: @user.servers %>
 
-      <%= link_to 'New server', new_server_path, class: 'button' %>
+      <%= link_to 'New Server', new_server_path, class: 'button' %>
     </div>
 
     <div class="tab" id="issues">

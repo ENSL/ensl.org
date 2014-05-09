@@ -1,5 +1,5 @@
 <h1>Gather Archive</h1>
-<h5 class="title">Players in bold were captains for their respective teams.</h5>
+<h5 class="title">Players starred were captains for their respective teams.</h5>
 
 <table class="gathers striped">
   <tr>
@@ -16,12 +16,9 @@
           <% gather.gatherers.each do |gatherer| %>
             <li>
               <% if gatherer.team == 1 %>
-                <% if gather.captain1 == gatherer %>
-                  <strong>
-                <% end %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
                 <% if gather.captain1 == gatherer %>
-                  </strong>
+                  <%= icon 'star' %>
                 <% end %>
               <% end %>
             </li>
@@ -33,12 +30,9 @@
           <% gather.gatherers.each do |gatherer| %>
             <li>
               <% if gatherer.team == 2 %>
-                <% if gather.captain2 == gatherer %>
-                  <strong>
-                <% end %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
                 <% if gather.captain2 == gatherer %>
-                  </strong>
+                  <%= icon 'star' %>
                 <% end %>
               <% end %>
             </li>

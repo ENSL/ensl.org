@@ -20,6 +20,7 @@
       <li class="dropdown">
         <%= active_link_to Gather.last, class: 'gathers' do %>
           Gathers 
+          <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
         <% end %>
         
         <ul>

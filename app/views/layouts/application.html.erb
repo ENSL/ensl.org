@@ -16,8 +16,8 @@
       <%= render partial: "header" %>
       <%= render partial: "navigation" %>
       <div class="wrapper">
-        <div id="content">
-          <div id="main" class="<%= yield :main_class %>">
+        <div id="content" class="<%= yield :main_class %>">
+          <div id="main">
             <%= yield %>
           </div>
           <div id="sidebar">
@@ -26,7 +26,6 @@
               <%= render partial: "widgets/#{widget}" %>  
             <% end %>
           </div>
-          <%= render partial: "gather" %>
         </div>
       </div>
       <%= render partial: "footer" %>

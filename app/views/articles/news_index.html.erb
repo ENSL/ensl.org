@@ -1,6 +1,6 @@
 <% provide :main_class, 'no-body' %>
 
-<div id="news">
+<div id="news" class="index">
   <% @news.each_with_index do |item, i| %>
     <%= render partial: 'preview', locals: { article: item, full: (true if i == 0) } %>
   <% end %>

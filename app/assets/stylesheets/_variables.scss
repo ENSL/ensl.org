@@ -56,13 +56,13 @@ $dark-blue: darken($blue, 15);
 $deep-blue: darken($dark-blue, 15);
 $dark-gray: #21262A;
 
-$medium-gray: #2F383D;
-
 $light-blue: #36b1ff;
 $light-gray: darken(#ECF1F5, 5);
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;
 $light-green: #1f7f5c;
+
+$medium-gray: lighten(#5a5a5a, 30%);
  
 $base-body-color: white;
 $base-font-color: $dark-gray;

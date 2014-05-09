@@ -4,8 +4,30 @@
 
 .shoutmsg {
   margin-bottom: 5px;
+  display: block;
+  clear: both;
 
   .timestamp {
     @extend .highlight;
+  }
+
+  .user {
+    float: left;
+    padding: 0 5px 5px 0;
+
+    .delete {
+      float: left;
+    }
+
+    .username {
+      clear: right;
+      display: block;
+    }
+
+    .time {
+      clear: left;
+      display: block;
+      color: #5a5a5a;
+    }
   }
 }
