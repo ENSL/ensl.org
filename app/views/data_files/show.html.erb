@@ -1,58 +1,48 @@
-<div class="box wide">
-  <h1>
-    <%= h @file %>
-  </h1>
+<div id="file">
+  <h1><%=h @file %></h1>
 
   <%= cascade @file, [["Filename", "name.filename".to_sym], "size_s", "directory", "md5_s", ["Modified", "created_at"]] %>
 
   <% if cuser and cuser.admin? %>
-    <p>
-      [
+    <div class="actions">
       <% if @file.can_update? cuser %>
-        <%= link_to 'Edit', edit_data_file_path(@file) %>
+        <%= link_to 'Edit', edit_data_file_path(@file), class: 'button tiny' %>
         <% end; if @file.can_destroy? cuser %>
-        <%= link_to 'Destroy', @file, :confirm => 'Are you sure?', :method => :delete %>
+        <%= link_to 'Destroy', @file, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
       <% end %>
-      ]
-    </p>
+    </div>
   <% end %>
 
-  <br />
+  <%= link_to "Download", @file.url, class: 'button' %>
 
-  <h2 class="center">
-    <%= link_to "Download", @file.url %>
-  </h2>
-</div>
+  <div class="files-list">
+    <h4>Related Files</h4>
 
-<div class="wide box">
-  <h3>
-    Related Files
-  </h3>
-
-  <table class="data">
-    <tr>
-      <th>Name</th>
-      <th>Size</th>
-      <th>MD5</th>
-      <th>Modified</th>
-    </tr>
-    <% @file.related_files.each do |related| %>
+    <table class="striped">
       <tr>
-        <td>
-          <%= link_to (h related.name.filename), related.name.url %>
-        </td>
-        <td>
-          <%= related.size_s %> MB
-        </td>
-        <td>
-          <%= related.md5_s %>
-        </td>
-        <td>
-          <%= shorttime related.created_at %>
-        </td>
+        <th>Name</th>
+        <th>Size</th>
+        <th>MD5</th>
+        <th>Modified</th>
       </tr>
-    <% end %>
-  </table>
+      <% @file.related_files.each do |related| %>
+        <tr>
+          <td>
+            <%= link_to (h related.name.filename), related.name.url %>
+          </td>
+          <td>
+            <%= related.size_s %> MB
+          </td>
+          <td>
+            <%= related.md5_s %>
+          </td>
+          <td>
+            <%= shorttime related.created_at %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
 </div>
 
 <%= add_comments @file %>

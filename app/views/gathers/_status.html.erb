@@ -1,63 +1,73 @@
-<div class="box left wide" id="gatherStatus">
+<div id="gather-stats">
   <% if @gather.status == Gather::STATE_RUNNING %>
+
     <% if @gatherer and @gatherer.can_destroy? cuser %>
-      Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.
-      <%= link_to 'Leave Gather', @gatherer, :confirm => 'Are you sure?', :method => :delete %>
-    <% elsif (g = Gatherer.new(:gather => @gather, :user => cuser)).can_create?(cuser) %>
+      <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
+      <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+
+    <% elsif (g = Gatherer.new(gather: @gather, user: cuser)).can_create?(cuser) %>
       <%= form_for g do |f| %>
         <%= f.hidden_field :gather_id %>
         <%= f.hidden_field :user_id %>
-        <p>
-          Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.
-        </p>
+
+        <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
         <p>
           You can download custom maps via the 
           <%= link_to "Steam Workshop", "http://steamcommunity.com/workshop/browse?searchtext=&childpublishedfileid=0&section=items&appid=4920&browsesort=trend&requiredtags%5B%5D=level" %>.
         </p>
+
         <p>
           <% if cuser.gatherers.count < 5 %>
             <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES) %>, installed NS and Teamspeak3.
           <% end  %>
-          <a href="javascript:" id="gatherJoinBtn">
+          <a href="javascript:" id="gatherJoinBtn" class="button">
             Click to join gather!
           </a>
         </p>
       <% end %>
+
     <% else %>
-      Log in to join the gather.
-    <% end %>
-  <% elsif @gather.status == Gather::STATE_VOTING %>
-    Please vote captains and maps.
-  <% elsif @gather.status == Gather::STATE_PICKING %>
-    <% if @gatherer and @gatherer.captain? %>
-      <% if @gatherer.turn? %>
-        It is your turn, please pick a player from the lobby!
-      <% else%>
-        Wait for the other captain to pick.
-      <% end %>
-    <% else %>
-      Captains are picking the teams, please wait. Are you a panda ? <br />
-    <% end %>
-  <% elsif @gather.status == Gather::STATE_FINISHED and @gather.server %>
-    Gather finished, join the
-    <% if @gather.server and @gather.server.ip and @gather.server.password %>
-      <%= link_to "Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}" %>
-    <% else %>
-      Server
-    <% end %>
-    and TS3. <br />
-    Maps: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br />
-    Server: <% if @gather.server %>
-    <%= @gather.server %>
-    (<%= @gather.server.ip %>:<%= @gather.server.port %> ; password = <%= if @gather.server.password then @gather.server.password else "<Password not specified>" end%>)
+      <p>Log in to join the gather.</p>
+
     <% end %>
 
-  <% end %>
-  <% if cuser and cuser.admin? %>
+  <% elsif @gather.status == Gather::STATE_VOTING %>
+    <p>Please vote captains and maps.</p>
+
+  <% elsif @gather.status == Gather::STATE_PICKING %>
     <p>
-      <%= link_to "Admin Page", edit_gather_url() %>
+      <% if @gatherer and @gatherer.captain? %>
+        <% if @gatherer.turn? %>
+          It is your turn, please pick a player from the lobby!
+        <% else%>
+          Wait for the other captain to pick.
+        <% end %>
+      <% else %>
+        Captains are picking the teams, please wait. Are you a panda?<br>
+      <% end %>
     </p>
+
+  <% elsif @gather.status == Gather::STATE_FINISHED and @gather.server %>
+    <p>Gather finished, join the Server and TeamSpeak 3.</p>
+    
+    <p>
+      <strong>Maps</strong>: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br>
+      <strong>Server</strong>: 
+      <% if @gather.server %>
+        <%= @gather.server %>
+        (<%= @gather.server.ip %>:<%= @gather.server.port %> ; 
+        password = <%= if @gather.server.password then @gather.server.password else "<Password not specified>" end %>)
+      <% end %>
+    </p>
+
+    <% if @gather.server and @gather.server.ip and @gather.server.password %>
+      <p>
+        <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny' %>
+      </p>
+    <% end %>
+  <% end %>
+
+  <% if cuser and cuser.admin? %>
+    <%= link_to "Admin Page", edit_gather_url, class: 'admin button' %>
   <% end %>
 </div>
-
-<div class="clear"></div>

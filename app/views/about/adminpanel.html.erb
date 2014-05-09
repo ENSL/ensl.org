@@ -2,7 +2,7 @@
   <h1>
     Admin Menu
   </h1>
-  <ul>
+  <ul class="disc">
     <li><%= link_to 'New Article', new_article_path %></li>
     <li><%= link_to "Article Admin", controller: "articles", action: "admin" %></li>
     <li><%= link_to "Files Admin", controller: "directories", action: "show", id: Directory.first %></li>

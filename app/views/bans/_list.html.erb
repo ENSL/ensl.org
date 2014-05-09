@@ -1,11 +1,11 @@
-<table class="data">
+<table class="bans striped">
   <tr>
-    <th>User</th>
-    <th>Type</th>
-    <th>Expiry</th>
-    <th>Reason</th>
+    <th class="user">User</th>
+    <th class="type">Type</th>
+    <th class="expiry">Expiry</th>
+    <th class="reason">Reason</th>
     <% if cuser and cuser.admin? %>
-      <th>Actions</th>
+      <th class="actions"></th>
     <% end %>
   </tr>
 
@@ -20,13 +20,14 @@
       </td>
       <td><%= ban.types[ban.ban_type] %></td>
       <td><%= shorttime ban.expiry %></td>
-      <td><%= shorten ban.reason, 30 %> </td>
+      <td><%= shorten ban.reason, 30 %></td>
       <% if cuser and cuser.admin? %>
-        <td>
+        <td class="actions">
           <% if ban.can_update? cuser %>
-            <%= link_to 'E', edit_ban_path(ban) %>
-            <% end; if ban.can_destroy? cuser %>
-            <%= link_to 'D', ban, :confirm => 'Are you sure?', :method => :delete %>
+            <%= link_to icon('pencil'), edit_ban_path(ban) %>
+          <% end %>
+          <% if ban.can_destroy? cuser %>
+            <%= link_to icon('times'), ban, confirm: 'Are you sure?', method: :delete %>
           <% end %>
         </td>
       <% end %>

@@ -1,23 +1,15 @@
-<div class="box wide">
-  <h1>Editing comment</h1>
+<div class="comment-form">
+  <h1>Editing Comment</h1>
 
   <%= form_for(@comment) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @comment.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
+    <%= render 'shared/errors', messages: @comment.errors.full_messages %>
 
-    <p>
-      <%= f.label :text %><br />
-      <%= f.text_area :text, :rows => 15, :cols => 60 %>
-    </p>
-    <p>
+    <div class="fields">
+      <%= f.text_area :text, rows: 5 %>
+    </div>
+    <div class="controls">
       <%= f.submit 'Update' %>
-    </p>
+    </div>
   <% end %>
 </div>
-
-<%= link_to 'Back', :back %>
+  

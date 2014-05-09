@@ -1,290 +1,174 @@
-<h1>Profile: <%= h @user.username %></h1>
+<div id="profile-edit">
+  <h1>Account: <%= h @user.username %></h1>
 
-<%= form_for @user, :html => { :multipart => true } do |f| %>
-  <% f.fields_for :profile do |p| %>
-    <div id="userTab">
-      <ul id="userTab-nav" class="tabs">
-        <li><a href="#userTabGeneral">General</a></li>
-        <li><a href="#userTabContact">Contact</a></li>
-        <li><a href="#userTabCountry"><%= t('profile.locals') %></a></li>
-        <li><a href="#userTabFavorites">Favorites</a></li>
-        <li><a href="#userTabSettings">Settings</a></li>
-        <li><a href="#userTabComputer">Computer</a></li>
-        <li><a href="#userTabExtra">Extra</a></li>
-        <li><a href="#notifications">Notify</a></li>
-      </ul>
+  <%= render 'shared/errors', messages: @user.errors.full_messages %>
 
-      <div class="box wide tabs">
-        <div class="tab" id="userTabGeneral">
-          <% if @user.errors.any? %>
-            <div id="error_explanation">
-              <h2>
-                <%= pluralize(@user.errors.count, t(:error)) %>
-              </h2>
-              <ul>
-                <% @user.errors.full_messages.each do |msg| %>
-                  <li><%= msg %></li>
-                <% end %>
-              </ul>
+  <%= form_for @user, html: { multipart: true, id: 'profile', class: 'square' } do |f| %>
+    <% f.fields_for :profile do |p| %>
+      <div id="user" class="tabbed">
+        <ul id="user-nav" class="tabs">
+          <li><a href="#account">Account</a></li>
+          <li><a href="#profile">Profile</a></li>
+          <li><a href="#country"><%= t('profile.locals') %></a></li>
+          <li><a href="#notifications">Notifications</a></li>
+        </ul>
+
+        <div class="tabbed-contents">
+          <div class="tab" id="account">
+            <div class="fields horizontal">
+              <%= f.label :username, 'Username', class: 'required' %>
+              <%= f.text_field :username %>
             </div>
-          <% end %>
-          <p>
-            <%= f.label :username, 'Username', :class => 'required' %><br />
-            <%= f.text_field :username %>
-          </p>
-          <p>
-            <%= f.label :raw_password, "Password" %><br />
-            <%= f.password_field :raw_password %>
-          </p>
-          <p>
-            <%= f.label :firstname %> (only available to members)<br />
-            <%= f.text_field :firstname %>
-          </p>
-          <p>
-            <%= f.label :lastname %> (only available to members)<br />
-            <%= f.text_field :lastname %>
-          </p>
-          <p>
-            <%= f.label :steamid %><br />
-            <%= f.text_field :steamid %>
-          </p>
-          <p>
-            <%= f.label :birthdate %><br />
-            <%= date_select :user, :birthdate, :order => [:year, :month, :day], :default => @user.birthdate, :start_year => 1950 %>
-          </p>
+            <div class="fields horizontal">
+              <%= f.label :raw_password, "Password" %>
+              <%= f.password_field :raw_password %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :email do %>
+                <p>Email</p>
+                <em>(only visible to admins)</em>
+              <% end %>
+              <%= f.text_field :email %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :public_email %>
+              <%= f.check_box :public_email %>
+              <%= f.label :public_email, class: 'checkbox' %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :steamid %>
+              <%= f.text_field :steamid, html: { placeholder: 'http://steamcommunity.com/id/...' } %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :firstname do %>
+                <p>First Name</p>
+                <em>(only visible to members)</em>
+              <% end %>
+              <%= f.text_field :firstname %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :lastname do %>
+                <p>Last Name</p>
+                <em>(only visible to members)</em>
+              <% end %> 
+              <%= f.text_field :lastname %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :birthdate %>
+              <div class="inputs">
+                <%= date_select :user, :birthdate, order: [:year, :month, :day], default: @user.birthdate, start_year: 1950 %>  
+              </div>
+            </div>
+          </div>
+
+          <div class="tab" id="profile">
+            <div class="fields horizontal">
+              <%= p.label :steam_profile, "Steam Profile URL" %>
+              <%= p.text_field :steam_profile %>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :web %>
+              <%= p.text_field :web %>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :achievements %>
+              <%= p.text_area :achievements, rows: 5 %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :signature %>
+              <%= p.text_area :signature, rows: 5 %>
+            </div>
+
+            <div class="fields horizontal">
+              <label>Avatar</label>
+              <%= p.file_field :avatar %>
+            </div>
+          </div>
+
+          <div class="tab" id="country">
+            <div class="fields horizontal">
+              <%= f.label :country %>
+              <div class="inputs">
+                <%= country_code_select :user, :country %>  
+              </div>
+            </div>
+            <div class="fields horizontal">
+              <%= p.label :town %>
+              <%= p.text_field :town %>
+            </div>
+            <div class="fields horizontal">
+              <%= f.label :time_zone %>
+              <div class="inputs">
+                <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.all %><br><br>
+                <p>Daylight savings will be observed automatically.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab" id="notifications">
+            <h4>Notify me when...</h4>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_news, "News item are posted" %>
+              <%= p.check_box :notify_news %>
+              <%= p.label :notify_news, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_articles, "New articles" %>
+              <%= p.check_box :notify_articles %>
+              <%= p.label :notify_articles, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_movies, "New movies" %>
+              <%= p.check_box :notify_movies %>
+              <%= p.label :notify_movies, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_gather, "Gather has 6 players" %>
+              <%= p.check_box :notify_gather %>
+              <%= p.label :notify_gather, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_own_match, "My team's matches" %>
+              <%= p.check_box :notify_own_match %>
+              <%= p.label :notify_own_match, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_any_match, "New matches" %>
+              <%= p.check_box :notify_any_match %>
+              <%= p.label :notify_any_match, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_challenge, "New challenges" %>
+              <%= p.check_box :notify_challenge %>
+              <%= p.label :notify_challenge, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
+              <%= p.label :notify_pms, "Private messages" %>
+              <%= p.check_box :notify_pms %>
+              <%= p.label :notify_pms, class: 'checkbox' %>
+            </div>
+          </div>
         </div>
 
-        <div class="tab" id="userTabContact">
-          <p>
-            <%= f.label :email %> (only available to admins)<br />
-            <%= f.text_field :email %>
-          </p>
-          <p>
-            <%= f.label :public_email %><br />
-            <%= f.check_box :public_email %>
-          </p>
-          <p>
-            <%= p.label :steam_profile, "Link to your Steam Profile" %><br />
-            <%= p.text_field :steam_profile %>
-          </p>
-          <p>
-            <%= p.label :irc %><br />
-            <%= p.text_field :irc %>
-          </p>
-          <p>
-            <%= p.label :msn %><br />
-            <%= p.text_field :msn %>
-          </p>
-          <p>
-            <%= p.label :icq %><br />
-            <%= p.text_field :icq %>
-          </p>
-          <p>
-            <%= p.label :web %><br />
-            <%= p.text_field :web %>
-          </p>
-        </div>
-
-        <div class="tab" id="userTabCountry">
-          <p>
-            <%= f.label :country %><br />
-            <%= country_code_select :user, :country %>
-          </p>
-          <p>
-            <%= p.label :town %><br />
-            <%= p.text_field :town %>
-          </p>
-          <p>
-            <%= f.label :time_zone %><br />
-            <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.all %>
-            <br />
-            Daylight savings will be observed automatically.
-          </p>
-        </div>
-
-        <div class="tab" id="userTabFavorites">
-          <p>
-            <%= p.label :singleplayer %><br />
-            <%= p.text_field :singleplayer %>
-          </p>
-          <p>
-            <%= p.label :multiplayer %><br />
-            <%= p.text_field :multiplayer %>
-          </p>
-          <p>
-            <%= p.label :food %><br />
-            <%= p.text_field :food %>
-          </p>
-          <p>
-            <%= p.label :beverage %><br />
-            <%= p.text_field :beverage %>
-          </p>
-          <p>
-            <%= p.label :hobby %><br />
-            <%= p.text_field :hobby %>
-          </p>
-          <p>
-            <%= p.label :music %><br />
-            <%= p.text_field :music %>
-          </p>
-          <p>
-            <%= p.label :book %><br />
-            <%= p.text_field :book %>
-          </p>
-          <p>
-            <%= p.label :movie %><br />
-            <%= p.text_field :movie %>
-          </p>
-          <p>
-            <%= p.label :tvseries %><br />
-            <%= p.text_field :tvseries %>
-          </p>
-        </div>
-
-        <div class="tab" id="userTabSettings">
-          <p>
-            <%= p.label :res %><br />
-            <%= p.text_field :res %>
-          </p>
-          <p>
-            <%= p.label :sensitivity %><br />
-            <%= p.text_field :sensitivity %>
-          </p>
-          <p>
-            <%= p.label :monitor_hz %><br />
-            <%= p.text_field :monitor_hz %>
-          </p>
-          <p>
-            <%= p.label :scripts %><br />
-            <%= p.text_field :scripts %>
-          </p>
-        </div>
-
-        <div class="tab" id="userTabComputer">
-          <p>
-            <%= p.label :cpu %><br />
-            <%= p.text_field :cpu %>
-          </p>
-          <p>
-            <%= p.label :gpu %><br />
-            <%= p.text_field :gpu %>
-          </p>
-          <p>
-            <%= p.label :ram %><br />
-            <%= p.text_field :ram %>
-          </p>
-          <p>
-            <%= p.label :psu %><br />
-            <%= p.text_field :psu %>
-          </p>
-          <p>
-            <%= p.label :motherboard %><br />
-            <%= p.text_field :motherboard %>
-          </p>
-          <p>
-            <%= p.label :soundcard %><br />
-            <%= p.text_field :soundcard %>
-          </p>
-          <p>
-            <%= p.label :hdd %><br />
-            <%= p.text_field :hdd %>
-          </p>
-          <p>
-            <%= p.label :case %><br />
-            <%= p.text_field :case %>
-          </p>
-          <p>
-            <%= p.label :monitor %><br />
-            <%= p.text_field :monitor %>
-          </p>
-          <p>
-            <%= p.label :mouse %><br />
-            <%= p.text_field :mouse %>
-          </p>
-          <p>
-            <%= p.label :mouse_pad %><br />
-            <%= p.text_field :mouse_pad %>
-          </p>
-          <p>
-            <%= p.label :keyboard %><br />
-            <%= p.text_field :keyboard %>
-          </p>
-          <p>
-            <%= p.label :head_phones %><br />
-            <%= p.text_field :head_phones %>
-          </p>
-          <p>
-            <%= p.label :speakers %><br />
-            <%= p.text_field :speakers %>
-          </p>
-        </div>
-
-        <div class="tab" id="userTabExtra">
-          <p>
-            <%= p.label :achievements %><br />
-            <%= p.text_area :achievements %>
-          </p>
-
-          <p>
-            <%= p.label :signature %><br />
-            <%= p.text_area :signature, :rows => 5, :cols => 50 %>
-          </p>
-
-          <p>
-            <label>Avatar:</label><br />
-            <%= p.file_field :avatar %>
-          </p>
-        </div>
-
-        <div class="tab" id="notifications">
-          <p>
-            <%= p.label :notify_news, "Notify me when news are posted" %><br />
-            <%= p.check_box :notify_news %>
-          </p>
-
-          <p>
-            <%= p.label :notify_articles, "Notify me of new articles" %><br />
-            <%= p.check_box :notify_articles %>
-          </p>
-
-          <p>
-            <%= p.label :notify_movies, "Notify me of new movies" %><br />
-            <%= p.check_box :notify_movies %>
-          </p>
-
-          <p>
-            <%= p.label :notify_gather, "Notify me when gather has 6 players" %><br />
-            <%= p.check_box :notify_gather %>
-          </p>
-
-          <p>
-            <%= p.label :notify_own_match, "Notify me of my team's matches" %><br />
-            <%= p.check_box :notify_own_match %>
-          </p>
-
-          <p>
-            <%= p.label :notify_any_match, "Notify me of any new match" %><br />
-            <%= p.check_box :notify_any_match %>
-          </p>
-
-          <p>
-            <%= p.label :notify_challenge, "Notify me of new challenges" %><br />
-            <%= p.check_box :notify_challenge %>
-          </p>
-
-          <p>
-            <%= p.label :notify_pms, "Notify me of private messages" %><br />
-            <%= p.check_box :notify_pms %>
-          </p>
+        <div class="controls">
+          <%= f.submit %>
         </div>
       </div>
-      <p>
-        <%= f.submit %>
-      </p>
-    </div>
+    <% end %>
   <% end %>
-<% end %>
 
-<script type="text/javascript">
-  var tabber1 = new Yetii({id: 'userTab'});
-</script>
+  <script type="text/javascript">
+    new Yetii({
+      id: 'user'
+    });
+  </script>
+</div>

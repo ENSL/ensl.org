@@ -1,5 +1,6 @@
 class TopicsController < ApplicationController
   before_filter :get_topic, only: [:show, :reply, :edit, :update, :destroy]
+  layout 'forums'
 
   def index
     render partial: true, locals: {page: params[:p].to_i}
@@ -18,7 +19,6 @@ class TopicsController < ApplicationController
     @newpost.topic = @topic
     @newpost.user = cuser
     @lock = (@topic.lock ? @topic.lock : Lock.new(:lockable => @topic))
-    render layout: 'forums'
   end
 
   def reply
@@ -27,7 +27,7 @@ class TopicsController < ApplicationController
     if request.xhr?
       render 'quickreply', layout: false
     else
-      render layout: 'forums'
+      render
     end
   end
 
@@ -35,12 +35,10 @@ class TopicsController < ApplicationController
     @topic = Topic.new
     @topic.forum = Forum.find(params[:id])
     raise AccessError unless @topic.can_create? cuser
-    render layout: 'forums'
   end
 
   def edit
     raise AccessError unless @topic.can_update? cuser
-    render layout: 'forums'
   end
 
   def create

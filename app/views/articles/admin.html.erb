@@ -1,34 +1,30 @@
-<h1>
-  Draft Articles
-</h1>
+<div class="admin articles">
+  <h1 class="title">Articles Admin</h1>
 
-<% @articles.each do |key, articles| %>
-  <div class="box wide">
-    <h3>
-      <%= h key %>
-    </h3>
+  <% @articles.each do |key, articles| %>
+    <h3 class="title"><%=h key %></h3>
 
-    <table class="data">
+    <table class="striped">
       <tr>
-        <th>Title</th>
-        <th>Category</th>
-        <th>Created</th>
-        <th>Author</th>
-        <th>Options</th>
+        <th class="title">Title</th>
+        <th class="category">Category</th>
+        <th class="created">Created</th>
+        <th class="author">Author</th>
+        <th class="actions"></th>
       </tr>
 
       <% for article in articles %>
-        <tr class="<%= cycle('even', 'odd') %>">
+        <tr>
           <td><%= namelink article %></td>
           <td><%= h article.category %></td>
           <td><%= shorttime article.created_at %></td>
           <td><%= namelink article.user %></td>
-          <td>
-            <%= link_to 'Edit', edit_article_path(article) %>
-            <%= link_to 'Destroy', article, :confirm => 'Are you sure?', :method => :delete %>
+          <td class="actions">
+            <%= link_to icon('pencil'), edit_article_path(article) %>
+            <%= link_to icon('times'), article, confirm: 'Are you sure?', method: :delete %>
           </td>
         </tr>
       <% end %>
     </table>
-  </div>
-<% end %>
+  <% end %>
+</div>

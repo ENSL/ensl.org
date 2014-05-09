@@ -1,25 +1,21 @@
-<h1>Listing challenges</h1>
+<h1 class="title">Listing Challenges</h1>
 
-<table class="data">
+<table class="striped">
   <tr>
-    <th></th>
     <th>Challenger</th>
     <th>Recipient</th>
     <th>Match time</th>
-    <th>Default time</th>
-    <th>Server</th>
     <th>Status</th>
+    <th class="actions"></th>
   </tr>
 
   <% @challenges.each do |challenge| %>
     <tr class="<%= cycle('even', 'odd') %>">
-      <td><%= link_to "[X]", challenge, :confirm => 'Are you sure?', :method => :delete %>
       <td><%= namelink challenge.contester1.team %></td>
       <td><%= namelink challenge.contester2.team %></td>
       <td><%= link_to (shorttime challenge.match_time), challenge %></td>
-      <td><%= challenge.mandatory ? shorttime(challenge.default_time) : "--" %></td>
-      <td><%= h challenge.server %></td>
       <td><%= challenge.statuses[challenge.status] %></td>
+      <td class="actions"><%= link_to icon('times'), challenge, confirm: 'Are you sure?', method: :delete %></td>
     </tr>
   <% end %>
 </table>

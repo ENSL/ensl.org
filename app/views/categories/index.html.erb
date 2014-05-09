@@ -1,29 +1,30 @@
-<h1>Listing categories</h1>
+<div class="categories">
+  <h1 class="title">Listing Categories</h1>
 
-<% Category.new.domains.each do |key, domain| %>
-  <h3 class="center">
-    <%= h domain %>
-  </h3>
+  <% Category.new.domains.each do |key, domain| %>
+    <h3 class="title"><%=h domain %></h3>
 
-  <table class="data">
-    <tr>
-      <th width="70%">Name</th>
-      <th width="30%">Options</th>
-    </tr>
-    <% @categories.each do |category| %>
-      <% if category.domain == key %>
-        <tr>
-          <td><%= h category.name %></td>
-          <td>
-            <%= link_to 'Edit', edit_category_path(category) %>
-            <%= link_to 'Up', :controller => :categories, :action => "up", :id => category.id %>
-            <%= link_to 'Down', :controller => :categories, :action => "down", :id => category.id %>
-            <%= link_to 'Delete', category, :confirm => 'Are you sure?', :method => :delete %>
-          </td>
-        </tr>
+    <table class="categories striped">
+      <tr>
+        <th class="name">Name</th>
+        <th class="actions"></th>
+      </tr>
+      <% @categories.each do |category| %>
+        <% if category.domain == key %>
+          <tr>
+            <td><%=h category.name %></td>
+            <td class="actions">
+              <%= link_to icon('chevron-up'), controller: :categories, action: "up", id: category.id %>
+              <%= link_to icon('chevron-down'), controller: :categories, action: "down", id: category.id %>
+              <%= link_to icon('pencil'), edit_category_path(category) %>
+              <%= link_to icon('times'), category, :confirm => 'Are you sure?', :method => :delete %>
+            </td>
+          </tr>
+        <% end %>
       <% end %>
-    <% end %>
-  </table>
-<% end %>
+    </table>
+  <% end %>
 
-<%= link_to 'New category', new_category_path %>
+  <%= link_to 'New Category', new_category_path, class: 'button' %>
+</div>
+  

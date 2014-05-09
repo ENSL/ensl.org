@@ -1,59 +1,53 @@
-<h1>Editing file</h1>
+<h1>Editing File</h1>
 
-<div class="wide box">
-  <%= form_for(@file) do |f| %>
-    <%= f.error_messages %>
+<%= form_for(@file, html: { class: 'square' }) do |f| %>
+  <%= render 'shared/errors', messages: @file.errors.full_messages %>
 
-    <%= cascade @file, ["name", "size_s", "md5_s"] %>
+  <%= cascade @file, ["name", "size_s", "md5_s"] %>
 
-    <p>
-      <%= f.label :description %><br />
-      <%= f.text_field :description %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
 
-    <p>
-      <%= f.label :directory_id %><br />
-      <%= f.select :directory_id, Directory.all.collect{|c| ["#{c.path} - #{c.name}", c.id]} %>
-    </p>
+  <div class="fields horizontal">
+    <%= f.label :directory_id %>
+    <%= f.select :directory_id, Directory.all.collect { |c| ["#{c.path} - #{c.name}", c.id] } %>
+  </div>
 
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
-  <% end %>
-</div>
+  <div class="controls">
+    <%= f.submit 'Update' %>
+  </div>
+<% end %>
 
-<div class="wide box">
-  <h3>
-    Related Files
-  </h3>
+<h3>Related Files</h3>
 
-  <table class="data">
+<table class="striped">
+  <tr>
+    <th>Name</th>
+    <th>Size</th>
+    <th>Action</th>
+  </tr>
+  <% @file.related_files.each do |related| %>
     <tr>
-      <th>Name</th>
-      <th>Size</th>
-      <th>Action</th>
+      <td>
+        <%= h related.name.filename %>
+      </td>
+      <td>
+        <%= related.size_s %> MB
+      </td>
+      <td>
+        <%= link_to "Remove", controller: "data_files", action: "delFile", id: @file, "related_id" => related %>
+      </td>
     </tr>
-    <% @file.related_files.each do |related| %>
-      <tr>
-        <td>
-          <%= h related.name.filename %>
-        </td>
-        <td>
-          <%= related.size_s %> MB
-        </td>
-        <td>
-          <%= link_to "Remove", :controller => "data_files", :action => "delFile", :id => @file, "related_id" => related %>
-        </td>
-      </tr>
-    <% end %>
-  </table>
-
-  <%= form_for @file, :url => {:action => "addFile", :id => @file} do |f| %>
-    <p>
-      <%= f.select :related_id, @file.directory.files.not(@file).collect {|file| [file, file.id]} %>
-      <%= f.submit "Add" %>
-    </p>
   <% end %>
-</div>
+</table>
 
-<%= link_to 'Show', @file %>
+<%= form_for @file, url: { action: "addFile", id: @file } do |f| %>
+  <div class="fields">
+    <%= f.select :related_id, @file.directory.files.not(@file).collect {|file| [file, file.id]} %>
+  </div>
+  <div class="controls">
+    <%= f.submit "Add" %>
+  </div>
+<% end %>

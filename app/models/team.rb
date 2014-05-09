@@ -88,6 +88,10 @@ class Team < ActiveRecord::Base
     founder.update_attribute :team_id, self.id
   end
 
+  def self.search(search)
+    search ? where("LOWER(name) LIKE LOWER(?)", "%#{search}%") : scoped
+  end
+
   def destroy
     if matches.count > 0
       update_attribute :active, false

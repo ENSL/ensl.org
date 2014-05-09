@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_filter :get_comment, only: [:raw, :edit, :update, :destroy]
+  before_filter :get_comment, only: [:raw, :quote, :edit, :update, :destroy]
   respond_to :html, :js
 
   def index
@@ -7,7 +7,7 @@ class CommentsController < ApplicationController
   end
 
   def show
-    @comments = Comment.recent5.all conditions: {commentable_id: params[:id2], commentable_type: params[:id]}
+    @comments = Comment.recent5.all conditions: { commentable_id: params[:id2], commentable_type: params[:id] }
     render partial: 'list', layout: false
   end
 
@@ -45,6 +45,9 @@ class CommentsController < ApplicationController
     raise AccessError unless @comment.can_destroy? cuser
     @comment.destroy
     redirect_to_back
+  end
+
+  def quote
   end
 
   private

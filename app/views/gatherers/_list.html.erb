@@ -1,32 +1,38 @@
 <% captain = team == 1 ? @gather.captain1 : @gather.captain2 %>
 <% pick = false %>
 
-<h2 class="center">
+<h4>
   <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
-  </h2>
+</h4>
 
-  <%= form_tag("/gathers/pick/#{@gather.id}") do %>
+<%= form_tag("/gathers/pick/#{@gather.id}") do %>
+  <ul class="gatherers">
+    <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
+      <li>
+        <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
+          <% pick = true %>
+          <%= radio_button_tag :player, gatherer.id %><%= flag gatherer.user.country %>
+          <%= namelink gatherer.user %>
 
-    <table id="gatherersTable">
-      <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
-        <tr height="10">
-          <% if @gatherer and gatherer.can_update? cuser, {:team => @gatherer.team} %>
-            <% pick = true %>
-            <td><%= radio_button_tag :player, gatherer.id %><%= flag gatherer.user.country %></td>
-            <td><%= namelink gatherer.user %></td>
-          <% else %>
-            <td><%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %></td>
-            <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
-              <td>&#187;
-              <% else %>
-                <td>
-                <% end %>
-                <%= namelink gatherer.user %><%= " (C)" if gatherer == captain %></td>
-            <% end %>
-          </tr>
+        <% else %>
+          <%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %>
+
+          <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
+            <%= icon 'chevron-right' %>
+          <% end %>
+
+          <%= namelink gatherer.user %>
+
+          <% if gatherer == captain %>
+            <span class="captain">
+              <%= icon('star') %>
+            </span>
+          <% end %>
         <% end %>
-        <% if pick %>
-          >> <a href="javascript:;" class="submit">Pick</a>
-        <% end %>
-      </table>
+      </li>
     <% end %>
+    <% if pick %>
+      <a class="button tiny">Pick</a>
+    <% end %>
+  </table>
+<% end %>

@@ -1,9 +1,17 @@
 Ensl::Application.routes.draw do
+  %w(403 404 422 500).each do |code|
+    get code, to: 'errors#show', code: code
+  end
+
 	root to: "articles#news_index"
 
 	resources :articles do
 		resources :versions
 	end
+
+  match 'contests/del_map'
+  match 'contests/scores'
+  match 'contests/historical', to: "contests#historical"
 
 	resources :contests do
 		get 'current', on: :collection
@@ -13,6 +21,9 @@ Ensl::Application.routes.draw do
 	resources :categories
 	resources :options
 	resources :polls
+
+  match 'comments/quote'
+
 	resources :comments
 	resources :shoutmsgs
 	resources :teamers
@@ -23,6 +34,10 @@ Ensl::Application.routes.draw do
 	resources :groupers
 	resources :forumers
 	resources :topics
+
+  match 'forums/up'
+  match 'forums/down'
+
 	resources :forums
 	resources :users
 	resources :locks
@@ -46,6 +61,9 @@ Ensl::Application.routes.draw do
 	resources :bans
 	resources :tweets
 	resources :issues
+  
+  match 'posts/quote'
+
 	resources :posts
 	resources :brackets
 
@@ -61,21 +79,14 @@ Ensl::Application.routes.draw do
   match 'news/admin', to: "articles#admin"
   match 'articles/cleanup'
 
-  match 'contests/historical', to: "contests#historical"
-
   match 'data_files/admin'
   match 'data_files/addFile'
   match 'data_files/delFile'
   match 'data_files/trash'
 
   match 'contesters/recalc'
-  match 'contests/scores'
-  match 'contests/del_map'
 
   match 'directories', to: "directories#show", id: 1
-
-  match 'forums/up'
-  match 'forums/down'
 
   match 'gathers/refresh'
   match 'gathers/latest/:game', to: "gathers#latest", via: :get
@@ -100,8 +111,6 @@ Ensl::Application.routes.draw do
   match 'users/agenda'
   match 'users/logout'
   match 'users/login'
-
-  match 'posts/quote'
 
   match 'users/agenda'
   match 'users/login'

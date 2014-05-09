@@ -1,71 +1,74 @@
-<div class="wide box">
-  <%= form_for(@forum) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @forum.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
+<div id="forums">
+  <%= form_for(@forum, html: { class: 'square' }) do |f| %>
+    <%= render 'shared/errors', messages: @forum.errors.full_messages %>
 
-    <p>
-      <%= f.label :title %><br />
+    <div class="fields horizontal">
+      <%= f.label :title %>
       <%= f.text_field :title %>
-    </p>
-    <p>
-      <%= f.label :description %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :description %>
       <%= f.text_field :description %>
-    </p>
-    <p>
-      <%= f.label :category %><br />
+    </div>
+    <div class="fields horizontal">
+      <%= f.label :category %>
       <%= f.select :category_id, Category.domain(Category::DOMAIN_FORUMS).ordered.collect{|c| [c, c.id]} %>
-    </p>
-    <p>
+    </div>
+    <div class="controls">
       <%= f.submit 'Save' %>
-    </p>
+    </div>
   <% end %>
-</div>
 
-<% unless @forum.new_record? %>
-  <div class="wide box">
-    <h2>
-      Access Rights
-    </h2>
-
-    If no groups are specified, everyone is allowed for the specific access type.
-
-    <table class="data">
+  <% unless @forum.new_record? %>
+    <h2>Access Rights</h2>
+    <p>If no groups are specified, everyone is allowed for the specific access type.</p>
+    
+    <table id="acl" class="striped">
       <tr>
-        <th>Group</th>
-        <th>Access Level</th>
-        <th>Options</th>
+        <th class="group">Group</th>
+        <th class="level">Access Level</th>
+        <th class="options">Options</th>
       </tr>
 
       <% @forum.forumers.each do |forumer| %>
-        <tr class="<%= cycle('even', 'odd') %>">
-          <%= form_for forumer do |g| %>
-            <td><%= namelink forumer.group %></td>
-            <td>
-              <%= g.select :access, forumer.accesses.invert, :size => 20 %>
-            </td>
-            <td>
-              <%= link_to_function "Update", "$('edit_forumer_#{forumer.id}').submit()" %>
-              <%= link_to "Remove", forumer, :method => :delete %>
-            </td>
-          <% end %>
+        <tr>
+          <td><%= namelink forumer.group %></td>
+          <td>
+            <%= form_for forumer do |g| %>
+              <div class="fields">
+                <%= g.select :access, forumer.accesses.invert, size: 20 %>
+              </div>
+            <% end %>
+          </td>
+          <td>
+            <%= content_tag :a, { class: 'button tiny', data: { forumer: forumer.id } } do %>
+              Update
+            <% end %>
+            <%= link_to "Remove", forumer, method: :delete, class: 'button tiny' %>
+          </td>
         </tr>
       <% end %>
     </table>
 
-    <%= form_for @forum.forumers.build do |f| %>
-      <%= f.error_messages %>
+    <%= form_for @forum.forumers.build, html: { class: 'add-acl' } do |f| %>
+      <%= render 'shared/errors', messages: @forum.errors.full_messages %>
+
       <%= f.hidden_field :forum_id %>
-      <p>
-        <%= f.label :group_id %><br />
+      
+      <div class="fields permissions">
+        <h4>Grant Access</h4>
         <%= f.select :group_id, Group.all.collect{|g| [g, g.id]} %>
         <%= f.select :access, f.object.accesses.invert, :size => 20 %>
-        <%= f.submit "Add" %>
-      </p>
+      </div>
+      <div class="controls">
+        <%= f.submit "Add" %>  
+      </div>
     <% end %>
-  </div>
-<% end %>
+  <% end %>
+
+  <script>
+    $('a[data-forumer]').click(function() {
+      $('#edit_forumer_' + $(this).data('forumer')).submit();
+    });
+  </script>
+</div>

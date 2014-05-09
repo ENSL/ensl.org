@@ -1,0 +1,48 @@
+footer.footer {
+  $footer-link-color: #5a5a5a;
+
+  background: image-url('layout/footer-background.png');
+  height: 155px;
+  max-height: 155px;
+
+  .content {
+    padding-top: $container-padding;
+  }
+
+  .footer-links {
+    @include clearfix;
+  }
+
+  ul {
+    @include media($medium-screen) {
+      @include span-columns(3);
+      @include omega(4n);
+      @include clearfix;
+    }
+  }
+
+  li {
+    text-align: center;
+
+    @include media($medium-screen) {
+      text-align: center;
+    }
+  }
+
+  li a {
+    color: $footer-link-color;
+  }
+
+  li h3 a {
+    text-transform: uppercase;
+    color: white;
+    font-size: 20px;
+  }  
+
+  p {
+    color: $footer-link-color;
+    margin: auto;
+    max-width: 35em;
+    text-align: center;
+  }
+}

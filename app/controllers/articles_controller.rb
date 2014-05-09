@@ -6,9 +6,8 @@ class ArticlesController < ApplicationController
   end
 
   def news_index
-    @news = Article.with_comments.ordered.limited.nodrafts.onlynews
+    @news = Article.with_comments.ordered.nodrafts.onlynews.limit(10)
     @categories = Category.ordered.domain(Category::DOMAIN_NEWS)
-    @nobody = true
   end
 
   def news_archive
@@ -24,7 +23,6 @@ class ArticlesController < ApplicationController
     raise AccessError unless @article.can_show? cuser
     @article.read_by! cuser if cuser
     # @article.record_view_count(request.remote_ip, cuser.nil?)
-    @nobody = true
   end
 
   def new

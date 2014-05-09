@@ -23,8 +23,8 @@
   </table>
 <% end %>
 
-<%= render :partial => "brackets/bracket", :collection => contest.brackets %>
+<%= render partial: "brackets/bracket", collection: contest.brackets %>
 
 <% if cuser and cuser.admin? and params[:action] != "historical" %>
-  <%= link_to 'Edit', edit_contest_path(contest) %>
+  <%= link_to 'Edit Brackets', edit_contest_path(contest), class: 'button' %>
 <% end %>

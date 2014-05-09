@@ -14,10 +14,11 @@
 # OS X
 .DS_Store
 
-# Assets
+# Uploaded Assets
 /public/system/*
 /public/files/*
 /public/local
+/public/uploads
 
 # RubyMine
 /.idea

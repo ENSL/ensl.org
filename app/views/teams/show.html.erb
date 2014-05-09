@@ -1,108 +1,93 @@
-<h1 class="center">
-  <%= h @team.name %>
-</h1>
+<div id="team-profile">
+  <h1 class="fancy">
+    <span><%=h @team.name %></span>
+  </h1>
 
-<% if @team.logo %>
-  <%= image_tag @team.logo.url, :class => "centered" %>
-<% end %>
-
-<br />
-
-<div id="teamTab">
-  <ul id="teamTab-nav" class="tabs">
-    <li><a href="#general">General</a></li>
-    <li><a href="#members">Members</a></li>
-    <li><a href="#matches">Matches</a></li>
-    <li><a href="#statistics">Statistics</a></li>
-  </ul>
-
-  <div class="box wide tabs">
-    <div class="tab" id="general">
-      <table class="split">
-        <tr>
-          <th>Irc:</th>
-          <td><%= h @team.irc %></td>
-        </tr>
-
-        <tr>
-          <th>Web:</th>
-          <td><%= h @team.web %></td>
-        </tr>
-
-        <tr>
-          <th>Tag:</th>
-          <td><%= h @team.tag %></td>
-        </tr>
-
-        <tr>
-          <th>Country:</th>
-          <td><%= h @team.country %></td>
-        </tr>
-
-        <tr>
-          <th>Founder:</th>
-          <td><%= namelink @team.founder %></td>
-        </tr>
-
-        <tr>
-          <th>Comment:</th>
-          <td><%= h @team.comment %></td>
-        </tr>
-
-        <% if @team.recruiting %>
-        <tr>
-          <th>Recruiting:</th>
-          <td><%= h @team.recruiting %></td>
-        </tr>
-      <% end %>
-      </table>
-
-      <p class="center">
-        <%= link_to "Send a message", :controller => "messages", :action => "new", :id => "Team", :id2 => @team %>
-      </p>
+  <% if @team.logo %>
+    <div class="logo">
+      <%= image_tag @team.logo.url, class: 'logo', alt: h(@team.name) %>
     </div>
+  <% end %>
 
-    <div class="tab" id="members">
-      <h3 class="center">
-        Current Members
-      </h3>
+  <div id="team" class="tabbed">
+    <ul id="team-nav" class="tabs">
+      <li><a href="#general">General</a></li>
+      <li><a href="#members">Members</a></li>
+      <li><a href="#matches">Matches</a></li>
+      <li><a href="#statistics">Statistics</a></li>
+    </ul>
 
-      <%= render :partial => "teamers/list", :locals => {:teamers => @team.teamers.active.ordered.distinct, :blacklist => false, :comment => true } %>
+    <div class="tabbed-contents">
+      <div class="tab" id="general">
+        <dl>        
+          <dt>IRC:</dt>
+          <dd><%=h @team.irc %></dd>
+          <dt>Web:</dt>
+          <dd><%=h @team.web %></dd>
+          <dt>Tag:</dt>
+          <dd><%=h @team.tag %></dd>
+          <dt>Country:</dt>
+          <dd><%=h @team.country %></dd>
+          <dt>Founder:</dt>
+          <dd><%= namelink @team.founder %></dd>
+          <dt>Comment:</dt>
+          <dd><%=h @team.comment %></dd>
+          <% if @team.recruiting %>
+            <dt>Recruiting:</dt>
+            <dd><%=h @team.recruiting %></dd>
+          <% end %>
+        </dl>
 
-      <h3 class="center">
-        Past Members
-      </h3>
+        <%= link_to "Send a message", { controller: "messages", action: "new", id: "Team", id2: @team }, { class: 'button tiny' } %>
+      </div>
 
-      <%= render :partial => "teamers/list", :locals => {:teamers => @team.teamers.past.distinct, :blacklist => @team.teamers.active.ordered.distinct, :comment => false} %>
-    </div>
+      <div class="tab" id="members">
+        <% if @team.teamers.active.ordered.distinct.length > 0 %>
+          <h3>Current Members</h3>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.distinct, blacklist: false, comment: true } %>
+        <% end %>
 
-    <div class="tab" id="matches">
-      <% @team.contesters.chronological.each do |contester| %>
-        <% next if Match.finished.ordered.of_contester(contester).count == 0 %>
-        <h3>
-          <%= link_to contester.contest, contester.contest, :name => "contest_#{contester.contest.id}" %>
-        </h3>
+        <% if @team.teamers.past.distinct.length > 0 %>
+          <h3>Past Members</h3>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.past.distinct, blacklist: @team.teamers.active.ordered.distinct, comment: false } %>
+        <% end %>
+      </div>
 
-        <%= render :partial => "matches/list",
-          :locals => {:matches => Match.finished.ordered.of_contester(contester), :friendly => contester.team, :contest => false} %>
-      <% end %>
-    </div>
+      <div class="tab" id="matches">
+        <% @team.contesters.chronological.each do |contester| %>
+          <% next if Match.finished.ordered.of_contester(contester).count == 0 %>
+          <h3>
+            <%= link_to contester.contest, contester.contest, :name => "contest_#{contester.contest.id}" %>
+          </h3>
+          <%= render partial: "matches/list", locals: { matches: Match.finished.ordered.of_contester(contester), friendly: contester.team, contest: false } %>
+        <% end %>
+      </div>
 
-    <div class="tab" id="matches">
-      <p>
-        <b>Matches:</b> <%= @team.matches_finished.count %> played  / <%=  @team.matches.count %> total<br />
-        - <b>Won:</b> <%=  @team.matches_won.count %> (<%= 100.0*@team.matches_won.count/@team.matches_finished.count %> %) <br />
-        - <b>Lost:</b> <%=  @team.matches_lost.count %> (<%= 100.0*@team.matches_lost.count/@team.matches_finished.count %> %) <br />
-        - <b>Draw:</b> <%=  @team.matches_draw.count %> (<%= 100.0*@team.matches_draw.count/@team.matches_finished.count %> %) <br />
-      </p>
+      <div class="tab" id="matches">
+        <dl>
+          <dt>Matches:</dt>
+          <dd><%= @team.matches_finished.count %> played / <%= @team.matches.count %> total</dd>
+          <dt>Won:</dt>
+          <dd><%= @team.matches_won.count %> (<%= 100.0*@team.matches_won.count/@team.matches_finished.count %> %)</dd>
+          <dt>Lost:</dt>
+          <dd><%= @team.matches_lost.count %> (<%= 100.0*@team.matches_lost.count/@team.matches_finished.count %> %)</dd>
+          <dt>Draw:</dt>
+          <dd><%= @team.matches_draw.count %> (<%= 100.0*@team.matches_draw.count/@team.matches_finished.count %> %)</dd>
+        </dl>
+      </div>
     </div>
   </div>
+
+  <script type="text/javascript">
+    new Yetii({
+      id: 'team',
+      active: 2
+    });
+  </script>
+
+  <% if cuser and @team.can_update? cuser %>
+    <div class="controls">
+      <%= link_to 'Edit Team', edit_team_path(@team), class: 'button' %>
+    </div>
+  <% end %>
 </div>
-
-<script type="text/javascript">
-  var tabber1 = new Yetii({id: 'teamTab', active: 2});
-</script>
-
-<% if cuser and @team.can_update? cuser %>
-  <%= link_to 'Edit', edit_team_path(@team) %>
-<% end %>

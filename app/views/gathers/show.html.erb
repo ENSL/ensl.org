@@ -1,3 +1,4 @@
+<div id="jplayer"></div>
 <script type="text/javascript">
   var played = false;
 
@@ -10,7 +11,7 @@
       success: function(response) {
         if (response.match(/Gather:voting/)) {
           if (!played) {
-            $("#jquery_jplayer_1").jPlayer({
+            $("#jplayer").jPlayer({
               ready: function() {
                 $(this).jPlayer("setMedia", {
                   mp3: "http://www.ensl.org/sounds/gather-5.mp3"
@@ -18,7 +19,7 @@
                 
                 var click = document.ontouchstart === undefined ? 'click' : 'touchstart';
                 var kickoff = function () {
-                  $("#jquery_jplayer_1").jPlayer("play");
+                  $("#jplayer").jPlayer("play");
                   document.documentElement.removeEventListener(click, kickoff, true);
                 };
 
@@ -33,75 +34,77 @@
           }
         }
         else if (response.length > 10) {
-          $("#jquery_jplayer_1").jPlayer("stop");
+          $("#jplayer").jPlayer("stop");
         }
       }
     });
   });
 </script>
 
-<div id="jquery_jplayer_1"></div>
+<div id="gather">
+  <h1 class="fancy">
+    <span>
+      <%= link_to @gather do %>
+        <%= @gather.category.to_s %> Gather
+      <% end %>  
+    </span>
+  </h1>
 
-<div class="wide">
-  <h2 class="center">
-    <div class="left">
-      <small><small><%= link_to raw("&#171;&#171; First"), @gather.first %></small></small>
-      <%= link_to raw("Previous &#8249;&#8249;"), @gather.previous_gather %>
-    </div>
-    <%= link_to @gather do %>
-      <%= @gather.category.to_s %> Gather
+  <div class="previous">
+    <%= link_to @gather.previous_gather, class: 'button tiny' do %>
+      <%= icon 'chevron-left' %> Previous
     <% end %>
-    <div class="right">
-      <% if @gather.next_gather %>
-        <%= link_to raw("&#8250;&#8250; Next"), @gather.next_gather%>
-        <small><small><%= link_to raw("Last &#187;&#187;"), @gather.last %></small></small>
-      <% else %>
-        <%= raw("&#8250;&#8250; Next") %>
-        <small><small><%= raw("Last &#187;&#187;") %></small></small>
+  </div>
+
+  <div class="next">
+    <% if @gather.next_gather %>
+      <%= link_to @gather.next_gather, class: 'button tiny' do %>
+        Next <%= icon 'chevron-right' %>
       <% end %>
-    </div>
-  </h2>
+    <% end %>
+  </div>
 
   <% if @gather and @gather.status != Gather::STATE_FINISHED %>
-    <div class="box wide" id="gatherInfo">
-      <h3 class="center">
+    <div id="gather-info">
+      <div class="info">
+        <h6>Requirements</h6>
+        <ul>
+          <li><a href="https://www.google.com/adsense/support/bin/answer.py?hl=en&amp;answer=12654">JavaScript</a> enabled</li>
+          <li>Read the <%= link_to "Gather Rules", article_url(Article::G_RULES) %></li>
+          <li>Remove yourself if you leave</li>
+        </ul>
+      </div>
 
-      </h3>
+      <div class="info">
+        <h6>Captains</h6>
+        <ul>
+          <li>Vote for the <strong>best</strong> players</li>
+          <li>Captain 1 = 2nd most voted</li>
+          <li>Captain 2 = 1st most voted</li>
+        </ul>
+      </div>
 
-      <table class="wide" id="gatherInfoText">
-        <tr>
-          <td>
-            <b>Requirements</b><br />
-            - <a href="https://www.google.com/adsense/support/bin/answer.py?hl=en&amp;answer=12654">Javascript</a> needs to enabled<br />
-            - Read <%= link_to "gather rules", article_url(Article::G_RULES) %> <br />
-            - Remove yourself if you leave
-          </td>
+      <div class="info">
+        <h6>Voice Comunication</h6>
+        <ul>
+          <li><%= link_to "Teamspeak 3", "http://www.teamspeak.com/?page=downloads" %></li>
+          <li><strong>Server:</strong> <a href="ts3server://ensl.org">ensl.org</a></li>
+          <li><strong>Password:</strong> ns2nsl</li>
+        </ul>
+      </div>
 
-          <td>
-            <b>Captains:</b><br />
-            - Vote for the <b>best</b> players<br />
-            - Captain 1 = 2nd most voted<br />
-            - Captain 2 = 1st most voted<br />
-          </td>
-
-          <td>
-            <b>Voice Comunication:</b><br />
-            - <%= link_to "Teamspeak 3", "http://www.teamspeak.com/?page=downloads" %> <br />
-            - <b>Server:</b> <a href="ts3server://ensl.org">ensl.org</a><br />
-            - <b>Password:</b> ns2nsl
-          </td>
-        </tr>
-      </table>
-
-      <div class="center">
-        <a href="javascript:;" id="gatherInfoHide">Hide information</a>
+      <div class="hide">
+        <a id="gather-info-hide" class="button tiny">
+          <%= icon 'times' %>
+          Hide information
+        </a>
       </div>
     </div>
   <% end  %>
 
-  <div id="gatherArea">
+  <div id="gather-area">
     <%= render_gather %>
   </div>
 
-  <%= render :partial => "shoutmsgs/index", :locals => {:object => @gather} %>
+  <%= render partial: 'shoutmsgs/index', locals: { object: @gather } %>
 </div>

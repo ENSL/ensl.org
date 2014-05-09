@@ -1,28 +1,34 @@
-<table class="data">
+<table class="striped">
   <tr>
-    <th></th>
-    <th>Name</th>
-    <th>Irc</th>
-    <th>Members</th>
+    <th class="country"></th>
+    <th class="name">Name</th>
+    <th class="irc">IRC</th>
+    <th class="members">Members</th>
     <% if cuser and cuser.admin? %>
-      <th>Options</th>
+      <th class="actions"></th>
     <% end %>
   </tr>
 
   <% for team in teams %>
     <% if team.teamers_num > 0 %>
-      <tr class="<%= cycle('even', 'odd') %>">
+      <tr>
         <td><%= flag team.country %></td>
         <td><%= namelink team %></td>
-        <td><%= h team.irc[0,15] if team.irc %></td>
+        <td><%= h team.irc if team.irc %></td>
         <td><%= h team.teamers_num %></td>
         <% if cuser and cuser.admin? %>
-          <td>
-            <%= link_to 'Edit', edit_team_path(team) %>
+          <td class="actions">
+            <%= link_to edit_team_path(team) do %>
+              <%= icon 'pencil' %>
+            <% end %>
             <% if team.active %>
-              <%= link_to 'Destroy', team, :confirm => 'Are you sure?', :method => :delete %>
+              <%= link_to team, confirm: 'Are you sure?', method: :delete do %>
+                <%= icon 'times' %>
+              <% end %>
             <% else %>
-              <%= link_to 'Recover', :action => "recover", :id => team %>
+              <%= link_to action: "recover", id: team do %>
+                <%= icon 'save' %>
+              <% end %>
             <% end %>
           </td>
         <% end %>

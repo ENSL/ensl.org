@@ -1,0 +1,317 @@
+/*
+  Forums
+*/
+
+#forums {
+  position: relative;
+
+  .topic-controls {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: auto;
+
+    a:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .pagination {
+    margin-bottom: 20px;
+  }
+}
+
+/*
+  Categories
+*/
+
+div#categories {
+
+  .category {
+    @include clearfix;
+    margin: 20px 0;
+  }
+
+  /*
+    Tables
+  */
+
+  table.category {
+    table-layout: auto;
+    margin: 0;
+    background: white;
+    padding: 20px;
+    box-shadow: $light-shadow;
+    border-radius: 10px;
+    border: 0;
+
+    thead th {
+      @include linear-gradient(#15181b, #0d1011);
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      font-family: $header-font-family;
+      font-size: 16px;
+      color: white;
+      border-bottom: 0;
+      text-transform: uppercase;
+
+      &:first-child {
+        border-radius: 10px 0 0 10px;
+      }
+
+      &:last-child {
+        border-radius: 0 10px 10px 0;
+      }
+    }
+
+    th.category {
+      font-family: 'Impact';
+      font-weight: normal;
+      color: #36b1ff;
+      font-size: 24px;
+      padding-left: 20px;
+    }
+  }
+
+  .bullet {
+    width: 10%;
+
+    background: {
+      image: image-url('layout/forum-category.png');  
+      position: center center;
+      repeat: no-repeat;
+    }
+
+    &.updated {
+      background-image: image-url('layout/forum-category-highlight.png');
+    }
+  }
+
+  .forum {
+    width: 45%;
+    padding-right: 10px;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: center;
+  }
+
+  .topics,
+  .posts {
+    width: 10%;
+  }
+  
+  .last {
+    width: 15%;
+  }
+}
+
+/*
+  Topics
+*/
+
+#topics {
+  table-layout: auto;
+  margin-bottom: 20px;
+  background: white;
+  padding: 20px;
+  box-shadow: $light-shadow;
+  border-radius: $base-border-radius;
+  border: 0;
+
+  .unread {
+    color: $red;
+  }
+
+  thead th {
+    @include linear-gradient(#15181b, #0d1011);
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+    font-family: $header-font-family;
+    font-size: 16px;
+    color: white;
+    text-transform: uppercase;
+
+    &:first-child {
+      border-radius: $base-border-radius 0 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 $base-border-radius 0 0;
+    }
+  }
+
+  .topic {
+    width: 55%;
+  }
+
+  .author {
+    width: 10%;
+  }
+
+  .replies,
+  .views {
+    width: 10%;
+  }
+
+  .last {
+    width: 15%;
+  }
+}
+
+.statistics {
+  padding: 20px;
+  background: white;
+  margin: 20px 0;
+  box-shadow: $light-shadow;
+  border-radius: $base-border-radius;
+
+  h4 {
+    margin-bottom: 1em;
+  }
+}
+
+#topic {
+  position: relative;
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .pagination {
+    margin-top: 0;
+  }
+
+  #reply {
+    @include span-columns(12);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: none;
+    background: white;
+    border-radius: $base-border-radius;
+    box-shadow: $light-shadow;
+
+    form {
+      margin-bottom: 0;
+
+      .controls {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+/*
+  Posts
+*/
+
+#posts {
+  @include span-columns(12);
+
+  .post {
+    @include span-columns(12);
+    margin-bottom: 20px;
+    border-radius: $base-border-radius;
+    background: white;
+    padding: 20px;
+    box-shadow: $light-shadow;
+
+    .avatar {
+      @include span-columns(3);
+
+      h5 {
+        text-align: center;
+        margin-bottom: 1em;
+      }
+
+      .image,
+      .team {
+        @include span-columns(12);
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .admin {
+        color: $red;
+      }
+    }
+
+    .content {
+      @include span-columns(9);
+      @include omega;
+
+      .text,
+      .signature {
+        @include span-columns(12);
+        padding: 20px 0;
+      }
+
+      .text {
+        margin-top: 20px;
+
+        fieldset {
+          border-color: darken($light-gray, 10);
+          border-radius: $base-border-radius;
+        }
+      }
+    }
+
+    .header {
+      @include span-columns(12);
+
+      .time {
+        @include span-columns(6);
+      }
+
+      .posts {
+        @include span-columns(6);
+        text-align: right;
+      }
+    }
+
+    .base {
+      @include span-columns(12);
+      padding-top: 20px;
+      border-top: 1px solid $light-gray;
+
+      .user {
+        @include span-columns(3);
+      }
+
+      .signature {
+        @include span-columns(9);
+        @include omega;
+        position: relative;
+
+        .controls {
+          position: absolute;
+          top: 0;
+          right: 0;
+
+          a:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+/*
+  Forms
+*/
+
+#forums .add-acl {
+
+  h4 {
+    margin: 1em 0;
+  }
+
+  .permissions,
+  .controls {
+    display: inline;
+    width: auto;
+    float: none;
+  }
+}

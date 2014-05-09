@@ -1,19 +1,40 @@
 <div class="logged">
-  <%= form_tag :controller => "users", :action => "logout" do %>
-    <div class="button">
-      <%= link_to 'Profile', edit_user_path(cuser) %>
-    </div>
-    <div class="button">
-      <%= link_to 'Agenda', "/users/agenda/#{cuser.id}" %>
-    </div>
-    <div class="button">
-      <%= link_to 'PMs', messages_path() %>
-      <% if c = cuser.new_messages.count > 0 %>
-        (<%= cuser.new_messages.count %>)
+  <div class="links">
+    <ul>
+      <% if cuser.admin? %>
+        <li>
+          <%= link_to '/about/adminpanel', class: 'admin' do %>
+            Admin (<%= Issue.with_status(0).count  %>) <%= icon 'wrench' %>
+          <% end %>
+        </li>
       <% end %>
-    </div>
-    <div class="button">
-      <%= link_to_function "Logout", '$(this).closest("form").submit();' %>
-    </div>
-  <% end %>
+      <li>
+        <%= link_to edit_user_path(cuser) do %>
+          Account <%= icon 'user' %>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to "/users/agenda/#{cuser.id}" do %>
+          Agenda <%= icon 'calendar' %>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to messages_path do %>
+          Messages <%= icon 'envelope' %>
+        <% end %>
+        <% if c = cuser.new_messages.count > 0 %>
+          (<%= cuser.new_messages.count %>)
+        <% end %>
+      </li>
+      <li>
+        <%= form_tag(controller: 'users', action: 'logout') do %>
+          <%= link_to '#', id: 'logout' do %>
+            Logout <%= icon 'key' %>
+          <% end %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+
+  <div class="avatar" style="background-image: url('<%= cuser.profile.avatar.url %>')"></div>
 </div>

@@ -1,35 +1,29 @@
-<div class="wide box">
-  <%= form_for(@ban) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @ban.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
+<%= form_for @ban, html: { class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @ban.errors.full_messages %>
 
-    <p>
-      <%= link_to_function 'User', "findUser('ban[user_name]')" %><br />
-      <%= f.text_field :user_name, {:value => @ban.user.to_s} %>
-    </p>
-    <p>
-      <%= f.label :ban_type %><br />
-      <%= f.select :ban_type, @ban.types.invert %>
-    </p>
-    <p>
-      <%= f.label :steamid %><br />
-      <%= f.text_field :steamid %>
-    </p>
-    <p>
-      <%= f.label :expiry %><br />
-      <%= f.datetime_select :expiry %>
-    </p>
-    <p>
-      <%= f.label :reason %> <%= bbcode %><br />
-      <%= f.text_area :reason %>
-    </p>
-    <p>
-      <%= f.submit 'Create' %>
-    </p>
-  <% end %>
-</div>
+  <div class="fields horizontal">
+    <%= f.label :user_name %>
+    <%= f.text_field :user_name, { value: @ban.user.to_s } %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :ban_type %>
+    <%= f.select :ban_type, @ban.types.invert %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :steamid %>
+    <%= f.text_field :steamid %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :expiry %>
+    <%= f.datetime_select :expiry, datetime_separator: '', time_separator: '' %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :reason do %>
+      Reason (<em>BB Code</em>)
+    <% end %>
+    <%= f.text_area :reason %>
+  </div>
+  <div class="controls">
+    <%= f.submit 'Create' %>
+  </div>
+<% end %>

@@ -1,21 +1,28 @@
-<h1>New topic</h1>
+<h1>New Topic</h1>
 
-<%= form_for @topic, :html => { :multipart => true } do |f| %>
-  <%= f.error_messages %>
+<%= form_for @topic, html: { multipart: true, class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @topic.errors.full_messages %>
+
   <%= f.hidden_field :forum_id %>
 
-  <p>
-    <%= f.label :title %><br />
-    <%= f.text_field :title, :size => 50 %>
-  </p>
+  <div class="fields horizontal">
+    <%= f.label :forum %>
+    <div class="inputs">
+      <%= @topic.forum %>
+    </div>
+  </div>
 
-  <p>
-    <%= f.text_area :first_post, :rows => 15, :cols => 108 %>
-  </p>
+  <div class="fields horizontal">
+    <%= f.label :title %>
+    <%= f.text_field :title, size: 50 %>
+  </div>
 
-  <p>
-    <%= f.submit 'Create the topic' %>
-  </p>
+  <div class="fields horizontal">
+    <%= f.label :post %>
+    <%= f.text_area :first_post, rows: 15 %>
+  </div>
+
+  <div class="controls">
+    <%= f.submit 'Create Topic' %>
+  </div>
 <% end %>
-
-<%= link_to 'Back', @topic.forum %>

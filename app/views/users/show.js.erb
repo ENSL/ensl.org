@@ -1,7 +1,8 @@
-$("td#userData").fadeIn("fast");
-$("td#userData").html("<%= escape_javascript(render(:partial => @page)) %>");
+$("#user-data").fadeIn("fast");
+$("#user-data").html("<%= escape_javascript(render(:partial => @page)) %>");
+
 <% if ["comments", "matches", "predictions", "teams"].include? @page %>
-  $("td#userData").removeClass("box");
+  $("#user-data").removeClass("box");
 <% else %>
-$("td#userData").addClass("box");
+  $("#user-data").addClass("box");
 <% end %>

@@ -1,0 +1,90 @@
+/*
+  File Page
+*/
+
+#file {
+
+  .actions,
+  .files-list {
+    @include span-columns(12);
+    margin: 20px 0;
+  }
+}
+
+/*
+  Files List
+*/
+
+#files {
+
+  .file {
+    @include span-columns(12);
+    padding-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    border-top: 3px solid $light-gray;
+
+    .actions {
+      position: absolute;
+      top: 20px;
+      right: 0;
+    }
+
+    .comments {
+      float: right;
+
+      i {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .controls {
+    @include span-columns(12);
+    margin-top: 20px;
+  }
+}
+
+/*
+  Movies List
+*/
+
+#movies {
+
+  .filters {
+    @include span-columns(12);
+    margin-bottom: 20px;
+  }
+}
+
+table.movie {
+
+  .controls {
+    @include span-columns(12);
+    margin: 20px 0;
+  }
+}
+
+.movie-full {
+
+  .title {
+    display: none;
+  }
+
+  #player {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 0px;
+    padding-bottom: 56%;
+    padding-top: 50px;
+    margin-bottom: 20px;
+
+    object {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+    }
+  }
+}

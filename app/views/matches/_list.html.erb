@@ -1,18 +1,18 @@
-<table class="data">
+<table id="matches" class="<%= 'contest' if contest %> striped">
   <tr>
     <% if contest %>
-      <th width="20%">Contest</th>
-      <th width="20%">Opponent</th>
+      <th class="contest">Contest</th>
+      <th class="opponent">Opponent</th>
     <% else %>
-      <th width="30%">Opponent</th>
+      <th class="opponent">Opponent</th>
     <% end %>
-    <th width="20%">Date</th>
+    <th class="date">Date</th>
     <% unless defined? exclude_maps %>
-      <th width="20%">Maps</th>
+      <th class="maps">Maps</th>
     <% end %>
-    <th width="5%">Score</th>
+    <th class="score">Score</th>
     <% if matches.first and matches.first.contest.contest_type == Contest::TYPE_LADDER %>
-      <th width="5%">Points</th>
+      <th class="points">Points</th>
     <% end %>
   </tr>
 
@@ -35,21 +35,21 @@
           <%= match.map1 %>, <%= match.map2 %>
         </td>
       <% end %>
-      <td>
+      <td class="score">
         <%= link_to match, :class => "bold #{match.score_color}" do %>
           <% if friendly == match.contester1.team %>
-            <%= h match.score1 %> - <%= h match.score2 %>
+            <%=h match.score1 %> - <%=h match.score2 %>
           <% else %>
-            <%= h match.score2 %> - <%= h match.score1 %>
+            <%=h match.score2 %> - <%=h match.score1 %>
           <% end %>
         <% end %>
       </td>
       <% if match.contest.contest_type == Contest::TYPE_LADDER %>
         <td>
           <% if match.get_friendly(:points) > 0 %>
-            <%= image_tag "icons/up.gif" %>
+            <%= icon 'chevron-up' %>
           <% elsif match.get_friendly(:points) < 0 %>
-            <%= image_tag "icons/down.gif" %>
+            <%= icon 'chevron-down' %>
           <% end %>
           <%= match.get_friendly(:points) %>
         </td>

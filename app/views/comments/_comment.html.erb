@@ -1,21 +1,25 @@
-<div class="commentBox centered">
-  <h5>
-    By: <%= namelink comment.user %>
-  <% if comment.user.team %>
-    ( <%= namelink comment.user.team %> )
-  <% end %>
-  on <%= shorttime comment.created_at %>
-<% if cuser %>
-  [ <%= link_to_function 'Q', "QuoteText('comments', #{comment.id}, '#{comment.user}')" %>
-<% if comment.can_update? cuser %>
-  <%= link_to 'E', edit_comment_path(comment) %>
-  <% end; if comment.can_destroy? cuser %>
-  <%= link_to 'D', comment, :confirm => 'Are you sure?', :method => :delete %>
-<% end %>
-]
-                <% end %>
-              </h5>
-              <div id="comment_<%= comment.id %>">
-                <%= raw comment.text_parsed %>
-              </div>
-            </div>
+<div id="comment_<%= comment.id %>" class="comment">
+  <div class="comment-image">
+    <%= image_tag comment.user.profile.avatar.url %>
+  </div>
+  <div class="comment-content">
+    <h1>
+      <%= flag(comment.user.country) if comment.user.country %>
+      <%= namelink(comment.user) %>
+      <% if comment.user.team %> | <%= namelink(comment.user.team) %><% end %>
+    </h1>
+    <div class="controls">
+      <% if cuser %>
+        <%= link_to_function icon('comment'), "QuoteText(#{comment.id}, 'comments')" %>
+        <% if comment.can_update? cuser %>
+          <%= link_to icon('pencil'), edit_comment_path(comment) %>
+        <% end %>
+        <% if comment.can_destroy? cuser %>
+          <%= link_to icon('times'), comment, :confirm => 'Are you sure?', :method => :delete %>
+        <% end %>
+      <% end %>
+    </div>
+    <%= comment.text_parsed.html_safe %>
+    <p class="comment-detail"><%= comment.created_at.strftime("%-d %B %Y, %H:%M") %></h2>
+  </div>
+</div>

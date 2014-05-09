@@ -1,34 +1,32 @@
-<h1>Listing polls</h1>
+<h1>Listing Polls</h1>
 
-<table class="data">
+<table class="polls striped">
   <tr>
-    <th>Question</th>
-    <th>End date</th>
-    <th>Votes</th>
-    <th>User</th>
+    <th class="question">Question</th>
+    <th class="date">End date</th>
+    <th class="votes">Votes</th>
+    <th class="user">User</th>
     <% if cuser and cuser.admin? %>
-      <th>Options</th>
+      <th class="actions"></th>
     <% end %>
   </tr>
 
   <% @polls.reverse_each do |poll| %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= link_to (h poll.question), poll %></td>
       <td><%= longtime poll.end_date %></td>
-      <td><%= h poll.votes %></td>
-      <td><%= h poll.user %></td>
+      <td><%=h poll.votes %></td>
+      <td><%=h poll.user %></td>
       <% if cuser and cuser.admin? %>
-        <td>
-          <%= link_to 'Edit', edit_poll_path(poll) %>
-          <%= link_to 'Destroy', poll, :confirm => 'Are you sure?', :method => :delete %>
+        <td class="actions">
+          <%= link_to icon('pencil'), edit_poll_path(poll) %>
+          <%= link_to icon('times'), poll, confirm: 'Are you sure?', method: :delete %>
         </td>
       <% end %>
     </tr>
   <% end %>
 </table>
 
-<br />
-
 <% if cuser and cuser.admin? %>
-  <%= link_to 'New poll', new_poll_path %>
+  <%= link_to 'New Poll', new_poll_path, class: 'button' %>
 <% end %>

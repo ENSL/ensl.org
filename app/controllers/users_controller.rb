@@ -53,7 +53,7 @@ class UsersController < ApplicationController
     if @user.valid? and @user.save
       @user.profile = Profile.new
       @user.profile.user = @user
-      @user.profile.save()
+      @user.profile.save
       redirect_to action: :show, id: @user.id
       save_session @user
     else

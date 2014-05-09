@@ -1,0 +1,76 @@
+/*
+  Tabs
+*/
+
+.tabbed {
+  $tabs-border-width: 1px;
+  $tabs-border-colour: $light-blue;
+  $tabs-padding-horizontal: 16px;
+  $tabs-height: 35px;
+
+  ul.tabs {
+    @include span-columns(12);
+    display: block;
+    font-family: $header-font-family;
+    height: $tabs-height;
+    max-height: $tabs-height;
+    position: relative;
+
+    li {
+      float: left;
+      display: block;
+
+      a {
+        @include linear-gradient($blue, $dark-blue);
+        background-color: $blue;
+        border: $tabs-border-width solid $tabs-border-colour;
+        border-right: 0;
+        padding: 0 $tabs-padding-horizontal;
+        float: left;
+        display: block;
+        color: white;
+        font-weight: 400;
+        line-height: $tabs-height;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      &:first-child a {
+        border-radius: $base-border-radius 0 0 0;
+      }
+
+      &:last-child a {
+        border-right: $tabs-border-width solid $tabs-border-colour;
+        border-radius: 0 $base-border-radius 0 0;
+      }
+
+      &.activeli {
+        z-index: 100;
+
+        a {
+          @include linear-gradient($light-blue, $blue);
+          background-color: $light-blue;
+        }
+      }
+    }
+  }
+
+  .tabbed-contents {
+    @include span-columns(12);  
+    border: $tabs-border-width solid $tabs-border-colour;
+    border-radius: 0 $base-border-radius $base-border-radius $base-border-radius;
+    background: lighten($light-gray, 10%);
+    box-shadow: $light-shadow;
+    padding: 20px;
+  }
+
+  @for $i from 1 through $grid-columns {
+    ul.tabs-#{$i} {
+      li {
+        @include span-columns($i);
+      }
+    }
+  }
+}

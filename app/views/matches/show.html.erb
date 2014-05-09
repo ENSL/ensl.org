@@ -1,90 +1,118 @@
-<div class="box wide center">
-  <h1>
-    <% if @match.score1 and @match.score2%>
-      <% if @match.score1 > @match.score2; c1 = 'green'; c2 = 'red' end %>
-        <% if @match.score1 < @match.score2; c1 = 'red'; c2 = 'green' end %>
-          <% if @match.score1 == @match.score2; c1 = 'yellow'; c2 = 'yellow' end %>
-            <%= namelink @match.contester1.team if @match.contester1 %>
-            <span class="<%= c1 %>"><%= h @match.score1 %></span>
-            -
-            <span class="<%= c2 %>"><%= h @match.score2 %></span>
-            <%= namelink @match.contester2.team if @match.contester2 %>
-          <% else %>
-            <%= namelink @match.contester1.team if @match.contester1 %>
-            vs
-            <%= namelink @match.contester2.team if @match.contester2 %>
-          <% end %>
-        </h1>
-
-        <h4 class="center">
-          <%= longtime @match.match_time %>
-        </h4>
-
-        <%= cascade @match, [:contest, :server, :hltv, :demo, :referee, [@match.contester1, "team1_lineup"], [@match.contester2, "team2_lineup"], ["Man of the Match", :motm]] %>
-
-        <p>
-          <b>Maps:</b>
-          <%= namelink @match.map1 %>, <%= namelink @match.map2 %>
-        </p>
-
-        <% if @match.hltv %>
-          <p>
-            <%= link_to "Connect to HLTV", "steam://connect/#{@match.hltv.addr}" %>
-          </p>
-        <% end %>
-
-        <%# if cuser and @match.can_update? cuser, [:matchers_attributes] %>
-          <%# if cuser and cuser.admin? %>
-          <!--p-->
-            <%#= link_to "Scoring and lineup", :action => "score", :id => @match %>
-          <!--/p-->
-        <%# end %>
-
-        <% if cuser and @match.can_update? cuser, [:report] %>
-          <p>
-            <%= link_to "Referee (Scoring, Line-Ups, Man of the match)", :controller => :matches, :action => "ref", :id => @match %>
-          </p>
-        <% end %>
-
-        <%# if cuser and @match.can_update? cuser, [:hltv] %>
-          <!--p-->
-            <%#= link_to "Extras", :action => "extra", :id => @match %>
-          <!--/p-->
-        <%# end %>
-
-        <br />
-
-        <h3>
-          Predictions (<%= @match.predictions.count %>)
-        </h3>
-
-        <% if @newpred.can_create? cuser %>
-          <%= form_for @newpred do |f| %>
-            <%= f.hidden_field :match_id %>
-            <%= f.text_field :score1, :size => 1 %> -
-            <%= f.text_field :score2, :size => 1 %>
-            <p>
-              <%= submit_tag "Save Prediction" %>
-            </p>
-          <% end %>
-        <% else %>
-          <p>
-            <b><%= @match.contester1.team if @match.contester1 %></b>: <%= @match.preds(1) %>%<br />
-            <b><%= @match.contester2.team if @match.contester2 %></b>: <%= @match.preds(2) %>%<br />
-          </p>
-        <% end %>
+<div id="match">
+  <div class="contesters">
+    <% if @match.score1 and @match.score2 %>
+      <h1 class="team-1"><%= namelink @match.contester1.team if @match.contester1 %></h1>
+      <div class="versus split">
+        <div class="score-1">
+          <%= h @match.score1 %>
+        </div>
+        <span class="vs"></span>
+        <div class="score-2">
+          <%= h @match.score2 %>
+        </div>
       </div>
+      <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
+    <% else %>
+      <h1 class="team-1"><%= namelink @match.contester1.team if @match.contester1 %></h1>
+      <div class="versus">
+        <span class="vs">VS</span>
+      </div>
+      <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
+    <% end %>
+  </div>
 
-      <% unless @match.report.nil? or @match.report.empty? %>
-        <div class="wide box">
-          <h3>
-            Report
-          </h3>
-
-          <p>
-            <%= raw @match.report %>
-          </p>
+  <% if @match.team1_lineup.any? || @match.team2_lineup.any? %>
+    <div class="lineups <%= 'shift' if !@match.team1_lineup.any? %>">
+      <% if @match.team1_lineup.any? %>
+        <div class="team-1">
+          <ul>
+            <% @match.team1_lineup.each do |teamer| %>
+              <li>
+                <% if teamer.user == @match.motm %>
+                  <%= icon 'star' %>
+                <% end %>
+                <%= teamer.user.username %>
+                <%= flag teamer.user.country %>
+              </li>
+            <% end %>  
+          </ul>
         </div>
       <% end %>
 
-      <%= add_comments @match %>
+      <% if @match.team2_lineup.any? %>
+        <div class="team-2">
+          <ul>
+            <% @match.team2_lineup.each do |teamer| %>
+              <li>
+                <%= flag teamer.user.country %>
+                <%= teamer.user.username %>  
+                <% if teamer.user == @match.motm %>
+                  <%= icon 'star' %>
+                <% end %>
+              </li>
+            <% end %>  
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="details">
+    <h3 class="contest"><%= @match.contest %></h3>
+    <h5 class="date"><%= @match.match_time.strftime("%A %e %B %Y") %></h5>
+    <h5 class="date"><%= Time.use_zone(timezone_offset) { @match.match_time.strftime("%H:%M %Z") } %></h5>
+  </div>
+  
+  <div class="predictions">
+    <h4>Predictions (<%= @match.predictions.count %>)</h4>
+
+    <% if @newpred.can_create? cuser %>
+      <%= form_for @newpred do |f| %>
+        <%= f.hidden_field :match_id %>
+
+        <div class="fields">
+          <div class="team-1">
+            <%= f.text_field :score1, size: 1, placeholder: 0 %>  
+          </div>
+          <div class="team-2">
+            <%= f.text_field :score2, size: 1, placeholder: 0 %>
+          </div>
+        </div>
+
+        <div class="add">
+          <%= submit_tag "Add Prediction", class: 'button tiny' %>  
+        </div>
+      <% end %>
+    <% else %>
+      <div class="team-1">
+        <%= @match.contester1.team if @match.contester1 %>
+        <div class="highlight"><%= @match.preds(1) %>%</div>
+      </div>
+      <div class="team-2">
+        <div class="highlight"><%= @match.preds(2) %>%</div>
+        <%= @match.contester2.team if @match.contester2 %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="details">
+    <%= cascade @match, [:server, :demo, :referee] %>
+    <strong>Maps</strong><br>
+    <%= namelink @match.map1 %>, <%= namelink @match.map2 %>
+  </div>
+  
+  <% unless @match.report.nil? or @match.report.empty? %>
+    <div class="report">
+      <h3>Match Report</h3>
+      <p><%= @match.report.html_safe %></p>
+    </div>
+  <% end %>
+
+  <% if cuser and @match.can_update? cuser, [:report] %>
+    <div class="referee">
+      <%= link_to "Referee Admin", { controller: :matches, action: 'ref', id: @match }, class: 'button' %>
+    </div>
+  <% end %>
+</div>
+
+<%= add_comments @match %>

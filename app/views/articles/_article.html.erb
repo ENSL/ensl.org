@@ -1,30 +1,25 @@
-<div class="article wide">
-  <h1>
-    <%= namelink article %>
-  </h1>
+<div class="article">
+  <h1><%= namelink article %></h1>
 
-  <div class="clear content">
+  <div class="content">
     <% if article.text_coding == Article::CODING_HTML %>
-      <%= raw article.text %>
+      <%= article.text.html_safe %>
     <% else %>
-      <%= raw article.text_parsed %>
+      <%= article.text_parsed.html_safe %>
     <% end %>
   </div>
 
-  <h4 class="left">
-    <%= namelink article.user %> on <%= longtime article.created_at %>
-  </h4>
+  <div class="author">
+    <%= namelink(article.user) %> on <%= longtime article.created_at %>
+  </div>
 
-  <h4 class="right">
+  <div class="actions">
     <% if article.can_update? cuser %>
-      <%= link_to 'Edit', edit_article_path(article) %> |
-      <% end; if article.can_destroy? cuser %>
-      <%= link_to 'Destroy', article, :confirm => 'Are you sure?', :method => :delete %> |
+      <%= link_to 'Edit', edit_article_path(article), class: 'button tiny' %>
     <% end %>
-    <%= link_to "History", article_versions_path(article) %> |
-    <%= link_to "Comments: #{article.comments.count}", article %>
-  </h4>
-
-  <div class="footer">
+    <% if article.can_destroy? cuser %>
+      <%= link_to 'Destroy', article, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+    <% end %>
+    <%= link_to "History", article_versions_path(article), class: 'button tiny' %>
   </div>
 </div>

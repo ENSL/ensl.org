@@ -3,6 +3,7 @@ class BracketsController < ApplicationController
 
   def edit
     raise AccessError unless @bracket.can_update? cuser
+    render layout: 'full'
   end
 
   def create

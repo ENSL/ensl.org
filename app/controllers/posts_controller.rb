@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_filter :get_post, except: [:new, :create]
   respond_to :html, :js
+  layout 'forums'
 
   def quote
     raise AccessError unless @post.can_show? cuser
@@ -10,7 +11,6 @@ class PostsController < ApplicationController
     @post = Post.new
     @post.topic = Topic.find(params[:id])
     raise AccessError unless @post.can_create? cuser
-    render layout: 'forums'
   end
 
   def edit
@@ -27,9 +27,9 @@ class PostsController < ApplicationController
       if @post.save
         flash[:notice] = t(:posts_create)
         format.js  { render }
-      else
-        flash[:error] = t(:posts_invalid) + @post.errors.full_messages.to_s
         format.html { return_to }
+      else
+        format.html { render :new }
       end
     end
   end

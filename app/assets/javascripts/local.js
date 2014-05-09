@@ -105,13 +105,13 @@ $(document).ready(function(){
   });
 });
 
-$( function() {
+$(function() {
   var menuContests;
   var menuGather;
   var menuMaterial;
   var menuForums;
 
-  $( function() {
+  $(function() {
     $('div#indexMenu div.contests').hover(function(){
     });
   });
@@ -121,89 +121,10 @@ $( function() {
       $(this).scrollTop(scrollTop-Math.round(delta));
   });
 
-  // Contests
-  $("div#indexMenu div.contests").mouseenter(function(){
-    $("div#indexItems div.contests").fadeIn(100);
-  });
-
-  $("div#indexMenu div.contests").mouseout(function(){
-    menuContests = setTimeout(function(){
-      $("div#indexItems div.contests").fadeOut(100);
-    }, 100);
-  });
-
-  $("div#indexItems div.contests").mouseenter(function(){
-    clearTimeout(menuContests);
-  });
-
-  $("div#indexItems div.contests").mouseleave(function(){
-    $("div#indexItems div.contests").fadeOut(100);
-  });
-
-  // Gather
-
-  $("div#indexMenu div.gather").mouseenter(function(){
-    $("div#indexItems div.gather").fadeIn(100);
-  });
-
-  $("div#indexMenu div.gather").mouseout(function(){
-    menuGather = setTimeout(function(){
-      $("div#indexItems div.gather").fadeOut(100);
-    }, 100);
-  });
-
-  $("div#indexItems div.gather").mouseenter(function(){
-    clearTimeout(menuGather);
-  });
-
-  $("div#indexItems div.gather").mouseleave(function(){
-    $("div#indexItems div.gather").fadeOut(100);
-  });
-
-  // Forums
-
-  $("div#indexMenu div.material").mouseenter(function(){
-    $("div#indexItems div.material").fadeIn(100);
-  });
-
-  $("div#indexMenu div.material").mouseout(function(){
-    menuMaterial = setTimeout(function(){
-      $("div#indexItems div.material").fadeOut(100);
-    }, 100);
-  });
-
-  $("div#indexItems div.material").mouseenter(function(){
-    clearTimeout(menuMaterial);
-  });
-
-  $("div#indexItems div.material").mouseleave(function(){
-    $("div#indexItems div.material").fadeOut(100);
-  });
-
-  // Forums
-
-  $("div#indexMenu div.forums").mouseenter(function(){
-    $("div#indexItems div.forums").fadeIn(100);
-  });
-
-  $("div#indexMenu div.forums").mouseout(function(){
-    menuForums = setTimeout(function(){
-      $("div#indexItems div.forums").fadeOut(100);
-    }, 100);
-  });
-
-  $("div#indexItems div.forums").mouseenter(function(){
-    clearTimeout(menuForums);
-  });
-
-  $("div#indexItems div.forums").mouseleave(function(){
-    $("div#indexItems div.forums").fadeOut(100);
-  });
-
   // Gather stuff
 
-  $("a#gatherInfoHide").live('click', function() {
-    $("div#gatherInfo").fadeOut('slow', 0);
+  $("a#gather-info-hide").live('click', function() {
+    $("div#gather-info").fadeOut('slow', 0);
   });
 
   $("a#gatherJoinBtn").live('click', function() {
@@ -230,9 +151,13 @@ $( function() {
     }, 2000);
   });
 
+  $user_tabs = $("#user-profile .tabs");
+
   // User page
-  $("td#userNavi > div > a").click(function(){
-    $("td#userData").fadeOut("fast");
+  $("#user-profile li a").click(function() {
+    $user_tabs.find("li").removeClass("activeli");
+    $(this).parent().addClass("activeli");
+
     $.ajax({
       type: "GET",
       url: window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + ".js?page=" + $(this).attr('id'),
@@ -270,10 +195,12 @@ function findUser(source) {
   return false;
 }
 
-function QuoteText(id) {
+function QuoteText(id, type) {
+  type = type || 'posts';
+
   $.ajax({
     type: "GET",
-    url: "/posts/quote/" + id + ".js",
+    url: "/" + type + "/quote/" + id + ".js",
     dataType: "script"
   });
 }

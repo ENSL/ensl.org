@@ -30,6 +30,8 @@ class CategoriesController < ApplicationController
       @category.update_attribute :sort, @category.id
       flash[:notice] = t(:articles_category)
       redirect_to :categories
+    else
+      render action: :new
     end
   end
 

@@ -1,21 +1,14 @@
-<h1>Editing category</h1>
+<h1>Editing Category</h1>
 
-<%= form_for @category do |f| %>
-  <div id="error_explanation">
-    <ul>
-      <% @category.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
+<%= form_for @category, html: { class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: @category.errors.full_messages %>
 
-  <p>
-    <%= f.label :name %><br />
+  <div class="fields horizontal">
+    <%= f.label :name %>
     <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.submit 'Update' %>
-  </p>
+  </div>
+    
+  <div class="controls">
+    <%= f.submit 'Update Category' %>
+  </div>
 <% end %>
-
-<%= link_to 'Back', categories_path %>

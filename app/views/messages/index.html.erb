@@ -1,39 +1,47 @@
-<h1>Received Messages (<%= cuser.new_messages.count %> unread / <%= cuser.received_messages.count %> total)</h1>
+<div id="messages" class="tabbed">
+  <h1>Private Messages</h1>
 
-<% cuser.received_messages.reverse_each do |message| %>
-  <div class="indented">
-    <div class="left">
-      <% if cuser.new_messages.include?(message) %>
-        <p class = "bold">
+  <ul id="messages-nav" class="tabs">
+    <li>
+      <a href="#inbox">
+        Inbox (<%= cuser.new_messages.count %>/<%= cuser.received_messages.count %>)
+      </a>
+    </li>
+    <li>
+      <a href="#sent">
+        Sent (<%= cuser.sent_messages.count %>)
+      </a>
+    </li>
+  </ul>
+
+  <div class="tabbed-contents">
+    <div id="inbox" class="tab">
+      <% if cuser.received_messages.any? %>
+        <% cuser.received_messages.reverse_each do |message| %>
+          <div class="message <% 'highlight' if cuser.new_messages.include?(message) %>">
+            <%= render partial: 'message', locals: { message: message } %>
+          </div>
         <% end %>
-        <%= namelink message %>
-        <span class="description">
-          <%= sanitize message.text[0, 20] %>
-        </span>
-        <% if cuser.new_messages.include?(message) %>
-        </p>
+      <% else %>
+        <p>You have no incoming messages.</p>
       <% end %>
     </div>
-    <div class="right">
-      (<%= namelink message.sender %> on <%= longdate message.created_at %>)
+    <div id="sent" class="tab">
+      <% if cuser.sent_messages.any? %>
+        <% cuser.sent_messages.reverse_each do |message| %>
+          <div class="message">
+            <%= render partial: 'message', locals: { message: message } %>
+          </div>
+        <% end %>
+      <% else %>
+        <p>You have no sent messages.</p>
+      <% end %>
     </div>
-    <br class="clear" />
   </div>
-<% end %>
+</div>
 
-<h1>Sent Messages (<%= cuser.sent_messages.count %> total)</h1>
-
-<% cuser.sent_messages.reverse_each do |message| %>
-  <div class="indented">
-    <div class="left">
-      <%= namelink message %>
-      <span class="description">
-        <%= sanitize message.text[0, 20] %>
-      </span>
-    </div>
-    <div class="right">
-      (<%= namelink message.recipient %> on <%= longdate message.created_at %>)
-    </div>
-    <br class="clear" />
-  </div>
-<% end %>
+<script type="text/javascript">
+  new Yetii({
+    id: 'messages'
+  });
+</script>

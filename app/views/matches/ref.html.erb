@@ -1,98 +1,104 @@
-<h2>
-  <%= namelink @match.contester1.team %> vs <%= namelink @match.contester2.team %>
-</h2>
+<div id="match">
+  <h1 class="fancy title">
+    <span>Referee Admin</span>
+  </h1>
 
-<%= render :partial => "javascripts/mce_full" %>
+  <div class="contesters">
+    <h1 class="team-1"><%= namelink @match.contester1.team if @match.contester1 %></h1>
+    <div class="versus">
+      <span class="vs">VS</span>
+    </div>
+    <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
+  </div>
 
-<div class="wide box">
-  <h2>
-    Lineup
-  </h2>
+  <%= render partial: 'javascripts/mce_full' %>
 
-  <div class="box center">
+  <div class="lineups">
+    <h3>Lineups</h3>
+
+    <div class="team-1">
+      <%= form_for @match do |f| %>
+        <%= f.error_messages %>
+
+        <div class="controls">
+          <%= f.submit 'Save Lineup' %>  
+        </div>
+
+        <% [@match.contester1].each do |contester| %>
+            <%= render partial: "lineup", locals: { contester: contester } %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="team-2">
+      <%= form_for @match do |f| %>
+        <%= f.error_messages %>
+
+        <div class="controls">
+          <%= f.submit 'Save Lineup' %>  
+        </div>
+
+        <% [@match.contester2].each do |contester| %>
+            <%= render partial: "lineup", locals: { contester: contester } %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="scoring">
+    <%= form_for @match, html: { class: 'square' } do |f| %>
+      <%= f.error_messages %>
+
+      <h3>Scoring</h3>
+
+      <div class="fields horizontal">
+        <%= f.label :server_id %>
+        <%= f.select :server_id, Server.active.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
+      </div>
+
+      <div class="fields horizontal">
+        <%= f.label :forfeit %>
+        <%= f.check_box :forfeit %>
+        <%= f.label :forfeit, class: 'checkbox' %>
+      </div>
+
+      <div class="fields horizontal">
+        <%= f.label "Scores" %>
+        <div class="inputs scores">
+          <%= f.text_field :score1, size: 1 %>
+          <%= f.text_field :score2, size: 2 %>  
+        </div>
+      </div>
+
+      <div class="fields horizontal">
+        <%= f.label :demo %>
+        <div class="inputs">
+          <%= f.select :demo_id, DataFile.ordered.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
+        </div>
+      </div>
+
+      <div class="fields horizontal">
+        <%= f.label 'Player of the match' %>
+        <%= f.text_field :motm_name, { value: User.get(@match.motm_id) } %>
+      </div>
+
+      <div class="controls">
+        <%= f.submit 'Save Scores' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="report">
     <%= form_for @match do |f| %>
-    <%= f.error_messages %>
+      <%= f.error_messages %>
 
-    <% [@match.contester1].each do |contester| %>
-        <%= render :partial => "lineup", :locals => {:contester => contester} %>
+      <h3>Match Report</h3>
+
+      <%= f.text_area :report %>
+
+      <div class="controls">
+        <%= f.submit 'Save Report' %>
+      </div>
     <% end %>
-    <p class="clear">
-      <%= f.submit "Save" %>
-    </p>
-  <% end %>
+  </div>
 </div>
-<div class="box center">
-  <%= form_for @match do |f| %>
-    <%= f.error_messages %>
-
-    <% [@match.contester2].each do |contester| %>
-        <%= render :partial => "lineup", :locals => {:contester => contester} %>
-    <% end %>
-    <p class="clear">
-      <%= f.submit "Save" %>
-    </p>
-  <% end %>
-</div>
-
-  <p class="clear"></p>
-</div>
-
-<div class="wide box">
-  <%= form_for @match do |f| %>
-    <%= f.error_messages %>
-
-    <h3>
-      Scoring and options
-    </h3>
-
-    <p>
-      <%= f.label :server_id %>
-      <%= f.select :server_id, Server.hlds.active.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
-    </p>
-
-    <p>
-      <%= f.label :forfeit %>
-      <%= f.check_box :forfeit %>
-    </p>
-
-    <p>
-      Score:
-      <%= f.text_field :score1, :size => 1 %>
-      <%= f.text_field :score2, :size => 2 %>
-    </p>
-
-    <p>
-      <%= f.label :demo %>:
-      <%= f.select :demo_id, DataFile.ordered.collect{|d| ["#{d.name}", d.id]}, {:include_blank => true} %>
-    </p>
-
-    <p>
-      <%= link_to_function 'Man of the match', "findUser('motm')" %>:
-      <%= f.text_field :motm_name, {:value => User.get(@match.motm_id)} %>
-    </p>
-
-    <p>
-      <%= f.submit "Save" %>
-    </p>
-  <% end %>
-</div>
-
-<div class="wide box">
-  <%= form_for @match do |f| %>
-    <%= f.error_messages %>
-
-    <h3>
-      Report
-    </h3>
-
-    <p>
-      <%= f.text_area :report, :rows => 20, :cols => 60 %>
-    </p>
-
-    <p>
-      <%= f.submit "Save" %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "Back", @match %>

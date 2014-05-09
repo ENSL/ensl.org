@@ -1,0 +1,17 @@
+/*
+  Breadcrumbs
+*/
+
+.breadcrumbs {
+  @include span-columns(12);
+  margin-bottom: 20px;
+
+  a {
+    display: inline-block;
+    font-size: $base-font-size + 2px;
+  }
+
+  .fa {
+    margin: 0 10px;
+  }
+}

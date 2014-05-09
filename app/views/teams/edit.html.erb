@@ -1,56 +1,58 @@
-<h1>Editing team: <%= h @team.name %></h1>
+<div id="teams" class="tabbed edit">
+  <h1>Manage Team: <%=h @team.name %></h1>
 
-<div id="teamsTab">
-  <ul id="teamsTab-nav" class="tabs">
-    <li><a href="#detailsTab">Details</a></li>
-    <li><a href="#membersTab">Members</a></li>
-    <li><a href="#contestsTab">Contests</a></li>
+  <ul id="teams-nav" class="tabs">
+    <li><a href="#details">Details</a></li>
+    <li><a href="#members">Members</a></li>
+    <li><a href="#contests">Contests</a></li>
   </ul>
 
-  <div class="box wide tabs">
-    <div id="detailsTab" class="tab">
-      <%= form_for @team, :html => {:multipart => true} do |f| %>
+  <div class="tabbed-contents">
+    <div id="details" class="tab">
+      <%= form_for @team, html: { multipart: true, class: 'square' } do |f| %>
         <%= f.error_messages %>
-        <p>
-          <%= f.label :name %><br />
+        <div class="fields horizontal">
+          <%= f.label :name %>
           <%= f.text_field :name %>
-        </p>
-        <p>
-          <%= f.label :irc %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :irc %>
           <%= f.text_field :irc %>
-        </p>
-        <p>
-          <%= f.label :web %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :web %>
           <%= f.text_field :web %>
-        </p>
-        <p>
-          <%= f.label :tag %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :tag %>
           <%= f.text_field :tag %>
-        </p>
-        <p>
-          <%= f.label :country %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :country %>
           <%= country_code_select :team, :country %>
-        </p>
-        <p>
-          <%= f.label :comment %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :comment %>
           <%= f.text_field :comment %>
-        </p>
-        <p>
-          <%= f.label :recruiting %><br />
-          <%= f.text_field :recruiting %><br />
-          Leave empty if you are not recruiting, otherwise write the recruiting criteria above.
-        </p>
-        <p>
-          <%= f.label :logo %><br />
-          <%= f.file_field :logo %><br />
-        </p>
-        <p>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :recruiting %>
+          <div class="inputs">
+            <%= f.text_field :recruiting %>
+            <p>Leave empty if you are not recruiting, or enter your recruiting criteria above.</p>  
+          </div>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :logo %>
+          <%= f.file_field :logo %>
+        </div>
+        <div class="controls">
           <%= f.submit "Update" %>
-        </p>
+        </div>
       <% end %>
     </div>
 
-    <div id="membersTab" class="tab">
+    <div id="members" class="tab">
       <%= form_for @team do |f| %>
         <table class="data">
           <tr>
@@ -60,8 +62,8 @@
             <th>Actions</th>
           </tr>
           <% @team.teamers.present.each do |member|  %>
-            <tr class="<%= cycle('even', 'odd') %>">
-              <td <% if member.team_id == member.user.team_id %>id="teamsPrimary"<% end %>>
+            <tr class="fields">
+              <td id="<%= 'primary' if member.team_id == member.user.team_id %>">
                 <%= link_to (h member.user.username), member.user %>
               </td>
               <td>
@@ -71,23 +73,31 @@
                 <%= select_tag "rank[#{member.id}]", options_for_select(member.ranks.invert, member.rank) %>
               </td>
               <td>
-                <%= link_to 'Remove', member, :confirm => 'Are you sure?', :method => :delete%>
+                <%= link_to member, confirm: 'Are you sure?', method: :delete, class: 'button tiny' do %>
+                  <%= icon 'times' %> Remove
+                <% end %>
               </td>
             </tr>
           <% end %>
         </table>
-        <p>
+        <div class="controls">
           <%= f.submit "Update" %>
-        </p>
+        </div>
       <% end %>
     </div>
 
-    <div id="contestsTab" class="tab">
+    <div id="contests" class="tab">
       <p>
-        <%= form_for @team.contesters.build do |f| %>
+        <%= form_for @team.contesters.build, html: { class: 'square' } do |f| %>
           <%= f.hidden_field :team_id %>
-          <%= f.collection_select :contest_id, Contest.active, :id, :name  %>
-          <%= f.submit "Join" %>
+
+          <div class="fields inline">
+            <%= f.collection_select :contest_id, Contest.active, :id, :name %>
+          </div>
+
+          <div class="controls inline">
+            <%= f.submit "Join" %>  
+          </div>
         <% end %>
       </p>
     </div>
@@ -95,8 +105,10 @@
 </div>
 
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'teamsTab'});
+  new Yetii({
+    id: 'teams'
+  });
 </script>
 
-<%= link_to 'Show', @team %> |
-<%= link_to 'Back', teams_path %>
+<%= link_to 'Show', @team, class: 'button' %>
+<%= link_to 'Back', teams_path, class: 'button' %>

@@ -1,0 +1,153 @@
+/*
+  Navigation
+*/
+
+$navigation-height: 50px;
+
+#menu {
+  @include span-columns(12);
+  font-family: $header-font-family;
+  height: $navigation-height;
+  margin-top: -50px;
+  background: image-url('layout/nav-background.png') top center repeat-x;
+  height: 100px;
+  
+  nav {
+    @include outer-container;
+  }
+}
+
+ul.navigation {
+  z-index: 100;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  float: right;
+  max-width: $max-width;
+  max-height: 60px;
+  margin-top: 5px;
+
+  > li {
+    float: left;
+    border: none;
+    height: 60px;
+    position: relative;
+
+    a {
+      font-weight: 400;
+      font-size: 15px;
+      height: $navigation-height;
+      line-height: $navigation-height;
+      padding: 0 20px;
+      text-transform: uppercase;
+      color: #5f5f5f;
+
+      &:hover,
+      &.active {
+        color: #3dcfff;
+      }
+
+      .count {
+        border-radius: $base-border-radius;
+        display: inline-block;
+        margin-left: 20px;
+        background: darken(#5a5a5a, 15%);
+        line-height: 20px;
+        padding: 0 3px;
+        color: lighten(#5f5f5f, 20%);
+      }
+
+      &.active .count,
+      &:hover .count {
+        color: $light-blue;
+      }
+    }
+
+    > a {
+      width: 100%;
+      float: left;
+      position: relative;
+      border-top: 1px solid #54585b;
+
+      &:before,
+      &:after {
+        @include box-sizing(border-box);
+        display: block;
+        content: '';
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        top: 0;
+      }
+      
+      &:before {
+        @include linear-gradient(#54585b, #15181a);
+        left: 0;
+      }
+
+      &:after {
+        @include linear-gradient(#54585b, #15181a);
+        right: -1px;
+      }
+
+      &:hover,
+      &.active {
+        @include background-image(radial-gradient(50% -10%, ellipse cover, transparentize(#2abdfb, 0.6), transparent 60%));
+        border-top: 1px solid #266d98;
+
+        &:before,
+        &:after {
+          @include linear-gradient(#266d98, #15181a);
+          z-index: 100;
+        }
+      }
+    }
+
+    &.dropdown {
+      position: relative;
+
+      ul {
+        background: image-url('layout/drop-menu-background.png') top center repeat-y;
+        width: 176px;
+        position: absolute;
+        box-shadow: $content-shadow;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 10;
+        top: 60px;
+        left: 0;
+        min-width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      &:hover {
+
+        ul {
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+          border-radius: $base-border-radius;
+
+          li {
+            
+            a {
+              white-space: nowrap;
+              display: block;
+              padding: 0 20px;
+              line-height: 30px;
+              height: 40px;
+            }
+
+            &:hover a {
+              
+            }
+          }
+        }
+      }
+    }
+  }
+}

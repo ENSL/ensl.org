@@ -30,7 +30,7 @@ class Topic < ActiveRecord::Base
   has_many :posts, :order => "id ASC", :dependent => :destroy
   has_many :view_counts, :as => :viewable, :dependent => :destroy
 
-  scope :basic, :include => [:latest, {:forum => :forumer}, :user]
+  scope :basic, :include => [:latest, { forum: :forumer }, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
   scope :recent,
     :conditions => "forumers.id IS NULL AND posts.id = (SELECT id FROM posts AS P WHERE P.topic_id = topics.id ORDER BY id DESC LIMIT 1)",
@@ -39,7 +39,7 @@ class Topic < ActiveRecord::Base
   scope :latest_page,
     lambda { |page| {:limit => "#{(page-1)*LATEST_PER_PAGE}, #{(page-1)*LATEST_PER_PAGE+LATEST_PER_PAGE}"} }
 
-    validates_presence_of :user_id, :forum_id
+  validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50
   validates_length_of :first_post, :in => 1..10000, :on => :create
 
@@ -57,7 +57,23 @@ class Topic < ActiveRecord::Base
   end
 
   def view_count
-    self.view_counts.length
+    view_counts.length
+  end
+
+  def cache_key(key)
+    "/topics/#{id}/#{key}"
+  end
+
+  def cached_view_count
+    Rails.cache.fetch(cache_key('view_count'), expires_in: 24.hours) do
+      view_count
+    end
+  end
+
+  def cached_posts_count
+    Rails.cache.fetch(cache_key('posts'), expires_in: 12.hours) do
+      posts.count - 1
+    end
   end
 
   def make_post
