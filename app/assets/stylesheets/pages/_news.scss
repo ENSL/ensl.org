@@ -2,9 +2,13 @@
   Articles
 */
 
+#news {
+  margin-left: -20px;
+}
+
 div.article {
   @include span-columns(12);
-  border-bottom: 3px solid $light-gray;
+  border-bottom: 3px solid $medium-gray;
   padding-bottom: 20px;
 
   h1 {
@@ -46,10 +50,10 @@ div.article {
 
   &.preview {
     @include span-columns(12);
-    padding: 20px 20px 20px 20px;
+    @include omega;
+    box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
     margin-bottom: 20px;
-    margin-left: -10px;
-    box-shadow: $content-shadow;
     border: 0;
 
     .content {

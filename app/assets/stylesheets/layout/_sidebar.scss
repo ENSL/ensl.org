@@ -15,7 +15,13 @@
       height: 75px;
       background: image-url('layout/sidebar-shadow.png') top center no-repeat;
       top: 0;
-      right: -15px;
+      right: -20px;
+    }
+
+    &:first-child {
+      &:before {
+        display: none;
+      }
     }
 
     h4 {
@@ -41,7 +47,7 @@
       color: white;
       background: #5a5a5a;
       padding: 0 20px;
-      margin: 0 -15px 0 0;
+      margin: 0 (- $container-padding) 0 0;
       margin-bottom: 12px;
       font-weight: normal;
       line-height: 30px;
@@ -84,6 +90,12 @@
       float: none;
     }
 
+    .button {
+      clear: both;
+      display: block;
+      margin: 0 auto;
+    }
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -94,10 +106,6 @@
   */
 
   .calendar {
-    &:before {
-      display: none;
-    }
-
     .entry {
       margin-bottom: 0;
     }
@@ -121,30 +129,6 @@
     input {
       @include span-columns(12);
       margin-bottom: 10px;
-    }
-
-    .shoutmsg {
-      display: block;
-      clear: both;
-
-      .user {
-        float: left;
-        padding: 0 5px 5px 0;
-
-        .delete {
-          float: left;
-        }
-
-        .username {
-          clear: right;
-          display: block;
-        }
-
-        .time {
-          clear: left;
-          display: block;
-        }
-      }
     }
   }
 
