@@ -15,7 +15,10 @@ feature 'Case insensitive login' do
       click_button submit(:user, :login)
       
       expect(page).to have_content(I18n.t('login_successful'))
-      expect(page).to have_content("Logged in as: #{username}")
+      
+      within user_status do
+        expect(page).to have_content(username)
+      end
     end
 
     scenario 'with a non-matching case allows the user to sign in' do
@@ -23,7 +26,10 @@ feature 'Case insensitive login' do
       click_button submit(:user, :login)
       
       expect(page).to have_content(I18n.t('login_successful'))
-      expect(page).to have_content("Logged in as: #{username}")
+
+      within user_status do
+        expect(page).to have_content(username)
+      end
     end
   end
 

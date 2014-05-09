@@ -1,0 +1,206 @@
+/*
+  Articles
+*/
+
+#news {
+  margin-left: -20px;
+}
+
+div.article {
+  @include span-columns(12);
+  border-bottom: 3px solid $medium-gray;
+  padding-bottom: 20px;
+
+  h1 {
+    margin: 1em 0;
+  }
+
+  .content {
+    @include span-columns(12);
+    margin-bottom: 40px;
+
+    ul {
+      @extend ul.disc;
+    }
+  }
+
+  .author {
+    @include span-columns(6);
+
+    a {
+      font-weight: bold;
+    }
+  }
+
+  .comments {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+
+    .fa {
+      margin-right: 10px;
+    }
+  }
+
+  .actions {
+    @include span-columns(12);
+    @include omega;
+    margin-top: 10px;
+  }
+
+  &.preview {
+    @include span-columns(12);
+    @include omega;
+    box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 0;
+
+    .content {
+      margin-bottom: 10px;
+    }
+
+    .author {
+      color: #8f8f8f;
+    }
+
+    .comments a {
+      color: #404040;
+    }
+
+    h2 {
+      margin: 0 0 .5em 0;
+      font-family: 'Impact';
+      font-weight: normal;
+    }
+  }
+}
+
+div.article-links {
+  @include span-columns(12);
+
+  .previous {
+    @include span-columns(6);
+
+    .fa {
+      padding-right: 10px;
+    }
+  }
+
+  .next {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+
+    .fa {
+      padding-left: 10px;
+    }
+  }
+}
+
+table.articles.archive {
+
+  .title {
+    width: 50%;
+  }
+
+  .date {
+    width: 20%;
+  }
+
+  .author {
+    width: 20%;
+  }
+}
+
+/*
+  Article Form
+*/
+
+form.article {
+
+  h4 {
+    margin-bottom: 20px;
+  }
+}
+
+.files {
+
+  .files-list {
+    margin: 20px 0 40px;
+  }
+
+  form {
+    @include span-columns(12);
+    margin: 20px 0;
+
+    .fields {
+      margin-bottom: 20px;
+    }
+  }
+}
+
+/*
+  Articles Page
+*/
+
+#articles {
+  @include span-columns(12);
+
+  h3 {
+    @include span-columns(12);
+    margin-top: 1em;
+  }
+
+  .article-list {
+    @include span-columns(12);
+    margin-bottom: 10px;
+
+    .new {
+      @extend .highlight;
+      margin-right: 10px;
+    }
+
+    .title {
+      @include span-columns(6);
+    }
+
+    .meta {
+      @include span-columns(6);
+      @include omega;
+      text-align: right;
+    }
+  }
+
+  .button.new {
+    margin-top: 20px;
+  }
+}
+
+/*
+  Admin Articles Page
+*/
+
+div.admin.articles {
+
+  .title {
+    width: 40%;
+  }
+
+  .category {
+    width: 20%;
+  }
+
+  .created {
+    width: 20%;
+  }
+
+  .author {
+    width: 10%;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: right;
+  }
+}

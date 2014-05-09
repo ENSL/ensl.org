@@ -1,0 +1,112 @@
+/*
+  Flash Messages
+*/
+
+.flash {
+  @include span-columns(12);
+  margin-bottom: 20px;
+  font-weight: 600;
+
+  &.notice {
+    @include flash;
+  }
+
+  &.success {
+    @include flash($flash-success);
+    
+    &:before {
+      content: "\f00c";
+    }
+  }
+
+  &.error {
+    @include flash($flash-error);
+
+    &:before {
+      content: "\f00d";
+    }
+  }
+
+  &.warning,
+  &.alert {
+    @include flash($flash-warning);
+
+    &:before {
+      content: "\f071";
+    }
+  }
+}
+
+/*
+  Error Messages
+*/
+
+div#errors {
+  @extend .flash.error;
+  @include span-columns(12);
+  margin-bottom: 20px;
+
+  strong {
+    @include span-columns(12);
+    margin-bottom: 10px;
+  }
+
+  ul.errors {
+    @include span-columns(12);
+
+    li {
+      margin-bottom: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+/*
+  Banner flash messages
+*/
+
+#notification {
+  position: absolute;
+  margin: 0 auto;
+  left: 50%;
+  top: 0;
+
+  .message {
+    background: image-url('layout/flash-notice-background.png');
+    position: relative;
+    width: 730px;
+    height: 60px;
+    left: -50%;
+    text-align: center;
+    font-family: $header-font-family;
+    font-size: 22px;
+    color: white;
+    line-height: 45px;
+    padding: 0 100px;
+    z-index: 2;
+
+    &:before {
+      background: image-url('layout/flash-notice-icon.png');
+      content: '';
+      display: block;
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      top: 5px;
+      left: 60px;
+    }
+
+    &.warning,
+    &.error,
+    &.alert {
+      background: image-url('layout/flash-error-background.png');
+
+      &:before {
+        background: image-url('layout/flash-error-icon.png');
+      }
+    }
+  }
+}

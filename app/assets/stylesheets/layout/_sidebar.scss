@@ -1,0 +1,175 @@
+#sidebar {
+
+  .widget {
+    @include span-columns(12);
+    margin-bottom: $container-padding;
+    font-family: $header-font-family;
+    color: white;
+    padding-top: 20px;
+    position: relative;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      width: 265px;
+      height: 75px;
+      background: image-url('layout/sidebar-shadow.png') top center no-repeat;
+      top: 0;
+      right: -20px;
+    }
+
+    &:first-child {
+      &:before {
+        display: none;
+      }
+    }
+
+    h4 {
+      font-family: 'Impact';
+      font-weight: normal;
+      text-align: center;
+      margin-bottom: 25px;
+      color: $light-blue;
+      text-transform: uppercase;
+    }
+
+    .widget-content-wrapper {
+      @include span-columns(12);
+      font-size: 12px;
+    }
+
+    a {
+      color: $light-blue;
+    }
+
+    .separator {
+      border-radius: 10px 0 0 10px;
+      color: white;
+      background: #5a5a5a;
+      padding: 0 20px;
+      margin: 0 (- $container-padding) 0 0;
+      margin-bottom: 12px;
+      font-weight: normal;
+      line-height: 30px;
+      text-align: right;
+      font-family: $header-font-family;
+
+      a {
+        color: $dark-blue;
+        float: right;
+      }
+    }
+
+    input[type=text] {
+      background: #0e1010;
+      border: 1px solid #494949;
+      color: white;
+    }
+
+    .controls {
+      text-align: center;
+    }
+
+    .button,
+    .controls input {
+      @include linear-gradient(#585858, #585858);
+      font-family: 'Impact';
+      font-weight: normal;
+      color: white;
+      border-radius: 10px;
+      background: #585858;
+      border: 0;
+      line-height: 30px;
+      height: 30px;
+      width: 175px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      font-size: 18px;
+      display: inline-block;
+      float: none;
+    }
+
+    .button {
+      clear: both;
+      display: block;
+      margin: 0 auto;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  /*
+    Calendar
+  */
+
+  .calendar {
+    .entry {
+      margin-bottom: 0;
+    }
+
+    .time {
+      color: #5a5a5a;
+      float: right;
+      margin-left: 10px;
+    }
+  }
+
+  /*
+    Shoutbox
+  */
+
+  .shoutbox {
+    .transcript {
+      margin-bottom: 20px;
+    }
+
+    input {
+      @include span-columns(12);
+      margin-bottom: 10px;
+    }
+  }
+
+  /*
+    Highlights
+  */
+
+  .highlights,
+  .posts {
+
+    ol {
+      margin-bottom: 20px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  /*
+    Polls
+  */
+
+  .poll {
+    .question {
+      @include span-columns(12);
+      margin-bottom: 20px;
+
+      h5 {
+        margin-bottom: 1em;
+      }
+    }
+
+    .bar {
+      display: block;
+      background: $blue;
+      height: 10px;
+    }
+
+    .button {
+      margin-bottom: 0;
+    }
+  }
+}

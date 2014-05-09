@@ -1,26 +1,22 @@
-<%= form_for(@poll) do |f| %>
-  <%= f.error_messages %>
+<div id="poll">
+  <%= form_for(@poll, html: { class: 'square' }) do |f| %>
+    <%= render 'shared/errors', messages: @poll.errors.full_messages %>
 
-  <div class="box wide">
-    <p>
-      <%= f.label :question %><br />
+    <div class="fields horizontal">
+      <%= f.label :question %>
       <%= f.text_field :question %>
-    </p>
-    <p>
-      <%= f.label :end_date %><br />
-      <%= f.datetime_select :end_date %>
-    </p>
-    <br />
-  </div>
+    </div>
 
-  <div class="wide box">
-    <h3>
-      Options
-    </h3>
+    <div class="fields horizontal">
+      <%= f.label :end_date %>
+      <%= f.datetime_select :end_date, datetime_separator: '', time_separator: '' %>
+    </div>
+
+    <h3 class="title">Options</h3>
 
     <div id="options">
       <%= f.fields_for :options do |opt| %>
-        <%= render "option", :f => opt %>
+        <%= render 'option', f: opt %>
       <% end %>
     </div>
 
@@ -28,11 +24,9 @@
       <%= link_to_add_fields "Add an Option", f, :options %>
     </p>
 
-  </div>
-
-  <p>
-    <%= f.submit 'Save' %>
-  </p>
-<% end %>
-
-<%= link_to 'Back', polls_path %>
+    <div class="controls">
+      <%= f.submit 'Save' %>
+    </div>
+  <% end %>
+</div>
+  

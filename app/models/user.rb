@@ -27,6 +27,7 @@ require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_versioned', 'lib', '
 
 class User < ActiveRecord::Base
   include Extra
+  
   VERIFICATION_TIME = 604800
 
   attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
@@ -162,7 +163,11 @@ class User < ActiveRecord::Base
   end
 
   def from
-    profile.town ? "#{profile.town}, #{country_s}" : "#{country_s}"
+    if profile.town && profile.town.length > 0
+      "#{profile.town}, #{country_s}"
+    else
+      "#{country_s}"
+    end
   end
 
   def age
@@ -275,6 +280,6 @@ class User < ActiveRecord::Base
   end
 
   def self.search(search)
-    search ? where('username LIKE ?', "%#{search}%") : scoped
+    search ? where("LOWER(username) LIKE LOWER(?) OR steamid LIKE ?", "%#{search}%", "%#{search}%") : scoped
   end
 end

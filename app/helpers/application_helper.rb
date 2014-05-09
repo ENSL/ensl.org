@@ -1,4 +1,14 @@
 module ApplicationHelper
+  def full_title(page_title)
+    base_title = "ENSL"
+
+    if page_title.empty?
+      base_title
+    else
+      "#{base_title} | #{page_title}"
+    end
+  end
+
   def namelink model, length = nil
     return if model.nil?
     model = case model.class.to_s
@@ -13,9 +23,9 @@ module ApplicationHelper
             end
     str = model.to_s
     if length and str.length > length
-      link_to raw(str.to_s[0, length] + "..."), model
+      link_to raw(str.to_s[0, length] + "..."), model, class: model.class.to_s.downcase
     else
-      link_to raw(str), model
+      link_to raw(str), model, class: model.class.to_s.downcase
     end
   end
 
@@ -30,6 +40,10 @@ module ApplicationHelper
     printtime time, "%d %B %y %H:%M"
   end
 
+  def longertime time
+    printtime time, "%e %B %Y - %H:%M %Z"
+  end
+
   def shorttime time
     printtime time, "%d/%b/%y %H:%M"
   end
@@ -39,23 +53,21 @@ module ApplicationHelper
   end
 
   def longdate time
-    printtime time, "%d %B %Y"
+    printtime time, "%e %B %Y"
   end
 
   def printtime time, format
     return unless time
-    out = ""
-    out << '<span style="font-style: italic; ">'
-    out <<  time.strftime(format)
-    out << '</span>'
-    raw out
+
+    content_tag(:span, style: 'font-style: italic') do
+      Time.use_zone(timezone_offset) { time.strftime(format) }
+    end
   end
 
   def cascade model, list
-    out = ""
-
-    list.each do |element|
+    out = list.map do |element|
       name = key = element
+      item = ""
       result = ""
 
       if element.instance_of?(Array)
@@ -81,12 +93,19 @@ module ApplicationHelper
         result << h(str)
       end
 
-      out << "<p>"
-      out << "<b>#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}</b>: "
-      out << result
-      out << "</p>"
+      item << content_tag(:dt) do
+        "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}".html_safe
+      end
+      item << content_tag(:dd) do
+        result.html_safe
+      end
+
+      item
     end
-    raw out
+
+    content_tag(:dl) do
+      out.join.html_safe
+    end
   end
 
   def abslink text, url
@@ -94,29 +113,30 @@ module ApplicationHelper
   end
 
   def flag country
-    if country and country.to_s.length > 0
-      image_tag "/images/flags/" + country.downcase + ".gif", :width => 18, :height => 12
+    if country and country.to_s.size > 0
+      image_tag "flags/#{country}.png", class: "flag"
     else
-      image_tag "/images/flags/eu.gif"
+      image_tag "flags/EU.png"
     end
   end
 
-  def add_comments object
-    @comment = Comment.new :commentable => object
+  def add_comments(object)
+    @comment = Comment.new(commentable: object)
     @comments = object.comments.ordered.with_userteam
+
     return_here
-    render :partial => "comments/index"
+    render partial: "comments/index"
   end
 
   def bbcode
-    link_to "(BBCode)", article_url(:id => 536)
+    link_to "(BBCode)", article_url(id: 536)
   end
 
   def sortable(column, title = nil)
     title ||= column.titleize
     css_class = (column == sort_column) ? "current #{sort_direction}" : nil
     direction = (column == sort_column && sort_direction == "asc") ? "desc" : "asc"
-    link_to title, {:sort => column, :direction => direction}, {:class => css_class}
+    link_to title, { sort: column, direction: direction }, { class: css_class }
   end
 
   def link_to_remove_fields(name, f)
@@ -125,8 +145,8 @@ module ApplicationHelper
 
   def link_to_add_fields(name, f, association)
     new_object = f.object.class.reflect_on_association(association).klass.new
-    fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(association.to_s.singularize, :f => builder)
+    fields = f.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
+      render(association.to_s.singularize, f: builder)
     end
     link_to_function(name, ("add_fields(this, '#{association}', '#{escape_javascript(fields)}')"))
   end
@@ -142,6 +162,14 @@ module ApplicationHelper
   def upcoming_matches
     GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).upcoming.sort_by do |event|
       event.start
+    end
+  end
+
+  def latest_rules
+    if Contest.last
+      Contest.last.rules
+    else
+      article_path(Article::RULES)
     end
   end
 end

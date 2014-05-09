@@ -1,19 +1,11 @@
-<h1>Current Contests</h1>
+<h1 class="title">Current Contests</h1>
 
 <% @contests.each do |contest| %>
+  <h3><%= link_to contest.name, contest %></h3>
 
   <% if contest.contest_type == Contest::TYPE_BRACKET %>
-    <h2><%= link_to contest.name, contest %></h2>
-    <%= render :partial => "bracket", :locals => {:contest => contest} %>
-  <% else %>
-    <h2><%= link_to contest.name, contest %></h2>
-    <%= render :partial => "contesters/list", :locals => {:contesters => contest.contesters.active.ordered, :actions => true} %>
+    <%= render partial: "bracket", locals: { contest: contest } %>
+  <% else %>  
+    <%= render partial: "contesters/list", locals: { contesters: contest.contesters.active.ordered, actions: true } %>
   <% end %>
-
-
 <% end %>
-
-
-
-<br />
-

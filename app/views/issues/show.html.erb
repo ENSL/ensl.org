@@ -1,30 +1,23 @@
-<h1>
-  Issue: <%= h @issue %> (created <%= @issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %>)
-</h1>
-
-<h3><%= link_to "Back to the list of issues", issues_path %></h3>
-
-<div class="wide box">
+<div id="issue">
+  <h1>Issue: <%= h @issue %></h1>
+  <h2 class="title">Created: <%= @issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %></h2>
+  
   <%= cascade @issue, [:author, :assigned, :category, "status_s"] %>
+
+  <h3>Issue details:</h3>
+  <p><%= @issue.text_parsed.html_safe %></p>
+
+  <% if @issue.solution and !@issue.solution.empty? %>
+    <h3>Solution:</h3>
+    <p><%= @issue.solution_formatted.html_safe %></p>
+  <% end %>
 
   <p>
     <% if @issue.can_update? cuser%>
-      <%= link_to 'Edit', edit_issue_path(@issue) %> |
+      <%= link_to 'Edit Issue', edit_issue_path(@issue), class: 'button' %>
     <% end %>
-    <%= link_to 'Back', issues_path %>
   </p>
 
-  <h3>
-    Issue details:
-  </h3>
-  <%= raw @issue.text_parsed %>
-
-  <% if @issue.solution and !@issue.solution.empty? %>
-    <h3>
-      Solution:
-    </h3>
-    <%= raw @issue.solution_formatted %>
-  <% end %>
+  <%= add_comments @issue %>
 </div>
-
-<%= add_comments @issue %>
+  

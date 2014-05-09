@@ -1,4 +1,4 @@
-<table class="data">
+<table class="striped files-list">
   <tr>
     <th>Name</th>
     <th>Path</th>
@@ -7,15 +7,15 @@
   </tr>
 
   <% files.each do |file| %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= namelink file %></td>
       <td><%= h file.url %></td>
       <td><%= file.size_s %></td>
       <td>
         <% if file.can_update? cuser %>
-          <%= link_to 'Edit', edit_data_file_path(file) %>
+          <%= link_to icon('pencil'), edit_data_file_path(file) %>
           <% end; if file.can_destroy? cuser %>
-          <%= link_to 'Destroy', file, :confirm => 'Are you sure?', :method => :delete %>
+          <%= link_to icon('times'), file, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>

@@ -8,29 +8,37 @@ feature 'Visitor signs up' do
   end
 
   scenario 'with valid Username, Email, Password and Steam ID' do
-    fill_form(:user, user.slice(*sign_up_attributes))
-    click_button submit(:user, :create)
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes))
+      click_button submit(:user, :create)
+    end
     
-    expect(page).to have_content("Logged in as: #{user[:username]}")
+    expect(user_status).to have_content(user[:username])
   end
 
   scenario 'with invalid Email' do
-    fill_form(:user, user.slice(*sign_up_attributes).merge({ email: "invalid" }))
-    click_button submit(:user, :create)
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge({ email: "invalid" }))
+      click_button submit(:user, :create)
+    end
 
     expect(page).to have_content(error_message('email.invalid'))
   end
 
   scenario 'with blank Password' do
-    fill_form(:user, user.slice(*sign_up_attributes).merge({ raw_password: "" }))
-    click_button submit(:user, :create)
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge({ raw_password: "" }))
+      click_button submit(:user, :create)
+    end
 
     expect(page).to have_content(error_message('raw_password.blank'))
   end
 
   scenario 'with invalid Steam ID' do
-    fill_form(:user, user.slice(*sign_up_attributes).merge({ steamid: "invalid" }))
-    click_button submit(:user, :create)
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge({ steamid: "invalid" }))
+      click_button submit(:user, :create)
+    end
 
     expect(page).to have_content(error_message('steamid.invalid'))
   end

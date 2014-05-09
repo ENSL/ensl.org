@@ -1,0 +1,52 @@
+/*
+  Polls List
+*/
+
+table.polls {
+
+  .questions {
+    width: 30%;
+  }
+
+  .date {
+    width: 30%;
+  }
+
+  .votes,
+  .user {
+    width: 15%;
+  }
+
+  .actions {
+    width: 10%;
+    text-align: right;
+  }
+}
+
+/*
+  Poll Forms
+*/
+
+#poll {
+  .inputs {
+
+    .question {
+      @include span-columns(9);
+    }
+
+    .destroy {
+      @include span-columns(3);
+      @include omega;
+
+      .checkbox {
+        float: left;
+      }
+
+      .remove {
+        display: inline-block;
+        line-height: 40px;
+        margin-left: 10px;
+      }
+    }
+  }
+}

@@ -1,0 +1,115 @@
+/*
+  Thread List
+*/
+
+#comments-thread {
+  @include span-columns(12);
+  
+  h3 {
+    margin: 1em 0;
+  }
+}
+
+/*
+  Comment
+*/
+
+.comment {
+  $comment-gutter: 1.4em;
+  $comment-image-padding: 3px;
+  $comment-image-width: 4em;
+  $comment-color: $base-font-color;
+  $comment-background: $light-gray;
+  $comment-detail-color: transparentize($comment-color, .5);
+  $comment-image-vert-alignment: top;
+
+  position: relative;
+  width: 100%;
+  margin-bottom: $base-line-height;
+  padding-bottom: 1em;
+  border-bottom: 1px solid $medium-gray;
+
+  .comment-image,
+  .comment-content {
+    display: table-cell;
+    vertical-align: $comment-image-vert-alignment;
+  }
+
+  .comment-image {
+    padding-right: $comment-gutter;
+
+    > img {
+      width: $comment-image-width;
+      height: auto;
+      border-radius: $base-border-radius;
+      padding: $comment-image-padding;
+      background: $comment-background;
+      display: block;
+      max-width: none;
+    }
+
+    .comment-reverse-order & {
+      padding-right: 0;
+      padding-left: 10px;
+    }
+  }
+
+  .comment-content {
+    width: 100%;
+    position: relative;
+
+    h1 {
+      font-size: 1em;
+      margin-bottom: .5em;
+    }
+
+    a.user,
+    a.team {
+      display: inline-block;
+    }
+
+    a.user {
+      margin-right: 10px;
+    }
+
+    a.team {
+      margin-left: 10px;
+    }
+
+    p {
+      margin-bottom: .5em;
+    }
+
+    p.comment-detail {
+      font-style: italic;
+      font-size: .9em;
+      color: $comment-detail-color;
+      margin-top: 10px;
+    }
+
+    .controls {
+      position: absolute;
+      top: - 5px;
+      right: 0;
+    }
+  }
+}
+
+/*
+  Comment Form
+*/
+
+.comment-form {
+  @include span-columns(12);
+  margin-bottom: 20px;
+
+  h1,
+  h5 {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  .fields {
+    margin-bottom: 20px;
+  }    
+}

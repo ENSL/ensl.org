@@ -1,0 +1,17 @@
+<div class="article preview">
+  <h2><%= namelink article %></h2>
+
+  <div class="content">
+    <%= preview_text(article, full) %>
+  </div>
+
+  <div class="author">
+    <%= namelink(article.user) %> on <%= longertime article.created_at %>
+  </div>
+
+  <div class="comments">
+    <%= link_to article do %>
+      <%= icon 'comments' %> Comments (<%= article.comments.count %>)
+    <% end %>
+  </div>
+</div>

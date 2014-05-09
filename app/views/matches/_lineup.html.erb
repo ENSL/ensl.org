@@ -1,46 +1,49 @@
-<h4>
-  <%= namelink contester.team %>
-</h4>
+<div class="players">
+  <% contester.lineup.each do |teamer| %>
+    <div class="player fields">
+      <% if matcher = @match.matchers.first(conditions: { user_id: teamer.user_id }) %>
+        <%= hidden_field_tag "match[matchers_attributes][#{@n}][id]", matcher.id %>
+      <% end %>
 
-<div class="left"><h5>Team members</h5>
-<% contester.lineup.each do |teamer| %>
-  <p>
-    <% if matcher = @match.matchers.first(:conditions => {:user_id => teamer.user_id}) %>
-      <%= hidden_field_tag "match[matchers_attributes][#{@n}][id]", matcher.id %>
-    <% end %>
-    <%= hidden_field_tag "match[matchers_attributes][#{@n}][user_id]", teamer.user_id %>
-    <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
-    <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
-    <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", false %>
-    <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", @match.users.exists?(teamer.user) %>
-    <%= teamer.user %>
-  </p>
-  <% @n = @n + 1; end %>
-</div>
-<div class ="center">
-  <% if contester.team.logo %>
-    <%= image_tag contester.team.logo.url%>
+      <%= hidden_field_tag "match[matchers_attributes][#{@n}][user_id]", teamer.user_id %>
+      <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
+      <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
+      <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", false %>
+      <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", @match.users.exists?(teamer.user), { id: "player_#{@n}" } %>
+
+      <%= label_tag "player_#{@n}", '', class: 'checkbox' %>
+
+      <span><%= teamer.user %></span>
+    </div>
+
+    <% @n = @n + 1 %>
   <% end %>
 </div>
-<div class="right"><h5>Mercenaries</h5>
+
+<div class="mercenaries">
   <% @match.matchers.mercs.of_contester(contester).each do |matcher| %>
-    <p>
+    <div class="player fields">
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][id]", matcher.id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][user_id]", matcher.user_id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", true %>
-      <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", true %>
-      <%= matcher.user %>
-    </p>
-    <% @n = @n + 1; end %>
+      <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", true, { id: "player_#{@n}" } %>
 
-    <p>
-      <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
-      <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
-      <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", true %>
-      <%= hidden_field_tag "match[matchers_attributes][#{@n}][_destroy]", "keep" %>
-      <%= link_to_function 'Merc', "findUser('match[matchers_attributes][#{@n}][merc][user_id]')" %>:
-      <%= text_field_tag "match[matchers_attributes][#{@n}][user_id]", '', :size => 5 %>
-    </p>
+      <%= label_tag "player_#{@n}", '', class: 'checkbox' %>
+      
+      <span><%= matcher.user %></span>
+    </div>
+
+    <% @n = @n + 1 %>
+  <% end %>
+
+  <div class="fields">
+    <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
+    <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
+    <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", true %>
+    <%= hidden_field_tag "match[matchers_attributes][#{@n}][_destroy]", "keep" %>
+
+    <%= text_field_tag "match[matchers_attributes][#{@n}][user_id]", '', placeholder: 'Mercenary' %>
   </div>
+</div>

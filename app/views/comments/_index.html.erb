@@ -1,11 +1,5 @@
-<div class="comments centered">
-  <h2 class="center">
-    Comments
-  </h2>
-
-  <div id="commentList">
-    <%= render :partial => "comments/comment", :collection => @comments %>
-  </div>
+<div id="comments-thread">
+  <h3>Comments</h3>
+  <%= render partial: "comments/comment", collection: @comments %>
+  <%= render partial: "comments/new" %>
 </div>
-
-<%= render :partial => "comments/new" %>

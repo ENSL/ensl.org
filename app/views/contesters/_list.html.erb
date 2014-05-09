@@ -1,53 +1,56 @@
-<table class="data">
-  <tr>
-    <th width="5%">&nbsp;</th>
-    <th width="5%">&nbsp;</th>
-    <th>Team</th>
-    <th></th>
-    <th width="5%">Score</th>
-    <th width="5%">Win</th>
-    <th width="5%">Loss</th>
-    <th width="5%">Draw</th>
-    <% if actions %>
-      <th width="5%">Actions</th>
-    <% end %>
-  </tr>
+<table class="contest striped">
+  <thead>
+    <tr>
+      <th class="movement"></th>
+      <th class="flag"></th>
+      <th class="team">Team</th>
+      <th class="awards"></th>
+      <th class="score">Score</th>
+      <th class="win">Win</th>
+      <th class="loss">Loss</th>
+      <th class="draw">Draw</th>
+      <% if actions %>
+        <th class="actions"></th>
+      <% end %>
+    </tr>
+  </thead>
 
+  <tbody>
   <% contesters.each do |contester| %>
-    <tr class="<%= cycle('even', 'odd') %>" height="18">
+    <tr>
       <% if contester.trend == Contester::TREND_UP %>
-        <td><%= image_tag "/images/icons/up.gif" %></td>
+        <td><%= icon 'chevron-up' %></td>
       <% elsif contester.trend == Contester::TREND_DOWN %>
-        <td><%= image_tag "/images/icons/down.gif" %></td>
+        <td><%= icon 'chevron-down' %></td>
       <% elsif contester.trend == Contester::TREND_FLAT %>
-        <td><%= image_tag "/images/icons/flat.gif" %></td>
+        <td><%= icon 'minus' %></td>
       <% else %>
         <td></td>
       <% end %>
       <td><%= flag contester.team.country %></td>
       <td><%= link_to (h contester.team.name), contester %></td>
-      <td><%= image_tag "/images/icons/gold.gif" if contester == contester.contest.winner %></td>
+      <td><%= icon 'trophy' if contester == contester.contest.winner %></td>
       <td><%= h contester.total_score %></td>
       <td><%= h contester.win %></td>
       <td><%= h contester.loss %></td>
       <td><%= h contester.draw %></td>
       <% if actions %>
-        <td>
+        <td class="actions">
           <% if @friendly %>
             <% challenge = Challenge.new
             challenge.contester1 = @friendly
             challenge.contester2 = contester %>
-          <% if challenge.can_create? cuser %>
-            <%= link_to 'C', :controller => 'challenges', :id => contester, :action => 'new' %>
+            <% if challenge.can_create? cuser %>
+              <%= link_to 'C', controller: 'challenges', id: contester, action: 'new' %>
+            <% end %>
           <% end %>
-        <% end %>
-        <% if cuser and cuser.admin? %>
-          <%= link_to 'E', edit_contester_path(contester) %>
-          <%= link_to 'D', contester, :confirm => 'Are you sure?', :method => :delete %>
-          <%= link_to 'R', :controller => "contesters", :action => "recalc", :id => contester %>
-        <% end %>
-      </td>
-    <% end %>
-  </tr>
-<% end %>
+          <% if cuser and cuser.admin? %>
+            <%= link_to icon('pencil'), edit_contester_path(contester) %>
+            <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
 </table>

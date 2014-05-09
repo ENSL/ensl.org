@@ -158,11 +158,11 @@ class Match < ActiveRecord::Base
   end
 
   def team1_lineup
-    matchers.all(:conditions => {:contester_id => contester1_id}).collect{|matcher| matcher.user.username} * ", "
+    matchers.all(:conditions => {:contester_id => contester1_id})
   end
 
   def team2_lineup
-    matchers.all(:conditions => {:contester_id => contester2_id}).collect{|matcher| matcher.user.username} * ", "
+    matchers.all(:conditions => {:contester_id => contester2_id})
   end
 
   def get_friendly param = nil

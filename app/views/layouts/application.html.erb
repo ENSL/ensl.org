@@ -1,82 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi" >
+<!doctype html>
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta http-equiv="Content-Style-Type" content="text/css" />
-    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title><%= full_title(yield(:title)) %></title>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <%= stylesheet_link_tag    "application" %>
+    <%= stylesheet_link_tag "application" %>
     <%= javascript_include_tag "application" %>
     <%= csrf_meta_tag %>
-    <title>ENSL</title>
   </head>
-
   <body>
-    <div id="indexContainer">
-      <div id="indexMain">
-        <div id="logo"></div>
-        <%= render :partial => "layouts/header" %>
-
-        <div id="indexMainarea">
-          <div id="indexContent">
-            <% if flash[:notice] %>
-              <div class="flashMsg">
-                <%= flash[:notice] %>
-              </div>
-            <% end %>
-            <% if flash[:error] %>
-              <div class="flashMsg flashError">
-                <%= flash[:error] %>
-              </div>
-            <% end %>
-            <%= yield  %>
+    <div id="container">
+      <%= render partial: "messages" %>
+      <%= render partial: "header" %>
+      <%= render partial: "navigation" %>
+      <div class="wrapper">
+        <div id="content" class="<%= yield :main_class %>">
+          <div id="main">
+            <%= yield %>
           </div>
-
-          <div id="indexRight">
-            <div class="indexBox" id="index-calendar">
-              <%= render :partial => "widgets/calendar" %>
-            </div>
-
-            <div class="indexBox">
-              <div class="header"><%= t('widget.shoutbox') %></div>
-              <div class="body">
-                <div class="content">
-                  <%= render :partial => "widgets/shoutbox" %>
-                </div>
-              </div>
-            </div>
-
-            <div class="indexBox" id="indexHighlights">
-              <%= render :partial => "widgets/highlights" %>
-            </div>
-
-            <div class="indexBox" id="indexLatest">
-              <%= render :partial => "widgets/posts" %>
-            </div>
-
-
-            <% if @current_action == "news_index" %>
-              <div class="indexBox" id="indexLatest">
-                <%= render :partial => "widgets/poll" %>
-              </div>
+          <div id="sidebar">
+            <%= yield :sidebar %>
+            <% ['calendar', 'shoutbox', 'posts', 'poll'].each do |widget| %>
+              <%= render partial: "widgets/#{widget}" %>  
             <% end %>
           </div>
-
-          <div style="clear:both;"></div>
         </div>
       </div>
-
-      <div id="indexFooter">
-        <% if cuser && (g = cuser.gathers.active.ordered.first) %>
-          <%= link_to "You're in THIS gather", g %>
-        <% elsif Gather.last && (Gather::FULL - Gather.last.gatherers.count) == 12 %>
-          Be first to join the <%= link_to "Gather", Gather.last %>!
-        <% elsif Gather.last %>
-          <%= link_to "Gather", Gather.last %> running, <%= Gather::FULL - Gather.last.gatherers.count %> more needed.
-        <% end %>
-      </div>
+      <%= render partial: "footer" %>
     </div>
   </body>
 </html>

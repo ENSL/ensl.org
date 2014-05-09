@@ -1,82 +1,73 @@
-<h1>Listing Contests</h1>
+<h1 class="title">Listing Contests</h1>
 
 <% if cuser and cuser.admin? %>
-  <%= link_to 'New Contest', new_contest_path %>
+  <%= link_to 'New Contest', new_contest_path, class: 'button' %>
 <% end %>
 
-<h2>Current Contests</h2>
-<table class="data">
-  <tr>
-    <th>Name</th>
-    <th>Start</th>
-    <th>End</th>
-    <th>Rules</th>
-    <th>Status</th>
-    <% if cuser and cuser.admin? %>
-      <th>Options</th>
-    <% end %>
-  </tr>
+<div id="contests">
+  <div class="current">
+    <h3 class="title">Current Contests</h3>
 
-  <% @contests_active.each do |contest| %>
-    <tr class="<%= cycle('even', 'odd') %>">
-      <td><%= link_to (h contest.name), contest %></td>
-      <td><%= longtime contest.start %></td>
-      <td><%= longtime contest.end %></td>
-      <% if contest.rules and contest.rules.title then %>
-        <td><%= link_to (h contest.rules.title), contest.rules %></td>
-      <% else %>
-        <td><%= "No ruleset specified" %></td>
+    <table class="current striped">
+      <tr>
+        <th class="name">Name</th>
+        <th class="date">Start</th>
+        <th class="status">Status</th>
+        <% if cuser and cuser.admin? %>
+          <th class="actions"></th>
+        <% end %>
+      </tr>
+
+      <% @contests_active.each do |contest| %>
+        <tr>
+          <td><%= link_to (h contest.name), contest %></td>
+          <td><%= longdate contest.start %></td>
+          <td><%= contest.statuses[contest.status] %></td>
+          <% if cuser and cuser.admin? %>
+            <td class="actions">
+              <%= link_to icon('pencil'), edit_contest_path(contest) %>
+              <%= link_to icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
+            </td>
+          <% end %>
+        </tr>
       <% end %>
-      <td><%= contest.statuses[contest.status] %></td>
-      <% if cuser and cuser.admin? %>
-        <td>
-          <%= link_to 'Edit', edit_contest_path(contest) %>
-          <%= link_to 'Destroy', contest, :confirm => 'Are you sure?', :method => :delete %>
-        </td>
+    </table>  
+  </div>
+    
+  <div class="previous">
+    <h3 class="title">Previous Contests</h3>
+
+    <table class="previous striped">
+      <tr>
+        <th class="name">Name</th>
+        <th class="date">Date</th>
+        <th class="winner">Winner</th>
+        <% if cuser and cuser.admin? %>
+          <th class="actions"></th>
+        <% end %>
+      </tr>
+
+      <% @contests_inactive.reverse_each do |contest| %>
+        <tr>
+          <td><%= link_to (h contest.name), contest %></td>
+          <td><%= longdate contest.start %></td>
+          <% if contest.winner then %>
+            <td><%= flag contest.winner.team.country %> <%= link_to (h contest.winner.team.name), contest.winner %></td>
+          <% else %>
+            <td></td>
+          <% end %>
+          <% if cuser and cuser.admin? %>
+            <td class="actions">
+              <%= link_to icon('pencil'), edit_contest_path(contest) %>
+              <%= link_to icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
+            </td>
+          <% end %>
+        </tr>
       <% end %>
-    </tr>
+    </table>
+  </div>
+    
+  <% if cuser and cuser.admin? %>
+    <%= link_to 'New Contest', new_contest_path, class: 'button' %>
   <% end %>
-</table>
-
-<h2>Previous Contests</h2>
-<table class="data">
-  <tr>
-    <th>Name</th>
-    <th>Start</th>
-    <th>End</th>
-    <th width="1%">Winner</th>
-    <th></th>
-    <th>Status</th>
-    <% if cuser and cuser.admin? %>
-      <th>Options</th>
-    <% end %>
-  </tr>
-
-  <% @contests_inactive.reverse_each do |contest| %>
-    <tr class="<%= cycle('even', 'odd') %>" height="18">
-      <td><%= link_to (h contest.name), contest %></td>
-      <td><%= longtime contest.start %></td>
-      <td><%= longtime contest.end %></td>
-      <% if contest.winner then %>
-        <td><%= flag contest.winner.team.country %></td>
-        <td><%= link_to (h contest.winner.team.name), contest.winner %></td>
-      <% else %>
-        <td><%= %></td>
-        <td><%= %></td>
-      <% end %>
-      <td><%= contest.statuses[contest.status] %></td>
-      <% if cuser and cuser.admin? %>
-        <td>
-          <%= link_to 'Edit', edit_contest_path(contest) %>
-          <%= link_to 'Destroy', contest, :confirm => 'Are you sure?', :method => :delete %>
-        </td>
-      <% end %>
-    </tr>
-  <% end %>
-</table>
-
-<br />
-
-<% if cuser and cuser.admin? %>
-  <%= link_to 'New Contest', new_contest_path %>
-<% end %>
+</div>

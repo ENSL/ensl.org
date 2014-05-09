@@ -1,7 +1,7 @@
-<h1>Editing Contest</h1>
+<h1 class="title">Editing Contest</h1>
 
-<div id="contestTab">
-  <ul id="contestTab-nav" class="tabs">
+<div id="contest" class="contest-manage tabbed">
+  <ul id="contest-nav" class="tabs">
     <li><a href="#general">General</a></li>
     <% if @contest.contest_type == Contest::TYPE_BRACKET %>
       <li><a href="#brackets">Brackets</a></li>
@@ -12,177 +12,169 @@
     <li><a href="#matches">Matches</a></li>
   </ul>
 
-  <div class="tabs box wide">
+  <div class="tabbed-contents">
     <div class="tab" id="general">
-      <%= form_for @contest do |f| %>
-        <div id="error_explanation">
-          <ul>
-            <% @contest.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-        <p>
-          <%= f.label :name %><br />
+      <%= form_for @contest, html: { class: 'square' } do |f| %>
+        <%= render 'shared/errors', messages: @contest.errors.full_messages %>
+
+        <div class="fields horizontal">
+          <%= f.label :name %>
           <%= f.text_field :name %>
-        </p>
-        <p>
-          <%= f.label :short_name %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :short_name %>
           <%= f.text_field :short_name %>
-        </p>
-        <p>
-          <%= f.label :start %><br />
-          <%= f.datetime_select :start %>
-        </p>
-        <p>
-          <%= f.label :end %><br />
-          <%= f.datetime_select :end %>
-        </p>
-        <p>
-          <%= f.label :status %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :start %>
+          <%= f.datetime_select :start, datetime_separator: '', time_separator: '' %>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :end %>
+          <%= f.datetime_select :end, datetime_separator: '', time_separator: '' %>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :status %>
           <%= f.select :status, @contest.statuses.invert %>
-        </p>
-        <p>
-          <%= f.label :demos_id %><br />
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :demos_id %>
           <%= f.select :demos_id, Directory.all.collect{|d| [d, d.id]} %>
-        </p>
-        <p>
-          <%= f.label :default_time %><br />
-          <%= f.time_select :default_time %>
-        </p>
-        <p>
-          <%= f.label :winner_id %><br />
-          <%= f.select :winner_id, @contest.contesters.collect{|t| [t.team, t.id]}, :include_blank => true %>
-        </p>
-        <p>
-          <%= f.label :rules_id %><br />
-          <%= f.select :rules_id, Category.find(Category::RULES).articles.collect{|a| [a, a.id]}, :include_blank => true %>
-        </p>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :default_time %>
+          <%= f.time_select :default_time, time_separator: '' %>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :winner_id %>
+          <%= f.select :winner_id, @contest.contesters.collect { |t| [t.team, t.id] }, include_blank: true %>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :rules_id %>
+          <%= f.select :rules_id, Category.find(Category::RULES).articles.collect { |a| [a, a.id] }, include_blank: true %>
+        </div>
+
         <% if @contest.contest_type == Contest::TYPE_LADDER %>
-          <p>
-            <%= f.label :weight %><br />
+          <div class="fields horizontal">
+            <%= f.label :weight %>
             <%= f.text_field :weight %>
-          </p>
-          <p>
-            <%= f.label :modulus_base %><br />
+          </div>
+          <div class="fields horizontal">
+            <%= f.label :modulus_base %>
             <%= f.text_field :modulus_base %>
-          </p>
-          <p>
-            <%= f.label :modulus_even %><br />
+          </div>
+          <div class="fields horizontal">
+            <%= f.label :modulus_even %>
             <%= f.text_field :modulus_even %>
-          </p>
-          <p>
-            <%= f.label :modulus_3to1 %><br />
+          </div>
+          <div class="fields horizontal">
+            <%= f.label :modulus_3to1 %>
             <%= f.text_field :modulus_3to1 %>
-          </p>
-          <p>
-            <%= f.label :modulus_4to0 %><br />
+          </div>
+          <div class="fields horizontal">
+            <%= f.label :modulus_4to0 %>
             <%= f.text_field :modulus_4to0 %>
-          </p>
+          </div>
         <% end %>
-        <p>
-          <%= f.submit 'Save' %>
-        </p>
+
+        <div class="controls">
+          <%= f.submit 'Save Contest' %>
+        </div>
       <% end %>
     </div>
 
     <% if @contest.contest_type == Contest::TYPE_BRACKET %>
       <div class="tab" id="brackets">
-        <table class="data">
+        <table class="brackets-list striped">
           <tr>
-            <th>Bracket</th>
-            <th>Slots</th>
-            <th>Options</th>
+            <th class="bracket">Bracket</th>
+            <th class="slots">Slots</th>
+            <th class="actions"></th>
           </tr>
 
           <% @contest.brackets.each do |bracket| %>
-            <tr class="<%= cycle('even', 'odd') %>">
+            <tr>
               <td><%= namelink bracket %></td>
               <td><%= bracket.slots %></td>
-              <td>
-                <%= link_to 'Edit', edit_bracket_path(bracket) %>
-                <%= link_to 'Destroy', bracket, :confirm => 'Are you sure?', :method => :delete %>
+              <td class="actions">
+                <%= link_to icon('pencil'), edit_bracket_path(bracket) %>
+                <%= link_to icon('times'), bracket, confirm: 'Are you sure?', method: :delete %>
               </td>
             </tr>
           <% end %>
         </table>
 
-        <%= form_for @contest.brackets.build do |f| %>
-          <div id="error_explanation">
-            <ul>
-              <% @contest.brackets.last.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
+        <%= form_for @contest.brackets.build, html: { class: 'square' } do |f| %>
+          <%= render 'shared/errors', messages: @contest.brackets.last.errors.full_messages %>
+
           <%= f.hidden_field :contest_id %>
-          <p>
+
+          <div class="fields horizontal">
             <%= f.label :slots %>
             <%= f.text_field :slots %>
+          </div>
+          <div class="controls">
             <%= f.submit 'Add Bracket' %>
-          </p>
+          </div>
         <% end %>
       </div>
     <% end %>
 
     <div class="tab" id="maps">
-      <table class="data">
+      <table class="maps striped">
         <tr>
-          <th>Name</th>
-          <th>Download</th>
-          <th>Options</th>
+          <th class="name">Name</th>
+          <th class="download">Download</th>
+          <th class="actions"></th>
         </tr>
 
         <% @contest.maps.basic.each do |map| %>
-          <tr class="<%= cycle('even', 'odd') %>">
+          <tr>
             <td><%= namelink map %></td>
             <td><%= h map.download %></td>
-            <td>
-              <%= link_to 'Edit', edit_map_path(map) %>
-              <%= link_to 'Remove', :action => "del_map", :id => @contest.id, :id2 => map.id  %>
+            <td class="actions">
+              <%= link_to icon('pencil'), edit_map_path(map) %>
+              <%= link_to icon('times'), action: "del_map", id: @contest.id, id2: map.id  %>
             </td>
           </tr>
         <% end %>
       </table>
 
       <%= form_for @contest do |f| %>
-        <div id="error_explanation">
-          <ul>
-            <% @contest.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-        <p>
+        <%= render 'shared/errors', messages: @contest.errors.full_messages %>
+
+        <div class="fields">
           <%= select_tag :map, options_from_collection_for_select(Map.basic, :id, :name) %>
+        </div>
+        <div class="controls">
           <%= f.submit 'Add map' %>
-        </p>
+        </div>
       <% end %>
     </div>
 
     <div class="tab" id="teams">
-      <table class="data">
+      <table class="teams striped">
         <tr>
-          <th>Team</th>
-          <th>Score</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th class="team">Team</th>
+          <th class="score">Score</th>
+          <th class="status">Status</th>
+          <th class="actions"></th>
         </tr>
 
         <% @contest.contesters.each do |contester| %>
-          <tr class="<%= cycle('even', 'odd') %>">
+          <tr>
             <td><%= link_to (h contester.team), contester %></td>
             <td><%= h contester.score %></td>
             <td><%= contester.statuses[contester.active] %></td>
-            <td>
+            <td class="actions">
               <% if contester.active %>
-                <%= link_to 'Edit', edit_contester_path(contester) %>
-                <%= link_to 'Delete', contester, :confirm => 'Are you sure?', :method => :delete %>
+                <%= link_to icon('pencil'), edit_contester_path(contester) %>
+                <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
               <% else %>
                 <%= form_for contester do |c| %>
-                  <%= c.hidden_field :active, {:value => 1} %>
-                  <%= link_to 'Edit', edit_contester_path(contester) %>
-                  <%= link_to_function 'Recover', "$('edit_contester_#{contester.id}').submit()" %>
+                  <%= c.hidden_field :active, { value: 1 } %>
+                  <%= link_to icon('pencil'), edit_contester_path(contester) %>
+                  <%= link_to_function icon('rotate-left'), "$('edit_contester_#{contester.id}').submit()" %>
                 <% end %>
               <% end %>
             </td>
@@ -191,29 +183,27 @@
       </table>
 
       <%= form_for @contest.contesters.build do |f| %>
-        <div id="error_explanation">
-          <ul>
-            <% @contest.contesters.last.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
+        <%= render 'shared/errors', messages: @contest.contesters.last.errors.full_messages %>
+
         <%= f.hidden_field :contest_id %>
-        <p>
+
+        <div class="fields">
           <%= f.select :team_id, Team.active.ordered.collect{|t| [t, t.id]} %>
-          <%= f.submit 'Add team' %>
-        </p>
+        </div>
+        <div class="controls">
+          <%= f.submit 'Add Team' %>  
+        </div>
       <% end %>
     </div>
 
     <div class="tab" id="weeks">
-      <table class="data">
+      <table class="weeks striped">
         <tr>
-          <th>Name</th>
-          <th>Start date</th>
-          <th>Map1</th>
-          <th>Map2</th>
-          <th>Options</th>
+          <th class="name">Name</th>
+          <th class="date">Start date</th>
+          <th class="map1">Map1</th>
+          <th class="map2">Map2</th>
+          <th class="actions"></th>
         </tr>
 
         <% @contest.weeks.each do |week| %>
@@ -222,24 +212,24 @@
             <td><%= week.start_date.strftime("%d %B %y") %></td>
             <td><%= h week.map1 %></td>
             <td><%= h week.map2 %></td>
-            <td>
-              <%= link_to 'Edit', edit_week_path(week) %>
-              <%= link_to 'Destroy', week, :confirm => 'Are you sure?', :method => :delete %>
+            <td class="actions">
+              <%= link_to icon('pencil'), edit_week_path(week) %>
+              <%= link_to icon('times'), week, confirm: 'Are you sure?', method: :delete %>
             </td>
           </tr>
         <% end %>
       </table>
 
-      <%= link_to "New Week", :controller => :weeks, :action => :new, :id => @contest %>
+      <%= link_to "New Week", { controller: :weeks, action: :new, id: @contest }, { class: 'button' } %>
     </div>
 
     <div class="tab" id="matches">
-      <table class="data">
+      <table class="matches striped">
         <tr>
-          <th>Teams</th>
-          <th>Date</th>
-          <th>Score</th>
-          <th>Options</th>
+          <th class="team">Teams</th>
+          <th class="date">Date</th>
+          <th class="score">Score</th>
+          <th class="actions"></th>
         </tr>
 
         <% @contest.matches.each do |match| %>
@@ -257,22 +247,22 @@
                 <b><%= h match.score1 %> - <%= h match.score2 %></b>
               <% end %>
             </td>
-            <td>
-              <%= link_to 'Referee', :controller => :matches, :action => :ref, :id => match %>
-              <%= link_to 'Edit', edit_match_path(match) %>
-              <%= link_to 'Delete', match, :confirm => 'Are you sure?', :method => :delete %>
+            <td class="actions">
+              <%= link_to icon('flag-checkered'), controller: :matches, action: :ref, id: match %>
+              <%= link_to icon('pencil'), edit_match_path(match) %>
+              <%= link_to icon('times'), match, confirm: 'Are you sure?', method: :delete %>
             </td>
           </tr>
         <% end %>
       </table>
 
-      <%= link_to "New Match", :controller => :matches, :action => :new, :id => @contest %>
+      <%= link_to "New Match", { controller: :matches, action: :new, id: @contest }, { class: 'button' } %>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  var tabber1 = new Yetii({id: 'contestTab'});
+  new Yetii({
+    id: 'contest'
+  });
 </script>
-
-<%= link_to 'Back', @contest %>

@@ -3,6 +3,7 @@ en:
   articles_article_views: "Views"
   bans_create: "Ban was successfully created."
   bans_update: "Ban was successfully updated."
+  brackets_update: "Bracket was successfully updated."
   articles_create: "Article was successfully created."
   articles_update: "Article was successfully updated."
   articles_revert: "Article reverted to version: {{version}}"
@@ -18,7 +19,9 @@ en:
   contests_update: "Contest was successfully updated."
   contests_join: "Team successfully joined contest."
   contests_contester_update: "Contester was successfully updated."
+  gather_create: "New Gather was started successfully."
   gathers_join: "You have joined the Gather."
+  gatherers_update: "Gather player successfully updated."
   files_create: "File was successfully created."
   files_update: "File was successfully updated."
   directories_create: "Directory was successfully created."
@@ -26,6 +29,7 @@ en:
   scores_recalc: "All scores recalculated."
   groups_added: "Group added to the list."
   groups_acl_update: "Group ACL updated."
+  groups_user_update: "Group member updated."
   forums_create: "Forum was successfully created."
   forums_update: "Forum was successfully updated."
   errors: "Errors: "
@@ -45,7 +49,7 @@ en:
   hltv_stopped: "HLTV's stopped. Demos saved."
   hltv_moved: "HLTV moved."
   hltv_movedd: "HLTVs moved to: "
-  messages_create: "Message was successfully created."
+  message_create: "Message was successfully sent."
   movies_create: "Movie was successfully created."
   movies_update: "Movie was successfully updated."
   execute: "Executed: "
@@ -60,7 +64,8 @@ en:
   predictions_create: "Prediction was successfully created."
   servers_updated: "Servers updated."
   servers_create: "Server was successfully created."
-  servers_update: "Server was successfully update."
+  servers_update: "Server was successfully updated."
+  server_destroy: "Server was removed successfully."
   invalid_message: "Invalid message."
   sites_create: "Site was successfully created."
   sites_update: "Site was successfully updated."
@@ -83,11 +88,17 @@ en:
   votes_success: "Voted successfully."
   error: "error"
   prohibited: "prohibited"
+  news:
+    archive: "Archive"
+  gather:
+    status:
+      joined: "You're currently in the Gather."
   widget:
     schedule: "Match Schedule"
-    shoutbox: "Shoutbox & Match search"
+    shoutbox: "Shoutbox"
     highlights: "Highlights"
     posts: "Latest Posts"
+    poll: "Poll"
   profile:
     locals: "Locals"
   sessions:
@@ -103,8 +114,12 @@ en:
         create: "Register"
         update: "Update Profile"
       post:
+        new: "New Article"
         create: "Create Article"
+        update: "Update Article"
   activerecord:
+    models:
+      gather: "Gather"
     attributes:
       article:
         title: "Title"

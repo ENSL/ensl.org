@@ -1,29 +1,24 @@
-<table class="data">
+<table class="issues striped">
   <tr>
-    <th>Created</th>
-    <th>Title</th>
-    <th>Status</th>
-    <th>Assigned</th>
-    <th>Category</th>
-    <th>Author</th>
-    <th>Actions</th>
+    <th class="date">Created</th>
+    <th class="title">Title</th>
+    <th class="assinged">Assigned</th>
+    <th class="author">Author</th>
+    <th class="actions"></th>
   </tr>
 
   <% issues.each do |issue| %>
-    <tr class="<%= cycle('even', 'odd') %>">
+    <tr>
       <td><%= issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
       <td><%= namelink issue %></td>
-      <td class="<%= issue.color %>">
-        <%= issue.statuses[issue.status] %>
-      </td>
       <td><%= namelink issue.assigned %></td>
-      <td><%= h issue.category %></td>
       <td><%= namelink issue.author %></td>
-      <td>
+      <td class="actions">
         <% if issue.can_update? cuser %>
-          <%= link_to 'Edit', edit_issue_path(issue) %>
-          <% end; if issue.can_destroy? cuser %>
-          <%= link_to 'Destroy', issue, :confirm => 'Are you sure?', :method => :delete %>
+          <%= link_to icon('pencil'), edit_issue_path(issue) %>
+        <% end %>
+        <% if issue.can_destroy? cuser %>
+          <%= link_to icon('times'), issue, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>

@@ -1,55 +1,24 @@
-<h1>
-  Server: <%= h @server.name %>
+<h1 class="fancy">
+  <span><%= h @server.name %></span>
 </h1>
 
-<div class="big2 left center">
-
-  <%= image_tag "servers/#{@server.id}.png", :width => 350, :height => 227, :class => "centered" %>
-</div>
-
-<div class="left">
-  <% if @server.map %>
-    <%= image_tag "maps/" + @server.map + ".gif", :width => 150, :height => 100, :class => "centered" %>
-  <% end %>
-
-  <h3 class="center">
-    <%= h @server.name %><br />
-  </h3>
-
-  <p>
-    <b>IP:</b>
-    <%= link_to @server.addr, "steam://connect/#{@server.addr}" %>
-  </p>
-
-  <%= cascade @server, ["dns", "password", "irc", ["Owner", :user], "description"] %>
-</div>
-
-<div class="clear"></div>
-
-<h3 class="center">
-  Reservations
-</h3>
-
-<table class="data">
-  <tr>
-    <th>Teams</th>
-    <th>Time</th>
-  </tr>
-
-  <% @server.matches.order("id DESC").limit(10).each do |match| %>
-    <tr>
-      <td><%= link_to match, match %></td>
-      <td><%= longtime match.match_time %></td>
-    </tr>
-  <% end %>
-</table>
-
-<% if @server.can_update? cuser %>
-  <%= link_to 'Edit', edit_server_path(@server) %> |
-  <%= link_to 'Admin', :action => "admin", :id => @server %> |
-  <% if @server.domain == Server::DOMAIN_HLTV %>
-    <%= link_to 'Default Record', :action => "default", :id => @server %> |
-  <% end %>
+<% if map = Map.find_by_name(@server.map) and map.picture.length > 0 %>
+  <div class="preview">
+    <%= image_tag map.picture %>
+  </div>
 <% end %>
 
-<%= link_to 'Back', servers_path %>
+<p>
+  <strong>IP:</strong>
+  <%= link_to @server.addr, "steam://connect/#{@server.addr}" %>
+</p>
+
+<%= cascade @server, ["dns", "password", "irc", ["Owner", :user], "description"] %>
+
+<% if @server.can_update? cuser %>
+  <%= link_to 'Edit Server', edit_server_path(@server), class: 'button' %>
+  <%= link_to 'Delete Server', @server, confirm: 'Are you sure?', method: :delete, class: 'button'  %>
+  <% if @server.domain == Server::DOMAIN_HLTV %>
+    <%= link_to 'Default Record', action: "default", id: @server, class: 'button' %>
+  <% end %>
+<% end %>

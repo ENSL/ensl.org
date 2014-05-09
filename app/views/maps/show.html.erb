@@ -1,21 +1,25 @@
-<h1>
-  <%=h @map.name %>
-</h1>
+<div id="map">
+  <h1 class="fancy">
+    <span><%=h @map.name %></span>
+  </h1>
 
-<div class="wide box">
-  <p class="bold">
-    Download: <%= link_to (h @map.download), (h @map.download) %>
-</p>
-
-<p class="bold">
-  Used in contests:
-</p>
-<ul>
-  <% @map.contests.each do |contest| %>
-    <li><%= namelink contest %></li>
+  <% if @map.picture.length > 0 %>
+    <div class="preview">
+      <%= image_tag @map.picture %>
+    </div>
   <% end %>
-</ul>
-</div>
 
-<%= link_to 'Edit', edit_map_path(@map) %> |
-<%= link_to 'Back', maps_path %>
+  <% if @map.download.length > 0 %>
+    <strong>Download</strong><br>
+    <p><%= link_to (h @map.download), (h @map.download) %></p>
+  <% end %>
+
+  <h4>Played in Contests</h4>
+  <ul class="disc">
+    <% @map.contests.each do |contest| %>
+      <li><%= namelink contest %></li>
+    <% end %>  
+  </ul>
+
+  <%= link_to 'Edit Map', edit_map_path(@map), class: 'button' %>
+</div>

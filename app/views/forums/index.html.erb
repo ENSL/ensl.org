@@ -1,46 +1,47 @@
-<br />
+<%= provide :content_class, 'no-body' %>
 
-<div class="forums">
+<div id="categories">
   <% @categories.each do |cat| %>
     <% forums = cuser ? cat.forums.available_to(cuser, Forumer::ACCESS_READ).ordered : cat.forums.public.ordered %>
     <% next if forums.length == 0 %>
-    <div class="category">
-      <table class="body">
-        <tr>
-          <th colspan="5" class="header">
-            <%= h cat.to_s %>
-          </th>
-        </tr>
-        <tr>
-          <th colspan="2">Forums</th>
-          <th class="center" width="10%">Topics</th>
-          <th class="center" width="10%">Posts</th>
-          <th class="center" width="15%">Last Post</th>
-        </tr>
 
+    <div class="category">
+      <table class="category striped">
+        <thead>
+          <tr>
+            <th colspan="2" class="category"><%=h cat.name %></th>
+            <th class="actions"></th>
+            <th class="topics">Topics</th>
+            <th class="posts">Posts</th>
+            <th class="last">Last Post</th>
+          </tr>  
+        </thead>
+        
         <% forums.each do |forum| %>
           <tr>
-            <td class="bullet <%= "hl" if cuser and !forum.read_by? cuser %>">&nbsp;</td>
+            <td class="bullet <%= 'updated' if cuser and !forum.read_by?(cuser) %>"></td>
             <td class="forum">
-              <div class="left">
-                <h3 class="desc">
-                  <%= namelink forum %>
-                </h3>
-                <%= forum.description %>
-              </div>
-              <div class="right minitext">
-                <% if forum.can_update? cuser %>
-                  <%= link_to "Up", :action => "up", :id => forum %><br />
-                  <%= link_to "Down", :action => "down", :id => forum %>
-                <% end %>
-              </div>
-              <div class="clear"></div>
+              <h5><%= namelink(forum) %></h5>
+              <%= forum.description %>
             </td>
-            <td class="numbers"><%= forum.topics.count %></td>
-            <td class="numbers"><%= forum.posts.count %></td>
-            <td>
+            <td class="actions">
+              <% if forum.can_update? cuser %>
+                <%= link_to action: "up", id: forum do %>
+                  <% icon 'arrow-up' %>
+                <% end %>
+                <%= link_to action: "down", id: forum do %>
+                  <% icon 'arrow-down' %>
+                <% end %>
+              <% end %>
+            </td>
+            <td class="topics"><%= forum.topics.count %></td>
+            <td class="posts"><%= forum.posts.count %></td>
+            <td class="last">
               <% if forum.posts.last %>
-                <%= link_to raw("#{h forum.posts.last.user} <br />#{shortdate forum.posts.last.created_at}"), lastpost(forum.posts.last.topic) %>
+                <%= link_to lastpost(forum.posts.last.topic) do %>
+                  <%=h forum.posts.last.user %><br>
+                  <%= shortdate(forum.posts.last.created_at) %>
+                <% end %>
               <% end %>
             </td>
           </tr>
@@ -48,28 +49,21 @@
       </table>
     </div>
   <% end %>
+</div>
 
-  <div class="category">
-    <table class="body">
-      <tr>
-        <th colspan="5" class="header">
-          Statistics
-        </th>
-      </tr>
-
-      <tr>
-        <td colspan="5" class="center">
-          We have total of <b><%= Post.count %></b> posts,
-          <b><%= Topic.count %></b> topics, and <b><%= User.count %></b> users.
-          Our newest member is <%= namelink User.last %> and most active member is <%= namelink User.posts_stats.first %>.
-        </td>
-      </tr>
-    </table>
-  </div>
+<div class="statistics">
+  <h4>Statistics</h4>
+  <p>
+    We have total of <strong><%= Post.count %></strong> posts,
+    <strong><%= Topic.count %></strong> topics, and <strong><%= User.count %></strong> users.
+  </p>
+  <p>
+    Our newest member is <%= namelink User.last %> and most active member is <%= namelink User.posts_stats.first %>.
+  </p>
 </div>
 
 <% if Forum.new.can_create? cuser %>
   <p>
-    <%= link_to 'New forum', new_forum_path %>
+    <%= link_to 'New Forum', new_forum_path, class: 'button' %>
   </p>
 <% end %>

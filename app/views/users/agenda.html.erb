@@ -1,5 +1,5 @@
-<div id="agendaTab">
-  <ul id="agendaTab-nav" class="tabs">
+<div id="agenda" class="tabbed">
+  <ul id="agenda-nav" class="tabs">
     <li><a href="#teams">Teams</a></li>
     <li><a href="#matches">Matches</a></li>
     <li><a href="#articles">Articles</a></li>
@@ -9,9 +9,11 @@
     <li><a href="#bans">Bans</a></li>
   </ul>
 
-  <div class="box wide tabs">
+  <div class="tabbed-contents">
     <div class="tab" id="teams">
-      <table class="data">
+      <h4>Your Teams</h4>
+
+      <table class="teams">
         <tr>
           <th>Name</th>
           <th>Comment</th>
@@ -21,20 +23,19 @@
 
         <% @user.teamers.active.each do |teamer| %>
           <tr>
-            <td <% if teamer.team == @user.team %>class="bold"<% end %>>
+            <td class="<%= 'current' if teamer.team == @user.team %>">
               <%= link_to (h teamer.team.name), teamer.team %>
             </td>
-            <td><%= h teamer.comment %></td>
-            <td><%= h teamer.ranks[teamer.rank] %></td>
+            <td><%=h teamer.comment %></td>
+            <td><%=h teamer.ranks[teamer.rank] %></td>
             <td>
               <% if @user.team != teamer.team %>
-                <%= form_for @user do |u| %>
-                  <%= link_to("Set as Primary", user_path(@user, :user => { :team_id => teamer.team.id }), :method => :put, :confirm => "Are you sure?") %>
-                  <%= link_to 'Leave', teamer, :confirm => 'Are you sure?', :method => :delete %>
+                <%= form_for @user, html: { class: 'inline' } do |u| %>
+                  <%= link_to "Set as Primary", user_path(@user, user: { team_id: teamer.team.id }), method: :put, confirm: "Are you sure?", class: 'button tiny' %>
                 <% end %>
-              <% else %>
-                <%= link_to 'Leave', teamer, :confirm => 'Are you sure?', :method => :delete %>
               <% end %>
+
+              <%= link_to 'Leave', teamer, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
             </td>
           </tr>
         <% end %>
@@ -44,33 +45,32 @@
         <%= form_for @teamer do |f| %>
           <%= f.error_messages %>
           <%= f.hidden_field :user_id %>
-          <p>
-          <h3>
-            Join an existing team:
-          </h3>
 
-          <%= f.select :team_id, Team.active.collect {|t| [t.name, t.id]} %>
-          <%= f.submit "Join" %>
-          </p>
+          <h4>Join an existing team</h4>
+
+          <div class="fields inline">
+            <%= f.select :team_id, Team.active.collect {|t| [t.name, t.id]} %>
+          </div>
+          <div class="controls inline">
+             <%= f.submit "Join", class: 'button' %>
+          </div>
         <% end %>
       <% else %>
-        <p>
-        You can join only one team at time.
-        Currently you are trying to join <%= namelink @user.teamers.joining.first.team %>.
-        You can cancel this request by clicking <%= link_to "here", @user.teamers.joining.first, :method => :delete %>.
-        </p>
+        <div class="flash warning">
+          <p>You can join only be a member of one team at a time.</p>
+          <p>Currently you are trying to join <%= namelink @user.teamers.joining.first.team %></p>
+          <p>You can cancel this request by clicking "Cancel Request"</p>
+        </div>
+
+        <%= link_to "Cancel Request", @user.teamers.joining.first, method: :delete, class: 'button' %>
       <% end %>
 
-      <p>
-      <%= link_to 'Create a new team', new_team_path %>
-      </p>
+      <%= link_to 'Create a new team', new_team_path, class: 'button' %>
     </div>
 
     <div class="tab" id="matches">
       <% if @user.challenges_received.future.pending.count > 0 %>
-        <h3 class="center">
-          Pending challenges for your response
-        </h3>
+        <h4>Pending challenges for your response</h4>
 
         <table class="data">
           <tr>
@@ -84,7 +84,7 @@
             <tr>
               <td>
                 <%= link_to ("Open"), challenge %>
-                | <%= link_to "Send a PM", :controller => "messages", :action => "new", :id => "Team", :id2 => challenge.contester1.team %>
+                <%= link_to "Send a PM", controller: "messages", action: "new", id: "Team", id2: challenge.contester1.team %>
               </td>
               <td><%= namelink challenge.contester1 %></td>
               <td><%= longtime challenge.match_time %></td>
@@ -94,13 +94,10 @@
             </tr>
           <% end %>
         </table>
-        <br />
       <% end %>
 
       <% if @user.challenges_sent.future.count > 0 %>
-        <h3 class="center">
-          Sent challenges
-        </h3>
+        <h4>Sent challenges</h4>
 
         <table class="data">
           <tr>
@@ -130,9 +127,7 @@
       <% end %>
 
       <% if @user.ref? and Match.future.unreffed.ordered.count > 0 %>
-        <h3 class="center">
-          Matches without referee
-        </h3>
+        <h4>Matches without referee</h4>
 
         <table class="data">
           <tr>
@@ -147,96 +142,108 @@
               <td><%= shorttime match.match_time %></td>
               <td>
                 <%= link_to 'Referee this match',
-                  :remote => true,
-                  :url => {:controller => "matches", :action => "update", :id => match.id,
-                    :match => {:referee_id => @user.id}}, :method => "put",
-                    :loading => "$('matchlink_#{match.id}').parentNode.innerHTML='Processing..';",
-                    :success => "$('matchlink_#{match.id}').parentNode.innerHTML='Complete';",
-                    :html => {:id => "matchlink_#{match.id}"} %>
-                  </td>
-                </tr>
-              <% end %>
-            </table>
+                  remote: true,
+                  url: { 
+                    controller: "matches", action: "update", id: match.id,
+                    match: { 
+                      referee_id: @user.id 
+                    }
+                  }, 
+                  method: "put",
+                  loading: "$('matchlink_#{match.id}').parentNode.innerHTML='Processing..';",
+                  success: "$('matchlink_#{match.id}').parentNode.innerHTML='Complete';",
+                  html: { id: "matchlink_#{match.id}" } %>
+              </td>
+            </tr>
           <% end %>
+        </table>
+      <% end %>
 
-          <% if @user.upcoming_matches.length > 0  # TODO: fix this %>
-            <h3 class="center">
-              Upcoming matches for your concern
-            </h3>
+      <% if @user.upcoming_matches.length > 0  # TODO: fix this %>
+        <h4>Upcoming matches for your concern</h4>
 
-            <table class="data">
-              <tr>
-                <th>Teams</th>
-                <th>Date</th>
-              </tr>
+        <table class="data">
+          <tr>
+            <th>Teams</th>
+            <th>Date</th>
+          </tr>
 
-              <% @user.upcoming_matches.each do |match| %>
-                <tr>
-                  <td><%= namelink match %></td>
-                  <td><%= shorttime match.match_time %>
-                  </td>
-                </tr>
-              <% end %>
-            </table>
-            <br />
+          <% @user.upcoming_matches.each do |match| %>
+            <tr>
+              <td><%= namelink match %></td>
+              <td><%= shorttime match.match_time %>
+              </td>
+            </tr>
           <% end %>
+        </table>
+      <% end %>
 
-          <% if @user.past_matches.length > 0 %>
-            <h3 class="center">
-              Past matches waiting for scoring or lineup
-            </h3>
+      <% if @user.past_matches.length > 0 %>
+        <h4>Past matches waiting for scoring or lineup</h4>
 
-            <table class="data">
-              <tr>
-                <th>Teams</th>
-                <th>Date</th>
-              </tr>
+        <table class="data">
+          <tr>
+            <th>Teams</th>
+            <th>Date</th>
+          </tr>
 
-              <% @user.past_matches.each do |match| %>
-                <tr>
-                  <td><%= namelink match %></td>
-                  <td><%= shorttime match.match_time %>
-                  </td>
-                </tr>
-              <% end %>
-            </table>
-            <br />
+          <% @user.past_matches.each do |match| %>
+            <tr>
+              <td><%= namelink match %></td>
+              <td><%= shorttime match.match_time %>
+              </td>
+            </tr>
           <% end %>
-        </div>
-
-        <div class="tab" id="articles">
-          <%= render :partial => "articles/list", :locals => {:articles => @user.articles} %>
-          <%= link_to 'New article', new_article_path %>
-        </div>
-
-        <div class="tab" id="movies">
-          <%= render :partial => "movies/movie", :collection => @user.movies %>
-        </div>
-
-        <div class="tab" id="servers">
-          <%= render :partial => "servers/server", :collection => @user.servers %>
-          <%= link_to 'New server', new_server_path %>
-        </div>
-
-        <div class="tab" id="issues">
-          <h3>
-            Issues created by you
-          </h3>
-          <%= render :partial => "issues/list", :locals => {:issues => @user.issues} %>
-
-          <h3>
-            Open issues assigned to you
-          </h3>
-          <%= render :partial => "issues/list", :locals => {:issues => @user.open_issues} %>
-          <%= link_to 'New issue', new_issue_path %>
-        </div>
-
-        <div class="tab" id="bans">
-          <%= render :partial => "bans/list", :locals => {:bans => @user.bans.effective} %>
-        </div>
-      </div>
+        </table>
+      <% end %>
     </div>
 
-    <script type="text/javascript">
-      var tabber1 = new Yetii({id: 'agendaTab'});
-      </script>
+    <div class="tab" id="articles">
+      <% if @user.articles.size > 0 %>
+        <%= render partial: "articles/list", locals: { articles: @user.articles } %>
+      <% end %>
+
+      <%= link_to 'New article', new_article_path, class: 'button' %>
+    </div>
+
+    <div class="tab" id="movies">
+      <%= render partial: "movies/movie", collection: @user.movies %>
+
+      <%= link_to "New Movie", { controller: "data_files", action: "new", id: Directory::MOVIES }, { class: 'button' } %>
+    </div>
+
+    <div class="tab" id="servers">
+      <%= render partial: "servers/server", collection: @user.servers %>
+
+      <%= link_to 'New Server', new_server_path, class: 'button' %>
+    </div>
+
+    <div class="tab" id="issues">
+      <% if @user.issues.size > 0 %>
+        <h4>Issues created by you</h4>
+        <%= render partial: "issues/list", locals: { issues: @user.issues } %>
+      <% end %>
+      
+      <% if @user.open_issues.size > 0 %>
+        <h4>Open issues assigned to you</h4>
+        <%= render partial: "issues/list", locals: { issues: @user.open_issues } %>
+      <% end %>
+
+      <%= link_to 'New issue', new_issue_path, class: 'button' %>
+    </div>
+
+    <div class="tab" id="bans">
+      <% if @user.bans.effective.size > 0 %>
+        <%= render partial: "bans/list", locals: { bans: @user.bans.effective } %>
+      <% else %>
+        <p>You have no effective bans currently.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  new Yetii({
+    id: 'agenda'
+  });
+</script>

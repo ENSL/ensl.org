@@ -13,6 +13,7 @@
 
 class Forum < ActiveRecord::Base
   include Extra
+  
   BANS = 8
   TRASH = 12
 

@@ -1,72 +1,47 @@
-<table>
-  <tr>
-    <td id="userNavi">
-      <div class="box">
-        <%= image_tag @user.profile.avatar.url, :id => "user" %>
+<div id="user-profile">
+  <h1 class="fancy">
+    <span><%= @user.username %></span>
+  </h1>
 
-        <div class="center bold">
-          <%= @user.username %>
-        </div>
-      </div>
+  <div class="photo">
+    <%= image_tag @user.profile.avatar.url %>
+  </div>
 
-      <br />
-
-      <div class="box center">
-        <a href="javascript:;" id="general">General</a>
-      </div>
-
-      <div class="box center">
-        <a href="javascript:;" id="favorites">Favorites</a>
-      </div>
-
-      <div class="box center">
-        <a href="javascript:;" id="computer">Computer</a>
-      </div>
-
-      <% if @user.articles.count > 0 %>
-        <div class="box center">
-          <a href="javascript:;" id="articles">Articles</a>
-        </div>
-      <% end %>
-
-      <% if @user.movies.count > 0 %>
-        <div class="box center">
-          <a href="javascript:;" id="movies">Movies</a>
-        </div>
-      <% end %>
+  <div class="tabs tabbed">
+    <ul id="user-nav" class="tabs">
+      <li class="activeli"><a id="general">General</a></li>
 
       <% if @user.teamers.past.count > 0 %>
-        <div class="box center">
-          <a href="javascript:;" id="teams">Teams</a>
-        </div>
+        <li><a id="teams">Teams</a></li>
       <% end %>
 
       <% if @user.match_teams.count > 0 %>
-        <div class="box center">
-          <a href="javascript:;" id="matches">Matches</a>
-        </div>
+        <li><a id="matches">Matches</a></li>
       <% end %>
 
       <% if @user.predictions.count > 0 %>
-        <div class="box center">
-          <a href="javascript:;" id="predictions">Predictions</a>
-        </div>
+        <li><a id="predictions">Predictions</a></li>
       <% end %>
 
-      <div class="box center">
-        <a href="javascript:;" id="comments">Comments</a>
-      </div>
+      <% if @user.articles.count > 0 %>
+        <li><a id="articles">Articles</a></li>
+      <% end %>
 
-      <div class="center">
-        <% if cuser and @user.can_update? cuser %>
-          <%= link_to 'Edit', edit_user_path(@user) %>
-          <%= link_to 'My Agenda', "/users/agenda/#{cuser.id}" %>
-        <% end %>
-      </div>
-    </td>
+      <% if @user.movies.count > 0 %>
+        <li><a id="movies">Movies</a></li>
+      <% end %>
 
-    <td id="userData" class="box">
+      <li><a id="comments">Comments</a></li>
+    </ul>
+
+    <div id="user-data" class="tabbed-contents">
       <%= render :partial => "general" %>
-    </td>
-  </tr>
-</table>
+    </div>
+  </div>
+
+  <% if cuser and @user.can_update? cuser %>
+    <%= link_to 'Edit', edit_user_path(@user), class: 'button' %>
+    <%= link_to 'My Agenda', "/users/agenda/#{cuser.id}", class: 'button' %>
+  <% end %>
+</div>
+

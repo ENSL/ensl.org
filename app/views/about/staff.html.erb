@@ -1,36 +1,33 @@
-<div class="wide box">
-  <h2 class="center">
-    General Information
-  </h2>
+<h1>General Information</h1>
+<p>
+  We are a free-working organization founded in 2005 which has organized various competitions for the Half-Life mod Natural Selection.
+  We now primarily focus on its successor, Natural Selection 2.
+</p>
+<p>To contact us:</p>
+<p>
+  <ol>
+    <li>Use the <%= link_to "contact", new_issue_path() %> form (you must be logged in)</li>
+    <li>Visit our <%= link_to "IRC", article_path(408) %> channel <%= link_to "#ENSL", "irc://irc.quakenet.org/ensl" %> on Quakenet.</li>
+    <li>Send email to the head admin as per the list below</li>
+    <li>Contact other staff members directly, check below and click profile for contact details</li>
+  </ol>
+</p>
+<p>
+  You can check some statistics about the ENSL here: <%= link_to "ENSL Statistics", controller: "about", action: "statistics" %> 
+</p>
 
-  <p>
-
-    We are a free-working organization founded in 2005 which has organized various competitions for the Half-Life mod Natural Selection.
-    We now primarily focus on its successor, Natural Selection 2.
-    To contact us:
-    <ol>
-      <li>Use the <%= link_to "contact", new_issue_path() %> form (you must be logged in)</li>
-      <li>Visit our <%= link_to "IRC", article_path(408) %> channel <%= link_to "#ENSL", "irc://irc.quakenet.org/ensl" %> on Quakenet.</li>
-      <li>Send email to the head admin as per the list below</li>
-      <li>Contact other staff members directly, check below and click profile for contact details</li>
-    </ol>
-  </p>
-  <p>
-    You can check some statistics about ENSL here : <%= link_to "ENSL Statistics", :controller => "about", :action => "statistics" %> 
-</p><br/>
-
-<div id="staffTab">
-  <ul id="staffTab-nav" class="tabs">
-    <li><a href="#AdminsTab">Admins</a></li>
-    <li><a href="#RefereesTab">Referees</a></li>
-    <li><a href="#ShoutcastersTab">Shoutcasters</a></li>
-    <li><a href="#ExtrasTab">Extras</a></li>
-    <li><a href="#SupportTab">Support</a></li>
+<div id="staff" class="tabbed">
+  <ul id="staff-nav" class="tabs">
+    <li><a href="#admins">Admins</a></li>
+    <li><a href="#referees">Referees</a></li>
+    <li><a href="#casters">Casters</a></li>
+    <li><a href="#extras">Extras</a></li>
+    <li><a href="#support">Support</a></li>
   </ul>
-  <div class="box wide tabs">
-    <div class="tab" id="AdminsTab">
-      <h3 class="center">Admins</h3>
-      <table class="data">
+  <div class="tabbed-contents">
+    <div class="tab" id="admins">
+      <h3>Admins</h3>
+      <table class="striped staff">
         <tr>
           <th></th>
           <th>Username</th>
@@ -39,9 +36,9 @@
           <th>Age</th>
         </tr>
         <% Group.admins.each do |grouper| %>
-          <tr class="<%= cycle('even', 'odd') %>">
-            <td><%= flag grouper.user.country %></td>
-            <td><%= namelink grouper.user %></td>
+          <tr>
+            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="username"><%= namelink grouper.user %></td>
             <td><%= h grouper.user.email_s %></td>
             <td>
               <% if grouper.task %>
@@ -50,14 +47,14 @@
                 <%= h grouper.group.name.singularize %>
               <% end %>
             </td>
-            <td><%= h grouper.user.age %></td>
+            <td class="age"><%= h grouper.user.age %></td>
           </tr>
         <% end %>
       </table>
     </div>
-    <div class="tab" id="RefereesTab">
-      <h3 class="center">Referees</h3>
-      <table class="data">
+    <div class="tab" id="referees">
+      <h3>Referees</h3>
+      <table class="striped staff">
         <tr>
           <th></th>
           <th>Username</th>
@@ -66,9 +63,9 @@
           <th>Age</th>
         </tr>
         <% Group.referees.each do |grouper| %>
-          <tr class="<%= cycle('even', 'odd') %>">
-            <td><%= flag grouper.user.country %></td>
-            <td><%= namelink grouper.user %></td>
+          <tr>
+            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="username"><%= namelink grouper.user %></td>
             <td><%= h grouper.user.email_s %></td>
             <td>
               <% if grouper.task %>
@@ -77,14 +74,14 @@
                 <%= h grouper.group.name.singularize %>
               <% end %>
             </td>
-            <td><%= h grouper.user.age %></td>
+            <td class="age"><%= h grouper.user.age %></td>
           </tr>
         <% end %>
       </table>
     </div>
-    <div class="tab" id="ShoutcastersTab">
-      <h3 class="center">Shoutcasters</h3>
-      <table class="data">
+    <div class="tab" id="casters">
+      <h3>Shoutcasters</h3>
+      <table class="striped staff">
         <tr>
           <th></th>
           <th>Username</th>
@@ -93,9 +90,9 @@
           <th>Age</th>
         </tr>
         <% Group.shoutcasters.each do |grouper| %>
-          <tr class="<%= cycle('even', 'odd') %>">
-            <td><%= flag grouper.user.country %></td>
-            <td><%= namelink grouper.user %></td>
+          <tr>
+            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="username"><%= namelink grouper.user %></td>
             <td><%= h grouper.user.email_s %></td>
             <td>
               <% if grouper.task %>
@@ -104,14 +101,14 @@
                 <%= h grouper.group.name.singularize %>
               <% end %>
             </td>
-            <td><%= h grouper.user.age %></td>
+            <td class="age"><%= h grouper.user.age %></td>
           </tr>
         <% end %>
       </table>
     </div>
-    <div class="tab" id="ExtrasTab">
-      <h3 class="center">Extras</h3>
-      <table class="data">
+    <div class="tab" id="extras">
+      <h3>Extras</h3>
+      <table class="striped staff">
         <tr>
           <th></th>
           <th>Username</th>
@@ -120,9 +117,9 @@
           <th>Age</th>
         </tr>
         <% Group.extras.each do |grouper| %>
-          <tr class="<%= cycle('even', 'odd') %>">
-            <td><%= flag grouper.user.country %></td>
-            <td><%= namelink grouper.user %></td>
+          <tr>
+            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="username"><%= namelink grouper.user %></td>
             <td><%= h grouper.user.email_s %></td>
             <td>
               <% if grouper.task %>
@@ -131,21 +128,21 @@
                 <%= h grouper.group.name.singularize %>
               <% end %>
             </td>
-            <td><%= h grouper.user.age %></td>
+            <td class="age"><%= h grouper.user.age %></td>
           </tr>
         <% end %>
       </table>
     </div>
-    <div class="tab" id="SupportTab">
-      <h3 class="center">Support<h3>
-          <ul>
-            <li><b><a href="http://unknownworlds.com/">Unknown Worlds Entertainment</a></b></li>
-            <ul>
-            </div>
-          </div>
-        </div>
-        <script type="text/javascript">
-          var tabber1 = new Yetii({id: 'staffTab'});
-          </script>
-
-        </div>
+    <div class="tab" id="support">
+      <h3>Support</h3>
+      <ul>
+        <li><b><a href="http://unknownworlds.com/">Unknown Worlds Entertainment</a></b></li>
+      <ul>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  new Yetii({
+    id: 'staff'
+  });
+</script>

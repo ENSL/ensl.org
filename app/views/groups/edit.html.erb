@@ -1,71 +1,82 @@
-<h1>Editing group: <%= h @group.name %></h1>
+<div id="group">
+  <h1 class="title">Editing Group: <%= h @group.name %></h1>
 
-<div id="groupTab">
-  <ul id="groupTab-nav" class="tabs">
-    <li><a href="#groupTabGeneral">General</a></li>
-    <li><a href="#groupTabMembers">Members</a></li>
-  </ul>
+  <div id="group" class="tabbed">
+    <ul id="group-nav" class="tabs">
+      <li><a href="#general">General</a></li>
+      <li><a href="#members">Members</a></li>
+    </ul>
 
-  <div class="box wide tabs">
-    <div class="tab" id="groupTabGeneral">
-      <%= form_for(@group) do |f| %>
-        <%= f.error_messages %>
-        <p>
-          <%= f.label :name %><br />
-          <%= f.text_field :name %>
-        </p>
-        <p>
-          <%= f.submit "Update" %>
-        </p>
-      <% end %>
-    </div>
+    <div class="tabbed-contents">
+      <div class="tab" id="general">
+        <%= form_for(@group, html: { class: 'square' }) do |f| %>
+          <%= render 'shared/errors', messages: @group.errors.full_messages %>
 
-    <div class="tab" id="groupTabMembers">
-      <table class="data">
-        <tr>
-          <th>Username</th>
-          <th>Real Name</th>
-          <th>Task</th>
-          <th>Options</th>
-        </tr>
+          <div class="fields horizontal">
+            <%= f.label :name %>
+            <%= f.text_field :name %>
+          </div>
+            
+          <div class="controls">
+            <%= f.submit 'Update' %>
+          </div>
+        <% end %>
+      </div>
 
-        <% # TODO fixaa tämä
-          @group.groupers.each do |grouper| %>
-          <tr class="<%= cycle('even', 'odd') %>">
-            <%= form_for grouper do |g| %>
+      <div class="tab" id="members">
+        <table class="roles striped">
+          <tr>
+            <th class="username">Username</th>
+            <th class="name">Real Name</th>
+            <th class="role">Task</th>
+          </tr>
+          <% @group.groupers.each do |grouper| %>
+            <tr>
               <td><%= namelink grouper.user %></td>
               <td><%= h grouper.user.realname %></td>
-              <td>
-                <%= g.text_field :task, :size => 20 %>
+              <td class="actions">
+                <%= form_for grouper do |g| %>
+                  <div class="fields inline">
+                    <%= g.text_field :task, size: 20 %>
+                  </div>
+                  <div class="controls">
+                    <%= g.submit 'Update', class: 'button tiny' %>
+                    <%= link_to 'Remove', grouper, method: :delete, class: 'button remove' %>
+                  </div>
+                <% end %>
               </td>
-              <td>
-                <%#= link_to_function "Update", "$('edit_grouper_#{grouper.id}').submit()" %>
-                <%#= link_to "Update", group_path(@group, grouper => { :task => "truc" }), :method => :put %>
-                <%= g.submit "Update" %>
-                <%= link_to "Remove", grouper, :method => :delete %>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </table>
+            </tr>
+          <% end %>
+        </table>
 
-      <%= form_for @group.groupers.build do |f| %>
-        <%= f.hidden_field :group_id %>
-        <p>
-          Add a <%= link_to_function 'user', "findUser('username')" %>:
-          <%= f.text_field :username %></p>
-        <%= f.label :task %>
-        <%= f.text_field :task %>
-        <%= f.submit "Add" %>
-      </p>
-    <% end %>
+        <div class="add">
+          <h3>Add a Member</h3>
+
+          <%= form_for @group.groupers.build, html: { class: 'square' } do |f| %>
+            <%= f.hidden_field :group_id %>
+
+            <div class="fields horizontal">
+              <%= f.label :username %>
+              <%= f.text_field :username %>
+            </div>
+              
+            <div class="fields horizontal">
+              <%= f.label :task, "Role" %>
+              <%= f.text_field :task %>
+            </div>
+
+            <div class="controls">
+              <%= f.submit 'Add Member' %>  
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-</div>
 
-<script type="text/javascript">
-  var tabber1 = new Yetii({id: 'groupTab'});
-</script>
-
-<%= link_to 'Show', @group %> |
-<%= link_to 'Back', groups_path %>
+  <script type="text/javascript">
+    new Yetii({
+      id: 'group'
+    });
+  </script>
+</div>

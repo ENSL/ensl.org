@@ -6,6 +6,7 @@ gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.17'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
+gem 'puma', '~> 2.8.2'
 
 gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
@@ -21,13 +22,19 @@ gem 'newrelic_rpm', '~> 3.7.2.195'
 gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
+gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.2', require: false
 
 gem 'sprockets', '~> 2.2.1'
-gem 'tinymce-rails', '~> 3.5.9'
-gem 'jquery-rails', '~> 2.0.2'
-gem 'sass-rails', '~> 3.2.5'
 gem 'coffee-rails', '~> 3.2.2'
+gem 'jquery-rails', '~> 2.0.2'
+gem 'tinymce-rails', '~> 3.5.9'
+gem 'sass', '~> 3.3.4'
+gem 'sass-rails', '~> 3.2.6'
+
+gem 'font-awesome-sass', '~> 4.0.3.1'
+gem 'bourbon', '~> 3.1.8'
+gem 'neat', '~> 1.6.0'
 
 group :assets do
   gem 'uglifier', '~> 2.5.0'
@@ -38,9 +45,10 @@ group :development do
   gem 'capistrano-rbenv', '~> 2.0.2'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rails', '~> 1.1'
-  gem 'capistrano3-unicorn', '~> 0.1.1'
+  gem 'better_errors', '~> 1.1.0'
+  gem 'binding_of_caller', '~> 0.7.2'
   gem 'annotate', '~> 2.6.2'
-  gem 'quiet_assets'
+  gem 'quiet_assets', '~> 1.0.2'
 end
 
 group :test do
@@ -57,9 +65,4 @@ end
 
 group :development, :test do
   gem 'pry-debugger', '~> 0.2.2'
-end
-
-group :staging, :production do
-  gem 'kgio', '~> 2.9.2'
-  gem 'unicorn', '~> 4.8.2'
 end

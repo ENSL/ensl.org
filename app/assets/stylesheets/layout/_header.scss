@@ -1,0 +1,171 @@
+/*
+  Banner
+*/
+
+header .banner {  
+  height: 125px;
+
+  #logo {
+    @include span-columns(7 of 12);
+    min-height: 180px;
+    position: relative;
+
+    img {
+      height: 180px;
+      position: absolute;
+      top: 30px;
+      left: -10px;
+      z-index: 1;
+    }
+  }
+
+  #authentication {
+    @include span-columns(5 of 12);
+    padding: 30px 0;
+    padding-top: 50px;
+    color: white;
+    
+    font-family: $header-font-family;
+    text-transform: uppercase;
+
+    .fields {
+      input[type=text],
+      input[type=password] {
+        text-align: right;
+        margin-bottom: 3px;
+      }
+    }
+
+    .logged {
+      position: relative;
+    }
+
+    a {
+      font-size: 12px;
+      line-height: 14px;
+      color: #497588;
+
+      &:hover {
+        color: white;
+      }
+    }
+
+    form {
+      display: inline;
+    }
+
+    &.admin {
+      
+      .links {
+        margin-top: -10px;
+      }
+    }
+
+    .fields { 
+      @include span-columns(12);
+
+      input {
+        @include span-columns(6);
+        margin-bottom: 10px;
+      }
+    }
+
+    .controls {
+      margin-top: 10px;
+      text-align: right;
+
+      input {
+        @include span-columns(12);
+        margin-bottom: 10px;
+      }
+
+      a {
+        @include span-columns(12);
+        text-align: left;
+      }
+    }
+
+    .password-reset {
+      float: right;
+    }
+
+    .links {
+      float: right;
+      position: relative;
+      padding-right: 80px;
+
+      li {
+        text-align: right;
+        height: 18px;
+      }
+
+      li i {
+        display: inline-block;
+        width: 1em;
+        text-align: center;
+        margin: 0 5px;
+      }
+
+    }
+
+    .avatar {
+      box-shadow: $content-shadow;
+      border-radius: $base-border-radius;
+      border: 1px solid #61beff;
+      text-align: center;
+      vertical-align: middle;
+      position: relative;
+      float: left;
+      height: 0;
+      background-size: cover;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 75px;
+      width: 75px;
+    }
+
+    .buttons {
+      @include span-columns(12);
+      font-family: $header-font-family;
+      text-align: right;
+      text-transform: uppercase;
+      font-size: 12px;
+
+      .login,
+      .register {
+        @include span-columns(6);
+      }
+
+      .login input {
+        background: none;
+        border: 0;
+        font-family: $header-font-family;
+        color: #73d5f7;
+        font-size: 14px;
+        padding: 0;
+        text-transform: uppercase;
+      }
+
+      .register a {
+        float: right;
+        display: block;
+        clear: both;
+      }
+    }
+  }
+
+  &.authenticated {
+
+    #logo {
+      @include span-columns(9 of 12);
+    }
+
+    #authentication {
+      @include span-columns(3 of 12);
+      padding: 30px 0;
+    }
+  }
+}

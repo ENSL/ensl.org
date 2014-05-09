@@ -1,27 +1,18 @@
 <h1>New Category</h1>
 
-<div class="wide box">
-  <%= form_for(@category) do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @category.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
+<%= form_for(@category, html: { class: 'square' }) do |f| %>
+  <%= render 'shared/errors', messages: @category.errors.full_messages %>
 
-    <p>
-      <%= f.label :name %><br />
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= f.label :domain %><br />
-      <%= f.select :domain, @category.domains.invert %>
-    </p>
-    <p>
-      <%= f.submit 'Create' %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to 'Back', categories_path %>
+  <div class="fields horizontal">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="fields horizontal">
+    <%= f.label :domain %>
+    <%= f.select :domain, @category.domains.invert %>
+  </div>
+  
+  <div class="controls">
+    <%= f.submit 'Create Category' %>
+  </div>
+<% end %>
