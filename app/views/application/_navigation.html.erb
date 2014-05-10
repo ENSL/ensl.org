@@ -1,5 +1,8 @@
 <nav id="menu">
   <div class="wrapper">
+    <div id="logo">
+      <%= link_to image_tag('logo.png'), root_path %>
+    </div>
     <ul class="navigation">
       <li class="icon">
         <%= active_link_to root_path, active: ["articles", "news_index"], class: 'news' do %>

@@ -109,8 +109,6 @@
   .gather-columns {
     @include span-columns(12);
     @include row(table);
-    margin-left: - $column-border-width;
-    width: $max-width - ($column-border-width*2);
   }
 
   .data {
@@ -118,9 +116,11 @@
     @include pad;
     border-radius: $column-border-width + $column-border-radius;
     padding-bottom: 20px;
-    padding: 0px;
     position: relative;
     z-index: 100;
+    background: rgba(0, 0, 0, 0.2);
+    border: 10px solid transparent;
+    background-clip: padding-box;
 
     h4 {
       padding-bottom: 20px;
@@ -134,22 +134,6 @@
 
     ul {
       margin-bottom: 10px;
-    }
-
-    .contents {
-      margin: 20px;
-      padding: 10px;
-    }
-
-    .contents:before {
-      border-radius: $base-border-radius;
-      content: '';
-      background: rgba(0, 0, 0, 0.15);
-      position: absolute;
-      width: 90%;
-      height: 100%;
-      z-index: -1;
-      margin: -20px;
     }
   }
 

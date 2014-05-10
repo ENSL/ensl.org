@@ -28,6 +28,10 @@ body#tinymce {
 
 .wrapper {
   @include outer-container;
+
+  &.body {
+    z-index: 10;
+  }
 }
 
 #content {

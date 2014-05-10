@@ -11,9 +11,29 @@ $navigation-height: 50px;
   margin-top: -50px;
   background: image-url('layout/nav-background.png') top center repeat-x;
   height: 100px;
-  
-  nav {
-    @include outer-container;
+  position: relative;
+  z-index: 25;
+
+  .wrapper {
+    position: relative;
+  }
+
+  #logo {
+    position: absolute;
+    bottom: -15px;
+    left: -10px;
+
+    a {
+      height: 180px;
+      display: block;
+      float: left;
+      position: relative;
+      z-index: 50;
+
+      img {
+        height: 180px;
+      }
+    }
   }
 }
 
