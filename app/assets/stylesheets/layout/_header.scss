@@ -3,24 +3,11 @@
 */
 
 header .banner {  
-  height: 125px;
-
-  #logo {
-    @include span-columns(7 of 12);
-    min-height: 180px;
-    position: relative;
-
-    img {
-      height: 180px;
-      position: absolute;
-      top: 30px;
-      left: -10px;
-      z-index: 1;
-    }
-  }
+  height: 180px;
 
   #authentication {
     @include span-columns(5 of 12);
+    @include shift(7);
     padding: 30px 0;
     padding-top: 50px;
     color: white;
@@ -159,12 +146,9 @@ header .banner {
 
   &.authenticated {
 
-    #logo {
-      @include span-columns(9 of 12);
-    }
-
     #authentication {
       @include span-columns(3 of 12);
+      @include shift(9);
       padding: 30px 0;
     }
   }
