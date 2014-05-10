@@ -194,7 +194,7 @@ class User < ActiveRecord::Base
   end
 
   def caster?
-    group.exists? :id => Group::CASTERS
+    groups.exists? :id => Group::CASTERS
   end
 
   def verified?
@@ -285,5 +285,13 @@ class User < ActiveRecord::Base
 
   def self.search(search)
     search ? where("LOWER(username) LIKE LOWER(?) OR steamid LIKE ?", "%#{search}%", "%#{search}%") : scoped
+  end
+
+  def self.refadmins
+    Group.find(Group::REFEREES).users.order(:username) + Group.find(Group::ADMINS).users.order(:username)
+  end
+
+  def self.casters
+    Group.find(Group::CASTERS).users.order(:username)
   end
 end

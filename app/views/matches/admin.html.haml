@@ -25,18 +25,34 @@
             \- #{h match.score2}
         %td
           - if match.caster
-            = namelink match.caster
-          - elsif match.can_update?(cuser, {:caster_id => 1})
             = form_for match do |f|
-              = f.hidden_field :caster_id, {:value => cuser.id}
-              = link_to "Take!", "#form_submit"
+              = f.hidden_field :caster_id, {:value => nil}
+              = namelink match.caster
+              - if match.can_update?(cuser, {:caster_id => nil})
+                = link_to "#form_submit" do
+                  %i.fa.fa-times
+          - elsif match.can_update?(cuser, {:caster_id => cuser.id})
+            = form_for match do |f|
+              - if cuser.admin?
+                = f.collection_select :caster_id, Group.casters, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
+              - else
+                = f.hidden_field :caster_id, {:value => cuser.id}
+                = link_to "Take!", "#form_submit"
         %td
           - if match.referee
-            = namelink match.referee
-          - elsif match.can_update?(cuser, {:referee_id => 1})
             = form_for match do |f|
-              = f.hidden_field :referee_id, {:value => cuser.id}
-              = link_to "Take!", "#form_submit"
+              = f.hidden_field :referee_id, {:value => nil}
+              = namelink match.referee
+              - if match.can_update?(cuser, {:referee_id => nil})
+                = link_to "#form_submit" do
+                  %i.fa.fa-times
+          - elsif match.can_update?(cuser, {:referee_id => cuser.id})
+            = form_for match do |f|
+              - if cuser.admin?
+                = f.collection_select :referee_id, User.refadmins, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
+              - else
+                = f.hidden_field :referee_id, {:value => cuser.id}
+                = link_to "Take!", "#form_submit"
         %td.actions
           - if cuser.ref? || cuser.admin?
-            = link_to "Admin", match_ref_path(match)
+            = link_to "Admin", "/matches/ref/#{match.id}"
