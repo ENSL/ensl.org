@@ -21,6 +21,7 @@ en:
   contests_contester_update: "Contester was successfully updated."
   gather_create: "New Gather was started successfully."
   gathers_join: "You have joined the Gather."
+  gathers_user_pick: "You have successfully selected a player for your team."
   gatherers_update: "Gather player successfully updated."
   files_create: "File was successfully created."
   files_update: "File was successfully updated."
