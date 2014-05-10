@@ -2,9 +2,13 @@
   Shoutbox Messages
 */
 
+#shoutbox {
+  display: table;
+}
+
 .shoutmsg {
+  display: table-row;
   margin-bottom: 5px;
-  display: block;
   clear: both;
 
   .timestamp {
@@ -12,12 +16,8 @@
   }
 
   .user {
-    float: left;
-    padding: 0 5px 5px 0;
-
-    .delete {
-      float: left;
-    }
+    display: table-cell;
+    min-width: 30%;
 
     .username {
       clear: right;
@@ -29,5 +29,11 @@
       display: block;
       color: #5a5a5a;
     }
+  }
+
+  .message {
+    max-width: 66%;
+    display: table-cell;
+    padding-left: 10px;
   }
 }

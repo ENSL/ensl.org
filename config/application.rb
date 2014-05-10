@@ -8,6 +8,9 @@ module Ensl
     # Custom error pages
     config.exceptions_app = self.routes
 
+    # Additional assets
+    config.assets.precompile += %w{errors.css}
+
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]
 

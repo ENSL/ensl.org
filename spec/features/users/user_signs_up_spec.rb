@@ -13,7 +13,7 @@ feature 'Visitor signs up' do
       click_button submit(:user, :create)
     end
     
-    expect(user_status).to have_content(user[:username])
+    expect(user_status).to have_content('ACCOUNT')
   end
 
   scenario 'with invalid Email' do
