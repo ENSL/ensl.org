@@ -17,7 +17,7 @@ feature 'Case insensitive login' do
       expect(page).to have_content(I18n.t('login_successful'))
       
       within user_status do
-        expect(page).to have_content(username)
+        expect(page).to have_content(account_link)
       end
     end
 
@@ -28,7 +28,7 @@ feature 'Case insensitive login' do
       expect(page).to have_content(I18n.t('login_successful'))
 
       within user_status do
-        expect(page).to have_content(username)
+        expect(page).to have_content(account_link)
       end
     end
   end
@@ -36,5 +36,9 @@ feature 'Case insensitive login' do
   def fill_login_form(username)
     fill_in "login_username", with: username
     fill_in "login_password", with: password
+  end
+
+  def account_link
+    'ACCOUNT'
   end
 end

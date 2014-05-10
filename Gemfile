@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 ruby '2.1.1'
 
 gem 'dotenv-rails', '~> 0.10.0'
-gem 'rails', '~> 3.2.17'
+gem 'rails', '~> 3.2.18'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.8.2'
