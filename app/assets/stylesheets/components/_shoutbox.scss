@@ -10,9 +10,12 @@
   display: table-row;
   margin-bottom: 5px;
   clear: both;
+  position: relative;
 
-  .timestamp {
-    @extend .highlight;
+  .destroy {
+    position: absolute;
+    top: 0;
+    right: -10px;
   }
 
   .user {
@@ -34,6 +37,11 @@
   .message {
     max-width: 66%;
     display: table-cell;
-    padding-left: 10px;
+
+    .contents {
+      position: relative;
+      display: block;
+      padding: 0 10px;
+    }
   }
 }
