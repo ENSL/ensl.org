@@ -80,7 +80,7 @@
       </table>
     </div>
     <div class="tab" id="casters">
-      <h3>Shoutcasters</h3>
+      <h3>CASTERS</h3>
       <table class="striped staff">
         <tr>
           <th></th>
@@ -89,7 +89,7 @@
           <th>Task</th>
           <th>Age</th>
         </tr>
-        <% Group.shoutcasters.each do |grouper| %>
+        <% Group.casters.each do |grouper| %>
           <tr>
             <td class="country"><%= flag grouper.user.country %></td>
             <td class="username"><%= namelink grouper.user %></td>

@@ -1,0 +1,42 @@
+- @matches.each do |week, matches|
+  %h2=week
+  %table.striped#matches
+    %tr
+      %th.opponent Teams
+      %th.date Date
+      %th.maps Maps
+      %th Score
+      %th Caster
+      %th Referee
+      %th.actions Actions
+    - matches.each do |match|
+      %tr
+        %td
+          = namelink match.contester1.team
+          vs
+          = namelink match.contester2.team
+        %td
+          = shorttime match.match_time
+        %td
+          = match.map1.to_s + " " + match.map2.to_s
+        %td
+          = link_to match, :class => "bold #{match.score_color}" do
+            = h match.score1
+            \- #{h match.score2}
+        %td
+          - if match.caster
+            = namelink match.caster
+          - elsif match.can_update?(cuser, {:caster_id => 1})
+            = form_for match do |f|
+              = f.hidden_field :caster_id, {:value => cuser.id}
+              = link_to "Take!", "#form_submit"
+        %td
+          - if match.referee
+            = namelink match.referee
+          - elsif match.can_update?(cuser, {:referee_id => 1})
+            = form_for match do |f|
+              = f.hidden_field :referee_id, {:value => cuser.id}
+              = link_to "Take!", "#form_submit"
+        %td.actions
+          - if cuser.ref? || cuser.admin?
+            = link_to "Admin", match_ref_path(match)

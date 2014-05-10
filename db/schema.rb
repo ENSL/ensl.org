@@ -11,21 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140330152235) do
-
-  create_table "admin_requests", :force => true do |t|
-    t.string   "addr"
-    t.string   "pwd"
-    t.integer  "server_id"
-    t.string   "player"
-    t.integer  "user_id"
-    t.string   "msg"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "admin_requests", ["server_id"], :name => "index_admin_requests_on_server_id"
-  add_index "admin_requests", ["user_id"], :name => "index_admin_requests_on_user_id"
+ActiveRecord::Schema.define(:version => 20140510080652) do
 
   create_table "article_versions", :force => true do |t|
     t.integer  "article_id"
@@ -214,16 +200,6 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
   add_index "data_files", ["directory_id"], :name => "index_data_files_on_directory_id"
   add_index "data_files", ["related_id"], :name => "index_data_files_on_related_id"
 
-  create_table "deleteds", :force => true do |t|
-    t.integer  "deletable_id"
-    t.string   "deletable_type"
-    t.integer  "user_id"
-    t.text     "reason"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "related_id"
-  end
-
   create_table "directories", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -235,21 +211,6 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
   end
 
   add_index "directories", ["parent_id"], :name => "index_directories_on_parent_id"
-
-  create_table "firms", :force => true do |t|
-    t.string   "name"
-    t.string   "y_code"
-    t.string   "email"
-    t.string   "website"
-    t.string   "phone"
-    t.string   "address"
-    t.integer  "zipcode"
-    t.string   "town"
-    t.integer  "owner"
-    t.string   "opentime"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "forumers", :force => true do |t|
     t.integer  "forum_id"
@@ -462,6 +423,7 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
     t.integer  "points1"
     t.integer  "points2"
     t.integer  "hltv_id"
+    t.string   "caster_id"
   end
 
   add_index "matches", ["challenge_id"], :name => "index_matches_on_challenge_id"
@@ -515,13 +477,6 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
   add_index "movies", ["preview_id"], :name => "index_movies_on_preview_id"
   add_index "movies", ["status"], :name => "index_movies_on_status"
   add_index "movies", ["user_id"], :name => "index_movies_on_user_id"
-
-  create_table "nodes", :force => true do |t|
-    t.string   "name"
-    t.integer  "foreign_key"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "options", :force => true do |t|
     t.string   "option"
@@ -631,6 +586,7 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
     t.string   "steam_profile"
     t.string   "achievements_parsed"
     t.string   "signature_parsed"
+    t.string   "stream"
   end
 
   add_index "profiles", ["user_id"], :name => "index_profiles_on_user_id"
@@ -754,6 +710,18 @@ ActiveRecord::Schema.define(:version => 20140330152235) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+
+  create_table "shoutmsg_archive", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "text"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "shoutable_type"
+    t.integer  "shoutable_id"
+  end
+
+  add_index "shoutmsg_archive", ["shoutable_type", "shoutable_id"], :name => "index_shoutmsgs_on_shoutable_type_and_shoutable_id"
+  add_index "shoutmsg_archive", ["user_id"], :name => "index_shoutmsgs_on_user_id"
 
   create_table "shoutmsgs", :force => true do |t|
     t.integer  "user_id"

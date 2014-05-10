@@ -99,6 +99,15 @@
     <%= cascade @match, [:server, :demo, :referee] %>
     <strong>Maps</strong><br>
     <%= namelink @match.map1 %>, <%= namelink @match.map2 %>
+
+    <% if @match.caster && @match.caster.profile.stream %>
+    <dl>
+      <dt>Stream</dt>
+      <dd>
+        <%= link_to @match.caster.profile.stream, @match.caster.profile.stream %>
+      </dd>
+    </dl>
+    <% end %>
   </div>
   
   <% unless @match.report.nil? or @match.report.empty? %>
