@@ -5,13 +5,14 @@
   <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
 </h4>
 
-<%= form_tag("/gathers/pick/#{@gather.id}") do %>
+<%= form_tag "/gathers/pick/#{@gather.id}" do %>
   <ul class="gatherers">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
       <li>
         <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
           <% pick = true %>
-          <%= radio_button_tag :player, gatherer.id %><%= flag gatherer.user.country %>
+          <%= radio_button_tag :player, gatherer.id %> 
+          <%= flag gatherer.user.country %> 
           <%= namelink gatherer.user %>
 
         <% else %>
@@ -31,8 +32,10 @@
         <% end %>
       </li>
     <% end %>
-    <% if pick %>
-      <a class="button tiny">Pick</a>
-    <% end %>
-  </table>
+  </ul>
+  <% if pick %>
+    <div class="controls">
+      <%= submit_tag 'Pick' %>
+    </div>
+  <% end %>
 <% end %>

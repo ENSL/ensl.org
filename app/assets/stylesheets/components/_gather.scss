@@ -193,3 +193,11 @@ table.gathers {
     width: 35%;
   }
 }
+
+/*
+  Player List
+*/
+
+ul.gatherers {
+  @include span-columns(12);
+}

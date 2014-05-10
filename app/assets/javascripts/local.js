@@ -106,19 +106,9 @@ $(document).ready(function(){
 });
 
 $(function() {
-  var menuContests;
-  var menuGather;
-  var menuMaterial;
-  var menuForums;
-
-  $(function() {
-    $('div#indexMenu div.contests').hover(function(){
-    });
-  });
-
   $("div#shoutbox").bind("mousewheel",function(ev, delta) {
-      var scrollTop = $(this).scrollTop();
-      $(this).scrollTop(scrollTop-Math.round(delta));
+    var scrollTop = $(this).scrollTop();
+    $(this).scrollTop(scrollTop-Math.round(delta));
   });
 
   // Gather stuff
