@@ -54,6 +54,7 @@ class Match < ActiveRecord::Base
   belongs_to :week
   belongs_to :hltv, :class_name => "Server"
   belongs_to :stream, :class_name => "Movie"
+  belongs_to :caster, :class_name => "User"
 
   scope :future, :conditions => ["match_time > UTC_TIMESTAMP()"]
   scope :future5, :conditions => ["match_time > UTC_TIMESTAMP()"], :limit => 5
@@ -293,6 +294,7 @@ class Match < ActiveRecord::Base
   def can_update? cuser, params = {}
     return false unless cuser
     return true if cuser.admin?
+    return true if cuser.caster? and Verification.contain params, [:caster_id]
     return true if cuser.ref? and !referee and Verification.contain params, [:referee_id]
     return true if cuser.ref? and referee == cuser \
       and Verification.contain params, [:score1, :score2, :forfeit, :report, :demo_id, :motm_name, :matchers_attributes, :server_id]

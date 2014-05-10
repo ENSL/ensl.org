@@ -47,7 +47,10 @@ Ensl::Application.routes.draw do
 	resources :servers
 	resources :predictions
 	resources :rounds
-	resources :matches
+	resources :matches do |m|
+    get :admin, :to => "matches#admin", :on => :collection
+    get :ref, :to => "matches#ref"
+  end
 	resources :maps
 	resources :logs
 	resources :log_files

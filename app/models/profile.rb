@@ -74,6 +74,8 @@ class Profile < ActiveRecord::Base
   validates_length_of :achievements, :maximum => 65000
   validates_format_of :steam_profile, :with => /\A[A-Za-z0-9_\-\+]{1,40}\z/, :allow_blank => true
 
+  validates :stream, :length => {:maximum => 30}
+
   before_validation :init_steam_profile
   before_save :parse_text
 

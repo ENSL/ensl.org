@@ -193,6 +193,10 @@ class User < ActiveRecord::Base
     groups.exists? :id => Group::REFEREES
   end
 
+  def caster?
+    group.exists? :id => Group::CASTERS
+  end
+
   def verified?
     #		created_at < DateTime.now.ago(VERIFICATION_TIME)
     true

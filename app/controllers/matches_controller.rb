@@ -1,5 +1,5 @@
 class MatchesController < ApplicationController
-  before_filter :get_match, except: [:index, :new, :create]
+  before_filter :get_match, except: [:index, :new, :create, :admin]
 
   def index
     @matches = Match.active
@@ -14,6 +14,11 @@ class MatchesController < ApplicationController
     @match = Match.new
     @match.contest = Contest.find params[:id]
     raise AccessError unless @match.can_create? cuser
+  end
+
+  def admin
+    @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee).all.group_by {|t| t.week.to_s }.to_a.reverse
+    render :layout => "full"
   end
 
   def extra
@@ -64,8 +69,11 @@ class MatchesController < ApplicationController
         format.xml { head :ok }
         format.html do
           flash[:notice] = t(:matches_update)
-          #redirect_to_back
-          redirect_to @match
+          if URI(request.referer).path.include?("admin")
+            redirect_to_back
+          else
+            redirect_to @match
+          end
         end
       end
     else

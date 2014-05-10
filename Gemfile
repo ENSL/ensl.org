@@ -35,6 +35,7 @@ gem 'sass-rails', '~> 3.2.6'
 gem 'font-awesome-sass', '~> 4.0.3.1'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.6.0'
+gem 'haml'
 
 group :assets do
   gem 'uglifier', '~> 2.5.0'

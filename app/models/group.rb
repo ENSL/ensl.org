@@ -17,7 +17,7 @@ class Group < ActiveRecord::Base
   MOVIES = 3
   DONORS = 4
   MOVIEMAKERS = 5
-  SHOUTCASTERS = 6
+  CASTERS = 6
   CHAMPIONS = 7
   PREDICTORS = 8
   STAFF = 10
@@ -48,7 +48,7 @@ class Group < ActiveRecord::Base
 
   def self.staff
     staff = []
-    (find(ADMINS).groupers + find(PREDICTORS).groupers + find(SHOUTCASTERS).groupers + find(STAFF).groupers + find(REFEREES).groupers).each do |g|
+    (find(ADMINS).groupers + find(PREDICTORS).groupers + find(CASTERS).groupers + find(STAFF).groupers + find(REFEREES).groupers).each do |g|
       staff << g unless staff.include? g
     end
     staff
@@ -78,11 +78,11 @@ class Group < ActiveRecord::Base
     extras
   end
 
-  def self.shoutcasters
-    shoutcasters = []
-    (find(SHOUTCASTERS).groupers).each do |g|
-      shoutcasters << g unless shoutcasters.include? g
+  def self.casters
+    casters = []
+    (find(CASTERS).groupers).each do |g|
+      casters << g unless casters.include? g
     end
-    shoutcasters
+    casters
   end
 end
