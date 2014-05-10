@@ -66,7 +66,7 @@ class Topic < ActiveRecord::Base
 
   def cached_view_count
     Rails.cache.fetch(cache_key('view_count'), expires_in: 1.hours) do
-      view_count
+      self.view_count
     end
   end
 
