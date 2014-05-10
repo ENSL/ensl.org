@@ -1,9 +1,6 @@
 <div class="shoutmsg">
   <div class="user">
     <span class="username">
-      <% if shoutmsg.can_destroy? cuser %>
-        <%= link_to icon('times'), shoutmsg, method: :delete %> 
-      <% end %>
       <%= namelink shoutmsg.user %>
     </span>
     <span class="time">
@@ -11,6 +8,11 @@
     </span>  
   </div>
   <div class="message">
-    <%= shoutmsg.text %>  
+    <div class="contents">
+      <%= shoutmsg.text %>
+      <% if shoutmsg.can_destroy? cuser %>
+        <%= link_to icon('times'), shoutmsg, method: :delete, class: 'destroy' %>
+      <% end %>
+    </div>
   </div>
 </div>

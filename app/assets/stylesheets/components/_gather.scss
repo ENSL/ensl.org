@@ -35,7 +35,12 @@
   }
 
   .shoutbox-messages {
-    @include span-columns(12);
+    display: table;
+    width: 100%;
+
+    .user {
+      width: 10%;
+    }
 
     .timestamp {
       margin: 0 5px 5px;
