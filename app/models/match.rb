@@ -294,8 +294,12 @@ class Match < ActiveRecord::Base
   def can_update? cuser, params = {}
     return false unless cuser
     return true if cuser.admin?
-    return true if cuser.caster? and Verification.contain params, [:caster_id]
-    return true if cuser.ref? and !referee and Verification.contain params, [:referee_id]
+    return true if cuser.caster? and Verification.contain params, [:caster_id] \
+      and (params[:caster_id] && params[:caster_id].to_i == cuser.id && caster_id.blank?) \
+      or (params[:caster_id].blank? && caster_id == cuser.id)
+    return true if cuser.ref?  and Verification.contain params, [:referee_id] \
+      and (params[:referee_id] && params[:referee_id].to_i == cuser.id  && referee_id.blank?) \
+      or (params[:referee_id].blank? && referee_id == cuser.id)
     return true if cuser.ref? and referee == cuser \
       and Verification.contain params, [:score1, :score2, :forfeit, :report, :demo_id, :motm_name, :matchers_attributes, :server_id]
     return true if match_time.past? and !score1 and !score2 and !forfeit \
