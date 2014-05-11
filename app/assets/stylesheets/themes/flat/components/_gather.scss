@@ -1,0 +1,191 @@
+/*
+  Gather Page
+*/
+
+#gather {
+  @include span-columns(12);
+
+  .previous a,
+  .next a {
+    display: inline-block;
+    float: none;
+    margin: 0;
+
+    i {
+      vertical-align: middle;
+    }
+  }
+
+  .previous {
+    @include span-columns(6);
+    margin-bottom: $container-padding;
+
+    i {
+      margin-right: 10px;
+    }
+  }
+
+  .next {
+    @include span-columns(6);
+    @include omega;
+    text-align: right;
+
+    i {
+      margin-left: 10px;
+    }
+  }
+
+  .shoutbox-messages {
+    @include span-columns(12);
+
+    .timestamp {
+      margin: 0 5px 5px;
+    }
+  }
+
+  .new-shout {
+    @include span-columns(12);
+    margin: 20px 0;
+
+    .shout_input {
+      width: 400px;
+      margin-right: 20px;
+    }
+
+    .fields,
+    .controls {
+      float: left;
+      display: block;
+    }
+  }
+}
+
+#gather-info {
+  @include span-columns(12);
+  margin: 20px 0;
+  border-bottom: 2px solid $light-gray;
+
+  .info {
+    @include span-columns(4);
+
+    h6 {
+      margin-bottom: 10px;
+    }
+
+    &:nth-child(3) {
+      @include omega;
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+
+    li {
+      margin-left: 20px;
+    }
+  }
+
+  .hide {
+    @include span-columns(12);
+    padding: 20px 0;
+    text-align: center;
+
+    a {
+      display: inline-block;
+      float: none;
+
+      i {
+        margin-right: 10px;
+      }
+    }   
+  }
+}
+
+#gather-area {
+  @include span-columns(12);
+
+  $column-border-width: 10px;
+  $column-border-radius: 5px;
+
+  .gather-columns {
+    @include span-columns(12);
+    @include row(table);
+    margin-left: - $column-border-width;
+    width: $max-width - ($column-border-width*2);
+  }
+
+  .data {
+    @include span-columns(4);
+    @include pad;
+    border-radius: $column-border-width + $column-border-radius;
+    padding-bottom: 20px;
+    background: lighten($light-gray, 5%);
+    padding: 20px;
+    border: $column-border-width solid white;
+
+    h4 {
+      padding-bottom: 20px;
+      text-align: center;
+    }
+
+    &:nth-child(3) {
+      @include reset-display;
+      @include omega;
+    }
+
+    ul {
+      margin-bottom: 10px;
+    }
+  }
+
+  .players {
+
+    .captain {
+      color: $gold;
+      margin: 0 10px;
+    }
+
+    .delete {
+      display: inline-block;
+      padding: 0 10px;
+    }
+  }
+}
+
+#gather-stats {
+  @include span-columns(12);
+  display: block;
+  clear: both;
+  padding: 20px 0;
+  margin: 20px 0;
+  border-top: 2px solid $light-gray;
+  border-bottom: 2px solid $light-gray;
+  position: relative;
+
+  .admin {
+    top: 20px;
+    right: 0;
+    margin: 0;
+    position: absolute;
+  }
+
+  p {
+    @include clearfix;
+  }
+}
+
+/*
+  Gather Archive
+*/
+
+table.gathers {
+
+  .date {
+    width: 30%;
+  }
+
+  .team1,
+  .team2 {
+    width: 35%;
+  }
+}

@@ -6,13 +6,13 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <%= stylesheet_link_tag 'errors' %>
+    <%= stylesheet_link_tag "themes/#{active_theme}/errors" %>
   </head>
   <body>
     <div id="error">
       <div class="message">
         <div id="logo">
-          <%= link_to image_tag("logo.png"), root_path %>
+          <%= link_to image_tag("themes/#{active_theme}/logo.png"), root_path %>
         </div>
         <div id="code">
           <h1><%= params[:code] %></h1>

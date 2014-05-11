@@ -9,7 +9,7 @@ module Ensl
     config.exceptions_app = self.routes
 
     # Additional assets
-    config.assets.precompile += %w{errors.css}
+    config.assets.precompile += Dir.glob("#{config.root}/app/assets/stylesheets/themes/*").map { |path| ["#{path}/theme.css", "#{path}/errors.css"] }.flatten
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]

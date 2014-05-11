@@ -1,0 +1,42 @@
+/*
+  Buttons
+*/
+
+@mixin button($background: $button-primary, $text: $button-text) {
+  $button-height: 35px;
+
+  @include linear-gradient($blue, $dark-blue);
+  border-radius: $base-border-radius;
+  font-family: $montserrat;
+  font-size: 14px;
+  background-color: $background;
+  color: $text;
+  height: $button-height;
+  padding: 0 $button-height/2;
+  line-height: $button-height;
+  float: left;
+  margin: 0 $button-height/2 $button-height/2 0;
+  border: 0;
+  cursor: pointer;
+  font-weight: 400;
+
+  &:hover {
+    color: lighten($light-blue, 30);
+  }
+}
+
+button,
+a.button,
+.button {
+  @include button;
+
+  &.tiny {
+    @include linear-gradient($light-blue, $blue);
+    background-color: transparent;
+    border-radius: 14px;
+    line-height: 25px;
+    height: 25px;
+    padding: 0 12px;
+    margin: 0 10px 0 0;
+  }
+}

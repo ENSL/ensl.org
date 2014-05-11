@@ -1,0 +1,194 @@
+/*
+  Navigation
+*/
+
+$navigation-height: 50px;
+
+#menu {
+  @include span-columns(12);
+  font-family: $montserrat;
+  height: $navigation-height;
+
+  #logo {
+    position: absolute;
+    top: 20px;
+    margin-left: -60px;
+  }
+}
+
+ul.navigation {
+  border-radius: $base-border-radius;
+  z-index: 100;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  float: right;
+  background-color: $light-blue;
+  max-width: $max-width;
+  max-height: $navigation-height;
+
+  > li {
+    float: left;
+    border-right: 1px solid $dark-blue;
+
+    &:first-child a {
+      border-radius: $base-border-radius 0 0 $base-border-radius;
+    }
+
+    &:last-child {
+      border-right: 0;
+
+      a {
+        border-radius: 0 $base-border-radius $base-border-radius 0;  
+      }
+    }
+
+    .count {
+      position: absolute;
+      top: 16px;
+      right: 12px;
+      border-radius: $base-border-radius;
+      background-color: $light-blue;
+      display: inline-block;
+      color: white;
+      line-height: 18px;
+      padding: 0 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    a {
+      font-weight: 400;
+      font-size: 15px;
+      height: $navigation-height;
+      line-height: $navigation-height;
+      padding: 0 50px 0 20px;
+    }
+
+    > a {
+      width: 100%;
+      color: white;
+      float: left;
+      position: relative;
+      background-color: $navbar-primary;
+
+      &:hover,
+      &.active {
+        background-color: $navbar-secondary;
+
+        .count {
+          background-color: lighten($light-blue, 20);
+        }
+      }
+
+      &.gathers {
+        padding-right: 65px;
+      }
+    }
+
+    &.icon {
+
+      a:after {
+        @extend .fa;
+        content: '';
+        display: block;
+        position: absolute;
+        right: 20px;
+        top: 0;
+        line-height: 50px;
+        font-size: 14px;
+      }
+
+      a {
+        &.news:after {
+          content: $fa-var-list-alt;
+        }
+
+        &.contests:after {
+          content: $fa-var-trophy;
+        }
+
+        &.articles:after {
+          content: $fa-var-file-text-o;
+        }
+
+        &.forums:after {
+          content: $fa-var-comments-o;
+        }
+
+        &.teams:after {
+          content: $fa-var-users;
+        }
+
+        &.users:after {
+          content: $fa-var-user;
+        }
+      }
+
+      i {
+        color: white;
+        max-height: $navigation-height;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 18px;
+        line-height: 1em;
+        padding: $navigation-height/3;
+      }
+    }
+
+    &.dropdown {
+      position: relative;
+
+      ul {
+        position: absolute;
+        box-shadow: $content-shadow;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 10;
+        top: $navigation-height;
+        left: 0;
+        min-width: 100%;
+        background-color: $navbar-primary;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      &:hover {
+
+        ul {
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+
+
+          li {
+            border-bottom: 1px solid $navbar-secondary;
+
+            &:first-child {
+              border-top: 1px solid $navbar-secondary;
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            a {
+              white-space: nowrap;
+              display: block;
+              color: $navbar-text;
+              padding: 0 20px;
+            }
+
+            &:hover a {
+              background: $light-blue;
+            }
+          }
+        }
+      }
+    }
+  }
+}

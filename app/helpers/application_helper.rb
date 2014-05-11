@@ -10,7 +10,7 @@ module ApplicationHelper
   end
 
   def active_theme
-    'default'
+    'flat'
   end
 
   def theme_stylesheet_link_tag
