@@ -1,0 +1,335 @@
+/*
+  Contester
+*/
+
+div#matches {
+  @include span-columns(12);
+  margin: 20px 0;
+}
+
+/*
+  Contest List
+*/
+
+table.contest {
+  margin-bottom: 40px;
+
+  .fa-chevron-up {
+    color: $light-green;
+  }
+
+  .fa-chevron-down {
+    color: $light-red;
+  }
+
+  .fa-trophy {
+    color: $gold;
+    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.75);
+  }
+
+  tbody td {
+    &:first-child {
+      text-align: center;
+    }
+
+    &:nth-child(2) {
+      text-align: center;
+    }
+
+    &:nth-child(4) {
+      text-align: left;
+    }
+
+    &.actions {
+      text-align: right;
+
+      i {
+        padding-left: 5px;
+      }
+    }
+  }
+
+  thead {
+
+    .movement,
+    .flag,
+    .awards {
+      width: 5%;
+    }
+
+    .team {
+      width: 35%;
+    }
+
+    .score,
+    .win,
+    .loss,
+    .draw,
+    .actions {
+      width: 10%;
+    }
+  }
+}
+
+div.widget.contest {
+
+  a.button {
+    margin: 20px 0 0;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/*
+  Standings
+*/
+
+div.standings {
+  @include span-columns(12);
+}
+
+/*
+  Brackets
+*/
+
+table.brackets {
+  margin: 20px 0 40px 0;
+  width: auto;
+
+  td {
+    padding: 0;
+    border-bottom: 0;
+    text-align: left;
+
+    a {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .empty {
+    padding: 0;
+  }
+
+  .flag {
+    width: 44px;
+
+    img {
+      width: 24px;
+      margin-left: 10px;
+    }
+  }
+
+  .team {
+    padding: 5px 0;
+    background-color: $light-gray;
+    border-right: 1px solid $medium-gray;
+    clear: both;
+
+    table {
+      margin: 0;
+    }
+
+    > a {
+      padding-left: 10px;
+    }
+  }
+
+  .bracket {
+    padding: 0 10px 0 0;
+    width: 158px;
+  }
+
+  .connector {
+    border-right: 1px solid $medium-gray;
+  }
+
+  > tbody > tr > td {
+    width: 150px;
+  }
+}
+
+/*
+  Contest Page
+*/
+
+#contest {
+
+  table.weeks {
+
+    .week {
+      width: 50%;
+    }
+
+    .date {
+      width: 30%;
+    }
+
+    .score {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  table.matches {
+
+    .team {
+      width: 50%;
+    }
+
+    .date {
+      width: 50%;
+      text-align: right;
+    }
+  }
+
+  table.predictions {
+
+    .user {
+      width: 50%;
+    }
+
+    .result {
+      width: 50%;
+      text-align: right;
+    }
+  }
+}
+
+/*
+  Contest Form Page
+*/
+
+#contest.contest-manage {
+
+  table.maps {
+
+    .name {
+      width: 50%;
+    }
+
+    .download {
+      width: 40%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  table.brackets-list {
+    width: 100%;
+
+    .bracket,
+    .slots {
+      width: 45%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  table.weeks {
+
+    .name {
+      width: 30%;
+    }
+
+    .date,
+    .map1,
+    .map2 {
+      width: 20%;
+    }
+
+    .actions {
+      width: 10%;
+      text-align: right;
+    }
+  }
+
+  #matches {
+    margin: 0;
+  }
+
+  table.matches {
+
+    .team {
+      width: 50%;
+    }
+
+    .date {
+      text-align: left;
+      width: 20%;
+    }
+
+    .score {
+      width: 10%;
+    }
+
+    .actions {
+      width: 15%;
+      text-align: right;
+    }
+  }
+}
+
+/*
+  Contest List
+*/
+
+#contests {
+  @include span-columns(12);
+
+  div.current {
+    @include span-columns(12);
+    margin-bottom: 20px;
+
+    table {
+
+      .name {
+        width: 40%;
+      }
+
+      .date {
+        width: 20%;
+      }
+
+      .status {
+        width: 30%;
+      }
+
+      .actions {
+        width: 10%;
+        text-align: right;
+      }
+    }
+  }
+
+  div.previous {
+    @include span-columns(12);
+    margin-bottom: 20px;
+
+    table {
+
+      .name {
+        width: 40%;
+      }
+
+      .date {
+        width: 20%;
+      }
+
+      .winner {
+        width: 30%;
+      }
+      
+      .actions {
+        width: 10%;
+        text-align: right;
+      }
+    }
+  }
+}

@@ -10,7 +10,7 @@
         <% end %>
       </li>
       <li class="dropdown icon">
-        <%= active_link_to controller: "contests", action: "current", class: 'contests' do %>
+        <%= active_link_to({ controller: "contests", action: "current" }, class: 'contests') do %>
           Contests
         <% end %>
         <ul>
@@ -52,12 +52,12 @@
         </ul>
       </li>
       <li class="icon">
-        <%= active_link_to controller: "teams", action: :index, class: 'teams' do %>
+        <%= active_link_to({ controller: "teams", action: :index }, class: 'teams') do %>
           Teams
         <% end %>
       </li>
       <li class="dropdown icon">
-        <%= active_link_to controller: "users", action: :index, class: 'users' do %>
+        <%= active_link_to({ controller: "users", action: :index }, class: 'users') do %>
           Users
         <% end %>
         <ul>

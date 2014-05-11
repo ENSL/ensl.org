@@ -1,0 +1,129 @@
+/*
+  Main Containers
+*/
+
+$container-padding: 1.7em;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body#tinymce {
+  padding: 10px;
+}
+
+#container {
+  min-height: 100%;
+  @include background-image(linear-gradient($deep-blue 0px, $dark-blue 500px));
+}
+
+.wrapper {
+  @include outer-container;
+}
+
+#content {
+  @include span-columns(12);
+  padding: $container-padding 0;
+
+  &.full {
+    box-shadow: $content-shadow;
+    padding: $container-padding;
+    background: $content-color;
+    border-radius: $base-border-radius;
+    margin: $container-padding 0;
+  }
+
+  &.no-body {
+    &.full {
+      background: transparent;
+      box-shadow: none;
+      padding: $container-padding 0;
+    }
+
+    #main {
+      box-shadow: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+    }    
+  }
+}
+
+#forums {
+  @include span-columns(12);
+}
+
+#main {
+  @include span-columns(9 of 12);
+  border-radius: $base-border-radius;
+  box-shadow: $content-shadow;
+  background: $content-color;
+  padding: 20px;
+}
+
+#sidebar {
+  @include span-columns(3 of 12);
+  @include omega();
+}
+
+/*
+  Heading styles
+*/
+
+h1, h2, h3, h4, h5, h6 {
+
+  &.title {
+    margin-bottom: 1em;
+  }
+
+  &.fancy {
+    clear: both;
+    text-align: center;
+    position: relative;
+    background-color: $content-color;
+
+    &:before {
+      content: "";
+      display: block;
+      border-top: 2px solid $medium-gray;
+      width: 100%;
+      height: 2px;
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+    }
+
+    span {
+      background: inherit;
+      padding: 0 .5em;
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+    }
+  }
+}
+
+/*
+  Text
+*/
+
+#main {
+  ul.disc,
+  ol {
+    list-style-type: disc;
+    margin: 20px 0;
+
+    li {
+      margin-left: 40px;
+      display: list-item;
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+}

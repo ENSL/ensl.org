@@ -36,5 +36,7 @@
     </ul>
   </div>
 
-  <div class="avatar" style="background-image: url('<%= cuser.profile.avatar.url %>')"></div>
+  <% if cuser.profile %>
+    <div class="avatar" style="background-image: url('<%= cuser.profile.avatar.url %>')"></div>
+  <% end %>
 </div>

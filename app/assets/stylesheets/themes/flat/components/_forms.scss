@@ -1,0 +1,321 @@
+/*
+  Forms
+*/
+
+$input-height: 35px;
+
+form {
+
+  .inline {
+    float: left;
+    display: inline-block;
+    width: auto;
+    margin-bottom: 20px;
+
+    input {
+      margin-bottom: 0;
+    }
+  }
+
+  .fields {
+    > .field_with_errors:first-child,
+    > label {
+      padding: 9px 0;
+      line-height: $input-font-size;
+    }
+
+    > .field_with_errors {
+
+      input,
+      input[type=text],
+      textarea {
+        border: $input-border-width solid $flash-error;
+
+        &:hover,
+        &:focus {
+          border-color: $flash-error;
+        }
+
+        &:focus {
+          color: $input-text;
+        }
+      }
+    }
+
+    .select-wrapper {
+      $select-padding: 6px;
+      $select-height: $input-height - 4px;
+
+      border-radius: $input-border-radius;
+      background-color: $input-primary;
+      border: $input-border-colour solid $input-border-width;
+      position: relative;
+      display: inline-block;
+      margin-right: 10px;
+      float: left;
+      max-width: 100%;
+
+      select {
+        @include appearance(none);
+        font-size: $input-font-size;
+        font-family: $open-sans;
+        float: left;
+        display: block;
+        width: auto;
+        position: relative;
+        line-height: $select-height/2 + 4px;
+        vertical-align: middle;
+        max-height: $select-height;
+        margin-left: 0;
+        border: 0;
+        margin: 0;
+        padding: $select-padding ($select-height + 10) $select-padding $input-padding;
+        font-size: $input-font-size;
+        max-width: 100%;
+
+        option {
+          font-size: $input-font-size;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      &:after {
+        font-family: $fontawesome;
+        pointer-events: none;
+        content: $fa-var-chevron-down;
+        font-weight: normal;
+        font-style: normal;
+        position: absolute;
+        top: 0;
+        right: 0;
+        text-align: center;
+        padding-top: 6px;
+        width: $select-height;
+        height: $select-height - 4px;
+        border-left: $input-border-width solid $input-border-colour;
+        color: $input-border-colour;
+      }
+
+      &:hover {
+        border: $input-border-width solid lighten($input-secondary, 20%);
+
+        &:after {
+          border-left: $input-border-width solid lighten($input-secondary, 20%);
+          color: $base-font-color;
+        }
+      }
+
+      &:focus {
+        border: $input-border-width solid $input-secondary;
+        color: $input-secondary;
+      }
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=email],
+    textarea {
+      border-radius: $input-border-radius;
+      background-color: $input-primary;
+      color: $input-text;
+      font-size: $input-font-size;
+      padding: 0 $input-padding;
+      height: $input-height;
+      border: $input-border-colour solid $input-border-width;
+
+      &:hover {
+        border: $input-border-width solid lighten($input-secondary, 20%);
+      }
+
+      &:focus {
+        border: $input-border-width solid $input-secondary;
+        outline: none;
+      }
+
+      &[disabled] {
+
+        &:hover {
+          border-color: $input-border-colour;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    textarea {
+      padding: $input-padding;
+      font-family: $open-sans;
+    }
+
+    .inputs label.checkbox,
+    > label.checkbox {
+      position: relative;
+      width: $input-height;
+      height: $input-height;
+      overflow: hidden;
+
+      &:before {
+        @include box-sizing(border-box);
+        content: "";
+        display: block;
+        border-radius: $input-border-radius;
+        width: $input-height;
+        height: $input-height;
+        padding: $input-padding;
+        background-color: $input-primary;
+        border: $input-border-colour solid $input-border-width;
+        margin: 0;
+      }
+      
+      &:hover {
+
+        &:before {
+          border: $input-border-width solid lighten($input-secondary, 20%);
+        }
+      }
+    }
+
+    input[type=checkbox] {
+      display: none;
+
+      &:checked {
+
+        & + label.checkbox:before {
+          content: $fa-var-check;
+          pointer-events: none;
+          font-family: $fontawesome;
+          font-weight: normal;
+          font-style: normal;
+          color: $light-blue;
+        }
+      }
+    }
+
+    textarea {
+      height: auto;
+      width: 100%;
+    }
+  }
+
+  .controls {
+    margin-bottom: 20px;
+
+    button,
+    input[type=submit] {
+      @include button($button-primary);
+      border-radius: $input-border-radius;
+      border: $input-border-width solid $button-primary;
+      margin-bottom: 0;
+      line-height: 30px;
+      outline: none;
+    }
+  }
+}
+
+form.square {
+  @include span-columns(12);
+  margin: 20px 0;
+
+  .horizontal {
+    @include span-columns(12);
+    margin-bottom: 20px;
+
+    &.small {
+      @include span-columns(6);
+    }
+
+    &.medium {
+      @include span-columns(9);
+    }
+
+    &.large {
+      @include span-columns(12);
+    }
+
+    > .field_with_errors:first-child,
+    > label,
+    > .label {
+      @include span-columns(3);
+      padding: 9px 0;
+      line-height: $input-font-size;
+
+      &.checkbox {
+        width: $input-height;
+        padding: 0;
+      }
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=email],  
+    textarea {
+      @include span-columns(9);
+    }
+
+    .inputs {
+      @include span-columns(9);
+
+      input[type=text],
+      input[type=password],
+      input[type=email] {
+        width: 100%;
+      }
+    }
+
+    &.wide {
+
+      > .field_with_errors {
+        width: 100%;
+      }
+
+      label {
+        width: 100%;
+      }
+
+      textarea,
+      .mceLayout {
+        width: 100%;
+      }
+    }
+  }
+
+  .controls {
+    @include span-columns(9);
+    @include shift(3);
+    font-weight: 400;
+
+    &.inline {
+      margin-left: 0;
+      width: auto;
+    }
+
+    input[type=submit],
+    button {
+      font-weight: 400;
+    }
+  }
+}
+
+form.search {
+  margin-bottom: 10px;
+
+  .query {
+    @include span-columns(7 of 9);
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .controls {
+    @include span-columns(2 of 9);
+    @include shift(0);
+    @include omega;
+
+    input {
+      width: 100%;
+    }
+  }
+}

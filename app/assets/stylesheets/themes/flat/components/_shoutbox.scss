@@ -1,0 +1,49 @@
+/*
+  Shoutbox Messages
+*/
+
+#shoutbox {
+  display: table;
+}
+
+.shoutmsg {
+  display: table-row;
+  margin-bottom: 5px;
+  clear: both;
+  position: relative;
+
+  .destroy {
+    position: absolute;
+    top: 0;
+    right: -10px;
+  }
+
+  .user {
+    display: table-cell;
+    min-width: 30%;
+
+    .username {
+      clear: right;
+      display: block;
+    }
+
+    .time {
+      clear: left;
+      display: block;
+      color: #5a5a5a;
+    }
+  }
+
+  .message {
+    max-width: 66%;
+    display: table-cell;
+
+    .contents {
+      word-wrap: break-word;
+      word-break: break-all;
+      position: relative;
+      display: block;
+      padding: 0 10px;
+    }
+  }
+}

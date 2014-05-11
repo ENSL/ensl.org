@@ -1,0 +1,53 @@
+/*
+  Generic Tables
+*/
+
+table {
+  border-collapse: collapse;
+  margin: ($base-line-height / 2) 0;
+  table-layout: fixed;
+  width: 100%;
+}
+
+th {
+  border-bottom: 1px solid darken($base-border-color, 15%);
+  font-weight: bold;
+  padding: 0.5em 0;
+  text-align: left;
+}
+
+td {
+  border-bottom: 1px solid $base-border-color;
+  padding: 0.5em 0;
+}
+
+tr, td, th {
+  vertical-align: middle;
+}
+
+/*
+  Striped Tables
+*/
+
+table.striped > tbody,
+table.striped > thead {
+  > tr {
+    td:first-child,
+    th:first-child {
+      padding-left: ($base-line-height / 2);
+    }
+
+    td:last-child,
+    th:last-child {
+      padding-right: ($base-line-height / 2);
+    }
+  }
+
+  > tr:nth-child(2n) td {
+    background-color: transparentize($light-blue, 0.9);
+  }
+
+  .actions {
+    text-align: right;
+  }
+}

@@ -1,0 +1,216 @@
+/*
+  Users Listing
+*/
+
+#users {
+  table-layout: auto;
+
+  .country,
+  .age {
+    width: 5%;
+  }
+
+  .username,
+  .name {
+    width: 30%;
+  }
+
+  .steamid {
+    width: 20%;
+  }
+
+  .actions {
+    text-align: right;
+  }
+}
+
+/*
+  Profile
+*/
+
+#user {
+  @include span-columns(12);
+
+  .tabbed-contents {
+    margin-bottom: 20px;
+  }
+}
+
+#profile {
+  
+  .controls {
+    @include shift(0);
+  }
+
+  .tab {
+
+    h4 {
+      margin-bottom: 1em;
+    }
+
+    .fields:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+#user-profile {
+
+  .photo {
+    @include span-columns(12);
+    margin: 20px 0;
+    text-align: center;
+
+    img {
+      display: inline-block;
+      float: none;
+      width: auto;
+    }
+  }
+
+  #user-data {
+    @include span-columns(12);
+    margin-bottom: 20px;
+
+    h2,
+    h3,
+    h4 {
+      margin-bottom: 1em;
+    }
+
+    .group {
+      @include span-columns(6);
+
+      dd a {
+        float: none;
+        display: block;
+      }
+    }
+
+    .achievements {
+      margin-bottom: 20px;
+    }
+
+    tbody td {
+      &:first-child,
+      &:nth-child(2) {
+        text-align: left;
+      }
+    }
+  }
+
+  table.predictions {
+
+    .prediction {
+      text-align: right;
+    }
+  }
+}
+
+#profile-edit {
+
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  form {
+    margin-top: 0;
+  }
+}
+
+/*
+  Agenda
+*/
+
+#agenda {
+
+  h4 {
+    margin-bottom: 1em;
+  }
+
+  table {
+    margin-bottom: 20px;
+  }
+
+  form {
+    @include span-columns(12);
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    :last-child {
+      margin-bottom: 0;  
+    }
+  }
+
+  #teams {
+
+    table {
+      margin-bottom: 40px;
+    }
+  }
+}
+
+/*
+  Messages
+*/
+
+#messages {
+  h1 {
+    margin-bottom: 1em;
+  } 
+
+  .tab {
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .message {
+    @include span-columns(12);
+    margin-bottom: 20px;
+
+    .subject {
+      margin-bottom: 1em;
+    }
+
+    .content {
+      margin-bottom: 20px;
+    }
+
+    a.message {
+      display: inline;
+      margin: 0;
+      float: none;
+    }
+
+    &.highlight {
+      font-weight: bold;
+    }
+  }
+
+  .back {
+    margin-top: 20px;
+  }
+}
+
+/*
+  Staff List
+*/
+
+table.staff {
+  table-layout: auto;
+
+  .country {
+    width: 6%;
+  }
+
+  .username {
+    width: 20%;
+  }
+
+  .age {
+    width: 5%;
+  }
+}

@@ -1,0 +1,65 @@
+/*
+  Flash Messages
+*/
+
+.flash {
+  @include span-columns(12);
+  margin-bottom: 20px;
+  font-weight: 600;
+
+  &.notice {
+    @include flash;
+  }
+
+  &.success {
+    @include flash($flash-success);
+    
+    &:before {
+      content: "\f00c";
+    }
+  }
+
+  &.error {
+    @include flash($flash-error);
+
+    &:before {
+      content: "\f00d";
+    }
+  }
+
+  &.warning,
+  &.alert {
+    @include flash($flash-warning);
+
+    &:before {
+      content: "\f071";
+    }
+  }
+}
+
+/*
+  Error Messages
+*/
+
+div#errors {
+  @extend .flash.error;
+  @include span-columns(12);
+  margin-bottom: 20px;
+
+  strong {
+    @include span-columns(12);
+    margin-bottom: 10px;
+  }
+
+  ul.errors {
+    @include span-columns(12);
+
+    li {
+      margin-bottom: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

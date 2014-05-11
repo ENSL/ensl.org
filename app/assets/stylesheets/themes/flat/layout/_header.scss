@@ -1,0 +1,148 @@
+/*
+  Banner
+*/
+
+header .banner {
+  height: 140px;
+
+  #logo {
+    @include span-columns(9 of 12);
+    min-height: 200px;
+    position: relative;
+
+    img {
+      height: 200px;
+      position: absolute;
+      top: 15px;
+      left: -40px;
+      z-index: 1;
+    }
+  }
+
+  #authentication {
+    @include span-columns(5 of 12);
+    @include shift(7);
+    padding: 10px 0;
+    color: white;
+    position: relative;
+
+    .logged {
+      padding-top: 10px;
+    }
+
+    form.dark {
+      @include span-columns(12);
+      margin-top: 20px;
+    }
+
+    .buttons {
+      @include span-columns(12);
+
+      .login,
+      .register {
+        @include span-columns(6);
+      }
+
+      .login {
+        input {
+          @include button;
+          float: right;
+          margin-right: 0;
+        }
+      }
+
+      .register {
+        @include omega;
+      }
+    }
+
+    .register a {
+      display: block;
+      float: right;
+      clear: both;
+    }
+
+    a {
+      color: white;
+
+      &:hover {
+        color: $light-blue;
+      }
+    }
+
+    form {
+      display: inline;
+    }
+
+    &.admin {
+      
+    }
+
+    .fields { 
+      @include span-columns(12);
+
+      input {
+        @include span-columns(6);
+        margin-bottom: 10px;
+      }
+    }
+
+    .controls {
+      margin-top: 10px;
+      text-align: right;
+
+      input {
+        @include span-columns(12);
+        margin-bottom: 10px;
+      }
+
+      a {
+        @include span-columns(12);
+        text-align: left;
+      }
+    }
+
+    .password-reset {
+      float: right;
+    }
+
+    .links {
+      position: absolute;
+      right: 0;
+      padding-right: 105px;
+
+      li {
+        text-align: right;
+      }
+
+      li i {
+        display: inline-block;
+        width: 1em;
+        text-align: center;
+        margin: 0 10px;
+      }
+    }
+
+    .avatar {
+      box-shadow: $content-shadow;
+      border-radius: $base-border-radius;
+      border: 2px solid $blue;
+      width: 100px;
+      height: 100px;
+      float: right;
+      background: {
+        size: cover;
+        position: center;
+        repeat: no-repeat;
+      }
+    }
+  }
+
+  &.authenticated {
+
+    #authentication {
+      @include span-columns(3 of 12);
+      @include shift(9);
+    }
+  }
+}
