@@ -9,7 +9,7 @@ $navigation-height: 50px;
   font-family: $header-font-family;
   height: $navigation-height;
   margin-top: -50px;
-  background: image-url('layout/nav-background.png') top center repeat-x;
+  background: image-url("#{$theme-path}/layout/nav-background.png") top center repeat-x;
   height: 100px;
   position: relative;
   z-index: 25;
@@ -128,7 +128,7 @@ ul.navigation {
       position: relative;
 
       ul {
-        background: image-url('layout/drop-menu-background.png') top center repeat-y;
+        background: image-url("#{$theme-path}/layout/drop-menu-background.png") top center repeat-y;
         width: 176px;
         position: absolute;
         box-shadow: $content-shadow;

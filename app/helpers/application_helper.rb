@@ -9,6 +9,14 @@ module ApplicationHelper
     end
   end
 
+  def active_theme
+    'default'
+  end
+
+  def theme_stylesheet_link_tag
+    stylesheet_link_tag "themes/#{active_theme}/theme"
+  end
+
   def namelink model, length = nil
     return if model.nil?
     model = case model.class.to_s
