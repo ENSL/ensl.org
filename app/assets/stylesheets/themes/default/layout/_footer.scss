@@ -1,7 +1,7 @@
 footer.footer {
   $footer-link-color: #5a5a5a;
 
-  background: image-url('layout/footer-background.png');
+  background: image-url("#{$theme-path}/layout/footer-background.png");
   height: 155px;
   max-height: 155px;
 

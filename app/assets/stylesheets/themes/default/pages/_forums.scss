@@ -77,13 +77,13 @@ div#categories {
     width: 10%;
 
     background: {
-      image: image-url('layout/forum-category.png');  
+      image: image-url("#{$theme-path}/layout/forum-category.png");
       position: center center;
       repeat: no-repeat;
     }
 
     &.updated {
-      background-image: image-url('layout/forum-category-highlight.png');
+      background-image: image-url("#{$theme-path}/layout/forum-category-highlight.png");
     }
   }
 
