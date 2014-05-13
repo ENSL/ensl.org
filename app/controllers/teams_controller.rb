@@ -6,11 +6,19 @@ class TeamsController < ApplicationController
   end
 
   def show
+    @teamer = Teamer.new
+    @teamer.user = @user
   end
 
   def new
     @team = Team.new
     raise AccessError unless @team.can_create? cuser
+  end
+
+  def replace_teamer
+    logger.info params
+    logger.info "hello" 
+    redirect_to_back
   end
 
   def edit
