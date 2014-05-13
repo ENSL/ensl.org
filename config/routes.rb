@@ -127,7 +127,7 @@ Ensl::Application.routes.draw do
 	match ':controller/:action/:id'
 	match ':controller/:action/:id.:format'
 	match ':controller/:action/:id/:id2'
-
+    match 'teamers/replace' => 'teamers#replace', :as => 'teamers_replace'
   namespace :api do
     namespace :v1 do
       resources :users
