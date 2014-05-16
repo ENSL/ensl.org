@@ -130,6 +130,11 @@ div#categories {
   border-radius: $base-border-radius;
   border: 0;
 
+  .read {
+    color: $base-font-color;
+    font-weight: normal;
+  }
+
   .unread {
     color: $red;
   }

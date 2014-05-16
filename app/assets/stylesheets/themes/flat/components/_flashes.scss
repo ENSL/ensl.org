@@ -63,3 +63,27 @@ div#errors {
     }
   }
 }
+
+/*
+  Notification Messages
+*/
+
+
+#notification {
+  position: absolute;
+  margin: 0 auto;
+  left: 50%;
+  top: 0;
+
+  .message {
+    @extend .flash;
+    position: relative;
+    width: auto;
+    left: -50%;
+    text-align: center;
+    font-family: $header-font-family;
+    color: white;
+    padding: 0 100px;
+    z-index: 2;
+  }
+}

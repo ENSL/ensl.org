@@ -8,8 +8,8 @@
       type: "script",
       minTimeout: 5000,
       maxTimeout: 15000,
-      success: function(response) {
-        if (response.match(/Gather:voting/)) {
+      success: function(response, text, request) {
+        if (request.getResponseHeader('Gather') == 'voting') {
           if (!played) {
             $("#jplayer").jPlayer({
               ready: function() {
