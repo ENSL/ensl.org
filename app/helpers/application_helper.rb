@@ -1,6 +1,6 @@
 module ApplicationHelper
   def full_title(page_title)
-    base_title = "ENSL"
+    base_title = "NSL"
 
     if page_title.empty?
       base_title
@@ -10,7 +10,7 @@ module ApplicationHelper
   end
 
   def active_theme
-    'flat'
+    'default'
   end
 
   def theme_stylesheet_link_tag
