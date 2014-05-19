@@ -66,17 +66,17 @@ class ContestsController < ApplicationController
 
   def update
     raise AccessError unless @contest.can_update? cuser
-    if params[:commit] == "Save"
+    if update_type == "contest"
       if @contest.update_attributes(params[:contest])
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else
         render :edit
       end
-    elsif params[:commit] == "Add map"
+    elsif update_type == "map"
       @contest.maps << Map.find(params[:map])
       render :edit
-    elsif params[:commit] == "Add team"
+    elsif update_type == "team"
       contester = Contester.new
       contester.team = Team.find params[:team]
       contester.contest = @contest
@@ -106,5 +106,9 @@ class ContestsController < ApplicationController
 
   def get_contest
     @contest = Contest.find params[:id]
+  end
+
+  def update_type
+    params[:type]
   end
 end

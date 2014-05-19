@@ -16,6 +16,7 @@
     <div class="tab" id="general">
       <%= form_for @contest, html: { class: 'square' } do |f| %>
         <%= render 'shared/errors', messages: @contest.errors.full_messages %>
+        <%= hidden_field_tag :type, 'contest' %>
 
         <div class="fields horizontal">
           <%= f.label :name %>
@@ -106,6 +107,7 @@
 
         <%= form_for @contest.brackets.build, html: { class: 'square' } do |f| %>
           <%= render 'shared/errors', messages: @contest.brackets.last.errors.full_messages %>
+          <%= hidden_field_tag :type, 'contest' %>
 
           <%= f.hidden_field :contest_id %>
 
@@ -142,6 +144,7 @@
 
       <%= form_for @contest do |f| %>
         <%= render 'shared/errors', messages: @contest.errors.full_messages %>
+        <%= hidden_field_tag :type, 'map' %>
 
         <div class="fields">
           <%= select_tag :map, options_from_collection_for_select(Map.basic, :id, :name) %>
@@ -184,6 +187,7 @@
 
       <%= form_for @contest.contesters.build do |f| %>
         <%= render 'shared/errors', messages: @contest.contesters.last.errors.full_messages %>
+        <%= hidden_field_tag :type, 'team' %>
 
         <%= f.hidden_field :contest_id %>
 
