@@ -9,7 +9,7 @@
   </div>
   <div class="message">
     <div class="contents">
-      <%= auto_link(shoutmsg.text, :html => { :target => '_blank' }) %>
+      <%= auto_link shoutmsg.text, html: { target: '_blank' } %>
       <% if shoutmsg.can_destroy? cuser %>
         <%= link_to icon('times'), shoutmsg, method: :delete, class: 'destroy' %>
       <% end %>

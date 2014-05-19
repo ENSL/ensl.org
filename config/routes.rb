@@ -48,9 +48,10 @@ Ensl::Application.routes.draw do
 	resources :predictions
 	resources :rounds
 	resources :matches do |m|
-    get :admin, :to => "matches#admin", :on => :collection
-    get :ref, :to => "matches#ref"
+    get :admin, to: "matches#admin", on: :collection
+    get :ref, to: "matches#ref"
   end
+
 	resources :maps
 	resources :logs
 	resources :log_files
@@ -127,7 +128,9 @@ Ensl::Application.routes.draw do
 	match ':controller/:action/:id'
 	match ':controller/:action/:id.:format'
 	match ':controller/:action/:id/:id2'
-    match 'teamers/replace' => 'teamers#replace', :as => 'teamers_replace'
+
+  match 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
+
   namespace :api do
     namespace :v1 do
       resources :users

@@ -14,8 +14,6 @@ class TeamersController < ApplicationController
   end
 
   def edit
-    logger.info params
-    logger.info "hello world"
     teamer_id = params["teamer"]
     @teamer = Teamer.find(teamer_id)
     @teamer.team_id = params["id"]
