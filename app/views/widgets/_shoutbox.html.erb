@@ -2,10 +2,10 @@
   <h4><%= t('widget.shoutbox') %></h4>
   <div class="widget-content-wrapper">
     <div id="shoutbox" class="transcript">
-      <%= render :partial => "shoutmsgs/shoutmsg", :collection => Shoutmsg.recent.box, :locals => {:popup => "$('shoutbox')"} %>
+      <%= render partial: "shoutmsgs/shoutmsg", collection: Shoutmsg.recent.box, locals: { popup: "$('shoutbox')" } %>
     </div>
   </div>
-  <%= render :partial => "shoutmsgs/new", :locals => { :shoutmsg => Shoutmsg.new } %>
-  <%= link_to "Shoutbox Recent History", :controller => :shoutmsgs, :action => "index" %><br/>
+  <%= render partial: "shoutmsgs/new", locals: { shoutmsg: Shoutmsg.new } %>
+  <%= link_to "Shoutbox Recent History", controller: :shoutmsgs, action: "index" %><br/>
   <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
 </div>
