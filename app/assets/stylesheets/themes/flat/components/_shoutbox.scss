@@ -39,8 +39,8 @@
     display: table-cell;
 
     .contents {
+      word-break: break-word;
       word-wrap: break-word;
-      word-break: break-all;
       position: relative;
       display: block;
       padding: 0 10px;
