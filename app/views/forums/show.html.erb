@@ -49,8 +49,8 @@
       <td><%=h topic.cached_view_count %></td>
       <td>
         <%= link_to lastpost(topic) do %>
-          <%=h topic.posts.last.user %><br>
-          <%= shortdate(topic.posts.last.created_at) %>
+          <%=h topic.latest.user %><br>
+          <%= shortdate(topic.latest.created_at) %>
         <% end %>
       </td>
     </tr>
