@@ -19,7 +19,9 @@
         <% end %>
       <% end %>
     </div>
-    <%= comment.text_parsed.html_safe %>
+    <div class="comment-body">
+      <%= comment.text_parsed.html_safe %>  
+    </div>
     <p class="comment-detail"><%= comment.created_at.strftime("%-d %B %Y, %H:%M") %></h2>
   </div>
 </div>

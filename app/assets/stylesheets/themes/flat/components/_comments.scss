@@ -58,6 +58,11 @@
     width: 100%;
     position: relative;
 
+    .comment-body {
+      word-break: break-word;
+      word-wrap: break-word;
+    }
+
     h1 {
       font-size: 1em;
       margin-bottom: .5em;
