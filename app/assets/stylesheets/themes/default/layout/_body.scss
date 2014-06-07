@@ -4,6 +4,15 @@
 
 $container-padding: 2em;
 
+html {
+  background: {
+    color: $blue;
+    image: image-url("#{$theme-path}/layout/background.jpg");
+    position: top center;
+    repeat: no-repeat;  
+  }
+}
+
 html,
 body {
   margin: 0;
@@ -18,12 +27,6 @@ body#tinymce {
 
 #container {
   min-height: 100%;
-  background: {
-    color: $blue;
-    image: image-url("#{$theme-path}/layout/background.jpg");
-    position: top center;
-    repeat: no-repeat;  
-  }
 }
 
 .wrapper {
