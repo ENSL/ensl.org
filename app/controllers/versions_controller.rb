@@ -7,6 +7,7 @@ class VersionsController < ApplicationController
   end
 
   def show
+    raise AccessError unless cuser and cuser.admin?
     @version = @article.versions.find params[:id]
     @nobody = true
     render 'articles/version'
