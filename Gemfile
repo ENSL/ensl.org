@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-ruby '2.1.1'
+ruby '2.1.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.18'
@@ -17,13 +17,15 @@ gem 'bbcoder', '~> 1.0.1'
 gem 'sanitize', '~> 2.1.0'
 gem 'carrierwave', '~> 0.10.0'
 gem 'bluecloth', '~> 2.2.0'
-gem 'therubyracer', '~> 0.12.1'
 gem 'newrelic_rpm', '~> 3.7.2.195'
 gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
 gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.2', require: false
+
+# Please install nodejs locally.
+gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
 gem 'sprockets', '~> 2.2.1'
 gem 'coffee-rails', '~> 3.2.2'
@@ -66,5 +68,5 @@ group :test do
 end
 
 group :development, :test do
-  gem 'pry-debugger', '~> 0.2.2'
+  gem 'pry-byebug', '~> 1.3.2'
 end

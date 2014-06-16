@@ -34,4 +34,4 @@ $ ->
   $('select.autosubmit').change ->
     $(this).closest('form').submit()
 
-  $('#notification').delay(3000).fadeOut()    
+  $('#notification').delay(3000).fadeOut()
