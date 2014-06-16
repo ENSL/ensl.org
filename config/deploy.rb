@@ -9,7 +9,8 @@ set :repo_url, 'https://github.com/ENSL/ensl.org.git'
 set :keep_releases, 10
 
 set :rbenv_type, :user
-set :rbenv_ruby, '2.1.1'
+set :rbenv_ruby, '2.1.2'
+set :bundle_flags, '--quiet'
 set :dotenv_role, [:app, :web]
 
 set :puma_config, -> { File.join(current_path, 'config', 'puma.rb') }

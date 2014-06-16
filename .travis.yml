@@ -4,7 +4,7 @@ addons:
   code_climate:
     repo_token: b3db5b7df9a0a1d0fd3503e72d7431ffbfa172492c2840d590ccb2fafd9172d3 
 rvm:
-  - 2.1.1
+  - 2.1.2
 env:
   - MYSQL_USERNAME=travis
 script:
