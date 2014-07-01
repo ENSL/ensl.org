@@ -175,7 +175,7 @@ module ApplicationHelper
 
   def latest_rules
     if Contest.last
-      Contest.last.rules
+      article_path(Contest.last.rules)
     else
       article_path(Article::RULES)
     end
