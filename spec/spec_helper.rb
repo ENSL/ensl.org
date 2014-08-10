@@ -10,9 +10,10 @@ require 'rspec/rails'
 require 'capybara/rspec'
 require 'capybara/poltergeist'
 
+Capybara.default_wait_time = 30
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app,
-    timeout: 15,
+    timeout: 30,
     phantomjs_logger: File.open('/dev/null')
   )
 end
