@@ -25,7 +25,7 @@
     }
 
     h4 {
-      font-family: 'Impact';
+      font-family: $header-font-family;
       font-weight: normal;
       text-align: center;
       margin-bottom: 25px;
@@ -73,7 +73,7 @@
     .button,
     .controls input {
       @include linear-gradient(#585858, #585858);
-      font-family: 'Impact';
+      font-family: $header-font-family;
       font-weight: normal;
       color: white;
       border-radius: 10px;
