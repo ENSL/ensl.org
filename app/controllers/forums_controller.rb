@@ -11,9 +11,10 @@ class ForumsController < ApplicationController
     raise AccessError unless @forum.can_show? cuser
 
     @topics = Topic.where(forum_id: @forum.id)
-    .includes(:posts, :user, :users_who_read, :lock)
+    .joins(posts: :user)
+    .includes(:lock, :readings)
     .group('topics.id')
-    .order('state DESC, posts.id DESC')
+    .order('state DESC, (SELECT created_at FROM posts p2 WHERE p2.topic_id = topics.id ORDER BY created_at DESC LIMIT 1) DESC')
     .paginate(page: params[:page], per_page: 30)
 
     @forum.read_by! cuser if cuser
