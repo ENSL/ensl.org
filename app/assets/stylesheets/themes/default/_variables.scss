@@ -34,13 +34,13 @@ $large-screen-up: new-breakpoint(min-width $large-screen 8);
   Typography
 */
 
-$inder: 'Inder', sans-serif;
-$electrolize: 'Electrolize', sans-serif;
+$opensans: 'Open Sans', sans-serif;
+$russoone: 'Russo One', sans-serif;
 $fontawesome: 'FontAwesome';
-$sans-serif: $electrolize;
+$sans-serif: $opensans;
 
-$base-font-family: $inder;
-$header-font-family: $electrolize;
+$base-font-family: $opensans;
+$header-font-family: $russoone;
  
 /*
   Sizes
