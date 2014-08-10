@@ -6,7 +6,7 @@ $navigation-height: 50px;
 
 #menu {
   @include span-columns(12);
-  font-family: $header-font-family;
+  font-family: $base-font-family;
   height: $navigation-height;
   margin-top: -50px;
   background: image-url("#{$theme-path}/layout/nav-background.png") top center repeat-x;
