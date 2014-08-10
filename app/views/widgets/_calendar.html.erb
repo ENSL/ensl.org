@@ -1,19 +1,21 @@
-<div class="widget calendar">
-  <h4><%= t('widget.schedule') %></h4>
+<% if upcoming_matches.size > 0 %>
+  <div class="widget calendar">
+    <h4><%= t('widget.schedule') %></h4>
 
-  <div class="widget-content-wrapper">
-    <% upcoming_matches.group_by{ |e| e.start.month }.each do |month, events| %>
-      <% events.group_by { |e| e.start.day }.each do |day, day_events| %>
-        <div class="separator"><%= day_events.first.start.strftime("%A, %e %B") %></div>
-          <% day_events.each do |event| %>
-            <div class="entry">
-              <p class="summary">
-                <span class="time"><%= event.start.strftime("%H:%M %Z") %></span>
-                <%= event.formatted_summary %>
-              </p>
-            </div>
-          <% end %>
+    <div class="widget-content-wrapper">      
+      <% upcoming_matches.group_by{ |e| e.start.month }.each do |month, events| %>
+        <% events.group_by { |e| e.start.day }.each do |day, day_events| %>
+          <div class="separator"><%= day_events.first.start.strftime("%A, %e %B") %></div>
+            <% day_events.each do |event| %>
+              <div class="entry">
+                <p class="summary">
+                  <span class="time"><%= event.start.strftime("%H:%M %Z") %></span>
+                  <%= event.formatted_summary %>
+                </p>
+              </div>
+            <% end %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </div>
-</div>
+<% end %>
