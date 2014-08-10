@@ -177,6 +177,10 @@ class User < ActiveRecord::Base
     a
   end
 
+  def current_layout
+    profile.layout || 'default'
+  end
+
   def joined
     created_at.strftime("%d %b %y")
   end
