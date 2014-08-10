@@ -3,10 +3,10 @@ source 'http://rubygems.org'
 ruby '2.1.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
-gem 'rails', '~> 3.2.18'
+gem 'rails', '~> 3.2.19'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
-gem 'puma', '~> 2.8.2'
+gem 'puma', '~> 2.9.0'
 
 gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
@@ -37,7 +37,7 @@ gem 'sass-rails', '~> 3.2.6'
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.6.0'
-gem 'haml'
+gem 'haml', '~> 4.0.5'
 gem 'rails_autolink', '~> 1.1.5'
 
 group :assets do
