@@ -10,7 +10,11 @@ module ApplicationHelper
   end
 
   def active_theme
-    'default'
+    if cuser && cuser.profile
+      cuser.current_layout
+    else
+      'default'
+    end
   end
 
   def theme_stylesheet_link_tag

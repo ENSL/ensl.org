@@ -109,6 +109,12 @@
                 <p>Daylight savings will be observed automatically.</p>
               </div>
             </div>
+            <div class="fields horizontal">
+              <%= p.label :layout %>
+              <div class="inputs">
+                <%= p.select :layout, ['default', 'flat'] %>  
+              </div>
+            </div>
           </div>
 
           <div class="tab" id="notifications">
