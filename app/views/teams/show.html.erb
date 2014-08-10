@@ -9,18 +9,20 @@
     </div>
   <% end %>
 
-  <% if cuser.teamers.joining.count == 0  && @team.active %>
-    <%= form_for @teamer do |f| %>
-      <%= f.error_messages %>
-      <%= f.hidden_field :user_id, :value => cuser.id %>
-      <%= f.hidden_field :team_id, :value => @team.id %>
+  <% if cuser && cuser.teamers %>
+    <% if cuser.teamers.joining.count == 0  && @team.active %>
+      <%= form_for @teamer do |f| %>
+        <%= f.error_messages %>
+        <%= f.hidden_field :user_id, :value => cuser.id %>
+        <%= f.hidden_field :team_id, :value => @team.id %>
 
-      <div class="controls inline">
-         <%= f.submit "Request To Join", class: 'button' %>
-      </div>
+        <div class="controls inline">
+           <%= f.submit "Request To Join", class: 'button' %>
+        </div>
+      <% end %>
+    <% elsif cuser.teamers.joining.first.team != @team %>
+      <%= link_to 'Request To Join', edit_teamer_path("teamer" => cuser.teamers.joining.first), method: :get,confirm: "You have already requested to join #{cuser.teamers.joining.first.team}. Do you want to request to join #{@team} instead?", class: 'button' %>
     <% end %>
-  <% elsif cuser.teamers.joining.first.team != @team %>
-    <%= link_to 'Request To Join', edit_teamer_path("teamer" => cuser.teamers.joining.first), method: :get,confirm: "You have already requested to join #{cuser.teamers.joining.first.team}. Do you want to request to join #{@team} instead?", class: 'button' %>
   <% end %>
 
   <div id="team" class="tabbed">
