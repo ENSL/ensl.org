@@ -39,10 +39,11 @@
     width: 100%;
 
     .user {
-      width: 10%;
+      display: inline;
     }
 
     .timestamp {
+      float:right
       margin: 0 5px 5px;
     }
   }
