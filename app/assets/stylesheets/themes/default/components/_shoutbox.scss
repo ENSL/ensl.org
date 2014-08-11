@@ -7,7 +7,7 @@
 }
 
 .shoutmsg {
-  display: table-row;
+  display: block;
   margin-bottom: 5px;
   clear: both;
   position: relative;
@@ -19,24 +19,24 @@
   }
 
   .user {
-    display: table-cell;
-    min-width: 30%;
+    display: inline;
 
     .username {
       clear: right;
+      float: left;
       display: block;
     }
 
     .time {
-      clear: left;
+      float: right;
       display: block;
       color: #5a5a5a;
     }
   }
 
   .message {
-    max-width: 66%;
-    display: table-cell;
+    clear:both;
+    display: block;
 
     .contents {
       word-break: break-word;
