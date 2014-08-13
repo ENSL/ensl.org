@@ -122,10 +122,12 @@ div#categories {
 
   .read {
     color: $base-font-color;
+    font-weight:normal;
   }
 
   .unread {
     color: $blue;
+    font-weight:bold;
   }
 
   thead th {
@@ -136,6 +138,7 @@ div#categories {
     font-size: 16px;
     color: white;
     text-transform: uppercase;
+    font-weight:normal;
 
     &:first-child {
       border-radius: $base-border-radius 0 0 0;
@@ -145,6 +148,11 @@ div#categories {
       border-radius: 0 $base-border-radius 0 0;
     }
   }
+
+  td h5 {
+    font-family: $base-font-family;
+  }
+
 
   .topic {
     width: 55%;
