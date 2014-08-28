@@ -35,3 +35,14 @@ $ ->
     $(this).closest('form').submit()
 
   $('#notification').delay(3000).fadeOut()
+
+  $('#steam-search a').click (event) ->
+    event.preventDefault()
+
+    $search = $('#steam-search')
+    id = $search.data 'user-id'
+
+    $search.html "<p>Searching...</p>"
+
+    $.get "/api/v1/users/#{id}", (data) ->
+      $search.html "<a href='#{data.steam.url}'>Steam Profile: #{data.steam.nickname}</a>"
