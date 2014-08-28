@@ -178,10 +178,6 @@ module ApplicationHelper
   end
 
   def latest_rules
-    if Contest.last
-      article_path(Contest.last.rules)
-    else
-      article_path(Article::RULES)
-    end
+    article_path(Article::RULES)
   end
 end
