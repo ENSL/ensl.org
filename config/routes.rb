@@ -1,6 +1,12 @@
-Ensl::Application.routes.draw do
+Ensl::Application.routes.draw do  
   %w(403 404 422 500).each do |code|
     get code, to: 'errors#show', code: code
+  end
+
+  namespace :api do
+    namespace :v1 do
+      resources :users, only: [:show, :index]
+    end
   end
 
 	root to: "articles#news_index"
@@ -130,10 +136,4 @@ Ensl::Application.routes.draw do
 	match ':controller/:action/:id/:id2'
 
   match 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
-
-  namespace :api do
-    namespace :v1 do
-      resources :users
-    end
-  end
 end
