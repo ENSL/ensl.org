@@ -10,8 +10,10 @@
     <dd><%= @user.profile.town %></dd>
     <dt>SteamID</dt>
     <dd>
-      <%= @user.steamid %>
-      <%= link_to "Search for Steam Account", "http://steamidfinder.com/?STEAM_#{@user.steamid}" %>
+      <p><%= @user.steamid %></p>
+      <div id="steam-search" data-user-id="<%= @user.id %>">
+        <%= link_to "Search for Steam Account" %>  
+      </div>
     </dd>
   </dl>
 
