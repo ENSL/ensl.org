@@ -9,7 +9,7 @@ set :repo_url, 'https://github.com/ENSL/ensl.org.git'
 set :keep_releases, 10
 
 set :rbenv_type, :user
-set :rbenv_ruby, '2.1.2'
+set :rbenv_ruby, '2.1.3'
 set :bundle_flags, '--quiet'
 set :dotenv_role, [:app, :web]
 
