@@ -1,4 +1,4 @@
-# Production Install (Ubuntu 13.10 x64 or Debian 7)
+# Production Install (Ubuntu 14.04 x64 or Debian 7)
 
 ## Capistrano setup
 
@@ -49,17 +49,17 @@ Switch user to deploy, and install rbenv
     echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
     exec $SHELL
 
-    rbenv install 2.1.1
-    rbenv global 2.1.1
+    rbenv install 2.1.3
+    rbenv global 2.1.3
 
     echo "gem: --no-ri --no-rdoc" > ~/.gemrc
     gem install bundler
 
 ## Install the ENSL site
 
-Create the `.env` file with the appropriate credentials.
+Create the `.env` file by copying `.env.example` with the appropriate credentials.
 
-    touch /var/www/virtual/ensl.org/deploy/shared/.env
+    cp /var/www/virtual/ensl.org/deploy/shared/.env.example /var/www/virtual/ensl.org/deploy/shared/.env
 
 # Deployment
 
