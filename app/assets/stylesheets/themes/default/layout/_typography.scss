@@ -18,7 +18,6 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.25em;
   margin: 0;
   text-rendering: optimizeLegibility; // Fix the character spacing for headings
-  font-weight: 400;
 
   a {
     color: $dark-blue;
@@ -56,7 +55,7 @@ p {
 a {
   color: $base-link-color;
   text-decoration: none;
-  font-weight: 400;
+  font-weight: bold;
   @include transition(color 0.1s linear);
 
   &:hover {
