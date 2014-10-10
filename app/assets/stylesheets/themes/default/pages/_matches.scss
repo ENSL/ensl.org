@@ -58,7 +58,7 @@ div#match {
       font-style: italic;
       text-transform: uppercase;
       padding-right: 10px;
-      font-weight: 400;
+      font-weight: bold;
     }
 
     .team-1,
@@ -82,7 +82,7 @@ div#match {
     .versus {
       @include span-columns(2);
       position: relative;
-      font-weight: 400;
+      font-weight: bold;
 
       &.split:before {
         content: "";
@@ -105,7 +105,7 @@ div#match {
         top: 0;
         text-align: center;
         line-height: $title-height;
-        font-weight: 400;
+        font-weight: bold;
       }
 
       .score-1 {
