@@ -3,7 +3,7 @@
 
     <% if @gatherer and @gatherer.can_destroy? cuser %>
       <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
-      <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+      <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny leave-gather' %>
 
     <% elsif (g = Gatherer.new(gather: @gather, user: cuser)).can_create?(cuser) %>
       <%= form_for g do |f| %>
