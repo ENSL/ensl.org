@@ -34,7 +34,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     if example.metadata[:type] == :feature
-      Capybara.current_driver = :selenium
+      Capybara.current_driver = :poltergeist
     else
       Capybara.use_default_driver
     end
