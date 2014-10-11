@@ -1,0 +1,1 @@
+window.ENSL = Ember.Application.Create();
