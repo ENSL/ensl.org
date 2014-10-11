@@ -15,6 +15,10 @@ class Gatherer < ActiveRecord::Base
   IDLE_TIME = 600
   EJECT_VOTES = 4
 
+  STATE_ACTIVE = 0
+  STATE_AWAY = 1
+  STATE_LEAVING = 2
+
   include Extra
 
   attr_protected :id
