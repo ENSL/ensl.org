@@ -9,6 +9,13 @@
           <li<% if gatherer.status > 0 %> class="away"<% end %>>
             <%= flag gatherer.user.country %>
             <%= namelink gatherer.user %>
+
+            <% if gatherer == @gather.captain1 or gatherer == @gather.captain2 %>
+              <span class="captain">
+                <%= icon('star') %>
+              </span>
+            <% end %>
+
             <% if cuser and cuser.admin? %>
               <%= link_to gatherer, method: :delete, class: 'delete' do %>
                 <%= icon 'times' %>
