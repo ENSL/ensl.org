@@ -202,3 +202,11 @@ table.gathers {
 ul.gatherers {
   @include span-columns(12);
 }
+
+ul#gatherers {
+  li.away a {
+    font-style: italic;
+    font-weight: normal;
+    color: #5b5b5b;
+  }
+}

@@ -1,6 +1,25 @@
 <div id="jplayer"></div>
 <script type="text/javascript">
   var played = false;
+  var leaving = true;
+  <% if @gatherer and @gatherer.can_destroy? cuser %>
+  var gatherer_id = <%= @gatherer.id %>;
+  <% else %>
+  var gatherer_id = 0;
+  <% end %>
+
+  function updateGathererStatus(status) {
+    $.ajax({
+      url: '/gatherers/' + gatherer_id + '/status',
+      type: 'POST',
+      data: {'status': status},
+      async: false,
+      cache: false,
+      success: function() {},
+      complete: function() {},
+      error: function() {}
+    });
+  }
 
   $(document).ready(function() {
     $.PeriodicalUpdater("/gathers/" + <%= @gather.id %> + ".js", {
@@ -38,6 +57,39 @@
         }
       }
     });
+
+    $(window).bind('beforeunload', function(e) {
+      if (gatherer_id > 0) {
+        return "You will be removed from the Gather if you leave this page.";
+      }
+    });
+
+    $(window).bind('unload', function() {
+      if (gatherer_id > 0) {
+        updateGathererStatus('leaving');
+      }
+    });
+
+    var afk = false;
+    var afk_timeout;
+    var afk_time = 1000 * 60 * 15; // 15 minutes
+    $(window).blur(function() {
+      afk_timeout = setTimeout(function() {
+        if (gatherer_id > 0) {
+          afk = true;
+          updateGathererStatus('away');
+        }
+      }, afk_time);
+    });
+
+    $(window).focus(function() {
+      if (afk) {
+        updateGathererStatus('active');
+        $.get("/gathers/" + <%= @gather.id %> + ".js");
+      }
+
+      clearTimeout(afk_timeout);
+    });
   });
 </script>
 
@@ -46,7 +98,7 @@
     <span>
       <%= link_to @gather do %>
         <%= @gather.category.to_s %> Gather
-      <% end %>  
+      <% end %>
     </span>
   </h1>
 
