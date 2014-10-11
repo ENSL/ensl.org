@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140810224606) do
+ActiveRecord::Schema.define(:version => 20141010193221) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -294,6 +294,7 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "votes",      :default => 0, :null => false
+    t.integer  "status",     :default => 0, :null => false
   end
 
   add_index "gatherers", ["gather_id"], :name => "index_gatherers_on_gather_id"
@@ -757,18 +758,6 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
-
-  create_table "shoutmsg_archive", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "shoutable_type"
-    t.integer  "shoutable_id"
-  end
-
-  add_index "shoutmsg_archive", ["shoutable_type", "shoutable_id"], :name => "index_shoutmsgs_on_shoutable_type_and_shoutable_id"
-  add_index "shoutmsg_archive", ["user_id"], :name => "index_shoutmsgs_on_user_id"
 
   create_table "shoutmsgs", :force => true do |t|
     t.integer  "user_id"
