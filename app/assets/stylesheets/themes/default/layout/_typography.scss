@@ -10,6 +10,7 @@ body {
   font-family: $base-font-family;
   font-size: $base-font-size;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   line-height: $base-line-height;
 }
 
