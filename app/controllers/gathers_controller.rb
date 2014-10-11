@@ -63,6 +63,22 @@ class GathersController < ApplicationController
     redirect_to @gather
   end
 
+  def captain
+    raise AccessError unless @gatherer
+
+    if @gather.captain1.nil? and @gather.captain2 != @gatherer
+      @gather.update_attribute :captain1, @gatherer
+    elsif @gather.captain2.nil? and @gather.captain1 != @gatherer
+      @gather.update_attribute :captain2, @gatherer
+    elsif @gatherer == @gather.captain1
+      @gather.update_attribute :captain1, nil
+    elsif @gatherer == @gather.captain2
+      @gather.update_attribute :captain2, nil
+    end
+
+    redirect_to @gather
+  end
+
   private
 
   def get_gather

@@ -89,6 +89,17 @@ class Gather < ActiveRecord::Base
     5
   end
 
+  def is_full?
+    return gatherers.count == Gather::FULL
+  end
+
+  def is_ready?
+    if is_full? and !captain1.nil? and !captain2.nil?
+      return true
+    end
+    false
+  end
+
   def first
     Gather.where(:category_id => category_id).order("id ASC").first
   end
@@ -124,8 +135,6 @@ class Gather < ActiveRecord::Base
       g = Gather.new
       g.category = self.category
       g.save
-      self.captain1 = self.gatherers.most_voted[1]
-      self.captain2 = self.gatherers.most_voted[0]
       if self.gather_maps.count > 1
         self.map1 = self.gather_maps.ordered[0]
         self.map2 = self.gather_maps.ordered[1]
@@ -139,7 +148,7 @@ class Gather < ActiveRecord::Base
   end
 
   def check_captains
-    if captain1_id_changed? or captain2_id_changed? or admin
+    if status == STATE_RUNNING and is_ready? or admin
       self.turn = 1
       self.status = STATE_PICKING
       gatherers.each do |gatherer|
@@ -151,6 +160,13 @@ class Gather < ActiveRecord::Base
           gatherer.update_attributes(:team => nil, :skip_callbacks => true)
         end
       end
+
+      # Create a new shout msgs when the gather is full
+      Shoutmsg.new({
+        :shoutable_type => self.class.to_s,
+        :shoutable_id => self.id,
+        :text => I18n.t(:gather_start_shout)
+      }).save
     end
   end
 
