@@ -32,6 +32,22 @@ class GatherersController < ApplicationController
     redirect_to_back
   end
 
+  def status
+    raise AccessError unless @gatherer.can_destroy? cuser
+
+    states = {
+      "leaving" => Gatherer::STATE_LEAVING,
+      "away" => Gatherer::STATE_AWAY,
+      "active" => Gatherer::STATE_ACTIVE,
+    }
+
+    if states.has_key?(params[:status])
+      @gatherer.update_attribute(:status, states[params[:status]])
+    end
+
+    render :nothing => true, :status => 200
+  end
+
   def destroy
     raise AccessError unless @gatherer.can_destroy? cuser
 

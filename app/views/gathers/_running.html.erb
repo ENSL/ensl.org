@@ -6,7 +6,7 @@
 
       <ul id="gatherers">
         <% @gather.gatherers.each do |gatherer| %>
-          <li>
+          <li<% if gatherer.status > 0 %> class="away"<% end %>>
             <%= flag gatherer.user.country %>
             <%= namelink gatherer.user %>
             <% if cuser and cuser.admin? %>

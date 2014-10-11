@@ -72,5 +72,24 @@ class GathersController < ApplicationController
     end
 
     @gatherer = @gather.gatherers.of_user(cuser).first if cuser
+    update_gatherers
+  end
+
+  def update_gatherers
+    # Update user that has left and came back
+    if @gatherer and @gatherer.status == Gatherer::STATE_LEAVING
+      @gatherer.update_attribute(:status, Gatherer::STATE_ACTIVE)
+    end
+
+    # Remove any users that left over 30 seconds ago
+    removed_users = false
+    @gather.gatherers.each do |gatherer|
+      if gatherer.status == Gatherer::STATE_LEAVING and gatherer.updated_at < Time.now - 30
+        removed_users = true
+        gatherer.destroy
+      end
+    end
+
+    @gather.reload if removed_users
   end
 end
