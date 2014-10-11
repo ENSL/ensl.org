@@ -1,7 +1,7 @@
 <div id="jplayer"></div>
 <script type="text/javascript">
   var played = false;
-  var leaving = true;
+  var leaving = false;
   <% if @gatherer and @gatherer.can_destroy? cuser %>
   var gatherer_id = <%= @gatherer.id %>;
   <% else %>
@@ -59,15 +59,19 @@
     });
 
     $(window).bind('beforeunload', function(e) {
-      if (gatherer_id > 0) {
+      if (gatherer_id > 0 && !leaving) {
         return "You will be removed from the Gather if you leave this page.";
       }
     });
 
     $(window).bind('unload', function() {
-      if (gatherer_id > 0) {
+      if (gatherer_id > 0 && !leaving) {
         updateGathererStatus('leaving');
       }
+    });
+
+    $('.leave-gather').click(function() {
+      leaving = true;
     });
 
     var afk = false;
