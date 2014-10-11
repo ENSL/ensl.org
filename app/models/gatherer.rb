@@ -91,6 +91,12 @@ class Gatherer < ActiveRecord::Base
 
   def start_gather
     gather.update_attribute :status, Gather::STATE_VOTING
+    # Create a new shout msgs when the gather is full
+    Shoutmsg.new({
+      :shoutable_type => gather.class.to_s,
+      :shoutable_id => gather.id,
+      :text => I18n.t(:gather_start_shout)
+    }).save
   end
 
   def notify_gatherers
