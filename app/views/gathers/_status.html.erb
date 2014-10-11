@@ -9,7 +9,7 @@
       <% end %>
 
       <%= form_tag "/gathers/captain/#{@gather.id}" do %>
-        <%= submit_tag (@gather.captain1 == @gatherer or @gather.captain2 == @gatherer) ? 'Stop Commanding' : 'Command a Team', class: 'button tiny' %>
+        <%= submit_tag (@gather.captain1 == @gatherer or @gather.captain2 == @gatherer) ? 'Stop Commanding' : 'Command a Team', class: 'button tiny leave-gather' %>
       <% end %>
 
       <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny leave-gather' %>
