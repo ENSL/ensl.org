@@ -2,7 +2,16 @@
   <% if @gather.status == Gather::STATE_RUNNING %>
 
     <% if @gatherer and @gatherer.can_destroy? cuser %>
-      <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
+      <% if Gather::FULL == @gather.gatherers.length %>
+          <p>Gather is full but we are waiting on commanders. If you would like to command, please use the button below.</p>
+      <% else %>
+        <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
+      <% end %>
+
+      <%= form_tag "/gathers/captain/#{@gather.id}" do %>
+        <%= submit_tag (@gather.captain1 == @gatherer or @gather.captain2 == @gatherer) ? 'Stop Commanding' : 'Command a Team', class: 'button tiny' %>
+      <% end %>
+
       <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny leave-gather' %>
 
     <% elsif (g = Gatherer.new(gather: @gather, user: cuser)).can_create?(cuser) %>
@@ -10,7 +19,11 @@
         <%= f.hidden_field :gather_id %>
         <%= f.hidden_field :user_id %>
 
-        <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
+        <% if Gather::FULL == @gather.gatherers.length %>
+          <p>Gather is full but we are waiting on commanders. If you would like to command, please use the button below.</p>
+        <% else %>
+          <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
+        <% end %>
         <p>
           You can download custom maps via the 
           <%= link_to "Steam Workshop", "http://steamcommunity.com/workshop/browse?searchtext=&childpublishedfileid=0&section=items&appid=4920&browsesort=trend&requiredtags%5B%5D=level" %>.
