@@ -41,6 +41,10 @@ gem 'neat', '~> 1.6.0'
 gem 'haml', '~> 4.0.5'
 gem 'rails_autolink', '~> 1.1.5'
 
+gem 'ember-source', '~> 1.8.0.beta.4'
+gem 'ember-data-source', '~> 1.0.0.beta.10'
+gem 'ember-rails', '~> 0.15.0'
+
 group :assets do
   gem 'uglifier', '~> 2.5.0'
 end
