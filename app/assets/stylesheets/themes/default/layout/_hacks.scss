@@ -2,11 +2,6 @@
   Firefox select hacks
 */
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 select {
   -moz-appearance: none;
   text-indent: 0.01px;
