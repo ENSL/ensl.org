@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Case insensitive login' do
+feature 'Case insensitive login', js: :true do
   let(:username) { "CaSe_InSeNsItIvE" }
   let(:password) { "passwordABC123" }
   let!(:user) { create(:user, username: username, raw_password: password) }
