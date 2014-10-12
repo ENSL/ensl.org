@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Visitor signs up' do
+feature 'Visitor signs up', js: :true do
   let(:user) { attributes_for(:user) }
 
   before do

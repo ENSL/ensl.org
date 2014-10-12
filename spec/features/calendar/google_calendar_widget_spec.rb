@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Google Calendar widget' do
+feature 'Google Calendar widget', js: :true do
   let(:events_list_json) { JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json'))) }
 
   before do

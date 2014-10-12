@@ -18,7 +18,7 @@ Capybara.register_driver :poltergeist do |app|
   )
 end
 
-Capybara.javascript_driver = :selenium
+Capybara.javascript_driver = :poltergeist
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -31,12 +31,4 @@ RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.order = 'random'
   config.use_transactional_fixtures = false
-
-  config.before(:each) do
-    if example.metadata[:type] == :feature
-      Capybara.current_driver = :poltergeist
-    else
-      Capybara.use_default_driver
-    end
-  end
 end
