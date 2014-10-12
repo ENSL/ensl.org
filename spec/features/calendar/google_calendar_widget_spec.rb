@@ -2,7 +2,6 @@ require 'spec_helper'
 
 feature 'Google Calendar widget' do
   let(:events_list_json) { JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json'))) }
-  let!(:user) { create(:user) }
 
   before do
     GoogleCalendar::Request.stub(:events_list) do
@@ -56,10 +55,12 @@ feature 'Google Calendar widget' do
 
     scenario 'when a user is logged in, their local timezone is used' do
       time = Time.zone.local(2014, 4, 1, 12, 0, 0)
+      user = create(:user)
+
+      sign_in_as(user)
+      change_timezone_for(user, timezone_us_east)
 
       Timecop.travel(time) do
-        sign_in_as(user)
-        change_timezone_for(user, timezone_us_east)
         visit root_path
 
         expect(first_event).to have_content(timezone_adjusted)
