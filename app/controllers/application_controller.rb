@@ -50,6 +50,10 @@ class ApplicationController < ActionController::Base
     render text: t(:application_stale)
   end
 
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render :template => 'errors/404.html', :status => :not_found, :layout => 'errors'
+  end
+
   private
 
   def update_user
