@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'User creates new article' do
+feature 'User creates new article', js: :true do
   let!(:category) { create(:category, domain: Category::DOMAIN_NEWS) }
   let(:article) { attributes_for(:article) }
 
