@@ -1,0 +1,58 @@
+<div id="gather">
+	<h1 class="fancy">
+		<span>
+			{{#link-to 'gather' gather}}{{category.name}} Gather{{/link-to}}
+		</span>
+	</h1>
+
+	<div id="gather-area">
+		<div class="gather-columns">
+
+			<div class="data players">
+				<div class="contents">
+					<h4>Players</h4>
+					<ul id="gatherers">
+						{{#each gatherers}}
+							<li>
+								{{flag user.country}}
+								{{user.username}}
+							</li>
+						{{/each}}
+					</ul>
+				</div>
+			</div>
+
+			<div class="gather-content">
+				<div class="voting">
+					<div class="data servers">
+						<div class="contents">
+							<h4>Servers</h4>
+							<ul class="votes">
+								{{#each gatherServers}}
+									<li>{{votingBar server.name votes 12}}</li>
+								{{/each}}
+							</ul>
+						</div>
+					</div>
+
+					<div class="data maps">
+						<div class="contents">
+							<h4>Maps</h4>
+							<ul class="votes">
+								{{#each gatherMaps}}
+									<li>{{votingBar map.name votes 12}}</li>
+								{{/each}}
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="data chat">
+					<div class="contents">
+						<h4>Chat</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

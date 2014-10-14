@@ -1,0 +1,15 @@
+<header>
+  <div class="banner <%= 'authenticated' if cuser %>">
+    <div class="wrapper">
+      <div id="authentication" class="{{!-- <%= 'admin' if cuser && cuser.admin? %> --}}">
+        {{!--
+        <% if cuser %>
+          <%= render partial: "widgets/logged" %>
+        <% else %>
+          <%= render partial: "widgets/login" %>
+        <% end %>
+        --}}
+      </div>
+    </div>
+  </div>
+</header>

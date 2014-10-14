@@ -1,13 +1,16 @@
 class GathersController < ApplicationController
   before_filter :get_gather, except: [:latest, :index, :create]
-  respond_to :html, :js
+  respond_to :html, :js, :json
 
   def index
     @gathers = Gather.ordered.limit(50).all
   end
 
   def show
-    render layout: 'full'
+    respond_to do |format|
+      format.html { render "layouts/ember", layout: false }
+      format.json { render json: @gather }
+    end
   end
 
   def latest

@@ -126,6 +126,9 @@ GEM
     ember-source (1.8.0.beta.4)
       handlebars-source (~> 1.0)
     erubis (2.7.0)
+    es5-shim-rails (4.0.1)
+      actionpack (>= 3.1)
+      railties (>= 3.1)
     exceptional (2.0.33)
       rack
     execjs (2.2.1)
@@ -277,6 +280,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_link_to (~> 1.0.2)
+  active_model_serializers
   annotate (~> 2.6.2)
   bbcoder (~> 1.0.1)
   better_errors (~> 1.1.0)
@@ -296,9 +300,9 @@ DEPENDENCIES
   database_cleaner (~> 1.2.0)
   dotenv-rails (~> 0.10.0)
   dynamic_form (~> 1.1.4)
-  ember-data-source (~> 1.0.0.beta.10)
   ember-rails (~> 0.15.0)
   ember-source (~> 1.8.0.beta.4)
+  es5-shim-rails (~> 4.0.1)
   exceptional (~> 2.0.33)
   factory_girl_rails (~> 4.4.1)
   faraday (~> 0.9.0)

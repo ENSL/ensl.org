@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+	<title><%= full_title(yield(:title)) %></title>
+	<meta charset="utf-8">
+	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<%= favicon_link_tag 'shared/favicon.ico' %>
+	<%= theme_stylesheet_link_tag %>
+	<%= csrf_meta_tag %>
+</head>
+<body>
+    <div id="container">
+      <%= render partial: "header" %>
+      <%= render partial: "navigation" %>
+      <div class="body wrapper">
+        <div id="content" class="full">
+          <%= render partial: "messages" %>
+          <%= yield %>
+        </div>
+      </div>
+      <%= render partial: "footer" %>
+    </div>
+
+	<%= javascript_include_tag 'app' %>
+</body>
+</html>
