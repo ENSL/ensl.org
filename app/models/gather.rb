@@ -131,7 +131,7 @@ class Gather < ActiveRecord::Base
   end
 
   def check_status
-    if status_changed? and status == STATE_PICKING and !self.captain1
+    if status_changed? and status == STATE_PICKING
       g = Gather.new
       g.category = self.category
       g.save
@@ -148,7 +148,7 @@ class Gather < ActiveRecord::Base
   end
 
   def check_captains
-    if status == STATE_RUNNING and is_ready? or admin
+    if status == STATE_RUNNING or status == STATE_VOTING and is_ready? or admin
       self.turn = 1
       self.status = STATE_PICKING
       gatherers.each do |gatherer|
