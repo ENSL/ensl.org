@@ -161,7 +161,8 @@ class Gatherer < ActiveRecord::Base
       end
     end
     return false unless team.nil? \
-      and ((gather.captain1.user == cuser and gather.turn == 1) or (gather.captain2.user == cuser and gather.turn == 2))
+      and ((gather.captain1 != nil and gather.captain1.user == cuser and gather.turn == 1) \
+      or (gather.captain2 != nil and gather.captain2.user == cuser and gather.turn == 2))
     return false if gather.turn == 1 and gather.gatherers.team(1).count == 2 and gather.gatherers.team(2).count < 3
     return false if gather.turn == 2 and gather.gatherers.team(1).count < 4 and gather.gatherers.team(2).count == 3
     return false if gather.turn == 1 and gather.gatherers.team(1).count == 4 and gather.gatherers.team(2).count < 5
