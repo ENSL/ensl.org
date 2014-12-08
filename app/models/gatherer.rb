@@ -70,7 +70,7 @@ class Gatherer < ActiveRecord::Base
   validates :confirm, :acceptance => true, :unless => Proc.new {|gatherer| gatherer.user.gatherers.count >= 5}
   validate :validate_username
 
-  after_create :start_gather, :if => Proc.new {|gatherer| gatherer.gather.is_ready?}
+  after_create :start_gather, :if => Proc.new {|gatherer| gatherer.gather.gatherers.count == Gather::FULL}
   after_create :notify_gatherers, :if => Proc.new {|gatherer| gatherer.gather.gatherers.count == Gather::NOTIFY}
   after_update :change_turn, :unless => Proc.new {|gatherer| gatherer.skip_callbacks == true}
   after_destroy :cleanup_votes
@@ -118,12 +118,6 @@ class Gatherer < ActiveRecord::Base
   end
 
   def cleanup_votes
-    if gather.captain1_id == id
-      gather.update_attribute :captain1, nil
-    elsif gather.captain2_id == id
-      gather.update_attribute :captain2, nil
-    end
-
     gather.map_votes.all(:conditions => {:user_id => user_id}).each { |g|  g.destroy }
     gather.server_votes.all(:conditions => {:user_id => user_id}).each { |g| g.destroy }
     gather.gatherer_votes.all(:conditions => {:user_id => user_id}).each { |g|  g.destroy }
@@ -161,8 +155,7 @@ class Gatherer < ActiveRecord::Base
       end
     end
     return false unless team.nil? \
-      and ((gather.captain1 != nil and gather.captain1.user == cuser and gather.turn == 1) \
-      or (gather.captain2 != nil and gather.captain2.user == cuser and gather.turn == 2))
+      and ((gather.captain1.user == cuser and gather.turn == 1) or (gather.captain2.user == cuser and gather.turn == 2))
     return false if gather.turn == 1 and gather.gatherers.team(1).count == 2 and gather.gatherers.team(2).count < 3
     return false if gather.turn == 2 and gather.gatherers.team(1).count < 4 and gather.gatherers.team(2).count == 3
     return false if gather.turn == 1 and gather.gatherers.team(1).count == 4 and gather.gatherers.team(2).count < 5

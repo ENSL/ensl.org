@@ -21,7 +21,6 @@ en:
   contests_join: "Team successfully joined contest."
   contests_contester_update: "Contester was successfully updated."
   gather_create: "New Gather was started successfully."
-  gather_start_shout: "The gather is full and commanders are picking teams."
   gathers_join: "You have joined the Gather."
   gathers_user_pick: "You have successfully selected a player for your team."
   gatherers_update: "Gather player successfully updated."
