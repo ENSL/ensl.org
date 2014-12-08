@@ -1,6 +1,5 @@
 <div id="jplayer"></div>
 <script type="text/javascript">
-  var gather_focus = true;
   var played = false;
   var leave_confirm = true;
   <% if @gatherer and @gatherer.can_destroy? cuser %>
@@ -22,8 +21,6 @@
     });
   }
 
-  var gatherAlertInterval;
-
   $(document).ready(function() {
     $.PeriodicalUpdater("/gathers/" + <%= @gather.id %> + ".js", {
       method: "GET",
@@ -31,27 +28,14 @@
       minTimeout: 5000,
       maxTimeout: 15000,
       success: function(response, text, request) {
-        if (request.getResponseHeader('Gather') == 'full') {
-          // Play notification while we wait on captains
-          if (!gatherAlertInterval) {
-            $('#jplayer').jPlayer({
-              ready: function() {
-                $(this).jPlayer('setMedia', {mp3: '/sounds/gather-alert.mp3'}).jPlayer("play");
-              },
-              loop: false
-            });
-            gatherAlertInterval = setInterval(function() { $("#jplayer").jPlayer("play"); }, 10000);
-          }
-        } else if (request.getResponseHeader('Gather') == 'picking' && !played) {
-          played = true
-
-          if (!gather_focus) {
+        if (request.getResponseHeader('Gather') == 'voting') {
+          if (!played) {
             $("#jplayer").jPlayer({
               ready: function() {
                 $(this).jPlayer("setMedia", {
                   mp3: "http://www.ensl.org/sounds/gather-5.mp3"
                 }).jPlayer("play");
-
+                
                 var click = document.ontouchstart === undefined ? 'click' : 'touchstart';
                 var kickoff = function () {
                   $("#jplayer").jPlayer("play");
@@ -64,10 +48,11 @@
               volume: 0.6,
               swfPath: "/flash"
             });
+
+            played = true
           }
         }
         else if (response.length > 10) {
-          clearInterval(gatherAlertInterval);
           $("#jplayer").jPlayer("stop");
         }
       }
@@ -96,7 +81,6 @@
     var afk_timeout;
     var afk_time = 1000 * 60 * 15; // 15 minutes
     $(window).blur(function() {
-      gather_focus = false;
       afk_timeout = setTimeout(function() {
         if (gatherer_id > 0) {
           afk = true;
@@ -106,12 +90,6 @@
     });
 
     $(window).focus(function() {
-      gather_focus = true;
-
-      if (played) {
-        $("#jplayer").jPlayer("stop");
-      }
-
       if (afk) {
         updateGathererStatus('active');
         $.get("/gathers/" + <%= @gather.id %> + ".js");
@@ -157,11 +135,11 @@
       </div>
 
       <div class="info">
-        <h6>Commanders</h6>
+        <h6>Captains</h6>
         <ul>
-          <li>Players choose to become commanders</li>
-          <li>Commanders will pick team players</li>
-          <li>Gather will not start without commanders</li>
+          <li>Vote for the <strong>best</strong> players</li>
+          <li>Captain 1 = 2nd most voted</li>
+          <li>Captain 2 = 1st most voted</li>
         </ul>
       </div>
 
