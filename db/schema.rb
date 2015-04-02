@@ -11,21 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140810224606) do
-
-  create_table "admin_requests", :force => true do |t|
-    t.string   "addr"
-    t.string   "pwd"
-    t.integer  "server_id"
-    t.string   "player"
-    t.integer  "user_id"
-    t.string   "msg"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "admin_requests", ["server_id"], :name => "index_admin_requests_on_server_id"
-  add_index "admin_requests", ["user_id"], :name => "index_admin_requests_on_user_id"
+ActiveRecord::Schema.define(:version => 20141010193221) do
 
   create_table "article_versions", :force => true do |t|
     t.integer  "article_id"
@@ -214,16 +200,6 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
   add_index "data_files", ["directory_id"], :name => "index_data_files_on_directory_id"
   add_index "data_files", ["related_id"], :name => "index_data_files_on_related_id"
 
-  create_table "deleteds", :force => true do |t|
-    t.integer  "deletable_id"
-    t.string   "deletable_type"
-    t.integer  "user_id"
-    t.text     "reason"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "related_id"
-  end
-
   create_table "directories", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -235,21 +211,6 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
   end
 
   add_index "directories", ["parent_id"], :name => "index_directories_on_parent_id"
-
-  create_table "firms", :force => true do |t|
-    t.string   "name"
-    t.string   "y_code"
-    t.string   "email"
-    t.string   "website"
-    t.string   "phone"
-    t.string   "address"
-    t.integer  "zipcode"
-    t.string   "town"
-    t.integer  "owner"
-    t.string   "opentime"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "forumers", :force => true do |t|
     t.integer  "forum_id"
@@ -294,6 +255,7 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "votes",      :default => 0, :null => false
+    t.integer  "status",     :default => 0, :null => false
   end
 
   add_index "gatherers", ["gather_id"], :name => "index_gatherers_on_gather_id"
@@ -516,13 +478,6 @@ ActiveRecord::Schema.define(:version => 20140810224606) do
   add_index "movies", ["preview_id"], :name => "index_movies_on_preview_id"
   add_index "movies", ["status"], :name => "index_movies_on_status"
   add_index "movies", ["user_id"], :name => "index_movies_on_user_id"
-
-  create_table "nodes", :force => true do |t|
-    t.string   "name"
-    t.integer  "foreign_key"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "options", :force => true do |t|
     t.string   "option"
