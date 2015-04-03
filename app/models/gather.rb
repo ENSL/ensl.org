@@ -70,8 +70,8 @@ class Gather < ActiveRecord::Base
   def self.player_count_for_game(name)
     game = self.find_game(name)
 
-    if game && players = game.gathers.ordered.first.gatherers
-      players.size
+    if game && (players = game.gathers.ordered.first.gatherers.count)
+      players
     else
       0
     end
