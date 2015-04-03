@@ -98,11 +98,11 @@ class GoogleCalendar
     end
 
     def start
-      Time.use_zone(@timezone_offset) { Time.zone.parse(@entry["start"]["dateTime"]) }
+      @entry["start"]["dateTime"].to_datetime.in_time_zone(@timezone_offset)
     end
 
     def end
-      Time.use_zone(@timezone_offset) { Time.zone.parse(@entry["end"]["dateTime"]) }
+      @entry["end"]["dateTime"].to_datetime.in_time_zone(@timezone_offset)
     end
 
     def formatted_summary
