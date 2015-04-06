@@ -3,7 +3,7 @@
   .widget {
     @include span-columns(12);
     margin-bottom: $container-padding;
-    font-family: $header-font-family;
+    font-family: $base-font-family;
     color: white;
     padding-top: 20px;
     position: relative;
