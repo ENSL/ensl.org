@@ -62,7 +62,13 @@ class GoogleCalendar
     end
 
     def request_url
-      "#{BASE_URL}/#{@id}/#{@endpoint}/?key=#{ENV['GOOGLE_API_KEY']}"
+      #The default number of events pulled is 250.
+      #We reached that number and events didn't show any more.
+      #So now I filter all events that have a start time
+      #that is longer ago then 7 days.
+      #Alternative: maxResults=2500
+      time_min = (Time.now - 7.days).utc.iso8601
+      "#{BASE_URL}/#{@id}/#{@endpoint}/?key=#{ENV['GOOGLE_API_KEY']}&timeMin=#{time_min}"
     end
   end
 
