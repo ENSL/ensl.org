@@ -6,7 +6,7 @@ gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.19'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
-gem 'puma', '~> 2.9.1'
+gem 'puma', '~> 2.11.1'
 
 gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
