@@ -27,6 +27,13 @@ body#tinymce {
 
 #container {
   min-height: 100%;
+  min-width: 1020px;
+  background: {
+    color: $blue;
+    image: image-url("#{$theme-path}/layout/background.jpg");
+    position: top center;
+    repeat: no-repeat;  
+  }
 }
 
 .wrapper {
