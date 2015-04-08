@@ -21,10 +21,11 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.99;
   clear: both;
   text-rendering: optimizeLegibility; // Fix the character spacing for headings
-  font-weight: 400;
+  font-weight: normal;
 
   a {
     color: $dark-blue;
+    font-weight:normal;
   }
 }
 
