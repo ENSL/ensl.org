@@ -10,6 +10,7 @@
     top: 40px;
     right: 0;
     width: auto;
+    z-index: 10;
 
     a:last-child {
       margin-right: 0;
@@ -127,7 +128,7 @@ div#categories {
 
   .unread {
     color: $blue;
-    font-weight: 400;
+    font-weight: bold;
   }
 
   thead th {
