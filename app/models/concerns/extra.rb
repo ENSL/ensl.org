@@ -34,8 +34,8 @@ module Extra
       objects = self.class.all(conditions: scope, order: column)
       objects.each do |item|
         if item.id == id and n > 0
-          old_position = item.read_attribute(:column)
-          item.update_attribute(column, objects.fetch(n-1).read_attribute(:column))
+          old_position = item[column]
+          item.update_attribute(column, objects.fetch(n-1)[column])
           objects.fetch(n-1).update_attribute(column, old_position)
         end
         n = n + 1
@@ -47,8 +47,8 @@ module Extra
       objects = self.class.all(conditions: scope, order: column)
       objects.each do |item|
         if item.id == id and n < (objects.length-1)
-          old_position = item.read_attribute(:column)
-          item.update_attribute(column, objects.fetch(n+1).read_attribute(:column))
+          old_position = item[column]
+          item.update_attribute(column, objects.fetch(n+1)[column])
           objects.fetch(n+1).update_attribute(column, old_position)
         end
         n = n + 1
