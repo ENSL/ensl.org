@@ -123,6 +123,8 @@ class Match < ActiveRecord::Base
   before_create :set_hltv
   after_create :send_notifications
   before_save :set_motm, :if => Proc.new {|match| match.motm_name and !match.motm_name.empty?}
+  before_update :reset_contest, :if => Proc.new {|match| match.score1_changed? or match.score2_changed?}
+  before_destroy :reset_contest
   after_save :recalculate, :if => Proc.new {|match| match.score1_changed? or match.score2_changed?}
   after_save :set_predictions, :if => Proc.new {|match| match.score1_changed? or match.score2_changed?}
 
@@ -213,6 +215,30 @@ class Match < ActiveRecord::Base
   def after_destroy
     predictions.update_all "result = 0"
     contest.recalculate
+  end
+
+  #Since ladders are broken anyway, they are not handled here
+  def reset_contest
+    return if score1_was.nil? or score2_was.nil?
+    return if contest.contest_type == Contest::TYPE_LEAGUE and !contester2.active or !contester1.active
+
+    if score1_was == score2_was
+      contester1.draw = contester1.draw - 1
+      contester2.draw = contester2.draw - 1
+    elsif score1_was > score2_was
+      contester1.win = contester1.win - 1
+      contester2.loss = contester2.loss - 1
+    elsif score1_was < score2_was
+      contester1.loss = contester1.loss - 1
+      contester2.win = contester2.win - 1
+    end
+
+    unless contest.contest_type == Contest::TYPE_BRACKET
+      contester1.score = contester1.score-score1_was
+      contester2.score = contester2.score-score2_was
+      contester1.save!
+      contester2.save!
+    end
   end
 
   def recalculate
