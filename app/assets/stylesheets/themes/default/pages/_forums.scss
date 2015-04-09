@@ -130,6 +130,10 @@ div#categories {
     color: $blue;
     font-weight: bold;
   }
+  
+  .sticky {
+    color: $red;
+  }
 
   thead th {
     @include linear-gradient(#15181b, #0d1011);
