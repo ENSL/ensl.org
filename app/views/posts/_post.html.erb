@@ -18,6 +18,9 @@
         <% if post.user.admin?%>
           <dt><%= namelink Group.find(Group::ADMINS) %></dt>
           <dd><%=  post.user.groupers.where(:group_id => Group::ADMINS).first.task %></dd>
+        <% elsif post.user.staff?%>
+          <dt><%= namelink Group.find(Group::STAFF) %></dt>
+          <dd><%=  post.user.groupers.where(:group_id => Group::STAFF).first.task %></dd>
         <% elsif post.user.caster?%>
           <dt><%= namelink Group.find(Group::CASTERS) %></dt>
           <dd><%=  post.user.groupers.where(:group_id => Group::CASTERS).first.task %></dd>
