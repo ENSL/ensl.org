@@ -197,6 +197,10 @@ class User < ActiveRecord::Base
     groups.exists? :id => Group::REFEREES
   end
 
+  def staff?
+    groups.exists? :id => Group::STAFF
+  end
+
   def caster?
     groups.exists? :id => Group::CASTERS
   end
