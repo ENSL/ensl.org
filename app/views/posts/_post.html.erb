@@ -13,6 +13,23 @@
     <% end %>
 
     <dl>
+      <% if post.user.groups.count > 0 %>
+      <dd>
+        <% if post.user.admin?%>
+          <dt><%= namelink Group.find(Group::ADMINS) %></dt>
+          <dd><%=  post.user.groupers.where(:group_id => Group::ADMINS).first.task %></dd>
+        <% elsif post.user.caster?%>
+          <dt><%= namelink Group.find(Group::CASTERS) %></dt>
+          <dd><%=  post.user.groupers.where(:group_id => Group::CASTERS).first.task %></dd>
+        <% elsif post.user.ref?%>
+          <dt><%= namelink Group.find(Group::REFEREES) %></dt>
+          <dd><%=  post.user.groupers.where(:group_id => Group::REFEREES).first.task %></dd>
+        <% else %>
+          <dt><%= namelink Group.find(post.user.groupers.first.group_id) %></dt>
+          <dd><%=  post.user.groupers.first.task %></dd>
+      <% end %>
+      </dd>
+      <% end %>
       <dt>Posts</dt>
       <dd><%= post.user.posts.count %></dd>
       <dt>Location</dt>
