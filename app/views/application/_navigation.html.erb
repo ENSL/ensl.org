@@ -4,10 +4,14 @@
       <%= link_to image_tag("themes/#{active_theme}/logo.png"), root_path %>
     </div>
     <ul class="navigation">
-      <li class="icon">
+      <li class="dropdown icon">
         <%= active_link_to root_path, active: ["articles", "news_index"], class: 'news' do %>
           News
         <% end %>
+        <ul>
+          <li><%= link_to "Twitter", "https://twitter.com/nslnews" %></li>
+          <li><%= link_to "Steam", "http://steamcommunity.com/groups/nsleagues" %></li>
+        </ul>
       </li>
       <li class="dropdown icon">
         <%= active_link_to({ controller: "contests", action: "current" }, class: 'contests') do %>
