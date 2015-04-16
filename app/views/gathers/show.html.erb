@@ -58,12 +58,6 @@
       }
     });
 
-    $(window).bind('beforeunload', function(e) {
-      if (gatherer_id > 0 && leave_confirm) {
-        return "You will be removed from the Gather if you leave this page.";
-      }
-    });
-
     $(window).bind('unload', function() {
       if (gatherer_id > 0 && leave_confirm) {
         updateGathererStatus('leaving');
