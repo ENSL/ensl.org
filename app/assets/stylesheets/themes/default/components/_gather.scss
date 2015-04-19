@@ -71,7 +71,7 @@
   border-bottom: 2px solid $medium-gray;
 
   .info {
-    @include span-columns(4);
+    @include span-columns(3);
 
     h6 {
       margin-bottom: 10px;
