@@ -31,4 +31,12 @@ RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.order = 'random'
   config.use_transactional_fixtures = false
+
+  config.before(:each) do
+    events_list_json = JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json')))
+
+    GoogleCalendar::Request.stub(:events_list) do
+      GoogleCalendar::EventList.new(events_list_json, Time.zone.name)
+    end
+  end
 end
