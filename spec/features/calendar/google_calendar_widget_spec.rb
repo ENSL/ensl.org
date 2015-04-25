@@ -1,13 +1,7 @@
 require 'spec_helper'
 
 feature 'Google Calendar widget', js: :true do
-  let(:events_list_json) { JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json'))) }
-
   before do
-    GoogleCalendar::Request.stub(:events_list) do
-      GoogleCalendar::EventList.new(events_list_json, Time.zone.name)
-    end
-
     visit root_path
   end
 
@@ -75,7 +69,7 @@ feature 'Google Calendar widget', js: :true do
   end
 
   def timezone_adjusted
-    if Time.now.dst?
+    if Time.zone.now.dst?
       "14:30 EDT"
     else
       "15:30 EST"
