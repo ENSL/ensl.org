@@ -75,7 +75,7 @@ feature 'Google Calendar widget', js: :true do
   end
 
   def timezone_adjusted
-    if Time.now.dst?
+    if Time.zone.now.dst?
       "14:30 EDT"
     else
       "15:30 EST"
