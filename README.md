@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ENSL/ensl.org.svg?branch=master)](https://travis-ci.org/ENSL/ensl.org)
+[![Circle CI](https://circleci.com/gh/ENSL/ensl.org.svg?style=svg)](https://circleci.com/gh/ENSL/ensl.org)
 [![Code Climate](https://codeclimate.com/github/ENSL/ensl.org.png)](https://codeclimate.com/github/ENSL/ensl.org)
 [![Code Climate](https://codeclimate.com/github/ENSL/ensl.org/coverage.png)](https://codeclimate.com/github/ENSL/ensl.org)
 
