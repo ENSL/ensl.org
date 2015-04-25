@@ -40,3 +40,6 @@
 /index/*
 rerun.txt
 pickle-email-*.html
+
+# Direnv
+.envrc
