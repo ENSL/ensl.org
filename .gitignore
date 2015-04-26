@@ -3,6 +3,7 @@
 /tmp/*
 /spec/tmp/*
 .ruby-version
+.ruby-gemset
 .env
 .tmp*
 .rspec
@@ -40,3 +41,6 @@
 /index/*
 rerun.txt
 pickle-email-*.html
+
+# Direnv
+.envrc
