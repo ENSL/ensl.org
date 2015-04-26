@@ -62,7 +62,7 @@ group :test do
   gem 'database_cleaner', '~> 1.2.0'
   gem 'rspec-rails', '~> 2.14.1'
   gem 'capybara', '~> 2.2.1'
-  gem 'poltergeist', '~> 1.5.0'
+  gem 'poltergeist', '~> 1.6.0'
   gem 'selenium-webdriver', '~> 2.41.0'
   gem 'factory_girl_rails', '~> 4.4.1'
   gem 'timecop', '~> 0.7.1'
