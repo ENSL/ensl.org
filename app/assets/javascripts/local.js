@@ -24,14 +24,6 @@ $(document).ready(function(){
   function HideUserPopupRunner(){
     document.getElementById("userPopup").style.visibility = "Hidden";
   }
-
-  // Shoutbox
-  $.PeriodicalUpdater("/shoutmsgs/index.js", {
-    method: "GET",
-    type: "script",
-    minTimeout: 10000,
-    multiplier: 2
-  });
 });
 
 $(function() {
