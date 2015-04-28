@@ -22,7 +22,7 @@ gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_code_select', '~> 1.0.1'
 gem 'active_link_to', '~> 1.0.2'
-gem 'rmagick', '~> 2.13.2', require: false
+gem 'rmagick', '~> 2.13.4', require: false
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
 # Please install nodejs locally.
