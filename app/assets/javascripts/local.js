@@ -1,75 +1,4 @@
 $(document).ready(function(){
-  //
-  //function showNews(source, cat, content){
-  //    new Ajax.Updater(content, '/categories/' + cat, {
-  //        method: 'get'
-  //    });
-  //    var thisChild = source.parentNode.firstChild;
-  //    while (thisChild != source.parentNode.lastChild) {
-  //        if (thisChild.nodeType == 1 && thisChild.getAttribute("class") != "unread") {
-  //            thisChild.setAttribute("class", "");
-  //        }
-  //        thisChild = thisChild.nextSibling;
-  //    }
-  //    source.setAttribute("class", "active");
-  //}
-
-  //function goToTheEnd(){
-  //    var ed = tinyMCE.activeEditor;
-  //    // This gets the root node of the editor window
-  //    var root = ed.dom.getRoot();
-  //    // And this gets the last node inside of it, so the last <p>...</p> tag
-  //    var lastnode = root.childNodes[root.childNodes.length - 1];
-  //
-  //    if (tinymce.isGecko) {
-  //        // But firefox places the selection outside of that tag, so we need to go one level deeper:
-  //        lastnode = lastnode.childNodes[lastnode.childNodes.length - 1];
-  //    }
-  //    // Now, we select the node
-  //    ed.selection.select(lastnode);
-  //    // And collapse the selection to the end to put the caret there:
-  //    ed.selection.collapse(false);
-  //}
-  //
-  //var myrules = {
-  //    '.remove': function(e){
-  //        el = Event.findElement(e);
-  //        target = el.href.replace(/.*#/, '.')
-  //        el.up(target).hide();
-  //        if (hidden_input = el.previous("input[type=hidden]")) {
-  //            hidden_input.value = '1'
-  //        }
-  //    }
-  //};
-  //
-  //Event.observe(window, 'load', function(){
-  //    $('container').delegate('click', myrules);
-  //});
-  //
-  //function changeCssClass(id, newclass){
-  //    var obj = document.getElementById(id)
-  //    obj.setAttribute("class", newclass);
-  //    obj.setAttribute("className", newclass);
-  //    obj.className = newclass;
-  //};
-  //
-  //function changeTab(container, tab){
-  //    $(tab).style.visibility = 'hidden';
-  //};
-  //
-  //function Trash(source){
-  //	var input = document.createElement("input");
-  //  input.name = "deleted[reason]";
-  //  input.type = "hidden";
-  //  input.value = prompt('Enter reason', 'Violation of rule #');
-  //	if (input.value == null) {
-  //  	return
-  //  }
-  //  source.appendChild(input);
-  //	source.submit();
-  //}
-
-
   // User popup
   var userInfoTimeout;
 
@@ -95,14 +24,6 @@ $(document).ready(function(){
   function HideUserPopupRunner(){
     document.getElementById("userPopup").style.visibility = "Hidden";
   }
-
-  // Shoutbox
-  $.PeriodicalUpdater("/shoutmsgs/index.js", {
-    method: "GET",
-    type: "script",
-    minTimeout: 10000,
-    multiplier: 2
-  });
 });
 
 $(function() {
