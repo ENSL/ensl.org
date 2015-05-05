@@ -29,11 +29,4 @@ class ShoutmsgsController < ApplicationController
     @shoutmsg.destroy
     redirect_to_back
   end
-
-
-  private
-
-  def render_shoutmsgs shoutable_type = nil, shoutable_id = nil
-
-  end
 end
