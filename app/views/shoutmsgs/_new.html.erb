@@ -17,3 +17,11 @@
     <% end %>
   <% end %>
 <% end %>
+
+<script type="text/javascript">
+$(function () {
+  ShoutboxController({
+    context: $('<%= "#new_#{shoutmsg.domain}" %>')
+  });
+});
+</script>
