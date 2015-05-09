@@ -19,11 +19,11 @@ feature 'Shoutbox', js: true do
 		valid_shout = 100.times.map { "a" }.join
 		invalid_shout = 101.times.map { "a" }.join
 		visit root_path
-		expect(page).to_not have_content("Shout message length exceeded")
+		expect(page).to_not have_content("Maximum shout length exceeded")
 		fill_in 'shoutbox_text', with: invalid_shout
-		expect(page).to have_content("Shout message length exceeded")
+		expect(page).to have_content("Maximum shout length exceeded")
 		fill_in 'shoutbox_text', with: valid_shout
-		expect(page).to_not have_content("Shout message length exceeded")
+		expect(page).to_not have_content("Maximum shout length exceeded")
 	end
 
 	scenario 'creating shout while banned' do
