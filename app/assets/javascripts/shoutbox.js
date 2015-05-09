@@ -20,7 +20,7 @@ ShoutboxController.prototype.init = function (options) {
 	self.$input = self.$context.find(".shout_input");
 	self.$button = self.$context.find('input[type="submit"]');
 	self.$messageBox = null;
-	self.$input.change(function () {
+	self.$input.bind("keyup change", function () {
 		if (self.$input.val().length > 100) {
 			self.disableShoutbox();
 		} else {
@@ -61,7 +61,7 @@ ShoutboxController.prototype.isDisabled = function () {
 // Disables Input Button
 ShoutboxController.prototype.disableShoutbox = function () {
 	var chars = this.$input.val().length;
-	this.writeMessage(["Shout message length exceeded (",chars,"/100)"].join(""));
+	this.writeMessage(["Maximum shout length exceeded (",chars,"/100)"].join(""));
 	this.$button.prop("disabled", true);
 };
 
