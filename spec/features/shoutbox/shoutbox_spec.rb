@@ -15,6 +15,17 @@ feature 'Shoutbox', js: true do
 		expect(page).to have_content(shout)
 	end
 
+	scenario 'enter more than 100 characters' do
+		valid_shout = 100.times.map { "a" }.join
+		invalid_shout = 101.times.map { "a" }.join
+		visit root_path
+		expect(page).to_not have_content("Shout message length exceeded")
+		fill_in 'shoutbox_text', with: invalid_shout
+		expect(page).to have_content("Shout message length exceeded")
+		fill_in 'shoutbox_text', with: valid_shout
+		expect(page).to_not have_content("Shout message length exceeded")
+	end
+
 	scenario 'creating shout while banned' do
 		Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.now + 10.days, user_name: user.username
 		visit root_path
