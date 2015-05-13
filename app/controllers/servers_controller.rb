@@ -1,11 +1,6 @@
 class ServersController < ApplicationController
   before_filter :get_server, except: [:index, :refresh, :new, :create]
 
-  def refresh
-    Server.refresh
-    render :text => t(:servers_updated)
-  end
-
   def index
     @servers = Server.hlds.active.ordered.all :include => :user
     @ns2 = Server.ns2.active.ordered.all :include => :user
@@ -23,15 +18,6 @@ class ServersController < ApplicationController
 
   def edit
     raise AccessError unless @server.can_update? cuser
-  end
-
-  def admin
-    @result = @server.execute params[:query] if params[:query]
-    raise AccessError unless @server.can_update? cuser
-
-    if request.xhr?
-      render partial: 'response', layout: false
-    end
   end
 
   def create
