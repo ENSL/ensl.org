@@ -1,11 +1,14 @@
 <div id="jplayer"></div>
 <script type="text/javascript">
   var played = false;
+  var muted = false;
   var leave_confirm = true;
   <% if @gatherer and @gatherer.can_destroy? cuser %>
   var gatherer_id = <%= @gatherer.id %>;
+  var muted = false;
   <% else %>
   var gatherer_id = 0;
+  var muted = true;
   <% end %>
 
   function updateGathererStatus(status) {
@@ -22,6 +25,7 @@
   }
 
   $(document).ready(function() {
+    init_mute();
     $.PeriodicalUpdater("/gathers/" + <%= @gather.id %> + ".js", {
       method: "GET",
       type: "script",
@@ -35,7 +39,7 @@
                 $(this).jPlayer("setMedia", {
                   mp3: "http://www.ensl.org/sounds/gather-1.mp3"
                 }).jPlayer("play");
-                
+
                 var click = document.ontouchstart === undefined ? 'click' : 'touchstart';
                 var kickoff = function () {
                   $("#jplayer").jPlayer("play");
@@ -55,9 +59,31 @@
         else if (response.length > 10) {
           $("#jplayer").jPlayer("stop");
         }
+        init_mute();
       }
     });
 
+      function init_mute() {
+          if(!muted){
+              $("#mute").text("Mute");
+              $("#jplayer").jPlayer("unmute");
+          } else {
+              $("#mute").text("Unmute");
+              $("#jplayer").jPlayer("mute");
+          }
+          $("#mute").off("click");
+          $("#mute").on("click", function() {
+              if(muted){
+                  $(this).text("Mute");
+                  $("#jplayer").jPlayer("unmute");
+              } else {
+                  $(this).text("Unmute");
+                  $("#jplayer").jPlayer("mute");
+              }
+              muted = !muted;
+              return false;
+          });
+      }
     $(window).bind('unload', function() {
       if (gatherer_id > 0 && leave_confirm) {
         updateGathererStatus('leaving');
