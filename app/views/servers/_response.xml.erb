@@ -1,7 +1,0 @@
-<% @server.logs.recent.reverse_each do |log| %>
-	<% if log.domain == Log::DOMAIN_RCON_COMMAND %>
-		<pre class="command"><%= log.text %></pre>
-	<% elsif log.domain == Log::DOMAIN_RCON_RESPONSE %>
-		<pre class="response"><%= log.text %></pre>
-	<% end %>
-<% end %>
