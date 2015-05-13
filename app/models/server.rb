@@ -111,51 +111,6 @@ class Server < ActiveRecord::Base
     self.category_id = (domain == DOMAIN_NS2 ? 45 : 44 )
   end
 
-  def save_demos
-    dir = case recordable_type
-          when "Match" then
-            recordable.contest.demos
-          when "Gather" then
-            Directory.find(Directory::DEMOS_GATHERS)
-          end
-
-    dir ||= Directory.find(Directory::DEMOS_DEFAULT)
-    zip_path = File.join(dir.path, recording + ".zip")
-
-    Zip::ZipOutputStream::open(zip_path) do |zos|
-      if recordable_type == "Match"
-        zos.put_next_entry "readme.txt"
-        zos.write "Team1: " + recordable.contester1.to_s + "\r\n"
-        zos.write "Team2: " + recordable.contester2.to_s + "\r\n"
-        zos.write "Date: " + recordable.match_time.to_s + "\r\n"
-        zos.write "Contest: " + recordable.contest.to_s + "\r\n"
-        zos.write "Server: " + recordable.server.addr + "\r\n" if recordable.server
-        zos.write "HLTV: " + addr + "\r\n"
-        zos.write YAML::dump(recordable.attributes).to_s
-      end
-      Dir.glob("#{DEMOS}/*").each do |file|
-        if File.file?(file) and file.match(/#{recording}.*\.dem/)
-          zos.put_next_entry File.basename(file)
-          zos.write(IO.read(file))
-        end
-      end
-    end
-
-    DataFile.transaction do
-      unless dbfile = DataFile.find_by_path(zip_path)
-        dbfile = DataFile.new
-        dbfile.path = zip_path
-        dbfile.directory = dir
-        dbfile.save!
-        DataFile.update_all({:name => File.basename(zip_path)}, {:id => dbfile.id})
-      end
-      if recordable_type == "Match"
-        recordable.demo = dbfile
-        recordable.save
-      end
-    end
-  end
-
   def is_free time
     challenges.around(time).pending.count == 0 and matches.around(time).count == 0
   end
