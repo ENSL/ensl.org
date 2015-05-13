@@ -4,7 +4,6 @@ class ServersController < ApplicationController
   def index
     @servers = Server.hlds.active.ordered.all :include => :user
     @ns2 = Server.ns2.active.ordered.all :include => :user
-    @hltvs = Server.hltvs.active.ordered.all :include => :user
     @officials = Server.ns2.active.ordered.where ["name LIKE ?", "%NSL%"]
   end
 
