@@ -25,6 +25,7 @@
 #  points1       :integer
 #  points2       :integer
 #  hltv_id       :integer
+#  caster_id     :string(255)
 #
 
 class Match < ActiveRecord::Base
