@@ -52,6 +52,8 @@
 #  steam_profile       :string(255)
 #  achievements_parsed :string(255)
 #  signature_parsed    :string(255)
+#  stream              :string(255)
+#  layout              :string(255)
 #
 
 class Profile < ActiveRecord::Base
