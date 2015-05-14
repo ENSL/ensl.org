@@ -13,6 +13,13 @@ FactoryGirl.define do
       create(:profile, user: user)
     end
 
+    trait :admin do
+      after(:create) do |user|
+        group = create(:group, :admin)
+        create :grouper, user: user, group: group
+      end
+    end
+
     factory :user_with_team do
       after(:create) do |user|
         create(:team, founder: user)
