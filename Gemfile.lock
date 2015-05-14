@@ -119,7 +119,6 @@ GEM
     ffi (1.9.3)
     font-awesome-sass (4.1.0)
       sass (~> 3.2)
-    gruff (0.3.7)
     haml (4.0.5)
       tilt
     hike (1.2.3)
@@ -284,7 +283,6 @@ DEPENDENCIES
   factory_girl_rails (~> 4.4.1)
   faraday (~> 0.9.0)
   font-awesome-sass (~> 4.1.0.0)
-  gruff (~> 0.3.6)
   haml (~> 4.0.5)
   jquery-rails (~> 2.0.2)
   mysql2 (~> 0.3.15)
