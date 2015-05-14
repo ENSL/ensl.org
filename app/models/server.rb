@@ -47,8 +47,8 @@ class Server < ActiveRecord::Base
   validates_length_of [:rcon, :password, :irc], :maximum => 30, :allow_blank => true
   validates_length_of :description, :maximum => 255, :allow_blank => true
   validates_format_of :ip, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
-    validates_format_of :port, :with => /\A[0-9]{1,5}\z/
-    validates_format_of :reservation, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/, :allow_nil => true
+  validates_format_of :port, :with => /\A[0-9]{1,5}\z/
+  validates_format_of :reservation, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/, :allow_nil => true
   validates_format_of :pwd, :with => /\A[A-Za-z0-9_\-]*\z/, :allow_nil => true
 
   scope :ordered, :order => "name"
