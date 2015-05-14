@@ -9,6 +9,7 @@
 #  created_at :datetime
 #  updated_at :datetime
 #  votes      :integer          default(0), not null
+#  status     :integer          default(0), not null
 #
 
 class Gatherer < ActiveRecord::Base
