@@ -26,6 +26,7 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
   config.include Controllers::JsonHelpers, type: :controller
   config.include Features::FormHelpers, type: :feature
+  config.include Features::ServerHelpers, type: :feature
   config.include Features::SessionHelpers, type: :feature
 
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
