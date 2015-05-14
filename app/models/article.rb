@@ -6,12 +6,12 @@
 #  title       :string(255)
 #  status      :integer          not null
 #  category_id :integer
-#  text        :text
+#  text        :text(16777215)
 #  user_id     :integer
 #  created_at  :datetime
 #  updated_at  :datetime
 #  version     :integer
-#  text_parsed :text
+#  text_parsed :text(16777215)
 #  text_coding :integer          default(0), not null
 #
 
