@@ -9,10 +9,17 @@
       <%= f.label :extra, "Extra Points" %>
       <%= f.text_field :extra %>
     </div>
-    <div class="fields horizontal">
-      <%= f.label :score %>
-      <%= f.text_field :score %>
-    </div>
+    <% if @contester.contest.contest_type == Contest::TYPE_LADDER %>
+        <div class="fields horizontal">
+          <%= f.label :rank %>
+          <%= f.text_field :score %>
+        </div>
+    <% else %>
+        <div class="fields horizontal">
+          <%= f.label :score %>
+          <%= f.text_field :score %>
+        </div>
+    <% end %>
     <div class="fields horizontal">
       <%= f.label :win %>
       <%= f.text_field :win %>
