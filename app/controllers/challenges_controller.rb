@@ -18,10 +18,13 @@ class ChallengesController < ApplicationController
   end
 
   def new
+    #No new challenges for now.
+    raise AccessError
     @challenge = Challenge.new
     @challenge.user = cuser
     @challenge.contester2 = Contester.active.find params[:id]
-    @challenge.get_contester1
+    contest = @challenge.contester2.contest
+    @challenge.contester1 = @challenge.user.active_contesters.of_contest(contest).first
     raise AccessError unless @challenge.can_create? cuser
   end
 
@@ -62,7 +65,8 @@ class ChallengesController < ApplicationController
   def destroy
     raise AccessError unless @challenge.can_destroy? cuser
     @challenge.destroy
-    return_to
+    #return_to FIX ME from challenge side
+    render text: t(:challenges_cleared)
   end
 
   private

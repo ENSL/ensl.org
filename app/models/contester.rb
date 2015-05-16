@@ -27,6 +27,8 @@ class Contester < ActiveRecord::Base
   attr_accessor :user
 
   scope :active, :include => :team, :conditions => {"contesters.active" => true}
+  # ranked is used for ladder. lower score the higher the rank
+  scope :ranked, :select => "contesters.*", :order => "score ASC, win DESC, loss ASC"
   scope :ordered, :select => "contesters.*, (score + extra) AS total_score", :order => "total_score DESC, score DESC, win DESC, loss ASC"
   scope :chronological, :order => "created_at DESC"
   scope :of_contest, lambda { |contest| {:conditions => {"contesters.contest_id" => contest.id}} }

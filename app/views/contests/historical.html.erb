@@ -11,7 +11,10 @@
     <div class="wide centered">
       <% if contest.contest_type == Contest::TYPE_BRACKET %>
         <%= render :partial => "bracket", :locals => {:contest => contest} %>
-      <% else %>
+        <% elsif contest.contest_type == Contest::TYPE_LADDER %>
+        <%= render partial: "contesters/ladder",
+            locals: { actions: false, contest: contest } %>
+        <% else %>
         <%= render :partial => "contesters/list", :locals => {:contesters => contest.contesters.active.ordered, :actions => false} %>
       <% end %>
     </div>
