@@ -20,9 +20,6 @@
       <dd>Sunday: <%= Time.use_zone(timezone_offset) { @contest.default_time.strftime("%H:%M %Z") } %></dd>
     </dl>
 
-    <% if @contest.contest_type == Contest::TYPE_LADDER %>
-      <%= link_to 'Scoring', "/contests/#{@contest}/score", class: 'button' %>
-    <% end %>
     <% if cuser and cuser.admin? %>
       <%= link_to 'Edit Contest', edit_contest_path(@contest), class: 'button' %>
     <% end %>
@@ -32,6 +29,9 @@
 <div class="standings">
   <% if @contest.contest_type == Contest::TYPE_BRACKET %>
     <%= render partial: 'bracket', locals: { contest: @contest } %>
+  <% elsif @contest.contest_type == Contest::TYPE_LADDER %>
+    <%= render partial: "contesters/ladder",
+        locals: { actions: true, contest: @contest } %>
   <% else %>
     <%= render partial: 'normal' %>
   <% end %>

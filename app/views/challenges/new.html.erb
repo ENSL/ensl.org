@@ -9,30 +9,12 @@
     <%= f.hidden_field :contester2_id %>
 
     <div class="contentWide">
-      <% if @challenge.errors.empty? or @challenge.server %>
+      <% if @challenge.errors.empty? %>
         <h3 class="center">
           <%= namelink @challenge.contester1.team %>
           vs
           <%= namelink @challenge.contester2.team %>
         </h3>
-
-        <p>
-          <%= f.label :match_time %><br />
-          <%= f.datetime_select :match_time %>
-        </p>
-        <p>
-          <%= f.check_box :mandatory %>
-          <%= f.label :mandatory %>
-          ( Default time will be following Sunday <%= @challenge.contester1.contest.default_time.strftime("%H:%M") %> )
-        </p>
-        <p>
-          <%= f.label :server_id %><br />
-          <%= f.select :server_id, Server.hlds.active.collect{|c| [c.name, c.id]} %>
-        </p>
-        <p>
-          <%= f.label :map1_id, "Your Map" %><br />
-          <%= f.select :map1_id, @challenge.contester1.contest.maps.basic.collect{|m| [m.name, m.id]} %>
-        </p>
         <p>
           <%= f.label :details, "Information for the opponent" %><br />
           <%= f.text_area :details, :cols => 40, :rows => 7 %>
