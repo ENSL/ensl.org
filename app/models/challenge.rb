@@ -36,7 +36,7 @@ class Challenge < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at, :default_time, :user_id, :status
 
-  validates_presence_of :contester1, :contester2, :server, :map1
+  validates_presence_of :contester1, :contester2
   validates_presence_of :map2, :on => :update
   #validates_datetime :match_time, :default_time
   #validates_length_of [:details, :response], :maximum => 255, :allow_blank => true, :allow_nil => true
@@ -111,102 +111,102 @@ class Challenge < ActiveRecord::Base
 
   def validate_teams
     if contester1.team == contester2.team
-      errors.add_to_base I18n.t(:challenges_yourself)
+      errors.add :base, I18n.t(:challenges_yourself)
     end
     if contester1.contest != contester2.contest
-      errors.add_to_base I18n.t(:challenges_opponent_contest)
+      errors.add :base, I18n.t(:challenges_opponent_contest)
     end
     if !contester2.active or !contester2.team.active
-      errors.add_to_base I18n.t(:challenges_opponent_inactive)
+      errors.add :base, I18n.t(:challenges_opponent_inactive)
     end
     if !contester1.active or !contester1.team.active
-      errors.add_to_base I18n.t(:challenges_inactive)
+      errors.add :base, I18n.t(:challenges_inactive)
     end
   end
 
   def validate_contest
     if contester1.contest.end.past? or contester1.contest.status == Contest::STATUS_CLOSED
-      errors.add_to_base I18n.t(:contests_closed)
+      errors.add :base, I18n.t(:contests_closed)
     end
     if contester1.contest.contest_type != Contest::TYPE_LADDER and !match
-      errors.add_to_base I18n.t(:contests_notladder)
+      errors.add :base, I18n.t(:contests_notladder)
     end
   end
 
   def validate_mandatory
-    return unless mandatory
+  #  return unless mandatory
 
-    if contester2.score < contester1.score
-      errors.add_to_base I18n.t(:challenges_mandatory)
-    end
-    if Challenge.pending.count(:conditions =>  \
-                               ["contester1_id = ? AND contester2_id = ? AND	mandatory = true AND default_time < UTC_TIMESTAMP()",
-                                contester1.id, contester2.id]) > 0
-      errors.add_to_base I18n.t(:challenges_mandatory_handled)
-    end
-    if Match.of_contester(contester2).on_week(match_time).count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_week)
-    end
-    if Challenge.of_contester(contester2).mandatory.on_week(match_time).count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_mandatory_week)
-    end
-    if Challenge.of_contester(contester2).mandatory.on_week(default_time).count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_mandatory_week_defaulttime)
-    end
-    if Match.of_contester(contester2).around(default_time).count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_defaulttime)
-    end
+  #  if contester2.score < contester1.score
+  #    errors.add :base, I18n.t(:challenges_mandatory)
+  #  end
+  #  if Challenge.pending.count(:conditions =>  \
+  #                             ["contester1_id = ? AND contester2_id = ? AND	mandatory = true AND default_time < UTC_TIMESTAMP()",
+  #                              contester1.id, contester2.id]) > 0
+  #    errors.add :base, I18n.t(:challenges_mandatory_handled)
+  #  end
+  #  if Match.of_contester(contester2).on_week(match_time).count > 0
+  #    errors.add :base, I18n.t(:challenges_opponent_week)
+  #  end
+  #  if Challenge.of_contester(contester2).mandatory.on_week(match_time).count > 0
+  #    errors.add :base, I18n.t(:challenges_opponent_mandatory_week)
+  #  end
+  #  if Challenge.of_contester(contester2).mandatory.on_week(default_time).count > 0
+  #    errors.add :base, I18n.t(:challenges_opponent_mandatory_week_defaulttime)
+  #  end
+  #  if Match.of_contester(contester2).around(default_time).count > 0
+  #    errors.add :base, I18n.t(:challenges_opponent_defaulttime)
+  #  end
   end
 
   def validate_match_time
-    if (match_time-get_margin).past?
-      if get_margin > 86400
-        errors.add_to_base I18n.t(:matches_time1) + get_margin / 60 / 60 / 24 + I18n.t(:matches_time2)
-      else
-        errors.add_to_base I18n.t(:matches_time1) + get_margin / 60 + I18n.t(:matches_time3)
-      end
-    end
-    if Challenge.of_contester(contester2).around(match_time).pending.count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_specifictime)
-    end
-    if Match.of_contester(contester2).around(match_time).count > 0
-      errors.add_to_base I18n.t(:challenges_opponent_match_specifictime)
-    end
-    if match_time > contester1.contest.end
-      errors.add_to_base I18n.t(:contests_end)
-    end
+#    if (match_time-get_margin).past?
+#      if get_margin > 86400
+#        errors.add :base, I18n.t(:matches_time1) + get_margin / 60 / 60 / 24 + I18n.t(:matches_time2)
+#      else
+#        errors.add :base, I18n.t(:matches_time1) + get_margin / 60 + I18n.t(:matches_time3)
+#      end
+#    end
+#    if Challenge.of_contester(contester2).around(match_time).pending.count > 0
+#      errors.add :base, I18n.t(:challenges_opponent_specifictime)
+#    end
+#    if Match.of_contester(contester2).around(match_time).count > 0
+#      errors.add :base, I18n.t(:challenges_opponent_match_specifictime)
+#    end
+#    if match_time > contester1.contest.end
+#      errors.add :base, I18n.t(:contests_end)
+#    end
   end
 
   def validate_server
-    unless server and server.official
-      errors.add_to_base I18n.t(:servers_notavailable)
-    end
-    unless server.is_free match_time
-      errors.add_to_base I18n.t(:servers_notfree_specifictime)
-    end
-    if !server.is_free default_time
-      errors.add_to_base I18n.t(:servers_notfree_defaulttime)
-    end
+ #   unless server and server.official
+ #     errors.add :base, I18n.t(:servers_notavailable)
+ #   end
+ #   unless server.is_free match_time
+ #     errors.add :base, I18n.t(:servers_notfree_specifictime)
+ #   end
+ #   if !server.is_free default_time
+ #     errors.add :base, I18n.t(:servers_notfree_defaulttime)
+ #   end
   end
 
   def validate_map1
     unless contester1.contest.maps.exists?(map1)
-      errors.add_to_base I18n.t(:contests_map_notavailable)
+      errors.add :base, I18n.t(:contests_map_notavailable)
     end
   end
 
   def validate_map2
     unless contester2.contest.maps.exists?(map2)
-      errors.add_to_base I18n.t(:contests_map_notavailable)
+      errors.add :base, I18n.t(:contests_map_notavailable)
     end
   end
 
   def validate_status
     if mandatory and ![STATUS_ACCEPTED, STATUS_DEFAULT, STATUS_FORFEIT].include? status
-      errors.add_to_base I18n.t(:challenges_mandatory_invalidresult)
+      errors.add :base, I18n.t(:challenges_mandatory_invalidresult)
     end
     unless statuses.include? status
-      errors.add_to_base I18n.t(:challenges_mandatory_invalidresult)
+      errors.add :base, I18n.t(:challenges_mandatory_invalidresult)
     end
   end
 
@@ -251,10 +251,10 @@ class Challenge < ActiveRecord::Base
   end
 
   def can_update? cuser
-    cuser and (contester2.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING and autodefault.future?
+    cuser and (contester2.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING# and autodefault.future?
   end
 
   def can_destroy? cuser
-    cuser and (contester1.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING and autodefault.future?
+    cuser and (contester1.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING# and autodefault.future?
   end
 end

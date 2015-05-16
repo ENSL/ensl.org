@@ -107,22 +107,26 @@ class Contest < ActiveRecord::Base
     end
   end
 
-  def elo_score score1, score2, diff, level = self.modulus_base, weight = self.weight, moduluses = [self.modulus_even, self.modulus_3to1, self.modulus_4to0]
-    points = (score2-score1).abs
-    modulus = moduluses[0].to_f if points <= 1
-    modulus = moduluses[1].to_f if points == 2
-    modulus = moduluses[2].to_f if points >= 3
-    if score1 == score2
-      result = 0.5
-    elsif score1 > score2
-      result = 1.0
-    elsif score2 > score1
-      result = 0.0
+  def update_ranks contester, old_rank, new_rank
+    if old_rank < new_rank
+      Contester.update_all(["score = score -1, trend = ?", Contester::TREND_UP],
+                           ["contest_id = ? and score > ? and score <= ?",
+                            self.id, old_rank, new_rank])
+      contester.trend = Contester::TREND_DOWN
+    elsif old_rank > new_rank
+      Contester.update_all(["score = score + 1, trend = ?", Contester::TREND_DOWN],
+                           ["contest_id = ? and score < ? and score >= ?",
+                            self.id, old_rank, new_rank])
+      contester.trend = Contester::TREND_UP
     end
-    prob = 1.0/(10**(diff.to_f/weight.to_f)+1.0)
-    total = (level.to_f*modulus*(result-prob)).round
-    return total
+    contester.score = new_rank
   end
+
+  def ladder_ranks_unique?
+    c = Contester.where({:contest_id => self.id})
+    c.uniq.pluck(:score).count == c.count
+  end
+
 
   def can_create? cuser
     cuser and cuser.admin?
