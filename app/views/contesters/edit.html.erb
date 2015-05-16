@@ -5,16 +5,16 @@
   <%= form_for @contester, html: { class: 'square' } do |f| %>
     <%= render 'shared/errors', messages: @contester.errors.full_messages %>
 
-    <div class="fields horizontal">
-      <%= f.label :extra, "Extra Points" %>
-      <%= f.text_field :extra %>
-    </div>
     <% if @contester.contest.contest_type == Contest::TYPE_LADDER %>
         <div class="fields horizontal">
           <%= f.label :rank %>
           <%= f.text_field :score %>
         </div>
     <% else %>
+        <div class="fields horizontal">
+          <%= f.label :extra, "Extra Points" %>
+          <%= f.text_field :extra %>
+        </div>
         <div class="fields horizontal">
           <%= f.label :score %>
           <%= f.text_field :score %>
