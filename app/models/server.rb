@@ -8,7 +8,6 @@
 #  dns             :string(255)
 #  ip              :string(255)
 #  port            :string(255)
-#  rcon            :string(255)
 #  password        :string(255)
 #  irc             :string(255)
 #  user_id         :integer
@@ -44,7 +43,7 @@ class Server < ActiveRecord::Base
   attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
   validates_length_of [:name, :dns,], :in => 1..30
-  validates_length_of [:rcon, :password, :irc], :maximum => 30, :allow_blank => true
+  validates_length_of [:password, :irc], :maximum => 30, :allow_blank => true
   validates_length_of :description, :maximum => 255, :allow_blank => true
   validates_format_of :ip, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
   validates_format_of :port, :with => /\A[0-9]{1,5}\z/
@@ -81,7 +80,6 @@ class Server < ActiveRecord::Base
   non_versioned_columns << 'dns'
   non_versioned_columns << 'ip'
   non_versioned_columns << 'port'
-  non_versioned_columns << 'rcon'
   non_versioned_columns << 'password'
   non_versioned_columns << 'irc'
   non_versioned_columns << 'user_id'
