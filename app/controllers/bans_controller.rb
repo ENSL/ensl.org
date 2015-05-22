@@ -8,10 +8,6 @@ class BansController < ApplicationController
   def show
   end
 
-  def refresh
-    Ban.refresh
-  end
-
   def new
     @ban = Ban.new
     raise AccessError unless @ban.can_create? cuser
