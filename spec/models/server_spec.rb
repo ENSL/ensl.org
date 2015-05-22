@@ -8,7 +8,6 @@
 #  dns             :string(255)
 #  ip              :string(255)
 #  port            :string(255)
-#  rcon            :string(255)
 #  password        :string(255)
 #  irc             :string(255)
 #  user_id         :integer
