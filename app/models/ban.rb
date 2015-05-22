@@ -87,12 +87,4 @@ class Ban < ActiveRecord::Base
   def can_destroy? cuser
     cuser and cuser.admin?
   end
-
-  def self.refresh
-    #file = File.new(VENT_BANS, "w")
-    #Ban.all(:conditions => ["ban_type = ? AND expiry > UTC_TIMESTAMP()", TYPE_VENT]).each do |ban|
-    #	file.write "#{ban.ip},,,"
-    #end
-    #file.close
-  end
 end
