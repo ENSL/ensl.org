@@ -3,10 +3,6 @@ module Verification
 		str.to_s.gsub(/[^A-Za-z0-9_\-]/, "")
 	end
 
-	def Verification.match_addr str
-		str.to_s.match(/(([0-9]{1,3}\.){3}[0-9]{1,3}):?([0-9]{0,5})/)[0]
-	end
-
 	def Verification.random_string len
 		chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
 		str = ""
