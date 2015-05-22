@@ -111,13 +111,6 @@ Ensl::Application.routes.draw do
   match 'movies/preview'
   match 'movies/snapshot'
 
-  match 'plugin/esi'
-  match 'plugin/user'
-  match 'plugin/ban'
-  match 'plugin/hltv_req'
-  match 'plugin/hltv_move'
-  match 'plugin/hltv_stop'
-
   match 'users/forgot'
   match 'users/recover'
   match 'users/agenda'
