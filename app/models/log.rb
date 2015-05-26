@@ -21,8 +21,6 @@ class Log < ActiveRecord::Base
   attr_accessor :text
 
   DOMAIN_LOG = 1
-  DOMAIN_RCON_COMMAND = 2
-  DOMAIN_RCON_RESPONSE = 3
   DOMAIN_INFO = 4
 
   TEAM_MARINES = 1
@@ -51,10 +49,6 @@ class Log < ActiveRecord::Base
   belongs_to :log_file
   belongs_to :actor, :class_name => "Rounder"
   belongs_to :target, :class_name => "Rounder"
-
-  #	def domains
-  #		return {DOMAIN_LOG => "HL Log", DOMAIN_RCON_COMMAND => "Rcon Command Log", DOMAIN_RCON_RESPONSE => "Rcon Response Log", DOMAIN_INFO => "Action Log"}
-  #	end
 
   def since
     (created_at - round.start).to_i
