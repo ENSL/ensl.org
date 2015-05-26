@@ -4,7 +4,6 @@ module Features
       dns = 'ServerDns.com'
       ip = '192.168.1.1'
       port = '8000'
-      rcon = 'whatsrcon'
       password = 'secret'
       name = 'MyNsServer'
       description = 'My NS Server'

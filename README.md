@@ -27,7 +27,7 @@ Features:
 - Map database
 - Votable polls
 - Twitter feed
-- Server database and RCON interface
+- Server database
 - Log file parsing (partially complete)
 
 ## Contributors
