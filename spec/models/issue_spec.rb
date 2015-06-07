@@ -35,12 +35,9 @@ describe 'User' do
 				expect(issue.can_show? user).to be_false
 			end
 		end
-		describe 'can_create? is weird and broken' do
-			it "returns true if no params" do
-				expect(issue.can_create? user).to be_true
-			end
-			it 'returns false if no params' do
-				expect(issue.can_create? user, {foo: "bar"}).to be_false
+		describe 'can_create?' do
+			it "returns true" do
+				expect(issue.can_create? nil).to be_true
 			end
 		end
 		describe 'can_update?' do
