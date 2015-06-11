@@ -6,7 +6,7 @@ base: &db
   username: <%= ENV['MYSQL_USERNAME'] %>
   password: <%= ENV['MYSQL_PASSWORD'] %>
   pool: <%= Integer(ENV['MYSQL_CONNECTION_POOL'] || 8) %>
-  wait_timeout: 30
+  wait_timeout: 90
   reconnect: true
 
 
