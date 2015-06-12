@@ -27,13 +27,12 @@ class Ban < ActiveRecord::Base
   VENT_BANS = "tmp/bans.txt"
 
   attr_protected :id, :created_at, :updated_at
-  attr_accessor :ts, :sign, :len, :user_name
+  attr_accessor :len, :user_name
 
   scope :ordered, order: "created_at DESC"
   scope :effective, conditions: "expiry > UTC_TIMESTAMP()"
   scope :ineffective, conditions: "expiry < UTC_TIMESTAMP()"
 
-  validate :validate_ts
   validate :validate_type
   validate :validate_ventban
   validates_format_of :steamid, with: /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/, allow_blank: true
@@ -56,12 +55,6 @@ class Ban < ActiveRecord::Base
      TYPE_SERVER => "NS Servers",
      TYPE_VENT => "Ventrilo",
      TYPE_GATHER => "Gather"}
-  end
-
-  def validate_ts
-    if ts and Verification.verify(steamid + ts.to_s) != sign
-      errors.add :ts, I18n.t(:wrong_verification_code)
-    end
   end
 
   def validate_type
@@ -93,13 +86,5 @@ class Ban < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
-  end
-
-  def self.refresh
-    #file = File.new(VENT_BANS, "w")
-    #Ban.all(:conditions => ["ban_type = ? AND expiry > UTC_TIMESTAMP()", TYPE_VENT]).each do |ban|
-    #	file.write "#{ban.ip},,,"
-    #end
-    #file.close
   end
 end
