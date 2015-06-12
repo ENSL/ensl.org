@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141010193221) do
+ActiveRecord::Schema.define(:version => 20150518162749) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -722,7 +722,6 @@ ActiveRecord::Schema.define(:version => 20141010193221) do
     t.string   "dns"
     t.string   "ip"
     t.string   "port"
-    t.string   "rcon"
     t.string   "password"
     t.string   "irc"
     t.integer  "user_id"
