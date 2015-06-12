@@ -99,8 +99,8 @@ class Issue < ActiveRecord::Base
     cuser and !cuser.nil? and ((author == cuser) or cuser.admin?)
   end
 
-  def can_create? cuser, params = {}
-    Verification.contain params, [:title, :category_id, :text]
+  def can_create? cuser
+    true
   end
 
   def can_update? cuser
