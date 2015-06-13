@@ -11,12 +11,13 @@
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$.PeriodicalUpdater("/shoutmsgs/index.js", {
-		  method: "GET",
-		  type: "script",
-		  minTimeout: 10000,
-		  multiplier: 2
-		});
-	});
+        $(document).ready(function () {
+                $.PeriodicalUpdater("/shoutmsgs/index.js", {
+                  method: "GET",
+                  type: "script",
+                  minTimeout: 20000,
+                  multiplier: 3,
+                  maxTimeout: 300000
+                });
+        });
 </script>
