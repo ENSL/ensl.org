@@ -50,4 +50,9 @@ class PluginController < ApplicationController
 
 	  render_out out
 	end
+
+	def render_out out
+		@text = out.join("\r")
+		render :layout => false
+	end
 end
