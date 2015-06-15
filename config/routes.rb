@@ -111,6 +111,8 @@ Ensl::Application.routes.draw do
   match 'movies/preview'
   match 'movies/snapshot'
 
+  match 'plugin/user'
+
   match 'users/forgot'
   match 'users/recover'
   match 'users/agenda'
