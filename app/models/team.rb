@@ -114,7 +114,7 @@ class Team < ActiveRecord::Base
   end
 
   def can_update? cuser
-    cuser and is_leader? cuser or cuser.admin?
+    cuser and (is_leader? cuser or cuser.admin?)
   end
 
   def can_destroy? cuser
