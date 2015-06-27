@@ -271,6 +271,10 @@ class User < ActiveRecord::Base
     cuser and (self == cuser or cuser.admin?)
   end
 
+  def can_change_name? cuser
+    cuser and cuser.admin?
+  end
+
   def can_destroy? cuser
     cuser and cuser.admin?
   end
