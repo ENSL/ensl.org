@@ -15,10 +15,12 @@
 
         <div class="tabbed-contents">
           <div class="tab" id="account">
+            <% if cuser and @user.can_change_name? cuser %>
             <div class="fields horizontal">
               <%= f.label :username, 'Username', class: 'required' %>
               <%= f.text_field :username %>
             </div>
+            <% end %>
             <div class="fields horizontal">
               <%= f.label :raw_password, "Password" %>
               <%= f.password_field :raw_password %>
