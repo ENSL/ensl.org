@@ -63,6 +63,7 @@ class UsersController < ApplicationController
 
   def update
     raise AccessError unless @user.can_update? cuser
+    params[:user].delete(:username) unless @user.can_change_name? cuser
     if @user.update_attributes params[:user]
       flash[:notice] = t(:users_update)
       redirect_to_back
