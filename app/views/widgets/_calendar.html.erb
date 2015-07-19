@@ -31,7 +31,7 @@
               <div class="entry">
                 <p class="summary">
                   <span class="time"><%= event.start.strftime("%H:%M %Z") %></span>
-                  <%= event.formatted_summary.sub(nsltv_regex, '') %>
+                  <%= event.formatted_summary %>
                 </p>
               </div>
             <% end %>

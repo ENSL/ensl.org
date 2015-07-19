@@ -20,7 +20,15 @@ class GoogleCalendar
 
   def upcoming
     events.select do |event|
-      event.start >= (Time.zone.now - 2.hours)
+      event.start >= (Time.zone.now - 2.hours) &&
+        (not event.nsltv_regex =~ event.summary)
+    end
+  end
+
+  def upcoming_nsltv
+    events.select do |event|
+      event.start >= (Time.zone.now - 2.hours) &&
+        event.nsltv_regex =~ (event.summary)
     end
   end
 
@@ -111,8 +119,13 @@ class GoogleCalendar
       @entry["end"]["dateTime"].to_datetime.in_time_zone(@timezone_offset)
     end
 
+    def nsltv_regex
+      /\[NSLTV\]/i
+    end
+
     def formatted_summary
-      summary.gsub(/(http\:\/\/)(.*[^)])/i, '<a href="\1\2">\2</a>').html_safe
+      summary.gsub(/(http\:\/\/)(.*[^)])/i, '<a href="\1\2">\2</a>').
+        gsub(nsltv_regex, '').html_safe
     end
 
     def [](key)
