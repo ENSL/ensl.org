@@ -171,26 +171,17 @@ module ApplicationHelper
     end
   end
 
-  def nsltv_regex
-    /\[NSLTV\]/i
-  end
 
   def upcoming_matches
     GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).
-      upcoming.
-      find_all{|e|
-       not nsltv_regex =~ (e.summary)
-      }.sort_by do |event|
+      upcoming.sort_by do |event|
       event.start
     end
   end
 
   def upcoming_nsltv
     GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).
-      upcoming.
-      find_all{|e|
-       nsltv_regex =~ (e.summary)
-      }.sort_by do |event|
+      upcoming_nsltv.sort_by do |event|
       event.start
     end
   end
