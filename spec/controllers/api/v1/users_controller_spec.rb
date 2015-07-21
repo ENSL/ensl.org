@@ -5,9 +5,29 @@ describe Api::V1::UsersController do
     request.accept = 'application/json'
   end
 
+  describe '#show' do
+    before do
+      @user = create :user_with_team, :chris
+    end
+
+    it 'returns user data' do
+      get :show, id: @user.id
+
+      expect(response).to be_success
+      expect(json['id']).to eq(@user.id)
+      expect(json['username']).to eq(@user.username)
+      expect(json['country']).to eq(@user.country)
+      expect(json['time_zone']).to eq(@user.time_zone)
+      expect(json['admin']).to eq(@user.admin?)
+      expect(json).to have_key("steam")
+      expect(json['steam']).to have_key("url")
+      expect(json['steam']).to have_key("nickname")
+    end
+  end
+
   describe '#index' do
     before do
-      10.times { create(:user_with_team) }
+      5.times { create(:user_with_team) }
     end
 
     it 'returns all users and associated teams' do
