@@ -20,6 +20,10 @@ FactoryGirl.define do
       end
     end
 
+    trait :chris do
+      steamid "0:1:58097444"
+    end
+
     factory :user_with_team do
       after(:create) do |user|
         create(:team, founder: user)
