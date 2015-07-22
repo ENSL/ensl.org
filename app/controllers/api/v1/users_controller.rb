@@ -19,5 +19,7 @@ class Api::V1::UsersController < Api::V1::BaseController
         nickname: @steam.nickname
       }
     }
+  rescue ActiveRecord::RecordNotFound
+    raise ActionController::RoutingError.new('User Not Found')
   end
 end
