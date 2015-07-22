@@ -23,6 +23,12 @@ describe Api::V1::UsersController do
       expect(json['steam']).to have_key("url")
       expect(json['steam']).to have_key("nickname")
     end
+
+    it 'returns 404 if user does not exist' do
+      expect {
+        get :show, id: -1
+      }.to raise_error(ActionController::RoutingError)
+    end
   end
 
   describe '#index' do
