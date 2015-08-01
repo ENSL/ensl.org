@@ -6,76 +6,77 @@ Ensl::Application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users, only: [:show, :index]
+      resources :servers, only: [:index]
     end
   end
 
-	root to: "articles#news_index"
+  root to: "articles#news_index"
 
-	resources :articles do
-		resources :versions
-	end
+  resources :articles do
+    resources :versions
+  end
 
   match 'contests/del_map'
   match 'contests/scores'
   match 'contests/historical', to: "contests#historical"
 
-	resources :contests do
-		get 'current', on: :collection
-	end
+  resources :contests do
+    get 'current', on: :collection
+  end
 
   resources :log_events
-	resources :categories
-	resources :options
-	resources :polls
+  resources :categories
+  resources :options
+  resources :polls
 
   match 'comments/quote'
 
-	resources :comments
-	resources :shoutmsgs
-	resources :teamers
-	resources :teams
-	resources :gathers
-	resources :gatherers
-	resources :groups
-	resources :groupers
-	resources :forumers
-	resources :topics
+  resources :comments
+  resources :shoutmsgs
+  resources :teamers
+  resources :teams
+  resources :gathers
+  resources :gatherers
+  resources :groups
+  resources :groupers
+  resources :forumers
+  resources :topics
 
   match 'forums/up'
   match 'forums/down'
 
-	resources :forums
-	resources :users
-	resources :locks
-	resources :contesters
-	resources :contests
-	resources :challenges
-	resources :servers
-	resources :predictions
-	resources :rounds
-	resources :matches do |m|
+  resources :forums
+  resources :users
+  resources :locks
+  resources :contesters
+  resources :contests
+  resources :challenges
+  resources :servers
+  resources :predictions
+  resources :rounds
+  resources :matches do |m|
     get :admin, to: "matches#admin", on: :collection
     get :ref, to: "matches#ref"
   end
 
-	resources :maps
-	resources :logs
-	resources :log_files
-	resources :directories
+  resources :maps
+  resources :logs
+  resources :log_files
+  resources :directories
   resources :data_files
-	resources :predictions
-	resources :weeks
-	resources :movies
-	resources :messages
-	resources :sites
-	resources :bans
-	resources :tweets
-	resources :issues
+  resources :predictions
+  resources :weeks
+  resources :movies
+  resources :messages
+  resources :sites
+  resources :bans
+  resources :tweets
+  resources :issues
   
   match 'posts/quote'
 
-	resources :posts
-	resources :brackets
+  resources :posts
+  resources :brackets
 
   match 'about/action'
   match 'about/staff'
@@ -127,10 +128,10 @@ Ensl::Application.routes.draw do
 
   match 'votes/create'
 
-	match ':controller/:action', requirements: { action: /A-Za-z/ }
-	match ':controller/:action/:id'
-	match ':controller/:action/:id.:format'
-	match ':controller/:action/:id/:id2'
+  match ':controller/:action', requirements: { action: /A-Za-z/ }
+  match ':controller/:action/:id'
+  match ':controller/:action/:id.:format'
+  match ':controller/:action/:id/:id2'
 
   match 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
 end
