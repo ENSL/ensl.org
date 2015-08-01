@@ -6,8 +6,8 @@ describe Api::V1::UsersController do
   end
 
   describe '#show' do
-    before do
-      @user = create :user_with_team, :chris
+    before(:each) do
+      @user = create :user, :chris
     end
 
     it 'returns user data' do
@@ -22,6 +22,10 @@ describe Api::V1::UsersController do
       expect(json).to have_key("steam")
       expect(json['steam']).to have_key("url")
       expect(json['steam']).to have_key("nickname")
+      expect(json['bans']['mute']).to eq(false)
+      expect(json['bans']['gather']).to eq(false)
+      expect(json['bans']['site']).to eq(false)
+      expect(json['team']).to be_nil
     end
 
     it 'returns 404 if user does not exist' do
@@ -47,6 +51,14 @@ describe Api::V1::UsersController do
       get :show, id: @user.id
       expect(response).to be_success
       expect(json['bans']['site']).to eq(true)
+    end
+    it 'returns team information' do
+      @user.destroy
+      @user_with_team = create :user_with_team, :chris
+      get :show, id: @user_with_team.id
+      expect(response).to be_success
+      expect(json['team']['id']).to eq(@user_with_team.team.id)
+      expect(json['team']['name']).to eq(@user_with_team.team.name)
     end
   end
 
