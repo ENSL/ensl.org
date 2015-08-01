@@ -15,7 +15,6 @@ class ShoutmsgsController < ApplicationController
 
   def create
     @shoutmsg = Shoutmsg.new params[:shoutmsg]
-    puts @shoutmsg
     @shoutmsg.user = cuser
     raise AccessError unless @shoutmsg.can_create? cuser
 
