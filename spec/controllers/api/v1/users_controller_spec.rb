@@ -29,6 +29,25 @@ describe Api::V1::UsersController do
         get :show, id: -1
       }.to raise_error(ActionController::RoutingError)
     end
+
+    it 'returns correct ban if user muted' do
+      create :ban, :mute, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['mute']).to eq(true)
+    end
+    it 'returns correct ban if user gather banned' do
+      create :ban, :gather, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['gather']).to eq(true)
+    end
+    it 'returns correct ban if user site banned' do
+      create :ban, :site, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['site']).to eq(true)
+    end
   end
 
   describe '#index' do
