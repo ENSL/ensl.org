@@ -30,7 +30,7 @@ class Team < ActiveRecord::Base
   validates_length_of :name, :tag, :in => 2..20
   validates_length_of :irc, :maximum => 20, :allow_blank => true
   validates_length_of :web, :maximum => 50, :allow_blank => true
-  validates_format_of :country, :with => /\A[A-Z]{2}\z$/, :allow_blank => true
+  validates_format_of :country, :with => /\A[A-Z]{2}\z/, :allow_blank => true
   validates_length_of [:comment, :recruiting], :in => 0..75, :allow_blank => true
 
   scope :with_teamers_num,
