@@ -32,12 +32,18 @@ describe User do
     end
 
     it "returns true if user is banned" do
-      ban = Ban.create! ban_type: Ban::TYPE_SITE, expiry: Time.now + 10.days, user_name: user.username
+      Ban.create!(ban_type: Ban::TYPE_SITE,
+                  expiry: Time.now + 10.days,
+                  user_name: user.username)
+
       expect(user.banned?).to be_truthy
     end
 
     it "returns true for specific bans" do
-      ban = Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.now + 10.days, user_name: user.username
+      Ban.create!(ban_type: Ban::TYPE_MUTE,
+                  expiry: Time.now + 10.days,
+                  user_name: user.username)
+
       expect(user.banned? Ban::TYPE_MUTE).to be_truthy
     end
   end
