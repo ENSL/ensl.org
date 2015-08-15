@@ -40,18 +40,21 @@ describe Api::V1::UsersController do
       expect(response).to be_success
       expect(json['bans']['mute']).to eq(true)
     end
+
     it 'returns correct ban if user gather banned' do
       create :ban, :gather, user: @user
       get :show, id: @user.id
       expect(response).to be_success
       expect(json['bans']['gather']).to eq(true)
     end
+
     it 'returns correct ban if user site banned' do
       create :ban, :site, user: @user
       get :show, id: @user.id
       expect(response).to be_success
       expect(json['bans']['site']).to eq(true)
     end
+
     it 'returns team information' do
       @user.destroy
       @user_with_team = create :user_with_team, :chris
@@ -81,7 +84,7 @@ describe Api::V1::UsersController do
 
       user_json = json["users"].first
       nested_team_json = user_json["team"]
-      
+
       expect(user_json).to have_key("username")
       expect(user_json).to have_key("steamid")
       expect(user_json).to have_key("team")
