@@ -23,6 +23,7 @@ gem 'country_code_select', '~> 1.0.1'
 gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.4', require: false
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+gem 'test-unit', '~> 3.1.3'
 
 # Please install nodejs locally.
 gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
@@ -65,7 +66,6 @@ group :test do
   gem 'selenium-webdriver', '~> 2.41.0'
   gem 'factory_girl_rails', '~> 4.4.1'
   gem 'timecop', '~> 0.7.1'
-  gem 'test-unit', '~> 3.1.3'
 end
 
 group :development, :test do
