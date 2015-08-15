@@ -10,7 +10,7 @@ require 'rspec/rails'
 require 'capybara/rspec'
 require 'capybara/poltergeist'
 
-Capybara.default_wait_time = 30
+Capybara.default_wait_time = 5
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app,
     timeout: 30,
@@ -34,6 +34,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.color = true
   config.formatter = :documentation
+  config.infer_spec_type_from_file_location!
 
   config.before(:each) do
     events_list_json = JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json')))

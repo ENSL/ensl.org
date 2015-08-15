@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::MapsController do
   before do
     request.accept = 'application/json'
-  end 
+  end
 
   describe '#index' do
     let!(:map) { create :map }
@@ -17,3 +17,4 @@ describe Api::V1::MapsController do
     end
   end
 end
+
