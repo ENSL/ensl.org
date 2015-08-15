@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::ServersController do
   before do
     request.accept = 'application/json'
-  end 
+  end
 
   describe '#index' do
     let!(:server) { create :server, :active }
