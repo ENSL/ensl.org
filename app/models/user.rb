@@ -140,11 +140,12 @@ class User < ActiveRecord::Base
   end
 
   def country_s
-    CountryCodeSelect::Countries::COUNTRIES.each do |c|
-      if c[1] == country
-        return c[0]
+    I18nCountrySelect::Countries::COUNTRY_CODES.each do |code|
+      if code == country
+        return I18n.t(code, :scope => :countries, :default => 'missing')
       end
     end
+
     country
   end
 
