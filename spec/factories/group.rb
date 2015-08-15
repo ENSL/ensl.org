@@ -9,4 +9,14 @@ FactoryGirl.define do
   	name "Admins"
   	id Group::ADMINS
   end
+
+  trait :champions do
+  	name "Champions"
+  	id Group::CHAMPIONS
+  end
+
+  trait :donors do
+  	name "Donors"
+  	id Group::DONORS
+  end
 end
