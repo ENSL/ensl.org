@@ -31,6 +31,5 @@ Ensl::Application.configure do
   # Use a different cache store
   config.cache_store = :dalli_store
 
-  # Enable threaded mode
-  # config.threadsafe!
+  config.eager_load = false
 end
