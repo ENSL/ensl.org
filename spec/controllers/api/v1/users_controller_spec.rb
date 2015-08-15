@@ -94,4 +94,3 @@ describe Api::V1::UsersController do
     end
   end
 end
-
