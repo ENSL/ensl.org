@@ -17,4 +17,3 @@ describe Api::V1::MapsController do
     end
   end
 end
-

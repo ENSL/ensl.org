@@ -18,4 +18,3 @@ describe Api::V1::ServersController do
     end
   end
 end
-
