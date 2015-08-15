@@ -1,9 +1,9 @@
 source 'http://rubygems.org'
 
-ruby '2.1.5'
+ruby '2.2.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
-gem 'rails', '~> 3.2.19'
+gem 'rails', '~> 3.2.22'
 gem 'mysql2', '~> 0.3.15'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
@@ -59,12 +59,13 @@ group :test do
   gem 'simplecov', '~> 0.7.1', require: false
   gem 'codeclimate-test-reporter', '~> 0.3.0', require: nil
   gem 'database_cleaner', '~> 1.2.0'
-  gem 'rspec-rails', '~> 2.14.1'
-  gem 'capybara', '~> 2.2.1'
+  gem 'rspec-rails', '~> 3.3.3'
+  gem 'capybara', '~> 2.4.4'
   gem 'poltergeist', '~> 1.6.0'
   gem 'selenium-webdriver', '~> 2.41.0'
   gem 'factory_girl_rails', '~> 4.4.1'
   gem 'timecop', '~> 0.7.1'
+  gem 'test-unit', '~> 3.1.3'
 end
 
 group :development, :test do
