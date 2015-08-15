@@ -39,6 +39,9 @@ gem 'neat', '~> 1.6.0'
 gem 'haml', '~> 4.0.5'
 gem 'rails_autolink', '~> 1.1.5'
 
+# Legacy feature shims
+gem 'protected_attributes', '~> 1.1.3'
+
 group :assets do
   gem 'uglifier', '~> 2.5.0'
 end
