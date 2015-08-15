@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'abstract_unit')
 require File.join(File.dirname(__FILE__), 'fixtures/page')
 require File.join(File.dirname(__FILE__), 'fixtures/widget')
 
-class VersionedTest < ActiveSupport::TestCase
+class VersionedTest < Test::Unit::TestCase
   fixtures :pages, :page_versions, :locked_pages, :locked_pages_revisions, :authors, :landmarks, :landmark_versions
   set_fixture_class :page_versions => Page::Version
 
@@ -32,7 +32,7 @@ class VersionedTest < ActiveSupport::TestCase
     assert_equal 24, p.version
     assert_equal 'Welcome to the weblog', p.title
 
-    assert p.revert_to!(23), "Couldn't revert to 23"
+    assert p.revert_to!(p.versions.first.version), "Couldn't revert to 23"
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
   end
@@ -59,7 +59,7 @@ class VersionedTest < ActiveSupport::TestCase
     assert_equal 24, p.version
     assert_equal 'Welcome to the weblog', p.title
 
-    assert p.revert_to!(p.versions.find_by_version(23)), "Couldn't revert to 23"
+    assert p.revert_to!(p.versions.first), "Couldn't revert to 23"
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
   end
@@ -81,7 +81,7 @@ class VersionedTest < ActiveSupport::TestCase
     assert_equal 'Welcome to the weblog', p.title
     assert_equal 'LockedPage', p.versions.first.version_type
 
-    assert p.revert_to!(p.versions.first.lock_version), "Couldn't revert to 23"
+    assert p.revert_to!(p.versions.first.version), "Couldn't revert to 23"
     assert_equal 'Welcome to the weblg', p.title
     assert_equal 'LockedPage', p.versions.first.version_type
   end
@@ -108,7 +108,7 @@ class VersionedTest < ActiveSupport::TestCase
     p = locked_pages(:thinking)
     assert_equal 'So I was thinking', p.title
 
-    assert p.revert_to!(p.versions.first.lock_version), "Couldn't revert to 1"
+    assert p.revert_to!(p.versions.first.version), "Couldn't revert to 1"
     assert_equal 'So I was thinking!!!', p.title
     assert_equal 'SpecialLockedPage', p.versions.first.version_type
   end
@@ -147,15 +147,15 @@ class VersionedTest < ActiveSupport::TestCase
 
     p = Page.create! :title => "title"
     assert_equal 1, p.version # version does not increment
-    assert_equal 1, p.versions.count
+    assert_equal 1, p.versions(true).size
 
     p.update_attributes(:title => 'new title')
     assert_equal 1, p.version # version does not increment
-    assert_equal 1, p.versions.count
+    assert_equal 1, p.versions(true).size
 
     p.update_attributes(:title => 'a title')
     assert_equal 2, p.version
-    assert_equal 2, p.versions.count
+    assert_equal 2, p.versions(true).size
 
     # reset original if condition
     Page.class_eval { alias_method :feeling_good?, :old_feeling_good }
@@ -168,15 +168,15 @@ class VersionedTest < ActiveSupport::TestCase
 
     p = Page.create! :title => "title"
     assert_equal 1, p.version # version does not increment
-    assert_equal 1, p.versions.count
+    assert_equal 1, p.versions(true).size
 
     p.update_attributes(:title => 'a title')
     assert_equal 1, p.version # version does not increment
-    assert_equal 1, p.versions.count
+    assert_equal 1, p.versions(true).size
 
     p.update_attributes(:title => 'b title')
     assert_equal 2, p.version
-    assert_equal 2, p.versions.count
+    assert_equal 2, p.versions(true).size
 
     # reset original if condition
     Page.version_condition = old_condition
@@ -187,10 +187,7 @@ class VersionedTest < ActiveSupport::TestCase
     p.save
     p.save
     5.times do |i|
-      p.title = "title#{i}"
-      p.save
-      assert_equal "title#{i}", p.title
-      assert_equal (i+2), p.version
+      assert_page_title p, i
     end
   end
 
@@ -199,10 +196,7 @@ class VersionedTest < ActiveSupport::TestCase
     p.update_attributes(:title => "title1")
     p.update_attributes(:title => "title2")
     5.times do |i|
-      p.title = "title#{i}"
-      p.save
-      assert_equal "title#{i}", p.title
-      assert_equal (i+4), p.lock_version
+      assert_page_title p, i, :lock_version
       assert p.versions(true).size <= 2, "locked version can only store 2 versions"
     end
   end
@@ -213,12 +207,17 @@ class VersionedTest < ActiveSupport::TestCase
     assert SpecialLockedPage.track_altered_attributes
   end
 
+  def test_version_order
+    assert_equal 23, pages(:welcome).versions.first.version
+    assert_equal 24, pages(:welcome).versions.last.version
+  end
+
   def test_track_altered_attributes
     p = LockedPage.create! :title => "title"
     assert_equal 1, p.lock_version
     assert_equal 1, p.versions(true).size
 
-    p.body = 'whoa'
+    p.title = 'title'
     assert !p.save_version?
     p.save
     assert_equal 2, p.lock_version # still increments version because of optimistic locking
@@ -237,12 +236,32 @@ class VersionedTest < ActiveSupport::TestCase
     assert_equal 2, p.versions(true).size # version 1 deleted
   end
 
+  def assert_page_title(p, i, version_field = :version)
+    p.title = "title#{i}"
+    p.save
+    assert_equal "title#{i}", p.title
+    assert_equal (i+4), p.send(version_field)
+  end
+
   def test_find_versions
-    assert_equal 1, locked_pages(:welcome).versions.find(:all, :conditions => ['title LIKE ?', '%weblog%']).size
+    assert_equal 2, locked_pages(:welcome).versions.size
+    assert_equal 1, locked_pages(:welcome).versions.find(:all, :conditions => ['title LIKE ?', '%weblog%']).length
+    assert_equal 2, locked_pages(:welcome).versions.find(:all, :conditions => ['title LIKE ?', '%web%']).length
+    assert_equal 0, locked_pages(:thinking).versions.find(:all, :conditions => ['title LIKE ?', '%web%']).length
+    assert_equal 2, locked_pages(:welcome).versions.length
   end
 
   def test_find_version
-    assert_equal page_versions(:welcome_1), pages(:welcome).versions.find_by_version(23)
+    assert_equal page_versions(:welcome_1), Page.find_version(pages(:welcome).id, 23)
+    assert_equal page_versions(:welcome_2), Page.find_version(pages(:welcome).id, 24)
+    assert_equal pages(:welcome), Page.find_version(pages(:welcome).id)
+
+    assert_equal page_versions(:welcome_1), pages(:welcome).find_version(23)
+    assert_equal page_versions(:welcome_2), pages(:welcome).find_version(24)
+    assert_equal pages(:welcome), pages(:welcome).find_version
+
+    assert_raise(ActiveRecord::RecordNotFound) { Page.find_version(pages(:welcome).id, 1) }
+    assert_raise(ActiveRecord::RecordNotFound) { Page.find_version(0, 23) }
   end
 
   def test_with_sequence
@@ -270,6 +289,7 @@ class VersionedTest < ActiveSupport::TestCase
     association = Page.reflect_on_association(:versions)
     options = association.options
     assert_equal :delete_all, options[:dependent]
+    assert_equal 'version', options[:order]
 
     association = Widget.reflect_on_association(:versions)
     options = association.options
@@ -320,51 +340,8 @@ class VersionedTest < ActiveSupport::TestCase
   end
 
   def test_should_find_version_count
-    assert_equal 2, pages(:welcome).versions.size
-  end
-
-  def test_if_changed_creates_version_if_a_listed_column_is_changed
-    landmarks(:washington).name = "Washington"
-    assert landmarks(:washington).changed?
-    assert landmarks(:washington).altered?
-  end
-
-  def test_if_changed_creates_version_if_all_listed_columns_are_changed
-    landmarks(:washington).name = "Washington"
-    landmarks(:washington).latitude = 1.0
-    landmarks(:washington).longitude = 1.0
-    assert landmarks(:washington).changed?
-    assert landmarks(:washington).altered?
-  end
-
-  def test_if_changed_does_not_create_new_version_if_unlisted_column_is_changed
-    landmarks(:washington).doesnt_trigger_version = "This should not trigger version"
-    assert landmarks(:washington).changed?
-    assert !landmarks(:washington).altered?
-  end
-
-  def test_without_locking_temporarily_disables_optimistic_locking
-    enabled1 = false
-    block_called = false
-    
-    ActiveRecord::Base.lock_optimistically = true
-    LockedPage.without_locking do
-      enabled1 = ActiveRecord::Base.lock_optimistically
-      block_called = true
-    end
-    enabled2 = ActiveRecord::Base.lock_optimistically
-    
-    assert block_called
-    assert !enabled1
-    assert enabled2
-  end
-  
-  def test_without_locking_reverts_optimistic_locking_settings_if_block_raises_exception
-    assert_raises(RuntimeError) do
-      LockedPage.without_locking do
-        raise RuntimeError, "oh noes"
-      end
-    end
-    assert ActiveRecord::Base.lock_optimistically
+    assert_equal 24, pages(:welcome).versions_count
+    assert_equal 24, page_versions(:welcome_1).versions_count
+    assert_equal 24, page_versions(:welcome_2).versions_count
   end
 end

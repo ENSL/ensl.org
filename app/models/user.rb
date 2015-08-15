@@ -23,7 +23,6 @@
 
 require 'country_code_select/countries'
 require 'digest/md5'
-require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_versioned', 'lib', 'acts_as_versioned.rb')
 
 class User < ActiveRecord::Base
   include Extra

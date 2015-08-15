@@ -1,14 +1,4 @@
-*GIT* (version numbers are overrated)
-
-* 0.6 (19 Jul 2010) Rails 3 refactoring by gvarela!
-
-* (16 Jun 2008) Backwards Compatibility is overrated (big updates for rails 2.1)
-
-  * Use ActiveRecord 2.1's dirty attribute checking instead [Asa Calow]
-  * Remove last traces of #non_versioned_fields
-  * Remove AR::Base.find_version and AR::Base.find_versions, rely on AR association proxies and named_scope
-  * Remove #versions_count, rely on AR association counter caching.
-  * Remove #versioned_attributes, basically the same as AR::Base.versioned_columns
+*SVN* (version numbers are overrated)
 
 * (5 Oct 2006) Allow customization of #versions association options [Dan Peterson]
 
