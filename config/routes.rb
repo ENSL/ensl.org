@@ -1,4 +1,4 @@
-Ensl::Application.routes.draw do  
+Ensl::Application.routes.draw do
   %w(403 404 422 500).each do |code|
     get code, to: 'errors#show', code: code
   end
@@ -17,9 +17,9 @@ Ensl::Application.routes.draw do
     resources :versions
   end
 
-  match 'contests/del_map'
-  match 'contests/scores'
-  match 'contests/historical', to: "contests#historical"
+  get 'contests/del_map'
+  get 'contests/scores'
+  get 'contests/historical', to: "contests#historical"
 
   resources :contests do
     get 'current', on: :collection
@@ -30,7 +30,7 @@ Ensl::Application.routes.draw do
   resources :options
   resources :polls
 
-  match 'comments/quote'
+  get 'comments/quote'
 
   resources :comments
   resources :shoutmsgs
@@ -43,8 +43,8 @@ Ensl::Application.routes.draw do
   resources :forumers
   resources :topics
 
-  match 'forums/up'
-  match 'forums/down'
+  get 'forums/up'
+  get 'forums/down'
 
   resources :forums
   resources :users
@@ -55,9 +55,9 @@ Ensl::Application.routes.draw do
   resources :servers
   resources :predictions
   resources :rounds
-  resources :matches do |m|
-    get :admin, to: "matches#admin", on: :collection
-    get :ref, to: "matches#ref"
+  resources :getes do |m|
+    get :admin, to: "getes#admin", on: :collection
+    get :ref, to: "getes#ref"
   end
 
   resources :maps
@@ -73,66 +73,66 @@ Ensl::Application.routes.draw do
   resources :bans
   resources :tweets
   resources :issues
-  
-  match 'posts/quote'
+
+  get 'posts/quote'
 
   resources :posts
   resources :brackets
 
-  match 'about/action'
-  match 'about/staff'
-  match 'about/statistics'
+  get 'about/action'
+  get 'about/staff'
+  get 'about/statistics'
 
-  match 'refresh', to: "application#refresh"
-  match 'search', to: "application#search"
+  get 'refresh', to: "application#refresh"
+  get 'search', to: "application#search"
 
-  match 'news', to: "articles#news_index"
-  match 'news/archive', to: "articles#news_archive"
-  match 'news/admin', to: "articles#admin"
-  match 'articles/cleanup'
+  get 'news', to: "articles#news_index"
+  get 'news/archive', to: "articles#news_archive"
+  get 'news/admin', to: "articles#admin"
+  get 'articles/cleanup'
 
-  match 'data_files/admin'
-  match 'data_files/addFile'
-  match 'data_files/delFile'
-  match 'data_files/trash'
+  get 'data_files/admin'
+  get 'data_files/addFile'
+  get 'data_files/delFile'
+  get 'data_files/trash'
 
-  match 'contesters/recalc'
+  get 'contesters/recalc'
 
-  match 'directories', to: "directories#show", id: 1
+  get 'directories', to: "directories#show", id: 1
 
-  match 'gathers/refresh'
-  match 'gathers/latest/:game', to: "gathers#latest", via: :get
-  match 'gather', to: "gathers#latest", game: "ns2", via: :get
+  get 'gathers/refresh'
+  get 'gathers/latest/:game', to: "gathers#latest", via: :get
+  get 'gather', to: "gathers#latest", game: "ns2", via: :get
 
-  match 'gatherers/:id/status', to: "gatherers#status", via: :post
+  get 'gatherers/:id/status', to: "gatherers#status", via: :post
 
-  match 'groups/addUser'
-  match 'groups/delUser'
+  get 'groups/addUser'
+  get 'groups/delUser'
 
-  match 'movies/download'
-  match 'movies/preview'
-  match 'movies/snapshot'
+  get 'movies/download'
+  get 'movies/preview'
+  get 'movies/snapshot'
 
-  match 'plugin/user'
+  get 'plugin/user'
 
-  match 'users/forgot'
-  match 'users/recover'
-  match 'users/agenda'
-  match 'users/logout'
-  match 'users/login'
+  get 'users/forgot'
+  get 'users/recover'
+  get 'users/agenda'
+  get 'users/logout'
+  get 'users/login'
 
-  match 'users/agenda'
-  match 'users/login'
-  match 'users/logout'
-  match 'users/popup'
-  match 'users/forgot', to: "users#forgot"
+  get 'users/agenda'
+  get 'users/login'
+  get 'users/logout'
+  get 'users/popup'
+  get 'users/forgot', to: "users#forgot"
 
-  match 'votes/create'
+  get 'votes/create'
 
-  match ':controller/:action', requirements: { action: /A-Za-z/ }
-  match ':controller/:action/:id'
-  match ':controller/:action/:id.:format'
-  match ':controller/:action/:id/:id2'
+  get ':controller/:action', requirements: { action: /A-Za-z/ }
+  get ':controller/:action/:id'
+  get ':controller/:action/:id.:format'
+  get ':controller/:action/:id/:id2'
 
-  match 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
+  get 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
 end
