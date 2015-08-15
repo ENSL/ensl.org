@@ -22,7 +22,7 @@ gem 'dynamic_form', '~> 1.1.4'
 gem 'i18n_country_select', '~> 1.1.5'
 gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.4', require: false
-gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+gem 'steam-condenser', '~> 1.3.11'
 gem 'test-unit', '~> 3.1.3'
 
 # Please install nodejs locally.
