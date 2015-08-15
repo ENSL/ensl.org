@@ -21,7 +21,6 @@
 #  public_email :boolean          default(FALSE), not null
 #
 
-require 'country_code_select/countries'
 require 'digest/md5'
 
 class User < ActiveRecord::Base
