@@ -5,7 +5,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def show
     @user = User.find(params[:id])
-    @steam = SteamCondenser::Community::SteamId.from_steam_id("STEAM_#{@user.steamid}")
+    @steam = steam_profile @user
 
     render json: {
       id: @user.id,
@@ -15,8 +15,8 @@ class Api::V1::UsersController < Api::V1::BaseController
       avatar: @user.profile.avatar.url,
       admin: @user.admin?,
       steam: {
-        url: @steam.base_url, 
-        nickname: @steam.nickname
+        url: @steam.nil? ? nil : @steam.base_url, 
+        nickname: @steam.nil? ? nil : @steam.nickname
       },
       bans: {
         gather: @user.banned?(Ban::TYPE_GATHER).present?,
@@ -27,5 +27,13 @@ class Api::V1::UsersController < Api::V1::BaseController
     }
   rescue ActiveRecord::RecordNotFound
     raise ActionController::RoutingError.new('User Not Found')
+  end
+
+  private
+
+  def steam_profile user
+    SteamCondenser::Community::SteamId.from_steam_id("STEAM_#{user.steamid}")
+  rescue SteamCondenser::Error => e
+    return nil
   end
 end
