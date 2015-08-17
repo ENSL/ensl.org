@@ -23,8 +23,8 @@ describe Api::V1::UsersCollection do
         expect(collection.execute_query.size).to eq(3)
       end
 
-      it 'returns 5 columns' do
-        expect(collection.execute_query.first.size).to eq(5)
+      it 'returns 6 columns' do
+        expect(collection.execute_query.first.size).to eq(6)
       end
     end
   end
