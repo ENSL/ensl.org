@@ -15,7 +15,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       avatar: @user.profile.avatar.url,
       admin: @user.admin?,
       steam: {
-        url: @steam.nil? ? nil : @steam.base_url, 
+        url: @steam.nil? ? nil : @steam.base_url,
         nickname: @steam.nil? ? nil : @steam.nickname
       },
       bans: {
@@ -31,9 +31,9 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   private
 
-  def steam_profile user
+  def steam_profile(user)
     SteamCondenser::Community::SteamId.from_steam_id("STEAM_#{user.steamid}")
-  rescue SteamCondenser::Error => e
-    return nil
+  rescue SteamCondenser::Error
+    nil
   end
 end
