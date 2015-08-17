@@ -81,11 +81,11 @@ describe Api::V1::UsersController do
 
     it 'returns the excpected JSON keys' do
       get :index
-
       user_json = json["users"].first
       nested_team_json = user_json["team"]
 
       expect(user_json).to have_key("username")
+      expect(user_json).to have_key("id")
       expect(user_json).to have_key("steamid")
       expect(user_json).to have_key("team")
       expect(nested_team_json).to have_key("name")
