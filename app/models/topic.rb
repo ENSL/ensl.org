@@ -32,8 +32,6 @@ class Topic < ActiveRecord::Base
 
   scope :basic, :include => [:latest, { forum: :forumer }, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
-  scope :latest_page,
-    lambda { |page| {:limit => "#{(page-1)*LATEST_PER_PAGE}, #{(page-1)*LATEST_PER_PAGE+LATEST_PER_PAGE}"} }
 
   validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50
