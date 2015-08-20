@@ -42,13 +42,14 @@ class Topic < ActiveRecord::Base
   acts_as_readable
 
   def self.recent_topics
-    Post.joins("LEFT OUTER JOIN topics ON topics.id = posts.topic_id")
-      .joins("LEFT OUTER JOIN forums on forums.id = topics.forum_id")
-      .joins("LEFT OUTER JOIN forumers on forums.id = forumers.forum_id")
-      .order("posts.id desc")
-      .where("forumers.id IS NULL")
-      .select("DISTINCT topic_id")
-      .limit(5).map(&:topic)
+    Post.joins("LEFT OUTER JOIN topics ON topics.id = posts.topic_id").
+      joins("LEFT OUTER JOIN forums on forums.id = topics.forum_id").
+      joins("LEFT OUTER JOIN forumers on forums.id = forumers.forum_id").
+      order("posts.id desc").
+      where("forumers.id IS NULL").
+      select("DISTINCT topic_id").
+      limit(5).
+      map(&:topic)
   end
 
   def to_s
