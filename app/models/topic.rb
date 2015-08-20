@@ -47,6 +47,10 @@ class Topic < ActiveRecord::Base
 
   acts_as_readable
 
+  def self.recent_topics
+    Post.order('id desc').select('DISTINCT topic_id').limit(5).map(&:topic)
+  end
+
   def to_s
     title
   end

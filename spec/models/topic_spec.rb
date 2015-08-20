@@ -27,4 +27,20 @@ describe Topic do
       end.to change(Topic, :count).by(1)
     end
   end
+
+  describe ".recent_topics" do
+    before(:all) do
+      5.times do
+        topic = create :topic
+        3.times do
+          post = create :post, topic: topic
+        end
+      end
+    end
+    it "returns 5 unique, most recently posted topics" do
+      recent_topics = Topic.recent_topics
+      expect(recent_topics.length).to eq(5)
+      expect(recent_topics.map(&:id).uniq.length).to eq(5)
+    end
+  end
 end
