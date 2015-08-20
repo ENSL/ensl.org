@@ -32,10 +32,6 @@ class Topic < ActiveRecord::Base
 
   scope :basic, :include => [:latest, { forum: :forumer }, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
-  scope :recent,
-    :conditions => "forumers.id IS NULL AND posts.id = (SELECT id FROM posts AS P WHERE P.topic_id = topics.id ORDER BY id DESC LIMIT 1)",
-    :order => "posts.id DESC",
-    :group => "topics.id"
   scope :latest_page,
     lambda { |page| {:limit => "#{(page-1)*LATEST_PER_PAGE}, #{(page-1)*LATEST_PER_PAGE+LATEST_PER_PAGE}"} }
 
