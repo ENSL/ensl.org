@@ -32,9 +32,7 @@ describe Topic do
     before(:all) do
       5.times do
         topic = create :topic
-        3.times do
-          post = create :post, topic: topic
-        end
+        3.times { create :post, topic: topic }
       end
     end
     it "returns 5 unique, most recently posted topics" do
