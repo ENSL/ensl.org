@@ -4,7 +4,7 @@ FactoryGirl.define do
     forum
     user
     before(:create) do |topic|
-    	topic.first_post = "My first post on the topic"
+      topic.first_post = "My first post on the topic"
     end
   end
 end
