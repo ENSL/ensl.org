@@ -19,6 +19,7 @@
 #  time_zone    :string(255)
 #  version      :integer
 #  public_email :boolean          default(FALSE), not null
+#  salt         :string(255)
 #
 
 require 'spec_helper'
