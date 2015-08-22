@@ -42,20 +42,20 @@ class Topic < ActiveRecord::Base
   acts_as_readable
 
   def self.recent_topics
-    self.find_by_sql %q{
-      SELECT DISTINCT topics.* 
+    find_by_sql %q{
+      SELECT DISTINCT topics.*
         FROM  (SELECT id, topic_id
-                FROM   posts 
-                ORDER  BY id DESC 
-                LIMIT  20) AS T 
-               INNER JOIN topics 
-                       ON T.topic_id = topics.id 
-               INNER JOIN forums 
-                       ON forums.id = topics.forum_id 
-               LEFT OUTER JOIN forumers 
-                            ON forumers.forum_id = forums.id 
-        WHERE forumers.id IS NULL 
-        LIMIT  5 
+                FROM   posts
+                ORDER  BY id DESC
+                LIMIT  20) AS T
+               INNER JOIN topics
+                       ON T.topic_id = topics.id
+               INNER JOIN forums
+                       ON forums.id = topics.forum_id
+               LEFT OUTER JOIN forumers
+                            ON forumers.forum_id = forums.id
+        WHERE forumers.id IS NULL
+        LIMIT  5
     }
   end
 
