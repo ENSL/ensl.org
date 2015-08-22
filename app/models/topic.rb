@@ -42,14 +42,21 @@ class Topic < ActiveRecord::Base
   acts_as_readable
 
   def self.recent_topics
-    Post.joins("LEFT OUTER JOIN topics ON topics.id = posts.topic_id").
-      joins("LEFT OUTER JOIN forums on forums.id = topics.forum_id").
-      joins("LEFT OUTER JOIN forumers on forums.id = forumers.forum_id").
-      order("posts.id desc").
-      where("forumers.id IS NULL").
-      select("DISTINCT topic_id").
-      limit(5).
-      map(&:topic)
+    self.find_by_sql %q{
+      SELECT DISTINCT topics.* 
+        FROM  (SELECT id, topic_id
+                FROM   posts 
+                ORDER  BY id DESC 
+                LIMIT  20) AS T 
+               INNER JOIN topics 
+                       ON T.topic_id = topics.id 
+               INNER JOIN forums 
+                       ON forums.id = topics.forum_id 
+               LEFT OUTER JOIN forumers 
+                            ON forumers.forum_id = forums.id 
+        WHERE forumers.id IS NULL 
+        LIMIT  5 
+    }
   end
 
   def to_s
