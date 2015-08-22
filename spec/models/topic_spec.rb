@@ -29,16 +29,17 @@ describe Topic do
   end
 
   describe ".recent_topics" do
-    before(:each) do
-      5.times do
+    it "returns 5 unique, most recently posted topics" do
+      topics = []
+      6.times do
         topic = create :topic
+        topics << topic
         3.times { create :post, topic: topic }
       end
-    end
-    it "returns 5 unique, most recently posted topics" do
       recent_topics = Topic.recent_topics
-      expect(recent_topics.length).to eq(5)
-      expect(recent_topics.map(&:id).uniq.length).to eq(5)
+      topics.last(5).each do |topic|
+        expect(recent_topics).to include(topic)
+      end
     end
     it "does not return posts from restricted forums" do
       restricted_topic = create :topic, title: "Restricted"

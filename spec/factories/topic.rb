@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :topic do
-    sequence(:title) { |n| "Forum Title #{n}" }
+    sequence(:title) { |n| "Topic Title #{n}" }
     forum
     user
     before(:create) do |topic|
