@@ -36,7 +36,7 @@ module ActiveRecord
         # Rates the object by a given score. A user object can be passed to the method.
         def rate_it( score, user_id )
           return unless score
-          rate = Rate.find_or_create_by_score( score.to_i )
+          rate = Rate.find_or_create_by(score: score.to_i)
           rate.user_id = user_id
           rates << rate
         end
