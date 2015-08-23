@@ -15,7 +15,6 @@
 #  article_id   :integer
 #
 
-require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_rateable', 'init.rb')
 require 'digest/md5'
 
 class DataFile < ActiveRecord::Base
