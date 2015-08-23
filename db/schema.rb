@@ -11,7 +11,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150701233306) do
+ActiveRecord::Schema.define(:version => 20150820223313) do
+
+  create_table "admin_requests", :force => true do |t|
+    t.string   "addr"
+    t.string   "pwd"
+    t.integer  "server_id"
+    t.string   "player"
+    t.integer  "user_id"
+    t.string   "msg"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "admin_requests", ["server_id"], :name => "index_admin_requests_on_server_id"
+  add_index "admin_requests", ["user_id"], :name => "index_admin_requests_on_user_id"
 
   create_table "article_versions", :force => true do |t|
     t.integer  "article_id"
@@ -200,6 +214,16 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
   add_index "data_files", ["directory_id"], :name => "index_data_files_on_directory_id"
   add_index "data_files", ["related_id"], :name => "index_data_files_on_related_id"
 
+  create_table "deleteds", :force => true do |t|
+    t.integer  "deletable_id"
+    t.string   "deletable_type"
+    t.integer  "user_id"
+    t.text     "reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "related_id"
+  end
+
   create_table "directories", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -212,6 +236,21 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
 
   add_index "directories", ["parent_id"], :name => "index_directories_on_parent_id"
 
+  create_table "firms", :force => true do |t|
+    t.string   "name"
+    t.string   "y_code"
+    t.string   "email"
+    t.string   "website"
+    t.string   "phone"
+    t.string   "address"
+    t.integer  "zipcode"
+    t.string   "town"
+    t.integer  "owner"
+    t.string   "opentime"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "forumers", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "group_id"
@@ -219,6 +258,9 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "forumers", ["forum_id"], :name => "index_forumers_on_forum_id"
+  add_index "forumers", ["group_id"], :name => "index_forumers_on_group_id"
 
   create_table "forums", :force => true do |t|
     t.string   "title"
@@ -340,6 +382,44 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
 
   add_index "locks", ["lockable_id", "lockable_type"], :name => "index_locks_on_lockable_id_and_lockable_type"
 
+  create_table "log_events", :force => true do |t|
+    t.string   "name"
+    t.string   "description"
+    t.integer  "team"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "log_files", :force => true do |t|
+    t.string   "name"
+    t.string   "md5"
+    t.integer  "size"
+    t.integer  "server_id"
+    t.datetime "updated_at"
+  end
+
+  add_index "log_files", ["server_id"], :name => "index_log_files_on_server_id"
+
+  create_table "logs", :force => true do |t|
+    t.integer  "server_id"
+    t.text     "text"
+    t.integer  "domain"
+    t.datetime "created_at"
+    t.integer  "round_id"
+    t.string   "details"
+    t.integer  "actor_id"
+    t.integer  "target_id"
+    t.string   "specifics1"
+    t.string   "specifics2"
+    t.integer  "log_file_id"
+  end
+
+  add_index "logs", ["actor_id"], :name => "index_logs_on_actor_id"
+  add_index "logs", ["log_file_id"], :name => "index_logs_on_log_file_id"
+  add_index "logs", ["round_id"], :name => "index_logs_on_round_id"
+  add_index "logs", ["server_id"], :name => "index_logs_on_server_id"
+  add_index "logs", ["target_id"], :name => "index_logs_on_target_id"
+
   create_table "maps", :force => true do |t|
     t.string   "name"
     t.string   "download"
@@ -440,6 +520,13 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
   add_index "movies", ["preview_id"], :name => "index_movies_on_preview_id"
   add_index "movies", ["status"], :name => "index_movies_on_status"
   add_index "movies", ["user_id"], :name => "index_movies_on_user_id"
+
+  create_table "nodes", :force => true do |t|
+    t.string   "name"
+    t.integer  "foreign_key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "options", :force => true do |t|
     t.string   "option"
@@ -583,6 +670,42 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
   add_index "readings", ["user_id", "readable_id", "readable_type"], :name => "index_readings_on_user_id_and_readable_id_and_readable_type"
   add_index "readings", ["user_id"], :name => "index_readings_on_user_id"
 
+  create_table "rounders", :force => true do |t|
+    t.integer "round_id"
+    t.integer "user_id"
+    t.integer "team"
+    t.string  "roles"
+    t.integer "kills"
+    t.integer "deaths"
+    t.string  "name"
+    t.string  "steamid"
+    t.integer "team_id"
+  end
+
+  add_index "rounders", ["round_id"], :name => "index_rounders_on_round_id"
+  add_index "rounders", ["team_id"], :name => "index_rounders_on_team_id"
+  add_index "rounders", ["user_id"], :name => "index_rounders_on_user_id"
+
+  create_table "rounds", :force => true do |t|
+    t.integer  "server_id"
+    t.datetime "start"
+    t.datetime "end"
+    t.integer  "winner"
+    t.integer  "match_id"
+    t.integer  "commander_id"
+    t.integer  "team1_id"
+    t.integer  "team2_id"
+    t.string   "map_name"
+    t.integer  "map_id"
+  end
+
+  add_index "rounds", ["commander_id"], :name => "index_rounds_on_commander_id"
+  add_index "rounds", ["map_id"], :name => "index_rounds_on_map_id"
+  add_index "rounds", ["match_id"], :name => "index_rounds_on_match_id"
+  add_index "rounds", ["server_id"], :name => "index_rounds_on_server_id"
+  add_index "rounds", ["team1_id"], :name => "index_rounds_on_team1_id"
+  add_index "rounds", ["team2_id"], :name => "index_rounds_on_team2_id"
+
   create_table "server_versions", :force => true do |t|
     t.integer  "server_id"
     t.integer  "version"
@@ -637,18 +760,6 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
-
-  create_table "shoutmsg_archive", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "shoutable_type"
-    t.integer  "shoutable_id"
-  end
-
-  add_index "shoutmsg_archive", ["shoutable_type", "shoutable_id"], :name => "index_shoutmsgs_on_shoutable_type_and_shoutable_id"
-  add_index "shoutmsg_archive", ["user_id"], :name => "index_shoutmsgs_on_user_id"
 
   create_table "shoutmsgs", :force => true do |t|
     t.integer  "user_id"
@@ -744,9 +855,13 @@ ActiveRecord::Schema.define(:version => 20150701233306) do
     t.string   "time_zone"
     t.integer  "version"
     t.boolean  "public_email", :default => false, :null => false
+    t.string   "salt"
   end
 
+  add_index "users", ["email"], :name => "index_users_on_email"
+  add_index "users", ["password"], :name => "index_users_on_password"
   add_index "users", ["team_id"], :name => "index_users_on_team_id"
+  add_index "users", ["username"], :name => "index_users_on_username"
 
   create_table "versions", :force => true do |t|
     t.string   "item_type",  :null => false
