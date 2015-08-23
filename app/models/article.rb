@@ -15,8 +15,6 @@
 #  text_coding :integer          default(0), not null
 #
 
-require File.join(Rails.root, 'vendor', 'plugins', 'has_view_count', 'init.rb')
-
 class Article < ActiveRecord::Base
   include Exceptions
   include Extra
