@@ -5,7 +5,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def show
     @user = User.find(params[:id])
-    @steam = SteamId.from_steam_id("STEAM_#{@user.steamid}")
+    @steam = SteamCondenser::Community::SteamId.from_steam_id("STEAM_#{@user.steamid}")
 
     render json: {
       id: @user.id,
