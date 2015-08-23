@@ -118,8 +118,8 @@ Ensl::Application.routes.draw do
   get 'users/forgot'
   get 'users/recover'
   get 'users/agenda'
-  get 'users/logout'
-  get 'users/login'
+  post 'users/logout'
+  post 'users/login'
 
   get 'users/agenda'
   get 'users/login'
