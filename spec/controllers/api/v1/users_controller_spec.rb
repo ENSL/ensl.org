@@ -6,8 +6,8 @@ describe Api::V1::UsersController do
   end
 
   describe '#show' do
-    before do
-      @user = create :user_with_team, :chris
+    before(:each) do
+      @user = create :user, :chris
     end
 
     it 'returns user data' do
@@ -22,6 +22,46 @@ describe Api::V1::UsersController do
       expect(json).to have_key("steam")
       expect(json['steam']).to have_key("url")
       expect(json['steam']).to have_key("nickname")
+      expect(json['bans']['mute']).to eq(false)
+      expect(json['bans']['gather']).to eq(false)
+      expect(json['bans']['site']).to eq(false)
+      expect(json['team']).to be_nil
+    end
+
+    it 'returns 404 if user does not exist' do
+      expect {
+        get :show, id: -1
+      }.to raise_error(ActionController::RoutingError)
+    end
+
+    it 'returns correct ban if user muted' do
+      create :ban, :mute, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['mute']).to eq(true)
+    end
+
+    it 'returns correct ban if user gather banned' do
+      create :ban, :gather, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['gather']).to eq(true)
+    end
+
+    it 'returns correct ban if user site banned' do
+      create :ban, :site, user: @user
+      get :show, id: @user.id
+      expect(response).to be_success
+      expect(json['bans']['site']).to eq(true)
+    end
+
+    it 'returns team information' do
+      @user.destroy
+      @user_with_team = create :user_with_team, :chris
+      get :show, id: @user_with_team.id
+      expect(response).to be_success
+      expect(json['team']['id']).to eq(@user_with_team.team.id)
+      expect(json['team']['name']).to eq(@user_with_team.team.name)
     end
   end
 
@@ -44,7 +84,7 @@ describe Api::V1::UsersController do
 
       user_json = json["users"].first
       nested_team_json = user_json["team"]
-      
+
       expect(user_json).to have_key("username")
       expect(user_json).to have_key("steamid")
       expect(user_json).to have_key("team")

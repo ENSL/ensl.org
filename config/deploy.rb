@@ -9,7 +9,7 @@ set :repo_url, 'https://github.com/ENSL/ensl.org.git'
 set :keep_releases, 10
 
 set :rbenv_type, :user
-set :rbenv_ruby, '2.1.5'
+set :rbenv_ruby, '2.2.2'
 set :bundle_flags, '--quiet'
 set :dotenv_role, [:app, :web]
 
@@ -18,10 +18,10 @@ set :puma_pid, -> { File.join(shared_path, 'tmp', 'pids', 'puma.pid') }
 
 set :writable_dirs, %w{public tmp}
 set :linked_files, %w{.env}
-set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle 
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle
                      public/system public/local public/uploads public/files}
 
-set :normalize_asset_timestamps, %{public/images 
+set :normalize_asset_timestamps, %{public/images
                                    public/javascripts
                                    public/stylesheets}
 
