@@ -32,12 +32,6 @@ class Topic < ActiveRecord::Base
 
   scope :basic, :include => [:latest, { forum: :forumer }, :user]
   scope :ordered, :order => "state DESC, posts.id DESC"
-  scope :recent,
-    :conditions => "forumers.id IS NULL AND posts.id = (SELECT id FROM posts AS P WHERE P.topic_id = topics.id ORDER BY id DESC LIMIT 1)",
-    :order => "posts.id DESC",
-    :group => "topics.id"
-  scope :latest_page,
-    lambda { |page| {:limit => "#{(page-1)*LATEST_PER_PAGE}, #{(page-1)*LATEST_PER_PAGE+LATEST_PER_PAGE}"} }
 
   validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50
@@ -46,6 +40,24 @@ class Topic < ActiveRecord::Base
   after_create :make_post
 
   acts_as_readable
+
+  def self.recent_topics
+    find_by_sql %q{
+      SELECT DISTINCT topics.*
+        FROM  (SELECT id, topic_id
+                FROM   posts
+                ORDER  BY id DESC
+                LIMIT  20) AS T
+               INNER JOIN topics
+                       ON T.topic_id = topics.id
+               INNER JOIN forums
+                       ON forums.id = topics.forum_id
+               LEFT OUTER JOIN forumers
+                            ON forumers.forum_id = forums.id
+        WHERE forumers.id IS NULL
+        LIMIT  5
+    }
+  end
 
   def to_s
     title

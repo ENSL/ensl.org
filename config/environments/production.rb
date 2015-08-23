@@ -61,4 +61,7 @@ Ensl::Application.configure do
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
+
+  # Custom Session Store config to allow gathers.staging.ensl.org
+  # config.session_store :cookie_store, key: '_ENSL_session_key', expire_after: 30.days.to_i, domain: "gathers.ensl.org"
 end
