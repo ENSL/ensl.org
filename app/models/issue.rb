@@ -15,8 +15,6 @@
 #  text_parsed :text
 #
 
-require File.join(Rails.root, 'vendor', 'plugins', 'acts-as-readable', 'init.rb')
-
 class Issue < ActiveRecord::Base
   include Extra
   
