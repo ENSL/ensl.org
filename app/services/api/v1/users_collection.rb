@@ -29,7 +29,8 @@ class Api::V1::UsersCollection < Api::V1::Collection
       users_table[:steamid],
       teams_table[:name],
       teams_table[:tag],
-      teams_table[:logo]
+      teams_table[:logo],
+      users_table[:id]
     ]
   end
 
@@ -45,6 +46,7 @@ class Api::V1::UsersCollection < Api::V1::Collection
   def map_query
     execute_query.map do |row|
       {
+        id: row[5],
         username: row[0],
         steamid: row[1],
         team: {
