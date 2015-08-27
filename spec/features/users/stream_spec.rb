@@ -1,11 +1,11 @@
-require 'spec_helper'
+require "spec_helper"
 
-feature 'User Stream Information' do
+feature "User Stream Information" do
   let(:password) { "foobar" }
   let!(:user) { create :user, raw_password: password }
 
-  feature 'stream administration' do
-    scenario 'user updates their stream' do
+  feature "stream administration" do
+    scenario "user updates their stream" do
       visit user_path(user)
       expect(page).to have_content("No Stream Provided")
       fill_login_form(user, password)
