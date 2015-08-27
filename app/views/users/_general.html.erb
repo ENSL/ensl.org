@@ -15,6 +15,9 @@
         <%= link_to "Search for Steam Account" %>  
       </div>
     </dd>
+    <dt>Stream</dt>
+    <dd><%= @user.profile.stream.blank? ? "No Stream Provided" : @user.profile.stream %></dd>
+    </dd>
   </dl>
 
   <h4>Contact</h4>
