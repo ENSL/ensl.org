@@ -20,6 +20,7 @@ describe Api::V1::UsersController do
       expect(json["time_zone"]).to eq(@user.time_zone)
       expect(json["admin"]).to eq(@user.admin?)
       expect(json).to have_key("steam")
+      expect(json["steam"]).to have_key("id")
       expect(json["steam"]).to have_key("url")
       expect(json["steam"]).to have_key("nickname")
       expect(json["bans"]["mute"]).to eq(false)
@@ -35,6 +36,7 @@ describe Api::V1::UsersController do
       get :show, id: @user.id
 
       expect(response).to be_success
+      expect(json["steam"]["id"]).to_not be_nil
       expect(json["steam"]["url"]).to be_nil
       expect(json["steam"]["nickname"]).to be_nil
     end
