@@ -855,7 +855,6 @@ ActiveRecord::Schema.define(:version => 20150820223313) do
     t.string   "time_zone"
     t.integer  "version"
     t.boolean  "public_email", :default => false, :null => false
-    t.string   "salt"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"
