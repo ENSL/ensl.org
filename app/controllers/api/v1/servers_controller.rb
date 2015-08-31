@@ -6,9 +6,10 @@ class Api::V1::ServersController < Api::V1::BaseController
   private
 
   def active_servers
-    Server.active.map  do |s|
+    Server.active.map do |s|
       {
         id: s.id,
+        name: s.name,
         description: s.description,
         dns: s.dns,
         ip: s.ip,
