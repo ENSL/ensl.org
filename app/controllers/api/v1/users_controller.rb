@@ -15,6 +15,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       avatar: @user.profile.avatar.url,
       admin: @user.admin?,
       steam: {
+        id: @user.steamid,
         url: @steam.nil? ? nil : @steam.base_url,
         nickname: @steam.nil? ? nil : @steam.nickname
       },

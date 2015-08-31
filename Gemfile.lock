@@ -144,7 +144,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.0)
-    newrelic_rpm (3.7.2.195)
+    newrelic_rpm (3.13.0.299)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     oj (2.5.5)
@@ -295,7 +295,7 @@ DEPENDENCIES
   jquery-rails (~> 2.0.2)
   mysql2 (~> 0.3.15)
   neat (~> 1.6.0)
-  newrelic_rpm (~> 3.7.2.195)
+  newrelic_rpm (~> 3.13.0.299)
   nokogiri (~> 1.6.1)
   oj (~> 2.5.5)
   poltergeist (~> 1.6.0)
@@ -320,4 +320,4 @@ DEPENDENCIES
   will_paginate (~> 3.0.5)
 
 BUNDLED WITH
-   1.10.5
+   1.10.6
