@@ -41,8 +41,15 @@ class Topic < ActiveRecord::Base
 
   acts_as_readable
 
-  def self.recent_topics
-    find_by_sql %q{
+  def self.recent_topics user=nil
+    constraint = ""
+
+    if user && user.groups.any?
+      forumer_ids = user.groups.map(&:forumers).flatten.map(&:id)
+      constraint = "OR forumers.id IN (#{forumer_ids.join(",")})" unless forumer_ids.empty?
+    end
+
+    find_by_sql %Q(
       SELECT DISTINCT topics.*
         FROM  (SELECT id, topic_id
                 FROM   posts
@@ -54,9 +61,9 @@ class Topic < ActiveRecord::Base
                        ON forums.id = topics.forum_id
                LEFT OUTER JOIN forumers
                             ON forumers.forum_id = forums.id
-        WHERE forumers.id IS NULL
+        WHERE forumers.id IS NULL #{constraint} 
         LIMIT  5
-    }
+    )
   end
 
   def to_s
