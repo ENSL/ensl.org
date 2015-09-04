@@ -44,7 +44,7 @@ class Topic < ActiveRecord::Base
   def self.recent_topics(user=nil)
     if user && user.groups.any?
       forumer_ids = user.groups.map(&:forumers).flatten.map(&:id)
-      constraint = "OR forumers.id IN (#{forumer_ids.join(",")})" if forumer_ids.any?
+      constraint = "OR forumers.id IN (#{forumer_ids.join(',')})" if forumer_ids.any?
     end
 
     find_by_sql %(
