@@ -48,18 +48,18 @@ describe Topic do
       expect(Topic.recent_topics).to_not include(restricted_topic)
     end
     describe "with privileged forum access" do
-      it "does not return posts in restriected forums if user is not a group member" do
+      it "does not return posts in restriected forums if user not member" do
         restricted_topic = create :topic, title: "Restricted"
         create :forumer, forum: restricted_topic.forum
         create :post, topic: restricted_topic
-        expect(Topic.recent_topics(user)).to_not include(restricted_topic) 
+        expect(Topic.recent_topics(user)).to_not include(restricted_topic)
       end
       it "return posts in restricted forums if user is a group member" do
         restricted_topic = create :topic, title: "Restricted"
         forumer = create :forumer, forum: restricted_topic.forum
         create :grouper, user: user, group: forumer.group
-        post = create :post, topic: restricted_topic
-        expect(Topic.recent_topics(user)).to include(restricted_topic) 
+        create :post, topic: restricted_topic
+        expect(Topic.recent_topics(user)).to include(restricted_topic)
       end
     end
   end
