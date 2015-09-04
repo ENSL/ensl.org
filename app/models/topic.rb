@@ -59,7 +59,7 @@ class Topic < ActiveRecord::Base
                        ON forums.id = topics.forum_id
                LEFT OUTER JOIN forumers
                             ON forumers.forum_id = forums.id
-        WHERE forumers.id IS NULL #{constraint ||= ""} 
+        WHERE forumers.id IS NULL #{constraint ||= ''}
         LIMIT  5
     )
   end
