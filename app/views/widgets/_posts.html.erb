@@ -4,7 +4,7 @@
   <div class="widget-content-wrapper">
     <div class="separator">Latest forum posts</div>
     <ol>
-      <% Topic.recent_topics.each do |topic| %>
+      <% Topic.recent_topics(cuser).each do |topic| %>
         <li>
           <%= link_to shorten(topic, 28), lastpost(topic) %>
         </li>
