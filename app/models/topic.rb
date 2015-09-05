@@ -43,7 +43,7 @@ class Topic < ActiveRecord::Base
 
   def self.recent_topics
     find_by_sql %q{
-      SELECT topics.*
+      SELECT DISTINCT topics.*
         FROM  (SELECT max(id) as max_id, topic_id
                 FROM   posts
                 GROUP  BY topic_id
