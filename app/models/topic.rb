@@ -43,11 +43,12 @@ class Topic < ActiveRecord::Base
 
   def self.recent_topics
     find_by_sql %q{
-      SELECT DISTINCT topics.*
-        FROM  (SELECT id, topic_id
+      SELECT topics.*
+        FROM  (SELECT max(id) as max_id, topic_id
                 FROM   posts
-                ORDER  BY id DESC
-                LIMIT  20) AS T
+                GROUP  BY topic_id
+                ORDER  BY max_id DESC
+                LIMIT  10) AS T
                INNER JOIN topics
                        ON T.topic_id = topics.id
                INNER JOIN forums
