@@ -31,7 +31,7 @@ describe Topic do
   describe ".recent_topics" do
     it "returns 5 unique, most recently posted topics" do
       topics = []
-      6.times do
+      10.times do
         topic = create :topic
         topics << topic
         3.times { create :post, topic: topic }
