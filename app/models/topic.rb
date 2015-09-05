@@ -48,7 +48,7 @@ class Topic < ActiveRecord::Base
                 FROM   posts
                 GROUP  BY topic_id
                 ORDER  BY max_id DESC
-                LIMIT  10) AS T
+                LIMIT  200) AS T
                INNER JOIN topics
                        ON T.topic_id = topics.id
                INNER JOIN forums
