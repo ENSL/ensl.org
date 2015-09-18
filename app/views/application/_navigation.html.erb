@@ -25,14 +25,19 @@
         </ul>
       </li>
       <li class="dropdown">
-        <%= active_link_to Gather.last, class: 'gathers' do %>
+        <%= link_to gathers_url, class: 'gathers', target: "_blank" do %>
           Gathers 
-          <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
+          <span class="count" id="gathercount"></span>
         <% end %>
-        
         <ul>
           <li><%= link_to "Introduction", article_url(464) %></li>
           <li><%= link_to "Archives", "/gathers/" %></li>
+          <li>
+            <%= active_link_to Gather.last, class: 'gathers' do %>
+              Fallback
+              <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
+            <% end %>
+          </li>
         </ul>
       </li>
       <li class="dropdown icon">
@@ -73,3 +78,14 @@
     </ul>
   </div>
 </nav>
+<script>
+$(function () {
+  $.ajax({
+    datatype: "json",
+    url: "<%= gathers_url %>/gathers/current", 
+    success: function (data) {
+      $("#gathercount").html(data.gatherers.length + "/12");
+    }
+  });
+});
+</script>
