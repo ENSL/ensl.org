@@ -143,6 +143,10 @@
     <% end %>
   </div>
 
+  <h4 class="fancy add-top">
+    Gathers have moved to <%= link_to "gathers.ensl.org", gathers_url, target: "_blank" %>. This app is just a fallback in case something goes wrong
+  </h4>
+
   <% if @gather and @gather.status != Gather::STATE_FINISHED %>
     <div id="gather-info">
       <div class="info">

@@ -189,4 +189,12 @@ module ApplicationHelper
   def latest_rules
     article_path(Article::RULES)
   end
+
+  def gathers_url
+    if Rails.env.production?
+      "http://gathers.ensl.org"
+    else
+      "http://gathers.staging.ensl.org"
+    end
+  end
 end
