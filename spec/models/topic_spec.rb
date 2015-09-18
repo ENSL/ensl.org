@@ -32,9 +32,8 @@ describe Topic do
     it "returns 5 unique, most recently posted topics" do
       topics = []
       10.times do
-        topic = create :topic
-        topics << topic
-        3.times { create :post, topic: topic }
+        topic = create :topic, first_post: "Foo"
+        topics.push(topic)
       end
       recent_topics = Topic.recent_topics
       topics.last(5).each do |topic|
