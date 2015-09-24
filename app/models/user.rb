@@ -243,13 +243,14 @@ class User < ActiveRecord::Base
   end
 
   def validate_steamid
-    if !(self.steamid.nil? || (m = self.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/) and accid = (m[3].to_i<<1)+m[2].to_i and accid > 0 and accid <= 4294967295))
-      errors.add :steamid
-    end
+    errors.add :steamid unless self.steamid.nil? ||
+      (m = self.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
+      (id = m[3].to_i) &&
+      id >= 1 && id <= 2147483647
   end
 
   def correct_steamid_universe
-    if self.steamid
+    if self.steamid.present?
       self.steamid[0] = "0"
     end
   end
