@@ -5,7 +5,9 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def show
     @user = User.find(params[:id])
-    @steam = steam_profile @user
+    if @user.steamid.present?
+      @steam = steam_profile @user
+    end
 
     render json: {
       id: @user.id,
