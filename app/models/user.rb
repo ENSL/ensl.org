@@ -100,7 +100,8 @@ class User < ActiveRecord::Base
   scope :idle,
     :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
 
-  validates_uniqueness_of :username, :email, :steamid
+  validates_uniqueness_of :username, :email
+  validates_uniqueness_of :steamid, :allow_nil => true
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
   validates_length_of :lastname, :in => 1..25, :allow_blank => true
   validates_length_of :username, :in => 2..20
@@ -108,14 +109,17 @@ class User < ActiveRecord::Base
     validates_presence_of :raw_password, :on => :create
   validates_length_of :email, :maximum => 50
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_length_of :steamid, :maximum => 30
-  validates_format_of :steamid, :with => /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/
+  validates_length_of :steamid, :maximum => 14
+  validates :steamid, presence: true, on: :create
+  validate :validate_steamid
     validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
   validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
   validate :validate_team
 
   before_create :init_variables
   before_validation :update_password
+
+  before_save :correct_steamid_universe
 
   accepts_nested_attributes_for :profile
 
@@ -236,6 +240,18 @@ class User < ActiveRecord::Base
 
   def unread_issues
     issues.unread_by(self)
+  end
+
+  def validate_steamid
+    if !(self.steamid.nil? || (m = self.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/) and accid = (m[3].to_i<<1)+m[2].to_i and accid > 0 and accid <= 4294967295))
+      errors.add :steamid
+    end
+  end
+
+  def correct_steamid_universe
+    if self.steamid
+      self.steamid[0] = "0"
+    end
   end
 
   def validate_team
