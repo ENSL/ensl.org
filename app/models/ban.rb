@@ -33,14 +33,13 @@ class Ban < ActiveRecord::Base
   scope :effective, conditions: "expiry > UTC_TIMESTAMP()"
   scope :ineffective, conditions: "expiry < UTC_TIMESTAMP()"
 
+  before_validation :check_user
+
   validate :validate_type
   validate :validate_ventban
-  validates_length_of :steamid, maximum: 14, allow_blank: true
-  validates_format_of :steamid, with: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
-  validates_format_of :addr, with: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
-  validates_length_of :reason, maximum: 255, allow_nil: true, allow_blank: true
-
-  before_validation :check_user
+  validates :steamid, length: {maximum: 14}, format: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
+  validates :addr, format: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
+  validates :reason, length: {maximum: 255}, allow_blank: true
 
   belongs_to :user
   belongs_to :server
