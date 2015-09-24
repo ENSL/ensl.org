@@ -52,6 +52,15 @@ feature 'Visitor signs up', js: :true do
     expect(page).to have_content(error_message('steamid.invalid'))
   end
 
+  scenario 'with nil Steam ID' do
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge({ steamid: nil }))
+      click_button submit(:user, :create)
+    end
+
+    expect(page).to have_content(error_message('steamid.invalid'))
+  end
+
   def sign_up_attributes
     [:username, :email, :raw_password, :steamid]
   end
