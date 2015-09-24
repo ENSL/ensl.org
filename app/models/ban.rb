@@ -35,7 +35,8 @@ class Ban < ActiveRecord::Base
 
   validate :validate_type
   validate :validate_ventban
-  validates_format_of :steamid, with: /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/, allow_blank: true
+  validates_length_of :steamid, maximum: 14, allow_blank: true
+  validates_format_of :steamid, with: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
   validates_format_of :addr, with: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
   validates_length_of :reason, maximum: 255, allow_nil: true, allow_blank: true
 
