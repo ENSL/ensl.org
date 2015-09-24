@@ -100,24 +100,20 @@ class User < ActiveRecord::Base
   scope :idle,
     :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
 
-  validates_uniqueness_of :username, :email
-  validates_uniqueness_of :steamid, :allow_nil => true
-  validates_length_of :firstname, :in => 1..15, :allow_blank => true
-  validates_length_of :lastname, :in => 1..25, :allow_blank => true
-  validates_length_of :username, :in => 2..20
-  validates_format_of :username, :with => /\A[A-Za-z0-9_\-\+]{2,20}\Z/
-    validates_presence_of :raw_password, :on => :create
-  validates_length_of :email, :maximum => 50
-  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_length_of :steamid, :maximum => 14
-  validates :steamid, presence: true, on: :create
+  before_validation :update_password
+
+  validates :username, uniqueness: true, length: {in: 2..20}, format: /\A[A-Za-z0-9_\-\+]{2,20}\Z/
+  validates :firstname, length: {in: 1..15}, allow_blank: true
+  validates :lastname, length: {in: 1..25}, allow_blank: true
+  validates :raw_password, presence: {on: :create}
+  validates :email, uniqueness: true, length: {maximum: 50}, format: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+  validates :steamid, uniqueness: {allow_nil: true}, length: {maximum: 14}, presence: {on: :create}
   validate :validate_steamid
-    validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
-  validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
+  validates :time_zone, length: {maximum: 100}, allow_blank: true
+  validates :public_email, inclusion: [true, false], allow_nil: true
   validate :validate_team
 
   before_create :init_variables
-  before_validation :update_password
 
   before_save :correct_steamid_universe
 
@@ -243,15 +239,16 @@ class User < ActiveRecord::Base
   end
 
   def validate_steamid
-    errors.add :steamid unless self.steamid.nil? ||
-      (m = self.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
+    errors.add :steamid unless
+	  steamid.nil? ||
+      (m = steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
       (id = m[3].to_i) &&
       id >= 1 && id <= 2147483647
   end
 
   def correct_steamid_universe
-    if self.steamid.present?
-      self.steamid[0] = "0"
+    if steamid.present?
+      steamid[0] = "0"
     end
   end
 
