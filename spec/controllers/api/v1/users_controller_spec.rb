@@ -29,16 +29,14 @@ describe Api::V1::UsersController do
       expect(json["team"]).to be_nil
     end
 
-    it "returns data for users with invalid steam ids" do
-      @user.steamid = "0:0:000"
+    it "returns nulled steam data for users who had invalid steam ids" do
+      @user.steamid = nil
       @user.save!
 
       get :show, id: @user.id
 
       expect(response).to be_success
-      expect(json["steam"]["id"]).to_not be_nil
-      expect(json["steam"]["url"]).to be_nil
-      expect(json["steam"]["nickname"]).to be_nil
+      expect(json["steam"]).to be_nil
     end
 
     it "returns 404 if user does not exist" do
