@@ -19,4 +19,9 @@ FactoryGirl.define do
   	name "Donors"
   	id Group::DONORS
   end
+
+  trait :gather_moderator do
+    name "Gather Moderator"
+    id Group::GATHER_MODERATORS
+  end
 end
