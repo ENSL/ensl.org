@@ -19,6 +19,7 @@ describe Api::V1::UsersController do
       expect(json["country"]).to eq(@user.country)
       expect(json["time_zone"]).to eq(@user.time_zone)
       expect(json["admin"]).to eq(@user.admin?)
+      expect(json["moderator"]).to eq(@user.gather_moderator?)
       expect(json).to have_key("steam")
       expect(json["steam"]).to have_key("id")
       expect(json["steam"]).to have_key("url")
@@ -37,6 +38,13 @@ describe Api::V1::UsersController do
 
       expect(response).to be_success
       expect(json["steam"]).to be_nil
+    end
+
+    it "returns gather moderator status" do
+      group = create :group, :gather_moderator
+      create :grouper, user: @user, group: group
+      get :show, id: @user.id
+      expect(json["moderator"]).to eq(true)
     end
 
     it "returns 404 if user does not exist" do
