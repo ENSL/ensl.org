@@ -48,4 +48,16 @@ describe User do
       expect(user.banned? Ban::TYPE_MUTE).to be_truthy
     end
   end
+
+  describe "#gather_moderator?" do
+    let!(:group) { create :group, :gather_moderator }
+
+    it "returns true if gather moderator" do
+      create :grouper, group: group, user: user
+      expect(user.gather_moderator?).to eq(true)
+    end
+    it "returns false if not gather moderator" do
+      expect(user.gather_moderator?).to eq(false)
+    end
+  end
 end

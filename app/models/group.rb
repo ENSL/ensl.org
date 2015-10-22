@@ -21,6 +21,7 @@ class Group < ActiveRecord::Base
   CHAMPIONS = 7
   PREDICTORS = 8
   STAFF = 10
+  GATHER_MODERATORS = 14
 
   attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
