@@ -205,6 +205,10 @@ class User < ActiveRecord::Base
     groups.exists? :id => Group::CASTERS
   end
 
+  def gather_moderator?
+    groups.exists? id: Group::GATHER_MODERATORS
+  end
+
   def verified?
     #		created_at < DateTime.now.ago(VERIFICATION_TIME)
     true
