@@ -1,2 +1,2 @@
 ruby:
-  config/styles/ruby.yml
+  config_file: config/styles/ruby.yml
