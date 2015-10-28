@@ -4,20 +4,32 @@
   <dl>
     <dt>Age</dt>
     <dd><%= @user.age %></dd>
-    <dt>Country</dt>
-    <dd><%= @user.country %></dd>
-    <dt>Town</dt>
-    <dd><%= @user.profile.town %></dd>
-    <dt>SteamID</dt>
-    <dd>
-      <p><%= @user.steamid %></p>
-      <div id="steam-search" data-user-id="<%= @user.id %>">
-        <%= link_to "Search for Steam Account" %>  
-      </div>
-    </dd>
-    <dt>Stream</dt>
-    <dd><%= @user.profile.stream.blank? ? "No Stream Provided" : @user.profile.stream %></dd>
-    </dd>
+
+    <% if !@user.country.blank? %>
+      <dt>Country</dt>
+      <dd><%= @user.country %></dd>
+    <% end %>
+
+    <% if !@user.profile.town.blank? %>
+      <dt>Town</dt>
+      <dd><%= @user.profile.town %></dd>
+    <% end %>
+
+    <% if !@user.steamid.blank? %>
+      <dt>SteamID</dt>
+      <dd>
+        <p><%= @user.steamid %></p>
+        <div id="steam-search" data-user-id="<%= @user.id %>">
+          <%= link_to "Search for Steam Account" %>  
+        </div>
+      </dd>
+    <% end %>
+
+    <% if !@user.profile.stream.blank? %>
+      <dt>Stream</dt>
+      <dd><%= @user.profile.stream %></dd>
+      </dd>
+    <% end %>
   </dl>
 
   <h4>Contact</h4>
