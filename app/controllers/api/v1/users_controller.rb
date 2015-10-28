@@ -4,7 +4,19 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def show
-    @user = User.find(params[:id])
+    if params[:format].nil? || params[:format] == "id"
+      @user = User.find(params[:id])
+    elsif params[:format] == "steamid"
+      steamid_i = params[:id].to_i
+      @user = User.first(conditions: { steamid: format("0:%d:%d", steamid_i % 2, steamid_i >> 1) })
+    elsif params[:format] == "steamidstr"
+      @user = User.first(conditions: { steamid: params[:id] })
+    end
+
+    if @user.nil?
+      raise ActionController::RoutingError.new("User Not Found")
+    end
+
     if @user.steamid.present?
       @steam = steam_profile @user
     end
@@ -16,6 +28,8 @@ class Api::V1::UsersController < Api::V1::BaseController
       time_zone: @user.time_zone,
       avatar: @user.profile.avatar.url,
       admin: @user.admin?,
+      referee: @user.ref?,
+      caster: @user.caster?,
       moderator: @user.gather_moderator?,
       steam: @user.steamid.nil? ? nil : {
         id: @user.steamid,
@@ -30,7 +44,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       team: @user.team.present? ? { id: @user.team.id, name: @user.team.name } : nil
     }
   rescue ActiveRecord::RecordNotFound
-    raise ActionController::RoutingError.new('User Not Found')
+    raise ActionController::RoutingError.new("User Not Found")
   end
 
   private
