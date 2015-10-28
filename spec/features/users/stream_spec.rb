@@ -7,7 +7,7 @@ feature "User Stream Information" do
   feature "stream administration" do
     scenario "user updates their stream" do
       visit user_path(user)
-      expect(page).to have_content("No Stream Provided")
+      expect(page.html).to_not include("<dt>Stream</dt>")
       fill_login_form(user, password)
       click_button submit(:user, :login)
       visit edit_user_path(user)
@@ -17,6 +17,7 @@ feature "User Stream Information" do
       click_button "Update Profile"
       expect(page).to have_content(I18n.t(:users_update))
       visit user_path(user)
+      expect(page.html).to include("<dt>Stream</dt>")
       expect(page).to have_content(stream_url)
     end
   end
