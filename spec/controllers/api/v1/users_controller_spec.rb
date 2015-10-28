@@ -10,16 +10,15 @@ describe Api::V1::UsersController do
       @user = create :user, :chris
     end
 
-    it "returns user data" do
-      get :show, id: @user.id
-
-      expect(response).to be_success
-      expect(json["id"]).to eq(@user.id)
-      expect(json["username"]).to eq(@user.username)
-      expect(json["country"]).to eq(@user.country)
-      expect(json["time_zone"]).to eq(@user.time_zone)
-      expect(json["admin"]).to eq(@user.admin?)
-      expect(json["moderator"]).to eq(@user.gather_moderator?)
+    def user_expectation(json, user)
+      expect(json["id"]).to eq(user.id)
+      expect(json["username"]).to eq(user.username)
+      expect(json["country"]).to eq(user.country)
+      expect(json["time_zone"]).to eq(user.time_zone)
+      expect(json["admin"]).to eq(user.admin?)
+      expect(json["referee"]).to eq(user.ref?)
+      expect(json["caster"]).to eq(user.caster?)
+      expect(json["moderator"]).to eq(user.gather_moderator?)
       expect(json).to have_key("steam")
       expect(json["steam"]).to have_key("id")
       expect(json["steam"]).to have_key("url")
@@ -28,6 +27,37 @@ describe Api::V1::UsersController do
       expect(json["bans"]["gather"]).to eq(false)
       expect(json["bans"]["site"]).to eq(false)
       expect(json["team"]).to be_nil
+    end
+
+    it "returns user data" do
+      get :show, id: @user.id
+
+      expect(response).to be_success
+      user_expectation(json, @user)
+    end
+
+    it "returns user data for query with id specified as format" do
+      get :show, id: @user.id, format: "id"
+
+      expect(response).to be_success
+      user_expectation(json, @user)
+    end
+
+    it "returns user data for a numeric steamid query" do
+      m = @user.steamid.match(/\A0:([01]):(\d{1,10})\Z/)
+      steamid = (m[2].to_i << 1) + m[1].to_i
+
+      get :show, id: steamid, format: "steamid"
+
+      expect(response).to be_success
+      user_expectation(json, @user)
+    end
+
+    it "returns user data for a string steamid query" do
+      get :show, id: @user.steamid, format: "steamidstr"
+
+      expect(response).to be_success
+      user_expectation(json, @user)
     end
 
     it "returns nulled steam data for users who had invalid steam ids" do
