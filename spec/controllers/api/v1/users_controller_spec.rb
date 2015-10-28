@@ -11,7 +11,6 @@ describe Api::V1::UsersController do
     end
 
     def user_expectation(json, user)
-      expect(response).to be_success
       expect(json["id"]).to eq(user.id)
       expect(json["username"]).to eq(user.username)
       expect(json["country"]).to eq(user.country)
