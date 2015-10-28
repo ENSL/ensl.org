@@ -15,13 +15,15 @@
       <dd><%= @user.profile.town %></dd>
     <% end %>
 
-    <dt>SteamID</dt>
-    <dd>
-      <p><%= @user.steamid %></p>
-      <div id="steam-search" data-user-id="<%= @user.id %>">
-        <%= link_to "Search for Steam Account" %>  
-      </div>
-    </dd>
+    <% if !@user.steamid.blank? %>
+      <dt>SteamID</dt>
+      <dd>
+        <p><%= @user.steamid %></p>
+        <div id="steam-search" data-user-id="<%= @user.id %>">
+          <%= link_to "Search for Steam Account" %>  
+        </div>
+      </dd>
+    <% end %>
 
     <% if !@user.profile.stream.blank? %>
       <dt>Stream</dt>
