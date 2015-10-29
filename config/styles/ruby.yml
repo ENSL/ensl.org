@@ -13,14 +13,6 @@ Style/CollectionMethods:
     find: detect
     find_all: select
     reduce: inject
-Style/DotPosition:
-  Description: Checks the position of the dot in multi-line method calls.
-  StyleGuide: https://github.com/bbatsov/ruby-style-guide#consistent-multi-line-chains
-  Enabled: true
-  EnforcedStyle: trailing
-  SupportedStyles:
-  - leading
-  - trailing
 Style/FileName:
   Description: Use snake_case for source file names.
   StyleGuide: https://github.com/bbatsov/ruby-style-guide#snake-case-files
