@@ -1,20 +1,21 @@
-ENV["RAILS_ENV"] ||= 'test'
+ENV["RAILS_ENV"] ||= "test"
 
-require 'codeclimate-test-reporter'
-require 'simplecov'
+require "codeclimate-test-reporter"
+require "simplecov"
 CodeClimate::TestReporter.start
-SimpleCov.start 'rails'
+SimpleCov.start "rails"
 
 require File.expand_path("../../config/environment", __FILE__)
-require 'rspec/rails'
-require 'capybara/rspec'
-require 'capybara/poltergeist'
+require "rspec/rails"
+require "capybara/rspec"
+require "capybara/poltergeist"
 
 Capybara.default_wait_time = 5
 Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app,
+  Capybara::Poltergeist::Driver.new(
+    app,
     timeout: 30,
-    phantomjs_logger: File.open('/dev/null')
+    phantomjs_logger: File.open("/dev/null")
   )
 end
 
@@ -30,16 +31,16 @@ RSpec.configure do |config|
   config.include Features::SessionHelpers, type: :feature
 
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  config.order = 'random'
+  config.order = "random"
   config.use_transactional_fixtures = false
   config.color = true
   config.formatter = :documentation
   config.infer_spec_type_from_file_location!
 
   config.before(:each) do
-    events_list_json = JSON.parse(File.read(Rails.root.join('spec/fixtures/google_calendar.json')))
+    events_list_json = JSON.parse(File.read(Rails.root.join("spec/fixtures/google_calendar.json")))
 
-    GoogleCalendar::Request.stub(:events_list) do
+    allow(GoogleCalendar::Request).to receive(:events_list) do
       GoogleCalendar::EventList.new(events_list_json, Time.zone.name)
     end
   end
