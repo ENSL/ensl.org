@@ -1,63 +1,60 @@
 module Verification
-	def Verification.verify input
-		md5 = Digest::MD5.hexdigest("9WvcZ9hX" + input + "KF7L4luQ").upcase.split(//)
-		chars = ["A", "B", "C", "D", "E", "F"]
-		nums = []
-		lastPos = md5[31].to_i
-		result = ""
+  def self.verify(input)
+    md5 = Digest::MD5.hexdigest("9WvcZ9hX" + input + "KF7L4luQ").upcase.split(//)
+    chars = %w[A B C D E F]
+    nums = []
+    last_pos = md5[31].to_i
+    result = ""
 
-		for i in 0..9
-			pos = md5[i].to_i
+    (0..9).each do |i|
+      pos = md5[i].to_i
 
-			if pos == 0
-				pos = lastPos ** (i % 4)
-			elsif (pos % 4) == 0
-				pos = pos * lastPos + i
-			elsif (pos % 3) == 0
-				pos = pos ** (i % 4)
-			elsif (pos % 2) == 0
-				pos = pos * i + pos
-			end
+      if pos == 0
+        pos = last_pos**(i % 4)
+      elsif (pos % 4) == 0
+        pos = pos * last_pos + i
+      elsif (pos % 3) == 0
+        pos **= (i % 4)
+      elsif pos.even?
+        pos = pos * i + pos
+      end
 
-			pos = (pos > 31) ? (pos % 32) : pos
-			curChar = md5[31 - pos]
-			curNum = curChar.to_i
+      pos = (pos > 31) ? (pos % 32) : pos
+      cur_char = md5[31 - pos]
+      cur_num = cur_char.to_i
 
-			if nums.include? curNum
-				if curNum == 0
-					curChar = chars[pos % 6]
-				else
-					curChar = (pos % 10).to_s
-				end
-				curNum = curChar.to_i
-			end
+      if nums.include? cur_num
+        if cur_num == 0
+          cur_char = chars[pos % 6]
+        else
+          cur_char = (pos % 10).to_s
+        end
+        cur_num = cur_char.to_i
+      end
 
-			nums << curNum
-			result << curChar
-			lastPos = pos
-		end
+      nums << cur_num
+      result << cur_char
+      last_pos = pos
+    end
 
-		return result
-	end
+    result
+  end
 
-	def Verification.uncrap str
-		str.to_s.gsub(/[^A-Za-z0-9_\-]/, "")
-	end
+  def self.uncrap(str)
+    str.to_s.gsub(/[^A-Za-z0-9_\-]/, "")
+  end
 
-	def Verification.random_string len
-		chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
-		str = ""
-		1.upto(len) do |i|
-			str << chars[rand(chars.size-1)]
-		end
-		return str
-	end
+  def self.random_string(len)
+    chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
+    str = ""
+    1.upto(len) do
+      str << chars[rand(chars.size - 1)]
+    end
+    str
+  end
 
   # TODO: rikki?
-	def Verification.contain params, filter
-		(params.instance_of?(Array) ? params : params.keys).each do |key|
-			return false unless filter.include? key.to_sym
-		end
-		return true
-	end
+  def self.contain(params, filter)
+    params.instance_of?(Array) ? (filter - params).empty? : filter.all? { |s| params.key? s }
+  end
 end
