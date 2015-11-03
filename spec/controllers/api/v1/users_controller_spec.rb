@@ -78,9 +78,23 @@ describe Api::V1::UsersController do
     end
 
     it "returns 404 if user does not exist" do
-      expect {
-        get :show, id: -1
-      }.to raise_error(ActionController::RoutingError)
+      expect { get :show, id: -1 }.to raise_error(ActionController::RoutingError)
+    end
+
+    it "returns 404 if user does not exist by steamid" do
+      expect { get :show, id: -1, format: "steamid" }.to raise_error(ActionController::RoutingError)
+    end
+
+    it "queries the steam condenser for an invalid steamid" do
+      @user.update_attribute(:steamid, "0:0:0")
+
+      get :show, id: @user.id
+
+      expect(response).to be_success
+      expect(json["steam"]).to_not be_nil
+      expect(json["steam"]["id"]).to eq(@user.steamid)
+      expect(json["steam"]["url"]).to be_nil
+      expect(json["steam"]["nickname"]).to be_nil
     end
 
     it "returns correct ban if user muted" do
