@@ -116,9 +116,9 @@ class Match < ActiveRecord::Base
         group: "month",
         order: "month_n"
 
-  validates_presence_of :contester1, :contester2, :contest
-  validates_format_of [:score1, :score2], with: /\A[0-9]\z/, allow_nil: true
-  validates_length_of :report, maximum: 64_000, allow_blank: true
+  validates :contester1, :contester2, :contest, presence: true
+  validates :score1, :score2, format: /\A[0-9]\z/, allow_nil: true
+  validates :report, length: { maximum: 64_000 }, allow_blank: true
 
   before_create :set_hltv
   after_create :send_notifications
@@ -193,7 +193,7 @@ class Match < ActiveRecord::Base
   end
 
   def send_notifications
-    Profile.all(include: :user, conditions: "notify_any_match = 1").each do |p|
+    Profile.all(include: :user, conditions: "notify_any_match = 1").find_each do |p|
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|
@@ -288,8 +288,8 @@ class Match < ActiveRecord::Base
   end
 
   def hltv_record(addr, pwd)
-    if (match_time - MATCH_LENGTH * 10) > DateTime.now ||
-       (match_time + MATCH_LENGTH * 10) < DateTime.now
+    if (match_time - MATCH_LENGTH * 10) > DateTime.now.utc ||
+       (match_time + MATCH_LENGTH * 10) < DateTime.now.utc
       raise Error, I18n.t(:hltv_request_20)
     end
     if hltv && hltv.recording
