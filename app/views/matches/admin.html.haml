@@ -34,7 +34,7 @@
           - elsif match.can_update?(cuser, {:caster_id => cuser.id})
             = form_for match do |f|
               - if cuser.admin?
-                = f.collection_select :caster_id, Group.casters, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
+                = f.collection_select :caster_id, User.casters, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
               - else
                 = f.hidden_field :caster_id, {:value => cuser.id}
                 = link_to "Take!", "#form_submit"
