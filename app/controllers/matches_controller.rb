@@ -24,12 +24,6 @@ class MatchesController < ApplicationController
   def extra
   end
 
-  def score
-    raise AccessError unless @match.can_update? cuser, [:matchers_attributes]
-    @contester = @match.contester1.team.is_leader?(cuser) ? @match.contester1 : @match.contester2
-    @n = 0
-  end
-
   def ref
     raise AccessError unless @match.can_update? cuser, [:report]
     @n = 0
