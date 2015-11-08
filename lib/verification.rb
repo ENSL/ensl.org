@@ -54,8 +54,9 @@ module Verification
   end
 
   # TODO: rikki?
-  # Returns true if params (or its keys) are a subset of filter
+  # Returns true if params (or its keys if a hash) are a subset of filter
   def self.contain(params, filter)
-    ((params.instance_of?(Array) ? params : params.keys) - filter).empty?
+    keys = (params.instance_of?(Array) ? params : params.keys).map { |k| k.to_sym }
+    (keys - filter).empty?
   end
 end
