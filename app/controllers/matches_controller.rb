@@ -17,8 +17,8 @@ class MatchesController < ApplicationController
   end
 
   def admin
-    @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee).
-               all.group_by { |t| t.week.to_s }.to_a.reverse
+    @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee)
+               .all.group_by { |t| t.week.to_s }.to_a.reverse
     render layout: "full"
   end
 
