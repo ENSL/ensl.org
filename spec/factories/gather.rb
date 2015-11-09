@@ -4,10 +4,10 @@ FactoryGirl.define do
   end
 
   trait :running do
-  	status Gather::STATE_RUNNING
+    status Gather::STATE_RUNNING
   end
 
   trait :picking do
-  	status Gather::STATE_PICKING
+    status Gather::STATE_PICKING
   end
 end
