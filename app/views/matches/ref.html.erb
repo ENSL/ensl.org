@@ -16,33 +16,25 @@
   <div class="lineups">
     <h3>Lineups</h3>
 
-    <div class="team-1">
-      <%= form_for @match do |f| %>
-        <%= f.error_messages %>
+    <%= form_for @match do |f| %>
+      <%= f.error_messages %>
 
-        <div class="controls">
-          <%= f.submit 'Save Lineup' %>  
-        </div>
-
+      <div class="team-1">
         <% [@match.contester1].each do |contester| %>
-            <%= render partial: "lineup", locals: { contester: contester } %>
+          <%= render partial: "lineup", locals: { contester: contester } %>
         <% end %>
-      <% end %>
-    </div>
-
-    <div class="team-2">
-      <%= form_for @match do |f| %>
-        <%= f.error_messages %>
-
-        <div class="controls">
-          <%= f.submit 'Save Lineup' %>  
-        </div>
-
+      </div>
+      
+      <div class="team-2">
         <% [@match.contester2].each do |contester| %>
-            <%= render partial: "lineup", locals: { contester: contester } %>
+          <%= render partial: "lineup", locals: { contester: contester } %>
         <% end %>
-      <% end %>
-    </div>
+      </div>
+      
+      <div class="controls">
+        <%= f.submit 'Save Lineups' %>
+      </div>
+    <% end %>
   </div>
 
   <div class="scoring">
@@ -83,7 +75,7 @@
       </div>
 
       <div class="controls">
-        <%= f.submit 'Save Scores' %>
+        <%= f.submit 'Save Scoring' %>
       </div>
     <% end %>
   </div>
