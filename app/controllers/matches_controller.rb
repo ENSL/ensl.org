@@ -6,7 +6,7 @@ class MatchesController < ApplicationController
   end
 
   def show
-    @ownpred = @match.predictions.first conditions: {user_id: cuser.id} if cuser
+    @ownpred = @match.predictions.first conditions: { user_id: cuser.id } if cuser
     @newpred = @match.predictions.build
   end
 
@@ -17,8 +17,9 @@ class MatchesController < ApplicationController
   end
 
   def admin
-    @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee).all.group_by {|t| t.week.to_s }.to_a.reverse
-    render :layout => "full"
+    @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee)
+               .all.group_by { |t| t.week.to_s }.to_a.reverse
+    render layout: "full"
   end
 
   def extra
@@ -39,7 +40,7 @@ class MatchesController < ApplicationController
 
     if @match.save
       flash[:notice] = t(:matches_create)
-      redirect_to controller: 'contests', action: 'edit', id: @match.contest
+      redirect_to edit_contest_path(@match.contest)
     else
       render :new
     end
@@ -49,11 +50,11 @@ class MatchesController < ApplicationController
     raise AccessError unless @match.can_update? cuser, params[:match]
     if params[:match][:matchers_attributes]
       params[:match][:matchers_attributes].each do |key, matcher|
-        matcher['_destroy'] = matcher['_destroy'] == "keep" ? false : true
-        if matcher['user_id'] == ""
+        matcher["_destroy"] = matcher["_destroy"] == "keep" ? false : true
+        if matcher["user_id"] == ""
           params[:match][:matchers_attributes].delete key
-        elsif matcher['user_id'].to_i == 0
-          matcher['user_id'] = User.find_by_username(matcher['user_id']).id
+        elsif matcher["user_id"].to_i == 0
+          matcher["user_id"] = User.find_by_username(matcher["user_id"]).id
         end
       end
     end
@@ -71,7 +72,12 @@ class MatchesController < ApplicationController
         end
       end
     else
-      render :edit
+      if URI(request.referer).path == match_ref_path(@match)
+        ref
+        render :ref
+      else
+        render :edit
+      end
     end
   end
 
@@ -90,13 +96,13 @@ class MatchesController < ApplicationController
       @match.hltv_stop
       flash[:notice] = t(:hltv_stopped)
     end
-    redirect_to action: 'show'
+    redirect_to action: "show"
   end
 
   def destroy
     raise AccessError unless @match.can_destroy? cuser
     @match.destroy
-    redirect_to controller: 'contests', action: 'edit', id: @match.contest
+    redirect_to edit_contest_path(@match.contest)
   end
 
   private

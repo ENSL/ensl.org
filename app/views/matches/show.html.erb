@@ -117,9 +117,9 @@
     </div>
   <% end %>
 
-  <% if cuser and @match.can_update? cuser, referee_id: cuser.id %>
+  <% if cuser and @match.can_update? cuser, [:report] %>
     <div class="referee">
-      <%= link_to "Referee Admin", { controller: :matches, action: 'ref', id: @match }, class: 'button' %>
+      <%= link_to "Referee Admin", match_ref_path(@match), class: 'button' %>
     </div>
   <% end %>
 </div>

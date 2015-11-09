@@ -2,7 +2,7 @@ module Features
   module FormHelpers
     def fill_form(model, hash)
       hash.each do |attribute, value|
-        fill_in attribute_translation(model, attribute), :with => value
+        fill_in attribute_translation(model, attribute), with: value
       end
     end
 

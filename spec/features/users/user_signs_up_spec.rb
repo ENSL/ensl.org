@@ -12,7 +12,7 @@ feature "Visitor signs up", js: :true do
       fill_form(:user, user.slice(*sign_up_attributes))
       click_button submit(:user, :create)
     end
-    
+
     expect(user_status).to have_content("ACCOUNT")
   end
 
