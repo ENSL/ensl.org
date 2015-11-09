@@ -193,7 +193,7 @@ class Match < ActiveRecord::Base
   end
 
   def send_notifications
-    Profile.all(include: :user, conditions: "notify_any_match = 1").find_each do |p|
+    Profile.includes(:user).where(notify_any_match: 1).find_each do |p|
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|

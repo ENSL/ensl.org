@@ -22,7 +22,7 @@
 #  salt         :string(255)
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe User do
   let!(:user) { create :user }
@@ -34,7 +34,7 @@ describe User do
 
     it "returns true if user is banned" do
       Ban.create!(ban_type: Ban::TYPE_SITE,
-                  expiry: Time.now + 10.days,
+                  expiry: Time.now.utc + 10.days,
                   user_name: user.username)
 
       expect(user.banned?).to be_truthy
@@ -42,7 +42,7 @@ describe User do
 
     it "returns true for specific bans" do
       Ban.create!(ban_type: Ban::TYPE_MUTE,
-                  expiry: Time.now + 10.days,
+                  expiry: Time.now.utc + 10.days,
                   user_name: user.username)
 
       expect(user.banned? Ban::TYPE_MUTE).to be_truthy

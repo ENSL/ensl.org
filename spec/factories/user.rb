@@ -20,6 +20,20 @@ FactoryGirl.define do
       end
     end
 
+    trait :caster do
+      after(:create) do |user|
+        group = create(:group, :caster)
+        create :grouper, user: user, group: group
+      end
+    end
+
+    trait :ref do
+      after(:create) do |user|
+        group = create(:group, :ref)
+        create :grouper, user: user, group: group
+      end
+    end
+
     trait :chris do
       steamid "0:1:58097444"
     end
