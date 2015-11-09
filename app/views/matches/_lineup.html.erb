@@ -1,7 +1,7 @@
 <div class="players">
   <% contester.lineup.each do |teamer| %>
     <div class="player fields">
-      <% if matcher = @match.matchers.first(conditions: { user_id: teamer.user_id }) %>
+      <% if matcher = @match.matchers.first(conditions: { user_id: teamer.user_id, contester_id: contester.id }) %>
         <%= hidden_field_tag "match[matchers_attributes][#{@n}][id]", matcher.id %>
       <% end %>
 
@@ -9,7 +9,7 @@
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][contester_id]", contester.id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][match_id]", @match.id %>
       <%= hidden_field_tag "match[matchers_attributes][#{@n}][merc]", false %>
-      <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", @match.users.exists?(teamer.user), { id: "player_#{@n}" } %>
+      <%= check_box_tag "match[matchers_attributes][#{@n}][_destroy]", "keep", !matcher.nil?, { id: "player_#{@n}" } %>
 
       <%= label_tag "player_#{@n}", '', class: 'checkbox' %>
 
@@ -45,5 +45,7 @@
     <%= hidden_field_tag "match[matchers_attributes][#{@n}][_destroy]", "keep" %>
 
     <%= text_field_tag "match[matchers_attributes][#{@n}][user_id]", '', placeholder: 'Mercenary' %>
+
+    <% @n = @n + 1 %>
   </div>
 </div>

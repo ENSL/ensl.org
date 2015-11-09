@@ -1,13 +1,13 @@
 FactoryGirl.define do
   factory :ban do
     ban_type Ban::TYPE_SITE
-    expiry Date.today + 1
+    expiry Time.now.utc.to_date + 1
     # Hack because of the awkward way bans are created (requires user_name)
     before(:create) do |ban|
       if ban.user.nil?
         user = create :user
         ban.user_name = user.username
-      else 
+      else
         ban.user_name = ban.user.username
       end
     end
