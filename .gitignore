@@ -53,4 +53,4 @@ pickle-email-*.html
 *.gemtags
 
 # Staging files
-tmp/*.tar.gz
+tmp/*.gz
