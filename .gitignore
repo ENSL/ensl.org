@@ -44,3 +44,6 @@ pickle-email-*.html
 
 # Direnv
 .envrc
+
+# Sublime
+*.sublime*
