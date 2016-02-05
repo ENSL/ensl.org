@@ -39,7 +39,7 @@ end
 
 class GoogleCalendar
   class Request
-    BASE_URL = "https://www.googleapis.com/calendar/v3/calendars"
+    BASE_URL = "https://www.googleapis.com/"
     EVENTS_ENDPOINT = "events"
 
     def self.events_list(id, timezone_offset)
@@ -61,7 +61,12 @@ class GoogleCalendar
 
     def get_data
       Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
-        Faraday.get(request_url)
+        if Rails.env.development?
+          conn = Faraday.new(BASE_URL, ssl: {verify: false})
+        else
+          conn = Faraday.new(BASE_URL)
+        end
+        conn.get(request_url)
       end
     end
 
@@ -76,7 +81,7 @@ class GoogleCalendar
       #that is longer ago then 7 days.
       #Alternative: maxResults=2500
       time_min = (Time.now - 7.days).utc.iso8601
-      "#{BASE_URL}/#{@id}/#{@endpoint}/?key=#{ENV['GOOGLE_API_KEY']}&timeMin=#{time_min}"
+      "calendar/v3/calendars/#{@id}/#{@endpoint}/?key=#{ENV['GOOGLE_API_KEY']}&timeMin=#{time_min}"
     end
   end
 
