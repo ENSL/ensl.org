@@ -6,6 +6,7 @@ Ensl::Application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users, only: [:show, :index]
+      resources :teams, only: [:show]
       resources :servers, only: [:index]
       resources :maps, only: [:index]
     end
