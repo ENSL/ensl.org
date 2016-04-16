@@ -44,3 +44,13 @@ pickle-email-*.html
 
 # Direnv
 .envrc
+
+# Sublime
+*.sublime*
+
+# Gemtags
+*.tags
+*.gemtags
+
+# Staging files
+tmp/*.gz
