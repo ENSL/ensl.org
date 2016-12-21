@@ -80,12 +80,15 @@
 </nav>
 <script>
 $(function () {
-  $.ajax({
-    datatype: "json",
-    url: "<%= gathers_url %>/gathers/current", 
-    success: function (data) {
-      $("#gathercount").html(data.gatherers.length + "/12");
-    }
-  });
+  var gatherInterval = setInterval(function() {
+    $.ajax({
+      datatype: "json",
+      url: "<%= gathers_url %>/gathers/current", 
+      success: function (data) {
+        $("#gathercount").html(data.gatherers.length + "/12");
+      }
+    });
+  },10000);
+  
 });
 </script>
