@@ -34,6 +34,7 @@ class Article < ActiveRecord::Base
   EXTRA = 428
   SB_RULES = 450
   G_RULES = 464
+  COMPMOD = 998
 
   attr_protected :id, :updated_at, :created_at, :user_id, :version
 
