@@ -39,7 +39,6 @@ class Api::V1::UsersCollection < Api::V1::Collection
     .project(columns)
     .join(teams_table, Arel::Nodes::OuterJoin)
     .on(joins)
-    .where(users_table[:team_id].not_eq(nil))
     .order(users_table[:id])
   end
 
