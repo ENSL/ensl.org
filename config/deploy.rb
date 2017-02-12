@@ -1,4 +1,4 @@
-lock '3.1.0'
+#lock '3.1.0'
 
 set :application, 'ensl'
 set :deploy_via, :remote_cache
