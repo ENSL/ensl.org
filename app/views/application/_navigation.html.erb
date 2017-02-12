@@ -80,16 +80,16 @@
   </div>
 </nav>
 <script>
-$(function () {
-  var gatherInterval = setInterval(function() {
+$((function gather () {
     $.ajax({
       datatype: "json",
       url: "<%= gathers_url %>/gathers/current", 
       success: function (data) {
         $("#gathercount").html(data.gatherers.length + "/12");
+      },
+      complete: function() {
+      	setTimeout(gather, 10000);
       }
     });
-  },10000);
-  
-});
+  })());
 </script>
