@@ -18,7 +18,11 @@
     <div id="inbox" class="tab">
       <% if cuser.received_messages.any? %>
         <% cuser.received_messages.reverse_each do |message| %>
-          <div class="message <% 'highlight' if cuser.new_messages.include?(message) %>">
+          <% if cuser.new_messages.include?(message) %>
+            <div class="message highlight">
+          <% else %>
+            <div class="message">
+          <% end %>
             <%= render partial: 'message', locals: { message: message } %>
           </div>
         <% end %>
