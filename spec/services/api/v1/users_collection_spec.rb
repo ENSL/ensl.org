@@ -9,8 +9,8 @@ describe Api::V1::UsersCollection do
         3.times { create(:user) }
       end
 
-      it "returns 0 results" do
-        expect(collection.execute_query.size).to eq(0)
+      it "returns 3 results" do
+        expect(collection.execute_query.size).to eq(3)
       end
     end
 
