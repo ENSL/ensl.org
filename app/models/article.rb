@@ -24,7 +24,7 @@ class Article < ActiveRecord::Base
   STATUS_PUBLISHED = 0
   STATUS_DRAFT = 1
 
-  RULES = 913
+  RULES = 1007
   HISTORY = 401
   HOF = 402
   SPONSORS = 403

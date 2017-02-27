@@ -16,7 +16,7 @@ class Category < ActiveRecord::Base
   MAIN = 1
   SPECIAL = 10
   INTERVIEWS = 11
-  RULES = 36
+  RULES = 61
 
   DOMAIN_NEWS = 0
   DOMAIN_ARTICLES = 1
