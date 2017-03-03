@@ -1,11 +1,13 @@
 class TeamersController < ApplicationController
   def create
+    @old_application = (cuser.teamers.joining.count == 0) ? nil : cuser.teamers.joining.first
     @teamer = Teamer.new params[:teamer]
     raise AccessError unless @teamer.can_create? cuser, params[:teamer]
     @teamer.user = cuser unless cuser.admin?
 
     if @teamer.save
       flash[:notice] = t(:applying_team) + @teamer.team.to_s
+      @old_application && @old_application.destroy
     else
       flash[:error] = @teamer.errors.full_messages.to_s
     end
