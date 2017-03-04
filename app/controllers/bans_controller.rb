@@ -20,6 +20,7 @@ class BansController < ApplicationController
   def create
     @ban = Ban.new(params[:ban])
     raise AccessError unless @ban.can_create? cuser
+    @ban.creator = cuser
 
     if @ban.save
       flash[:notice] = t(:bans_create)
