@@ -3,7 +3,7 @@
 </h1>
 
 <div class="wide box">
-  <%= cascade @ban, ["steamid", :user, "addr", :server, "expiry", "reason_b", "created_at"] %>
+  <%= cascade @ban, ["steamid", :user, "addr", :server, "expiry", "reason_b", "created_at", :creator] %>
 </div>
 
 <%= link_to "Back", bans_url %>
