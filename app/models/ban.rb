@@ -13,7 +13,7 @@
 #  updated_at :datetime
 #  ban_type   :integer
 #  ip         :string(255)
-#
+#  creator_id :integer
 
 class Ban < ActiveRecord::Base
   include Extra
@@ -43,6 +43,8 @@ class Ban < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :server
+
+  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User'
 
   def color
     expiry.past? ? "green" : "red"
