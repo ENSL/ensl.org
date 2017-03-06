@@ -37,6 +37,7 @@ class Ban < ActiveRecord::Base
 
   validate :validate_type
   validate :validate_ventban
+  validate :validate_permission
   validates :steamid, length: {maximum: 14}, format: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
   validates :addr, format: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
   validates :reason, length: {maximum: 255}, allow_blank: true
@@ -69,6 +70,12 @@ class Ban < ActiveRecord::Base
     end
   end
 
+  def validate_permission
+    unless creator.admin? or (creator.gather_moderator? and self.ban_type == TYPE_GATHER)
+      errors.add :ban_type, 'Gather Moderators can only create gather bans'
+    end
+  end
+
   def check_user
     if user_name
       self.user = User.find_by_username(user_name)
@@ -79,14 +86,14 @@ class Ban < ActiveRecord::Base
   end
 
   def can_create? cuser
-    cuser and cuser.admin?
+    cuser and cuser.allowed_to_ban?
   end
 
   def can_update? cuser
-    cuser and cuser.admin?
+    cuser and (cuser.admin? or (self.creator == cuser and cuser.allowed_to_ban?))
   end
 
   def can_destroy? cuser
-    cuser and cuser.admin?
+    cuser and (cuser.admin? or (self.creator == cuser and cuser.allowed_to_ban?))
   end
 end
