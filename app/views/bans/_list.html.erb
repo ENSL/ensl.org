@@ -4,7 +4,7 @@
     <th class="type">Type</th>
     <th class="expiry">Expiry</th>
     <th class="reason">Reason</th>
-    <% if cuser and cuser.admin? %>
+    <% if cuser and cuser.allowed_to_ban? %>
       <th class="actions"></th>
     <% end %>
   </tr>
@@ -21,7 +21,7 @@
       <td><%= ban.types[ban.ban_type] %></td>
       <td><%= shorttime ban.expiry %></td>
       <td><%= shorten ban.reason, 30 %></td>
-      <% if cuser and cuser.admin? %>
+      <% if cuser and cuser.allowed_to_ban? %>
         <td class="actions">
           <% if ban.can_update? cuser %>
             <%= link_to icon('pencil'), edit_ban_path(ban) %>
