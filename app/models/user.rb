@@ -209,6 +209,10 @@ class User < ActiveRecord::Base
     groups.exists? id: Group::GATHER_MODERATORS
   end
 
+  def allowed_to_ban?
+    admin? or gather_moderator?
+  end
+
   def verified?
     #		created_at < DateTime.now.ago(VERIFICATION_TIME)
     true
