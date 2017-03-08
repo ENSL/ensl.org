@@ -26,11 +26,11 @@ class ContestersController < ApplicationController
       @contester.score = @contester.contest.contesters.active.count + 1
     end
 
-    if @contester.save
+    if @contester.save!
       flash[:notice] = t(:contests_join)
       redirect_to contest_path(@contester.contest_id)
     else
-      flash[:error] = t(:errors) + @contester.errors.full_messages.to_s
+      flash[:error] = @contester.errors.full_messages.to_s #t(:errors) + @contester.errors.full_messages.to_s
       redirect_to_back
     end
   end

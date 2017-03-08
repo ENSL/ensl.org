@@ -177,7 +177,7 @@
                 <%= form_for contester do |c| %>
                   <%= c.hidden_field :active, { value: 1 } %>
                   <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                  <%= link_to_function icon('rotate-left'), "$('edit_contester_#{contester.id}').submit()" %>
+                  <%= link_to_function icon('rotate-left'), "$('#edit_contester_#{contester.id}').submit()" %>
                 <% end %>
               <% end %>
             </td>
