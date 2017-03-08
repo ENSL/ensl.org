@@ -71,7 +71,7 @@ class Ban < ActiveRecord::Base
   end
 
   def validate_permission
-    unless creator.admin? or (creator.gather_moderator? and self.ban_type == TYPE_GATHER)
+    unless creator and (creator.admin? or (creator.gather_moderator? and self.ban_type == TYPE_GATHER))
       errors.add :ban_type, 'Gather Moderators can only create gather bans'
     end
   end
