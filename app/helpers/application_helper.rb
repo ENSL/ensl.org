@@ -35,9 +35,9 @@ module ApplicationHelper
             end
     str = model.to_s
     if length and str.length > length
-      link_to raw(str.to_s[0, length] + "..."), model, class: model.class.to_s.downcase
+      link_to str.to_s[0, length] + "...", model, class: model.class.to_s.downcase
     else
-      link_to raw(str), model, class: model.class.to_s.downcase
+      link_to str, model, class: model.class.to_s.downcase
     end
   end
 
