@@ -130,6 +130,7 @@ Ensl::Application.routes.draw do
   match "users/forgot", to: "users#forgot"
 
   match "votes/create"
+  match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
 
   match ":controller/:action", requirements: { action: /A-Za-z/ }
   match ":controller/:action/:id"

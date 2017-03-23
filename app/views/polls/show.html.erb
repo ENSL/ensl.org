@@ -1,1 +1,4 @@
 <%= render :partial => "show" %>
+<% if cuser && cuser.admin? %>
+    <%= link_to "Show votes", polls_showvotes_url(@poll) ,class: "button" %>
+<% end %>

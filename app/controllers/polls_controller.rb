@@ -48,6 +48,10 @@ class PollsController < ApplicationController
     redirect_to polls_url
   end
 
+  def showvotes
+    raise AccessError unless cuser.admin?
+  end
+
   private
 
   def get_poll
