@@ -1,0 +1,16 @@
+<div>
+  <h1><%= @poll.question %></h1>
+  <table>
+    <tr>
+      <th>Player</th>
+      <th>voted for</th>
+      <th>Time</th>
+    </tr>
+    <% @poll.real_votes.reverse_each do |vote| %>
+      <tr>
+        <td><%= namelink vote.user %></td>
+        <td><%= vote.votable%></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
