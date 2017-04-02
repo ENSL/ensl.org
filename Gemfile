@@ -4,7 +4,7 @@ ruby '2.2.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.22'
-gem 'mysql2', '~> 0.3.15'
+gem 'mysql2', '~> 0.3.17'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
 
@@ -24,6 +24,7 @@ gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.4', require: false
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'test-unit', '~> 3.1.3'
+gem 'google-api-client', '~> 0.10.3'
 
 # Please install nodejs locally.
 gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
