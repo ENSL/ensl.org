@@ -171,19 +171,20 @@ module ApplicationHelper
     end
   end
 
+  def calendar
+    @calendar ||= GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset)
+  end
+
+  def event_start_time event
+    event.start.date_time.to_datetime.in_time_zone(timezone_offset)
+  end
 
   def upcoming_matches
-    GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).
-      upcoming.sort_by do |event|
-      event.start
-    end
+      calendar.upcoming || []
   end
 
   def upcoming_nsltv
-    GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset).
-      upcoming_nsltv.sort_by do |event|
-      event.start
-    end
+    calendar.upcoming_nsltv || []
   end
 
   def latest_rules

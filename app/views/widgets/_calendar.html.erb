@@ -3,14 +3,14 @@
     <h4><%= t('widget.schedule') %></h4>
 
     <div class="widget-content-wrapper">
-      <% upcoming_matches.group_by{ |e| e.start.month }.each do |month, events| %>
-        <% events.group_by { |e| e.start.day }.each do |day, day_events| %>
-          <div class="separator"><%= day_events.first.start.strftime("%A, %e %B") %></div>
+      <% upcoming_matches.group_by{ |e| e.start.date_time.month }.each do |month, events| %>
+        <% events.group_by { |e| e.start.date_time.day }.each do |day, day_events| %>
+          <div class="separator"><%= event_start_time(day_events.first).strftime("%A, %e %B") %></div>
             <% day_events.each do |event| %>
               <div class="entry">
                 <p class="summary">
-                  <span class="time"><%= event.start.strftime("%H:%M %Z") %></span>
-                  <%= event.formatted_summary %>
+                  <span class="time"><%= event_start_time(event).strftime("%H:%M %Z") %></span>
+                  <%= event.summary %>
                 </p>
               </div>
             <% end %>
@@ -24,14 +24,14 @@
     <h4>NSLTV</h4>
 
     <div class="widget-content-wrapper">
-      <% upcoming_nsltv.group_by{ |e| e.start.month }.each do |month, events| %>
-        <% events.group_by { |e| e.start.day }.each do |day, day_events| %>
-          <div class="separator"><%= day_events.first.start.strftime("%A, %e %B") %></div>
+      <% upcoming_nsltv.group_by{ |e| e.start.date_time.month }.each do |month, events| %>
+        <% events.group_by { |e| e.start.date_time.day }.each do |day, day_events| %>
+          <div class="separator"><%= event_start_time(day_events.first).strftime("%A, %e %B") %></div>
             <% day_events.each do |event| %>
               <div class="entry">
                 <p class="summary">
-                  <span class="time"><%= event.start.strftime("%H:%M %Z") %></span>
-                  <%= event.formatted_summary %>
+                  <span class="time"><%= event_start_time(event).strftime("%H:%M %Z") %></span>
+                  <%= event.summary %>
                 </p>
               </div>
             <% end %>
