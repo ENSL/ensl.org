@@ -36,7 +36,7 @@ class GoogleCalendar
         list = result
       end
     }
-    @events = (list) ? list.items : nil
+    @events = (list) ? list.items.sort_by { |event| event.start.date_time } : nil
   end
 
   def nsltv_regex
