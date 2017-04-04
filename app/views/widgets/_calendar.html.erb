@@ -10,7 +10,11 @@
               <div class="entry">
                 <p class="summary">
                   <span class="time"><%= event_start_time(event).strftime("%H:%M %Z") %></span>
-                  <%= event.summary %>
+                  <%= event.summary %><% if event.description %>
+                    <%= link_to event.description, event.description %>
+                  <% else %>
+                    (no caster yet)
+                  <% end %>
                 </p>
               </div>
             <% end %>
