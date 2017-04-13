@@ -122,6 +122,14 @@
       <%= link_to "Referee Admin", match_ref_path(@match), class: 'button' %>
     </div>
   <% end %>
+  <% if cuser and @match.referee.nil? and cuser.ref? %>
+    <div class="referee">
+      <%= form_for @match do |f| %>
+        <%= f.hidden_field :referee_id, value: cuser.id %>
+        <%= f.submit "Signup as referee", class: 'button' %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <%= add_comments @match %>
