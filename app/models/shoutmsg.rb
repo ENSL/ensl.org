@@ -17,7 +17,6 @@ class Shoutmsg < ActiveRecord::Base
   attr_protected :id, :created_at, :updated_at, :user_id
 
   validates_length_of :text, :in => 1..100
-  validates_presence_of :user
 
   scope :recent,
     :include => :user,
