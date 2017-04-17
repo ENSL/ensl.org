@@ -193,7 +193,7 @@ module ApplicationHelper
 
   def gathers_url
     if Rails.env.production?
-      "http://gathers.ensl.org"
+      "https://gathers.ensl.org"
     else
       "http://gathers.staging.ensl.org"
     end
