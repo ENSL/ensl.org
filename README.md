@@ -4,7 +4,7 @@
 
 # ENSL Website
 
-This is the source code of ENSL website. Currently deployed on [ensl.org](http://www.ensl.org).
+This is the source code of ENSL website. Currently deployed on [ensl.org](https://www.ensl.org).
 
 Features:
 

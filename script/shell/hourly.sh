@@ -1,2 +1,2 @@
 #!/bin/bash
-wget -O /dev/null http://www.ensl.org/directories/refresh/1
+wget -O /dev/null https://www.ensl.org/directories/refresh/1

@@ -195,7 +195,7 @@ module ApplicationHelper
     if Rails.env.production?
       "https://gathers.ensl.org"
     else
-      "http://gathers.staging.ensl.org"
+      "https://gathers.staging.ensl.org"
     end
   end
 end
