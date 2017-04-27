@@ -10,6 +10,7 @@ Ensl::Application.routes.draw do
       resources :teams, only: [:show]
       resources :servers, only: [:index]
       resources :maps, only: [:index]
+      resources :gathers, only: [:create]
     end
   end
 
