@@ -1,4 +1,5 @@
 Ensl::Application.routes.draw do
+
   %w(403 404 422 500).each do |code|
     get code, to: "errors#show", code: code
   end
@@ -60,6 +61,7 @@ Ensl::Application.routes.draw do
   get "matches/ref/:id" => "matches#ref", as: :match_ref
   resources :matches do
     get :admin, to: "matches#admin", on: :collection
+    resources :match_proposals, path: "proposals", as: "proposals", only: [:index, :new, :create]
   end
 
   resources :maps

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170304191254) do
+ActiveRecord::Schema.define(:version => 20170501121908) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -431,6 +431,18 @@ ActiveRecord::Schema.define(:version => 20170304191254) do
     t.string   "picture"
     t.integer  "category_id"
   end
+
+  create_table "match_proposals", :force => true do |t|
+    t.integer  "match_id"
+    t.integer  "team_id"
+    t.integer  "status"
+    t.datetime "proposed_time"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "match_proposals", ["match_id"], :name => "index_match_proposals_on_match_id"
+  add_index "match_proposals", ["team_id"], :name => "index_match_proposals_on_team_id"
 
   create_table "matchers", :force => true do |t|
     t.integer  "match_id",     :null => false
