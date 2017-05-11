@@ -1,2 +1,11 @@
-<h1>MatchProposals#new</h1>
-<p>Find me in app/views/match_proposals/new.html.erb</p>
+<h1>New Proposal</h1>
+<%= form_for @proposal, html: { class: 'square' } do |f| %>
+    <%= render 'shared/errors', messages: @proposal.errors.full_messages %>
+    <div class="fields horizontal">
+      <%= f.label :proposed_time %>
+      <%= f.datetime_select :proposed_time, minute_step: 15 %>
+    </div>
+    <div class="controls">
+      <%= f.submit 'Propose' %>
+    </div>
+<% end %>

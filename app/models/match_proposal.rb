@@ -3,7 +3,7 @@ class MatchProposal < ActiveRecord::Base
   STATUS_PENDING = 0
   STATUS_REVOKED = 1
   STATUS_REJECTED = 2
-  STATUS_ACCEPTED = 3
+  STATUS_CONFIRMED = 3
 
   belongs_to :match
   belongs_to :team
@@ -11,8 +11,19 @@ class MatchProposal < ActiveRecord::Base
 
   validates_presence_of :match, :team, :proposed_time
 
-  def can_create? (match, cuser)
-    match && cuser && cuser.team.is_leader?(cuser) && (match.of_team cuser.team)
+  def status_strings
+    {STATUS_PENDING   => 'Pending',
+     STATUS_REVOKED   => 'Revoked',
+     STATUS_REJECTED  => 'Rejected',
+     STATUS_CONFIRMED => 'Confirmed'}
+  end
+
+  def can_create? cuser
+    cuser && cuser.team.is_leader?(cuser) && match.of_team(cuser.team)
+  end
+
+  def can_update? cuser
+    cuser && cuser.team.is_leader?(cuser) && match.of_team (cuser.team)
   end
 
   def can_destroy?

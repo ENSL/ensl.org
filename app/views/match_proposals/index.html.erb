@@ -15,7 +15,7 @@
     <tr class="<%=cycle('even', 'odd') %>">
       <td><%= proposal.team.name %></td>
       <td><%= longtime proposal.proposed_time %> </td>
-      <td><%= proposal.status %></td>
+      <td><%= proposal.status_strings[proposal.status] %></td>
       <td>test</td>
     </tr>
   <% end %>
