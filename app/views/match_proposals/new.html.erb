@@ -3,7 +3,7 @@
     <%= render 'shared/errors', messages: @proposal.errors.full_messages %>
     <div class="fields horizontal">
       <%= f.label :proposed_time %>
-      <%= f.datetime_select :proposed_time, minute_step: 15 %>
+      <%= f.datetime_select :proposed_time, datetime_separator: '', time_separator: '', minute_step: 15 %>
     </div>
     <div class="controls">
       <%= f.submit 'Propose' %>

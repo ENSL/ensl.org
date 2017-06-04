@@ -3,7 +3,6 @@
 <% if @match.match_proposals.empty? %>
 <h4>There are no proposals yet</h4>
 <% else %>
-
 <table id="proposals" class="striped">
   <tr>
     <th>Team</th>
@@ -20,5 +19,5 @@
     </tr>
   <% end %>
 </table>
-    <% end %>
+<% end %>
 <%= link_to 'Back', match_path(@match), class: 'button' %><%= link_to 'Propose match time', new_match_proposal_path(@match), class: 'button' %>

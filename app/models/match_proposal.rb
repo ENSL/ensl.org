@@ -19,11 +19,11 @@ class MatchProposal < ActiveRecord::Base
   end
 
   def can_create? cuser
-    cuser && cuser.team.is_leader?(cuser) && match.of_team(cuser.team)
+    cuser && match && match.can_make_proposal?(cuser)
   end
 
   def can_update? cuser
-    cuser && cuser.team.is_leader?(cuser) && match.of_team (cuser.team)
+    cuser && match && match.can_make_proposal?(cuser)
   end
 
   def can_destroy?

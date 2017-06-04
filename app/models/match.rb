@@ -358,4 +358,8 @@ class Match < ActiveRecord::Base
   def can_destroy?(cuser)
     cuser && cuser.admin?
   end
+
+  def can_make_proposal?(cuser)
+    cuser && (contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser))
+  end
 end
