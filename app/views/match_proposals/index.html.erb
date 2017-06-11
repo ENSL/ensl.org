@@ -31,7 +31,9 @@
 </table>
     <script type="text/javascript">
       function proposalStateSubmit(newState, formID) {
-
+          var form = $('#edit_match_proposal_' + formID);
+          form.children("input[type='hidden']").val(newState);
+          form.submit();
       }
     </script>
 <% end %>
