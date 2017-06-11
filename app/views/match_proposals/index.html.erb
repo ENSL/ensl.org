@@ -8,16 +8,31 @@
     <th>Team</th>
     <th>Time</th>
     <th>Status</th>
+    <% if @match.can_make_proposal?(cuser) %>
     <th>Actions</th>
+    <% end %>
   </tr>
   <% @match.match_proposals.each do |proposal| %>
     <tr class="<%=cycle('even', 'odd') %>">
       <td><%= proposal.team.name %></td>
       <td><%= longtime proposal.proposed_time %> </td>
       <td><%= proposal.status_strings[proposal.status] %></td>
-      <td>test</td>
+      <% if @match.can_make_proposal?(cuser) %>
+      <td>
+        <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
+          <%= f.hidden_field :status, value: 0 %>
+          <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})" %>
+          <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})" %>
+        <% end %>
+      </td>
+      <% end %>
     </tr>
   <% end %>
 </table>
+    <script type="text/javascript">
+      function proposalStateSubmit(newState, formID) {
+
+      }
+    </script>
 <% end %>
 <%= link_to 'Back', match_path(@match), class: 'button' %><%= link_to 'Propose match time', new_match_proposal_path(@match), class: 'button' %>
