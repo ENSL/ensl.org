@@ -86,4 +86,12 @@ class Group < ActiveRecord::Base
     end
     casters
   end
+
+  def self.gathermods
+    gathermods = []
+    (find(GATHER_MODERATORS).groupers).each do |g|
+      gathermods << g unless gathermods.include? g
+    end
+    gathermods
+  end
 end
