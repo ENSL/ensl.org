@@ -96,18 +96,36 @@ class Issue < ActiveRecord::Base
   end
 
   def can_show? cuser
-    cuser and !cuser.nil? and ((author == cuser) or cuser.admin?)
+    cuser and ((author == cuser) or (Issue::allowed_categories(cuser).include?(self.category_id)))
   end
 
   def can_create? cuser
     true
   end
 
-  def can_update? cuser
-    cuser and cuser.admin?
+  def can_update?(cuser, params = {})
+    ret = cuser && Issue::allowed_categories(cuser).include?(self.category_id)
+    if ret && !cuser.admin? && params.member?(:category_id)
+      ret = (self.category_id.to_s == params[:category_id])
+    end
+
+    ret
   end
 
   def can_destroy? cuser
     cuser and cuser.admin?
   end
+
+  # STATIC METHODS
+
+  def self.allowed_categories cuser
+    allowed = []
+    allowed << 54 if cuser.admin? || cuser.gather_moderator? # gather
+    allowed << 17 if cuser.admin? # website
+    allowed << 22 if cuser.admin? # league
+    allowed << 20 if cuser.admin? # ensl plugin
+    allowed
+  end
+
+
 end

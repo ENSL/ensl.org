@@ -190,19 +190,24 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    groups.exists? :id => Group::ADMINS
+    groups.exists? id: Group::ADMINS
   end
 
   def ref?
-    groups.exists? :id => Group::REFEREES
+    groups.exists? id: Group::REFEREES
   end
 
   def staff?
-    groups.exists? :id => Group::STAFF
+    groups.exists? id: Group::STAFF
   end
 
   def caster?
-    groups.exists? :id => Group::CASTERS
+    groups.exists? id: Group::CASTERS
+  end
+
+  # might seem redundant but allows for later extensions like forum moderators
+  def moderator?
+    groups.exists? id: Group::GATHER_MODERATORS
   end
 
   def gather_moderator?
@@ -210,7 +215,7 @@ class User < ActiveRecord::Base
   end
 
   def allowed_to_ban?
-    admin? or gather_moderator?
+    admin? or moderator?
   end
 
   def verified?

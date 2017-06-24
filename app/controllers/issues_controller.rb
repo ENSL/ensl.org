@@ -2,7 +2,7 @@ class IssuesController < ApplicationController
   before_filter :get_issue, only: [:show, :edit, :update, :destroy]
 
   def index
-    raise AccessError unless cuser and cuser.admin?
+    raise AccessError unless cuser and (cuser.admin? or cuser.moderator?)
 
     sort = case params['sort']
            when "title"  then "title"
@@ -12,9 +12,11 @@ class IssuesController < ApplicationController
            else "created_at DESC"
            end
 
-    @open = Issue.with_status(Issue::STATUS_OPEN).all order: sort
-    @solved = Issue.with_status(Issue::STATUS_SOLVED).all order: sort
-    @rejected = Issue.with_status(Issue::STATUS_REJECTED).all order: sort
+    allowed = Issue::allowed_categories cuser
+
+    @open = Issue.where(category_id: allowed).with_status(Issue::STATUS_OPEN).all order: sort
+    @solved = Issue.where(category_id: allowed).with_status(Issue::STATUS_SOLVED).all order: sort
+    @rejected = Issue.where(category_id: allowed).with_status(Issue::STATUS_REJECTED).all order: sort
   end
 
   def show
@@ -49,7 +51,7 @@ class IssuesController < ApplicationController
   end
 
   def update
-    raise AccessError unless @issue.can_update? cuser
+    raise AccessError unless @issue.can_update?(cuser, params[:issue])
     if @issue.update_attributes(params[:issue])
       flash[:notice] = t(:issues_update)
       redirect_to(@issue)
