@@ -22,8 +22,17 @@ class MatchProposal < ActiveRecord::Base
     cuser && match && match.can_make_proposal?(cuser)
   end
 
-  def can_update? cuser
-    cuser && match && match.can_make_proposal?(cuser)
+  def can_update? cuser, params = {}
+    return false unless cuser && match && match.can_make_proposal?(cuser)
+
+    if params.key?(:status) && (status.to_s != params[:status]) &&
+        (STATUS_REVOKED.to_s != params[:status])
+      return false unless (team != cuser.team)
+      return false if (STATUS_CONFIRMED.to_s == params[:status]) && (proposed_time < 20.minutes.from_now)
+      # TODO: update to usefull timelimit
+      # TODO: define rules for revoking; timelimit, access
+    end
+    true
   end
 
   def can_destroy?

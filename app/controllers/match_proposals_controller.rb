@@ -25,10 +25,12 @@ class MatchProposalsController < ApplicationController
   end
 
   def update
-    raise AccessError unless @match.can_make_proposal?(cuser)
     @proposal = MatchProposal.find(params[:id])
+    raise AccessError unless @proposal.can_update?(cuser, params[:match_proposal])
     @proposal.status = params[:match_proposal][:status]
     if @proposal.save
+      # TODO: rework messages
+      # TODO: make it so only one proposal can be confirmed for a match at any given time
       action = case @proposal.status
                  when MatchProposal::STATUS_CONFIRMED
                    "Confirmed Proposal for #{Time.use_zone(view_context.timezone_offset) { @proposal.proposed_time.strftime('%d %B %y %H:%M %Z') }}"
