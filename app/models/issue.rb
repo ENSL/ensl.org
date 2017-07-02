@@ -24,6 +24,11 @@ class Issue < ActiveRecord::Base
   STATUS_SOLVED = 1
   STATUS_REJECTED = 2
 
+  CATEGORY_WEBSITE = 17
+  CATEGORY_NSLPLUGIN = 20
+  CATEGORY_LEAGUE = 22
+  CATEGORY_GATHER = 52
+
   attr_accessor :assigned_name
   attr_protected :id, :created_at, :updated_at
 
@@ -96,7 +101,11 @@ class Issue < ActiveRecord::Base
   end
 
   def can_show? cuser
-    cuser and ((author == cuser) or (Issue::allowed_categories(cuser).include?(self.category_id)))
+    return false unless cuser
+    return true if cuser.admin?
+
+    ((author == cuser) or (Issue::allowed_categories(cuser).include?(self.category_id)))
+
   end
 
   def can_create? cuser
@@ -104,12 +113,10 @@ class Issue < ActiveRecord::Base
   end
 
   def can_update?(cuser, params = {})
-    ret = cuser && Issue::allowed_categories(cuser).include?(self.category_id)
-    if ret && !cuser.admin? && params.member?(:category_id)
-      ret = (self.category_id.to_s == params[:category_id])
-    end
-
-    ret
+    return false unless cuser
+    return true if cuser.admin?
+    return false unless Issue::allowed_categories(cuser).include?(self.category_id)
+    !(params.member?(:category_id) && (self.category_id.to_s != params[:category_id]))
   end
 
   def can_destroy? cuser
@@ -120,10 +127,10 @@ class Issue < ActiveRecord::Base
 
   def self.allowed_categories cuser
     allowed = []
-    allowed << 54 if cuser.admin? || cuser.gather_moderator? # gather
-    allowed << 17 if cuser.admin? # website
-    allowed << 22 if cuser.admin? # league
-    allowed << 20 if cuser.admin? # ensl plugin
+    allowed << CATEGORY_GATHER if cuser.admin? || cuser.gather_moderator? # gather
+    allowed << CATEGORY_WEBSITE if cuser.admin? # website
+    allowed << CATEGORY_LEAGUE if cuser.admin? # league
+    allowed << CATEGORY_NSLPLUGIN if cuser.admin? # ensl plugin
     allowed
   end
 
