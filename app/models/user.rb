@@ -99,6 +99,8 @@ class User < ActiveRecord::Base
     :conditions => "bans.id IS NOT NULL"
   scope :idle,
     :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
+  scope :lately,
+    :conditions => ["lastvisit > ?", 30.days.ago.utc]
 
   before_validation :update_password
 
