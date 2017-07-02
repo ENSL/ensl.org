@@ -13,10 +13,11 @@ class IssuesController < ApplicationController
            end
 
     allowed = Issue::allowed_categories cuser
+    qstring = "category_id IN (?) OR category_id IS NULL"
 
-    @open = Issue.where(category_id: allowed).with_status(Issue::STATUS_OPEN).all order: sort
-    @solved = Issue.where(category_id: allowed).with_status(Issue::STATUS_SOLVED).all order: sort
-    @rejected = Issue.where(category_id: allowed).with_status(Issue::STATUS_REJECTED).all order: sort
+    @open = Issue.where(qstring, allowed).with_status(Issue::STATUS_OPEN).all order: sort
+    @solved = Issue.where(qstring, allowed).with_status(Issue::STATUS_SOLVED).all order: sort
+    @rejected = Issue.where(qstring, allowed).with_status(Issue::STATUS_REJECTED).all order: sort
   end
 
   def show

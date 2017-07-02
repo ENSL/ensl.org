@@ -27,7 +27,7 @@ class Issue < ActiveRecord::Base
   CATEGORY_WEBSITE = 17
   CATEGORY_NSLPLUGIN = 20
   CATEGORY_LEAGUE = 22
-  CATEGORY_GATHER = 52
+  CATEGORY_GATHER = 54
 
   attr_accessor :assigned_name
   attr_protected :id, :created_at, :updated_at
