@@ -22,6 +22,7 @@ class Group < ActiveRecord::Base
   PREDICTORS = 8
   STAFF = 10
   GATHER_MODERATORS = 14
+  COMP_MOD_COUNCIL = 16
 
   attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
@@ -93,5 +94,13 @@ class Group < ActiveRecord::Base
       gathermods << g unless gathermods.include? g
     end
     gathermods
+  end
+
+  def self.compmodcouncil
+    compmodcouncil = []
+    (find(COMP_MOD_COUNCIL).groupers).each do |g|
+      compmodcouncil << g unless compmodcouncil.include? g
+    end
+    compmodcouncil
   end
 end

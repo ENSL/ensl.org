@@ -22,6 +22,7 @@
     <li><a href="#referees">Referees</a></li>
     <li><a href="#casters">Casters</a></li>
     <li><a href="#gathermods">Gather Mods</a></li>
+    <li><a href="#compmodcouncil">Comp. Mod Council</a></li>
     <li><a href="#extras">Extras</a></li>
     <li><a href="#support">Support</a></li>
   </ul>
@@ -118,6 +119,33 @@
           <th>Age</th>
         </tr>
         <% Group.gathermods.each do |grouper| %>
+            <tr>
+              <td class="country"><%= flag grouper.user.country %></td>
+              <td class="username"><%= namelink grouper.user %></td>
+              <td><%= h grouper.user.email_s %></td>
+              <td>
+                <% if grouper.task %>
+                    <%= h grouper.task %>
+                <% else %>
+                    <%= h grouper.group.name.singularize %>
+                <% end %>
+              </td>
+              <td class="age"><%= h grouper.user.age %></td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+    <div class="tab" id="compmodcouncil">
+      <h3>COMP. MOD COUNCIL</h3>
+      <table class="striped staff">
+        <tr>
+          <th></th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Task</th>
+          <th>Age</th>
+        </tr>
+        <% Group.compmodcouncil.each do |grouper| %>
             <tr>
               <td class="country"><%= flag grouper.user.country %></td>
               <td class="username"><%= namelink grouper.user %></td>
