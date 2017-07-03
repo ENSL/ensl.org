@@ -13,7 +13,8 @@ class IssuesController < ApplicationController
            end
 
     allowed = Issue::allowed_categories cuser
-    qstring = "category_id IN (?) OR category_id IS NULL"
+    qstring = 'category_id IN (?)'
+    qstring += ' OR category_id IS NULL' if cuser.admin?
 
     @open = Issue.where(qstring, allowed).with_status(Issue::STATUS_OPEN).all order: sort
     @solved = Issue.where(qstring, allowed).with_status(Issue::STATUS_SOLVED).all order: sort

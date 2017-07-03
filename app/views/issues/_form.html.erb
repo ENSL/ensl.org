@@ -4,7 +4,7 @@
     <%= f.label :title %>
     <%= f.text_field :title %>
   </div>
-  <% if cuser and Issue::allowed_categories(cuser).include?(@issue.category_id) %>
+  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(@issue.category_id)) %>
     <div class="fields horizontal">
       <%= f.label :status %>
       <%= f.select :status, @issue.statuses.invert %>
@@ -22,7 +22,7 @@
     <%= f.label :text %>
     <%= f.text_area :text, rows: 7 %>
   </div>
-  <% if cuser and Issue::allowed_categories(cuser).include?(@issue.category_id) %>
+  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(@issue.category_id)) %>
     <div class="fields horizontal">
       <%= f.label :solution %>
       <%= f.text_area :solution, rows: 7 %>
