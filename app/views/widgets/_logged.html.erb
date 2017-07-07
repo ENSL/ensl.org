@@ -7,6 +7,12 @@
             Admin (<%= Issue.with_status(0).count  %>) <%= icon 'wrench' %>
           <% end %>
         </li>
+      <% elsif cuser.moderator? %>
+        <li>
+          <%= link_to issues_path, class: 'admin' do %>
+            Issues (<%= Issue.where(category_id: Issue.allowed_categories(cuser)).with_status(0).count %>) <%= icon 'wrench' %>
+          <% end %>
+        </li>
       <% end %>
       <li>
         <%= link_to user_path(cuser) do %>

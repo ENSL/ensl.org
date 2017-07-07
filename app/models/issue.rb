@@ -24,6 +24,11 @@ class Issue < ActiveRecord::Base
   STATUS_SOLVED = 1
   STATUS_REJECTED = 2
 
+  CATEGORY_WEBSITE = 17
+  CATEGORY_NSLPLUGIN = 20
+  CATEGORY_LEAGUE = 22
+  CATEGORY_GATHER = 54
+
   attr_accessor :assigned_name
   attr_protected :id, :created_at, :updated_at
 
@@ -96,18 +101,38 @@ class Issue < ActiveRecord::Base
   end
 
   def can_show? cuser
-    cuser and !cuser.nil? and ((author == cuser) or cuser.admin?)
+    return false unless cuser
+    return true if cuser.admin?
+
+    ((author == cuser) or (Issue::allowed_categories(cuser).include?(self.category_id)))
+
   end
 
   def can_create? cuser
     true
   end
 
-  def can_update? cuser
-    cuser and cuser.admin?
+  def can_update?(cuser, params = {})
+    return false unless cuser
+    return true if cuser.admin?
+    return false unless Issue::allowed_categories(cuser).include?(self.category_id)
+    !(params.member?(:category_id) && (self.category_id.to_s != params[:category_id]))
   end
 
   def can_destroy? cuser
     cuser and cuser.admin?
   end
+
+  # STATIC METHODS
+
+  def self.allowed_categories cuser
+    allowed = []
+    allowed << CATEGORY_GATHER if cuser.admin? || cuser.gather_moderator? # gather
+    allowed << CATEGORY_WEBSITE if cuser.admin? # website
+    allowed << CATEGORY_LEAGUE if cuser.admin? # league
+    allowed << CATEGORY_NSLPLUGIN if cuser.admin? # ensl plugin
+    allowed
+  end
+
+
 end

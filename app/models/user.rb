@@ -99,6 +99,8 @@ class User < ActiveRecord::Base
     :conditions => "bans.id IS NOT NULL"
   scope :idle,
     :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
+  scope :lately,
+    :conditions => ["lastvisit > ?", 30.days.ago.utc]
 
   before_validation :update_password
 
@@ -190,11 +192,15 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    groups.exists? :id => Group::ADMINS
+    groups.exists? id: Group::ADMINS
   end
 
   def ref?
-    groups.exists? :id => Group::REFEREES
+    groups.exists? id: Group::REFEREES
+  end
+
+  def staff?
+    groups.exists? id: Group::STAFF
   end
 
   def staff?
@@ -202,7 +208,20 @@ class User < ActiveRecord::Base
   end
 
   def caster?
-    groups.exists? :id => Group::CASTERS
+    groups.exists? id: Group::CASTERS
+  end
+
+  # might seem redundant but allows for later extensions like forum moderators
+  def moderator?
+    groups.exists? id: Group::GATHER_MODERATORS
+  end
+
+  def gather_moderator?
+    groups.exists? id: Group::GATHER_MODERATORS
+  end
+
+  def allowed_to_ban?
+    admin? or moderator?
   end
 
   def gather_moderator?

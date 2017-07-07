@@ -3,7 +3,11 @@ class UsersController < ApplicationController
   respond_to :html, :js
 
   def index
-    @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
+    if params[:filter] == 'lately'
+      @users = User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
+    else
+      @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
+    end
   end
 
   def show

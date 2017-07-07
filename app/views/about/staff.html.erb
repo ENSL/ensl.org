@@ -6,7 +6,7 @@
 <p>To contact us:</p>
 <p>
   <ol>
-    <li>Use the <%= link_to "contact", new_issue_path() %> form (you must be logged in)</li>
+    <li>Use the <%= link_to "contact", new_issue_path %> form (you must be logged in)</li>
     <li>Visit our <%= link_to "IRC", article_path(408) %> channel <%= link_to "#ENSL", "irc://irc.quakenet.org/ensl" %> on Quakenet.</li>
     <li>Send email to the head admin as per the list below</li>
     <li>Contact other staff members directly, check below and click profile for contact details</li>
@@ -21,6 +21,8 @@
     <li><a href="#admins">Admins</a></li>
     <li><a href="#referees">Referees</a></li>
     <li><a href="#casters">Casters</a></li>
+    <li><a href="#gathermods">Gather Mods</a></li>
+    <li><a href="#compmodcouncil">Comp. Mod Council</a></li>
     <li><a href="#extras">Extras</a></li>
     <li><a href="#support">Support</a></li>
   </ul>
@@ -106,6 +108,60 @@
         <% end %>
       </table>
     </div>
+    <div class="tab" id="gathermods">
+      <h3>GATHER MODERATORS</h3>
+      <table class="striped staff">
+        <tr>
+          <th></th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Task</th>
+          <th>Age</th>
+        </tr>
+        <% Group.gathermods.each do |grouper| %>
+            <tr>
+              <td class="country"><%= flag grouper.user.country %></td>
+              <td class="username"><%= namelink grouper.user %></td>
+              <td><%= h grouper.user.email_s %></td>
+              <td>
+                <% if grouper.task %>
+                    <%= h grouper.task %>
+                <% else %>
+                    <%= h grouper.group.name.singularize %>
+                <% end %>
+              </td>
+              <td class="age"><%= h grouper.user.age %></td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+    <div class="tab" id="compmodcouncil">
+      <h3>COMP. MOD COUNCIL</h3>
+      <table class="striped staff">
+        <tr>
+          <th></th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Task</th>
+          <th>Age</th>
+        </tr>
+        <% Group.compmodcouncil.each do |grouper| %>
+            <tr>
+              <td class="country"><%= flag grouper.user.country %></td>
+              <td class="username"><%= namelink grouper.user %></td>
+              <td><%= h grouper.user.email_s %></td>
+              <td>
+                <% if grouper.task %>
+                    <%= h grouper.task %>
+                <% else %>
+                    <%= h grouper.group.name.singularize %>
+                <% end %>
+              </td>
+              <td class="age"><%= h grouper.user.age %></td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
     <div class="tab" id="extras">
       <h3>Extras</h3>
       <table class="striped staff">
@@ -137,7 +193,7 @@
       <h3>Support</h3>
       <ul>
         <li><b><a href="http://unknownworlds.com/">Unknown Worlds Entertainment</a></b></li>
-      <ul>
+      </ul>
     </div>
   </div>
 </div>

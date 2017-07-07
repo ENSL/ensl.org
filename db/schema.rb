@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170501121908) do
+ActiveRecord::Schema.define(:version => 20170702150454) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -649,7 +649,7 @@ ActiveRecord::Schema.define(:version => 20170501121908) do
     t.boolean  "notify_challenge",    :default => true, :null => false
     t.string   "steam_profile"
     t.string   "achievements_parsed"
-    t.string   "signature_parsed"
+    t.text     "signature_parsed"
     t.string   "stream"
     t.string   "layout"
   end
@@ -872,6 +872,7 @@ ActiveRecord::Schema.define(:version => 20170501121908) do
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"
+  add_index "users", ["lastvisit"], :name => "index_users_on_lastvisit"
   add_index "users", ["password"], :name => "index_users_on_password"
   add_index "users", ["team_id"], :name => "index_users_on_team_id"
   add_index "users", ["username"], :name => "index_users_on_username"

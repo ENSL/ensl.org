@@ -26,7 +26,7 @@ module Extra
     end
 
     def bbcode_to_html(text)
-      Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\r/, "<br>").html_safe
+      Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, "<br>").html_safe
     end
 
     def move_up(scope, column = "position")
