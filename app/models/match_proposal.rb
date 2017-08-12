@@ -51,7 +51,7 @@ class MatchProposal < ActiveRecord::Base
           return false
       end
     end
-    
+
     true
   end
 
