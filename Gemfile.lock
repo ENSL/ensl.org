@@ -96,8 +96,14 @@ GEM
       execjs
     coffee-script-source (1.7.0)
     columnize (0.8.9)
-    country_code_select (1.0.1)
-      activesupport (>= 3.0)
+    countries (2.1.2)
+      i18n_data (~> 0.8.0)
+      money (~> 6.9)
+      sixarm_ruby_unaccent (~> 1.1)
+      unicode_utils (~> 1.4)
+    country_select (3.1.0)
+      countries (~> 2.0)
+      sort_alphabetical (~> 1.0)
     dalli (2.7.1)
     database_cleaner (1.2.0)
     debug_inspector (0.0.2)
@@ -146,6 +152,7 @@ GEM
     httpclient (2.8.3)
     hurley (0.2)
     i18n (0.7.0)
+    i18n_data (0.8.0)
     journey (1.0.4)
     jquery-rails (2.0.3)
       railties (>= 3.1.0, < 5.0)
@@ -164,6 +171,8 @@ GEM
     method_source (0.8.2)
     mime-types (1.25.1)
     mini_portile (0.6.2)
+    money (6.9.0)
+      i18n (>= 0.6.4, < 0.9)
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -271,7 +280,10 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
     simplecov-html (0.7.1)
+    sixarm_ruby_unaccent (1.2.0)
     slop (3.5.0)
+    sort_alphabetical (1.1.0)
+      unicode_utils (>= 1.2.2)
     sprockets (2.2.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -302,6 +314,7 @@ GEM
     uglifier (2.5.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
+    unicode_utils (1.4.0)
     websocket (1.0.7)
     websocket-driver (0.5.4)
       websocket-extensions (>= 0.1.0)
@@ -329,7 +342,7 @@ DEPENDENCIES
   carrierwave (~> 0.10.0)
   codeclimate-test-reporter (~> 0.3.0)
   coffee-rails (~> 3.2.2)
-  country_code_select (~> 1.0.1)
+  country_select
   dalli (~> 2.7.0)
   database_cleaner (~> 1.2.0)
   dotenv-rails (~> 0.10.0)
@@ -372,4 +385,4 @@ RUBY VERSION
    ruby 2.2.2p95
 
 BUNDLED WITH
-   1.14.6
+   1.15.1

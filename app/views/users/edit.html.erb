@@ -97,7 +97,7 @@
             <div class="fields horizontal">
               <%= f.label :country %>
               <div class="inputs">
-                <%= country_code_select :user, :country, [['EU', 'EU']] %>  
+                <%= country_select :user, :country, include_blank: true %>
               </div>
             </div>
             <div class="fields horizontal">

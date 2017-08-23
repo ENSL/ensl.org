@@ -126,9 +126,9 @@ module ApplicationHelper
 
   def flag country
     if country and country.to_s.size > 0
-      image_tag "flags/#{country}.png", class: 'flag'
+      image_tag 'shared/blank.gif', class: "flag flag-#{country.downcase}"
     else
-      image_tag 'flags/EU.png', class: 'flag'
+      image_tag 'shared/blank.gif', class: 'flag'
     end
   end
 
