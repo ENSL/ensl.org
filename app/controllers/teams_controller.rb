@@ -41,12 +41,15 @@ class TeamsController < ApplicationController
     if @team.update_attributes params[:team]
       if params[:rank]
         @team.teamers.present.each do |member|
-          rank = params[:rank]["#{member.id}"]
-          if cuser.admin? or (rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
-            if member.rank == Teamer::RANK_JOINER
+          # Contains new rank as given by submitted parameters
+          new_rank = params[:rank]["#{member.id}"]
+          # Can only set own rank to equal or lower than current rank
+          if cuser.admin? or (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
+            # Update team when rank changes from joiner to member or higher
+            if member.rank == Teamer::RANK_JOINER && new_rank.to_i >= Teamer::RANK_MEMBER
               member.user.update_attribute :team, @team
             end
-            member.update_attribute :rank, rank
+            member.update_attribute :rank, new_rank
             member.update_attribute :comment, params[:comment]["#{member.id}"]
           end
         end

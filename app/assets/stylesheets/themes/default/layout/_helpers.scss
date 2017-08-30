@@ -2,12 +2,6 @@
   Global Helpers
 */
 
-img.flag {
-  display: inline-block;
-  vertical-align: - 6px;
-  margin-right: 10px;
-}
-
 .actions-bottom {
   @include span-columns(12);
   margin-top: 20px;
