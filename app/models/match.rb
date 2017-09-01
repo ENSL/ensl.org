@@ -362,4 +362,8 @@ class Match < ActiveRecord::Base
   def can_make_proposal?(cuser)
     cuser && (contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser))
   end
+
+  def user_in_match?(user)
+    user && (user.team == contester1.team || user.team == contester2.team)
+  end
 end
