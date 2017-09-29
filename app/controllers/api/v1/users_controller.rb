@@ -14,7 +14,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
 
     if @user.nil?
-      render json: nil
+      render json: nil, status: :not_found
       return
     end
 
