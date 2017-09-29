@@ -14,7 +14,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
 
     if @user.nil?
-      raise ActionController::RoutingError.new("User Not Found")
+      render json: nil
+      return
     end
 
     if @user.steamid.present?
