@@ -51,7 +51,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   private
 
   def not_found
-    head :not_found
+    render json: {error: "User not found"}, status: :not_found
   end
 
   def steam_profile(user)
