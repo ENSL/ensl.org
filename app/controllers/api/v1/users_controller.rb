@@ -14,7 +14,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
 
     if @user.nil?
-      raise ActionController::RoutingError.new("User Not Found")
+      not_found
+      return
     end
 
     if @user.steamid.present?
@@ -44,10 +45,14 @@ class Api::V1::UsersController < Api::V1::BaseController
       team: @user.team.present? ? { id: @user.team.id, name: @user.team.name } : nil
     }
   rescue ActiveRecord::RecordNotFound
-    raise ActionController::RoutingError.new("User Not Found")
+    not_found
   end
 
   private
+
+  def not_found
+    render json: {error: "User not found"}, status: :not_found
+  end
 
   def steam_profile(user)
     SteamCondenser::Community::SteamId.from_steam_id("STEAM_#{user.steamid}")

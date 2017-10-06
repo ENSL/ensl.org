@@ -78,11 +78,15 @@ describe Api::V1::UsersController do
     end
 
     it "returns 404 if user does not exist" do
-      expect { get :show, id: -1 }.to raise_error(ActionController::RoutingError)
+      get :show, id: -1
+      expect(response.status).to eq(404)
+      expect(json["error"]).to eq("User not found")
     end
 
     it "returns 404 if user does not exist by steamid" do
-      expect { get :show, id: -1, format: "steamid" }.to raise_error(ActionController::RoutingError)
+      get :show, id: -1, format: "steamid"
+      expect(response.status).to eq(404)
+      expect(json["error"]).to eq("User not found")
     end
 
     it "queries the steam condenser for an invalid steamid" do
