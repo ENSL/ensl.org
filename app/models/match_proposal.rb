@@ -19,8 +19,10 @@ class MatchProposal < ActiveRecord::Base
   scope :of_match, ->(match) { where('match_id = ?', match.id) }
   scope :confirmed_for_match, ->(match) { where('match_id = ? AND status = ?', match.id, STATUS_CONFIRMED) }
   scope :confirmed_upcoming, ->{ where('status = ? AND proposed_time > UTC_TIMESTAMP()', STATUS_CONFIRMED) }
+  scope :confirmed_for_contest,
+        ->(contest){ includes(:match).where(matches:{contest_id: contest.id}, status: STATUS_CONFIRMED).all}
 
-  def status_strings
+  def self.status_strings
     {STATUS_PENDING   => 'Pending',
      STATUS_REVOKED   => 'Revoked',
      STATUS_REJECTED  => 'Rejected',
@@ -47,7 +49,11 @@ class MatchProposal < ActiveRecord::Base
     cuser && cuser.admin?
   end
 
-  private
+  def state_immutable?
+    status == STATUS_REJECTED ||
+      status == STATUS_DELAYED ||
+      status == STATUS_REVOKED
+  end
 
   def status_change_allowed?(cuser, new_status)
     case new_status
@@ -58,17 +64,20 @@ class MatchProposal < ActiveRecord::Base
         # only confirmed matches can be set to delayed
         # only admins can set matches to delayed and only if they are not playing in that match
         # matches can only be delayed if they are not to far in the future
-        return false unless self.status == STATUS_CONFIRMED && cuser.admin? &&
+        return self.status == STATUS_CONFIRMED && cuser.admin? &&
             !self.match.user_in_match?(cuser) && self.proposed_time <= CONFIRMATION_LIMIT.minutes.from_now
       when STATUS_REVOKED
         # unconfirmed can only be revoked by team making the proposal
         # confirmed can only be revoked if soon enough before match time
-        return false unless self.status == STATUS_PENDING && self.team == cuser.team ||
+        return self.status == STATUS_PENDING && self.team == cuser.team ||
             self.status == STATUS_CONFIRMED && self.proposed_time > CONFIRMATION_LIMIT.minutes.from_now
       when STATUS_CONFIRMED, STATUS_REJECTED
         # only team proposed to can reject or confirm and only if soon enough before match time
-        return false unless self.status == STATUS_PENDING && self.team != cuser.team &&
-            self.proposed_time < CONFIRMATION_LIMIT.minutes.from_now
+        status_ok = self.status == STATUS_PENDING
+        team_ok = self.team != cuser.team
+        time_ok = CONFIRMATION_LIMIT.minutes.from_now < self.proposed_time
+
+        return status_ok && team_ok && time_ok
       else
         # invalid status
         return false

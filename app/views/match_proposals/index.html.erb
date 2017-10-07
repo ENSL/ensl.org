@@ -1,7 +1,8 @@
 <h1>Proposals</h1>
+<h2><%= @match.contester1 %> VS <%= @match.contester2 %></h2>
 <%= link_to 'Back', match_path(@match), class: 'button' %>
 <% if @match.match_proposals.empty? %>
-<h4>There are no proposals yet</h4>
+<h4 style="clear: both;">There are no proposals yet</h4>
 <% else %>
 <table id="proposals" class="striped">
   <tr>
@@ -16,13 +17,19 @@
     <tr class="<%=cycle('even', 'odd') %>">
       <td><%= proposal.team.name %></td>
       <td><%= longtime proposal.proposed_time %> </td>
-      <td><%= proposal.status_strings[proposal.status] %></td>
+      <td><%= MatchProposal.status_strings[proposal.status] %></td>
       <% if @match.can_make_proposal?(cuser) %>
       <td>
-        <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
-          <%= f.hidden_field :status, value: 0 %>
-          <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})" %>
-          <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})" %>
+        <% unless proposal.state_immutable? %>
+          <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
+            <%= f.hidden_field :status, value: 0 %>
+            <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
+            <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
+            <%= link_to_function icon('eraser'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
+              <%= link_to_function icon('hourglass'), "proposalStateSubmit(#{MatchProposal::STATUS_DELAYED},#{proposal.id})", title: 'Delay' %>
+            <% end %>
+          <% end %>
         <% end %>
       </td>
       <% end %>
@@ -33,7 +40,16 @@
       function proposalStateSubmit(newState, formID) {
           var form = $('#edit_match_proposal_' + formID);
           form.children("input[type='hidden']").val(newState);
-          form.submit();
+          $.post(form.attr('action'),form.serialize(), function(data) {
+              datajson = data.responseText;
+              tr = form.closest('tr');
+              tr.children('td').eq(1).html(datajson.status);
+              alert(datajson.message);
+          }, 'json')
+            .error(function (err) {
+                errjson = JSON.parse(err.responseText);
+                alert(errjson.error.message);
+            });
       }
     </script>
 <% end %>

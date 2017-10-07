@@ -1,5 +1,5 @@
 class ContestsController < ApplicationController
-  before_filter :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc]
+  before_filter :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc, :confirmed_matches]
 
   def index
     # @contests = Contest.all
@@ -100,6 +100,10 @@ class ContestsController < ApplicationController
     raise AccessError unless @contest.can_destroy? cuser
     @contest.destroy
     redirect_to contests_url
+  end
+
+  def confirmed_matches
+    @match_props = MatchProposal.confirmed_for_contest(@contest)
   end
 
   private

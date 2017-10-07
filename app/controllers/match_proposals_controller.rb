@@ -1,6 +1,7 @@
 class MatchProposalsController < ApplicationController
   before_filter :get_match
   def index
+    raise AccessError unless @match.user_in_match?(cuser)
   end
 
   def new
@@ -25,25 +26,35 @@ class MatchProposalsController < ApplicationController
   end
 
   def update
-    @proposal = MatchProposal.find(params[:id])
-    raise AccessError unless @proposal.can_update?(cuser, params[:match_proposal])
-    @proposal.status = params[:match_proposal][:status]
-    if @proposal.save
-      # TODO: rework messages
-      # TODO: make it so only one proposal can be confirmed for a match at any given time
-      action = case @proposal.status
-                 when MatchProposal::STATUS_CONFIRMED
-                   "Confirmed Proposal for #{Time.use_zone(view_context.timezone_offset) { @proposal.proposed_time.strftime('%d %B %y %H:%M %Z') }}"
-                 when MatchProposal::STATUS_REJECTED
-                   "Rejected Proposal for #{Time.use_zone(view_context.timezone_offset) { @proposal.proposed_time.strftime('%d %B %y %H:%M %Z') }}"
-                 else
-                   "Smthn went wrong"
-               end
-      flash[:notice] = action
-    else
-      flash[:notice] = "Error"
+    raise AccessError unless request.xhr? # Only respond to ajax requests
+    rjson = {}
+    proposal = MatchProposal.find(params[:id])
+    unless proposal
+      rjson[:error] = {
+        code: 404,
+        message: "No proposal with id #{params[:id]}"
+      }
+      render(json: rjson, status: :not_found) && return
     end
-    redirect_to(match_proposals_path(@match))
+    unless proposal.can_update?(cuser, params[:match_proposal])
+      rjson[:error] = {
+        code: 403,
+        message: "You are not allowed to update the state to #{MatchProposal.status_strings[params[:match_proposal][:status].to_i]}"
+      }
+      render(json: rjson, status: :forbidden) && return
+    end
+    proposal.status = params[:match_proposal][:status]
+    if proposal.save
+      rjson[:status] = MatchProposal.status_strings[proposal.status]
+      rjson[:message] = "Successfully updated status to #{MatchProposal.status_strings[proposal.status]}"
+      render(json: rjson, status: :success)
+    else
+      rjson[:error] = {
+        code: 500,
+        message: 'Something went wrong! Please try again.'
+      }
+      render(json: rjson, status: 500)
+    end
   end
 
 private

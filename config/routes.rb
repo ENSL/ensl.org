@@ -51,6 +51,8 @@ Ensl::Application.routes.draw do
   resources :users
   resources :locks
   resources :contesters
+
+  get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
   resources :contests
   resources :challenges
   resources :servers
