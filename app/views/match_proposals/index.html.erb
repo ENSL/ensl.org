@@ -25,7 +25,7 @@
             <%= f.hidden_field :status, value: 0 %>
             <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
             <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
-            <%= link_to_function icon('eraser'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+            <%= link_to_function icon('undo'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
               <%= link_to_function icon('hourglass'), "proposalStateSubmit(#{MatchProposal::STATUS_DELAYED},#{proposal.id})", title: 'Delay' %>
             <% end %>
@@ -41,10 +41,9 @@
           var form = $('#edit_match_proposal_' + formID);
           form.children("input[type='hidden']").val(newState);
           $.post(form.attr('action'),form.serialize(), function(data) {
-              datajson = data.responseText;
               tr = form.closest('tr');
-              tr.children('td').eq(1).html(datajson.status);
-              alert(datajson.message);
+              tr.children('td').eq(2).text(data.status);
+              if(data.status === 'Revoked' || data.status === 'Rejected') tr.children('td').eq(3).empty();
           }, 'json')
             .error(function (err) {
                 errjson = JSON.parse(err.responseText);

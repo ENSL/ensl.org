@@ -5,6 +5,11 @@ class MatchProposalsController < ApplicationController
   end
 
   def new
+    mp = MatchProposal.confirmed_for_match(@match).first
+    if mp
+      flash[:danger] = 'Cannot create a new proposal aslong as there already is a confirmed one'
+      redirect_to(match_proposals_path(@match))  && return
+    end
     @proposal = MatchProposal.new
     @proposal.match = @match
     raise AccessError unless @proposal.can_create? cuser
@@ -47,7 +52,7 @@ class MatchProposalsController < ApplicationController
     if proposal.save
       rjson[:status] = MatchProposal.status_strings[proposal.status]
       rjson[:message] = "Successfully updated status to #{MatchProposal.status_strings[proposal.status]}"
-      render(json: rjson, status: :success)
+      render(json: rjson, status: :accepted)
     else
       rjson[:error] = {
         code: 500,
