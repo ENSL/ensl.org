@@ -7,7 +7,7 @@
   <% @match_props && @match_props.each do |mp| %>
     <tr>
       <th><%= link_to mp.match.contester1, contester_path(mp.match.contester1) %> VS <%= link_to mp.match.contester2, contester_path(mp.match.contester2) %></th>
-      <th><%= longertime(mp.proposed_time) %></th>
+      <th><%= link_to longertime(mp.proposed_time), match_path(mp.match) %></th>
     </tr>
   <% end %>
 </table>
