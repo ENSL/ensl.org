@@ -10,7 +10,7 @@
     <th>Time</th>
     <th>Status</th>
     <% if @match.can_make_proposal?(cuser) %>
-    <th>Actions</th>
+    <th class="actions">Actions</th>
     <% end %>
   </tr>
   <% @match.match_proposals.each do |proposal| %>
@@ -19,7 +19,7 @@
       <td><%= longtime proposal.proposed_time %> </td>
       <td><%= MatchProposal.status_strings[proposal.status] %></td>
       <% if @match.can_make_proposal?(cuser) %>
-      <td>
+      <td class="actions">
         <% unless proposal.state_immutable? %>
           <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
             <%= f.hidden_field :status, value: 0 %>
