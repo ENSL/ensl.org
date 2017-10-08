@@ -5,10 +5,13 @@ class MatchProposalsController < ApplicationController
   end
 
   def new
-    mp = MatchProposal.confirmed_for_match(@match).first
-    if mp
-      flash[:danger] = 'Cannot create a new proposal aslong as there already is a confirmed one'
-      redirect_to(match_proposals_path(@match))  && return
+    # Don't allow creation of new proposals if there is a confirmed one already
+    if MatchProposal.exists?(
+      match_id: @match.id,
+      status: MatchProposal::STATUS_CONFIRMED
+    )
+      flash[:error] = 'Cannot create a new proposal if there is already a confirmed one'
+      redirect_to(match_proposals_path(@match)) && return
     end
     @proposal = MatchProposal.new
     @proposal.match = @match

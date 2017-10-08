@@ -23,9 +23,15 @@
         <% unless proposal.state_immutable? %>
           <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
             <%= f.hidden_field :status, value: 0 %>
-            <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
-            <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
-            <%= link_to_function icon('undo'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_CONFIRMED) %>
+              <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
+            <% end %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REJECTED) %>
+              <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
+            <% end %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REVOKED) %>
+              <%= link_to_function icon('undo'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+            <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
               <%= link_to_function icon('hourglass'), "proposalStateSubmit(#{MatchProposal::STATUS_DELAYED},#{proposal.id})", title: 'Delay' %>
             <% end %>
