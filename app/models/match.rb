@@ -189,6 +189,11 @@ class Match < ActiveRecord::Base
     end
   end
 
+  def get_opposing_team(team)
+    team == contester1.team ? contester2.team : contester1.team
+  end
+
+
   def set_hltv
     get_hltv if match_time.future?
   end

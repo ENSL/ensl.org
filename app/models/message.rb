@@ -44,11 +44,15 @@ class Message < ActiveRecord::Base
   end
 
   def thread
-    Message.find_by_sql ["
+    if sender_type == 'System'
+      Message.where(recipient_id: recipient.id, sender_type: 'System')
+    else
+      Message.find_by_sql ["
                          (SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?)
                          UNION
                          (SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?)
                          ORDER BY id", sender.id, recipient.id, recipient.id, sender.id]
+    end
   end
 
   def parse_text

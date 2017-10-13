@@ -24,8 +24,17 @@ class MatchProposalsController < ApplicationController
     raise AccessError unless @proposal.can_create? cuser
     @proposal.team = cuser.team
     @proposal.status = MatchProposal::STATUS_PENDING
-
     if @proposal.save
+      # TODO: send message to teamleaders of opposite team
+      msg = Message.new
+      msg.sender_type = 'System'
+      msg.recipient_type = 'Team'
+      msg.title = 'New Scheduling Proposal'
+      recipient = @match.get_opposing_team(cuser.team)
+      msg.recipient = recipient
+      msg.text = "There is a new scheduling proposal for your match against #{recipient.name}.\n" \
+        "Find it [url=#{match_proposals_path(@match)}]here[/url]"
+      msg.save
       flash[:notice] = 'Created new proposal'
       redirect_to(match_proposals_path(@match))
     else
@@ -51,8 +60,10 @@ class MatchProposalsController < ApplicationController
       }
       render(json: rjson, status: :forbidden) && return
     end
+    send_msg = proposal.status != params[:match_proposal][:status]
     proposal.status = params[:match_proposal][:status]
     if proposal.save
+      # TODO: send message to opposite team leaders if send_msg
       rjson[:status] = MatchProposal.status_strings[proposal.status]
       rjson[:message] = "Successfully updated status to #{MatchProposal.status_strings[proposal.status]}"
       render(json: rjson, status: :accepted)
