@@ -60,10 +60,23 @@ class MatchProposalsController < ApplicationController
       }
       render(json: rjson, status: :forbidden) && return
     end
-    send_msg = proposal.status != params[:match_proposal][:status]
-    proposal.status = params[:match_proposal][:status]
+    new_status = params[:match_proposal][:status]
+    curr_status = proposal.status
+    status_updated = curr_status != new_status
+    proposal.status = new_status
     if proposal.save
-      # TODO: send message to opposite team leaders if send_msg
+
+      if status_updated
+        msg = Message.new
+        msg.sender_type = 'System'
+        msg.recipient_type = 'Team'
+        msg.title = 'New Scheduling Proposal'
+        recipient = @match.get_opposing_team(cuser.team)
+        msg.recipient = recipient
+        msg.text = message_text(new_status)
+        msg.save if msg.text
+      end
+
       rjson[:status] = MatchProposal.status_strings[proposal.status]
       rjson[:message] = "Successfully updated status to #{MatchProposal.status_strings[proposal.status]}"
       render(json: rjson, status: :accepted)
@@ -79,5 +92,24 @@ class MatchProposalsController < ApplicationController
 private
   def get_match
     @match = Match.find params[:match_id]
+  end
+
+  def message_text(new_status)
+    case new_status
+    when MatchProposal::STATUS_CONFIRMED
+      "A scheduling proposal for your match against #{recipient.name} was confirmed!.\n" \
+      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
+    when MatchProposal::STATUS_REJECTED
+      "A scheduling proposal for your match against #{recipient.name} was rejected!.\n" \
+      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
+    when MatchProposal::STATUS_REVOKED
+      "A scheduling proposal for your match against #{recipient.name} was revoked!.\n" \
+      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
+    when MatchProposal::STATUS_DELAYED
+      "Delaying for your match against #{recipient.name} was permitted!.\n" \
+      "Schedule a new time as soon as possible [url=#{match_proposals_path(@match)}]here[/url]"
+    else
+      false # Should not happen as transition to any other state is not allowed
+    end
   end
 end
