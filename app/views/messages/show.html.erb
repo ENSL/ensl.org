@@ -10,7 +10,7 @@
       <div class="content">
         <%= raw message.text_parsed %>
       </div>
-      <p>Sent by: <%= namelink message.sender %> on <%= shortdate message.created_at %></p>
+      <p>Sent by: <% if message.sender_type == 'System' %>System<% else %><%= namelink message.sender %><% end %> on <%= shortdate message.created_at %></p>
       <p>
         <%= link_to "Reply", 
           { controller: "messages", action: "new", id: message.sender_type, id2: message.sender_id, title: message.title },

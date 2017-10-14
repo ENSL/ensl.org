@@ -42,6 +42,7 @@ class Match < ActiveRecord::Base
   has_many :users, through: :matchers
   has_many :predictions, dependent: :destroy
   has_many :comments, as: :commentable, order: "created_at", dependent: :destroy
+  has_many :match_proposals, inverse_of: :match, dependent: :destroy
   belongs_to :challenge
   belongs_to :contest
   belongs_to :contester1, class_name: "Contester", include: "team"
@@ -187,6 +188,11 @@ class Match < ActiveRecord::Base
       friendly == contester1.team ? points2 : points1
     end
   end
+
+  def get_opposing_team(team)
+    team == contester1.team ? contester2.team : contester1.team
+  end
+
 
   def set_hltv
     get_hltv if match_time.future?
@@ -356,5 +362,13 @@ class Match < ActiveRecord::Base
 
   def can_destroy?(cuser)
     cuser && cuser.admin?
+  end
+
+  def can_make_proposal?(cuser)
+    cuser && (contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser))
+  end
+
+  def user_in_match?(user)
+    user && (user.team == contester1.team || user.team == contester2.team)
   end
 end

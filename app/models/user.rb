@@ -199,6 +199,10 @@ class User < ActiveRecord::Base
     groups.exists? id: Group::STAFF
   end
 
+  def staff?
+    groups.exists? :id => Group::STAFF
+  end
+
   def caster?
     groups.exists? id: Group::CASTERS
   end
@@ -214,6 +218,14 @@ class User < ActiveRecord::Base
 
   def allowed_to_ban?
     admin? or moderator?
+  end
+
+  def gather_moderator?
+    groups.exists? id: Group::GATHER_MODERATORS
+  end
+
+  def allowed_to_ban?
+    admin? or gather_moderator?
   end
 
   def verified?

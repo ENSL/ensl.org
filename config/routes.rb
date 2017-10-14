@@ -51,6 +51,8 @@ Ensl::Application.routes.draw do
   resources :users
   resources :locks
   resources :contesters
+
+  get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
   resources :contests
   resources :challenges
   resources :servers
@@ -60,6 +62,7 @@ Ensl::Application.routes.draw do
   get "matches/ref/:id" => "matches#ref", as: :match_ref
   resources :matches do
     get :admin, to: "matches#admin", on: :collection
+    resources :match_proposals, path: "proposals", as: :proposals, only: [:index, :new, :create, :update]
   end
 
   resources :maps

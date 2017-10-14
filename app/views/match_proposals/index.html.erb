@@ -1,0 +1,61 @@
+<h1>Proposals</h1>
+<h2><%= @match.contester1 %> VS <%= @match.contester2 %></h2>
+<%= link_to 'Back', match_path(@match), class: 'button' %>
+<% if @match.match_proposals.empty? %>
+<h4 style="clear: both;">There are no proposals yet</h4>
+<% else %>
+<table id="proposals" class="striped">
+  <tr>
+    <th>Team</th>
+    <th>Time</th>
+    <th>Status</th>
+    <% if @match.can_make_proposal?(cuser) %>
+    <th class="actions">Actions</th>
+    <% end %>
+  </tr>
+  <% @match.match_proposals.each do |proposal| %>
+    <tr class="<%=cycle('even', 'odd') %>">
+      <td><%= proposal.team.name %></td>
+      <td><%= longtime proposal.proposed_time %> </td>
+      <td><%= MatchProposal.status_strings[proposal.status] %></td>
+      <% if @match.can_make_proposal?(cuser) %>
+      <td class="actions">
+        <% unless proposal.state_immutable? %>
+          <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
+            <%= f.hidden_field :status, value: 0 %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_CONFIRMED) %>
+              <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
+            <% end %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REJECTED) %>
+              <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
+            <% end %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REVOKED) %>
+              <%= link_to_function icon('undo'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+            <% end %>
+            <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
+              <%= link_to_function icon('hourglass'), "proposalStateSubmit(#{MatchProposal::STATUS_DELAYED},#{proposal.id})", title: 'Delay' %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+    <script type="text/javascript">
+      function proposalStateSubmit(newState, formID) {
+          var form = $('#edit_match_proposal_' + formID);
+          form.children("input[type='hidden']").val(newState);
+          $.post(form.attr('action'),form.serialize(), function(data) {
+              tr = form.closest('tr');
+              tr.children('td').eq(2).text(data.status);
+              if(data.status === 'Revoked' || data.status === 'Rejected') tr.children('td').eq(3).empty();
+          }, 'json')
+            .error(function (err) {
+                errjson = JSON.parse(err.responseText);
+                alert(errjson.error.message);
+            });
+      }
+    </script>
+<% end %>
+<%= link_to 'Back', match_path(@match), class: 'button' %><%= link_to 'Propose match time', new_match_proposal_path(@match), class: 'button' %>

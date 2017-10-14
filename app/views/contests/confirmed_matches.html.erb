@@ -1,0 +1,13 @@
+<h1 class="title">Confirmed Matches for <%= @contest.name %></h1>
+<table class="striped">
+  <tr>
+    <th>Match</th>
+    <th>Scheduled for</th>
+  </tr>
+  <% @match_props && @match_props.each do |mp| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= link_to mp.match.contester1, contester_path(mp.match.contester1) %> VS <%= link_to mp.match.contester2, contester_path(mp.match.contester2) %></td>
+      <td><%= link_to longertime(mp.proposed_time), match_path(mp.match) %></td>
+    </tr>
+  <% end %>
+</table>

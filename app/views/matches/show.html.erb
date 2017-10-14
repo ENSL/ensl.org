@@ -116,6 +116,11 @@
       <p><%= @match.report.html_safe %></p>
     </div>
   <% end %>
+  <% if cuser and (cuser.admin? or @match.user_in_match? cuser) %>
+      <div class="referee">
+        <%= link_to 'Proposals', match_proposals_path(@match), class: 'button' %>
+      </div>
+  <% end %>
 
   <% if cuser and @match.can_update? cuser, [:report] %>
     <div class="referee">
