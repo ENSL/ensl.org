@@ -41,7 +41,11 @@
           <tr>
             <td class="country"><%= flag grouper.user.country %></td>
             <td class="username"><%= namelink grouper.user %></td>
+            <% if grouper.user.public_email %>
             <td><%= h grouper.user.email_s %></td>
+            <% else %>
+            <td></td>
+            <% end %>
             <td>
               <% if grouper.task %>
                 <%= h grouper.task %>
