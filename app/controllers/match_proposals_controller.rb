@@ -60,7 +60,7 @@ class MatchProposalsController < ApplicationController
       }
       render(json: rjson, status: :forbidden) && return
     end
-    new_status = params[:match_proposal][:status]
+    new_status = params[:match_proposal][:status].to_i
     curr_status = proposal.status
     status_updated = curr_status != new_status
     proposal.status = new_status
@@ -70,10 +70,10 @@ class MatchProposalsController < ApplicationController
         msg = Message.new
         msg.sender_type = 'System'
         msg.recipient_type = 'Team'
-        msg.title = 'New Scheduling Proposal'
+        msg.title = 'Scheduling Proposal Update'
         recipient = @match.get_opposing_team(cuser.team)
         msg.recipient = recipient
-        msg.text = message_text(new_status)
+        msg.text = message_text(new_status, recipient)
         msg.save if msg.text
       end
 
@@ -94,19 +94,19 @@ private
     @match = Match.find params[:match_id]
   end
 
-  def message_text(new_status)
+  def message_text(new_status, recipient)
     case new_status
     when MatchProposal::STATUS_CONFIRMED
-      "A scheduling proposal for your match against #{recipient.name} was confirmed!.\n" \
+      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was confirmed!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_REJECTED
-      "A scheduling proposal for your match against #{recipient.name} was rejected!.\n" \
+      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was rejected!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_REVOKED
-      "A scheduling proposal for your match against #{recipient.name} was revoked!.\n" \
+      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was revoked!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_DELAYED
-      "Delaying for your match against #{recipient.name} was permitted!.\n" \
+      "Delaying for your match against [b]#{recipient.name}[/b] was permitted!.\n" \
       "Schedule a new time as soon as possible [url=#{match_proposals_path(@match)}]here[/url]"
     else
       false # Should not happen as transition to any other state is not allowed
