@@ -3,10 +3,15 @@ class UsersController < ApplicationController
   respond_to :html, :js
 
   def index
-    if params[:filter] == 'lately'
-      @users = User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
+    search = params[:search]
+    if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser && cuser.admin?
+      @users = User.where(lastip: $1).paginate(per_page: 40, page: params[:page])
     else
-      @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
+      if params[:filter] == 'lately'
+        @users = User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
+      else
+        @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
+      end
     end
   end
 
