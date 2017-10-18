@@ -1,7 +1,7 @@
 class MatchProposalsController < ApplicationController
   before_filter :get_match
   def index
-    raise AccessError unless @match.user_in_match?(cuser)
+    raise AccessError unless cuser.admin? || @match.user_in_match?(cuser)
   end
 
   def new
