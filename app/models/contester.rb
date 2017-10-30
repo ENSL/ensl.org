@@ -43,7 +43,7 @@ class Contester < ActiveRecord::Base
   validates_inclusion_of [:score, :win, :loss, :draw, :extra], :in => 0..9999, :allow_nil => true
   validates_uniqueness_of :team_id, :scope => :contest_id, :message => "You can't join same contest twice."
   #validate_on_create:validate_member_participation
-  #validate_on_create:validate_contest
+  validate :validate_contest, :on => :create
   #validate_on_create:validate_playernumber
 
   before_create :init_variables
@@ -87,8 +87,10 @@ class Contester < ActiveRecord::Base
   end
 
   def validate_contest
-    if contest.end.past? or contest.status == Contest::STATUS_CLOSED
-      errors.add :contest, I18n.t(:contests_closed)
+    if contest.end.past?
+      self.errors.add :base, "Cannot join contest! It is already over!"
+    elsif contest.status != Contest::STATUS_OPEN
+      self.errors.add :base, "Cannot join contest! Signups are closed!"
     end
   end
 
