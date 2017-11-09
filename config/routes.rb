@@ -136,7 +136,7 @@ Ensl::Application.routes.draw do
   match "votes/create"
   match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
 
-  get "CustomUrls/administrate"
+  get "custom_urls", to: "custom_urls#administrate"
   resources :custom_urls, only: [:create, :update, :destroy]
 
   get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
