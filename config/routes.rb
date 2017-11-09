@@ -1,4 +1,5 @@
 Ensl::Application.routes.draw do
+
   %w(403 404 422 500).each do |code|
     get code, to: "errors#show", code: code
   end
@@ -134,6 +135,11 @@ Ensl::Application.routes.draw do
 
   match "votes/create"
   match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
+
+  get "sites/administrate"
+  resource :sites, only: [:create, :update, :destroy]
+
+  get ":name", requirements: {name: /\A[a-z\-]{2,10}\Z/}
 
   match ":controller/:action", requirements: { action: /A-Za-z/ }
   match ":controller/:action/:id"
