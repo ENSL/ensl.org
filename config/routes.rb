@@ -75,7 +75,7 @@ Ensl::Application.routes.draw do
   resources :weeks
   resources :movies
   resources :messages
-  resources :sites
+  # resources :sites
   resources :bans
   resources :tweets
   resources :issues
@@ -136,10 +136,10 @@ Ensl::Application.routes.draw do
   match "votes/create"
   match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
 
-  get "sites/administrate"
-  resource :sites, only: [:create, :update, :destroy]
+  get "CustomUrls/administrate"
+  resources :custom_urls, only: [:create, :update, :destroy]
 
-  get ":name", requirements: {name: /\A[a-z\-]{2,10}\Z/}
+  get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
 
   match ":controller/:action", requirements: { action: /A-Za-z/ }
   match ":controller/:action/:id"

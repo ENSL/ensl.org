@@ -1,4 +1,4 @@
-class Site < ActiveRecord::Base
+class CustomUrl < ActiveRecord::Base
   belongs_to :article
   attr_accessible :name
 
