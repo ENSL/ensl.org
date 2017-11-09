@@ -1,4 +1,4 @@
-class SitesController < ApplicationController
+class CustomUrlsController < ApplicationController
   def administrate
   end
 

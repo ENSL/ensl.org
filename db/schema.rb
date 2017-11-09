@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171013154050) do
+ActiveRecord::Schema.define(:version => 20171109165433) do
 
   create_table "admin_requests", :force => true do |t|
     t.string   "addr"
@@ -198,6 +198,16 @@ ActiveRecord::Schema.define(:version => 20171013154050) do
 
   add_index "contests_maps", ["contest_id", "map_id"], :name => "index_contests_maps_on_contest_id_and_map_id"
   add_index "contests_maps", ["map_id", "contest_id"], :name => "index_contests_maps_on_map_id_and_contest_id"
+
+  create_table "custom_urls", :force => true do |t|
+    t.string   "name"
+    t.integer  "article_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "custom_urls", ["article_id"], :name => "index_custom_urls_on_article_id"
+  add_index "custom_urls", ["name"], :name => "index_custom_urls_on_name"
 
   create_table "data_files", :force => true do |t|
     t.string   "name"
