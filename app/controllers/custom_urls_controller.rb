@@ -1,9 +1,10 @@
 class CustomUrlsController < ApplicationController
   def administrate
+    raise AccessError unless cuser && cuser.admin?
   end
 
   def create
-
+    raise AccessError unless request.xhr?
   end
 
   def show
@@ -15,8 +16,10 @@ class CustomUrlsController < ApplicationController
   end
 
   def update
+    raise AccessError unless request.xhr?
   end
 
   def destroy
+    raise AccessError unless request.xhr?
   end
 end
