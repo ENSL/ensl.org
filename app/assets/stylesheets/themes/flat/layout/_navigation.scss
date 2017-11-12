@@ -124,6 +124,14 @@ ul.navigation {
         &.users:after {
           content: $fa-var-user;
         }
+
+        &.league:after {
+          content: $fa-var-gamepad;
+        }
+
+        &.tutorials:after {
+          content: $fa-var-graduation-cap;
+        }
       }
 
       i {

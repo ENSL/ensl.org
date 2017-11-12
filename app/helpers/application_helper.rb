@@ -187,10 +187,6 @@ module ApplicationHelper
     calendar.upcoming_nsltv || []
   end
 
-  def latest_rules
-    article_path(Article::RULES)
-  end
-
   def gathers_url
     if Rails.env.production?
       "https://gathers.ensl.org"
