@@ -1,2 +1,63 @@
-<h1>Site#administrate</h1>
-<p>Find me in app/views/site/administrate.html.erb</p>
+<div id="custom-urls-panel">
+  <h1 class="fancy"><span>Custom URLs - Admin Panel</span></h1>
+  <div>
+    <p>Don't delete custom URLs linked from the menu!</p>
+  </div>
+  <div>
+    <table id="custom-urls" class="striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Article</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @custom_urls.each do |url| %>
+          <tr class="<%= cycle('odd', 'even') %>" id="<%= url.id %>">
+            <td class="name"><%= url.name %></td>
+            <td class="article"><%= url.article.title %></td>
+            <td>
+              <%= link_to_function icon('pencil'), "showEdit(#{url.id})" %>
+              <%= link_to_function icon('times'), "deleteUrl(#{url.id})" %>
+            </td>
+            <td class="edit hidden" colspan="3">
+              <%= form_for url do |f| %>
+                <div class="fields">
+                  <div class="inline">
+                    <%= f.text_field :name %>
+                  </div>
+                  <%= f.select :article_id, Article.all.collect {|t| [t.title, t.id]} %>
+                  <%= link_to_function 'Save', "submitEdit(#{url.id})", class: 'button' %>
+                </div>
+            <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% unless @custom_url.errors.empty? %>
+      <div>
+        <p><b>Errors:</b></p>
+        <ul>
+          <% @custom_url.errors.full_messages.each do |error| %>
+              <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+        <br>
+    <% end %>
+    <%= form_for @custom_url do |f| %>
+        <div class="fields">
+          <div class="inline">
+            <%= f.text_field :name %>
+          </div>
+          <%= f.select :article_id, Article.all.collect {|t| [t.title, t.id]} %>
+          <%= f.submit 'Add', class: 'button' %>
+        </div>
+  <% end %>
+  </div>
+  <script type="text/javascript">
+    <%= render 'controls.js' %>
+  </script>
+</div>

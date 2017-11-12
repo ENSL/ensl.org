@@ -5,5 +5,8 @@ class CustomUrl < ActiveRecord::Base
   validates :name,
             length: {in: 2..10},
             uniqueness: true,
-            format: /\A[a-z\-]{2,10}\Z/
+            format: /\A[a-z]+([\-])?[a-z]+\Z/
+
+  validates :article_id,
+            presence: true
 end

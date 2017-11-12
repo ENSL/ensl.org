@@ -1,0 +1,42 @@
+showEdit = function (url_id) {
+  var parent = $('#' + url_id);
+  parent.find('> td').toggleClass('hidden');
+};
+
+submitEdit = function (url_id) {
+  var parent = $('#' + url_id);
+  var form = parent.find('form');
+
+  $.post('<%= custom_urls_url %>/' + url_id, form.serialize())
+    .done(function (data) {
+      var nameField = parent.children('.name');
+      var articleField = parent.children('.article');
+
+      nameField.text(data.obj.name);
+      articleField.text(data.obj.title);
+      parent.find('> td').toggleClass('hidden');
+
+      alert(data.message);
+  }).fail(function (errorRes) {
+      var error = JSON.parse(errorRes.responseText);
+      alert(error.message);
+  });
+}
+
+deleteUrl = function (url_id) {
+    var confirmed = confirm('Are you sure you want to delete this item?');
+
+    if(confirmed) {
+        $.ajax({
+            url: '<%= custom_urls_url %>/' + url_id,
+            type: 'DELETE'
+        }).done(function (data) {
+            var trID = '#' + url_id;
+            $(trID).remove();
+            alert(data.message);
+        }).fail(function (errorRes) {
+            var error = JSON.parse(errorRes.responseText);
+            alert(error.message);
+        });
+    }
+}
