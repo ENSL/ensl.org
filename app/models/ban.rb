@@ -26,7 +26,6 @@ class Ban < ActiveRecord::Base
   TYPE_GATHER = 5
   VENT_BANS = "tmp/bans.txt"
 
-  attr_protected :id, :created_at, :updated_at
   attr_accessor :len, :user_name
 
   scope :ordered, order: "created_at DESC"
