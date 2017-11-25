@@ -64,4 +64,6 @@ Ensl::Application.configure do
 
   # Custom Session Store config to allow gathers.staging.ensl.org
   config.session_store :cookie_store, key: "_ENSL_session_key", expire_after: 30.days.to_i, domain: ".ensl.org"
+
+  config.eager_load = true
 end

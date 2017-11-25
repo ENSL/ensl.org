@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 ruby '2.2.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
-gem 'rails', '~> 3.2.22'
+gem 'rails', '~> 4.0'
 gem 'mysql2', '~> 0.3.17'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
@@ -29,12 +29,11 @@ gem 'google-api-client', '~> 0.10.3'
 # Please install nodejs locally.
 gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
-gem 'sprockets', '~> 2.2.1'
-gem 'coffee-rails', '~> 3.2.2'
+gem 'coffee-rails', '~> 4.1.0'
 gem 'jquery-rails', '~> 2.0.2'
 gem 'tinymce-rails', '~> 3.5.9'
 gem 'sass', '~> 3.3.4'
-gem 'sass-rails', '~> 3.2.6'
+gem 'sass-rails', '~> 4.0.1'
 
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'bourbon', '~> 3.1.8'
