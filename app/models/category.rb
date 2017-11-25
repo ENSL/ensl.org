@@ -28,21 +28,26 @@ class Category < ActiveRecord::Base
 
   PER_PAGE = 3
 
-  attr_protected :id, :updated_at, :created_at, :sort
-
   validates_length_of :name, :in => 1..30
   validate :validate_domain
 
-  scope :ordered, :order => "sort ASC, created_at DESC"
-  scope :domain, lambda { |domain| {:conditions => {:domain => domain}} }
-  scope :nospecial, :conditions => ["name != 'Special'"]
-  scope :newest, :include => :articles, :order => "articles.created_at DESC"
-  scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
-    scope :of_user, lambda { |user| {:conditions => {"articles.user_id" => user.id}, :include => :articles} }
+  scope :ordered, ->{ order(:sort, created_at: :desc) }
+  scope :domain, ->(domain) { where(domain: domain) }
+  scope :nospecial,->{ where.not(name: 'Special') }
+  scope :newest, lambda{
+    includes(:articles)
+      .order(articles: { created_at: :desc})
+  }
+  scope :of_user, lambda { |user|
+    includes(:articles)
+      .where(articles: {
+          user_id: user.id
+      })
+  }
 
-  has_many :articles, :order => "created_at DESC"
-  has_many :issues, :order => "created_at DESC"
-  has_many :forums, :order => "forums.position"
+  has_many :articles, ->{ order(created_at: :desc) }
+  has_many :issues, ->{ order(created_at: :desc) }
+  has_many :forums, ->{ order(:position) }
   has_many :movies
   has_many :maps
   has_many :gathers
@@ -65,7 +70,7 @@ class Category < ActiveRecord::Base
   end
 
   def validate_domain
-    errors.add :domain, I18n.t(:invalid_domain) unless domains.include? domain
+    errors.add(:domain, 'Incalid Domain') unless domains.include? domain
   end
 
   def can_create? cuser

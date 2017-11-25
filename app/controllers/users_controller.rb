@@ -53,7 +53,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new params[:user]
+    @user = User.new(user_create_params)
     @user.lastvisit = Date.today
     @user.lastip = request.env['REMOTE_ADDR']
 
@@ -73,7 +73,7 @@ class UsersController < ApplicationController
   def update
     raise AccessError unless @user.can_update? cuser
     params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update_attributes params[:user]
+    if @user.update_attributes user_update_params
       flash[:notice] = t(:users_update)
       redirect_to_back
     else
@@ -117,7 +117,8 @@ class UsersController < ApplicationController
 
   def forgot
     if request.post?
-      if u = User.first(:conditions => {:username => params[:username], :email => params[:email]}) and u.send_new_password
+      user = User.where(username: params[:username], email:  params[:email] ).first
+      if user and user.send_new_password
         flash[:notice] = t(:passwords_sent)
       else
         flash[:error] = t(:incorrect_information)
@@ -136,5 +137,17 @@ class UsersController < ApplicationController
     user.lastip = request.ip
     user.lastvisit = DateTime.now
     user.save()
+  end
+
+  def user_create_params
+    params.require(:user).permit(:raw_password, :username, :email, :steamid, :birthdate)
+  end
+
+  def user_update_params
+    params.require(:user).permit(
+        :raw_password, :username, :email, :steamid, :birthdate,
+        :firstname, :lastname, :country, :time_zone, :public_email,
+        params[:user][:profile_attributes].try(:keys)
+    )
   end
 end

@@ -39,7 +39,7 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new params[:article]
+    @article = Article.new(article_create_params)
     @article.user = cuser
     raise AccessError unless @article.can_create? cuser
 
@@ -52,8 +52,8 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    raise AccessError unless @article.can_update? cuser, params[:article]
-    if @article.update_attributes(params[:article])
+    raise AccessError unless @article.can_update?(cuser, params[:article])
+    if @article.update_attributes(article_update_params)
       flash[:notice] = t(:articles_update)
       redirect_to @article
     else
@@ -78,5 +78,13 @@ class ArticlesController < ApplicationController
 
   def get_article
     @article = Article.find params[:id]
+  end
+
+  def article_create_params
+    params.require(:article).permit(:title,:status, :category, :text, :text_parsed, :text_coding, :user)
+  end
+
+  def article_update_params
+    params.require(:article).permit(:title,:status, :category, :text, :text_parsed, :text_coding)
   end
 end
