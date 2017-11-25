@@ -28,9 +28,9 @@ class Ban < ActiveRecord::Base
 
   attr_accessor :len, :user_name
 
-  scope :ordered, order: "created_at DESC"
-  scope :effective, conditions: "expiry > UTC_TIMESTAMP()"
-  scope :ineffective, conditions: "expiry < UTC_TIMESTAMP()"
+  scope :ordered, -> { order(created_at: :desc ) }
+  scope :effective, -> { where("expiry > UTC_TIMESTAMP()") }
+  scope :ineffective, -> { where("expiry < UTC_TIMESTAMP()") }
 
   before_validation :check_user
 
