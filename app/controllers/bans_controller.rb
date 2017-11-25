@@ -53,7 +53,7 @@ class BansController < ApplicationController
   end
 
   def ban_create_params
-    params.require(:ban).pemit(:steamid, :addr, :reason, :len, :user_name, :creator, :ban_type, :ip, :server, :len, :expiry)
+    params.require(:ban).permit(:steamid, :addr, :reason, :len, :user_name, :creator, :ban_type, :ip, :server, :len, :expiry)
   end
 
   def ban_update_params

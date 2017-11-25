@@ -3,7 +3,7 @@ class CategoriesController < ApplicationController
 
   def show
     if [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
-      @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
+      @articles = Article.with_comments.ordered.limited.nodrafts.of_category params[:id]
       Category.find(params[:id]).read_by! cuser if cuser
       render partial: 'articles/article', collection: @articles.to_a
     end
@@ -23,7 +23,7 @@ class CategoriesController < ApplicationController
   end
 
   def create
-    @category = Category.new params[:category]
+    @category = Category.new category_params
     raise AccessError unless @category.can_create? cuser
 
     if @category.save
@@ -37,7 +37,7 @@ class CategoriesController < ApplicationController
 
   def update
     raise AccessError unless @category.can_update? cuser
-    if @category.update_attributes params[:category]
+    if @category.update_attributes category_params
       flash[:notice] = t(:articles_category_update)
       redirect_to :categories
     end
@@ -65,5 +65,9 @@ class CategoriesController < ApplicationController
 
   def get_category
     @category = Category.find params[:id]
+  end
+
+  def category_params
+    params.require(:category).permit(:name, :domain)
   end
 end

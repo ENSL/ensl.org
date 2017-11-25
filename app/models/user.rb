@@ -23,14 +23,12 @@
 
 
 require 'digest/md5'
-require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_versioned', 'lib', 'acts_as_versioned.rb')
 
 class User < ActiveRecord::Base
   include Extra
-  
+
   VERIFICATION_TIME = 604800
 
-  attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password
 
   belongs_to :team
@@ -47,60 +45,78 @@ class User < ActiveRecord::Base
   has_many :groups, :through => :groupers
   has_many :shoutmsgs, :dependent => :destroy
   has_many :issues, :foreign_key => "author_id", :dependent => :destroy
-  has_many :open_issues, :class_name => "Issue", :foreign_key => "assigned_id",
-    :conditions => ["issues.status = ?", Issue::STATUS_OPEN]
+
+  has_many :open_issues, ->{ where(status: Issue::STATUS_OPEN) },
+           :class_name => "Issue", :foreign_key => 'assigned_id'
+
   has_many :posted_comments, :dependent => :destroy, :class_name => "Comment"
-  has_many :comments, :class_name => "Comment", :as => :commentable, :order => "created_at ASC", :dependent => :destroy
+
+  has_many :comments, ->{ order(created_at: :asc) },
+           :class_name => "Comment", :as => :commentable, :dependent => :destroy
+
   has_many :teamers, :dependent => :destroy
-  has_many :active_teams, :through => :teamers, :source => "team",
-    :conditions => ["teamers.rank >= ? AND teams.active = ?", Teamer::RANK_MEMBER, true]
-  has_many :active_contesters, :through => :active_teams, :source => "contesters",
-    :conditions => {"contesters.active" => true}
-  has_many :active_contests, :through => :active_contesters, :source => "contest",
-    :conditions => ["contests.status != ?", Contest::STATUS_CLOSED]
-  has_many :past_teams, :through => :teamers, :source => "team", :group => "user_id, team_id"
+
+  has_many :active_teams, ->{ where(["teamers.rank >= ? AND teams.active = ?", Teamer::RANK_MEMBER, true]) },
+           :through => :teamers, :source => "team"
+
+  has_many :active_contesters, ->{ where(active: true) },
+           :through => :active_teams, :source => "contesters"
+
+  has_many :active_contests,->{ where(status: Contest::STATUS_CLOSED) },
+           :through => :active_contesters, :source => "contest"
+
+  has_many :past_teams, ->{ group(:user_id, :team_id) },
+           :through => :teamers, :source => "team"
+
   has_many :matchers, :dependent => :destroy
   has_many :matches, :through => :matchers
   has_many :predictions, :dependent => :destroy
   has_many :challenges_received, :through => :active_contesters, :source => "challenges_received"
   has_many :challenges_sent, :through => :active_contesters, :source => "challenges_sent"
-  has_many :upcoming_team_matches, :through => :active_contesters, :source => "matches",
-    :conditions => "match_time > UTC_TIMESTAMP()"
-  has_many :upcoming_ref_matches, :class_name => "Match", :foreign_key => "referee_id",
-    :conditions => "match_time > UTC_TIMESTAMP()"
-  has_many :past_team_matches, :through => :active_contesters, :source => "matches",
-    :conditions => "match_time < UTC_TIMESTAMP()"
-  has_many :past_ref_matches, :class_name => "Match", :foreign_key => "referee_id",
-    :conditions => "match_time < UTC_TIMESTAMP()"
+
+  has_many :upcoming_team_matches, ->{ where("match_time > UTC_TIMESTAMP()") },
+           :through => :active_contesters, :source => "matches"
+
+  has_many :upcoming_ref_matches, ->{ where("match_time > UTC_TIMESTAMP()") },
+           :class_name => "Match", :foreign_key => "referee_id"
+
+  has_many :past_team_matches, ->{ where("match_time < UTC_TIMESTAMP()") },
+           :through => :active_contesters, :source => "matches"
+
+  has_many :past_ref_matches,->{ where("match_time < UTC_TIMESTAMP()") },
+           :class_name => "Match", :foreign_key => "referee_id"
+
   has_many :received_personal_messages, :class_name => "Message", :as => "recipient", :dependent => :destroy
   has_many :received_team_messages, :through => :active_teams, :source => :received_messages
   has_many :sent_personal_messages, :class_name => "Message", :as => "sender", :dependent => :destroy
   has_many :sent_team_messages, :through => :active_teams, :source => :sent_messages
-  has_many :match_teams, :through => :matchers, :source => :teams, :uniq => true
+  has_many :match_teams, ->{ uniq }, :through => :matchers, :source => :teams
 
-  scope :active, :conditions => {:banned => false}
-  scope :with_age,
-    :select => "DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(birthdate)), '%Y')+0 AS aged, COUNT(*) as num, username",
-    :group => "aged",
-    :having => "num > 8 AND aged > 0"
-  scope :country_stats,
-    :select => "country, COUNT(*) as num",
-    :conditions => "country is not null and country != '' and country != '--'",
-    :group => "country",
-    :having => "num > 15",
-    :order => "num DESC"
-  scope :posts_stats,
-    :select => "users.id, username, COUNT(posts.id) as num",
-    :joins => "LEFT JOIN posts ON posts.user_id = users.id",
-    :group => "users.id",
-    :order => "num DESC"
-  scope :banned,
-    :joins => "LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()",
-    :conditions => "bans.id IS NOT NULL"
-  scope :idle,
-    :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
-  scope :lately,
-    :conditions => ["lastvisit > ?", 30.days.ago.utc]
+  scope :active,->{ where(banned: false) }
+  scope :with_age, lambda {
+    select("DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(birthdate)), '%Y')+0 AS aged, COUNT(*) as num, username")
+    .having('num > 8 AND aged > 0')
+    .group('aged')
+  }
+  scope :country_stats, lambda {
+    select("country, COUNT(*) as num")
+      .where("country is not null and country != '' and country != '--'")
+      .having("num > 15")
+      .group("country")
+      .order("num DESC")
+  }
+  scope :posts_stats, lambda {
+    select("users.id, username, COUNT(posts.id) as num")
+      .joins("LEFT JOIN posts ON posts.user_id = users.id")
+      .group("users.id")
+      .order("num DESC")
+  }
+  scope :banned, lambda {
+    joins("LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()")
+      .where("bans.id IS NOT NULL")
+  }
+  scope :idle, ->{ where(["lastvisit < ?", 30.minutes.ago.utc]) }
+  scope :lately, ->{ where(["lastvisit > ?", 30.days.ago.utc]) }
 
   before_validation :update_password
 
@@ -199,10 +215,6 @@ class User < ActiveRecord::Base
     groups.exists? id: Group::STAFF
   end
 
-  def staff?
-    groups.exists? :id => Group::STAFF
-  end
-
   def caster?
     groups.exists? id: Group::CASTERS
   end
@@ -218,14 +230,6 @@ class User < ActiveRecord::Base
 
   def allowed_to_ban?
     admin? or moderator?
-  end
-
-  def gather_moderator?
-    groups.exists? id: Group::GATHER_MODERATORS
-  end
-
-  def allowed_to_ban?
-    admin? or gather_moderator?
   end
 
   def verified?

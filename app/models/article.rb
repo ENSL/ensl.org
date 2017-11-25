@@ -36,23 +36,27 @@ class Article < ActiveRecord::Base
   G_RULES = 464
   COMPMOD = 998
 
-  attr_protected :id, :updated_at, :created_at, :user_id, :version
+  scope :recent, ->{ order(created_at: :desc).limit(8) }
+  scope :with_comments, lambda {
+    select("articles.*, COUNT(C.id) AS comment_num")
+    .joins("LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id")
+    .group(:id)
+  }
+  scope :ordered, -> { order(created_at: :desc) }
+  scope :limited, -> { limit(5) }
+  scope :nodrafts, -> { where(status: STATUS_PUBLISHED) }
+  scope :drafts, -> { where(status: STATUS_DRAFT) }
+  scope :of_category, ->(cat){ where(category_id: cat) }
 
-  scope :recent, order: 'created_at DESC', limit: 8
-  scope :with_comments,
-    select: "articles.*, COUNT(C.id) AS comment_num",
-    joins: "LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id",
-    group: "articles.id"
-  scope :ordered, order: 'articles.created_at DESC'
-  scope :limited, limit: 5
-  scope :nodrafts, conditions: { status: STATUS_PUBLISHED }
-  scope :drafts, conditions: { status: STATUS_DRAFT }
-  scope :articles, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]
-  scope :onlynews, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_NEWS]
-  scope :category, lambda { |cat| { conditions: { category_id: cat } } }
-  scope :domain, lambda { |domain| { includes: 'category', conditions: { "categories.domain" => domain } } }
-  scope :nospecial, conditions: ["category_id != ?", Category::SPECIAL]
-  scope :interviews, conditions: ["category_id = ?", Category::INTERVIEWS]
+  scope :domain, lambda { |domain|
+    includes(:category)
+      .where(category_id: {category: { domain: domain}})
+  }
+  scope :articles, -> { domain Category::DOMAIN_ARTICLES }
+  scope :onlynews, -> { domain Category::DOMAIN_NEWS }
+
+  scope :nospecial, -> { where(category_id: Category::SPECIAL) }
+  scope :interviews, -> { where(category_id: Category::INTERVIEWS) }
 
   belongs_to :user
   belongs_to :category
@@ -83,11 +87,11 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.first(conditions: ["id < ?", self.id], order: "id DESC")
+    category.articles.nodrafts.where(["id < ?", self.id]).order(id: :desc).first
   end
 
   def next_article
-    category.articles.nodrafts.first(conditions: ["id > ?", self.id], order: "id ASC")
+    category.articles.nodrafts.where(["id > ?", self.id]).order(:id).first
   end
 
   def statuses
@@ -95,7 +99,7 @@ class Article < ActiveRecord::Base
   end
 
   def validate_status
-    errors.add :status, I18n.t(:invalid_status) unless statuses.include? status
+    errors.add :status, 'Invalid status' unless statuses.include? status
   end
 
   def init_variables

@@ -19,9 +19,9 @@ Ensl::Application.routes.draw do
     resources :versions
   end
 
-  match "contests/del_map"
-  match "contests/scores"
-  match "contests/historical", to: "contests#historical"
+  get "contests/del_map"
+  get "contests/scores"
+  get "contests/historical", to: "contests#historical"
 
   resources :contests do
     get "current", on: :collection
@@ -32,7 +32,7 @@ Ensl::Application.routes.draw do
   resources :options
   resources :polls
 
-  match "comments/quote"
+  get "comments/quote"
 
   resources :comments
   resources :shoutmsgs
@@ -45,8 +45,8 @@ Ensl::Application.routes.draw do
   resources :forumers
   resources :topics
 
-  match "forums/up"
-  match "forums/down"
+  get "forums/up"
+  get "forums/down"
 
   resources :forums
   resources :users
@@ -80,71 +80,65 @@ Ensl::Application.routes.draw do
   resources :tweets
   resources :issues
 
-  match "posts/quote"
+  get "posts/quote"
 
   resources :posts
   resources :brackets
 
-  match "about/action"
-  match "about/staff"
-  match "about/statistics"
+  get "about/action"
+  get "about/staff"
+  get "about/statistics"
 
-  match "refresh", to: "application#refresh"
-  match "search", to: "application#search"
+  # match "refresh", to: "application#refresh"
+  # match "search", to: "application#search"
 
-  match "news", to: "articles#news_index"
-  match "news/archive", to: "articles#news_archive"
-  match "news/admin", to: "articles#admin"
-  match "articles/cleanup"
+  get "news", to: "articles#news_index"
+  get "news/archive", to: "articles#news_archive"
+  get "news/admin", to: "articles#admin"
+  get "articles/cleanup"
 
-  match "data_files/admin"
-  match "data_files/addFile"
-  match "data_files/delFile"
-  match "data_files/trash"
+  get "data_files/admin"
+  match "data_files/addFile", via: [:get, :post]
+  match "data_files/delFile", via: [:get, :post]
+  match "data_files/trash", via: [:get, :post]
 
-  match "contesters/recalc"
+  match "contests/recalc", via: [:get, :post]
 
-  match "directories", to: "directories#show", id: 1
+  get "directories", to: "directories#show", id: 1
 
-  match "gathers/refresh"
+  match "gathers/refresh", via: [:get, :post]
   match "gathers/latest/:game", to: "gathers#latest", via: :get
   match "gather", to: "gathers#latest", game: "ns2", via: :get
 
   match "gatherers/:id/status", to: "gatherers#status", via: :post
 
-  match "groups/addUser"
-  match "groups/delUser"
+  post "groups/addUser"
+  post "groups/delUser"
 
-  match "movies/download"
-  match "movies/preview"
-  match "movies/snapshot"
+  get "movies/download"
+  get "movies/preview"
+  get "movies/snapshot"
 
-  match "plugin/user"
+  get "plugin/user"
 
-  match "users/forgot"
-  match "users/recover"
-  match "users/agenda"
-  match "users/logout"
-  match "users/login"
+  match "users/forgot", via: [:get, :post]
+  get "users/agenda"
+  match "users/logout", via: [:get, :post]
+  match "users/login", via: [:get, :post]
+  get "users/popup"
 
-  match "users/agenda"
-  match "users/login"
-  match "users/logout"
-  match "users/popup"
-  match "users/forgot", to: "users#forgot"
-
-  match "votes/create"
-  match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
+  post "votes/create"
+  get "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
 
   get "custom_urls", to: "custom_urls#administrate"
   resources :custom_urls, only: [:create, :update, :destroy]
 
   get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
 
-  match ":controller/:action", requirements: { action: /A-Za-z/ }
-  match ":controller/:action/:id"
-  match ":controller/:action/:id.:format"
-  match ":controller/:action/:id/:id2"
+  match ":controller/:action", requirements: { action: /A-Za-z/ }, via: [:get, :post]
+  match ":controller/:action/:id", via: [:get, :post]
+  match ":controller/:action/:id.:format", via: [:get, :post]
+  match ":controller/:action/:id/:id2", via: [:get, :post]
 
-  match "teamers/replace", to: "teamers#replace", as: "teamers_replace"
+  # match "teamers/replace", to: "teamers#replace", as: "teamers_replace"
 end

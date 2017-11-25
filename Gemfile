@@ -41,6 +41,10 @@ gem 'neat', '~> 1.6.0'
 gem 'haml', '~> 4.0.5'
 gem 'rails_autolink', '~> 1.1.5'
 
+# acts as
+gem 'acts_as_readable', '~> 2.1', '>= 2.1.1'
+gem 'db_acts_as_versioned', '~> 3.5.0'
+
 group :assets do
   gem 'uglifier', '~> 2.5.0'
 end
