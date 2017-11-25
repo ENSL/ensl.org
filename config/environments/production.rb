@@ -70,6 +70,5 @@ Ensl::Application.configure do
   # Custom Session Store config to allow gathers.staging.ensl.org
   config.session_store :cookie_store, key: "_ENSL_session_key", expire_after: 30.days.to_i, domain: ".ensl.org"
 
-#  config.cache_store = :dalli_store, 'cache', 'cache-2.example.com:11211:2',
-#  { :namespace => NAME_OF_RAILS_APP, :expires_in => 1.day, :compress => true }
+  config.eager_load = true
 end
