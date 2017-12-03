@@ -25,16 +25,12 @@ class MatchProposalsController < ApplicationController
     @proposal.team = cuser.team
     @proposal.status = MatchProposal::STATUS_PENDING
     if @proposal.save
-      # TODO: send message to teamleaders of opposite team
-      msg = Message.new
-      msg.sender_type = 'System'
-      msg.recipient_type = 'Team'
-      msg.title = 'New Scheduling Proposal'
       recipient = @match.get_opposing_team(cuser.team)
-      msg.recipient = recipient
-      msg.text = "There is a new scheduling proposal for your match against #{recipient.name}.\n" \
-        "Find it [url=#{match_proposals_path(@match)}]here[/url]"
-      msg.save
+      msg_text = "There is a new scheduling proposal for your match against #{cuser.team.name}.\n" \
+                 "Find it [url=#{match_proposals_path(@match)}]here[/url]"
+
+      send_message_to_opp_team(msg_text, 'New Scheduling Proposal', recipient)
+
       flash[:notice] = 'Created new proposal'
       redirect_to(match_proposals_path(@match))
     else
@@ -67,14 +63,10 @@ class MatchProposalsController < ApplicationController
     if proposal.save
 
       if status_updated
-        msg = Message.new
-        msg.sender_type = 'System'
-        msg.recipient_type = 'Team'
-        msg.title = 'Scheduling Proposal Update'
         recipient = @match.get_opposing_team(cuser.team)
-        msg.recipient = recipient
-        msg.text = message_text(new_status, recipient)
-        msg.save if msg.text
+        msg_text = message_text(new_status)
+
+        send_message_to_opp_team(msg_text, 'Scheduling Proposal Update', recipient)
       end
 
       rjson[:status] = MatchProposal.status_strings[proposal.status]
@@ -94,22 +86,32 @@ private
     @match = Match.find params[:match_id]
   end
 
-  def message_text(new_status, recipient)
+  def message_text(new_status)
     case new_status
     when MatchProposal::STATUS_CONFIRMED
-      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was confirmed!.\n" \
+      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was confirmed!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_REJECTED
-      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was rejected!.\n" \
+      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was rejected!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_REVOKED
-      "A scheduling proposal for your match against [b]#{recipient.name}[/b] was revoked!.\n" \
+      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was revoked!.\n" \
       "Find it [url=#{match_proposals_path(@match)}]here[/url]"
     when MatchProposal::STATUS_DELAYED
-      "Delaying for your match against [b]#{recipient.name}[/b] was permitted!.\n" \
+      "Delaying for your match against [b]#{cuser.team.name}[/b] was permitted!.\n" \
       "Schedule a new time as soon as possible [url=#{match_proposals_path(@match)}]here[/url]"
     else
       false # Should not happen as transition to any other state is not allowed
     end
+  end
+
+  def send_message_to_opp_team(text, title, recipient_team)
+    msg = Message.new
+    msg.sender_type = 'System'
+    msg.recipient_type = 'Team'
+    msg.title = title
+    msg.recipient = recipient_team
+    msg.text = text
+    msg.save if text
   end
 end
