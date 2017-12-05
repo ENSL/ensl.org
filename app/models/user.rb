@@ -73,7 +73,6 @@ class User < ActiveRecord::Base
   has_many :past_ref_matches, :class_name => "Match", :foreign_key => "referee_id",
     :conditions => "match_time < UTC_TIMESTAMP()"
   has_many :received_personal_messages, :class_name => "Message", :as => "recipient", :dependent => :destroy
-  has_many :received_team_messages, :through => :active_teams, :source => :received_messages
   has_many :sent_personal_messages, :class_name => "Message", :as => "sender", :dependent => :destroy
   has_many :sent_team_messages, :through => :active_teams, :source => :sent_messages
   has_many :match_teams, :through => :matchers, :source => :teams, :uniq => true
@@ -199,10 +198,6 @@ class User < ActiveRecord::Base
     groups.exists? id: Group::STAFF
   end
 
-  def staff?
-    groups.exists? :id => Group::STAFF
-  end
-
   def caster?
     groups.exists? id: Group::CASTERS
   end
@@ -220,14 +215,6 @@ class User < ActiveRecord::Base
     admin? or moderator?
   end
 
-  def gather_moderator?
-    groups.exists? id: Group::GATHER_MODERATORS
-  end
-
-  def allowed_to_ban?
-    admin? or gather_moderator?
-  end
-
   def verified?
     #		created_at < DateTime.now.ago(VERIFICATION_TIME)
     true
@@ -242,7 +229,7 @@ class User < ActiveRecord::Base
   end
 
   def received_messages
-    received_personal_messages + received_team_messages
+    received_personal_messages + team.received_messages
   end
 
   def sent_messages
