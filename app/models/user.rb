@@ -229,7 +229,11 @@ class User < ActiveRecord::Base
   end
 
   def received_messages
-    received_personal_messages + team.received_messages
+    received_personal_messages + received_team_messages
+  end
+
+  def received_team_messages
+    Message.where(recipient_id: team_id, recipient_type: 'Team' )
   end
 
   def sent_messages
