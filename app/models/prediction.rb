@@ -18,8 +18,8 @@ class Prediction < ActiveRecord::Base
   attr_protected :id, :created_at, :updated_at, :result
 
   validates_presence_of :match, :user
-  validates_inclusion_of :score1, :in => 0..4, :message => "Invalid score"
-  validates_inclusion_of :score2, :in => 0..4, :message => "Invalid score"
+  validates_inclusion_of :score1, :in => 0..99, :message => "Invalid score"
+  validates_inclusion_of :score2, :in => 0..99, :message => "Invalid score"
   validates_uniqueness_of :match_id, :scope => :user_id
 
   scope :with_contest, :include => {:match => :contest}

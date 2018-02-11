@@ -118,7 +118,7 @@ class Match < ActiveRecord::Base
         order: "month_n"
 
   validates :contester1, :contester2, :contest, presence: true
-  validates :score1, :score2, format: /\A[0-9]\z/, allow_nil: true
+  validates :score1, :score2, format: /\A[1-9]?[0-9]\z/, allow_nil: true
   validates :report, length: { maximum: 64_000 }, allow_blank: true
 
   before_create :set_hltv
