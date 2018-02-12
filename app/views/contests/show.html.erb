@@ -82,7 +82,7 @@
                 </td>
                 <% if @contest.contest_type == Contest::TYPE_LADDER %>
                   <td class="points">
-                    <%= match.points1 %> / <%= match.points2 %>
+                    <%= match.points1 || 0 %> / <%= match.points2 || 0 %>
                   </td>
                 <% end %>
               </tr>
@@ -118,7 +118,7 @@
               </td>
               <% if @contest.contest_type == Contest::TYPE_LADDER %>
                 <td>
-                  <%= match.points1 %> / <%= match.points2 %>
+                  <%= match.points1 || 0 %> / <%= match.points2 || 0 %>
                 </td>
               <% end %>
             </tr>

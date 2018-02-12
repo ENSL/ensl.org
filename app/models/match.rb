@@ -273,21 +273,35 @@ class Match < ActiveRecord::Base
     self.diff = diff ? diff : (contester2.score - contester1.score)
 
     if contest.contest_type == Contest::TYPE_LADDER
-      self.points1 = contest.elo_score score1, score2, diff
-      self.points2 = contest.elo_score score2, score1, -(diff)
+      # Dunno what all this is but its not working anyways
+      # self.points1 = contest.elo_score score1, score2, diff
+      # self.points2 = contest.elo_score score2, score1, -(diff)
+      # contester1.extra = contester1.extra + contest.modulus_base / 10
+      # contester2.extra = contester2.extra + contest.modulus_base / 10
+
+      score_diff = score2 - score1
+      if score_diff == 0 # Draw
+        if diff < 0 # contester2 has higher rank
+          # set contester1s rank one below contester2
+          contest.update_ranks(contester1, contester1.score, contester2.score - 1)
+        else
+          # set contester2s rank one below contester1
+          contest.update_ranks(contester2, contester2.score, contester1.score - 1)
+        end
+      elsif score_diff < 0 && diff < 0 # contester1 won and contester2 has higher rank
+        contest.update_ranks(contester1, contester1.score, contester2.score)
+      elsif score_diff > 0 && diff > 0 # contester2 won and contester1 has higher rank
+        contest.update_ranks(contester2, contester2.score, contester1.score)
+      end
+
     elsif contest.contest_type == Contest::TYPE_LEAGUE
       self.points1 = score1
       self.points2 = score2
-    end
-
-    if contest.contest_type == Contest::TYPE_LADDER
-      contester1.extra = contester1.extra + contest.modulus_base / 10
-      contester2.extra = contester2.extra + contest.modulus_base / 10
+      contester1.score = contester1.score + points1 < 0 ? 0 : contester1.score + points1
+      contester2.score = contester2.score + points2 < 0 ? 0 : contester2.score + points2
     end
 
     unless contest.contest_type == Contest::TYPE_BRACKET
-      contester1.score = contester1.score + points1 < 0 ? 0 : contester1.score + points1
-      contester2.score = contester2.score + points2 < 0 ? 0 : contester2.score + points2
       contester1.save!
       contester2.save!
     end
