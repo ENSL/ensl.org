@@ -1,0 +1,9 @@
+web:
+  image: ensl/ensl.org
+  links:
+    - mysql
+    - redis
+mysql:
+  image: mysql
+redis:
+  image: redis
