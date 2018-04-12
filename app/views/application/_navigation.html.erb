@@ -19,7 +19,7 @@
         <% end %>
         <ul>
           <li><%= link_to "Rules", "/rules" %></li>
-          <li><%= link_to "Comp Mod Changes", "/compmod" %></li>
+          <li><%= link_to "Compmod Changes", "/compmod" %></li>
           <li><%= link_to "Historical", "/contests" %></li>
           <li><%= link_to "NS1 History", "/contests/historical/NS1" %></li>
           <li><%= link_to "NS2 History", "/contests/historical/NS2" %></li>
@@ -34,8 +34,14 @@
           <li><%= link_to "Introduction", article_url(464) %></li>
           <li><%= link_to "Archives", "/gathers/" %></li>
           <li>
+            <%= link_to "/gathers/latest/ns1", class: 'gathers' do %>
+              NS1 Gather
+              <span class="count"><%= Gather.player_count_for_game('NS1') %>/<%= Gather::FULL %></span>
+            <% end %>
+          </li>
+          <li>
             <%= link_to "/gathers/latest/ns2", class: 'gathers' do %>
-              Fallback
+              NS2 Backup
               <span class="count"><%= Gather.player_count_for_game('NS2') %>/<%= Gather::FULL %></span>
             <% end %>
           </li>
