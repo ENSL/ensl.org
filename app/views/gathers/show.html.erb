@@ -49,7 +49,7 @@
                 document.documentElement.addEventListener(click, kickoff, true);
               },
               loop: true,
-              volume: 0.6,
+              volume: 0.5,
               swfPath: "/flash"
             });
 
@@ -144,7 +144,7 @@
   </div>
 
   <h4 class="fancy add-top">
-    Gathers have moved to <%= link_to "gathers.ensl.org", gathers_url, target: "_blank" %>. This app is just a fallback in case something goes wrong
+    NS2 gathers have moved to <%= link_to "gathers.ensl.org", gathers_url, target: "_blank" %>. This page is for the real game.
   </h4>
 
   <% if @gather and @gather.status != Gather::STATE_FINISHED %>
@@ -170,18 +170,18 @@
       <div class="info">
         <h6>Gather Info</h6>
         <ul>
-          <li><%= link_to "Gather Spreadsheet", "https://docs.google.com/spreadsheets/d/1MNhP60WcTGA0xgpnmFCfRhlZWU106X6MgxLGgPt0N5A" %></li>
-          <li><%= link_to "Fill out Spreadsheet", "https://docs.google.com/forms/d/1PHkGwcM9Z6Qut4voBkR71cSSi9vB7xx-cOF6JtW7lmk/viewform" %></li>
-          <li><%= link_to "Steam group", "http://steamcommunity.com/groups/nslgathers" %></li>
+          <li><%= link_to "Gather topic (all info)", "https://www.ensl.org/topics/1897" %></li>
+          <li><%= link_to "Join the discord", "https://discord.gg/a8dT2cn" %></li>
+          <li><%= link_to "Connect to game server", "steam://connect/51.15.77.137:27015/europe// -noforcemparms" %></li>
         </ul>
       </div>
 
       <div class="info">
-        <h6>Voice Comunication</h6>
+        <h6>Voice Communication</h6>
         <ul>
           <li><%= link_to "Teamspeak 3", "http://www.teamspeak.com/?page=downloads" %></li>
-          <li><strong>Server:</strong> <a href="ts3server://ensl.org">ensl.org</a></li>
-          <li><strong>Channel password:</strong> ns2gather </li>
+          <li><strong>Join server:</strong> <a href="ts3server://ensl.org?channel=NS1%20Gathers">ensl.org</a></li>
+          <li><strong>All passwords:</strong> europe </li>
         </ul>
       </div>
 
@@ -192,7 +192,7 @@
         </a>
       </div>
     </div>
-  <% end  %>
+  <% end %>
 
   <div id="gather-area">
     <%= render_gather %>
