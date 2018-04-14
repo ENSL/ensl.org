@@ -1,9 +1,11 @@
 web:
-  image: ensl/ensl.org
+  image: ensl
   links:
     - mysql
-    - redis
+#    - redis
 mysql:
-  image: mysql
-redis:
-  image: redis
+  image: mysql/mysql-server
+  volumes:
+    - /srv/ensl/mysql:/var/lib/mysql
+#redis:
+#  image: redis

@@ -10,6 +10,7 @@ module Ensl
 
     # Additional assets
     config.assets.precompile += ["themes/*/theme.css", "themes/*/errors.css"]
+    config.assets.initialize_on_precompile = false
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]

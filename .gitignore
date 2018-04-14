@@ -2,6 +2,7 @@
 /log/*
 /tmp/*
 /spec/tmp/*
+/env/*
 .ruby-version
 .ruby-gemset
 .env

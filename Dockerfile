@@ -29,10 +29,15 @@ USER web
 
 WORKDIR /var/www
 COPY .env /var/www/
-RUN bundle install --path /var/bundle
-RUN bundle exec rake assets:precompile
+RUN bundle install --path /var/bundle --jobs 4
+#RUN bundle exec rake assets:precompile
 
-# When using bash
 USER root
 
-CMD ["bundle", "exec", "puma", "-C /var/www/config/puma.rb"]
+RUN apt-get install -y memcached
+RUN service memcached start
+
+#USER root
+
+USER web
+CMD ["/var/www/entry.sh"]
