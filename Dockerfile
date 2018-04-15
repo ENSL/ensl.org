@@ -34,6 +34,7 @@ RUN bundle install --path /var/bundle --jobs 4
 
 USER root
 
+# FIXME: move this to docker image
 RUN apt-get install -y memcached
 RUN service memcached start
 

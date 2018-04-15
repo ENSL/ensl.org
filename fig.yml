@@ -1,11 +1,14 @@
 web:
   image: ensl
+  volumes:
+    - "/srv/ensl/public:/var/www/public"
+  ports: "4000:4000"
   links:
     - mysql
 #    - redis
 mysql:
-  image: mysql/mysql-server
+  image: mysql/mysql-server:5.7
   volumes:
-    - /srv/ensl/mysql:/var/lib/mysql
+    - "/srv/ensl/mysql:/var/lib/mysql"
 #redis:
 #  image: redis

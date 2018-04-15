@@ -10,7 +10,7 @@ stdout_path = "#{base_path}/lpuma.stdout.log"
 tag 'ENSL'
 
 preload_app!
-daemonize true
+daemonize false
 directory base_path
 pidfile "#{base_path}/tmp/puma.pid"
 state_path "#{base_path}/tmp/puma.state"
