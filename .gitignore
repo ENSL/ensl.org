@@ -2,7 +2,8 @@
 /log/*
 /tmp/*
 /spec/tmp/*
-/env/*
+/env/production.sh
+/env/development.sh
 .ruby-version
 .ruby-gemset
 .env

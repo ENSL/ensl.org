@@ -2,7 +2,8 @@ web:
   image: ensl
   volumes:
     - "/srv/ensl/public:/var/www/public"
-  ports: "4000:4000"
+  ports:
+    - "4000:4000"
   links:
     - mysql
 #    - redis

@@ -1,4 +1,4 @@
-PROJECT ?= abevoelker/example_rails_docker_ci
+PROJECT ?= ensl/ensl.org
 TAG     ?= latest
 
 ifdef REGISTRY
