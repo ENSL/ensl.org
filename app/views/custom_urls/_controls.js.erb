@@ -7,7 +7,7 @@ submitEdit = function (url_id) {
   var parent = $('#' + url_id);
   var form = parent.find('form');
 
-  $.post('<%= custom_urls_url %>/' + url_id, form.serialize())
+  $.post('<%= custom_urls_path %>/' + url_id, form.serialize())
     .done(function (data) {
       var nameField = parent.children('.name');
       var articleField = parent.children('.article');
@@ -28,7 +28,7 @@ deleteUrl = function (url_id) {
 
     if(confirmed) {
         $.ajax({
-            url: '<%= custom_urls_url %>/' + url_id,
+            url: '<%= custom_urls_path %>/' + url_id,
             type: 'DELETE'
         }).done(function (data) {
             var trID = '#' + url_id;
