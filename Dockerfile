@@ -32,4 +32,4 @@ RUN bundle exec rake assets:precompile && mv /var/www/public/assets /var/www/ass
 # for debug
 # USER root
 
-CMD ["/var/www/entry.sh"]
+CMD ["/var/www/scripts/entry.sh"]
