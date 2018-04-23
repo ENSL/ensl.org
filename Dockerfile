@@ -24,11 +24,12 @@ ADD . /var/www
 RUN chown -R web:web /var/www
 
 # Precompile assets
-#WORKDIR /var/www
-#RUN bundle exec rake assets:precompile
+WORKDIR /var/www
+USER web
+RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
+RUN bundle exec rake assets:precompile && mv /var/www/public/assets /var/www/assets_tmp
 
 # for debug
 # USER root
 
-USER web
 CMD ["/var/www/entry.sh"]

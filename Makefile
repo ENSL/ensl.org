@@ -1,5 +1,6 @@
-PROJECT ?= ensl/ensl.org
-TAG     ?= latest
+REGISTRY ?= ensl
+PROJECT  ?= ensl.org
+TAG      ?= latest
 
 ifdef REGISTRY
   IMAGE=$(REGISTRY)/$(PROJECT):$(TAG)
