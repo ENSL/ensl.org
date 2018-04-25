@@ -2,6 +2,8 @@
 /log/*
 /tmp/*
 /spec/tmp/*
+/env/production.sh
+/env/development.sh
 .ruby-version
 .ruby-gemset
 .env
@@ -12,6 +14,10 @@
 *.rbc
 *.sassc
 
+# Database and files
+db_data/*
+!db_data/.placeholder
+
 # OS X
 .DS_Store
 
@@ -20,6 +26,7 @@
 /public/files/*
 /public/local
 /public/uploads
+/public/assets
 
 # RubyMine
 /.idea

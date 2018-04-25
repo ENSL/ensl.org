@@ -37,7 +37,7 @@ Ensl::Application.configure do
   # config.logger = SyslogLogger.new
 
   # Use a different cache store in production
-  config.cache_store = :dalli_store
+  config.cache_store = :dalli_store, 'memcached:11211', 'localhost'
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -64,4 +64,7 @@ Ensl::Application.configure do
 
   # Custom Session Store config to allow gathers.staging.ensl.org
   config.session_store :cookie_store, key: "_ENSL_session_key", expire_after: 30.days.to_i, domain: ".ensl.org"
+
+#  config.cache_store = :dalli_store, 'cache', 'cache-2.example.com:11211:2',
+#  { :namespace => NAME_OF_RAILS_APP, :expires_in => 1.day, :compress => true }
 end

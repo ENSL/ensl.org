@@ -1,7 +1,7 @@
 base: &db
   adapter: mysql2
   encoding: utf8
-  host: localhost
+  host: <%= ENV['MYSQL_HOST'] %>
   database: <%= ENV['MYSQL_DATABASE'] %>
   username: <%= ENV['MYSQL_USERNAME'] %>
   password: <%= ENV['MYSQL_PASSWORD'] %>
