@@ -26,6 +26,6 @@ innodb_buffer_pool_size         = 1280M
 innodb_flush_log_at_trx_commit  = 1
 innodb_thread_concurrency       = 16
 innodb_flush_method             = O_DIRECT
-innodb_additional_mem_pool_size = 20M
+#innodb_additional_mem_pool_size = 20M
 innodb_file_per_table           = 1
 transaction-isolation           = READ-COMMITTED

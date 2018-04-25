@@ -26,6 +26,7 @@ db_data/*
 /public/files/*
 /public/local
 /public/uploads
+/public/assets
 
 # RubyMine
 /.idea

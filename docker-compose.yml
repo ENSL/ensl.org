@@ -3,8 +3,8 @@ version: "3"
 services:
   web:
     image: ensl/ensl.org:latest
-#    volumes:
-#     - "/srv/ensl/ensl.org/public:/var/www/public"
+    volumes:
+     - "./public:/var/www/public"
     ports:
      - "4000:4000"
     depends_on:
@@ -14,8 +14,8 @@ services:
   db:
     image: mariadb:latest
     volumes:
-     - "/srv/ensl/ensl.org/db_data:/var/lib/mysql"
-#      - "/srv/ensl/ensl.org/ext/mysql.conf.d:/etc/mysql/conf.d"
+     - "./db_data:/var/lib/mysql"
+     - "./ext/mysql.conf.d:/etc/mysql/conf.d"
     environment:
      - MYSQL_DATABASE
      - MYSQL_USER

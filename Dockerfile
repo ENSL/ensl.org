@@ -23,13 +23,14 @@ RUN su -c "bundle config github.https true; cd /var/www && bundle install --path
 ADD . /var/www
 RUN chown -R web:web /var/www
 
-# Precompile assets
 WORKDIR /var/www
 USER web
+
 RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
-RUN bundle exec rake assets:precompile && mv /var/www/public/assets /var/www/assets_tmp
+RUN bundle exec rake assets:precompile
 
-# for debug
-# USER root
+# This is a temporary solution to fix assets issue
+RUN mv /var/www/public/assets /home/web/assets
 
-CMD ["/var/www/scripts/entry.sh"]
+USER root
+CMD ["/var/www/script/entry.sh"]
