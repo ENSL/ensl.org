@@ -35,10 +35,13 @@ class CustomUrlsController < ApplicationController
       url = CustomUrl.find(params[:id]) rescue nil
 
       if url
-        if url.update_attributes(params[:custom_url])
+        url.article_id = params[:custom_url][:article_id]
+        url.name= params[:custom_url][:name]
+        if url.save
           response[:status] = 200
           response[:message] = 'Successfully updated!'
-          response[:obj] = url
+          resobj = {name: url.name, title: url.article.title}
+          response[:obj] = resobj
         else
           response[:status] = 400
           message = 'Update failed! Errors:'
