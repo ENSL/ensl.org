@@ -35,7 +35,7 @@ Ensl::Application.routes.draw do
   match "comments/quote"
 
   resources :comments
-  resources :shoutmsgs
+  resources :shoutmsgs, except: :index 
   resources :teamers
   resources :teams
   resources :gathers

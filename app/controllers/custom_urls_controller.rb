@@ -22,6 +22,7 @@ class CustomUrlsController < ApplicationController
 
   def show
     custom_url = CustomUrl.find_by_name(params[:name])
+    raise ActiveRecord::RecordNotFound unless custom_url
     @article = custom_url.article
     raise AccessError unless @article.can_show? cuser
     @article.read_by! cuser if cuser

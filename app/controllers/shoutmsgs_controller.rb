@@ -1,10 +1,6 @@
 class ShoutmsgsController < ApplicationController
   respond_to :html, :js
 
-  def index
-    @shoutmsgs = Shoutmsg.lastXXX.typebox
-  end
-
   def show
     if params[:id2]
       @shoutmsgs = Shoutmsg.recent.of_object(params[:id], params[:id2]).reverse

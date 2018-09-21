@@ -22,7 +22,6 @@ class Group < ActiveRecord::Base
   PREDICTORS = 8
   STAFF = 10
   GATHER_MODERATORS = 14
-  COMP_MOD_COUNCIL = 16
 
   attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
@@ -50,7 +49,8 @@ class Group < ActiveRecord::Base
 
   def self.staff
     staff = []
-    (find(ADMINS).groupers + find(PREDICTORS).groupers + find(CASTERS).groupers + find(STAFF).groupers + find(REFEREES).groupers).each do |g|
+
+    (admins + casters + referees + extras).each do |g|
       staff << g unless staff.include? g
     end
     staff
@@ -58,7 +58,10 @@ class Group < ActiveRecord::Base
 
   def self.admins
     admins = []
-    (find(ADMINS).groupers).each do |g|
+    admin_group = where(id: ADMINS).first
+    return admins unless admin_group
+
+    (admin_group.groupers).each do |g|
       admins << g unless admins.include? g
     end
     admins
@@ -66,7 +69,10 @@ class Group < ActiveRecord::Base
 
   def self.referees
     referees = []
-    (find(REFEREES).groupers).each do |g|
+    referee_group = where(id: REFEREES).first
+    return referees unless referee_group
+
+    (referee_group.groupers).each do |g|
       referees << g unless referees.include? g
     end
     referees
@@ -74,7 +80,13 @@ class Group < ActiveRecord::Base
 
   def self.extras
     extras = []
-    (find(PREDICTORS).groupers + find(STAFF).groupers).each do |g|
+    extra_group = where(id: PREDICTORS).first
+    staff_group = where(id: STAFF).first
+
+    extra_groupers = extra_group ? extra_group.groupers : []
+    staff_groupers = staff_group ? staff_group.groupers : []
+
+    (extra_groupers + staff_groupers).each do |g|
       extras << g unless extras.include? g
     end
     extras
@@ -82,7 +94,10 @@ class Group < ActiveRecord::Base
 
   def self.casters
     casters = []
-    (find(CASTERS).groupers).each do |g|
+    caster_group = where(id:CASTERS).first
+    return casters unless caster_group
+
+    (caster_group.groupers).each do |g|
       casters << g unless casters.include? g
     end
     casters
@@ -90,17 +105,12 @@ class Group < ActiveRecord::Base
 
   def self.gathermods
     gathermods = []
-    (find(GATHER_MODERATORS).groupers).each do |g|
+    gathermod_group = where(id:GATHER_MODERATORS).first
+    return gathermods unless gathermod_group
+
+    (gathermod_group.groupers).each do |g|
       gathermods << g unless gathermods.include? g
     end
     gathermods
-  end
-
-  def self.compmodcouncil
-    compmodcouncil = []
-    (find(COMP_MOD_COUNCIL).groupers).each do |g|
-      compmodcouncil << g unless compmodcouncil.include? g
-    end
-    compmodcouncil
   end
 end
