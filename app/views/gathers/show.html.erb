@@ -34,22 +34,23 @@
       success: function(response, text, request) {
         if (request.getResponseHeader('Gather') == 'voting') {
           if (!played) {
+            var startTime = 110;
             $("#jplayer").jPlayer({
               ready: function() {
                 $(this).jPlayer("setMedia", {
                   mp3: "https://www.ensl.org/sounds/gather-1.mp3"
-                }).jPlayer("play");
+                }).jPlayer("play", startTime);
 
                 var click = document.ontouchstart === undefined ? 'click' : 'touchstart';
                 var kickoff = function () {
-                  $("#jplayer").jPlayer("play");
+                  $("#jplayer").jPlayer("play", startTime);
                   document.documentElement.removeEventListener(click, kickoff, true);
                 };
 
                 document.documentElement.addEventListener(click, kickoff, true);
               },
-              loop: true,
-              volume: 0.5,
+              loop: false,
+              volume: 0.45,
               swfPath: "/flash"
             });
 
@@ -180,8 +181,8 @@
         <h6>Voice Communication</h6>
         <ul>
           <li><%= link_to "Teamspeak 3", "http://www.teamspeak.com/?page=downloads" %></li>
-          <li><strong>Join server:</strong> <a href="ts3server://ensl.org?channel=NS1%20Gathers">ensl.org</a></li>
-          <li><strong>All passwords:</strong> europe </li>
+          <li><strong>Click to join:</strong> <a href="ts3server://ensl.org?channel=NS1%20Gathers">ensl.org</a></li>
+          <li><strong>TS password:</strong> europe </li>
         </ul>
       </div>
 
