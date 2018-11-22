@@ -1,10 +1,10 @@
 source 'http://rubygems.org'
 
-ruby '2.2.2'
+ruby '2.2.10'
 
 gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 4.0.13'
-gem 'mysql2', '~> 0.3.15'
+gem 'mysql2', '~> 0.3.18'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
 

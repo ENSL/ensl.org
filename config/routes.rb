@@ -42,6 +42,7 @@ Ensl::Application.routes.draw do
   resources :groupers
   resources :forumers
   resources :topics
+  resources :matches
 
   get 'forums/up'
   get 'forums/down'
