@@ -6,7 +6,6 @@
     </div>
   </div>
   <%= render partial: "shoutmsgs/new", locals: { shoutmsg: Shoutmsg.new } %>
-  <%= link_to "Shoutbox Recent History", controller: :shoutmsgs, action: "index" %><br/>
   <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
 </div>
 

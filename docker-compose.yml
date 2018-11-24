@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  web:
+    image: ensl/ensl.org:latest
+    volumes:
+     - "./public:/var/www/public"
+    ports:
+     - "4000:4000"
+    depends_on:
+     - db
+     - memcached
+  #    - redis
+  db:
+    image: mariadb:latest
+    volumes:
+     - "./db_data:/var/lib/mysql"
+     - "./ext/mysql.conf.d:/etc/mysql/conf.d"
+    environment:
+     - MYSQL_DATABASE
+     - MYSQL_USER
+     - MYSQL_USERNAME
+     - MYSQL_PASSWORD
+     - MYSQL_ROOT_PASSWORD
+#     - MYSQL_ROOT_HOST
+  memcached:
+    image: memcached:latest
+  #redis:
+  #  image: redis

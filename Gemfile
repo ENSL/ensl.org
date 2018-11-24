@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
-ruby '2.2.2'
+ruby '2.2.10'
+#ruby '2.2.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
 gem 'rails', '~> 3.2.22'
@@ -8,6 +9,7 @@ gem 'mysql2', '~> 0.3.17'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
 
+gem 'i18n-js'
 gem 'exceptional', '~> 2.0.33'
 gem 'oj', '~> 2.5.5'
 gem 'faraday', '~> 0.9.0'
@@ -27,7 +29,7 @@ gem 'test-unit', '~> 3.1.3'
 gem 'google-api-client', '~> 0.10.3'
 
 # Please install nodejs locally.
-gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
+#gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
 gem 'sprockets', '~> 2.2.1'
 gem 'coffee-rails', '~> 3.2.2'
