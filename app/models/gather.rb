@@ -181,11 +181,11 @@ class Gather < ActiveRecord::Base
   end
 
   def can_create? cuser
-    cuser and cuser.admin?
+    return true if cuser.admin? or cuser.gather_moderator?
   end
 
   def can_update? cuser
-    cuser and cuser.admin?
+    return true if cuser.admin? or cuser.gather_moderator?
   end
 
   def self.last(name = "NS2")
