@@ -34,7 +34,7 @@
       success: function(response, text, request) {
         if (request.getResponseHeader('Gather') == 'voting') {
           if (!played) {
-            var startTime = 0;
+            var startTime = 110;
             $("#jplayer").jPlayer({
               ready: function() {
                 $(this).jPlayer("setMedia", {
