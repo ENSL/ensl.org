@@ -149,7 +149,7 @@ class Gatherer < ActiveRecord::Base
   def can_update? cuser, params = {}
     return false unless cuser
     if params.keys.include? "username"
-      if cuser.admin?
+      if cuser.admin? or cuser.gather_moderator?
         return true
       else
         return false
@@ -166,6 +166,6 @@ class Gatherer < ActiveRecord::Base
   end
 
   def can_destroy? cuser
-    cuser and ((user == cuser or cuser.admin?) and gather.status == Gather::STATE_RUNNING)
+    cuser and ((user == cuser or cuser.admin? or gather_moderator) and gather.status == Gather::STATE_RUNNING)
   end
 end
