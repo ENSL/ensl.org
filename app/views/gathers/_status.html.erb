@@ -69,7 +69,7 @@
 
 
   <%= link_to "Mute", '#', id: "mute", class: 'button tiny' %>
-  <% if cuser and (cuser.admin? or cuser.gather_moderators?) %>
+  <% if cuser and (cuser.admin? or cuser.gather_moderator?) %>
     <%= link_to "Admin Page", edit_gather_url, class: 'admin button' %>
   <% end %>
 </div>
