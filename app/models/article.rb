@@ -35,26 +35,26 @@ class Article < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at, :user_id, :version
 
-  scope :recent, order: 'created_at DESC', limit: 8
-  scope :with_comments,
-    select: "articles.*, COUNT(C.id) AS comment_num",
-    joins: "LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id",
-    group: "articles.id"
-  scope :ordered, order: 'articles.created_at DESC'
-  scope :limited, limit: 5
-  scope :nodrafts, conditions: { status: STATUS_PUBLISHED }
-  scope :drafts, conditions: { status: STATUS_DRAFT }
-  scope :articles, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]
-  scope :onlynews, conditions: ["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_NEWS]
-  scope :category, lambda { |cat| { conditions: { category_id: cat } } }
-  scope :domain, lambda { |domain| { includes: 'category', conditions: { "categories.domain" => domain } } }
-  scope :nospecial, conditions: ["category_id != ?", Category::SPECIAL]
-  scope :interviews, conditions: ["category_id = ?", Category::INTERVIEWS]
+  scope :recent, -> { order('created_at DESC').limit(8) }
+  scope :with_comments, -> {
+    select("articles.*, COUNT(C.id) AS comment_num").
+    joins("LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id").
+    group("articles.id") }
+  scope :ordered, ->  { order('articles.created_at DESC') }
+  scope :limited, -> { limit(5) }
+  scope :nodrafts, -> { where(status: STATUS_PUBLISHED) }
+  scope :drafts, -> { where(status: STATUS_DRAFT) }
+  scope :articles, -> { where(["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]) }
+  scope :onlynews, -> { where(category_id: Category.select(:id).where.not(domain: Category::DOMAIN_NEWS)) }
+  scope :category, -> (cat) { where(category_id: cat) }
+  scope :domain, -> (domain) { includes(:category).where("categories.domain = '?'", domain) }
+  #scope :nospecial, -> { where("category_id != ?", Category::SPECIAL) }
+  scope :interviews, -> { where(category_id: Category::INTERVIEWS) }
 
   belongs_to :user
   belongs_to :category
-  has_many :comments, as: :commentable, order: 'created_at ASC', dependent: :destroy
-  has_many :files, class_name: 'DataFile', order: 'created_at DESC', dependent: :destroy
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :files, class_name: 'DataFile', dependent: :destroy
 
   validates_length_of :title, :in => 1..50
   validates_length_of :text, :in => 1..16000000

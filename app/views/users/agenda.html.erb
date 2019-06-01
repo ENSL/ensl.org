@@ -224,9 +224,9 @@
         <%= render partial: "issues/list", locals: { issues: @user.issues } %>
       <% end %>
       
-      <% if @user.open_issues.size > 0 %>
+      <% if @user.asssigned_issues.size > 0 %>
         <h4>Open issues assigned to you</h4>
-        <%= render partial: "issues/list", locals: { issues: @user.open_issues } %>
+        <%= render partial: "issues/list", locals: { issues: @user.asssigned_issues } %>
       <% end %>
 
       <%= link_to 'New issue', new_issue_path, class: 'button' %>
