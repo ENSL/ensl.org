@@ -80,7 +80,7 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.first(conditions: ["id < ?", self.id], order: "id DESC")
+    category.articles.nodrafts.first.where("id < ?", self.id).order("id DESC")
   end
 
   def next_article

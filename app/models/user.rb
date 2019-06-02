@@ -45,51 +45,50 @@ class User < ActiveRecord::Base
   has_many :groups, :through => :groupers
   has_many :shoutmsgs, :dependent => :destroy
   has_many :issues, :foreign_key => "author_id", :dependent => :destroy
-  has_many :assigned_issues, :class_name => "Issue", :foreign_key => "assigned_id",
+  has_many :assigned_issues, :class_name => "Issue", :foreign_key => "assigned_id"
   has_many :posted_comments, :dependent => :destroy, :class_name => "Comment"
-  has_many :comments, :class_name => "Comment", :as => :commentable, :order => "created_at ASC", :dependent => :destroy
+  has_many :comments, -> { order("created_at ASC") }, :class_name => "Comment", :as => :commentable, :dependent => :destroy
   has_many :teamers, :dependent => :destroy
-  has_many :active_teams, :through => :teamers, :source => "team", ->
-    { where("teamers.rank >= ? AND teams.active = ?", Teamer::RANK_MEMBER, true) }
-  has_many :active_contesters, :through => :active_teams, :source => "contesters", ->
-    { where({"contesters.active = ?", true} }
-  has_many :active_contests, :through => :active_contesters, :source => "contest", ->
-    { where("contests.status != ?", Contest::STATUS_CLOSED) }
-  has_many :past_teams, :through => :teamers, :source => "team", :group => "user_id, team_id"
+  has_many :active_teams, -> { where("teamers.rank >= ? AND teams.active = ?", Teamer::RANK_MEMBER, true) }, \
+           :through => :teamers, :source => "team"
+  has_many :active_contesters, -> { where("contesters.active = ?", true) }, \
+           :through => :active_teams, :source => "contesters"
+  has_many :active_contests, -> { where("contests.status != ?", Contest::STATUS_CLOSED) }, \
+           :through => :active_contesters, :source => "contest"
   has_many :matchers, :dependent => :destroy
   has_many :matches, :through => :matchers
   has_many :predictions, :dependent => :destroy
   has_many :challenges_received, :through => :active_contesters, :source => "challenges_received"
   has_many :challenges_sent, :through => :active_contesters, :source => "challenges_sent"
-  has_many :upcoming_team_matches, :through => :active_contesters, :source => "matches",
-    :conditions => "match_time > UTC_TIMESTAMP()"
-  has_many :upcoming_ref_matches, :class_name => "Match", :foreign_key => "referee_id",
-    :conditions => "match_time > UTC_TIMESTAMP()"
-  has_many :past_team_matches, :through => :active_contesters, :source => "matches",
-    :conditions => "match_time < UTC_TIMESTAMP()"
-  has_many :past_ref_matches, :class_name => "Match", :foreign_key => "referee_id",
-    :conditions => "match_time < UTC_TIMESTAMP()"
+  has_many :upcoming_team_matches, -> { where("match_time > UTC_TIMESTAMP()") },
+           :through => :active_teams, :source => "matches"
+  has_many :upcoming_ref_matches, -> { where("match_time > UTC_TIMESTAMP()") },
+           :class_name => "Match", :foreign_key => "referee_id"
+  has_many :past_team_matches, -> { where("match_time < UTC_TIMESTAMP()") },
+           :through => :active_contesters, :source => "matches"
+  has_many :past_ref_matches, -> { where("match_time < UTC_TIMESTAMP()") },
+           :class_name => "Match", :foreign_key => "referee_id"
   has_many :received_personal_messages, :class_name => "Message", :as => "recipient", :dependent => :destroy
   has_many :received_team_messages, :through => :active_teams, :source => :received_messages
   has_many :sent_personal_messages, :class_name => "Message", :as => "sender", :dependent => :destroy
   has_many :sent_team_messages, :through => :active_teams, :source => :sent_messages
-  has_many :match_teams, :through => :matchers, :source => :teams, :uniq => true
+  has_many :match_teams, :through => :matchers, :source => :teams
 
   scope :active, -> { where(banned: false) }
-  scope :with_age, ->
-    {where("DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(birthdate)), '%Y')+0 AS aged, COUNT(*) as num, username").
-    .group("aged").
-    .having("num > 8 AND aged > 0")}
-  scope :country_stats, ->
-    {select("country, COUNT(*) as num").
-    .where("country is not null and country != '' and country != '--'").
-    .group("country").
-    .having("num > 15").
-    .order("num DESC") }
-  scope :posts_stats, ->
-    { select("users.id, username, COUNT(posts.id) as num").
-     .joins("LEFT JOIN posts ON posts.user_id = users.id").
-     .group("users.id").
+  scope :with_age, -> {
+      where("DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(birthdate)), '%Y')+0 AS aged, COUNT(*) as num, username")
+     .group("aged")
+     .having("num > 8 AND aged > 0") }
+  scope :country_stats, -> {
+     select("country, COUNT(*) as num")
+     .where("country is not null and country != '' and country != '--'")
+     .group("country")
+     .having("num > 15")
+     .order("num DESC") }
+  scope :posts_stats, -> {
+     select("users.id, username, COUNT(posts.id) as num")
+     .joins("LEFT JOIN posts ON posts.user_id = users.id")
+     .group("users.id")
      .order("num DESC") }
   scope :banned,
     :joins => "LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()",
@@ -200,18 +199,14 @@ class User < ActiveRecord::Base
   end
 
   def caster?
-    groups.exists? :id SL/ensl.org
-
+    groups.exists? :id => Group::CASTERS
   end
 
   def verified?
-    #		created_at < DaSL/ensl.org
-N_TIME)
     true
   end
 
-  def has_access? groupSL/ensl.org
-
+  def has_access? groups
     admin? or groups.exists?(:id => group)
   end
 

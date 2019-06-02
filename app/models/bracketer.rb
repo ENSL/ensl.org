@@ -22,7 +22,7 @@ class Bracketer < ActiveRecord::Base
   belongs_to :match
   belongs_to :contester, :foreign_key => "team_id"
 
-  scope :pos, lambda { |row, col| {:conditions => {"row" => row, "column" => col}} }
+  scope :pos, -> (row, col) { where(row: row, column: col) }
 
   def to_s
     if self.match_id

@@ -2,7 +2,7 @@ class ShoutmsgsController < ApplicationController
   respond_to :html, :js
 
   def index
-    @shoutmsgs = Shoutmsg.lastXXX.typebox
+    @shoutmsgs = Shoutmsg.last.typebox
   end
 
   def show
