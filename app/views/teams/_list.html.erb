@@ -10,7 +10,6 @@
   </tr>
 
   <% for team in teams %>
-    <% if team.teamers_num > 0 %>
       <tr>
         <td><%= flag team.country %></td>
         <td><%= namelink team %></td>
@@ -33,6 +32,5 @@
           </td>
         <% end %>
       </tr>
-    <% end %>
   <% end %>
 </table>

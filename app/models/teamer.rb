@@ -29,80 +29,67 @@ class Teamer < ActiveRecord::Base
   #validate_on_create:validate_contests
   validate :validate_team
 
-  scope :basic,
-    :include => :user,
-    :order => "rank DESC, created_at ASC"
-  scope :past,
-    :conditions => ["teamers.rank = ?", RANK_REMOVED]
-  scope :joining,
-    :conditions => ["teamers.rank = ?", RANK_JOINER]
-  scope :present,
-    :conditions => ["teamers.rank >= ?", RANK_JOINER]
-  scope :active,
-    :conditions => ["teamers.rank >= ?", RANK_MEMBER]
-  scope :leaders,
-    :conditions => ["teamers.rank >= ?", RANK_DEPUTEE]
-  scope :of_team,
-    lambda { |team| {:conditions => {"teamers.team_id" => team.id}} }
-  scope :active_teams,
-    :include => :team,
-    :conditions => ["teams.active = ?", true]
-  scope :distinct,
-    :group => "user_id, team_id"
-  scope :ordered,
-    :order => "rank DESC, created_at ASC"
-  scope :historic,
-    lambda { |user, time|
-    {:conditions => ["user_id = ? AND created_at < ? AND ((updated_at > ? AND rank = ?) OR rank >= ?)",
-                     user.id, time.utc, time.utc, RANK_REMOVED, RANK_MEMBER]} }
+  scope :basic, -> { includes(:user).order("rank DESC, created_at ASC") }
+  scope :past, -> { where("teamers.rank = ?", RANK_REMOVED) }
+  scope :joining,-> { where("teamers.rank = ?", RANK_JOINER) }
+  scope :present, -> { where("teamers.rank >= ?", RANK_JOINER) }
+  scope :active, -> { where("teamers.rank >= ?", RANK_MEMBER) }
+  scope :leaders, -> { where("teamers.rank >= ?", RANK_DEPUTEE) }
+  scope :of_team, -> (team) { where("teamers.team_id" => team.id) }
+  scope :active_teams, -> { includes(:team).where("teams.active = ?", true) }
+  scope :unique_by_team, -> { group("user_id, team_id") }
+  scope :ordered, -> { order("rank DESC, created_at ASC") }
+  scope :historic, ->  (user, time) {
+                     where("user_id = ? AND created_at < ? AND ((updated_at > ? AND rank = ?) OR rank >= ?)",
+                     user.id, time.utc, time.utc, RANK_REMOVED, RANK_MEMBER) }
 
-    belongs_to :user
-    belongs_to :team
-    has_many :other_teamers, :through => :user, :source => :teamers, :conditions => ["teamers.id != ?", object_id]
-    has_many :contesters, :through => :team
+  belongs_to :user
+  belongs_to :team
+  has_many :other_teamers, -> { where("teamers.id != ?", object_id) }, :through => :user, :source => :teamers
+  has_many :contesters, :through => :team
 
-    before_create :init_variables
+  before_create :init_variables
 
-    def to_s
-      user.to_s
+  def to_s
+    user.to_s
+  end
+
+  def ranks
+    {RANK_JOINER => "Joining", RANK_MEMBER => "Member", RANK_DEPUTEE => "Deputee", RANK_LEADER => "Leader"}
+  end
+
+  def validate_team
+    if user.teamers.of_team(team).present.count > 0
+      errors.add :team, I18n.t(:teams_join_twice)
     end
+  end
 
-    def ranks
-      {RANK_JOINER => "Joining", RANK_MEMBER => "Member", RANK_DEPUTEE => "Deputee", RANK_LEADER => "Leader"}
-    end
+  def validate_contests
+    # TODO
+  end
 
-    def validate_team
-      if user.teamers.of_team(team).present.count > 0
-        errors.add :team, I18n.t(:teams_join_twice)
-      end
-    end
+  def init_variables
+    self.rank = RANK_JOINER unless self.rank
+  end
 
-    def validate_contests
-      # TODO
+  def destroy
+    user.update_attribute :team, nil if user.team == team
+    if rank == Teamer::RANK_JOINER
+      super
+    else
+      update_attribute :rank, Teamer::RANK_REMOVED
     end
+  end
 
-    def init_variables
-      self.rank = RANK_JOINER unless self.rank
-    end
+  def can_create? cuser, params
+    cuser and Verification.contain params, [:user_id, :team_id]
+  end
 
-    def destroy
-      user.update_attribute :team, nil if user.team == team
-      if rank == Teamer::RANK_JOINER
-        super
-      else
-        update_attribute :rank, Teamer::RANK_REMOVED
-      end
-    end
+  def can_update? cuser
+    cuser and cuser.admin?
+  end
 
-    def can_create? cuser, params
-      cuser and Verification.contain params, [:user_id, :team_id]
-    end
-
-    def can_update? cuser
-      cuser and cuser.admin?
-    end
-
-    def can_destroy? cuser
-      cuser and (user == cuser or team.is_leader? cuser or cuser.admin?)
-    end
+  def can_destroy? cuser
+    cuser and (user == cuser or team.is_leader? cuser or cuser.admin?)
+  end
 end

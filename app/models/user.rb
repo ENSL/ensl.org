@@ -90,23 +90,23 @@ class User < ActiveRecord::Base
      .joins("LEFT JOIN posts ON posts.user_id = users.id")
      .group("users.id")
      .order("num DESC") }
-  scope :banned,
-    :joins => "LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()",
-    :conditions => "bans.id IS NOT NULL"
-  scope :idle,
-    :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
+  scope :banned, -> {
+      joins("LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()")
+      .conditions("bans.id IS NOT NULL") }
+  scope :idle, -> {
+      joins("lastvisit < ?", 30.minutes.ago.utc) }
 
   validates_uniqueness_of :username, :email, :steamid
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
   validates_length_of :lastname, :in => 1..25, :allow_blank => true
   validates_length_of :username, :in => 2..20
   validates_format_of :username, :with => /\A[A-Za-z0-9_\-\+]{2,20}\Z/
-    validates_presence_of :raw_password, :on => :create
+  validates_presence_of :raw_password, :on => :create
   validates_length_of :email, :maximum => 50
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_length_of :steamid, :maximum => 30
   validates_format_of :steamid, :with => /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/
-    validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
+  validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
   validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
   validate :validate_team
 
@@ -292,7 +292,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search(search)
-    search ? where("LOWER(username) LIKE LOWER(?) OR steamid LIKE ?", "%#{search}%", "%#{search}%") : scoped
+    search ? where("LOWER(username) LIKE LOWER(?) OR steamid LIKE ?", "%#{search}%", "%#{search}%") : all
   end
 
   def self.refadmins

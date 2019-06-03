@@ -18,8 +18,6 @@
 #  category_id :integer
 #
 
-require 'data_file'
-
 class Movie < ActiveRecord::Base
   include Extra
 

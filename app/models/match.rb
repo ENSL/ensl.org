@@ -41,11 +41,11 @@ class Match < ActiveRecord::Base
   has_many :matchers, :dependent => :destroy
   has_many :users, :through => :matchers
   has_many :predictions, :dependent => :destroy
-  has_many :comments, :as => :commentable, :order => "created_at", :dependent => :destroy
+  has_many :comments, -> { order("created_at") }, :as => :commentable, :dependent => :destroy
   belongs_to :challenge
   belongs_to :contest
-  belongs_to :contester1, :class_name => "Contester", :include => 'team'
-  belongs_to :contester2, :class_name => "Contester", :include => 'team'
+  belongs_to :contester1, -> { includes('team') }, :class_name => "Contester"
+  belongs_to :contester2, -> { includes('team') }, :class_name => "Contester"
   belongs_to :map1, :class_name => "Map"
   belongs_to :map2, :class_name => "Map"
   belongs_to :server
@@ -57,65 +57,41 @@ class Match < ActiveRecord::Base
   belongs_to :stream, :class_name => "Movie"
   belongs_to :caster, :class_name => "User"
 
-  scope :future, :conditions => ["match_time > UTC_TIMESTAMP()"]
-  scope :future5, :conditions => ["match_time > UTC_TIMESTAMP()"], :limit => 5
-  scope :finished, :conditions => ["score1 != 0 OR score2 != 0"]
-  scope :realfinished, :conditions => ["score1 IS NOT NULL AND score2 IS NOT NULL"]
-  scope :unfinished, :conditions => ["score1 IS NULL AND score2 IS NULL"]
-  scope :unreffed, :conditions => ["referee_id IS NULL"]
-  scope :ordered, :order => "match_time DESC"
-  scope :chrono, :order => "match_time ASC"
-  scope :recent, :limit => "8"
-  scope :bigrecent, :limit => "50"
-  scope :active, :conditions => ["contest_id IN (?)", Contest.active]
-  scope :on_day,
-    lambda { |day| {
-    :conditions => ["match_time > ? and match_time < ?", day.beginning_of_day, day.end_of_day]} }
-  scope :on_week,
-    lambda { |time| {
-    :conditions => ["match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week]} }
-  scope :of_contester,
-    lambda { |contester| {
-    :conditions => ["contester1_id = ? OR contester2_id = ?", contester.id, contester.id]} }
-  scope :of_user,
-    lambda { |user| {
-    :include => :matchers,
-    :conditions => ["matchers.user_id = ?",  user.id]} }
-  scope :of_team,
-    lambda { |team| {
-    :include => {:contester1 => :team,
-                 :contester2 => :team}, :conditions => ["teams.id = ? OR teams_contesters.id = ?", team.id, team.id]} }
-  scope :of_userteam,
-    lambda { |user, team| {
-    :include => {:matchers => {:contester => :team}},
-    :conditions => ["teams.id = ? AND matchers.user_id = ?", team.id, user.id]} }
-  scope :within_time,
-    lambda { |from, to| {
-    :conditions => ["match_time > ? AND match_time < ?", from.utc, to.utc]} }
-  scope :around,
-    lambda { |time| {
-    :conditions => ["match_time > ? AND match_time < ?",  time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc]} }
-  scope :after,
-    lambda { |time| {
-    :conditions => ["match_time > ? AND match_time < ?",  time.utc, time.ago(-MATCH_LENGTH).utc]} }
-  scope :map_stats,
-    :select => "map1_id, COUNT(*) as num, maps.name",
-    :joins => "LEFT JOIN maps ON maps.id = map1_id",
-    :group => "map1_id",
-    :having => "map1_id is not null",
-    :order => "num DESC"
-  scope :year_stats,
-    :select => "id, DATE_FORMAT(match_time, '%Y') as year, COUNT(*) as num",
-    :conditions => "match_time > '2000-01-01 01:01:01'",
-    :group => "year",
-    :order => "num DESC"
-  scope :month_stats,
-    :select => "id, DATE_FORMAT(match_time, '%m') as month_n,
-    DATE_FORMAT(match_time, '%M') as month,
-    COUNT(*) as num",
-    :conditions => "match_time > '2000-01-01 01:01:01'",
-    :group => "month",
-    :order => "month_n"
+  scope :future, -> { where("match_time > UTC_TIMESTAMP()") }
+  scope :future5, -> { where("match_time > UTC_TIMESTAMP()").limit(5) }
+  scope :finished, -> { where("score1 != 0 OR score2 != 0") }
+  scope :realfinished, -> { where("score1 IS NOT NULL AND score2 IS NOT NULL") }
+  scope :unfinished, -> { where("score1 IS NULL AND score2 IS NULL") }
+  scope :unreffed, -> { where.not(referee_id: nil) }
+  scope :ordered, -> { order("match_time DESC") }
+  scope :chrono, -> { order("match_time ASC") }
+  scope :recent, -> { limit("8") }
+  scope :bigrecent, -> { limit("50") }
+  scope :active, -> { where("contest_id IN (?)", Contest.active) }
+  scope :on_day, -> (day) { where("match_time > ? and match_time < ?", day.beginning_of_day, day.end_of_day) }
+  scope :on_week, -> (time) { where("match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week) }
+  scope :of_contester, -> (contester) { where("contester1_id = ? OR contester2_id = ?", contester.id, contester.id) }
+  scope :of_user, -> (user) { includes(:matchers).where("matchers.user_id = ?",  user.id) }
+  scope :of_team, -> (team) { includes({:contester1 => :team, :contester2 => :team}).where("teams.id = ? OR teams_contesters.id = ?", team.id, team.id) }
+  scope :of_userteam, -> (user, team) { includes({:matchers => {:contester => :team}}).where("teams.id = ? AND matchers.user_id = ?", team.id, user.id) }
+  scope :within_time, -> (from, to) { where("match_time > ? AND match_time < ?", from.utc, to.utc) }
+  scope :around, -> (time) { where("match_time > ? AND match_time < ?", time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc) }
+  scope :after, -> (time) { where("match_time > ? AND match_time < ?", time.utc, time.ago(-MATCH_LENGTH).utc) }
+  scope :map_stats, -> { select("map1_id, COUNT(*) as num, maps.name").
+                         joins("LEFT JOIN maps ON maps.id = map1_id").
+                         group("map1_id").
+                         having("map1_id is not null").
+                         order("num DESC") }
+  scope :year_stats, -> { select("id, DATE_FORMAT(match_time, '%Y') as year, COUNT(*) as num").
+                          where("match_time > '2000-01-01 01:01:01'").
+                          group("year").
+                          order("num DESC") }
+  scope :month_stats, -> { select("id, DATE_FORMAT(match_time, '%m') as month_n,
+                                   DATE_FORMAT(match_time, '%M') as month,
+                                   COUNT(*) as num").
+                           where("match_time > '2000-01-01 01:01:01'").
+                           group("month").
+                           order("month_n") }
 
   validates_presence_of :contester1, :contester2, :contest
   validates_format_of [:score1, :score2], :with => /\A[0-9]\z/, :allow_nil => true
@@ -145,12 +121,12 @@ class Match < ActiveRecord::Base
   end
 
   def preds contester
-    perc = Prediction.count(:conditions => ["match_id = ? AND score#{contester} > 2", id])
+    perc = Prediction.where("match_id = ? AND score#{contester} > 2", id).count()
     perc != 0 ? (perc/predictions.count.to_f*100).round : 0
   end
 
   def mercs contester
-    matchers.all :conditions => {:merc => true, :contester_id => contester.id}
+    matchers.where(merc: true, contester_id: contester.id)
   end
 
   def get_hltv
@@ -162,11 +138,11 @@ class Match < ActiveRecord::Base
   end
 
   def team1_lineup
-    matchers.all(:conditions => {:contester_id => contester1_id})
+    matchers.where(contester_id: contester1_id)
   end
 
   def team2_lineup
-    matchers.all(:conditions => {:contester_id => contester2_id})
+    matchers.where(contester_id: contester2_id)
   end
 
   def get_friendly param = nil
@@ -194,7 +170,7 @@ class Match < ActiveRecord::Base
   end
 
   def send_notifications
-    Profile.all(:include => :user, :conditions => "notify_any_match = 1").each do |p|
+    Profile.where("notify_any_match", 1).includes(:user).each do |p|
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|

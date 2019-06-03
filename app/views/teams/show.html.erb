@@ -58,14 +58,14 @@
       </div>
 
       <div class="tab" id="members">
-        <% if @team.teamers.active.ordered.distinct.length > 0 %>
+        <% if @team.teamers.active.ordered.unique_by_team.length > 0 %>
           <h3>Current Members</h3>
-          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.distinct, blacklist: false, comment: true } %>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.active.ordered.unique_by_team, blacklist: false, comment: true } %>
         <% end %>
 
-        <% if @team.teamers.past.distinct.length > 0 %>
+        <% if @team.teamers.past.unique_by_team.length > 0 %>
           <h3>Past Members</h3>
-          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.past.distinct, blacklist: @team.teamers.active.ordered.distinct, comment: false } %>
+          <%= render partial: "teamers/list", locals: { teamers: @team.teamers.past.unique_by_team, blacklist: @team.teamers.active.ordered.unique_by_team, comment: false } %>
         <% end %>
       </div>
 

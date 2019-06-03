@@ -2,7 +2,7 @@
 
 <div id="categories">
   <% @categories.each do |cat| %>
-    <% forums = cuser ? cat.forums.available_to(cuser, Forumer::ACCESS_READ).ordered : cat.forums.public.ordered %>
+    <% forums = cuser ? cat.forums.available_to(cuser, Forumer::ACCESS_READ).ordered : cat.forums.public_forums.ordered %>
     <% next if forums.length == 0 %>
 
     <div class="category">
@@ -58,7 +58,7 @@
     <strong><%= Topic.count %></strong> topics, and <strong><%= User.count %></strong> users.
   </p>
   <p>
-    Our newest member is <%= namelink User.last %> and most active member is <%= namelink User.posts_stats.first %>.
+    Our newest member is <%= namelink User.last %> and most active member is <%= namelink User.posts_stats(1).first %>.
   </p>
 </div>
 

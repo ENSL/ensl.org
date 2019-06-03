@@ -30,7 +30,7 @@ class Gather < ActiveRecord::Base
   attr_accessor :admin
 
   scope :ordered, -> { order("id DESC") }
-  scope :basic, -> { include(:captain1, :captain2, :map1, :map2, :server) }
+  scope :basic, -> { includes(:captain1, :captain2, :map1, :map2, :server) }
   scope :active, -> { where("gathers.status IN (?, ?, ?) AND gathers.updated_at > ?",
                             STATE_VOTING, STATE_PICKING, STATE_RUNNING, 12.hours.ago.utc) }
   

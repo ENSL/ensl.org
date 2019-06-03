@@ -35,30 +35,30 @@ class Contest < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at
 
-  scope :active, :conditions => ["status != ?", STATUS_CLOSED]
-  scope :inactive, :conditions => {:status => STATUS_CLOSED}
-  scope :joinable, :conditions => {:status => STATUS_OPEN}
-  scope :with_contesters, :include => :contesters
-  scope :ordered, :order => "start DESC"
-  scope :nsls1, :conditions => ["name LIKE ?", "NSL S1:%"]
-  scope :nsls2, :conditions => ["name LIKE ?", "NSL S2:%"]
-  scope :ns1seasons, :conditions => ["name LIKE ?", "S%:%"]
+  scope :active, -> { where.not(status: STATUS_CLOSED) }
+  scope :inactive, -> { where(status: STATUS_CLOSED) }
+  scope :joinable, -> { where(status: STATUS_OPEN) }
+  scope :with_contesters, -> { includes(:contesters) }
+  scope :ordered, -> { order("start DESC") }
+  scope :nsls1, -> { where("name LIKE ?", "NSL S1:%") }
+  scope :nsls2, -> { where("name LIKE ?", "NSL S2:%") }
+  scope :ns1seasons, -> { where("name LIKE ?", "S%:%") }
 
   has_many :matches, :dependent => :destroy
   has_many :weeks, :dependent => :destroy
-  has_many :contesters, :dependent => :destroy, :include => :team
+  has_many :contesters, -> { includes(:team) }, :dependent => :destroy
   has_many :predictions, :through => :matches
   has_many :brackets
-  has_many :preds_with_score,
-    :source => :predictions,
-    :through => :matches,
-    :select => "predictions.id, predictions.user_id,
-    SUM(result) AS correct,
-    SUM(result)/COUNT(*)*100 AS score,
-    COUNT(*) AS total",
-    :conditions => "result IS NOT NULL",
-    :group => "predictions.user_id",
-    :order => "correct DESC"
+  has_many :preds_with_score, -> {
+            select("predictions.id, predictions.user_id
+                    SUM(result) AS correct,
+                    SUM(result)/COUNT(*)*100 AS score,
+                    COUNT(*) AS total")
+            .where("result IS NOT NULL")
+            .group("predictions.user_id")
+            .order("correct DESC") },
+            :source => :predictions,
+            :through => :matches
   has_and_belongs_to_many :maps
   belongs_to :demos, :class_name => "Directory"
   belongs_to :winner, :class_name => "Contester"
