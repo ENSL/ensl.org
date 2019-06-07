@@ -69,7 +69,8 @@
       
       <div class="controls">
         <% if post.topic.posts.build.can_create? cuser %>
-          <%= link_to_function 'Quote Reply', "QuoteText(#{post.id}); $('#reply').fadeIn('slow')", class: 'button tiny' %>
+          <%= # link_to_function 'Quote Reply', "QuoteText(#{post.id}); $('#reply').fadeIn('slow') ", class: 'button tiny' %>
+          <%= link_to '#', data:{on: :click, call: 'QuoteText', args: "#{post.id}"}, class: 'button tiny' %>
         <% end %>
         <% if post.can_update? cuser %>
           <%= link_to 'Edit', edit_post_path(post), class: 'button tiny' %>

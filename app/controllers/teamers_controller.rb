@@ -1,4 +1,7 @@
 class TeamersController < ApplicationController
+  def index
+  end
+
   def create
     @teamer = Teamer.new params[:teamer]
     raise AccessError unless @teamer.can_create? cuser, params[:teamer]

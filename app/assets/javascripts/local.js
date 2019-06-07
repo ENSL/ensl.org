@@ -32,6 +32,12 @@ $(function() {
     $(this).scrollTop(scrollTop-Math.round(delta));
   });
 
+
+  // Forums fast reply
+  $("a#fastReply").live('click', function() {
+    $('#reply').fadeIn('slow')
+  });
+
   // Gather stuff
 
   $("a#gather-info-hide").live('click', function() {

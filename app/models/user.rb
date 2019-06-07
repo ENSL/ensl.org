@@ -183,7 +183,7 @@ class User < ActiveRecord::Base
   end
 
   def banned? type = Ban::TYPE_SITE
-    Ban.first :conditions => ["expiry > UTC_TIMESTAMP() AND user_id = ? AND ban_type = ?", self.id, type]
+    Ban.where("expiry > UTC_TIMESTAMP() AND user_id = ? AND ban_type = ?", self.id, type).exists?
   end
 
   def admin?

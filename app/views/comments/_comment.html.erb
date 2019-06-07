@@ -10,7 +10,7 @@
     </h1>
     <div class="controls">
       <% if cuser %>
-        <%= link_to_function icon('comment'), "QuoteText(#{comment.id}, 'comments')" %>
+        <%= link_to '#', data:{on: :click, call: 'QuoteText',args: "#{comment.id}, 'comments'"} >
         <% if comment.can_update? cuser %>
           <%= link_to icon('pencil'), edit_comment_path(comment) %>
         <% end %>

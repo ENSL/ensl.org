@@ -16,7 +16,7 @@ class Post < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
-  scope :basic, :include => [{:user => [:team, :profile]}, :topic]
+  scope :basic, -> {includes([{:user => [:team, :profile]}, :topic])}
 
   validates_presence_of :topic, :user
   validates_length_of :text, :in => 1..10000

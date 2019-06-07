@@ -75,7 +75,7 @@ class Forum < ActiveRecord::Base
   is_admin = Grouper.where(user_id: cuser, group_id: Group::ADMINS)
   Forum.where("EXISTS (#{is_admin.to_sql}) OR
                id IN (SELECT q.id from (#{user_has_access.to_sql}) q ) OR
-               id IN (SELECT q.id from (#{Forum.public.to_sql}) q )")
+               id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
   end
 
 end
