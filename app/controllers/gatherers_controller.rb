@@ -51,8 +51,9 @@ class GatherersController < ApplicationController
   def destroy
     raise AccessError unless @gatherer.can_destroy? cuser
 
+    @gather = @gatherer.gather
     @gatherer.destroy
-    redirect_to @gatherer.gather
+    redirect_to @gather
   end
 
   private

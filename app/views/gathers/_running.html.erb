@@ -9,7 +9,7 @@
           <li<% if gatherer.status > 0 %> class="away"<% end %>>
             <%= flag gatherer.user.country %>
             <%= namelink gatherer.user %>
-            <% if cuser and (cuser.admin? or cuser.gather_moderator?) %>
+            <% if cuser and gatherer.can_destroy?(cuser) %>
               <%= link_to gatherer, method: :delete, class: 'delete' do %>
                 <%= icon 'times' %>
               <% end %>

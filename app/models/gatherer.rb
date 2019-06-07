@@ -166,6 +166,6 @@ class Gatherer < ActiveRecord::Base
   end
 
   def can_destroy? cuser
-    cuser and ((user == cuser or cuser.admin? or gather_moderator) and gather.status == Gather::STATE_RUNNING)
+    cuser and ((user == cuser or cuser.admin? or cuser.gather_moderator?) and gather.status == Gather::STATE_RUNNING)
   end
 end
