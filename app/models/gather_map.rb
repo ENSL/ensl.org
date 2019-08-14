@@ -19,7 +19,7 @@ class GatherMap < ActiveRecord::Base
 
   def to_s
     self.map.to_s
-  endD
+  end
 
   def init_variables
     self.votes = 0
