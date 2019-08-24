@@ -50,7 +50,7 @@ class Teamer < ActiveRecord::Base
   scope :distinct,
     :group => "user_id, team_id"
   scope :ordered,
-    :order => "rank DESC, created_at ASC"
+    :order => "`rank` DESC, `created_at` ASC"
   scope :historic,
     lambda { |user, time|
     {:conditions => ["user_id = ? AND created_at < ? AND ((updated_at > ? AND rank = ?) OR rank >= ?)",

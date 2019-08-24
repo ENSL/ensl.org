@@ -93,6 +93,9 @@ class Team < ActiveRecord::Base
   end
 
   def destroy
+    User.where(team_id: self.id).each do |user|
+      user.update_attribute(:team_id, nil)
+    end
     if matches.count > 0
       update_attribute :active, false
       teamers.update_all ["rank = ?", Teamer::RANK_REMOVED]
