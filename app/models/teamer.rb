@@ -21,6 +21,7 @@ class Teamer < ActiveRecord::Base
   RANK_LEADER = 2
 
   attr_protected :id, :created_at, :updated_at, :version
+  attr_accessor :username
 
   validates_length_of :comment, :in => 0..15, :allow_blank => true
   validates_uniqueness_of :user_id, :scope => [:team_id, :rank]
@@ -28,6 +29,7 @@ class Teamer < ActiveRecord::Base
   #validate_on_create:validate_team
   #validate_on_create:validate_contests
   validate :validate_team
+  validate :validate_username
 
   scope :basic,
     :include => :user,
@@ -74,6 +76,16 @@ class Teamer < ActiveRecord::Base
     def validate_team
       if user.teamers.of_team(team).present.count > 0
         errors.add :team, I18n.t(:teams_join_twice)
+      end
+    end
+
+    def validate_username
+      if username
+        if u = User.first(:conditions => {:username => username})
+          self.user = u
+        else
+          errors.add(:username, t(:gatherer_wrong_username))
+        end
       end
     end
 

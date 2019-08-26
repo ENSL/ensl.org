@@ -84,6 +84,19 @@
           <%= f.submit "Update" %>
         </div>
       <% end %>
+
+      <%= form_for @team.teamers.build, html: { class: 'square' } do |f| %>
+        <%= f.hidden_field :team_id %>
+
+        <div class="fields horizontal">
+          <%= f.label :username, "Add user:" %>
+          <%= f.text_field :username %>
+        </div>
+
+        <div class="controls inline">
+          <%= f.submit "Add" %>  
+        </div>
+      <% end %>       
     </div>
 
     <div id="contests" class="tab">
@@ -94,6 +107,20 @@
           <div class="fields inline">
             <%= f.collection_select :contest_id, Contest.active, :id, :name %>
           </div>
+        <%= form_for @team.contesters.build, html: { class: 'square' } do |f| %>
+          <%= f.hidden_field :team_id %>
+
+          <div class="fields inline">
+            <%= f.collection_select :contest_id, Contest.active, :id, :name %>
+          </div>
+
+          <div class="controls inline">
+            <%= f.submit "Join" %>  
+          </div>
+        <% end %>
+      </p>
+    </div>
+  </div>
 
           <div class="controls inline">
             <%= f.submit "Join" %>  
