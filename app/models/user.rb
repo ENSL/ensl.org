@@ -138,13 +138,8 @@ class User < ActiveRecord::Base
   end
 
   def country_s
-    I18nCountrySelect::Countries::COUNTRY_CODES.each do |code|
-      if code == country
-        return I18n.t(code, :scope => :countries, :default => 'missing')
-      end
-    end
-
-    country
+    country_object = ISO3166::Country[country]
+    country_object.translations[I18n.locale.to_s] || country_object.name
   end
 
   def realname
@@ -211,15 +206,15 @@ class User < ActiveRecord::Base
   end
 
   def new_messages
-    received_personal_messages.unread_by(self) + received_team_messages.unread_by(self)
+    received_personal_messages.unread_by(self).union(received_team_messages.unread_by(self))
   end
 
   def received_messages
-    received_personal_messages + received_team_messages
+    received_personal_messages.union(received_team_messages)
   end
 
   def sent_messages
-    sent_personal_messages + sent_team_messages
+    sent_personal_messages.union(sent_team_messages)
   end
 
   def upcoming_matches

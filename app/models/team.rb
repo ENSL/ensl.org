@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
   belongs_to :founder, :class_name => "User"
 
   has_many :active_teamers, -> { where("rank >= ?", Teamer::RANK_MEMBER) }
-  has_many :teamers, :dependent => :destroy
+  has_many :teamers, :dependent => :destroy, :counter_cache => true
   has_many :leaders, -> { where("rank = ?", Teamer::RANK_LEADER) }, :class_name => "Teamer"
   has_many :contesters, :dependent => :destroy
   has_many :contests, -> { where("contesters.active", true) }, :through => :contesters
