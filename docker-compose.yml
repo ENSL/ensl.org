@@ -4,7 +4,7 @@ services:
   web:
     image: ensl/ensl.org:latest
     volumes:
-     - "./public:/var/www/public"
+     - "../public:/var/www/public"
     ports:
      - "4000:4000"
     depends_on:
@@ -13,6 +13,7 @@ services:
   #    - redis
   db:
     image: mariadb:latest
+    command: mysqld
     volumes:
      - "./db_data:/var/lib/mysql"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"

@@ -30,7 +30,8 @@ RUN bundle config github.https true; cd /var/www && bundle install --path /var/b
 RUN bundle exec rake assets:precompile
 
 # This is a temporary solution to fix assets issue
-RUN mv /var/www/public/assets /home/web/assets
 
 USER root
+RUN mv /var/www/public/assets /home/web/assets
+
 CMD ["/var/www/script/entry.sh"]
