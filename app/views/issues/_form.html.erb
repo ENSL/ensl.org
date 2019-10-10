@@ -11,7 +11,7 @@
     </div>
     <div class="fields horizontal">
       <%= f.label :assigned %>
-      <%= f.text_field :assigned_name, {:value => User.first(:conditions => {:id => @issue.assigned})} %>
+      <%= f.text_field :assigned_name, {:value => User.where(id: @issue.assigned)} %>
     </div>
   <% end %>
   <div class="fields horizontal">

@@ -206,7 +206,7 @@ class User < ActiveRecord::Base
   end
 
   def new_messages
-    received_personal_messages.unread_by(self).union(received_team_messages.unread_by(self))
+    received_personal_messages.union(received_team_messages).unread_by(self)
   end
 
   def received_messages

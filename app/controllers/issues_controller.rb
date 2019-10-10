@@ -12,9 +12,9 @@ class IssuesController < ApplicationController
            else "created_at DESC"
            end
 
-    @open = Issue.with_status(Issue::STATUS_OPEN).all order: sort
-    @solved = Issue.with_status(Issue::STATUS_SOLVED).all order: sort
-    @rejected = Issue.with_status(Issue::STATUS_REJECTED).all order: sort
+    @open = Issue.with_status(Issue::STATUS_OPEN).order(sort)
+    @solved = Issue.with_status(Issue::STATUS_SOLVED).order(sort)
+    @rejected = Issue.with_status(Issue::STATUS_REJECTED).order(sort)
   end
 
   def show

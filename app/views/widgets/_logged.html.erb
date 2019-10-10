@@ -22,8 +22,8 @@
         <%= link_to messages_path do %>
           Messages <%= icon 'envelope' %>
         <% end %>
-        <% if c = cuser.new_messages.num > 0 %>
-          (<%= cuser.new_messages.num %>)
+        <% if c = cuser.new_messages.count > 0 %>
+          (<%= cuser.new_messages.count %>)
         <% end %>
       </li>
       <li>
