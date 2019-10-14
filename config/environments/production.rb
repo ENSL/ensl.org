@@ -48,8 +48,13 @@ Ensl::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
 
-  # Use sendmail
-  config.action_mailer.delivery_method = :sendmail
+  # Use smtp-Server
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp',
+    domain: 'ensl.org'
+  }
+
   config.action_mailer.raise_delivery_errors = true
 
   # Enable threaded mode

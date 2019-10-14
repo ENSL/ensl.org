@@ -5,11 +5,13 @@ services:
     image: ensl/ensl.org:latest
     volumes:
      - "../public:/var/www/public"
+     - "../logs:/var/www/log"
     ports:
      - "4000:4000"
     depends_on:
      - db
      - memcached
+     - smtp
   #    - redis
   db:
     image: mariadb:latest
@@ -26,5 +28,13 @@ services:
 #     - MYSQL_ROOT_HOST
   memcached:
     image: memcached:latest
+  smtp:
+    image: mwader/postfix-relay:latest
+    restart: always
+    volumes:
+     - "../dkim:/etc/opendkim/keys"
+    environment:
+      - POSTFIX_myhostname=ensl.org
+      - OPENDKIM_DOMAINS=ensl.org
   #redis:
   #  image: redis

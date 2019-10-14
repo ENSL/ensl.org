@@ -18,6 +18,9 @@
 db_data/*
 !db_data/.placeholder
 
+# ignore dkim keys
+dkim
+
 # OS X
 .DS_Store
 

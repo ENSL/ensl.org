@@ -1,7 +1,22 @@
 <h1>Password Recovery</h1>
 
-<p><strong>We are currently unable to send automated emails!</strong></p>
-<p>Please see the guide <a href="https://www.ensl.org/articles/1042">here</a> on instructions on requesting a password reset.</p>
+<p>If you do not receive your new password by email, please see the guide <a href="https://www.ensl.org/articles/1042">here</a>.</p>
+
+  <%= form_tag({ controller: 'users', action: 'forgot' }, { class: 'square' }) do %>
+    <div class="fields horizontal">
+      <%= label_tag :username %>
+      <%= text_field_tag :username %>
+    </div>
+  
+    <div class="fields horizontal">
+      <%= label_tag :email %>
+      <%= text_field_tag :email %>
+    </div>
+  
+    <div class="controls">
+      <%= submit_tag "Recover password" %>  
+    </div>
+  <% end %>
 
 <p>
   Special characters have been removed from nicks. <br> You may need to
