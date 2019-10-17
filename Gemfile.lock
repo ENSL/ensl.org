@@ -214,6 +214,10 @@ GEM
       ffi (~> 1.0)
     ref (2.0.0)
     rmagick (2.13.4)
+    rspec (3.3.0)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
     rspec-core (3.3.2)
       rspec-support (~> 3.3.0)
     rspec-expectations (3.3.1)
@@ -338,6 +342,7 @@ DEPENDENCIES
   rails (~> 4.1.16)
   rails_autolink (~> 1.1.5)
   rmagick (~> 2.13.4)
+  rspec
   rspec-rails (~> 3.3.3)
   sanitize (~> 2.1.0)
   sass-rails (~> 5.0.3)

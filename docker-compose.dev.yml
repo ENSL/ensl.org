@@ -25,12 +25,12 @@ services:
      - "./db_data:/var/lib/mysql"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
     environment:
-     - MYSQL_DATABASE
-     - MYSQL_USER
-     - MYSQL_USERNAME
-     - MYSQL_PASSWORD
-     - MYSQL_ROOT_PASSWORD
-     - MYSQL_ROOT_HOST
+     - MYSQL_DATABASE=ensl
+     - MYSQL_USER=ensl
+     - MYSQL_USERNAME=ensl
+     - MYSQL_PASSWORD=ensl
+     - MYSQL_ROOT_PASSWORD=ensl
+     - MYSQL_ROOT_HOST=%
   memcached:
     image: memcached:latest
   #redis:

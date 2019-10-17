@@ -16,6 +16,7 @@
 db_data*
 db_data/*
 !db_data/.placeholder
+*.sql
 
 # OS X
 .DS_Store
