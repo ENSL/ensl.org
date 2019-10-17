@@ -16,6 +16,9 @@ services:
      - memcached
   #    - redis
   db:
+    # Debug
+    #    command: bash 
+    #tty: true
     command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
     volumes:

@@ -12,9 +12,10 @@
 *.rbc
 *.sassc
 
-# MySQL
-db_data/
-db_data*/
+# Database and files
+db_data*
+db_data/*
+!db_data/.placeholder
 
 # OS X
 .DS_Store

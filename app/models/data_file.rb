@@ -28,7 +28,7 @@ class DataFile < ActiveRecord::Base
   scope :recent, -> { order("created_at DESC").limit(8) }
   scope :demos, -> { order("created_at DESC").where("directory_id IN (SELECT id FROM directories WHERE parent_id = ?)", Directory::DEMOS) }
   scope :ordered, -> { order("created_at DESC") }
-  scope :movies, -> { order("created_at DESC", :conditions => {:directory_id => Directory::MOVIES}
+  scope :movies, -> { order("created_at DESC").where({:directory_id => Directory::MOVIES}) }
   scope :not, -> (file) { where.not(id: file.id) }
   scope :unrelated, -> { where("related_id is null") }
 
@@ -47,7 +47,7 @@ class DataFile < ActiveRecord::Base
   after_create :create_movie, :if => Proc.new {|file| file.directory_id == Directory::MOVIES and !file.location.include?("_preview.mp4") }
   after_save :update_relations, :if => Proc.new { |file| file.related_id_changed? and related_files.count > 0 }
 
-  acts_as_rateable
+  # acts_as_rateable
   mount_uploader :name, FileUploader
 
   def to_s

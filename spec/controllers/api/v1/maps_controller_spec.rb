@@ -1,4 +1,9 @@
-require 'spec_helper'
+require 'rails_helper'
+
+module Api
+  module V1
+  end
+end
 
 describe Api::V1::MapsController do
   before do
@@ -6,7 +11,7 @@ describe Api::V1::MapsController do
   end
 
   describe '#index' do
-    let!(:map) { create :map }
+    let!(:map) { Map.new() }
 
     it 'returns a list of maps' do
       get :index

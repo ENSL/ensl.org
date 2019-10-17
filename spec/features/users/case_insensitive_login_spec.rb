@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 feature 'Case insensitive login', js: :true do
   let(:username) { "CaSe_InSeNsItIvE" }
