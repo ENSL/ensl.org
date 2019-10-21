@@ -37,7 +37,7 @@
         </tr>
         <% Group.admins.each do |grouper| %>
           <tr>
-            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="country"><%= flag grouper.user.country_s %></td>
             <td class="username"><%= namelink grouper.user %></td>
             <td><%= h grouper.user.email_s %></td>
             <td>

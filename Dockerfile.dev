@@ -6,7 +6,7 @@ ENV RAILS_ENV development
 RUN adduser web --home /home/web --shell /bin/bash --disabled-password --gecos ""
 
 RUN apt-get update && apt-get -y upgrade \
-    && apt-get -y install mysql-client libmysqlclient-dev memcached nodejs \
+    && apt-get -y install mysql-client libmysqlclient-dev memcached nodejs firefox-esr \
     && service memcached start
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively

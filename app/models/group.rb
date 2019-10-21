@@ -55,11 +55,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.admins
-    admins = []
-    (find(ADMINS).groupers).each do |g|
-      admins << g unless admins.include? g
-    end
-    admins
+    find(ADMINS).groupers.valid_users
   end
 
   def self.referees

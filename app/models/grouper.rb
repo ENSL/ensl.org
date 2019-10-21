@@ -21,6 +21,8 @@ class Grouper < ActiveRecord::Base
   validates :group, :user, :presence => true
   validates :task, :length => {:maximum => 25}
 
+  scope :valid_users, -> { joins(:user).where.not(users: { id: nil }) }
+
   before_validation :fetch_user, :if => Proc.new {|grouper| grouper.username and !grouper.username.empty?}
 
   def to_s
