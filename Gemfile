@@ -41,7 +41,7 @@ gem 'sass-rails', '~> 3.2.6'
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.6.0'
-gem 'haml', '~> 4.0.5'
+gem 'haml', '~> 5.1.2'
 gem 'rails_autolink', '~> 1.1.5'
 
 group :assets do
