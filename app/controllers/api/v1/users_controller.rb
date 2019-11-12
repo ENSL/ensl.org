@@ -32,6 +32,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       referee: @user.ref?,
       caster: @user.caster?,
       moderator: @user.gather_moderator?,
+      contributor: @user.contributor?,
       steam: @user.steamid.nil? ? nil : {
         id: @user.steamid,
         url: @steam.nil? ? nil : @steam.base_url,

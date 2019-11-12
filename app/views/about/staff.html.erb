@@ -16,6 +16,7 @@
 <div id="staff" class="tabbed">
   <ul id="staff-nav" class="tabs">
     <li><a href="#admins">Admins</a></li>
+    <li><a href="#contributors">Contributors</a></li>
     <li><a href="#referees">Referees</a></li>
     <li><a href="#casters">Casters</a></li>
     <li><a href="#gathermods">Gather Mods</a></li>
@@ -34,6 +35,37 @@
           <th>Age</th>
         </tr>
         <% Group.admins.each do |grouper| %>
+          <tr>
+            <td class="country"><%= flag grouper.user.country %></td>
+            <td class="username"><%= namelink grouper.user %></td>
+            <% if grouper.user.public_email %>
+            <td><%= h grouper.user.email_s %></td>
+            <% else %>
+            <td></td>
+            <% end %>
+            <td>
+              <% if grouper.task %>
+                <%= h grouper.task %>
+              <% else %>
+                <%= h grouper.group.name.singularize %>
+              <% end %>
+            </td>
+            <td class="age"><%= h grouper.user.age %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+    <div class="tab" id="contributors">
+      <h3>Admins</h3>
+      <table class="striped staff">
+        <tr>
+          <th></th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Task</th>
+          <th>Age</th>
+        </tr>
+        <% Group.contributors.each do |grouper| %>
           <tr>
             <td class="country"><%= flag grouper.user.country %></td>
             <td class="username"><%= namelink grouper.user %></td>

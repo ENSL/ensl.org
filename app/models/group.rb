@@ -22,6 +22,7 @@ class Group < ActiveRecord::Base
   PREDICTORS = 8
   STAFF = 10
   GATHER_MODERATORS = 14
+  CONTRIBUTORS = 16
 
   attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
@@ -112,5 +113,16 @@ class Group < ActiveRecord::Base
       gathermods << g unless gathermods.include? g
     end
     gathermods
+  end
+
+  def self.contributors
+    contributors = []
+    group_contrib = where(id:CONTRIBUTORS).first
+    return contributors unless group_contrib
+
+    (group_contrib.groupers).each do |g|
+      contributors << g unless contributors.include? g
+    end
+    contributors
   end
 end

@@ -33,8 +33,8 @@ Ensl::Application.configure do
   # See everything in the log (default is :info)
   config.log_level = :error
 
-  # Use a different logger for distrwt  ibuted setups
-  # config.logger = SyslogLogger.new
+  # Use a different logger for distributed setups
+  config.logger = Logger.new(Rails.root.join("log", Rails.env + ".log" ), 5 , 10 * 1024 * 1024)
 
   # Use a different cache store in production
   config.cache_store = :dalli_store, 'memcached:11211', 'localhost'

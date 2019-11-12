@@ -14,6 +14,8 @@ Group.create!(id: Group::CASTERS, name: "Streamers", founder: User.first)
 Group.create!(id: Group::CHAMPIONS, name: "Champions", founder: User.first)
 Group.create!(id: Group::PREDICTORS, name: "Predictors", founder: User.first)
 Group.create!(id: Group::STAFF, name: "Staff", founder: User.first)
+Group.create!(id: Group::GATHER_MODERATORS, name: 'Gather Moderators', founder: User.first)
+Group.create!(id: Group::CONTRIBUTORS, name: 'Contributors', founder: User.first)
 
 # Group Association
 Grouper.create!(group_id: Group::ADMINS, user_id: User.first.id)
