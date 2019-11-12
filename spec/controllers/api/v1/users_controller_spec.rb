@@ -19,6 +19,7 @@ describe Api::V1::UsersController do
       expect(json["referee"]).to eq(user.ref?)
       expect(json["caster"]).to eq(user.caster?)
       expect(json["moderator"]).to eq(user.gather_moderator?)
+      expect(json["contributor"]).to eq(user.contributor?)
       expect(json).to have_key("steam")
       expect(json["steam"]).to have_key("id")
       expect(json["steam"]).to have_key("url")
