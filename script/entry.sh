@@ -7,7 +7,7 @@ rm -rf /var/www/public/assets
 mv /home/web/assets /var/www/public/
 chown -R web:web /var/www/public
 
-LOG_FILE = "/var/www/log/$RAILS_ENV.log"
+LOG_FILE="/var/www/log/$RAILS_ENV.log"
 touch $LOG_FILE
 chown web:web $LOG_FILE
 
