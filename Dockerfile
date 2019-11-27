@@ -26,7 +26,7 @@ RUN chown -R web:web /var/www
 WORKDIR /var/www
 USER web
 
-RUN touch log/${RAILS_ENV}.log
+RUN mkdir -p /var/www/log && touch /var/www/log/${RAILS_ENV}.log
 RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
 RUN bundle exec rake assets:precompile
 
