@@ -14,8 +14,8 @@ RUN service memcached start
 ADD Gemfile      /var/www/
 ADD Gemfile.lock /var/www/
 RUN chown -R web:web /var/www &&\
-    mkdir -p /var/bundle &&\
-    chown -R web:web /var/bundle
+  mkdir -p /var/bundle &&\
+  chown -R web:web /var/bundle
 
 RUN su -c "bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4" -s /bin/bash -l web
 
@@ -26,6 +26,7 @@ RUN chown -R web:web /var/www
 WORKDIR /var/www
 USER web
 
+RUN touch log/${RAILS_ENV}.log
 RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
 RUN bundle exec rake assets:precompile
 
