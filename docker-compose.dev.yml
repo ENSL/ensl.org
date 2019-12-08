@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        buildno: 1
+    volumes:
+     - ".:/var/www/"
+    ports:
+     - "4000:4000"
+    links:
+     - db
+     - memcached
+  #    - redis
+  db:
+    # Debug
+    #    command: bash 
+    #tty: true
+    command: mysqld_safe --skip-grant-tables
+    image: mariadb:latest
+    volumes:
+     - "./db_data:/var/lib/mysql"
+     - "./ext/mysql.conf.d:/etc/mysql/conf.d"
+    environment:
+     - MYSQL_DATABASE=ensl
+     - MYSQL_USER=ensl
+     - MYSQL_USERNAME=ensl
+     - MYSQL_PASSWORD=ensl
+     - MYSQL_ROOT_PASSWORD=ensl
+     - MYSQL_ROOT_HOST=%
+  memcached:
+    image: memcached:latest
+  #redis:
+  #  image: redis
