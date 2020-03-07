@@ -13,7 +13,11 @@
 
 ActiveRecord::Schema.define(:version => 20171109165433) do
 
+<<<<<<< Updated upstream
   create_table "admin_requests", :force => true do |t|
+=======
+  create_table "admin_requests", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "addr"
     t.string   "pwd"
     t.integer  "server_id"
@@ -24,10 +28,17 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.datetime "updated_at"
   end
 
+<<<<<<< Updated upstream
   add_index "admin_requests", ["server_id"], :name => "index_admin_requests_on_server_id"
   add_index "admin_requests", ["user_id"], :name => "index_admin_requests_on_user_id"
 
   create_table "article_versions", :force => true do |t|
+=======
+  add_index "admin_requests", ["server_id"], name: "index_admin_requests_on_server_id", using: :btree
+  add_index "admin_requests", ["user_id"], name: "index_admin_requests_on_user_id", using: :btree
+
+  create_table "article_versions", force: true do |t|
+>>>>>>> Stashed changes
     t.integer  "article_id"
     t.integer  "version"
     t.string   "title"
@@ -69,12 +80,16 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.datetime "updated_at"
     t.integer  "ban_type"
     t.string   "ip"
-    t.integer  "creator_id"
   end
 
+<<<<<<< Updated upstream
   add_index "bans", ["creator_id"], :name => "index_bans_on_creator_id"
   add_index "bans", ["server_id"], :name => "index_bans_on_server_id"
   add_index "bans", ["user_id"], :name => "index_bans_on_user_id"
+=======
+  add_index "bans", ["server_id"], name: "index_bans_on_server_id", using: :btree
+  add_index "bans", ["user_id"], name: "index_bans_on_user_id", using: :btree
+>>>>>>> Stashed changes
 
   create_table "bracketers", :force => true do |t|
     t.integer  "bracket_id"
@@ -199,6 +214,7 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
   add_index "contests_maps", ["contest_id", "map_id"], :name => "index_contests_maps_on_contest_id_and_map_id"
   add_index "contests_maps", ["map_id", "contest_id"], :name => "index_contests_maps_on_map_id_and_contest_id"
 
+<<<<<<< Updated upstream
   create_table "custom_urls", :force => true do |t|
     t.string   "name"
     t.integer  "article_id"
@@ -210,6 +226,9 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
   add_index "custom_urls", ["name"], :name => "index_custom_urls_on_name"
 
   create_table "data_files", :force => true do |t|
+=======
+  create_table "data_files", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "name"
     t.string   "description"
     t.string   "path"
@@ -236,7 +255,21 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.integer  "related_id"
   end
 
+<<<<<<< Updated upstream
   create_table "directories", :force => true do |t|
+=======
+  create_table "deleteds", force: true do |t|
+    t.integer  "deletable_id"
+    t.string   "deletable_type"
+    t.integer  "user_id"
+    t.text     "reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "related_id"
+  end
+
+  create_table "directories", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "name"
     t.string   "description"
     t.string   "path"
@@ -248,7 +281,11 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
 
   add_index "directories", ["parent_id"], :name => "index_directories_on_parent_id"
 
+<<<<<<< Updated upstream
   create_table "firms", :force => true do |t|
+=======
+  create_table "firms", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "name"
     t.string   "y_code"
     t.string   "email"
@@ -263,7 +300,11 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.datetime "updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "forumers", :force => true do |t|
+=======
+  create_table "forumers", force: true do |t|
+>>>>>>> Stashed changes
     t.integer  "forum_id"
     t.integer  "group_id"
     t.integer  "access"
@@ -442,6 +483,7 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.integer  "category_id"
   end
 
+<<<<<<< Updated upstream
   create_table "match_proposals", :force => true do |t|
     t.integer  "match_id"
     t.integer  "team_id"
@@ -455,6 +497,12 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.integer  "match_id",     :null => false
     t.integer  "user_id",      :null => false
     t.integer  "contester_id", :null => false
+=======
+  create_table "matchers", force: true do |t|
+    t.integer  "match_id",     null: false
+    t.integer  "user_id",      null: false
+    t.integer  "contester_id", null: false
+>>>>>>> Stashed changes
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "merc",         :null => false
@@ -542,14 +590,22 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
   add_index "movies", ["status"], :name => "index_movies_on_status"
   add_index "movies", ["user_id"], :name => "index_movies_on_user_id"
 
+<<<<<<< Updated upstream
   create_table "nodes", :force => true do |t|
+=======
+  create_table "nodes", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "name"
     t.integer  "foreign_key"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "options", :force => true do |t|
+=======
+  create_table "options", force: true do |t|
+>>>>>>> Stashed changes
     t.string   "option"
     t.integer  "poll_id"
     t.datetime "created_at"
@@ -656,7 +712,7 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.boolean  "notify_challenge",    :default => true, :null => false
     t.string   "steam_profile"
     t.string   "achievements_parsed"
-    t.text     "signature_parsed"
+    t.string   "signature_parsed"
     t.string   "stream"
     t.string   "layout"
   end
@@ -779,10 +835,17 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.datetime "updated_at"
   end
 
+<<<<<<< Updated upstream
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "shoutmsgs", :force => true do |t|
+=======
+  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
+  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
+
+  create_table "shoutmsgs", force: true do |t|
+>>>>>>> Stashed changes
     t.integer  "user_id"
     t.string   "text"
     t.datetime "created_at"
@@ -878,11 +941,15 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
     t.boolean  "public_email", :default => false, :null => false
   end
 
+<<<<<<< Updated upstream
   add_index "users", ["email"], :name => "index_users_on_email"
   add_index "users", ["lastvisit"], :name => "index_users_on_lastvisit"
   add_index "users", ["password"], :name => "index_users_on_password"
   add_index "users", ["team_id"], :name => "index_users_on_team_id"
   add_index "users", ["username"], :name => "index_users_on_username"
+=======
+  add_index "users", ["team_id"], name: "index_users_on_team_id", using: :btree
+>>>>>>> Stashed changes
 
   create_table "versions", :force => true do |t|
     t.string   "item_type",  :null => false

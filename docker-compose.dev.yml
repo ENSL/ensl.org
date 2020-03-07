@@ -2,6 +2,9 @@ version: "3"
 
 services:
   web:
+    # Debug
+    command: /bin/bash 
+    tty: true 
     build:
       context: ./
       dockerfile: Dockerfile.dev
@@ -16,7 +19,7 @@ services:
      - memcached
   #    - redis
   db:
-    # Debug
+    # Debugd
     #    command: bash 
     #tty: true
     command: mysqld_safe --skip-grant-tables
