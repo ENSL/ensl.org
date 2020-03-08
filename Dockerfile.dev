@@ -18,8 +18,8 @@ RUN su -c "bundle config github.https true; cd /var/www && bundle install --path
 
 WORKDIR /var/www
 USER web
-
-RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
+    
+RUN bundle config github.https true; cd /var/www && bundle install -- path /var/bundle --jobs 4
 
 USER root
 CMD ["/var/www/script/entry.sh"]

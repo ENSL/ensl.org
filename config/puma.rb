@@ -1,5 +1,5 @@
 require "dotenv"
-Dotenv.load
+Dotenv.load()
 
 base_path = (ENV['DEPLOY_PATH'] || Dir.pwd)
 #current_path = "#{base_path}/current"

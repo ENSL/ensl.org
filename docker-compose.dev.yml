@@ -22,7 +22,7 @@ services:
     # Debugd
     #    command: bash 
     #tty: true
-    command: mysqld_safe --skip-grant-tables
+    #    command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
     volumes:
      - "./db_data:/var/lib/mysql"
