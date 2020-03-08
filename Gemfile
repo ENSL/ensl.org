@@ -57,6 +57,7 @@ group :development do
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'annotate', '~> 2.6.2'
   gem 'quiet_assets', '~> 1.0.2'
+  gem 'web-console'
 end
 
 group :test do

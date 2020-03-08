@@ -1,0 +1,20 @@
+<h1>Last 500 Shoutbox Messages</h1>
+
+<table class="data">
+  <tr>
+    <th>Date</th>
+    <th>Time</th>
+    <th>User</th>
+    <th>Text</th>
+  </tr>
+
+  <% @shoutmsgs.each do |shoutmsg| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= shoutmsg.created_at.strftime("%Y/%m/%d") %></td>
+      <td><%= shoutmsg.created_at.strftime("%H:%M") %></td>
+      <td><%= namelink shoutmsg.user %></td>
+      <td><%= shoutmsg.text %></td>
+    </tr>
+  <% end %>
+</table>
+

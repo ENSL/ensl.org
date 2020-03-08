@@ -39,6 +39,16 @@ class Shoutmsg < ActiveRecord::Base
   belongs_to :user
   belongs_to :shoutable, :polymorphic => true
 
+<<<<<<< Updated upstream
+=======
+  scope :recent, -> { includes(:user).order("id DESC").limit(8) }
+  scope :box, -> { where(shoutable_type: nil, shoutable_id: nil).limit(8) }
+  scope :typebox, -> { where(shoutable_type: nil, shoutable_id: nil) }
+  scope :last500, -> { includes(:user).order("id DESC").limit(500) }
+  scope :of_object, -> (object, id) { where(shoutable_type: object, shoutable_id: id) }
+  scope :ordered, order("id")
+
+>>>>>>> Stashed changes
   def domain
     self[:shoutable_type] ? "shout_#{shoutable_type}_#{shoutable_id}" : "shoutbox"
   end
