@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 ruby '2.2.10'
 
-gem 'dotenv-rails', '~> 0.10.0'
+gem 'dotenv-rails'
 gem 'rails', '~> 4.1.16'
 gem 'mysql2', '~> 0.3.18'
 gem 'dalli', '~> 2.7.0'

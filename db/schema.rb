@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171109165433) do
+ActiveRecord::Schema.define(version: 20190917222520) do
 
   create_table "admin_requests", force: true do |t|
     t.string   "addr"
@@ -27,9 +27,6 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
   add_index "admin_requests", ["server_id"], name: "index_admin_requests_on_server_id", using: :btree
   add_index "admin_requests", ["user_id"], name: "index_admin_requests_on_user_id", using: :btree
 
-  create_table "article_versions", force: true do |t|
-
-ActiveRecord::Schema.define(version: 20190917222520) do
   create_table "article_versions", force: true do |t|
     t.integer  "article_id"
     t.integer  "version"
@@ -75,10 +72,9 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.integer  "creator_id"
   end
 
-
-  add_index "bans", ["creator_id"], :name => "index_bans_on_creator_id"
-  add_index "bans", ["server_id"], :name => "index_bans_on_server_id"
-  add_index "bans", ["user_id"], :name => "index_bans_on_user_id"
+  add_index "bans", ["creator_id"], name: "index_bans_on_creator_id", using: :btree
+  add_index "bans", ["server_id"], name: "index_bans_on_server_id", using: :btree
+  add_index "bans", ["user_id"], name: "index_bans_on_user_id", using: :btree
 
   create_table "bracketers", force: true do |t|
     t.integer  "bracket_id"
@@ -206,8 +202,8 @@ ActiveRecord::Schema.define(version: 20190917222520) do
   create_table "custom_urls", force: true do |t|
     t.string   "name"
     t.integer  "article_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "custom_urls", ["article_id"], name: "index_custom_urls_on_article_id", using: :btree
@@ -250,7 +246,7 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.boolean  "hidden",      default: false, null: false
   end
 
-  add_index "directories", ["parent_id"], :name => "index_directories_on_parent_id"
+  add_index "directories", ["parent_id"], name: "index_directories_on_parent_id", using: :btree
 
   create_table "firms", force: true do |t|
     t.string   "name"
@@ -266,8 +262,6 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "directories", ["parent_id"], name: "index_directories_on_parent_id", using: :btree
 
   create_table "forumers", force: true do |t|
     t.integer  "forum_id"
@@ -341,8 +335,7 @@ ActiveRecord::Schema.define(version: 20190917222520) do
   add_index "gathers", ["captain1_id"], name: "index_gathers_on_captain1_id", using: :btree
   add_index "gathers", ["captain2_id"], name: "index_gathers_on_captain2_id", using: :btree
   add_index "gathers", ["map1_id"], name: "index_gathers_on_map1_id", using: :btree
-  add_index "gathers", ["map2_id"], name: "index_gathers_on_map2_id", 
-  create_table "log_files", force: true do |t|using: :btree
+  add_index "gathers", ["map2_id"], name: "index_gathers_on_map2_id", using: :btree
   add_index "gathers", ["server_id"], name: "index_gathers_on_server_id", using: :btree
 
   create_table "gathers_users", id: false, force: true do |t|
@@ -456,7 +449,8 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.integer  "status"
   end
 
-  add_index "match_proposals", ["status"], :name => "index_match_proposals_on_status"
+  add_index "match_proposals", ["match_id"], name: "index_match_proposals_on_match_id", using: :btree
+  add_index "match_proposals", ["status"], name: "index_match_proposals_on_status", using: :btree
 
   create_table "matchers", force: true do |t|
     t.integer  "match_id",     null: false
@@ -540,10 +534,7 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.integer  "length"
     t.integer  "match_id"
     t.integer  "status"
-    t.string   "name"
-    t.integer  "foreign_key"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer  "category_id"
   end
 
   add_index "movies", ["file_id"], name: "index_movies_on_file_id", using: :btree
@@ -552,7 +543,7 @@ ActiveRecord::Schema.define(version: 20190917222520) do
   add_index "movies", ["status"], name: "index_movies_on_status", using: :btree
   add_index "movies", ["user_id"], name: "index_movies_on_user_id", using: :btree
 
-  create_table "nodes", :force => true do |t|
+  create_table "nodes", force: true do |t|
     t.string   "name"
     t.integer  "foreign_key"
     t.datetime "created_at"
@@ -772,7 +763,7 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.string   "recording"
     t.datetime "idle"
     t.integer  "default_id"
-  w    t.boolean  "active",          default: true, null: false
+    t.boolean  "active",          default: true, null: false
     t.string   "recordable_type"
     t.integer  "recordable_id"
     t.integer  "category_id"
@@ -789,20 +780,8 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
-  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
-
-  create_table "shoutmsg_archive", force: true do |t|
-    t.integer  "user_id"
-    t.string   "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "shoutable_type"
-    t.integer  "shoutable_id"
-  end
-
-  add_index "shoutmsg_archive", ["shoutable_type", "shoutable_id"], name: "index_shoutmsgs_on_shoutable_type_and_shoutable_id", using: :btree
-  add_index "shoutmsg_archive", ["user_id"], name: "index_shoutmsgs_on_user_id", using: :btree
+  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
+  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "shoutmsgs", force: true do |t|
     t.integer  "user_id"
@@ -898,14 +877,11 @@ ActiveRecord::Schema.define(version: 20190917222520) do
     t.date     "birthdate"
     t.string   "time_zone"
     t.integer  "version"
-    t.boolean  "public_email", :default => false, :null => false
+    t.boolean  "public_email", default: false, null: false
   end
 
-  add_index "users", ["email"], :name => "index_users_on_email"
-  add_index "users", ["lastvisit"], :name => "index_users_on_lastvisit"
-  add_index "users", ["password"], :name => "index_users_on_password"
-  add_index "users", ["team_id"], :name => "index_users_on_team_id"
-  add_index "users", ["username"], :name => "index_users_on_username"
+  add_index "users", ["lastvisit"], name: "index_users_on_lastvisit", using: :btree
+  add_index "users", ["team_id"], name: "index_users_on_team_id", using: :btree
 
   create_table "versions", force: true do |t|
     t.string   "item_type",  null: false

@@ -120,15 +120,6 @@ class Match < ActiveRecord::Base
     "red" if contester2.team == friendly && score2 < score1
   end
 
-<<<<<<< HEAD
-  def preds(contester)
-    perc = Prediction.count(conditions: ["match_id = ? AND score#{contester} > 2", id])
-    perc != 0 ? (perc / predictions.count.to_f * 100).round : 0
-  end
-
-  def mercs(contester)
-    matchers.all conditions: { merc: true, contester_id: contester.id }
-=======
   def preds contester
     perc = Prediction.where("match_id = ? AND score#{contester} > 2", id).count()
     perc != 0 ? (perc/predictions.count.to_f*100).round : 0
@@ -136,7 +127,6 @@ class Match < ActiveRecord::Base
 
   def mercs contester
     matchers.where(merc: true, contester_id: contester.id)
->>>>>>> feature/rails-4
   end
 
   def get_hltv
@@ -148,19 +138,11 @@ class Match < ActiveRecord::Base
   end
 
   def team1_lineup
-<<<<<<< HEAD
-    matchers.all(conditions: { contester_id: contester1_id })
-  end
-
-  def team2_lineup
-    matchers.all(conditions: { contester_id: contester2_id })
-=======
     matchers.where(contester_id: contester1_id)
   end
 
   def team2_lineup
     matchers.where(contester_id: contester2_id)
->>>>>>> feature/rails-4
   end
 
   def get_friendly(param = nil)
@@ -193,11 +175,7 @@ class Match < ActiveRecord::Base
   end
 
   def send_notifications
-<<<<<<< HEAD
-    Profile.includes(:user).where(notify_any_match: 1).find_each do |p|
-=======
     Profile.where("notify_any_match", 1).includes(:user).each do |p|
->>>>>>> feature/rails-4
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|

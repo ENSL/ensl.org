@@ -5,7 +5,6 @@ class ShoutmsgsController < ApplicationController
     @shoutmsgs = Shoutmsg.last.typebox
   end
 
->>>>>>> Stashed changes
   def show
     if params[:id2]
       @shoutmsgs = Shoutmsg.recent.of_object(params[:id], params[:id2]).reverse
