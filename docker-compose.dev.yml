@@ -3,8 +3,8 @@ version: "3"
 services:
   web:
     # Debug
-    command: /bin/bash 
-    tty: true 
+    #command: /bin/bash 
+    #tty: true 
     build:
       context: ./
       dockerfile: Dockerfile.dev
@@ -19,10 +19,10 @@ services:
      - memcached
   #    - redis
   db:
-    # Debugd
+    # Debug
     #    command: bash 
     #tty: true
-    #    command: mysqld_safe --skip-grant-tables
+    command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
     volumes:
      - "./db_data:/var/lib/mysql"

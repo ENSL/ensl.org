@@ -9,7 +9,7 @@
 #
 
 class GatherMap < ActiveRecord::Base
-  scope :ordered, :order => "votes DESC, id DESC"
+  scope :ordered, -> { order("votes DESC, id DESC") }
 
   belongs_to :gather
   belongs_to :map

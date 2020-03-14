@@ -10,12 +10,11 @@
   </tr>
 
   <% for team in teams %>
-    <% if team.teamers_num > 0 %>
       <tr>
         <td><%= flag team.country %></td>
         <td><%= namelink team %></td>
         <td><%= h team.irc if team.irc %></td>
-        <td><%= h team.teamers_num %></td>
+        <td><%= h team.teamers.count %></td>
         <% if cuser and cuser.admin? %>
           <td class="actions">
             <%= link_to edit_team_path(team) do %>
@@ -33,6 +32,5 @@
           </td>
         <% end %>
       </tr>
-    <% end %>
   <% end %>
 </table>

@@ -29,7 +29,7 @@ module ApplicationHelper
             when "Comment"
               model.commentable
             when "Post"
-              model.topic
+              model.topic 
             else
               model
             end

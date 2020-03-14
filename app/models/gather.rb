@@ -29,12 +29,11 @@ class Gather < ActiveRecord::Base
 
   attr_accessor :admin
 
-  scope :ordered, :order => "id DESC"
-  scope :basic, :include => [:captain1, :captain2, :map1, :map2, :server]
-  scope :active,
-    :conditions => ["gathers.status IN (?, ?, ?) AND gathers.updated_at > ?",
-                    STATE_VOTING, STATE_PICKING, STATE_RUNNING, 12.hours.ago.utc]
-
+  scope :ordered, -> { order("id DESC") }
+  scope :basic, -> { includes(:captain1, :captain2, :map1, :map2, :server) }
+  scope :active, -> { where("gathers.status IN (?, ?, ?) AND gathers.updated_at > ?",
+                            STATE_VOTING, STATE_PICKING, STATE_RUNNING, 12.hours.ago.utc) }
+  
   belongs_to :server
   belongs_to :captain1, :class_name => "Gatherer"
   belongs_to :captain2, :class_name => "Gatherer"
@@ -94,11 +93,11 @@ class Gather < ActiveRecord::Base
   end
 
   def previous_gather
-    Gather.first(:conditions => ["id < ? AND category_id = ?", self.id, category_id], :order => "id DESC")
+    Gather.first.where("id < ? AND category_id = ?", self.id, category_id).order("id DESC")
   end
 
   def next_gather
-    Gather.first(:conditions => ["id > ? AND category_id = ?", self.id, category_id], :order => "id ASC")
+    Gather.first.where("id > ? AND category_id = ?", self.id, category_id).order("id ASC")
   end
 
   def last

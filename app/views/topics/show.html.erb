@@ -54,7 +54,7 @@
 
   <div>
     <% if @newpost.can_create? cuser %>
-      <%= link_to_function 'Fast Reply', "$('#reply').fadeIn('slow')", class: 'button' %>
+      <%= link_to 'Fast Reply', "#", class: 'button fastReply' %>
       <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>
     <% end %>
     <% if @topic.can_update? cuser %>

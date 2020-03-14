@@ -1,12 +1,16 @@
-require 'spec_helper'
+require "spec_helper"
 
-feature 'Google Calendar widget', js: :true do
+feature "Google Calendar widget", js: :true do
+  let(:timezone_name) { Time.zone.name }
+  let(:events_data_file) { Rails.root.join("spec/fixtures/google_calendar.json") }
+  let(:events_list_data) { JSON.parse(File.read(events_data_file)) }
+
   before do
     skip # disabling calendar tests for now as they dont fit the new implementation anymore
     visit root_path
   end
 
-  scenario 'the most recent upcoming event should appear correctly' do
+  scenario "the most recent upcoming event should appear correctly" do
     time = Time.zone.local(2014, 4, 1, 12, 0, 0)
 
     Timecop.travel(time) do
@@ -16,8 +20,8 @@ feature 'Google Calendar widget', js: :true do
     end
   end
 
-  feature 'Timezones offsets' do
-    scenario 'when a user is logged out, CEST is default' do
+  feature "Timezones offsets" do
+    scenario "when a user is logged out, CEST is default" do
       time = Time.zone.local(2014, 4, 1, 12, 0, 0)
 
       Timecop.travel(time) do
@@ -27,7 +31,7 @@ feature 'Google Calendar widget', js: :true do
       end
     end
 
-    scenario 'when time has passed under 2 hours after the start date' do
+    scenario "when time has passed under 2 hours after the start date" do
       time = Time.zone.local(2014, 4, 4, 23, 59, 0)
 
       Timecop.travel(time) do
@@ -37,7 +41,7 @@ feature 'Google Calendar widget', js: :true do
       end
     end
 
-    scenario 'when time has passed over 2 hours after the start date' do
+    scenario "when time has passed over 2 hours after the start date" do
       time = Time.zone.local(2014, 4, 5, 0, 1, 0)
 
       Timecop.travel(time) do
@@ -48,17 +52,24 @@ feature 'Google Calendar widget', js: :true do
       end
     end
 
-    scenario 'when a user is logged in, their local timezone is used' do
-      time = Time.zone.local(2014, 4, 1, 12, 0, 0)
-      user = create(:user)
+    context "when a user is logged in" do
+      let(:timezone_name) { "Eastern Time (US & Canada)" }
 
-      sign_in_as(user)
-      change_timezone_for(user, timezone_us_east)
+      before do
+        user = create(:user)
 
-      Timecop.travel(time) do
-        visit root_path
+        sign_in_as(user)
+        change_timezone_for(user, timezone_name)
+      end
 
-        expect(first_event).to have_content(timezone_adjusted)
+      scenario "their local timezone is used" do
+        time = Time.zone.local(2014, 4, 1, 12, 0, 0)
+
+        Timecop.travel(time) do
+          visit root_path
+
+          expect(first_event).to have_content(timezone_adjusted)
+        end
       end
     end
   end
@@ -75,9 +86,5 @@ feature 'Google Calendar widget', js: :true do
     else
       "15:30 EST"
     end
-  end
-
-  def timezone_us_east
-    "Eastern Time (US & Canada)"
   end
 end

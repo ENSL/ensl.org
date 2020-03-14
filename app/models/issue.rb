@@ -15,8 +15,6 @@
 #  text_parsed :text
 #
 
-require File.join(Rails.root, 'vendor', 'plugins', 'acts-as-readable', 'init.rb')
-
 class Issue < ActiveRecord::Base
   include Extra
   
@@ -41,7 +39,7 @@ class Issue < ActiveRecord::Base
     lambda { |user| {
     :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
     :conditions => "readings.user_id IS NULL"} }
-  scope :with_status, lambda { |s| { :conditions => {:status => s}} }
+  scope :with_status, -> (s) { where(status: s) }
 
   validates_length_of :title, :in => 1..50
   validates_length_of :text, :in => 1..65000

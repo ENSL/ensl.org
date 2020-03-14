@@ -30,36 +30,39 @@ class Team < ActiveRecord::Base
   validates_length_of :name, :tag, :in => 2..20
   validates_length_of :irc, :maximum => 20, :allow_blank => true
   validates_length_of :web, :maximum => 50, :allow_blank => true
-  validates_format_of :country, :with => /\A[A-Z]{2}\z$/, :allow_blank => true
+  validates_format_of :country, :with => /\A[A-Z]{2}\z/, :allow_blank => true
   validates_length_of [:comment, :recruiting], :in => 0..75, :allow_blank => true
 
-  scope :with_teamers_num,
-    lambda { |num| {
-    :select => "teams.*, COUNT(T.id) AS teamers_num",
-    :joins	=> "LEFT JOIN teamers T ON T.team_id = teams.id AND T.rank >= #{Teamer::RANK_MEMBER}",
-    :group => "teams.id",
-    :having => ["teamers_num >= ?", num]} }
-  scope :with_teamers, :include => :teamers
-  scope :active, :conditions => {:active => true}
-  scope :inactive, :conditions => {:active => false}
-  scope :ordered, :order => "name"
-  scope :recruiting, :conditions => "recruiting IS NOT NULL AND recruiting != ''"
+  scope :with_teamers_num, -> (num) {
+              select("teams.*, COUNT(T.id) AS teamers_num").
+              joins("LEFT JOIN teamers T ON T.team_id = teams.id AND T.rank >= #{Teamer::RANK_MEMBER}").
+              group("teams.id").
+              having("teamers_num >= ?", num) }
+  scope :non_empty_teams, -> { joins(:teamers).where("teamers.rank >= #{Teamer::RANK_MEMBER}").distinct }
+  scope :with_teamers, -> { includes(:teamers) }
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
+  scope :ordered, -> { order("name") }
+  scope :recruiting, -> { where("recruiting IS NOT NULL AND recruiting != ''") }
 
   belongs_to :founder, :class_name => "User"
-  has_many :teamers, :dependent => :destroy
-  has_many :leaders, :class_name => "Teamer", :conditions => ["rank = ?", Teamer::RANK_LEADER]
+
+  has_many :active_teamers, -> { where("rank >= ?", Teamer::RANK_MEMBER) }
+  has_many :teamers, :dependent => :destroy, :counter_cache => true
+  has_many :leaders, -> { where("rank = ?", Teamer::RANK_LEADER) }, :class_name => "Teamer"
   has_many :contesters, :dependent => :destroy
-  has_many :contests, :through => :contesters, :conditions => {"contesters.active" => true}
+  has_many :contests, -> { where("contesters.active", true) }, :through => :contesters
   has_many :received_messages, :class_name => "Message", :as => "recipient"
   has_many :sent_messages, :class_name => "Message", :as => "sender"
   has_many :matches, :through => :contesters
-  has_many :matches_finished, :through => :contesters, :source => :matches, :conditions => "(score1 != 0 OR score2 != 0)"
-  has_many :matches_won, :through => :contesters, :source => :matches,
-    :conditions => "((score1 > score2 AND contester1_id = contesters.id) OR (score2 > score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)"
-  has_many :matches_lost, :through => :contesters, :source => :matches,
-    :conditions => "((score1 < score2 AND contester1_id = contesters.id) OR (score2 < score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)"
-  has_many :matches_draw, :through => :contesters, :source => :matches,
-    :conditions => "(score1 = score2 AND score1 > 0) AND (score1 != 0 OR score2 != 0)"
+  has_many :matches_finished, -> { where("(score1 != 0 OR score2 != 0)") },
+           :through => :contesters, :source => :matches
+  has_many :matches_won, -> { where("((score1 > score2 AND contester1_id = contesters.id) OR (score2 > score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)") },
+           :through => :contesters, :source => :matches
+  has_many :matches_lost, -> { where("((score1 < score2 AND contester1_id = contesters.id) OR (score2 < score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)") },
+           :through => :contesters, :source => :matches
+  has_many :matches_draw, -> { where("(score1 = score2 AND score1 > 0) AND (score1 != 0 OR score2 != 0)") },
+           :through => :contesters, :source => :matches
 
   mount_uploader :logo, TeamUploader
 
@@ -89,7 +92,7 @@ class Team < ActiveRecord::Base
   end
 
   def self.search(search)
-    search ? where("LOWER(name) LIKE LOWER(?)", "%#{search}%") : scoped
+    search ? where("LOWER(name) LIKE LOWER(?)", "%#{search}%") : all
   end
 
   def destroy

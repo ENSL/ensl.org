@@ -33,16 +33,16 @@ class Category < ActiveRecord::Base
   validates_length_of :name, :in => 1..30
   validate :validate_domain
 
-  scope :ordered, :order => "sort ASC, created_at DESC"
-  scope :domain, lambda { |domain| {:conditions => {:domain => domain}} }
-  scope :nospecial, :conditions => ["name != 'Special'"]
-  scope :newest, :include => :articles, :order => "articles.created_at DESC"
-  scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
-    scope :of_user, lambda { |user| {:conditions => {"articles.user_id" => user.id}, :include => :articles} }
+  scope :ordered, -> { order("sort ASC, created_at DESC") }
+  scope :domain, -> (domain) { where(domain: domain) }
+  scope :nospecial, -> { where.not(name: 'Special') }
+  scope :newest, -> { includes(:articles).order("articles.created_at DESC") }
+  # scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
+  scope :of_user, -> (user) { where("articles.user_id", user.id).includes(:articles) }
 
-  has_many :articles, :order => "created_at DESC"
-  has_many :issues, :order => "created_at DESC"
-  has_many :forums, :order => "forums.position"
+  has_many :articles, -> { order("created_at DESC") }
+  has_many :issues, -> { order("created_at DESC") }
+  has_many :forums, -> { order("forums.position") }
   has_many :movies
   has_many :maps
   has_many :gathers

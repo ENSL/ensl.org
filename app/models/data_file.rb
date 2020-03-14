@@ -15,7 +15,6 @@
 #  article_id   :integer
 #
 
-require File.join(Rails.root, 'vendor', 'plugins', 'acts_as_rateable', 'init.rb')
 require 'digest/md5'
 
 class DataFile < ActiveRecord::Base
@@ -26,12 +25,12 @@ class DataFile < ActiveRecord::Base
   attr_accessor :related_id
   attr_protected :id, :updated_at, :created_at, :path, :size, :md5
 
-  scope :recent, :order => "created_at DESC", :limit => 8
-  scope :demos, :order => "created_at DESC", :conditions => ["directory_id IN (SELECT id FROM directories WHERE parent_id = ?)", Directory::DEMOS]
-  scope :ordered, :order => "created_at DESC"
-  scope :movies, :order => "created_at DESC", :conditions => {:directory_id => Directory::MOVIES}
-  scope :not, lambda { |file| {:conditions => ["id != ?", file.id]} }
-  scope :unrelated, :conditions => "related_id is null"
+  scope :recent, -> { order("created_at DESC").limit(8) }
+  scope :demos, -> { order("created_at DESC").where("directory_id IN (SELECT id FROM directories WHERE parent_id = ?)", Directory::DEMOS) }
+  scope :ordered, -> { order("created_at DESC") }
+  scope :movies, -> { order("created_at DESC").where({:directory_id => Directory::MOVIES}) }
+  scope :not, -> (file) { where.not(id: file.id) }
+  scope :unrelated, -> { where("related_id is null") }
 
   has_many :related_files, :class_name => "DataFile", :foreign_key => :related_id
   has_many :comments, :as => :commentable
@@ -48,7 +47,7 @@ class DataFile < ActiveRecord::Base
   after_create :create_movie, :if => Proc.new {|file| file.directory_id == Directory::MOVIES and !file.location.include?("_preview.mp4") }
   after_save :update_relations, :if => Proc.new { |file| file.related_id_changed? and related_files.count > 0 }
 
-  acts_as_rateable
+  # acts_as_rateable
   mount_uploader :name, FileUploader
 
   def to_s

@@ -19,28 +19,10 @@ class Shoutmsg < ActiveRecord::Base
   validates_length_of :text, :in => 1..100
   validates_presence_of :user
 
-  scope :recent,
-    :include => :user,
-    :order => "id DESC",
-    :limit => 8
-  scope :box,
-    :conditions => "shoutable_type IS NULL AND shoutable_id IS NULL",
-    :limit => 8
-  scope :typebox,
-    :conditions => "shoutable_type IS NULL AND shoutable_id IS NULL"
-  scope :lastXXX,
-    :include => :user,
-    :order => "id DESC",
-    :limit => 500
-  scope :of_object,
-    lambda { |object, id| {:conditions => {:shoutable_type => object, :shoutable_id => id}} }
-  scope :ordered, :order => "id"
-
   belongs_to :user
   belongs_to :shoutable, :polymorphic => true
 
-<<<<<<< Updated upstream
-=======
+
   scope :recent, -> { includes(:user).order("id DESC").limit(8) }
   scope :box, -> { where(shoutable_type: nil, shoutable_id: nil).limit(8) }
   scope :typebox, -> { where(shoutable_type: nil, shoutable_id: nil) }
@@ -48,7 +30,6 @@ class Shoutmsg < ActiveRecord::Base
   scope :of_object, -> (object, id) { where(shoutable_type: object, shoutable_id: id) }
   scope :ordered, order("id")
 
->>>>>>> Stashed changes
   def domain
     self[:shoutable_type] ? "shout_#{shoutable_type}_#{shoutable_id}" : "shoutbox"
   end

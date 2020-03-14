@@ -19,13 +19,11 @@ class Forum < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at
 
-  scope :public,
-    :select => "forums.*",
-    :joins => "LEFT JOIN forumers ON forumers.forum_id = forums.id AND forumers.access = #{Forumer::ACCESS_READ}",
-    :conditions => "forumers.id IS NULL"
-  scope :of_forum,
-    lambda { |forum| {:conditions => {"forums.id" => forum.id}} }
-  scope :ordered, :order => "position"
+  scope :public_forums, -> { select("forums.*")
+                     .joins("LEFT JOIN forumers ON forumers.forum_id = forums.id AND forumers.access = #{Forumer::ACCESS_READ}")
+                     .where("forumers.id IS NULL") }
+  scope :of_forum, -> (forum) { where("forums.id", forum.id) }
+  scope :ordered, -> { order("position") }
 
   has_many :topics
   has_many :posts, :through => :topics
@@ -50,7 +48,7 @@ class Forum < ActiveRecord::Base
     if cuser
       Forum.available_to(cuser, Forumer::ACCESS_READ).of_forum(self).first
     else
-      Forum.public.of_forum(self).first
+      Forum.public_forums.where(id: self.id).exists?
     end
   end
 
@@ -77,7 +75,7 @@ class Forum < ActiveRecord::Base
   is_admin = Grouper.where(user_id: cuser, group_id: Group::ADMINS)
   Forum.where("EXISTS (#{is_admin.to_sql}) OR
                id IN (SELECT q.id from (#{user_has_access.to_sql}) q ) OR
-               id IN (SELECT q.id from (#{Forum.public.to_sql}) q )")
+               id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
   end
 
 end

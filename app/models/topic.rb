@@ -26,12 +26,12 @@ class Topic < ActiveRecord::Base
   belongs_to :user
   belongs_to :forum
   has_one :lock, :as => :lockable
-  has_one :latest, :class_name => "Post", :order => "id DESC"
-  has_many :posts, :order => "id ASC", :dependent => :destroy
+  has_one :latest, -> { order("id DESC") }, :class_name => "Post"
+  has_many :posts, -> { order("id ASC") }, :dependent => :destroy
   has_many :view_counts, :as => :viewable, :dependent => :destroy
 
-  scope :basic, :include => [:latest, { forum: :forumer }, :user]
-  scope :ordered, :order => "state DESC, posts.id DESC"
+  scope :basic, -> { includes([:latest, { forum: :forumer }, :user]) }
+  scope :ordered, -> { order("state DESC, posts.id DESC") }
 
   validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50

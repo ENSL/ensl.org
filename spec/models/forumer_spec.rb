@@ -10,7 +10,7 @@
 #  updated_at :datetime
 #
 
-require "spec_helper"
+require "rails_helper"
 
 describe Forumer do
   describe "create" do

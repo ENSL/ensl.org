@@ -26,22 +26,24 @@ class Contester < ActiveRecord::Base
   attr_protected :id, :updated_at, :created_at, :trend
   attr_accessor :user
 
-  scope :active, :include => :team, :conditions => {"contesters.active" => true}
+  belongs_to :team
+  belongs_to :contest
+
+  scope :active, -> { includes(:team).where(active: true) }
   # ranked is used for ladder. lower score the higher the rank
-  scope :ranked, :select => "contesters.*", :order => "score ASC, win ASC, win + draw + loss DESC"
-  scope :ordered, :select => "contesters.*, (score + extra) AS total_score", :order => "total_score DESC, score DESC, win DESC, loss ASC"
-  scope :chronological, :order => "created_at DESC"
-  scope :of_contest, lambda { |contest| {:conditions => {"contesters.contest_id" => contest.id}} }
+  scope :ranked, -> { order("score ASC, win DESC, loss ASC").select("contesters.*") }
+  scope :ordered, -> { select("contesters.*, (score + extra) AS total_score").order("total_score DESC, score DESC, win DESC, loss ASC") }
+  scope :chronological, -> { order("created_at DESC") }
+  scope :of_contest, -> (contest) { where("contesters.contest_id", contest.id) }
 
   has_many :challenges_sent, :class_name => "Challenge", :foreign_key => "contester1_id"
   has_many :challenges_received, :class_name => "Challenge", :foreign_key => "contester2_id"
-  has_many :matches, :through => :contest, :conditions => "(contester1_id = contesters.id OR contester2_id = contesters.id)"
-  belongs_to :team
-  belongs_to :contest
+  has_many :matches, -> { where("(contester1_id = contesters.id OR contester2_id = contesters.id)") }, :through => :contest
 
   validates_presence_of :team, :contest
   validates_inclusion_of [:score, :win, :loss, :draw, :extra], :in => 0..9999, :allow_nil => true
   validates_uniqueness_of :team_id, :scope => :contest_id, :message => "You can't join same contest twice."
+  
   #validate_on_create:validate_member_participation
   validate :validate_contest, :on => :create
   #validate_on_create:validate_playernumber
@@ -95,7 +97,7 @@ class Contester < ActiveRecord::Base
   end
 
   def validate_playernumber
-    if team.teamers.active.distinct.count < 6
+    if team.teamers.active.unique_by_team.count < 6
       errors.add :team, I18n.t(:contests_join_need6)
     end
   end

@@ -1,5 +1,5 @@
 <ol>
-  <% Comment.recent3.filtered.each do |comment| %>
+  <% Comment.recent(3).filtered.each do |comment| %>
     <li>
       <b>
         <%= namelink comment.commentable, 15 %>

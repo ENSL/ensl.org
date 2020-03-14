@@ -1,5 +1,4 @@
 Ensl::Application.routes.draw do
-
   %w(403 404 422 500).each do |code|
     get code, to: "errors#show", code: code
   end
@@ -19,9 +18,9 @@ Ensl::Application.routes.draw do
     resources :versions
   end
 
-  match "contests/del_map"
-  match "contests/scores"
-  match "contests/historical", to: "contests#historical"
+  get 'contests/del_map'
+  get 'contests/scores'
+  get 'contests/historical', to: "contests#historical"
 
   resources :contests do
     get "current", on: :collection
@@ -32,7 +31,7 @@ Ensl::Application.routes.draw do
   resources :options
   resources :polls
 
-  match "comments/quote"
+  get 'comments/quote'
 
   resources :comments
   resources :shoutmsgs, except: :index 
@@ -44,9 +43,10 @@ Ensl::Application.routes.draw do
   resources :groupers
   resources :forumers
   resources :topics
+  resources :matches
 
-  match "forums/up"
-  match "forums/down"
+  get 'forums/up'
+  get 'forums/down'
 
   resources :forums
   resources :users
@@ -59,11 +59,9 @@ Ensl::Application.routes.draw do
   resources :servers
   resources :predictions
   resources :rounds
-
-  get "matches/ref/:id" => "matches#ref", as: :match_ref
-  resources :matches do
-    get :admin, to: "matches#admin", on: :collection
-    resources :match_proposals, path: "proposals", as: :proposals, only: [:index, :new, :create, :update]
+  resources :getes do |m|
+    get :admin, to: "getes#admin", on: :collection
+    get :ref, to: "getes#ref"
   end
 
   resources :maps
@@ -80,71 +78,61 @@ Ensl::Application.routes.draw do
   resources :tweets
   resources :issues
 
-  match "posts/quote"
-
-  resources :posts
   resources :brackets
+  get 'about/action'
+  get 'about/staff'
+  get 'about/statistics'
 
-  match "about/action"
-  match "about/staff"
-  match "about/statistics"
+  get 'refresh', to: "application#refresh"
+  get 'search', to: "application#search"
 
-  match "refresh", to: "application#refresh"
-  match "search", to: "application#search"
+  get 'news', to: "articles#news_index"
+  get 'news/archive', to: "articles#news_archive"
+  get 'news/admin', to: "articles#admin"
+  get 'articles/cleanup'
 
-  match "news", to: "articles#news_index"
-  match "news/archive", to: "articles#news_archive"
-  match "news/admin", to: "articles#admin"
-  match "articles/cleanup"
+  get 'data_files/admin'
+  get 'data_files/addFile'
+  get 'data_files/delFile'
+  get 'data_files/trash'
 
-  match "data_files/admin"
-  match "data_files/addFile"
-  match "data_files/delFile"
-  match "data_files/trash"
+  get 'contesters/recalc'
 
-  match "contesters/recalc"
+  get 'directories', to: "directories#show", id: 1
 
-  match "directories", to: "directories#show", id: 1
+  get 'gathers/refresh'
+  get 'gathers/latest/:game', to: "gathers#latest", via: :get
+  get 'gather', to: "gathers#latest", game: "ns2", via: :get
 
-  match "gathers/refresh"
-  match "gathers/latest/:game", to: "gathers#latest", via: :get
-  match "gather", to: "gathers#latest", game: "ns2", via: :get
+  get 'gatherers/:id/status', to: "gatherers#status", via: :post
 
-  match "gatherers/:id/status", to: "gatherers#status", via: :post
+  get 'groups/addUser'
+  get 'groups/delUser'
 
-  match "groups/addUser"
-  match "groups/delUser"
+  get 'movies/download'
+  get 'movies/preview'
+  get 'movies/snapshot'
 
-  match "movies/download"
-  match "movies/preview"
-  match "movies/snapshot"
+  get 'plugin/user'
 
-  match "plugin/user"
+  get 'users/forgot'
+  get 'users/recover'
+  get 'users/agenda'
+  post 'users/logout'
+  post 'users/login'
 
-  match "users/forgot"
-  match "users/recover"
-  match "users/agenda"
-  match "users/logout"
-  match "users/login"
+  get 'users/agenda'
+  get 'users/login'
+  get 'users/logout'
+  get 'users/popup'
+  get 'users/forgot', to: "users#forgot"
 
-  match "users/agenda"
-  match "users/login"
-  match "users/logout"
-  match "users/popup"
-  match "users/forgot", to: "users#forgot"
+  get 'votes/create'
 
-  match "votes/create"
-  match "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
+  get ':controller/:action', requirements: { action: /A-Za-z/ }
+  get ':controller/:action/:id'
+  get ':controller/:action/:id.:format'
+  get ':controller/:action/:id/:id2'
 
-  get "custom_urls", to: "custom_urls#administrate"
-  resources :custom_urls, only: [:create, :update, :destroy]
-
-  get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
-
-  match ":controller/:action", requirements: { action: /A-Za-z/ }
-  match ":controller/:action/:id"
-  match ":controller/:action/:id.:format"
-  match ":controller/:action/:id/:id2"
-
-  match "teamers/replace", to: "teamers#replace", as: "teamers_replace"
+  get 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
 end

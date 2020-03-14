@@ -58,19 +58,12 @@ class Group < ActiveRecord::Base
   end
 
   def self.admins
-    admins = []
-    admin_group = where(id: ADMINS).first
-    return admins unless admin_group
-
-    (admin_group.groupers).each do |g|
-      admins << g unless admins.include? g
-    end
-    admins
+    find(ADMINS).groupers.valid_users
   end
 
   def self.referees
     referees = []
-    referee_group = where(id: REFEREES).first
+    referee_group = where(id: REFEREES).firsto
     return referees unless referee_group
 
     (referee_group.groupers).each do |g|

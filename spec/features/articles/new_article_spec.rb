@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 feature 'User creates new article', js: :true do
   let!(:category) { create(:category, domain: Category::DOMAIN_NEWS) }

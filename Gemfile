@@ -1,11 +1,10 @@
 source 'http://rubygems.org'
 
 ruby '2.2.10'
-#ruby '2.2.2'
 
 gem 'dotenv-rails', '~> 0.10.0'
-gem 'rails', '~> 3.2.22'
-gem 'mysql2', '~> 0.3.17'
+gem 'rails', '~> 4.1.16'
+gem 'mysql2', '~> 0.3.18'
 gem 'dalli', '~> 2.7.0'
 gem 'puma', '~> 2.11.1'
 
@@ -22,31 +21,35 @@ gem 'newrelic_rpm', '~> 3.13.0.299'
 gem 'will_paginate', '~> 3.0.5'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'country_select', require: 'country_select_without_sort_alphabetical'
+gem 'i18n_country_select'
 gem 'active_link_to', '~> 1.0.2'
 gem 'rmagick', '~> 2.13.4', require: false
-gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'test-unit', '~> 3.1.3'
 gem 'google-api-client', '~> 0.10.3'
+gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+gem 'public_suffix', '~> 3.1.1'
+gem 'active_record_union'
+
+# Dependency version fix
+gem 'signet', '0.11.0'
 
 # Please install nodejs locally.
 #gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
-gem 'sprockets', '~> 2.2.1'
-gem 'coffee-rails', '~> 3.2.2'
+gem 'coffee-rails', '~> 4.0.0'
 gem 'jquery-rails', '~> 2.0.2'
 gem 'tinymce-rails', '~> 3.5.9'
-gem 'sass', '~> 3.3.4'
-gem 'sass-rails', '~> 3.2.6'
+gem 'sass-rails', '~> 5.0.3'
 
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.6.0'
 gem 'haml', '~> 4.0.5'
 gem 'rails_autolink', '~> 1.1.5'
+gem 'uglifier', '~> 2.5.0'
 
-group :assets do
-  gem 'uglifier', '~> 2.5.0'
-end
+# Legacy feature shims
+gem 'protected_attributes', '~> 1.1.3'
 
 group :development do
   gem 'capistrano', '~> 3.1.0'
@@ -67,9 +70,10 @@ group :test do
   gem 'rspec-rails', '~> 3.3.3'
   gem 'capybara', '~> 2.4.4'
   gem 'poltergeist', '~> 1.6.0'
-  gem 'selenium-webdriver', '~> 2.41.0'
+  gem 'selenium-webdriver', '~> 2.47.1'
   gem 'factory_girl_rails', '~> 4.4.1'
   gem 'timecop', '~> 0.7.1'
+  gem 'rspec'
 end
 
 group :development, :test do

@@ -2,7 +2,7 @@
   <div class="widget poll">
     <h4><%= t('widget.poll') %></h4>
 
-    <% @poll = Poll.first(order: "created_at DESC") %>
+    <% @poll = Poll.first %>
     <%= render(partial: "polls/show") if @poll %>
   </div>
 <% end %>

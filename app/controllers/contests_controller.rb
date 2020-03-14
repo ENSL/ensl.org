@@ -10,9 +10,9 @@ class ContestsController < ApplicationController
   def historical
     case params[:id]
     when "NS1"
-      @contests = Contest.with_contesters.ordered.where ["name LIKE ? OR name LIKE ?", "S%:%", "%Night%"]
+      @contests = Contest.all.ordered.includes(:contesters).where("name LIKE ? OR name LIKE ?", "S%:%", "%Night%")
     else
-      @contests = Contest.with_contesters.ordered.where ["id > ?", "113"]
+      @contests = Contest.all.ordered.includes(:contesters).where("id > ?", "113")
     end
   end
 

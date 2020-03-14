@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 feature 'Server Administration' do
 	let!(:admin) { create :user, :admin }  

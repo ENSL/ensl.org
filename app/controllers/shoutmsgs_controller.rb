@@ -1,10 +1,8 @@
 class ShoutmsgsController < ApplicationController
   respond_to :html, :js
 
-<<<<<<< Updated upstream
-=======
   def index
-    @shoutmsgs = Shoutmsg.typebox
+    @shoutmsgs = Shoutmsg.last.typebox
   end
 
 >>>>>>> Stashed changes

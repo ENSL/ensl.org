@@ -17,6 +17,7 @@
 # Database and files
 db_data/*
 !db_data/.placeholder
+*.sql
 
 # ignore dkim keys
 dkim

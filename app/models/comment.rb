@@ -17,12 +17,11 @@ class Comment < ActiveRecord::Base
 
   attr_protected :id, :updated_at, :created_at, :user_id
 
-  scope :with_userteam, :include => {:user => :team}
-  scope :recent, :order => "id DESC", :limit => 10
-  scope :recent3, :order => "id DESC", :limit => 3
-  scope :recent5, :order => "id DESC", :limit => 5, :group => "commentable_id, commentable_type"
-  scope :filtered, :conditions => ["commentable_type != 'Issue'"]
-  scope :ordered, :order => "id ASC"
+  scope :with_userteam, -> { includes({:user => :team}) }
+  scope :recent, -> (n) { order("id DESC").limit(n) }
+  scope :recent5, -> { order("id DESC").limit(5).group("commentable_id, commentable_type") }
+  scope :filtered, -> { where.not({"commentable_type" => 'Issue'}) }
+  scope :ordered, -> { order("id ASC") }
 
   belongs_to :user
   belongs_to :commentable, :polymorphic => true

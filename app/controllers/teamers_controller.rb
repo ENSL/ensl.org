@@ -1,4 +1,7 @@
 class TeamersController < ApplicationController
+  def index
+  end
+
   def create
     @old_application = (cuser.teamers.joining.count == 0) ? nil : cuser.teamers.joining.first
     @teamer = Teamer.new params[:teamer]

@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'rails_helper'
 
 feature "Visitor signs up", js: :true do
   let(:user) { attributes_for(:user) }

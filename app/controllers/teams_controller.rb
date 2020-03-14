@@ -2,7 +2,7 @@ class TeamsController < ApplicationController
   before_filter :get_team, only: [:show, :edit, :update, :destroy, :recover]
 
   def index
-    @teams = Team.with_teamers_num(0).search(params[:search]).paginate(per_page: 80, page: params[:page]).ordered
+    @teams = Team.search(params[:search]).paginate(per_page: 80, page: params[:page]).ordered
   end
 
   def show
@@ -15,7 +15,7 @@ class TeamsController < ApplicationController
     raise AccessError unless @team.can_create? cuser
   end
 
-  def replace_teamer 
+  def replace_teamer
     redirect_to_back
   end
 

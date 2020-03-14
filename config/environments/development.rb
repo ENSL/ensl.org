@@ -31,13 +31,12 @@ Ensl::Application.configure do
   # Use a different cache store
   config.cache_store = :dalli_store
 
-<<<<<<< Updated upstream
   # Enable threaded mode
   # config.threadsafe!
-=======
   config.eager_load = false
 
   config.web_console.permissions = '172.18.0.0/16'
   config.web_console.whiny_requests = true
->>>>>>> Stashed changes
+
+  config.eager_load = false
 end

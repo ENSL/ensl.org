@@ -13,7 +13,7 @@
 
     <div class="separator">Latest comments</div>
     <ol>
-      <% Comment.recent.filtered.each do |comment| %>
+      <% Comment.recent(3).each do |comment| %>
         <li>
           <%= namelink comment.commentable, 15 %>
           by <%= namelink comment.user, 10 %>

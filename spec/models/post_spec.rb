@@ -11,7 +11,7 @@
 #  text_parsed :text
 #
 
-require "spec_helper"
+require "rails_helper"
 
 describe Post do
   let!(:user) { create :user }

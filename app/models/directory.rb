@@ -26,11 +26,11 @@ class Directory < ActiveRecord::Base
 
   belongs_to :parent, :class_name => "Directory"
   has_many :subdirs, :class_name => "Directory", :foreign_key => :parent_id
-  has_many :files, :class_name => "DataFile", :order => "name"
+  has_many :files, -> { order("name") }, :class_name => "DataFile"
 
-  scope :ordered, :order => "name ASC"
-  scope :filtered, :conditions => {:hidden => false}
-  scope :of_parent, lambda { |parent| {:conditions => {:parent_id => parent.id}} }
+  scope :ordered, ->  { order("name ASC") }
+  scope :filtered, -> { where(hidden: true) }
+  scope :of_parent, -> (parent) { where(parent_id: parent.id) }
 
   validates_length_of [:name, :path], :in => 1..255
   validates_format_of :name, :with => /\A[A-Za-z0-9]{1,20}\z/, :on => :create
