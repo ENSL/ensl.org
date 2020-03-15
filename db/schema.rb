@@ -607,7 +607,7 @@ ActiveRecord::Schema.define(:version => 20171109165433) do
   add_index "predictions", ["match_id"], :name => "index_predictions_on_match_id"
   add_index "predictions", ["user_id"], :name => "index_predictions_on_user_id"
 
-  create_table "profiles", :force => true do |t|
+  create_table "profiles", :options => 'ENGINE=MyISAM', :force => true do |t|
     t.integer  "user_id"
     t.string   "msn"
     t.string   "icq"

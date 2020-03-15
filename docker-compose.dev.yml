@@ -2,6 +2,10 @@ version: "3"
 
 services:
   web:
+    # Debug
+    stdin_open: true
+    command: /bin/bash 
+    tty: true 
     build:
       context: ./
       dockerfile: Dockerfile.dev
@@ -17,7 +21,7 @@ services:
   #    - redis
   db:
     # Debug
-    #    command: bash 
+    #command: bash 
     #tty: true
     command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
