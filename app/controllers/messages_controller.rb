@@ -7,7 +7,7 @@ class MessagesController < ApplicationController
 
   def show
     raise AccessError unless @message.can_show? cuser
-    @message.read_by! cuser
+    @message.mark_as_read! for: cuser
     @messages = @message.thread
   end
 

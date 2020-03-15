@@ -49,7 +49,7 @@ class Issue < ActiveRecord::Base
   before_save :parse_text
   after_save :remove_readings
 
-  acts_as_readable
+  acts_as_reader
 
   def to_s
     title

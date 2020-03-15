@@ -62,7 +62,7 @@ class Movie < ActiveRecord::Base
   mount_uploader :picture, MovieUploader
 
   has_view_count
-  acts_as_readable
+  acts_as_reader
 
   def to_s
     file.to_s

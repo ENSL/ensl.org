@@ -22,7 +22,7 @@ class MoviesController < ApplicationController
   end
 
   def show
-    @movie.read_by! cuser if cuser
+    @movie.mark_as_read! for: cuser if cuser
     @movie.record_view_count(request.remote_ip, cuser.nil?)
     redirect_to @movie.file.related if @movie.file and @movie.file.related
   end

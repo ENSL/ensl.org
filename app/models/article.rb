@@ -69,7 +69,7 @@ class Article < ActiveRecord::Base
   after_destroy :remove_readings
 
   has_view_count
-  acts_as_readable
+  acts_as_reader
   acts_as_versioned
 
   non_versioned_columns << 'category_id'

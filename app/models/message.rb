@@ -37,7 +37,7 @@ class Message < ActiveRecord::Base
   before_save :parse_text
   after_create :send_notifications
 
-  acts_as_readable
+  acts_as_reader
 
   def to_s
     title

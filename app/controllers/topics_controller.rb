@@ -13,8 +13,8 @@ class TopicsController < ApplicationController
 
     return_here
     @topic.record_view_count(request.remote_ip, cuser.nil?)
-    @topic.read_by! cuser if cuser
-    @topic.forum.read_by! cuser if cuser
+    @topic.mark_as_read! for: cuser if cuser
+    @topic.forum.mark_as_read! for: cuser if cuser
     @newpost = Post.new
     @newpost.topic = @topic
     @newpost.user = cuser

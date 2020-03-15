@@ -25,7 +25,7 @@ class CustomUrlsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless custom_url
     @article = custom_url.article
     raise AccessError unless @article.can_show? cuser
-    @article.read_by! cuser if cuser
+    @article.mark_as_read! for: cuser if cuser
     render 'articles/show'
   end
 

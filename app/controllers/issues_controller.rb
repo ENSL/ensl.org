@@ -23,7 +23,7 @@ class IssuesController < ApplicationController
 
   def show
     raise AccessError unless @issue.can_show? cuser
-    @issue.read_by! cuser
+    @issue.mark_as_read! for: cuser
   end
 
   def new

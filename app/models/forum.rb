@@ -34,7 +34,7 @@ class Forum < ActiveRecord::Base
 
   after_create :update_position
 
-  acts_as_readable
+  acts_as_reader
 
   def to_s
     self.title
@@ -65,17 +65,17 @@ class Forum < ActiveRecord::Base
   end
 
   def self.available_to cuser, level
-  user_has_access =
-    Forum .joins("JOIN forumers ON forumers.forum_id = forums.id
-                           AND forumers.access =  #{level}")
-    .joins("JOIN groups ON forumers.group_id = groups.id")
-    .joins("JOIN groupers ON groupers.group_id = groups.id
-                        AND groupers.user_id = #{cuser.id}")
+    user_has_access =
+      Forum .joins("JOIN forumers ON forumers.forum_id = forums.id
+                            AND forumers.access =  #{level}")
+      .joins("JOIN groups ON forumers.group_id = groups.id")
+      .joins("JOIN groupers ON groupers.group_id = groups.id
+                          AND groupers.user_id = #{cuser.id}")
 
-  is_admin = Grouper.where(user_id: cuser, group_id: Group::ADMINS)
-  Forum.where("EXISTS (#{is_admin.to_sql}) OR
-               id IN (SELECT q.id from (#{user_has_access.to_sql}) q ) OR
-               id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
+    is_admin = Grouper.where(user_id: cuser, group_id: Group::ADMINS)
+    Forum.where("EXISTS (#{is_admin.to_sql}) OR
+                id IN (SELECT q.id from (#{user_has_access.to_sql}) q ) OR
+                id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
   end
 
 end

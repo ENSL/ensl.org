@@ -39,7 +39,7 @@ class Topic < ActiveRecord::Base
 
   after_create :make_post
 
-  acts_as_readable
+  acts_as_reader
 
   def self.recent_topics
     find_by_sql %q{

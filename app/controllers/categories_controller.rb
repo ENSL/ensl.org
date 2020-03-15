@@ -4,7 +4,7 @@ class CategoriesController < ApplicationController
   def show
     if [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
       @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
-      Category.find(params[:id]).read_by! cuser if cuser
+      Category.find(params[:id]).mark_as_read! for: cuser if cuser
       render partial: 'articles/article', collection: @articles.to_a
     end
   end
