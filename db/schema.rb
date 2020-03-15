@@ -561,7 +561,7 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   add_index "predictions", ["match_id"], name: "index_predictions_on_match_id", using: :btree
   add_index "predictions", ["user_id"], name: "index_predictions_on_user_id", using: :btree
 
-  create_table "profiles", force: true do |t|
+  create_table "profiles", :options => 'ENGINE=MyISAM', :force => true do |t|
     t.integer  "user_id"
     t.string   "msn"
     t.string   "icq"
@@ -788,7 +788,7 @@ ActiveRecord::Schema.define(version: 20200315183444) do
     t.integer  "user_id",    null: false
     t.string   "comment"
     t.integer  "rank",       null: false
-    t.datetime "created_at"
+    t.datetime "created_at"mer
     t.datetime "updated_at"
   end
 
