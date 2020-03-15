@@ -1,10 +1,10 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :group do
     sequence(:id) { |n| n + 100 } # Preserve first 100
     sequence(:name) { |n| "Group#{n}" }
     association :founder, factory: :user
 
-    initialize_with { Group.find_or_create_by_id(id) }
+    # initialize_with { Group.find_or_create_by(id: id) }
   end
 
   trait :admin do

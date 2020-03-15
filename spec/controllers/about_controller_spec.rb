@@ -7,11 +7,10 @@ RSpec.describe AboutController, type: :controller do
     end
 
     context 'as an admin' do
-        # let!(:admin) { create(:user, :admin) }
-        let!(:admin) { create :user, :admin }
+        let!(:admin) { create(:user, :admin) }
 
         before do
-            sign_in_as(admin)
+            login_admin
         end
 
         it "renders the adminpanel template" do

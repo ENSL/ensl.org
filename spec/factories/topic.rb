@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :topic do
     sequence(:title) { |n| "Topic Title #{n}" }
     forum

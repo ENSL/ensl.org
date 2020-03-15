@@ -71,7 +71,7 @@ group :test do
   gem 'capybara', '~> 2.4.4'
   gem 'poltergeist', '~> 1.6.0'
   gem 'selenium-webdriver', '~> 2.47.1'
-  gem 'factory_girl_rails', '~> 4.4.1'
+  gem 'factory_bot_rails'
   gem 'timecop', '~> 0.7.1'
   gem 'rspec'
 end

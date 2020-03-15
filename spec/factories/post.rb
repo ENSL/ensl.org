@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :post do
     sequence(:text) { |n| "Post Body #{n}" }
     topic

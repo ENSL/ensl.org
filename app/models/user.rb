@@ -31,6 +31,8 @@ class User < ActiveRecord::Base
   attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password
 
+  #attribute :lastvisit, :string, default: DateTime.now
+
   belongs_to :team
   has_one :profile, :dependent => :destroy
   has_many :bans, :dependent => :destroy

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :gather do
     association :category, factory: [:category, :game]
   end

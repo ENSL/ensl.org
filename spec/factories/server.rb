@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :server do
     sequence(:name) { |n| "ServerName#{n}" }
     sequence(:dns) { |n| "DNS#{n}" }

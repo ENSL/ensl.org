@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :match do
     contest
     contester1 do

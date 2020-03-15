@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :ban do
     ban_type Ban::TYPE_SITE
     expiry Time.now.utc.to_date + 1

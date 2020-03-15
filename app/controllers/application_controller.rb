@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
   def update_user
     if cuser
       Time.zone = cuser.time_zone
-      cuser.update_attribute :lastvisit, DateTime.now if cuser.lastvisit < 2.minutes.ago
+      cuser.update_attribute :lastvisit, DateTime.now if cuser.lastvisit and cuser.lastvisit < 2.minutes.ago
 
       if cuser.banned? Ban::TYPE_SITE
         session[:user] = nil
