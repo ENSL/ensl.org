@@ -63,7 +63,7 @@ class Group < ActiveRecord::Base
 
   def self.referees
     referees = []
-    referee_group = where(id: REFEREES).firsto
+    referee_group = where(id: REFEREES).first
     return referees unless referee_group
 
     (referee_group.groupers).each do |g|

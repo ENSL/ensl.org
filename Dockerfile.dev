@@ -1,4 +1,4 @@
-FROM ruby:2.2.10
+FROM ruby:2.3.8
 
 ENV RAILS_ENV development
 
@@ -6,20 +6,20 @@ ENV RAILS_ENV development
 RUN adduser web --home /home/web --shell /bin/bash --disabled-password --gecos ""
 
 RUN apt-get update && apt-get -y upgrade \
-    && apt-get -y install mysql-client libmysqlclient-dev memcached nodejs firefox-esr \
-    && service memcached start
+    && apt-get -y install libmariadb-dev libmariadb-dev-compat nodejs \
+                           zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
+                           libxslt1-dev imagemagick libmagickwand-dev
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
-
 ADD Gemfile Gemfile.lock /var/www/
 
 RUN mkdir -p /var/bundle && chown -R web:web /var/bundle && chown -R web:web /var/www
-RUN su -c "bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4" -s /bin/bash -l web
 
 WORKDIR /var/www
 USER web
 
-RUN bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4
+RUN bundle config github.https true && \
+bundle install --path /var/bundle --jobs 8
 
 USER root
 CMD ["/var/www/script/entry.sh"]

@@ -95,7 +95,9 @@ class User < ActiveRecord::Base
       joins("LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()")
       .conditions("bans.id IS NOT NULL") }
   scope :idle, -> {
-      joins("lastvisit < ?", 30.minutes.ago.utc) }
+      where("lastvisit < ?", 30.minutes.ago.utc) }
+  scope :lately, -> {
+      where("lastvisit > ?", 30.days.ago.utc) }
 
   validates_uniqueness_of :username, :email, :steamid
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
