@@ -3,6 +3,7 @@ source 'http://rubygems.org'
 ruby '2.3.8'
 
 gem 'rails', '~> 4.1.16'
+gem 'rake', '< 11.0'
 
 # Dotenv
 gem 'dotenv-rails'

@@ -61,9 +61,10 @@ Ensl::Application.routes.draw do
   resources :servers
   resources :predictions
   resources :rounds
-  resources :getes do |m|
-    get :admin, to: "getes#admin", on: :collection
-    get :ref, to: "getes#ref"
+  resources :matches do |m|
+    get :admin, to: "matches#admin", on: :collection
+    get :ref, to: "matches#ref"
+    resources :match_proposals, path: "proposals", as: :proposals, only: [:index, :new, :create, :update]
   end
 
   resources :maps
@@ -79,7 +80,9 @@ Ensl::Application.routes.draw do
   resources :bans
   resources :tweets
   resources :issues
-  resources :posts
+  resources :posts do |p|
+    get :quote
+  end
 
   resources :brackets
 
@@ -133,6 +136,11 @@ Ensl::Application.routes.draw do
   get 'users/forgot', to: "users#forgot"
 
   get 'votes/create'
+  get "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
+
+  resources :custom_urls, only: [:create, :update, :destroy]
+
+  get "custom_urls", to: "custom_urls#administrate"
 
   get ':controller/:action', requirements: { action: /A-Za-z/ }
   get ':controller/:action/:id'

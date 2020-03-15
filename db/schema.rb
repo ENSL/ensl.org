@@ -13,6 +13,20 @@
 
 ActiveRecord::Schema.define(version: 20200315183444) do
 
+  create_table "admin_requests", force: true do |t|
+    t.string   "addr"
+    t.string   "pwd"
+    t.integer  "server_id"
+    t.string   "player"
+    t.integer  "user_id"
+    t.string   "msg"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "admin_requests", ["server_id"], name: "index_admin_requests_on_server_id", using: :btree
+  add_index "admin_requests", ["user_id"], name: "index_admin_requests_on_user_id", using: :btree
+
   create_table "article_versions", force: true do |t|
     t.integer  "article_id"
     t.integer  "version"
@@ -188,8 +202,8 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   create_table "custom_urls", force: true do |t|
     t.string   "name"
     t.integer  "article_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "custom_urls", ["article_id"], name: "index_custom_urls_on_article_id", using: :btree
@@ -212,6 +226,16 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   add_index "data_files", ["directory_id"], name: "index_data_files_on_directory_id", using: :btree
   add_index "data_files", ["related_id"], name: "index_data_files_on_related_id", using: :btree
 
+  create_table "deleteds", force: true do |t|
+    t.integer  "deletable_id"
+    t.string   "deletable_type"
+    t.integer  "user_id"
+    t.text     "reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "related_id"
+  end
+
   create_table "directories", force: true do |t|
     t.string   "name"
     t.string   "description"
@@ -223,6 +247,21 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   end
 
   add_index "directories", ["parent_id"], name: "index_directories_on_parent_id", using: :btree
+
+  create_table "firms", force: true do |t|
+    t.string   "name"
+    t.string   "y_code"
+    t.string   "email"
+    t.string   "website"
+    t.string   "phone"
+    t.string   "address"
+    t.integer  "zipcode"
+    t.string   "town"
+    t.integer  "owner"
+    t.string   "opentime"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "forumers", force: true do |t|
     t.integer  "forum_id"
@@ -410,6 +449,7 @@ ActiveRecord::Schema.define(version: 20200315183444) do
     t.integer  "status"
   end
 
+  add_index "match_proposals", ["match_id"], name: "index_match_proposals_on_match_id", using: :btree
   add_index "match_proposals", ["status"], name: "index_match_proposals_on_status", using: :btree
 
   create_table "matchers", force: true do |t|
@@ -503,6 +543,13 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   add_index "movies", ["status"], name: "index_movies_on_status", using: :btree
   add_index "movies", ["user_id"], name: "index_movies_on_user_id", using: :btree
 
+  create_table "nodes", force: true do |t|
+    t.string   "name"
+    t.integer  "foreign_key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "options", force: true do |t|
     t.string   "option"
     t.integer  "poll_id"
@@ -561,7 +608,7 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   add_index "predictions", ["match_id"], name: "index_predictions_on_match_id", using: :btree
   add_index "predictions", ["user_id"], name: "index_predictions_on_user_id", using: :btree
 
-  create_table "profiles", :options => 'ENGINE=MyISAM', :force => true do |t|
+  create_table "profiles", :options => 'ENGINE=MyISAM', force: true do |t|
     t.integer  "user_id"
     t.string   "msn"
     t.string   "icq"
@@ -606,10 +653,10 @@ ActiveRecord::Schema.define(version: 20200315183444) do
     t.boolean  "notify_gather"
     t.boolean  "notify_own_match"
     t.boolean  "notify_any_match"
-    t.boolean  "notify_pms",                      default: true, null: false
-    t.boolean  "notify_challenge",                default: true, null: false
+    t.boolean  "notify_pms",          default: true, null: false
+    t.boolean  "notify_challenge",    default: true, null: false
     t.string   "steam_profile"
-    t.string   "achievements_parsed", limit: 400
+    t.string   "achievements_parsed"
     t.text     "signature_parsed"
     t.string   "stream"
     t.string   "layout"
@@ -747,18 +794,6 @@ ActiveRecord::Schema.define(version: 20200315183444) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "shoutmsg_archive", force: true do |t|
-    t.integer  "user_id"
-    t.string   "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "shoutable_type"
-    t.integer  "shoutable_id"
-  end
-
-  add_index "shoutmsg_archive", ["shoutable_type", "shoutable_id"], name: "index_shoutmsgs_on_shoutable_type_and_shoutable_id", using: :btree
-  add_index "shoutmsg_archive", ["user_id"], name: "index_shoutmsgs_on_user_id", using: :btree
-
   create_table "shoutmsgs", force: true do |t|
     t.integer  "user_id"
     t.string   "text"
@@ -788,7 +823,7 @@ ActiveRecord::Schema.define(version: 20200315183444) do
     t.integer  "user_id",    null: false
     t.string   "comment"
     t.integer  "rank",       null: false
-    t.datetime "created_at"mer
+    t.datetime "created_at"
     t.datetime "updated_at"
   end
 
