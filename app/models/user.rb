@@ -119,6 +119,8 @@ class User < ActiveRecord::Base
 
   accepts_nested_attributes_for :profile
 
+  acts_as_reader
+
   acts_as_versioned
   non_versioned_columns << 'firstname'
   non_versioned_columns << 'lastname'

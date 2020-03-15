@@ -65,7 +65,7 @@
       <%= form_for @lock do |f| %>
         <%= f.hidden_field :lockable_type %>
         <%= f.hidden_field :lockable_id %>
-        <%= link_to_function "Lock", "this.parentNode.submit()", class: 'button' %>
+        <%= link_to "Lock", "#", class: 'button submitButton' %>
       <% end %>
     <% elsif @lock.can_destroy? cuser %>
       <%= link_to 'Unlock', @lock, class: 'button', confirm: 'Are you sure?', method: :delete %>

@@ -24,12 +24,12 @@ class Message < ActiveRecord::Base
   validates_length_of :text, :in => 1..65000
 
   scope :ordered, :order => "created_at DESC"
-  scope :read_by,
-    lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
-  scope :unread_by,
-    lambda { |user| {
-    :joins => "LEFT JOIN readings ON readable_type = 'Message' AND readable_id = messages.id AND readings.user_id = #{user.id}",
-    :conditions => "readings.user_id IS NULL"} }
+  #scope :read_by,
+  #  lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
+  #scope :unread_by,
+  #  lambda { |user| {
+   # :joins => "LEFT JOIN readings ON readable_type = 'Message' AND readable_id = messages.id AND readings.user_id = #{user.id}",
+   # :conditions => "readings.user_id IS NULL"} }
 
   belongs_to :sender, :polymorphic => true
   belongs_to :recipient, :polymorphic => true
@@ -37,7 +37,7 @@ class Message < ActiveRecord::Base
   before_save :parse_text
   after_create :send_notifications
 
-  acts_as_reader
+  acts_as_readable
 
   def to_s
     title

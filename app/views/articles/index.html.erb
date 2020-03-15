@@ -8,7 +8,7 @@
       <% category.articles.nodrafts.ordered.each do |article| %>
         <div class="article-list">
           <div class="title">
-            <% if cuser and !article.read_by? cuser %>
+            <% if cuser and !cuser.have_read?(article) %>
               <span class="new">NEW</span>
             <% end %>
 

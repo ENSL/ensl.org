@@ -35,10 +35,10 @@ class Issue < ActiveRecord::Base
   belongs_to :author, :class_name => "User"
   belongs_to :assigned, :class_name => "User"
 
-  scope :unread_by,
-    lambda { |user| {
-    :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
-    :conditions => "readings.user_id IS NULL"} }
+  #scope :unread_by,
+  #  lambda { |user| {
+  #  :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
+  #  :conditions => "readings.user_id IS NULL"} }
   scope :with_status, -> (s) { where(status: s) }
 
   validates_length_of :title, :in => 1..50
@@ -49,7 +49,7 @@ class Issue < ActiveRecord::Base
   before_save :parse_text
   after_save :remove_readings
 
-  acts_as_reader
+  acts_as_readable
 
   def to_s
     title

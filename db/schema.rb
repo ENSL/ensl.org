@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200315144657) do
+ActiveRecord::Schema.define(version: 20200315183444) do
 
   create_table "article_versions", force: true do |t|
     t.integer  "article_id"
@@ -632,6 +632,16 @@ ActiveRecord::Schema.define(version: 20200315144657) do
 
   add_index "ratings", ["rate_id"], name: "index_ratings_on_rate_id", using: :btree
   add_index "ratings", ["rateable_id", "rateable_type"], name: "index_ratings_on_rateable_id_and_rateable_type", using: :btree
+
+  create_table "read_marks", force: true do |t|
+    t.integer  "readable_id"
+    t.string   "readable_type", null: false
+    t.integer  "reader_id"
+    t.string   "reader_type",   null: false
+    t.datetime "timestamp"
+  end
+
+  add_index "read_marks", ["reader_id", "reader_type", "readable_type", "readable_id"], name: "read_marks_reader_readable_index", unique: true, using: :btree
 
   create_table "readings", force: true do |t|
     t.string   "readable_type"

@@ -34,7 +34,7 @@ class Forum < ActiveRecord::Base
 
   after_create :update_position
 
-  acts_as_reader
+  acts_as_readable
 
   def to_s
     self.title

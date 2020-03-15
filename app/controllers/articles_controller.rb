@@ -21,7 +21,7 @@ class ArticlesController < ApplicationController
 
   def show
     raise AccessError unless @article.can_show? cuser
-    @article.read_by! cuser if cuser
+    cuser.mark_as_read(@article) if cuser
     # @article.record_view_count(request.remote_ip, cuser.nil?)
   end
 

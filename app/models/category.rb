@@ -48,7 +48,7 @@ class Category < ActiveRecord::Base
   has_many :gathers
   has_many :servers
 
-  acts_as_reader
+  acts_as_readable
 
   def to_s
     name
