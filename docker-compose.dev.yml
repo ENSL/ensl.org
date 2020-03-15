@@ -15,10 +15,50 @@ services:
      - ".:/var/www/"
     ports:
      - "4000:4000"
+     - "35729:35729"
     links:
      - db
      - memcached
-  #    - redis
+     - selenium
+     #- redis
+
+  test:
+    # Debug
+    #stdin_open: true
+    command: ["/bin/bash", "-c", "--", "while true; do sleep 100; done;"]
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        buildno: 1
+    env_file:
+      - .env.test
+    ports:
+      - 3005:3005 # Capybara listens here
+    links:
+      - db
+      - selenium
+    volumes:
+      - ".:/var/www"
+    # command: bin/spring server
+    environment:
+      TEST_APP_HOST: test
+      TEST_APP_PORT: 3005
+      SELENIUM_HOST: selenium
+      RAILS_ENV: test
+    networks:
+      default:
+        aliases:
+          - test
+
+  redis:
+    image: 'redis:4.0-alpine'
+
+  selenium:
+    image: selenium/standalone-chrome-debug
+    ports:
+      - 5900:5900
+
   db:
     # Debug
     #command: bash 
@@ -35,6 +75,7 @@ services:
      - MYSQL_PASSWORD=ensl
      - MYSQL_ROOT_PASSWORD=ensl
      - MYSQL_ROOT_HOST=%
+
   memcached:
     image: memcached:latest
   #redis:
