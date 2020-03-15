@@ -6,13 +6,22 @@ RSpec.describe AboutController, type: :controller do
         expect(response).to render_template("staff")
     end
 
-    it "renders the adminpanel template" do
-        get :adminpanel
-        expect(response).to render_template("adminpanel")
-    end
+    context 'as an admin' do
+        # let!(:admin) { create(:user, :admin) }
+        let!(:admin) { create :user, :admin }
 
-    it "renders the statistics template" do
-        get :statistics
-        expect(response).to render_template("statistics")
+        before do
+            sign_in_as(admin)
+        end
+
+        it "renders the adminpanel template" do
+            get :adminpanel
+            expect(response).to render_template("adminpanel")
+        end
+
+        it "renders the statistics template" do
+            get :statistics
+            expect(response).to render_template("statistics")
+        end
     end
 end

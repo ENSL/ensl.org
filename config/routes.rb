@@ -77,10 +77,13 @@ Ensl::Application.routes.draw do
   resources :bans
   resources :tweets
   resources :issues
+  resources :posts
 
   resources :brackets
+
   get 'about/action'
   get 'about/staff'
+  get 'about/adminpanel'
   get 'about/statistics'
 
   get 'refresh', to: "application#refresh"

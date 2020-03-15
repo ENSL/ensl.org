@@ -52,6 +52,9 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
 
+  # Capybara
+  config.include Capybara::DSL
+
   # rspec-mocks config goes here. You can use an alternate test double
   # library (such as bogus or mocha) by changing the `mock_with` option here.
   config.mock_with :rspec do |mocks|
@@ -63,22 +66,12 @@ RSpec.configure do |config|
 
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.
-=begin
   # These two settings work together to allow you to limit a spec run
   # to individual examples or groups you care about by tagging them with
   # `:focus` metadata. When nothing is tagged with `:focus`, all examples
   # get run.
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
-
-RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
-  config.include Controllers::JsonHelpers, type: :controller
-  config.include Features::FormHelpers, type: :feature
-  config.include Features::ServerHelpers, type: :feature
-  config.include Features::SessionHelpers, type: :feature
-
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.order = "random"
   config.use_transactional_fixtures = false
   config.color = true
