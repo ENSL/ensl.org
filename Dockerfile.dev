@@ -6,9 +6,14 @@ ENV RAILS_ENV development
 RUN adduser web --home /home/web --shell /bin/bash --disabled-password --gecos ""
 
 RUN apt-get update && apt-get -y upgrade \
-    && apt-get -y install libmariadb-dev libmariadb-dev-compat nodejs \
-                           zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
-                           libxslt1-dev imagemagick libmagickwand-dev
+    && apt-get -y install \
+        libmariadb-dev libmariadb-dev-compat \
+        libssl-dev  \
+        zlib1g-dev libreadline-dev libyaml-dev  \
+        libxslt1-dev libxml2-dev \
+        imagemagick libmagickwand-dev \
+        nodejs \
+        firefox-esr
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
 ADD Gemfile Gemfile.lock /var/www/

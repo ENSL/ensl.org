@@ -19,7 +19,7 @@ services:
     links:
      - db
      - memcached
-     - selenium
+     #- selenium
      #- redis
 
   test:
@@ -58,6 +58,7 @@ services:
     image: selenium/standalone-chrome-debug
     ports:
       - 5900:5900
+      - 4444:4444
 
   db:
     # Debug

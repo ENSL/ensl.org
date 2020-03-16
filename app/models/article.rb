@@ -66,7 +66,6 @@ class Article < ActiveRecord::Base
   before_validation :init_variables, :if => Proc.new{ |model| model.new_record? }
   before_save :format_text
   after_save :send_notifications
-  after_destroy :remove_readings
 
   has_view_count
   acts_as_readable

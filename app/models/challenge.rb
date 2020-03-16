@@ -49,20 +49,19 @@ class Challenge < ActiveRecord::Base
   #validate_on_update :validate_map2
   #validate_on_update :validate_status
 
-  scope :of_contester,
-    lambda { |contester| {:conditions => ["contester1_id = ? OR contester2_id = ?", contester.id, contester.id]} }
-  scope :within_time,
-    lambda { |from, to| {:conditions => ["match_time > ? AND match_time < ?", from.utc, to.utc]} }
-  scope :around,
-    lambda { |time| {:conditions => ["match_time > ? AND match_time < ?",  time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc]} }
-  scope :on_week,
-    lambda { |time| {:conditions => ["match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week]} }
-  scope :pending, :conditions =>  {:status => STATUS_PENDING}
-  scope :mandatory, :conditions =>  {:mandatory => true}
-  scope :future, :conditions =>  "match_time > UTC_TIMESTAMP()"
-  scope :past, :conditions =>  "match_time < UTC_TIMESTAMP()"
+  scope :category, -> (cat) { where(category_id: cat) }
+
+  scope :of_contester, -> (contester) { where("contester1_id = ? OR contester2_id = ?", contester.id, contester.id) }
+  scope :within_time, -> (from, to) { where("match_time > ? AND match_time < ?", from.utc, to.utc) }
+  scope :around, -> (time) {  where("match_time > ? AND match_time < ?",  time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc) }
+  scope :on_week, -> (time) { where("match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week) }
+  scope :pending, -> { where(status: STATUS_PENDING) }
+  scope :mandatory, -> { where(mandatory: true) }
+  scope :future, -> { where("match_time > UTC_TIMESTAMP()") }
+  scope :past, -> { where("match_time < UTC_TIMESTAMP()") }
 
   has_one :match
+  
   belongs_to :map1, :class_name => "Map"
   belongs_to :map2, :class_name => "Map"
   belongs_to :user

@@ -22,7 +22,6 @@ class Post < ActiveRecord::Base
   validates_length_of :text, :in => 1..10000
 
   before_save :parse_text
-  after_create :remove_readings
   after_destroy :remove_topics, :if => Proc.new {|post| post.topic.posts.count == 0}
 
   belongs_to :user
@@ -35,13 +34,7 @@ class Post < ActiveRecord::Base
       topic.posts.count + 1
     end
   end
-
-  # FIXME
-  def remove_readings
-    Reading.delete_all ["readable_type = 'Topic' AND readable_id = ?", topic.id]
-    Reading.delete_all ["readable_type = 'Forum' AND readable_id = ?", topic.forum.id]
-  end
-
+  
   def parse_text
     if self.text
       self.text_parsed = bbcode_to_html(self.text)

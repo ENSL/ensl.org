@@ -77,17 +77,18 @@ end
 
 group :test do
 #  gem 'spring'
-  gem 'simplecov', '~> 0.7.1', require: false
-  gem 'codeclimate-test-reporter', '~> 0.3.0', require: nil
-  gem 'database_cleaner', '~> 1.2.0'
+  gem 'rspec'
   gem 'rspec-rails', '~> 3.3.3'
+  gem 'factory_bot_rails'
+  gem 'database_cleaner', '~> 1.2.0'  
   gem 'capybara', '~> 2.4.4'
   gem 'poltergeist', '~> 1.6.0'
-  gem 'selenium-webdriver', '~> 2.47.1'
-  gem 'factory_bot_rails'
+  gem 'selenium-webdriver'
   gem 'timecop', '~> 0.7.1'
-  gem 'rspec'
+  gem 'simplecov', '~> 0.7.1', require: false
+  gem 'codeclimate-test-reporter', '~> 0.3.0', require: nil
   gem 'test-unit', '~> 3.1.3'
+  gem 'phantomjs', :require => 'phantomjs/poltergeist'
 end
 
 group :development, :test do
