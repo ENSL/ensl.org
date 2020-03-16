@@ -30,7 +30,7 @@ class Gatherer < ActiveRecord::Base
     lambda { |team| {:conditions => {:team => team}} }
   scope :of_user,
     lambda { |user| {:conditions => {:user_id => user.id}} }
-  scope :lobby, :conditions => "team IS NULL"
+  scope :lobby, -> { where(team: nil) }
   scope :best,
     lambda { |gather| {
     :select => "u.id, u.username, (COUNT(*) / (SELECT COUNT(*) FROM gatherers g3 WHERE g3.user_id = u.id)) AS skill, g4.id",
@@ -42,25 +42,23 @@ class Gatherer < ActiveRecord::Base
     :having => "g4.id IS NOT NULL",
     :order => "skill DESC",
     :limit => 15 } }
-  scope :with_kpd,
-    :select => "gatherers.*, SUM(kills)/SUM(deaths) as kpd, COUNT(rounders.id) as rounds",
-    :joins => "LEFT JOIN rounders ON rounders.user_id = gatherers.user_id",
-    :group => "rounders.user_id",
-    :order => "kpd DESC"
-  scope :lobby_team,
-    lambda { |team| {
-    :conditions => ["gatherers.team IS NULL OR gatherers.team = ?", team],
-    :order => "gatherers.team"} }
-  scope :most_voted, :order => "votes DESC, created_at DESC"
+  scope :with_kpd, -> {
+    select("gatherers.*, SUM(kills)/SUM(deaths) as kpd, COUNT(rounders.id) as rounds").
+    joins("LEFT JOIN rounders ON rounders.user_id = gatherers.user_id").
+    group("rounders.user_id").
+    order("kpd DESC") }
+  scope :lobby_team, -> (team) { conditions("gatherers.team IS NULL OR gatherers.team = ?", team).
+    order("gatherers.team") }
+  scope :most_voted, -> { order("votes DESC, created_at DESC") }
   scope :not_user,
     lambda { |user| {:conditions => ["user_id != ?", user.id]} }
-  scope :eject_order, :order => "votes ASC"
-  scope :ordered,
-    :joins => "LEFT JOIN gathers ON captain1_id = gatherers.id OR captain2_id = gatherers.id",
-    :order => "captain1_id, captain2_id, gatherers.id"
-  scope :idle,
-    :joins => "LEFT JOIN users ON users.id = gatherers.user_id",
-    :conditions => ["lastvisit < ?", 30.minutes.ago.utc]
+  scope :eject_order, -> { order("votes ASC") }
+  scope :ordered, -> {
+    joins("LEFT JOIN gathers ON captain1_id = gatherers.id OR captain2_id = gatherers.id").
+    order("captain1_id, captain2_id, gatherers.id") }
+  scope :idle, -> {
+    joins("LEFT JOIN users ON users.id = gatherers.user_id").
+    where("lastvisit < ?", 30.minutes.ago.utc) }
 
   belongs_to :user
   belongs_to :gather

@@ -28,7 +28,7 @@ class Shoutmsg < ActiveRecord::Base
   scope :typebox, -> { where(shoutable_type: nil, shoutable_id: nil) }
   scope :last500, -> { includes(:user).order("id DESC").limit(500) }
   scope :of_object, -> (object, id) { where(shoutable_type: object, shoutable_id: id) }
-  scope :ordered, order("id")
+  scope :ordered, -> { order("id") }
 
   def domain
     self[:shoutable_type] ? "shout_#{shoutable_type}_#{shoutable_id}" : "shoutbox"

@@ -79,6 +79,7 @@ group :development do
   gem 'quiet_assets'
   gem 'spring', '2.0.2'
   gem 'web-console'
+  gem 'rubocop'
 end
 
 group :test do

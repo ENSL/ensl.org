@@ -50,21 +50,20 @@ class Server < ActiveRecord::Base
   validates_format_of :reservation, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/, :allow_nil => true
   validates_format_of :pwd, :with => /\A[A-Za-z0-9_\-]*\z/, :allow_nil => true
 
-  scope :ordered, :order => "name"
-  scope :hlds, :conditions => ["domain = ?", DOMAIN_HLDS]
-  scope :ns2, :conditions => ["domain = ?", DOMAIN_NS2]
-  scope :hltvs, :conditions => ["domain = ?", DOMAIN_HLTV]
-  scope :active, :conditions => "active = 1"
-  scope :with_players, :conditions => "players > 0"
-  scope :reserved, :conditions => "reservation IS NOT NULL"
-  scope :unreserved_now, :conditions => "reservation IS NULL"
-  scope :unreserved_hltv_around,
-    lambda { |time| {
-    :select => "servers.*",
-    :joins => "LEFT JOIN matches ON servers.id = matches.hltv_id
-  AND match_time > '#{(time.ago(Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'
-  AND match_time < '#{(time.ago(-Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'",
-    :conditions => "matches.hltv_id IS NULL"} }
+  scope :ordered, -> { order("name") }
+  scope :hlds, -> { where("domain = ?", DOMAIN_HLDS) }
+  scope :ns2, -> { where("domain = ?", DOMAIN_NS2) }
+  scope :hltvs, -> { where("domain = ?", DOMAIN_HLTV) }
+  scope :active, -> { where("active = 1") }
+  scope :with_players, -> { where("players > 0") }
+  scope :reserved, -> { where("reservation IS NOT NULL") }
+  scope :unreserved_now, -> { where("reservation IS NULL") }
+  scope :unreserved_hltv_around, -> (time) {
+    select("servers.*").
+    joins("LEFT JOIN matches ON servers.id = matches.hltv_id
+    AND match_time > '#{(time.ago(Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'
+    AND match_time < '#{(time.ago(-Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'").
+    where("matches.hltv_id IS NULL") }
 
   has_many :logs
   has_many :matches
