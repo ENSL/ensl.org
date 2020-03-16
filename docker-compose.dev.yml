@@ -4,7 +4,7 @@ services:
   web:
     # Debug
     stdin_open: true
-    command: /bin/bash 
+    # command: /bin/bash 
     tty: true 
     build:
       context: ./
@@ -19,6 +19,7 @@ services:
     links:
      - db
      - memcached
+     #- spring
      #- selenium
      #- redis
 
@@ -59,6 +60,22 @@ services:
     ports:
       - 5900:5900
       - 4444:4444
+
+#  spring:
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile.dev
+#      args:
+#        buildno: 1
+#    volumes:
+#      - .:/var/www
+#    command: spring server
+
+    # This ensures that the pid namespace is shared between the host
+    # and the container. It's not necessary to be able to run spring
+    # commands, but it is necessary for "spring status" and "spring stop"
+    # to work properly.
+#    pid: host
 
   db:
     # Debug
