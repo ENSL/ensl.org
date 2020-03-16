@@ -2,6 +2,7 @@ source 'http://rubygems.org'
 
 ruby '2.3.8'
 
+# Rails core
 gem 'rails', '~> 4.1.16'
 gem 'rake', '< 11.0'
 
@@ -41,27 +42,28 @@ gem 'public_suffix', '~> 3.1.1'
 gem 'google-api-client', '~> 0.10.3'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
-# Legacy feature shims
+# FIXME: Legacy feature shims
 gem 'protected_attributes', '~> 1.1.3'
 gem 'rails_autolink', '~> 1.1.5'
 
-# Dependency version fix
-gem 'signet', '0.11.0'
+# Javascript
+gem 'coffee-rails', '~> 4.0.0'
+gem 'jquery-rails', '~> 2.0.2'
+gem 'i18n-js'
+gem 'tinymce-rails', '~> 3.5.9'
 
 # Please install nodejs locally.
 #gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
-# Move these to assets group
-gem 'coffee-rails', '~> 4.0.0'
-gem 'jquery-rails', '~> 2.0.2'
-gem 'tinymce-rails', '~> 3.5.9'
 gem 'sass-rails', '~> 5.0.3'
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.6.0'
 gem 'haml', '~> 4.0.5'
 gem 'uglifier', '~> 2.5.0'
-gem 'i18n-js'
+
+# Dependency version fix
+gem 'signet', '0.11.0'
 
 group :production do
   gem 'newrelic_rpm', '~> 3.13.0.299'
