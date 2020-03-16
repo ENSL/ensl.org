@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/anton-zaytsev/acts_as_rateable.git
+  revision: 01066eceb2d16e35be437b7392cc3375f1f377f7
+  specs:
+    acts_as_rateable (3.0.0)
+
+GIT
   remote: https://github.com/koraktor/steam-condenser-ruby.git
   revision: 2cb441f0518a0b8d20a017dfcc42783ae878311a
   specs:
@@ -327,6 +333,7 @@ PLATFORMS
 DEPENDENCIES
   active_link_to (~> 1.0.2)
   active_record_union
+  acts_as_rateable!
   annotate
   bbcoder (~> 1.0.1)
   better_errors

@@ -33,7 +33,7 @@ class Forum < ActiveRecord::Base
   belongs_to :category
 
   after_create :update_position
-
+  
   acts_as_readable
 
   def to_s

@@ -34,7 +34,7 @@
           <% end %>
 
           <%= link_to (h topic), topic,
-              class: ((cuser and !topic.read_by? cuser) ? "unread" : "read") +
+              class: ((cuser and !cuser.have_read? topic) ? "unread" : "read") +
                      ((topic.state == Topic::STATE_STICKY) ? " sticky" : "") %>
         </h5>
 

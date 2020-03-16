@@ -124,6 +124,7 @@ class Article < ActiveRecord::Base
     end
   end
 
+  # FIXME
   def remove_readings
     Reading.delete_all ["readable_type = 'Category' AND readable_id = ?", category_id]
   end

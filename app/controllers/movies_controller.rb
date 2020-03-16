@@ -2,23 +2,7 @@ class MoviesController < ApplicationController
   before_filter :get_movie, except: [:index, :new, :create]
 
   def index
-    @movies = []
-    order = case params[:order]
-            when "date" then "data_files.created_at DESC"
-            when "author" then "users.username ASC"
-            when "ratings" then "total_ratings DESC"
-            else "total_ratings DESC"
-            end
-
-    if params[:filter]
-      Movie.index(order).each do |movie|
-        if movie.file and movie.file.average_rating_round >= params[:filter].to_i
-          @movies << movie
-        end
-      end
-    else
-      @movies = Movie.index(order)
-    end
+    @movies = Movie.filter_or_all(params[:filter], params[:order])
   end
 
   def show

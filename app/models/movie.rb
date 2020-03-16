@@ -18,6 +18,8 @@
 #  category_id :integer
 #
 
+# Rails.root.join('lib/plugins/acts_as_rateable/init.rb')
+
 class Movie < ActiveRecord::Base
   include Extra
 
@@ -34,15 +36,13 @@ class Movie < ActiveRecord::Base
   scope :ordered,
     :include => "file",
     :order => "data_files.created_at DESC"
-  scope :index,
-    lambda { |order| {
-    :select => "movies.*, users.username, AVG(rates.score) as total_ratings",
-    :joins => "LEFT JOIN data_files ON movies.file_id = data_files.id
-  LEFT JOIN users ON movies.user_id = users.id
-  LEFT JOIN ratings ON rateable_id = data_files.id AND rateable_type = 'DataFile'
-  LEFT JOIN rates ON ratings.rate_id = rates.id",
-    :order => order,
-    :group => "movies.id"} }
+  scope :index, -> {
+    select("movies.*, users.username, AVG(rates.score) as total_ratings")
+    .joins("LEFT JOIN data_files ON movies.file_id = data_files.id
+            LEFT JOIN users ON movies.user_id = users.id
+            LEFT JOIN ratings ON rateable_id = data_files.id AND rateable_type = 'DataFile'
+            LEFT JOIN rates ON ratings.rate_id = rates.id")
+    .group("movies.id") }
   scope :active_streams, :conditions => "status > 0"
 
   belongs_to :user
@@ -89,7 +89,7 @@ class Movie < ActiveRecord::Base
   def before_validation
     if user_name and !user_name.empty?
       self.user = User.find_by_username(user_name)
-    else
+      else
       self.user = nil
     end
     #if file.nil? and match and stream_ip and stream_port
@@ -127,6 +127,28 @@ def make_stream
     system cmd
   update_attribute :status, $?.pid
   cmd
+end
+
+def self.filter_or_all order, filter
+  order = case  order
+    when "date" then "data_files.created_at DESC"
+    when "author" then "users.username ASC"
+    when "ratings" then "total_ratings DESC"
+    else "total_ratings DESC"
+  end
+
+  # FIXME: use new system
+  #movies = []
+  #if filter
+  #  Movie.index.order(order).each do |movie|
+  #    if movie.file and movie.file.average_rating_round >= filter.to_i
+  #      movies << movie
+  #    end
+  #  end
+  #  return movies
+  #else
+    return index.order(order)
+  #end
 end
 
 #def update_status

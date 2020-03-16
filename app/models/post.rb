@@ -36,6 +36,7 @@ class Post < ActiveRecord::Base
     end
   end
 
+  # FIXME
   def remove_readings
     Reading.delete_all ["readable_type = 'Topic' AND readable_id = ?", topic.id]
     Reading.delete_all ["readable_type = 'Forum' AND readable_id = ?", topic.forum.id]

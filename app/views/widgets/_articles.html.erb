@@ -6,7 +6,7 @@
     </h3>
     <ul>
       <% Article.articles.nodrafts.nospecial.recent.each do |article| %>
-        <li class="<%= 'bold' if cuser and !article.read_by? cuser %>">
+        <li class="<%= 'bold' if cuser and !cuser.have_read? article %>">
           <%= namelink article %>
         </li>
       <% end %>

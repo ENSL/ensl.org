@@ -12,7 +12,7 @@ class ForumsController < ApplicationController
 
     @topics = Topic.where(forum_id: @forum.id)
     .joins(posts: :user)
-    .includes(:lock, :readings)
+    .includes(:lock)
     .group('topics.id')
     .order('state DESC, (SELECT created_at FROM posts p2 WHERE p2.topic_id = topics.id ORDER BY created_at DESC LIMIT 1) DESC')
     .paginate(page: params[:page], per_page: 30)

@@ -92,6 +92,7 @@ class Issue < ActiveRecord::Base
     bbcode_to_html(solution)
   end
 
+  # FIXME
   def remove_readings
     if status_changed? and status == STATUS_SOLVED
       Reading.delete_all ["readable_type = 'Issue' AND readable_id = ?", self.id]

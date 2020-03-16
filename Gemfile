@@ -21,6 +21,7 @@ gem 'faraday', '~> 0.9.0'
 # Model plugins
 # FIXME: using this b/c ruby 2.4 not supported
 gem 'unread', '0.10.1'
+# gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 # View helper gems
 gem 'nokogiri', '~> 1.9.0'
