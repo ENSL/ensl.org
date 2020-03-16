@@ -1,68 +1,41 @@
-# Production Install (Ubuntu 14.04 x64 or Debian 7)
+# Production Install (Ubuntu LTS)
 
-## Capistrano setup
+ENSL Website is fairly easy to run.
 
-SSH as a user with sudo access, update package lists and upgrade packages (new install only)
+## 1. Install reverse proxy
 
-    sudo apt-get update
-    sudo apt-get upgrade
+Install apache, nginx etc. reverse proxy. It will take requests from the users and pass them to ENSL website. Sample configuration availble @ ext/nginx.
 
-Either use an existing sandboxed user account, or create a deploy user and disable password authentication. Instead, authenticate with a keypair.
+https://www.nginx.com/resources/wiki/start/
 
-    sudo adduser deploy
-    sudo passwd -l deploy
+    sudo apt-get install nginx
 
-## Install Apache
+## 2. Install docker and docker-compose
 
-    sudo apt-get install apache2 apache2-mpm-prefork
+https://docs.docker.com/install/
+https://docs.docker.com/compose/install/
 
-Now create the required directories, e.g. `/var/www/virtual/ensl.org/deploy`
+Install docker + docker-compose:
 
-## Install MySQL & Memcached
+    wget -O - 'https://get.docker.com/'|bash
+    sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 
-You may need to re-configure MySQL. Use `sudo dpkg-reconfigure mysql-server-5.5`
+## 3. Install git
 
-    sudo apt-get install mysql-server mysql-client libmysqlclient-dev memcached
+## 4. Download ENSL website and install it
 
-Login to mysql as root, and create the database and user account:
+Now create the required directories, e.g. `/srv/ensl.org`
 
-    CREATE DATABASE `ensl`;
-    CREATE USER 'xxx'@'localhost' IDENTIFIED BY 'xxx';
-    GRANT ALL PRIVILEGES ON ensl.* TO 'xxx'@'localhost' WITH GRANT OPTION;
-
-## Install rbenv, ruby, bundler and Image Magick
-
-As a user with sudo, install dependencies
-
-    sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev imagemagick libmagickwand-dev
-
-Switch user to deploy, and install rbenv
-
-    su deploy
-    cd ~
-    git clone git://github.com/sstephenson/rbenv.git .rbenv
-    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-    echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-    exec $SHELL
-
-    git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
-    exec $SHELL
-
-    rbenv install 2.1.3
-    rbenv global 2.1.3
-
-    echo "gem: --no-ri --no-rdoc" > ~/.gemrc
-    gem install bundler
-
-## Install the ENSL site
+    git clone git@github.com:ENSL/ensl.org.git
 
 Create the `.env` file by copying `.env.example` with the appropriate credentials.
 
-    cp /var/www/virtual/ensl.org/deploy/shared/.env.example /var/www/virtual/ensl.org/deploy/shared/.env
+    cd $PATH_TO_WEBSITE && cp .env.example .env
+    vim .env
 
-# Deployment
+If the database does not exist, it will be created with settings from .env file so make sure you configure it.
 
-Use capistrano to deploy:
+Finally, Start the docker containers.
 
-    bundle exec cap production deploy
+    docker-compose build
+    docker-compose --rm up
