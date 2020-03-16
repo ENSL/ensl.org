@@ -15,7 +15,7 @@
 class Map < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at, :deleted
+  #attr_protected :id, :updated_at, :created_at, :deleted
 
   has_and_belongs_to_many :contests
 

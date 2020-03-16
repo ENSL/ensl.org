@@ -14,7 +14,7 @@
 class Matcher < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
 
   belongs_to :match
   belongs_to :user

@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :get_post, except: [:new, :create]
+  before_action :get_post, except: [:new, :create]
   respond_to :html, :js
   layout 'forums'
 

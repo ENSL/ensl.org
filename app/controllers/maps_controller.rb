@@ -1,5 +1,5 @@
 class MapsController < ApplicationController
-  before_filter :get_map, only: [:show, :edit, :update, :destroy]
+  before_action :get_map, only: [:show, :edit, :update, :destroy]
 
   def index
     @maps = Map.basic

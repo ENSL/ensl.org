@@ -15,7 +15,7 @@
 class Week < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
 
   validates_presence_of :contest, :map1, :map2
   validates_length_of :name, :in => 1..30

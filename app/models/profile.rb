@@ -59,7 +59,7 @@
 class Profile < ActiveRecord::Base
   include Extra
 
-  attr_protected :user_id, :id, :updated_at, :created_at
+  #attr_protected :user_id, :id, :updated_at, :created_at
 
   belongs_to :user
 

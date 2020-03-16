@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
-  before_filter :get_article, only: [:show, :edit, :update, :cleanup, :destroy]
+  before_action :get_article, only: [:show, :edit, :update, :cleanup, :destroy]
 
   def index
     @categories = Category.ordered.nospecial.domain Category::DOMAIN_ARTICLES
@@ -39,7 +39,8 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new params[:article]
+    @article = Article.new article_params
+    ([:article])
     @article.user = cuser
     raise AccessError unless @article.can_create? cuser
 
@@ -53,7 +54,7 @@ class ArticlesController < ApplicationController
 
   def update
     raise AccessError unless @article.can_update? cuser, params[:article]
-    if @article.update_attributes(params[:article])
+    if @article.update_attributes(article_params)
       flash[:notice] = t(:articles_update)
       redirect_to @article
     else
@@ -78,5 +79,9 @@ class ArticlesController < ApplicationController
 
   def get_article
     @article = Article.find params[:id]
+  end
+
+  def article_params
+    params.require(:article).permit(:tite, :status, :category_id, :text, :user_id)
   end
 end

@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  before_filter :get_team, only: [:show, :edit, :update, :destroy, :recover]
+  before_action :get_team, only: [:show, :edit, :update, :destroy, :recover]
 
   def index
     @teams = Team.search(params[:search]).paginate(per_page: 80, page: params[:page]).ordered

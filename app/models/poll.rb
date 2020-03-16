@@ -16,7 +16,7 @@ class Poll < ActiveRecord::Base
 
   default_scope -> { order("created_at DESC") }
 
-  attr_protected :id, :updated_at, :created_at, :votes, :user_id
+  #attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
   validates_length_of :question, :in => 1..50
   #validates_datetime :end_date

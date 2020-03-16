@@ -17,7 +17,7 @@ class Forum < ActiveRecord::Base
   BANS = 8
   TRASH = 12
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
 
   scope :public_forums, -> { select("forums.*")
                      .joins("LEFT JOIN forumers ON forumers.forum_id = forums.id AND forumers.access = #{Forumer::ACCESS_READ}")

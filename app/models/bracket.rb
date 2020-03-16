@@ -13,7 +13,7 @@
 class Bracket < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :created_at, :updated_at
+  #attr_protected :id, :created_at, :updated_at
 
   belongs_to :contest
   has_many :bracketers

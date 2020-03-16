@@ -24,7 +24,7 @@ class Team < ActiveRecord::Base
   STATUS_INACTIVE = 0
   STATUS_ACTIVE = 1
 
-  attr_protected :id, :active, :founder_id, :created_at, :updated_at
+  #attr_protected :id, :active, :founder_id, :created_at, :updated_at
 
   validates_presence_of :name, :tag
   validates_length_of :name, :tag, :in => 2..20

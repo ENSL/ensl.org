@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_filter :get_user, only: [:show, :history, :popup, :agenda, :edit, :update, :destroy]
+  before_action :get_user, only: [:show, :history, :popup, :agenda, :edit, :update, :destroy]
   respond_to :html, :js
 
   def index

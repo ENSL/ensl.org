@@ -28,7 +28,7 @@ class Category < ActiveRecord::Base
 
   PER_PAGE = 3
 
-  attr_protected :id, :updated_at, :created_at, :sort
+  #attr_protected :id, :updated_at, :created_at, :sort
 
   validates_length_of :name, :in => 1..30
   validate :validate_domain

@@ -14,7 +14,7 @@
 class Shoutmsg < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :created_at, :updated_at, :user_id
+  #attr_protected :id, :created_at, :updated_at, :user_id
 
   validates_length_of :text, :in => 1..100
   validates_presence_of :user

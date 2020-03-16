@@ -28,7 +28,7 @@ class Issue < ActiveRecord::Base
   CATEGORY_GATHER = 54
 
   attr_accessor :assigned_name
-  attr_protected :id, :created_at, :updated_at
+  #attr_protected :id, :created_at, :updated_at
 
   has_many :comments, :as => :commentable
   belongs_to :category

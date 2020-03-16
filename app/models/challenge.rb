@@ -34,7 +34,7 @@ class Challenge < ActiveRecord::Base
   ACCEPT_BEFORE_VOLUNTARY = 300					# Time to accept before voluntary match time: 5 mins
   MATCH_LENGTH = 7200										# Usual match length (for servers): 2 hours
 
-  attr_protected :id, :updated_at, :created_at, :default_time, :user_id, :status
+  #attr_protected :id, :updated_at, :created_at, :default_time, :user_id, :status
 
   validates_presence_of :contester1, :contester2
   validates_presence_of :map2, :on => :update

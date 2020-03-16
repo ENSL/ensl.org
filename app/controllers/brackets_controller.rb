@@ -1,5 +1,5 @@
 class BracketsController < ApplicationController
-  before_filter :get_bracket, only: [:show, :edit, :update, :destroy]
+  before_action :get_bracket, only: [:show, :edit, :update, :destroy]
 
   def edit
     raise AccessError unless @bracket.can_update? cuser

@@ -36,7 +36,7 @@ class Match < ActiveRecord::Base
   include Exceptions
 
   attr_accessor :lineup, :method, :motm_name, :friendly
-  attr_protected :id, :updated_at, :created_at, :diff, :points1, :points2
+  #attr_protected :id, :updated_at, :created_at, :diff, :points1, :points2
 
   has_many :matchers, :dependent => :destroy
   has_many :users, :through => :matchers

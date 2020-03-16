@@ -1,5 +1,5 @@
 class MatchesController < ApplicationController
-  before_filter :get_match, except: [:index, :new, :create, :admin]
+  before_action :get_match, except: [:index, :new, :create, :admin]
 
   def index
     @matches = Match.active

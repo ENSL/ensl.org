@@ -22,7 +22,7 @@ class Gatherer < ActiveRecord::Base
 
   include Extra
 
-  attr_protected :id
+  #attr_protected :id
   attr_accessor :confirm, :username
   cattr_accessor :skip_callbacks
 

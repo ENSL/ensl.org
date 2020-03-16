@@ -15,7 +15,7 @@
 class Comment < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at, :user_id
+  #attr_protected :id, :updated_at, :created_at, :user_id
 
   scope :with_userteam, -> { includes({:user => :team}) }
   scope :recent, -> (n) { order("id DESC").limit(n) }

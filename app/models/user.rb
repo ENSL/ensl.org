@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
 
   VERIFICATION_TIME = 604800
 
-  attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
+  #attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password
 
   #attribute :lastvisit, :string, default: DateTime.now

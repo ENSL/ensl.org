@@ -1,5 +1,5 @@
 class CategoriesController < ApplicationController
-  before_filter :get_category, except: [:index, :new, :create]
+  before_action :get_category, except: [:index, :new, :create]
 
   def show
     if [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain

@@ -23,7 +23,7 @@ class Contester < ActiveRecord::Base
   TREND_UP = 1
   TREND_DOWN = 2
 
-  attr_protected :id, :updated_at, :created_at, :trend
+  #attr_protected :id, :updated_at, :created_at, :trend
   attr_accessor :user
 
   belongs_to :team

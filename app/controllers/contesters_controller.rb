@@ -1,5 +1,5 @@
 class ContestersController < ApplicationController
-  before_filter :get_contester, only: [:show, :edit, :update, :recover, :destroy, :recalc]
+  before_action :get_contester, only: [:show, :edit, :update, :recover, :destroy, :recalc]
 
   def show
     @matches = Match.future.unfinished.ordered.of_contester @contester

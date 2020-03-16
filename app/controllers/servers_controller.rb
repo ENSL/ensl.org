@@ -1,5 +1,5 @@
 class ServersController < ApplicationController
-  before_filter :get_server, except: [:index, :refresh, :new, :create]
+  before_action :get_server, except: [:index, :refresh, :new, :create]
 
   def index
     @servers = Server.hlds.active.ordered.all :include => :user

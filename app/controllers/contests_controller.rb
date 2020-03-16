@@ -1,5 +1,5 @@
 class ContestsController < ApplicationController
-  before_filter :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc, :confirmed_matches]
+  before_action :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc, :confirmed_matches]
 
   def index
     # @contests = Contest.all

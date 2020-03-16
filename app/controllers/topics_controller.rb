@@ -1,5 +1,5 @@
 class TopicsController < ApplicationController
-  before_filter :get_topic, only: [:show, :reply, :edit, :update, :destroy]
+  before_action :get_topic, only: [:show, :reply, :edit, :update, :destroy]
   layout 'forums'
 
   def index

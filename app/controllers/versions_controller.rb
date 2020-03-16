@@ -1,5 +1,5 @@
 class VersionsController < ApplicationController
-  before_filter :get_article
+  before_action :get_article
 
   def index
     @versions = @article.versions

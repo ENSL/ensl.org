@@ -24,7 +24,7 @@ class Group < ActiveRecord::Base
   GATHER_MODERATORS = 14
   CONTRIBUTORS = 16
 
-  attr_protected :id, :updated_at, :created_at, :founder_id
+  #attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
 
   has_and_belongs_to_many :users

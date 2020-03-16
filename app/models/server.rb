@@ -40,7 +40,7 @@ class Server < ActiveRecord::Base
   DOMAIN_NS2 = 2
 
   attr_accessor :pwd
-  attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
+  #attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
   validates_length_of [:name, :dns,], :in => 1..30
   validates_length_of [:password, :irc], :maximum => 30, :allow_blank => true

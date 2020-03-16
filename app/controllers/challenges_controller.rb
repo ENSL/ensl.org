@@ -1,5 +1,5 @@
 class ChallengesController < ApplicationController
-  before_filter :get_challenge, only: [:show, :edit, :update, :destroy]
+  before_action :get_challenge, only: [:show, :edit, :update, :destroy]
 
   def index
     @challenges = Challenge.all

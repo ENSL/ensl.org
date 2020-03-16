@@ -15,7 +15,7 @@
 class Prediction < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :created_at, :updated_at, :result
+  #attr_protected :id, :created_at, :updated_at, :result
 
   validates_presence_of :match, :user
   validates_inclusion_of :score1, :in => 0..99, :message => "Invalid score"

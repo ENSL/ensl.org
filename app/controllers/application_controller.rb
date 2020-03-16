@@ -4,8 +4,8 @@ class ApplicationController < ActionController::Base
   helper :all
   helper_method :cuser, :strip, :return_here
 
-  before_filter :update_user
-  before_filter :set_controller_and_action_names
+  before_action :update_user
+  before_action :set_controller_and_action_names
 
   protect_from_forgery
   respond_to :html, :js

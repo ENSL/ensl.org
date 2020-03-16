@@ -34,8 +34,6 @@ class Article < ActiveRecord::Base
   G_RULES = 464
   COMPMOD = 998
 
-  attr_protected :id, :updated_at, :created_at, :user_id, :version
-
   scope :recent, -> { order('created_at DESC').limit(8) }
   scope :with_comments, -> {
     select("articles.*, COUNT(C.id) AS comment_num").

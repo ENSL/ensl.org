@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_filter :get_group, except: [:index, :new, :create]
+  before_action :get_group, except: [:index, :new, :create]
 
   def index
     @groups = Group.all

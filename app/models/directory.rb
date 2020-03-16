@@ -22,7 +22,7 @@ class Directory < ActiveRecord::Base
   MOVIES = 30
   ARTICLES = 39
 
-  attr_protected :id, :updated_at, :created_at, :path
+  #attr_protected :id, :updated_at, :created_at, :path
 
   belongs_to :parent, :class_name => "Directory"
   has_many :subdirs, :class_name => "Directory", :foreign_key => :parent_id

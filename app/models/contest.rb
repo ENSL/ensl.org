@@ -33,7 +33,7 @@ class Contest < ActiveRecord::Base
   TYPE_LEAGUE = 1
   TYPE_BRACKET = 2
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
 
   scope :active, -> { where.not(status: STATUS_CLOSED) }
   scope :inactive, -> { where(status: STATUS_CLOSED) }

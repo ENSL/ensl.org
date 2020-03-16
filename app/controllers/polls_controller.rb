@@ -1,5 +1,5 @@
 class PollsController < ApplicationController
-  before_filter :get_poll, except: [:index, :new, :create]
+  before_action :get_poll, except: [:index, :new, :create]
 
   def index
     @polls = Poll.all

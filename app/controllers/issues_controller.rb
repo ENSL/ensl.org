@@ -1,5 +1,5 @@
 class IssuesController < ApplicationController
-  before_filter :get_issue, only: [:show, :edit, :update, :destroy]
+  before_action :get_issue, only: [:show, :edit, :update, :destroy]
 
   def index
     raise AccessError unless cuser and (cuser.admin? or cuser.moderator?)

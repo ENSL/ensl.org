@@ -17,7 +17,7 @@
 class Message < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :created_at, :updated_at
+  #attr_protected :id, :created_at, :updated_at
   attr_accessor :sender_raw
 
   validates_length_of :title, :in => 1..100

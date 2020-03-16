@@ -16,7 +16,7 @@ class Bracketer < ActiveRecord::Base
   include Exceptions
   include Extra
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
 
   belongs_to :contest
   belongs_to :match

@@ -1,5 +1,5 @@
 class BansController < ApplicationController
-  before_filter :get_ban, only: [:show, :edit, :update, :destroy]
+  before_action :get_ban, only: [:show, :edit, :update, :destroy]
 
   def index
     @bans = Ban.ordered
@@ -32,7 +32,7 @@ class BansController < ApplicationController
 
   def update
     raise AccessError unless @ban.can_update? cuser
-    if @ban.update_attributes(params[:ban])
+    if @ban.update_attributes(ban_params(ban_params))
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else
@@ -50,5 +50,9 @@ class BansController < ApplicationController
 
   def get_ban
     @ban = Ban.find(params[:id])
+  end
+
+  def ban_params
+    params.permit(:steamid, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
   end
 end

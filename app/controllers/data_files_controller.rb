@@ -1,5 +1,5 @@
 class DataFilesController < ApplicationController
-  before_filter :get_file, only: [:show, :edit, :update, :destroy, :rate, :addFile, :delFile]
+  before_action :get_file, only: [:show, :edit, :update, :destroy, :rate, :addFile, :delFile]
 
   def show
   end

@@ -12,7 +12,7 @@
 class Vote < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at, :user_id
+  #attr_protected :id, :updated_at, :created_at, :user_id
 
   validates_uniqueness_of :user_id, :scope => :votable_id
   validates_presence_of :user_id, :votable_id, :votable_type

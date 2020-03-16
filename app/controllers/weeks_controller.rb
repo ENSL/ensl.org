@@ -1,5 +1,5 @@
 class WeeksController < ApplicationController
-  before_filter :get_week, except: [:new, :create]
+  before_action :get_week, except: [:new, :create]
 
   def new
     @week = Week.new

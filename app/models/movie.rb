@@ -29,7 +29,7 @@ class Movie < ActiveRecord::Base
   VLC = "/usr/bin/vlc"
   LOCAL = "78.46.36.107:29100"
 
-  attr_protected :id, :updated_at, :created_at
+  #attr_protected :id, :updated_at, :created_at
   attr_accessor :user_name, :name, :stream_ip, :stream_port
 
   scope :recent, -> { limit(5) }

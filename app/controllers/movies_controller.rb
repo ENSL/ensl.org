@@ -1,5 +1,5 @@
 class MoviesController < ApplicationController
-  before_filter :get_movie, except: [:index, :new, :create]
+  before_action :get_movie, except: [:index, :new, :create]
 
   def index
     @movies = Movie.filter_or_all(params[:filter], params[:order])

@@ -14,7 +14,7 @@
 class Post < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at, :votes, :user_id
+  #attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
   scope :basic, -> {includes([{:user => [:team, :profile]}, :topic])}
 

@@ -11,7 +11,7 @@
 #
 
 class Grouper < ActiveRecord::Base
-  attr_protected :id, :created_at, :updated_at
+  #attr_protected :id, :created_at, :updated_at
   attr_accessor :username
 
   belongs_to :group

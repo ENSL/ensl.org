@@ -1,5 +1,5 @@
 class DirectoriesController < ApplicationController
-  before_filter :get_directory, except: [:new, :create]
+  before_action :get_directory, except: [:new, :create]
 
   def show
     if @directory.hidden

@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  before_filter :get_message, only: [:show, :edit, :update, :destroy]
+  before_action :get_message, only: [:show, :edit, :update, :destroy]
 
   def index
     raise AccessError unless cuser

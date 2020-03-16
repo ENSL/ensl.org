@@ -13,7 +13,7 @@
 class Option < ActiveRecord::Base
   include Extra
 
-  attr_protected :id, :updated_at, :created_at, :votes
+  #attr_protected :id, :updated_at, :created_at, :votes
 
   validates_length_of :option, :in => 1..30
 

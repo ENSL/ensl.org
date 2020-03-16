@@ -23,7 +23,7 @@ class DataFile < ActiveRecord::Base
   MEGABYTE = 1048576
 
   attr_accessor :related_id
-  attr_protected :id, :updated_at, :created_at, :path, :size, :md5
+  #attr_protected :id, :updated_at, :created_at, :path, :size, :md5
 
   scope :recent, -> { order("created_at DESC").limit(8) }
   scope :demos, -> { order("created_at DESC").where("directory_id IN (SELECT id FROM directories WHERE parent_id = ?)", Directory::DEMOS) }

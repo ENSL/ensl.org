@@ -20,7 +20,7 @@ class Teamer < ActiveRecord::Base
   RANK_DEPUTEE = 1
   RANK_LEADER = 2
 
-  attr_protected :id, :created_at, :updated_at, :version
+  #attr_protected :id, :created_at, :updated_at, :version
 
   validates_length_of :comment, :in => 0..15, :allow_blank => true
   validates_uniqueness_of :user_id, :scope => [:team_id, :rank]

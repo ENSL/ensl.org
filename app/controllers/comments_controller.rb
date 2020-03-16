@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_filter :get_comment, only: [:raw, :quote, :edit, :update, :destroy]
+  before_action :get_comment, only: [:raw, :quote, :edit, :update, :destroy]
   respond_to :html, :js
 
   def index
