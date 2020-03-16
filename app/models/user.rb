@@ -145,7 +145,11 @@ class User < ActiveRecord::Base
 
   def country_s
     country_object = ISO3166::Country[country]
-    country_object.translations[I18n.locale.to_s] || country_object.name
+    if country_object
+      country_object.translations[I18n.locale.to_s] || country_object.name
+    else
+      "Unknown"
+    end
   end
 
   def realname
