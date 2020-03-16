@@ -11,7 +11,7 @@
 #
 
 class GatherServer < ActiveRecord::Base
-  scope :ordered, :order => "votes DESC"
+  scope :ordered, -> { order("votes DESC") }
 
   belongs_to :gather
   belongs_to :server

@@ -32,10 +32,9 @@ class Movie < ActiveRecord::Base
   attr_protected :id, :updated_at, :created_at
   attr_accessor :user_name, :name, :stream_ip, :stream_port
 
-  scope :recent, :limit => 5
-  scope :ordered,
-    :include => "file",
-    :order => "data_files.created_at DESC"
+  scope :recent, -> { limit(5) }
+  scope :ordered, -> {  include("file").
+    order("data_files.created_at DESC") }
   scope :index, -> {
     select("movies.*, users.username, AVG(rates.score) as total_ratings")
     .joins("LEFT JOIN data_files ON movies.file_id = data_files.id
@@ -43,7 +42,7 @@ class Movie < ActiveRecord::Base
             LEFT JOIN ratings ON rateable_id = data_files.id AND rateable_type = 'DataFile'
             LEFT JOIN rates ON ratings.rate_id = rates.id")
     .group("movies.id") }
-  scope :active_streams, :conditions => "status > 0"
+  scope :active_streams, -> { where("status > 0") }
 
   belongs_to :user
   belongs_to :file, :class_name => "DataFile"

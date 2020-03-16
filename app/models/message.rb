@@ -23,7 +23,9 @@ class Message < ActiveRecord::Base
   validates_length_of :title, :in => 1..100
   validates_length_of :text, :in => 1..65000
 
-  scope :ordered, :order => "created_at DESC"
+  scope :ordered, -> { order("created_at DESC") }
+
+  # FIXME: check before removing, provided by unread
   #scope :read_by,
   #  lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
   #scope :unread_by,

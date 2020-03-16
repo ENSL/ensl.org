@@ -20,7 +20,7 @@ class Week < ActiveRecord::Base
   validates_presence_of :contest, :map1, :map2
   validates_length_of :name, :in => 1..30
 
-  scope :ordered, :order => "start_date ASC"
+  scope :ordered, -> { order("start_date ASC") }
 
   belongs_to :contest
   belongs_to :map1, :class_name => "Map"

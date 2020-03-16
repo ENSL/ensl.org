@@ -19,9 +19,9 @@ class Map < ActiveRecord::Base
 
   has_and_belongs_to_many :contests
 
-  scope :basic, :conditions => {:deleted => false}, :order => "name"
-  scope :with_name, lambda { |name| {:conditions => {:name => name}} }
-  scope :classic, :conditions => "name LIKE 'ns_%'"
+  scope :basic, -> { where(deleted: false).order("name") }
+  scope :with_name, -> (name) { where(name: name) }
+  scope :classic, -> { where("name LIKE 'ns_%'") }
   scope :of_category,
     lambda { |category| {
     :conditions => {:category_id => category.id} }}

@@ -22,7 +22,7 @@ class Prediction < ActiveRecord::Base
   validates_inclusion_of :score2, :in => 0..99, :message => "Invalid score"
   validates_uniqueness_of :match_id, :scope => :user_id
 
-  scope :with_contest, :include => {:match => :contest}
+  scope :with_contest, -> { include({:match => :contest}) }
 
   belongs_to :match
   belongs_to :user
