@@ -38,24 +38,28 @@ class ApplicationController < ActionController::Base
     redirect_to controller: "articles", action: "news_index"
   end
 
-  rescue_from AccessError do |exception|
-    render 'errors/403', status: 403, layout: 'errors'
-  end
+  unless Rails.env.production?
 
-  rescue_from Error do |exception|
-    render text: exception.message, layout: true
-  end
+    rescue_from AccessError do |exception|
+      render 'errors/403', status: 403, layout: 'errors'
+    end
 
-  rescue_from ActiveRecord::StaleObjectError do |exception|
-    render text: t(:application_stale)
-  end
+    rescue_from Error do |exception|
+      render text: exception.message, layout: true
+    end
 
-  rescue_from ActiveRecord::RecordNotFound do |exception|
-    render :template => 'errors/404.html', :status => :not_found, :layout => 'errors'
+    rescue_from ActiveRecord::StaleObjectError do |exception|
+      render text: t(:application_stale)
+    end
+
+    rescue_from ActiveRecord::RecordNotFound do |exception|
+      render :template => 'errors/404.html', :status => :not_found, :layout => 'errors'
+    end
   end
 
   private
 
+  # FIXME: move to model
   def update_user
     if cuser
       Time.zone = cuser.time_zone

@@ -99,6 +99,8 @@ class User < ActiveRecord::Base
   scope :lately, -> {
       where("lastvisit > ?", 30.days.ago.utc) }
 
+  before_validation :update_password
+
   validates_uniqueness_of :username, :email, :steamid
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
   validates_length_of :lastname, :in => 1..25, :allow_blank => true

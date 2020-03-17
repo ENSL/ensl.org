@@ -7,6 +7,7 @@ module Features
       fill_in "login_password", with: user.raw_password
 
       click_button I18n.t("helpers.submit.user.login")
+      expect(page).to have_content(I18n.t('login_successful'))
     end
 
     def change_timezone_for(user, timezone)

@@ -78,11 +78,11 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.first.where("id < ?", self.id).order("id DESC")
+    category.articles.nodrafts.first&.(where("id < ?", self.id).order("id DESC"))
   end
 
   def next_article
-    category.articles.nodrafts.first(conditions: ["id > ?", self.id], order: "id ASC")
+    category.articles.nodrafts.first&.(where("id > ?", self.id).order("id ASC"))
   end
 
   def statuses
@@ -140,5 +140,11 @@ class Article < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.article_params params, cuser
+    p = [:title, :category_id, :text, :text_coding]
+    p << :status if cuser.admin?
+    params.require(:article).permit(*p)
   end
 end

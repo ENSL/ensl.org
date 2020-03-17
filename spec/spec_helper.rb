@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 
 require 'dotenv'
-Dotenv.load('.env')
+Dotenv.load()
 
 # require "codeclimate-test-reporter"
 require "simplecov"
