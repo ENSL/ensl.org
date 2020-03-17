@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 source 'http://rubygems.org'
-ruby '2.4.9'
+ruby '2.5.7'
 
 # Rails core
-gem 'rails', '~> 5.2.4.1'
+gem 'rails', '~> 6.0.2.1'
 gem 'rake', '< 11.0'
 
 # Dotenv

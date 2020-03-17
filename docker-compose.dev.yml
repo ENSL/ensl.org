@@ -4,7 +4,7 @@ services:
   web:
     # Debug
     stdin_open: true
-    # command: /bin/bash 
+    command: /bin/bash 
     tty: true 
     build:
       context: ./
