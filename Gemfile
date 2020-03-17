@@ -97,6 +97,10 @@ group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'selenium-webdriver'
+  # Fix FF issue
+  gem 'geckodriver-helper'
+  # Fix legacy issue
+  gem 'rails-controller-testing'
   gem 'simplecov', require: false
   gem 'test-unit'
   gem 'timecop'

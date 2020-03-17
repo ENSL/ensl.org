@@ -13,6 +13,7 @@ RUN apt-get update && apt-get -y upgrade \
         libxslt1-dev libxml2-dev \
         imagemagick libmagickwand-dev \
         nodejs \
+        phantomjs \
         firefox-esr
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively

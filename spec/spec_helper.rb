@@ -39,7 +39,7 @@ Capybara.register_driver :selenium_remote do |app|
   )
 end
 
-#Capybara.javascript_driver = :selenium_remote
+# Capybara.javascript_driver = :selenium
 
 #Capybara.javascript_driver = :selenium_remote
 #Capybara.server_port = TEST_APP_PORT
