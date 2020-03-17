@@ -381,7 +381,7 @@ GEM
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
-    will_paginate (3.0.12)
+    will_paginate (3.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
 
@@ -443,7 +443,7 @@ DEPENDENCIES
   uglifier (~> 2.5.0)
   unread (= 0.10.1)
   web-console (= 3.7.0)
-  will_paginate (~> 3.0.5)
+  will_paginate
 
 RUBY VERSION
    ruby 2.4.9p362

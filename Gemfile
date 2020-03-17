@@ -37,7 +37,7 @@ gem 'i18n_country_select'
 gem 'dynamic_form'
 gem 'public_suffix'
 gem 'sanitize'
-gem 'will_paginate', '~> 3.0.5'
+gem 'will_paginate'
 
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
