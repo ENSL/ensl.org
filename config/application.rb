@@ -4,6 +4,9 @@ require 'rails/all'
 
 Bundler.require(*Rails.groups(assets: %w(development test)))
 
+# FIXME
+ActionController::Parameters.permit_all_parameters = true
+
 module Ensl
   class Application < Rails::Application
     # Custom error pages

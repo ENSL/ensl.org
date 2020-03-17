@@ -34,23 +34,23 @@ $(function() {
 
 
   // Forums fast reply
-  $("a#fastReply").live('click', function() {
+  $("a#fastReply").on('click', function() {
     $('#reply').fadeIn('slow')
   });
 
   // Gather stuff
 
-  $("a#gather-info-hide").live('click', function() {
+  $("a#gather-info-hide").on('click', function() {
     $("div#gather-info").fadeOut('slow', 0);
   });
 
-  $("a#gatherJoinBtn").live('click', function() {
+  $("a#gatherJoinBtn").on('click', function() {
     $('form#new_gatherer').submit();
   });
 
   // Submit TODO
 
-  $("a.submit").live('click', function() {
+  $("a.submit").on('click', function() {
     $(this).closest('form').submit()
   });
 
@@ -83,7 +83,7 @@ $(function() {
   });
 
   // Users page
-  $("#users th a, #users .pagination a").live("click", function() {
+  $("#users th a, #users .pagination a").on("click", function() {
     $.getScript(this.href);
     return false;
   });
