@@ -80,8 +80,8 @@ class Ban < ActiveRecord::Base
     if user_name
       self.user = User.find_by_username(user_name)
     else
-      self.user = User.first(conditions: { steamid: steamid })
-      self.server = Server.first(conditions: ["CONCAT(ip, ':', port) = ?", addr])
+      self.user = User.where(steamid: steamid).first
+      self.server = Server.where("CONCAT(ip, ':', port) = ?", addr).first
     end
   end
 

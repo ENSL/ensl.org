@@ -1,6 +1,7 @@
 <h1 class="title">Listing Users</h1>
 <p><%= User.lately.count %> players have signed in within the past 30 days.</p>
-<%= link_to 'Show them', params.merge(filter: 'lately'), class: 'button' %><br><br><br>
+<% # FIXME: check this %>
+<%= link_to 'Show them', params.to_enum.to_h.merge(filter: 'lately'), class: 'button' %><br><br><br>
 
 <p>Search for users by name or Steam ID:</p>
 
