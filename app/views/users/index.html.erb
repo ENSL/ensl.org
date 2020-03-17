@@ -39,10 +39,10 @@
       <% if cuser and cuser.admin? %>
         <td class="actions">
           <%= link_to edit_user_path(user) do %>
-            <%= icon 'pencil' %>
+            <%= icon 'fas', 'pencil' %>
           <% end %>
           <%= link_to user, confirm: "Proceed to delete?", method: :delete do %>
-            <%= icon 'times' %>
+            <%= icon 'fas', 'times' %>
           <% end %>
         </td>
       <% end %>

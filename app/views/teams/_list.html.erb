@@ -18,15 +18,15 @@
         <% if cuser and cuser.admin? %>
           <td class="actions">
             <%= link_to edit_team_path(team) do %>
-              <%= icon 'pencil' %>
+              <%= icon 'fas', 'pencil' %>
             <% end %>
             <% if team.active %>
               <%= link_to team, confirm: 'Are you sure?', method: :delete do %>
-                <%= icon 'times' %>
+                <%= icon 'fas', 'times' %>
               <% end %>
             <% else %>
               <%= link_to action: "recover", id: team do %>
-                <%= icon 'save' %>
+                <%= icon 'fas', 'save' %>
               <% end %>
             <% end %>
           </td>

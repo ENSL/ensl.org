@@ -47,9 +47,9 @@
       <% if match.contest.contest_type == Contest::TYPE_LADDER %>
         <td>
           <% if match.get_friendly(:points) > 0 %>
-            <%= icon 'chevron-up' %>
+            <%= icon 'fas', 'chevron-up' %>
           <% elsif match.get_friendly(:points) < 0 %>
-            <%= icon 'chevron-down' %>
+            <%= icon 'fas', 'chevron-down' %>
           <% end %>
           <%= match.get_friendly(:points) %>
         </td>

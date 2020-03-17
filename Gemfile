@@ -16,7 +16,7 @@ gem 'dotenv-rails'
 # Fixme: using this bc puma startup problem
 gem 'active_record_union'
 gem 'dalli', '~> 2.7.0'
-gem 'mysql2', '0.3.18'
+gem 'mysql2'
 
 # Web server
 gem 'faraday', '~> 0.9.0'
@@ -58,11 +58,11 @@ gem 'tinymce-rails'
 # Please install nodejs locally.
 # gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
-gem 'bourbon'
-gem 'font-awesome-sass'
+gem 'bourbon','~> 3.1.8'
+gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'haml'
-gem 'neat'
-gem 'sass-rails'
+gem 'neat', '~> 1.6.0'
+gem 'sass-rails', '~> 5.0.3'
 gem 'uglifier', '~> 2.5.0'
 
 # Dependency version fix

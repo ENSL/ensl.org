@@ -19,7 +19,7 @@
           <%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %>
 
           <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
-            <%= icon 'chevron-right' %>
+            <%= icon 'fas', 'chevron-right' %>
           <% end %>
 
           <%= namelink gatherer.user %>
