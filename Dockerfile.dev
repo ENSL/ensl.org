@@ -18,13 +18,15 @@ RUN apt-get update && apt-get -y upgrade \
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
 ADD Gemfile Gemfile.lock /var/www/
 
-RUN mkdir -p /var/bundle && chown -R web:web /var/bundle && chown -R web:web /var/www
+RUN gem install bundler && \
+    mkdir -p /var/bundle && chown -R web:web /var/bundle && chown -R web:web /var/www
 
 WORKDIR /var/www
 USER web
 
 RUN bundle config github.https true && \
-bundle install --path /var/bundle --jobs 8
+    bundle config set path '/var/bundle' && \
+    bundle install --jobs 8
 
 USER root
 CMD ["/var/www/script/entry.sh"]
