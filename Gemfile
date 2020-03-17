@@ -59,8 +59,12 @@ gem 'tinymce-rails'
 # gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
 gem 'bourbon','~> 3.1.8'
+
+# Fix icons before updating
 gem 'font-awesome-sass', '~> 4.1.0.0'
 gem 'haml'
+
+# Upgrading will cause issues
 gem 'neat', '~> 1.6.0'
 gem 'sass-rails', '~> 5.0.3'
 gem 'uglifier', '~> 2.5.0'
@@ -84,7 +88,7 @@ end
 group :test do
   #  gem 'spring'
   gem 'capybara'
-  gem 'codeclimate-test-reporter', require: nil
+  # gem 'codeclimate-test-reporter', require: nil
   gem 'database_cleaner'
   gem 'factory_bot_rails'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
