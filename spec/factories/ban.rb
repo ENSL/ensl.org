@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :ban do
-    ban_type Ban::TYPE_SITE
-    expiry Time.now.utc.to_date + 1
+    ban_type { Ban::TYPE_SITE }
+    expiry { Time.now.utc.to_date + 1 }
     # Hack because of the awkward way bans are created (requires user_name)
     before(:create) do |ban|
       if ban.user.nil?
@@ -14,18 +14,18 @@ FactoryBot.define do
   end
 
   trait :mute do
-    ban_type Ban::TYPE_MUTE
+    ban_type { Ban::TYPE_MUTE }
   end
 
   trait :site do
-    ban_type Ban::TYPE_SITE
+    ban_type { Ban::TYPE_SITE }
   end
 
   trait :gather do
-    ban_type Ban::TYPE_GATHER
+    ban_type { Ban::TYPE_GATHER }
   end
 
   trait :expired do
-    expiry Date.yesterday - 1
+    expiry { Date.yesterday - 1 }
   end
 end

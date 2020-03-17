@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 source 'http://rubygems.org'
-
 ruby '2.4.9'
 
 # Rails core
 gem 'rails', '~> 5.2.4.1'
 gem 'rake', '< 11.0'
-gem 'responders'
 
 # Dotenv
 gem 'dotenv-rails'
@@ -32,12 +30,12 @@ gem 'active_link_to'
 gem 'bbcoder'
 gem 'bluecloth'
 gem 'carrierwave'
-gem 'country_select', require: 'country_select_without_sort_alphabetical'
-gem 'dynamic_form'
-gem 'i18n_country_select'
 gem 'nokogiri'
-gem 'public_suffix'
 gem 'rmagick'
+gem 'country_select', require: 'country_select_without_sort_alphabetical'
+gem 'i18n_country_select'
+gem 'dynamic_form'
+gem 'public_suffix'
 gem 'sanitize'
 gem 'will_paginate', '~> 3.0.5'
 
@@ -46,14 +44,14 @@ gem 'google-api-client', '~> 0.10.3'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
 # FIXME: Legacy feature shims
-# gem 'protected_attributes'
 gem 'rails_autolink'
+gem 'responders'
 
 # Javascript
 gem 'coffee-rails'
-gem 'i18n-js'
 gem 'jquery-rails'
 gem 'tinymce-rails'
+gem 'i18n-js'
 
 # Please install nodejs locally.
 # gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
@@ -66,6 +64,8 @@ gem 'haml'
 
 # Upgrading will cause issues
 gem 'neat', '~> 1.6.0'
+
+# This it outdated by sassc
 gem 'sass-rails', '~> 5.0.3'
 gem 'uglifier', '~> 2.5.0'
 
@@ -90,7 +90,8 @@ group :test do
   gem 'capybara'
   # gem 'codeclimate-test-reporter', require: nil
   gem 'database_cleaner'
-  gem 'factory_bot_rails'
+  # FIXME: Downgraded b/c of deprecations, fix static attributes
+  gem 'factory_bot_rails', '4.10.0'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'poltergeist'
   gem 'rspec'

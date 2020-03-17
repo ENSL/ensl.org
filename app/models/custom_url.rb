@@ -1,6 +1,6 @@
 class CustomUrl < ActiveRecord::Base
   belongs_to :article
-  attr_accessible :name
+  # FIXME: attr_accessible :name
 
   validates :name,
             length: {in: 2..10},

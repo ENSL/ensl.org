@@ -5,7 +5,7 @@ FactoryBot.define do
   end
 
   trait :news do
-    domain Category::DOMAIN_NEWS
+    domain { Category::DOMAIN_NEWS }
   end
 
   trait :game do

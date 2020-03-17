@@ -12,7 +12,7 @@ class MatchProposal < ActiveRecord::Base
   belongs_to :match
   belongs_to :team
   #has_many :confirmed_by, class_name: 'Team', uniq: true
-  attr_accessible :proposed_time, :status
+  # FIXME: attr_accessible :proposed_time, :status
 
   validates_presence_of :match, :team, :proposed_time
 

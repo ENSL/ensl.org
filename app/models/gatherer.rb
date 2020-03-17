@@ -26,10 +26,8 @@ class Gatherer < ActiveRecord::Base
   attr_accessor :confirm, :username
   cattr_accessor :skip_callbacks
 
-  scope :team,
-    lambda { |team| {:conditions => {:team => team}} }
-  scope :of_user,
-    lambda { |user| {:conditions => {:user_id => user.id}} }
+  scope :team, -> (team) { where(team: team) }
+  scope :of_user, -> (user) { where(user_id: user.id) }
   scope :lobby, -> { where(team: nil) }
   scope :best,
     lambda { |gather| {
@@ -47,11 +45,10 @@ class Gatherer < ActiveRecord::Base
     joins("LEFT JOIN rounders ON rounders.user_id = gatherers.user_id").
     group("rounders.user_id").
     order("kpd DESC") }
-  scope :lobby_team, -> (team) { conditions("gatherers.team IS NULL OR gatherers.team = ?", team).
+  scope :lobby_team, -> (team) { where("gatherers.team IS NULL OR gatherers.team = ?", team).
     order("gatherers.team") }
   scope :most_voted, -> { order("votes DESC, created_at DESC") }
-  scope :not_user,
-    lambda { |user| {:conditions => ["user_id != ?", user.id]} }
+  scope :not_user, -> (user) { where("user_id != ?", user.id) }
   scope :eject_order, -> { order("votes ASC") }
   scope :ordered, -> {
     joins("LEFT JOIN gathers ON captain1_id = gatherers.id OR captain2_id = gatherers.id").
@@ -80,7 +77,7 @@ class Gatherer < ActiveRecord::Base
 
   def validate_username
     if username
-      if u = User.first(:conditions => {:username => username})
+      if u = User.where(username: username).exists?
         self.user = u
       else
         errors.add(:username, t(:gatherer_wrong_username))
@@ -93,7 +90,7 @@ class Gatherer < ActiveRecord::Base
   end
 
   def notify_gatherers
-    Profile.all(:include => :user, :conditions => "notify_gather = 1").each do |p|
+    Profile.where(notify_gather: 1).includes(:user).each do |p|
       Notifications.gather p.user, gather if p.user
     end
   end
@@ -117,9 +114,9 @@ class Gatherer < ActiveRecord::Base
   end
 
   def cleanup_votes
-    gather.map_votes.all(:conditions => {:user_id => user_id}).each { |g|  g.destroy }
-    gather.server_votes.all(:conditions => {:user_id => user_id}).each { |g| g.destroy }
-    gather.gatherer_votes.all(:conditions => {:user_id => user_id}).each { |g|  g.destroy }
+    gather.map_votes.where(user_id: user_id).each { |g|  g.destroy }
+    gather.server_votes.where(user_id: user_id).each { |g|  g.destroy }
+    gather.gatherer_votes.where(user_id: user_id).each { |g|  g.destroy }
   end
 
   def votes_needed?

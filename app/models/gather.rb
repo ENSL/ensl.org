@@ -43,12 +43,12 @@ class Gather < ActiveRecord::Base
 
   has_many :gatherers
   has_many :users, :through => :gatherers
+  has_many :gather_maps, :class_name => "GatherMap"
   has_many :gatherer_votes, :through => :gatherers, :source => :real_votes
   has_many :map_votes, :through => :gather_maps, :source => :real_votes
-  has_many :gather_maps, :class_name => "GatherMap"
+  has_many :gather_servers, :class_name => "GatherServer"
   has_many :maps, :through => :gather_maps
   has_many :server_votes, :through => :gather_servers, :source => :real_votes
-  has_many :gather_servers, :class_name => "GatherServer"
   has_many :servers, :through => :gather_servers
   has_many :shoutmsgs, :as => "shoutable"
   has_many :real_votes, :class_name => "Vote", :as => :votable, :dependent => :destroy
@@ -93,11 +93,11 @@ class Gather < ActiveRecord::Base
   end
 
   def previous_gather
-    Gather.first.where("id < ? AND category_id = ?", self.id, category_id).order("id DESC")
+    Gather.where("id < ? AND category_id = ?", self.id, category_id).order("id DESC").first
   end
 
   def next_gather
-    Gather.first.where("id > ? AND category_id = ?", self.id, category_id).order("id ASC")
+    Gather.where("id > ? AND category_id = ?", self.id, category_id).order("id ASC").first
   end
 
   def last

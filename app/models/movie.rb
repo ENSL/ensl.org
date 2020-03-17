@@ -35,7 +35,7 @@ class Movie < ActiveRecord::Base
   scope :recent, -> { limit(5) }
   scope :ordered, -> {  include("file").
     order("data_files.created_at DESC") }
-  scope :index, -> {
+  scope :with_ratings, -> {
     select("movies.*, users.username, AVG(rates.score) as total_ratings")
     .joins("LEFT JOIN data_files ON movies.file_id = data_files.id
             LEFT JOIN users ON movies.user_id = users.id
@@ -146,7 +146,7 @@ def self.filter_or_all order, filter
   #  end
   #  return movies
   #else
-    return index.order(order)
+    return with_ratings.order(order)
   #end
 end
 

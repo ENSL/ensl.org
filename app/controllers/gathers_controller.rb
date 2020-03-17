@@ -67,7 +67,7 @@ class GathersController < ApplicationController
 
   def get_gather
     Gather.transaction do
-      @gather = Gather.basic.find(params[:id], :lock => true)
+      @gather = Gather.basic.where(id: params[:id]).lock(true).first
       @gather.refresh cuser
     end
 

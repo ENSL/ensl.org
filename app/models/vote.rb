@@ -48,18 +48,18 @@ class Vote < ActiveRecord::Base
         return false
       end
     elsif votable_type == "Gatherer" or votable_type == "GatherMap" or votable_type == "GatherServer"
-      return false unless votable.gather.users.exists? cuser
+      return false unless votable.gather.users.exists? cuser.id
 
       case votable_type
       when "Gatherer" then
         return false if votable.gather.status != Gather::STATE_VOTING
-        return false if votable.gather.gatherer_votes.count(:conditions => {:user_id => user.id}) > 1
+        return false if votable.gather.gatherer_votes.where(user_id: user.id).count > 1
       when "GatherMap" then
         return false if votable.gather.status == Gather::STATE_FINISHED
-        return false if votable.gather.map_votes.count(:conditions => {:user_id => user.id}) > 1
+        return false if votable.gather.map_votes.where(user_id: user.id).count > 1
       when "GatherServer" then
         return false if votable.gather.status == Gather::STATE_FINISHED
-        return false if votable.gather.server_votes.first :conditions => {:user_id => user.id}
+        return false if votable.gather.server_votes.where(user_id: user.id).count > 0
       end
     end
 

@@ -28,7 +28,7 @@ class Poll < ActiveRecord::Base
   accepts_nested_attributes_for :options, :allow_destroy => true
 
   def voted? user
-    real_votes.count(:conditions => {:user_id => user.id}) > 0
+    real_votes.where(user_id: user.id).count > 0
   end
 
   def can_create? cuser
