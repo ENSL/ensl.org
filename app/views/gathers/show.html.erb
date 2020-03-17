@@ -132,14 +132,14 @@
 
   <div class="previous">
     <%= link_to @gather.previous_gather, class: 'button tiny' do %>
-      <%= icon 'fas', 'chevron-left' %> Previous
+      <%= icon 'chevron-left' %> Previous
     <% end %>
   </div>
 
   <div class="next">
     <% if @gather.next_gather %>
       <%= link_to @gather.next_gather, class: 'button tiny' do %>
-        Next <%= icon 'fas', 'chevron-right' %>
+        Next <%= icon 'chevron-right' %>
       <% end %>
     <% end %>
   </div>
@@ -188,7 +188,7 @@
 
       <div class="hide">
         <a id="gather-info-hide" class="button tiny">
-          <%= icon 'fas', 'times' %>
+          <%= icon 'times' %>
           Hide information
         </a>
       </div>

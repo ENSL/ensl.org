@@ -21,17 +21,17 @@
     <tr>
       <td><%= h rank + 1%>.</td>
       <% if contester.trend == Contester::TREND_UP %>
-        <td><%= icon 'fas', 'chevron-up' %></td>
+        <td><%= icon 'chevron-up' %></td>
       <% elsif contester.trend == Contester::TREND_DOWN %>
-        <td><%= icon 'fas', 'chevron-down' %></td>
+        <td><%= icon 'chevron-down' %></td>
       <% elsif contester.trend == Contester::TREND_FLAT %>
-        <td><%= icon 'fas', 'minus' %></td>
+        <td><%= icon 'minus' %></td>
       <% else %>
         <td></td>
       <% end %>
       <td><%= flag contester.team.country %></td>
       <td><%= link_to (h contester.team.name), contester %></td>
-      <td><%= icon 'fas', 'trophy' if contester == contester.contest.winner %></td>
+      <td><%= icon 'trophy' if contester == contester.contest.winner %></td>
       <td><%= h contester.win %></td>
       <td><%= h contester.loss %></td>
       <td><%= h contester.draw %></td>

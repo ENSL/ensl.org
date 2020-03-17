@@ -2,7 +2,7 @@
   <% if article.previous_article %>
     <div class="previous">
       <%= link_to article.previous_article do %>
-        <%= icon 'fas', 'arrow-left' %>
+        <%= icon 'arrow-left' %>
         <%= article.previous_article %>
       <% end %>
     </div>
@@ -11,7 +11,7 @@
     <div class="next">
       <%= link_to article.next_article do %>
         <%= article.next_article %>
-        <%= icon 'fas', 'arrow-right' %>
+        <%= icon 'arrow-right' %>
       <% end %>
     </div>
   <% end %>

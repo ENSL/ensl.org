@@ -3,9 +3,10 @@ ENV["RAILS_ENV"] ||= "test"
 require 'dotenv'
 Dotenv.load('.env')
 
-require "codeclimate-test-reporter"
+# require "codeclimate-test-reporter"
 require "simplecov"
-CodeClimate::TestReporter.start
+
+# CodeClimate::TestReporter.start
 SimpleCov.start "rails"
 
 require File.expand_path("../../config/environment", __FILE__)

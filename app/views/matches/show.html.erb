@@ -29,7 +29,7 @@
             <% @match.team1_lineup.each do |teamer| %>
               <li>
                 <% if teamer.user == @match.motm %>
-                  <%= icon 'fas', 'star' %>
+                  <%= icon 'star' %>
                 <% end %>
                 <%= teamer.user.username %>
                 <%= flag teamer.user.country %>
@@ -47,7 +47,7 @@
                 <%= flag teamer.user.country %>
                 <%= teamer.user.username %>  
                 <% if teamer.user == @match.motm %>
-                  <%= icon 'fas', 'star' %>
+                  <%= icon 'star' %>
                 <% end %>
               </li>
             <% end %>  

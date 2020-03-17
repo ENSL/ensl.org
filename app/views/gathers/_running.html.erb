@@ -11,7 +11,7 @@
             <%= namelink gatherer.user %>
             <% if cuser and gatherer.can_destroy?(cuser) %>
               <%= link_to gatherer, method: :delete, class: 'delete' do %>
-                <%= icon 'fas', 'times' %>
+                <%= icon 'times' %>
               <% end %>
             <% end %>
           </li>
