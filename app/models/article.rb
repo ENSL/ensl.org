@@ -3,16 +3,23 @@
 # Table name: articles
 #
 #  id          :integer          not null, primary key
-#  title       :string(255)
 #  status      :integer          not null
-#  category_id :integer
 #  text        :text(16777215)
-#  user_id     :integer
+#  text_coding :integer          default("0"), not null
+#  text_parsed :text(16777215)
+#  title       :string(255)
+#  version     :integer
 #  created_at  :datetime
 #  updated_at  :datetime
-#  version     :integer
-#  text_parsed :text(16777215)
-#  text_coding :integer          default(0), not null
+#  category_id :integer
+#  user_id     :integer
+#
+# Indexes
+#
+#  index_articles_on_category_id            (category_id)
+#  index_articles_on_created_at             (created_at)
+#  index_articles_on_created_at_and_status  (created_at,status)
+#  index_articles_on_user_id                (user_id)
 #
 
 class Article < ActiveRecord::Base

@@ -25,7 +25,7 @@ class MoviesController < ApplicationController
   end
 
   def create
-    @movie = Movie.new(params[:movie])
+    @movie = Movie.new(Movie.params(params, cuser))
     raise AccessError unless @movie.can_create? cuser
 
     if @movie.save
@@ -39,7 +39,7 @@ class MoviesController < ApplicationController
   def update
     raise AccessError unless @movie.can_update? cuser
 
-    if @movie.update_attributes(params[:movie])
+    if @movie.update_attributes(Movie.params(params, cuser))
       flash[:notice] = t(:movies_update)
       redirect_to(@movie)
     else

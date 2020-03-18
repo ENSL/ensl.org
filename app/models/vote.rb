@@ -3,10 +3,15 @@
 # Table name: votes
 #
 #  id           :integer          not null, primary key
+#  votable_type :string(255)
+#  poll_id      :integer
 #  user_id      :integer
 #  votable_id   :integer
-#  poll_id      :integer
-#  votable_type :string(255)
+#
+# Indexes
+#
+#  index_votes_on_user_id                      (user_id)
+#  index_votes_on_votable_id_and_votable_type  (votable_id,votable_type)
 #
 
 class Vote < ActiveRecord::Base
@@ -64,5 +69,9 @@ class Vote < ActiveRecord::Base
     end
 
     return true
+  end
+
+  def self.params(params, cuser)
+    params.require(:vote).permit(:votable_type, :votable_id, :poll_id, :user_id)
   end
 end

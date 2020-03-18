@@ -3,11 +3,16 @@
 # Table name: groupers
 #
 #  id         :integer          not null, primary key
-#  group_id   :integer
-#  user_id    :integer
 #  task       :string(255)
 #  created_at :datetime
 #  updated_at :datetime
+#  group_id   :integer
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_groupers_on_group_id  (group_id)
+#  index_groupers_on_user_id   (user_id)
 #
 
 class Grouper < ActiveRecord::Base
@@ -44,4 +49,6 @@ class Grouper < ActiveRecord::Base
   def can_destroy? cuser
     cuser and cuser.admin?
   end
+
+  
 end

@@ -3,13 +3,19 @@
 # Table name: gatherers
 #
 #  id         :integer          not null, primary key
-#  user_id    :integer
-#  gather_id  :integer
+#  status     :integer          default("0"), not null
 #  team       :integer
+#  votes      :integer          default("0"), not null
 #  created_at :datetime
 #  updated_at :datetime
-#  votes      :integer          default(0), not null
-#  status     :integer          default(0), not null
+#  gather_id  :integer
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_gatherers_on_gather_id                 (gather_id)
+#  index_gatherers_on_updated_at_and_gather_id  (updated_at,gather_id)
+#  index_gatherers_on_user_id                   (user_id)
 #
 
 class Gatherer < ActiveRecord::Base
@@ -162,5 +168,9 @@ class Gatherer < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and ((user == cuser or cuser.admin? or cuser.gather_moderator?) and gather.status == Gather::STATE_RUNNING)
+  end
+
+  def self.params(params, cuser)
+    params.require(:gatherer).permit(:status, :user_id, :gather_id, :team, :votes)
   end
 end

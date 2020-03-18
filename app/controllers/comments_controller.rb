@@ -16,7 +16,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = Comment.new params[:comment]
+    @comment = Comment.new Comment.params(parmas, cuser)
     @comment.user = cuser
     raise AccessError unless @comment.can_create? cuser
 
@@ -33,7 +33,7 @@ class CommentsController < ApplicationController
 
   def update
     raise AccessError unless @comment.can_update? cuser
-    if @comment.update_attributes params[:comment]
+    if @comment.update_attributes(Comment.params(parmas, cuser))
       flash[:notice] = t(:comments_update)
       return_to
     else

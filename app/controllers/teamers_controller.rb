@@ -4,8 +4,8 @@ class TeamersController < ApplicationController
 
   def create
     @old_application = (cuser.teamers.joining.count == 0) ? nil : cuser.teamers.joining.first
-    @teamer = Teamer.new params[:teamer]
-    raise AccessError unless @teamer.can_create? cuser, params[:teamer]
+    @teamer = Teamer.new(Teamer.params(params, cuser))
+    raise AccessError unless @teamer.can_create?(cuser, Teamer.params(params, cuser))
     @teamer.user = cuser unless cuser.admin?
 
     if @teamer.save

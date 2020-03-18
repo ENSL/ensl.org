@@ -1,6 +1,6 @@
 class PredictionsController < ApplicationController
   def create
-    @prediction = Prediction.new params[:prediction]
+    @prediction = Prediction.new(Prediction.params(params, cuser))
     @prediction.user = cuser
     raise AccessError unless @prediction.can_create? cuser
 

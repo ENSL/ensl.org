@@ -3,13 +3,18 @@
 # Table name: predictions
 #
 #  id         :integer          not null, primary key
-#  match_id   :integer
-#  user_id    :integer
+#  result     :integer
 #  score1     :integer
 #  score2     :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  result     :integer
+#  match_id   :integer
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_predictions_on_match_id  (match_id)
+#  index_predictions_on_user_id   (user_id)
 #
 
 class Prediction < ActiveRecord::Base
@@ -29,5 +34,9 @@ class Prediction < ActiveRecord::Base
 
   def can_create? cuser
     cuser and match.match_time.future? and !match.score1 and !match.score2 and !cuser.predictions.exists?(:match_id => match.id)
+  end
+
+  def self.params(params, cuser)
+    params.require(:prediction).permit(:result, :score1, :score2, :match_id, :user_id)
   end
 end

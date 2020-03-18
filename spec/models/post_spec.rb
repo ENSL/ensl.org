@@ -3,12 +3,17 @@
 # Table name: posts
 #
 #  id          :integer          not null, primary key
-#  text        :text
-#  topic_id    :integer
-#  user_id     :integer
+#  text        :text(65535)
+#  text_parsed :text(65535)
 #  created_at  :datetime
 #  updated_at  :datetime
-#  text_parsed :text
+#  topic_id    :integer
+#  user_id     :integer
+#
+# Indexes
+#
+#  index_posts_on_topic_id  (topic_id)
+#  index_posts_on_user_id   (user_id)
 #
 
 require "rails_helper"

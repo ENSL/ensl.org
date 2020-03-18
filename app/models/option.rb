@@ -4,10 +4,14 @@
 #
 #  id         :integer          not null, primary key
 #  option     :string(255)
-#  poll_id    :integer
+#  votes      :integer          default("0"), not null
 #  created_at :datetime
 #  updated_at :datetime
-#  votes      :integer          default(0), not null
+#  poll_id    :integer
+#
+# Indexes
+#
+#  index_options_on_poll_id  (poll_id)
 #
 
 class Option < ActiveRecord::Base
@@ -22,5 +26,10 @@ class Option < ActiveRecord::Base
 
   def to_s
     self.option
+  end
+
+  def self.params(params, cuser)
+    # FIXME: check this
+    params.require(:option).permit(:option, :votes, :poll_id)
   end
 end

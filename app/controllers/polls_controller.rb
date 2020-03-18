@@ -19,7 +19,7 @@ class PollsController < ApplicationController
   end
 
   def create
-    @poll = Poll.new params[:poll]
+    @poll = Poll.new(Poll.params(params, cuser))
     @poll.user = cuser
     raise AccessError unless @poll.can_create? cuser
 
@@ -34,7 +34,7 @@ class PollsController < ApplicationController
   def update
     raise AccessError unless @poll.can_update? cuser
 
-    if @poll.update_attributes params[:poll]
+    if @poll.update_attributes(Poll.params(params, cuser))
       flash[:notice] = t(:polls_update)
       redirect_to @poll
     else

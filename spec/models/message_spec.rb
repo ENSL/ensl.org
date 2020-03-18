@@ -3,15 +3,20 @@
 # Table name: messages
 #
 #  id             :integer          not null, primary key
-#  sender_type    :string(255)
-#  sender_id      :integer
 #  recipient_type :string(255)
-#  recipient_id   :integer
+#  sender_type    :string(255)
+#  text           :text(65535)
+#  text_parsed    :text(65535)
 #  title          :string(255)
-#  text           :text
 #  created_at     :datetime
 #  updated_at     :datetime
-#  text_parsed    :text
+#  recipient_id   :integer
+#  sender_id      :integer
+#
+# Indexes
+#
+#  index_messages_on_recipient_id_and_recipient_type  (recipient_id,recipient_type)
+#  index_messages_on_sender_id_and_sender_type        (sender_id,sender_type)
 #
 
 require "rails_helper"

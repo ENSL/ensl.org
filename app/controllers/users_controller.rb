@@ -53,7 +53,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new params[:user]
+    @user = User.new(User.params(params, cuser))
+    # FIXME: move to model
     @user.lastvisit = Date.today
     @user.lastip = request.env['REMOTE_ADDR']
 
@@ -72,8 +73,9 @@ class UsersController < ApplicationController
 
   def update
     raise AccessError unless @user.can_update? cuser
+    # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update_attributes params[:user]
+    if @user.update_attributes(User.params(params, cuser))
       flash[:notice] = t(:users_update)
       redirect_to_back
     else
@@ -126,10 +128,6 @@ class UsersController < ApplicationController
   end
 
   private
-
-  def user_params
-    params.require(:user).permit(:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter)
-  end
 
   def get_user
     @user = User.find(params[:id])

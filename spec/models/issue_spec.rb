@@ -3,16 +3,22 @@
 # Table name: issues
 #
 #  id          :integer          not null, primary key
-#  title       :string(255)
+#  solution    :text(65535)
 #  status      :integer
-#  assigned_id :integer
-#  category_id :integer
-#  text        :text
-#  author_id   :integer
+#  text        :text(65535)
+#  text_parsed :text(65535)
+#  title       :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
-#  solution    :text
-#  text_parsed :text
+#  assigned_id :integer
+#  author_id   :integer
+#  category_id :integer
+#
+# Indexes
+#
+#  index_issues_on_assigned_id  (assigned_id)
+#  index_issues_on_author_id    (author_id)
+#  index_issues_on_category_id  (category_id)
 #
 
 require "rails_helper"

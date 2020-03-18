@@ -53,7 +53,7 @@ class ContestsController < ApplicationController
   end
 
   def create
-    @contest = Contest.new params[:contest]
+    @contest = Contest.new(Contest.params(params, cuser))
     raise AccessError unless @contest.can_create? cuser
 
     if @contest.save
@@ -67,7 +67,7 @@ class ContestsController < ApplicationController
   def update
     raise AccessError unless @contest.can_update? cuser
     if update_type == "contest"
-      if @contest.update_attributes(params[:contest])
+      if @contest.update_attributes(Contest.params(params, cuser))
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else

@@ -3,11 +3,16 @@
 # Table name: forumers
 #
 #  id         :integer          not null, primary key
-#  forum_id   :integer
-#  group_id   :integer
 #  access     :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  forum_id   :integer
+#  group_id   :integer
+#
+# Indexes
+#
+#  index_forumers_on_forum_id  (forum_id)
+#  index_forumers_on_group_id  (group_id)
 #
 
 class Forumer < ActiveRecord::Base
@@ -35,5 +40,9 @@ class Forumer < ActiveRecord::Base
 
   def accesses
     {ACCESS_READ => "Read", ACCESS_REPLY => "Reply", ACCESS_TOPIC => "Post a Topic"}
+  end
+
+  def self.params(params, cuser)
+    params.require(:forumer).permit(:access, :forum_id, :group_id)
   end
 end

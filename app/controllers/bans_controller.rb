@@ -18,7 +18,7 @@ class BansController < ApplicationController
   end
 
   def create
-    @ban = Ban.new(params[:ban])
+    @ban = Ban.new(Ban.params(params, cuser))
     raise AccessError unless @ban.can_create? cuser
     @ban.creator = cuser
 
@@ -32,7 +32,7 @@ class BansController < ApplicationController
 
   def update
     raise AccessError unless @ban.can_update? cuser
-    if @ban.update_attributes(ban_params(ban_params))
+    if @ban.update_attributes(Ban.params(params, cuser))
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else
@@ -50,9 +50,5 @@ class BansController < ApplicationController
 
   def get_ban
     @ban = Ban.find(params[:id])
-  end
-
-  def ban_params
-    params.permit(:steamid, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
   end
 end

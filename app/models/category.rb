@@ -3,11 +3,16 @@
 # Table name: categories
 #
 #  id         :integer          not null, primary key
+#  domain     :integer
 #  name       :string(255)
 #  sort       :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  domain     :integer
+#
+# Indexes
+#
+#  index_categories_on_domain  (domain)
+#  index_categories_on_sort    (sort)
 #
 
 class Category < ActiveRecord::Base
@@ -78,5 +83,9 @@ class Category < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:ban).permit(:name, :sort, :domain)
   end
 end

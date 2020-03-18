@@ -3,57 +3,61 @@
 # Table name: profiles
 #
 #  id                  :integer          not null, primary key
-#  user_id             :integer
-#  msn                 :string(255)
+#  achievements        :text(65535)
+#  achievements_parsed :string(400)
+#  avatar              :string(255)
+#  beverage            :string(255)
+#  book                :string(255)
+#  case                :string(255)
+#  clan_search         :string(255)
+#  cpu                 :string(255)
+#  food                :string(255)
+#  gpu                 :string(255)
+#  hdd                 :string(255)
+#  head_phones         :string(255)
+#  hobby               :string(255)
 #  icq                 :string(255)
 #  irc                 :string(255)
-#  web                 :string(255)
-#  town                :string(255)
-#  singleplayer        :string(255)
-#  multiplayer         :string(255)
-#  food                :string(255)
-#  beverage            :string(255)
-#  hobby               :string(255)
-#  music               :string(255)
-#  book                :string(255)
-#  movie               :string(255)
-#  tvseries            :string(255)
-#  res                 :string(255)
-#  sensitivity         :string(255)
-#  monitor_hz          :string(255)
-#  scripts             :string(255)
-#  cpu                 :string(255)
-#  gpu                 :string(255)
-#  ram                 :string(255)
-#  psu                 :string(255)
-#  motherboard         :string(255)
-#  soundcard           :string(255)
-#  hdd                 :string(255)
-#  case                :string(255)
+#  keyboard            :string(255)
+#  layout              :string(255)
 #  monitor             :string(255)
+#  monitor_hz          :string(255)
+#  motherboard         :string(255)
 #  mouse               :string(255)
 #  mouse_pad           :string(255)
-#  keyboard            :string(255)
-#  head_phones         :string(255)
-#  speakers            :string(255)
-#  achievements        :text
-#  updated_at          :datetime
-#  signature           :string(255)
-#  avatar              :string(255)
-#  clan_search         :string(255)
-#  notify_news         :boolean
-#  notify_articles     :boolean
-#  notify_movies       :boolean
-#  notify_gather       :boolean
-#  notify_own_match    :boolean
+#  movie               :string(255)
+#  msn                 :string(255)
+#  multiplayer         :string(255)
+#  music               :string(255)
 #  notify_any_match    :boolean
-#  notify_pms          :boolean          default(TRUE), not null
-#  notify_challenge    :boolean          default(TRUE), not null
+#  notify_articles     :boolean
+#  notify_challenge    :boolean          default("1"), not null
+#  notify_gather       :boolean
+#  notify_movies       :boolean
+#  notify_news         :boolean
+#  notify_own_match    :boolean
+#  notify_pms          :boolean          default("1"), not null
+#  psu                 :string(255)
+#  ram                 :string(255)
+#  res                 :string(255)
+#  scripts             :string(255)
+#  sensitivity         :string(255)
+#  signature           :string(255)
+#  signature_parsed    :text(65535)
+#  singleplayer        :string(255)
+#  soundcard           :string(255)
+#  speakers            :string(255)
 #  steam_profile       :string(255)
-#  achievements_parsed :string(255)
-#  signature_parsed    :string(255)
 #  stream              :string(255)
-#  layout              :string(255)
+#  town                :string(255)
+#  tvseries            :string(255)
+#  web                 :string(255)
+#  updated_at          :datetime
+#  user_id             :integer
+#
+# Indexes
+#
+#  index_profiles_on_user_id  (user_id)
 #
 
 class Profile < ActiveRecord::Base
@@ -96,5 +100,11 @@ class Profile < ActiveRecord::Base
   def parse_text
     self.achievements_parsed = bbcode_to_html(achievements) if self.achievements
     self.signature_parsed = bbcode_to_html(signature) if self.signature
+  end
+
+  def self.params(params, cuser)
+    # FIXME: check this, add user_id
+    # TEST
+    params.require(:profile).except!(:id, :updated_at).permit!
   end
 end

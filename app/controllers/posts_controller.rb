@@ -19,7 +19,7 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = Post.new(params[:post])
+    @post = Post.new(Post.params(params, cuser))
     @post.user = cuser
     raise AccessError unless @post.can_create? cuser
 
@@ -36,7 +36,7 @@ class PostsController < ApplicationController
 
   def update
     raise AccessError unless @post.can_update? cuser, params[:post]
-    if @post.update_attributes(params[:post])
+    if @post.update_attributes(Post.params(params, cuser))
       flash[:notice] = t(:posts_update)
       redirect_to @post.topic
     else

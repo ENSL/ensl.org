@@ -3,13 +3,20 @@
 # Table name: comments
 #
 #  id               :integer          not null, primary key
-#  text             :text
-#  user_id          :integer
 #  commentable_type :string(255)
-#  commentable_id   :integer
+#  text             :text(65535)
+#  text_parsed      :text(65535)
 #  created_at       :datetime
 #  updated_at       :datetime
-#  text_parsed      :text
+#  commentable_id   :integer
+#  user_id          :integer
+#
+# Indexes
+#
+#  index_comments_on_commentable_type                     (commentable_type)
+#  index_comments_on_commentable_type_and_commentable_id  (commentable_type,commentable_id)
+#  index_comments_on_commentable_type_and_id              (commentable_type,id)
+#  index_comments_on_user_id                              (user_id)
 #
 
 class Comment < ActiveRecord::Base
@@ -57,5 +64,9 @@ class Comment < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params params, cuser
+    params.require(:ban).permit(:text, :user_id, :commentable_type, :commentable_id)
   end
 end

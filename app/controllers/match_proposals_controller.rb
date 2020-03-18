@@ -1,5 +1,6 @@
 class MatchProposalsController < ApplicationController
   before_action :get_match
+  
   def index
     raise AccessError unless cuser.admin? || @match.user_in_match?(cuser)
   end
@@ -19,7 +20,7 @@ class MatchProposalsController < ApplicationController
   end
 
   def create
-    @proposal = MatchProposal.new(params[:match_proposal])
+    @proposal = MatchProposal.new(MatchProposal.params(params, cuser))
     @proposal.match = @match
     raise AccessError unless @proposal.can_create? cuser
     @proposal.team = cuser.team
@@ -49,7 +50,7 @@ class MatchProposalsController < ApplicationController
       }
       render(json: rjson, status: :not_found) && return
     end
-    unless proposal.can_update?(cuser, params[:match_proposal])
+    unless proposal.can_update?(cuser, MatchProposal.params(params, cuser))
       rjson[:error] = {
         code: 403,
         message: "You are not allowed to update the state to #{MatchProposal.status_strings[params[:match_proposal][:status].to_i]}"

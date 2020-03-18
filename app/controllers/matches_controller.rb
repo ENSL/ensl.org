@@ -6,7 +6,7 @@ class MatchesController < ApplicationController
   end
 
   def show
-    @ownpred = @match.predictions.first conditions: { user_id: cuser.id } if cuser
+    @ownpred = @match.predictions.where(user_id: cuser.id) if cuser
     @newpred = @match.predictions.build
   end
 
@@ -35,7 +35,7 @@ class MatchesController < ApplicationController
   end
 
   def create
-    @match = Match.new params[:match]
+    @match = Match.new(Match.params(params, cuser))
     raise AccessError unless @match.can_create? cuser
 
     if @match.save
@@ -59,7 +59,7 @@ class MatchesController < ApplicationController
       end
     end
 
-    if @match.update_attributes params[:match]
+    if @match.update_attributes(Match.params(params, cuser))
       respond_to do |format|
         format.xml { head :ok }
         format.html do

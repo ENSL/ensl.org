@@ -42,7 +42,7 @@ class TopicsController < ApplicationController
   end
 
   def create
-    @topic = Topic.new(params[:topic])
+    @topic = Topic.new(Topic.params(params, cuser))
     @topic.user = cuser
     raise AccessError unless @topic.can_create? cuser
 

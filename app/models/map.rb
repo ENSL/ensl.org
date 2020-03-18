@@ -3,12 +3,12 @@
 # Table name: maps
 #
 #  id          :integer          not null, primary key
-#  name        :string(255)
+#  deleted     :boolean          default("0"), not null
 #  download    :string(255)
+#  name        :string(255)
+#  picture     :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
-#  deleted     :boolean          default(FALSE), not null
-#  picture     :string(255)
 #  category_id :integer
 #
 
@@ -49,5 +49,9 @@ class Map < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:map).permit(:name, :download, :picture, :category_id)
   end
 end

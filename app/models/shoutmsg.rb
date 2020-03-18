@@ -3,12 +3,17 @@
 # Table name: shoutmsgs
 #
 #  id             :integer          not null, primary key
-#  user_id        :integer
+#  shoutable_type :string(255)
 #  text           :string(255)
 #  created_at     :datetime
 #  updated_at     :datetime
-#  shoutable_type :string(255)
 #  shoutable_id   :integer
+#  user_id        :integer
+#
+# Indexes
+#
+#  index_shoutmsgs_on_shoutable_type_and_shoutable_id  (shoutable_type,shoutable_id)
+#  index_shoutmsgs_on_user_id                          (user_id)
 #
 
 class Shoutmsg < ActiveRecord::Base
@@ -48,5 +53,9 @@ class Shoutmsg < ActiveRecord::Base
       return false if cuser != msg.user
     end
     return true
+  end
+
+  def self.params(params, cuser)
+    params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
   end
 end

@@ -38,6 +38,7 @@ gem 'dynamic_form'
 gem 'public_suffix'
 gem 'sanitize'
 gem 'will_paginate'
+gem 'time_difference'
 
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
@@ -94,8 +95,6 @@ group :test do
   gem 'factory_bot_rails', '4.10.0'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'poltergeist'
-  gem 'rspec'
-  gem 'rspec-rails'
   gem 'selenium-webdriver'
   # Fix FF issue
   gem 'geckodriver-helper'
@@ -104,6 +103,13 @@ group :test do
   gem 'simplecov', require: false
   gem 'test-unit'
   gem 'timecop'
+
+  # Use dev versions because of rspec bug
+  gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
+  gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
+  gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'
+  gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails'
+  gem 'rspec-support', git: 'https://github.com/rspec/rspec-support'
 end
 
 group :development, :test do

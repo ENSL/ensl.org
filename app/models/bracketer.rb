@@ -3,13 +3,18 @@
 # Table name: bracketers
 #
 #  id         :integer          not null, primary key
-#  bracket_id :integer
 #  column     :integer
 #  row        :integer
-#  match_id   :integer
-#  team_id    :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  bracket_id :integer
+#  match_id   :integer
+#  team_id    :integer
+#
+# Indexes
+#
+#  index_bracketers_on_match_id  (match_id)
+#  index_bracketers_on_team_id   (team_id)
 #
 
 class Bracketer < ActiveRecord::Base

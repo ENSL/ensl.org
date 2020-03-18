@@ -3,22 +3,27 @@
 # Table name: users
 #
 #  id           :integer          not null, primary key
-#  username     :string(255)
-#  password     :string(255)
-#  firstname    :string(255)
-#  lastname     :string(255)
+#  birthdate    :date
+#  country      :string(255)
 #  email        :string(255)
-#  steamid      :string(255)
-#  team_id      :integer
+#  firstname    :string(255)
+#  lastip       :string(255)
+#  lastname     :string(255)
 #  lastvisit    :datetime
+#  password     :string(255)
+#  public_email :boolean          default("0"), not null
+#  steamid      :string(255)
+#  time_zone    :string(255)
+#  username     :string(255)
+#  version      :integer
 #  created_at   :datetime
 #  updated_at   :datetime
-#  lastip       :string(255)
-#  country      :string(255)
-#  birthdate    :date
-#  time_zone    :string(255)
-#  version      :integer
-#  public_email :boolean          default(FALSE), not null
+#  team_id      :integer
+#
+# Indexes
+#
+#  index_users_on_lastvisit  (lastvisit)
+#  index_users_on_team_id    (team_id)
 #
 
 require 'digest/md5'
@@ -179,6 +184,10 @@ class User < ActiveRecord::Base
     a = Date.today.year - birthdate.year
     a-= 1 if Date.today < birthdate + a.years
     a
+  end
+
+  def idle
+    "%d m" % [TimeDifference.between(DateTime.now, lastvisit).in_minutes.floor]
   end
 
   def current_layout
@@ -343,5 +352,9 @@ class User < ActiveRecord::Base
 
   def self.casters
     Group.find(Group::CASTERS).users.order(:username)
+  end
+
+  def self.params(params, cuser)
+    params.require(:user).permit(:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter)
   end
 end

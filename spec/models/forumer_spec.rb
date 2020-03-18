@@ -3,11 +3,16 @@
 # Table name: forumers
 #
 #  id         :integer          not null, primary key
-#  forum_id   :integer
-#  group_id   :integer
 #  access     :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  forum_id   :integer
+#  group_id   :integer
+#
+# Indexes
+#
+#  index_forumers_on_forum_id  (forum_id)
+#  index_forumers_on_group_id  (group_id)
 #
 
 require "rails_helper"

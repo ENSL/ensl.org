@@ -19,7 +19,7 @@ class ContestersController < ApplicationController
   end
 
   def create
-    @contester = Contester.new params[:contester]
+    @contester = Contester.new(Contester.params(params, cuser))
     @contester.user = cuser
     raise AccessError unless @contester.can_create? cuser
     if @contester.contest.contest_type == Contest::TYPE_LADDER
@@ -48,7 +48,7 @@ class ContestersController < ApplicationController
       end
     end
 
-    if @contester.update_attributes params[:contester]
+    if @contester.update_attributes(Contester.params(params, cuser))
       flash[:notice] = t(:contests_contester_update)
       redirect_to @contester.contest
     else

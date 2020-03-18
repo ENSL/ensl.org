@@ -3,12 +3,16 @@
 # Table name: forums
 #
 #  id          :integer          not null, primary key
-#  title       :string(255)
 #  description :string(255)
-#  category_id :integer
+#  position    :integer
+#  title       :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
-#  position    :integer
+#  category_id :integer
+#
+# Indexes
+#
+#  index_forums_on_category_id  (category_id)
 #
 
 class Forum < ActiveRecord::Base
@@ -78,4 +82,7 @@ class Forum < ActiveRecord::Base
                 id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
   end
 
+  def self.params(params, cuser)
+    params.require(:data_file).permit(:description, :position, :title, :category_id)
+  end
 end

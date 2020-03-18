@@ -3,12 +3,17 @@
 # Table name: topics
 #
 #  id         :integer          not null, primary key
+#  state      :integer          default("0"), not null
 #  title      :string(255)
-#  user_id    :integer
-#  forum_id   :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  state      :integer          default(0), not null
+#  forum_id   :integer
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_topics_on_forum_id  (forum_id)
+#  index_topics_on_user_id   (user_id)
 #
 
 class Topic < ActiveRecord::Base
@@ -121,5 +126,9 @@ class Topic < ActiveRecord::Base
 
   def states
     {STATE_NORMAL => "Normal", STATE_STICKY => "Sticky"}
+  end
+
+  def self.params(params, cuser)
+    params.permit(:state, :title, :forum_id, :user_id)
   end
 end

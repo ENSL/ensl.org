@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: match_proposals
+#
+#  id            :integer          not null, primary key
+#  proposed_time :datetime
+#  status        :integer
+#  match_id      :integer
+#  team_id       :integer
+#
+# Indexes
+#
+#  index_match_proposals_on_status  (status)
+#
 class MatchProposal < ActiveRecord::Base
 
   STATUS_PENDING   = 0
@@ -84,4 +98,7 @@ class MatchProposal < ActiveRecord::Base
     end
   end
 
+  def self.params(params, cuser)
+    params.require(:match_proposal).permit(:status, :match_id, :team_id, :proposed_time)
+  end
 end

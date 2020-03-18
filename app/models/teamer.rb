@@ -3,12 +3,17 @@
 # Table name: teamers
 #
 #  id         :integer          not null, primary key
-#  team_id    :integer          not null
-#  user_id    :integer          not null
 #  comment    :string(255)
 #  rank       :integer          not null
 #  created_at :datetime
 #  updated_at :datetime
+#  team_id    :integer          not null
+#  user_id    :integer          not null
+#
+# Indexes
+#
+#  index_teamers_on_team_id  (team_id)
+#  index_teamers_on_user_id  (user_id)
 #
 
 class Teamer < ActiveRecord::Base
@@ -91,5 +96,9 @@ class Teamer < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and (user == cuser or team.is_leader? cuser or cuser.admin?)
+  end
+
+  def self.params(params, cuser)
+    params.require(:teamer).permit(:comment, :rank, :team_id, :user_id)
   end
 end

@@ -3,15 +3,20 @@
 # Table name: messages
 #
 #  id             :integer          not null, primary key
-#  sender_type    :string(255)
-#  sender_id      :integer
 #  recipient_type :string(255)
-#  recipient_id   :integer
+#  sender_type    :string(255)
+#  text           :text(65535)
+#  text_parsed    :text(65535)
 #  title          :string(255)
-#  text           :text
 #  created_at     :datetime
 #  updated_at     :datetime
-#  text_parsed    :text
+#  recipient_id   :integer
+#  sender_id      :integer
+#
+# Indexes
+#
+#  index_messages_on_recipient_id_and_recipient_type  (recipient_id,recipient_type)
+#  index_messages_on_sender_id_and_sender_type        (sender_id,sender_type)
 #
 
 class Message < ActiveRecord::Base
@@ -89,5 +94,10 @@ class Message < ActiveRecord::Base
 
   def can_create? cuser
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
+  end
+
+  def self.params(params, cuser)
+    # FIXME: check this
+    params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id)
   end
 end

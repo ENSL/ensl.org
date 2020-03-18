@@ -3,9 +3,14 @@
 # Table name: gather_maps
 #
 #  id        :integer          not null, primary key
+#  votes     :integer
 #  gather_id :integer
 #  map_id    :integer
-#  votes     :integer
+#
+# Indexes
+#
+#  index_gather_maps_on_gather_id  (gather_id)
+#  index_gather_maps_on_map_id     (map_id)
 #
 
 class GatherMap < ActiveRecord::Base

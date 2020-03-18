@@ -3,23 +3,30 @@
 # Table name: contests
 #
 #  id           :integer          not null, primary key
-#  name         :string(255)
-#  start        :datetime
+#  contest_type :integer          default("0"), not null
+#  default_time :time
 #  end          :datetime
+#  modulus_3to1 :float(24)
+#  modulus_4to0 :float(24)
+#  modulus_base :integer
+#  modulus_even :float(24)
+#  name         :string(255)
+#  short_name   :string(255)
+#  start        :datetime
 #  status       :integer
+#  weight       :integer
 #  created_at   :datetime
 #  updated_at   :datetime
-#  default_time :time
-#  contest_type :integer          default(0), not null
-#  winner_id    :integer
 #  demos_id     :integer
-#  short_name   :string(255)
-#  weight       :integer
-#  modulus_base :integer
-#  modulus_even :float
-#  modulus_3to1 :float
-#  modulus_4to0 :float
 #  rules_id     :integer
+#  winner_id    :integer
+#
+# Indexes
+#
+#  index_contests_on_demos_id   (demos_id)
+#  index_contests_on_rules_id   (rules_id)
+#  index_contests_on_status     (status)
+#  index_contests_on_winner_id  (winner_id)
 #
 
 class Contest < ActiveRecord::Base
@@ -138,5 +145,12 @@ class Contest < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params params, cuser
+    params.require(:contest).permit(:name, :start, :end, :status, :default_time,
+                                    :contest_type, :winner_id, :demos_id, :short_name,
+                                    :weight, :modulus_base, :modulus_even,
+                                    :modulus_3to1, :modulus_4to0, :rules_id)
   end
 end

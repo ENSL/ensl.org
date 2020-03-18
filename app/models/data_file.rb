@@ -3,16 +3,22 @@
 # Table name: data_files
 #
 #  id           :integer          not null, primary key
-#  name         :string(255)
 #  description  :string(255)
+#  md5          :string(255)
+#  name         :string(255)
 #  path         :string(255)
 #  size         :integer          not null
-#  md5          :string(255)
 #  created_at   :datetime
 #  updated_at   :datetime
+#  article_id   :integer
 #  directory_id :integer
 #  related_id   :integer
-#  article_id   :integer
+#
+# Indexes
+#
+#  index_data_files_on_article_id    (article_id)
+#  index_data_files_on_directory_id  (directory_id)
+#  index_data_files_on_related_id    (related_id)
 #
 
 require 'digest/md5'
@@ -149,5 +155,9 @@ class DataFile < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin? or (article and article.can_create? cuser)
+  end
+
+  def self.params(params, cuser)
+    params.require(:data_file).permit(:description, :name, :article_id, :related_id, :directory_id)
   end
 end

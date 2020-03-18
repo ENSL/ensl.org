@@ -29,7 +29,7 @@ class ChallengesController < ApplicationController
   end
 
   def create
-    @challenge = Challenge.new params[:challenge]
+    @challenge = Challenge.new(Challenge.params(params, cuser))
     @challenge.user = cuser
     raise AccessError unless @challenge.can_create? cuser
 
@@ -55,7 +55,7 @@ class ChallengesController < ApplicationController
       @challenge.status = Challenge::STATUS_DECLINED
     end
 
-    if @challenge.update_attributes params[:challenge]
+    if @challenge.update_attributes(Challenge.params(params, cuser))
       flash[:notice] = t(:challenges_update)
     end
 

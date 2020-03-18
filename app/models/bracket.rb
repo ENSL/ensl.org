@@ -3,11 +3,15 @@
 # Table name: brackets
 #
 #  id         :integer          not null, primary key
-#  contest_id :integer
+#  name       :string(255)
 #  slots      :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  name       :string(255)
+#  contest_id :integer
+#
+# Indexes
+#
+#  index_brackets_on_contest_id  (contest_id)
 #
 
 class Bracket < ActiveRecord::Base
@@ -77,5 +81,9 @@ class Bracket < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params params, cuser
+    params.require(:bracket).permit(:contest_id, :slots, :name)
   end
 end

@@ -3,29 +3,46 @@
 # Table name: matches
 #
 #  id            :integer          not null, primary key
-#  contester1_id :integer
-#  contester2_id :integer
-#  score1        :integer
-#  score2        :integer
-#  match_time    :datetime
-#  challenge_id  :integer
-#  contest_id    :integer
-#  report        :text
-#  created_at    :datetime
-#  updated_at    :datetime
-#  map1_id       :integer
-#  map2_id       :integer
-#  server_id     :integer
-#  motm_id       :integer
-#  demo_id       :integer
-#  week_id       :integer
-#  referee_id    :integer
-#  forfeit       :boolean
 #  diff          :integer
+#  forfeit       :boolean
+#  match_time    :datetime
 #  points1       :integer
 #  points2       :integer
-#  hltv_id       :integer
+#  report        :text(65535)
+#  score1        :integer
+#  score2        :integer
+#  created_at    :datetime
+#  updated_at    :datetime
 #  caster_id     :string(255)
+#  challenge_id  :integer
+#  contest_id    :integer
+#  contester1_id :integer
+#  contester2_id :integer
+#  demo_id       :integer
+#  hltv_id       :integer
+#  map1_id       :integer
+#  map2_id       :integer
+#  motm_id       :integer
+#  referee_id    :integer
+#  server_id     :integer
+#  week_id       :integer
+#
+# Indexes
+#
+#  index_matches_on_challenge_id       (challenge_id)
+#  index_matches_on_contest_id         (contest_id)
+#  index_matches_on_contester1_id      (contester1_id)
+#  index_matches_on_contester2_id      (contester2_id)
+#  index_matches_on_demo_id            (demo_id)
+#  index_matches_on_hltv_id            (hltv_id)
+#  index_matches_on_map1_id            (map1_id)
+#  index_matches_on_map2_id            (map2_id)
+#  index_matches_on_match_time         (match_time)
+#  index_matches_on_motm_id            (motm_id)
+#  index_matches_on_referee_id         (referee_id)
+#  index_matches_on_score1_and_score2  (score1,score2)
+#  index_matches_on_server_id          (server_id)
+#  index_matches_on_week_id            (week_id)
 #
 
 class Match < ActiveRecord::Base
@@ -360,5 +377,10 @@ class Match < ActiveRecord::Base
 
   def user_in_match?(user)
     user && (user.team == contester1.team || user.team == contester2.team)
+  end
+
+  def self.params(params, cuser)
+    # FIXME: check this
+    params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2, :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_Id, :week_id)
   end
 end

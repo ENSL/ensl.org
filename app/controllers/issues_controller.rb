@@ -36,7 +36,7 @@ class IssuesController < ApplicationController
   end
 
   def create
-    @issue = Issue.new(params[:issue])
+    @issue = Issue.new(Issue.params(params, cuser))
     @issue.author = cuser if cuser
     raise AccessError unless @issue.can_create? cuser
 
@@ -54,7 +54,7 @@ class IssuesController < ApplicationController
 
   def update
     raise AccessError unless @issue.can_update?(cuser, params[:issue])
-    if @issue.update_attributes(params[:issue])
+    if @issue.update_attributes(Issue.params(params, cuser))
       flash[:notice] = t(:issues_update)
       redirect_to(@issue)
     else

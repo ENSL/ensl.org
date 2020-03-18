@@ -3,19 +3,27 @@
 # Table name: gathers
 #
 #  id          :integer          not null, primary key
+#  lastpick1   :datetime
+#  lastpick2   :datetime
 #  status      :integer
+#  turn        :integer
+#  votes       :integer          default("0"), not null
+#  created_at  :datetime
+#  updated_at  :datetime
 #  captain1_id :integer
 #  captain2_id :integer
+#  category_id :integer
 #  map1_id     :integer
 #  map2_id     :integer
 #  server_id   :integer
-#  created_at  :datetime
-#  updated_at  :datetime
-#  turn        :integer
-#  lastpick1   :datetime
-#  lastpick2   :datetime
-#  votes       :integer          default(0), not null
-#  category_id :integer
+#
+# Indexes
+#
+#  index_gathers_on_captain1_id  (captain1_id)
+#  index_gathers_on_captain2_id  (captain2_id)
+#  index_gathers_on_map1_id      (map1_id)
+#  index_gathers_on_map2_id      (map2_id)
+#  index_gathers_on_server_id    (server_id)
 #
 
 class Gather < ActiveRecord::Base
@@ -191,5 +199,9 @@ class Gather < ActiveRecord::Base
     if game = self.find_game(name)
       game.gathers.ordered.first
     end
+  end
+
+  def self.params(params, cuser)
+    params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id)
   end
 end

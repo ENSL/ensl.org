@@ -26,7 +26,7 @@ class DirectoriesController < ApplicationController
   end
 
   def create
-    @directory = Directory.new params[:directory]
+    @directory = Directory.new(Directory.params(params, cuser))
     raise AccessError unless @directory.can_create? cuser
 
     if @directory.save
@@ -39,7 +39,7 @@ class DirectoriesController < ApplicationController
 
   def update
     raise AccessError unless @directory.can_update? cuser
-    if @directory.update_attributes(params[:directory])
+    if @directory.update_attributes(Directory.params(params, cuser))
       flash[:notice] = t(:directories_update)
       redirect_to @directory
     else

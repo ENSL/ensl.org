@@ -1,6 +1,6 @@
 class GroupersController < ApplicationController
   def create
-    @grouper = Grouper.new params[:grouper]
+    @grouper = Grouper.new(Grouper.params(params, cuser))
     raise AccessError unless @grouper.can_create? cuser
 
     if @grouper.save
@@ -16,7 +16,7 @@ class GroupersController < ApplicationController
     @grouper = Grouper.find params[:id]
     raise AccessError unless @grouper.can_update? cuser
 
-    if @grouper.update_attributes params[:grouper]
+    if @grouper.update_attributes(Grouper.params(params, cuser))
       flash[:notice] = t(:groups_user_update)
     else
       flash[:error] = @grouper.errors.full_messages.to_s

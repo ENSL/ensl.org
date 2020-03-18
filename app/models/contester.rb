@@ -3,17 +3,22 @@
 # Table name: contesters
 #
 #  id         :integer          not null, primary key
-#  team_id    :integer
+#  active     :boolean          default("1"), not null
+#  draw       :integer          default("0"), not null
+#  extra      :integer          not null
+#  loss       :integer          default("0"), not null
+#  score      :integer          default("0"), not null
+#  trend      :integer          not null
+#  win        :integer          default("0"), not null
 #  created_at :datetime
 #  updated_at :datetime
-#  score      :integer          default(0), not null
-#  win        :integer          default(0), not null
-#  loss       :integer          default(0), not null
-#  draw       :integer          default(0), not null
 #  contest_id :integer
-#  trend      :integer          not null
-#  extra      :integer          not null
-#  active     :boolean          default(TRUE), not null
+#  team_id    :integer
+#
+# Indexes
+#
+#  index_contesters_on_contest_id  (contest_id)
+#  index_contesters_on_team_id     (team_id)
 #
 
 class Contester < ActiveRecord::Base
@@ -120,5 +125,9 @@ class Contester < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and team.is_leader? cuser or cuser.admin?
+  end
+
+  def self.params params, cuser
+    params.require(:contester).permit(:team_id, :score, :win, :lowss, :draw, :contest_id, :active, :extra)
   end
 end

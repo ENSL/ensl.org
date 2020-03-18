@@ -3,12 +3,16 @@
 # Table name: polls
 #
 #  id         :integer          not null, primary key
-#  question   :string(255)
 #  end_date   :datetime
-#  user_id    :integer
+#  question   :string(255)
+#  votes      :integer          default("0"), not null
 #  created_at :datetime
 #  updated_at :datetime
-#  votes      :integer          default(0), not null
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_polls_on_user_id  (user_id)
 #
 
 class Poll < ActiveRecord::Base
@@ -41,5 +45,9 @@ class Poll < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:poll).permit(:end_date, :question)
   end
 end

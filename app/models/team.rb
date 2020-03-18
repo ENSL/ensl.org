@@ -2,19 +2,24 @@
 #
 # Table name: teams
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  irc        :string(255)
-#  web        :string(255)
-#  tag        :string(255)
-#  country    :string(255)
-#  comment    :string(255)
-#  created_at :datetime
-#  updated_at :datetime
-#  logo       :string(255)
-#  founder_id :integer
-#  active     :boolean          default(TRUE), not null
-#  recruiting :string(255)
+#  id            :integer          not null, primary key
+#  active        :boolean          default("1"), not null
+#  comment       :string(255)
+#  country       :string(255)
+#  irc           :string(255)
+#  logo          :string(255)
+#  name          :string(255)
+#  recruiting    :string(255)
+#  tag           :string(255)
+#  teamers_count :integer
+#  web           :string(255)
+#  created_at    :datetime
+#  updated_at    :datetime
+#  founder_id    :integer
+#
+# Indexes
+#
+#  index_teams_on_founder_id  (founder_id)
 #
 
 class Team < ActiveRecord::Base
@@ -125,5 +130,9 @@ class Team < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:team).except(:id, :active, :founder_id, :created_at, :updated_at).permit!
   end
 end

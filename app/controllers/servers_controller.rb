@@ -20,7 +20,7 @@ class ServersController < ApplicationController
   end
 
   def create
-    @server = Server.new params[:server]
+    @server = Server.new(Server.params(params, cuser))
     @server.user = cuser
     raise AccessError unless @server.can_create? cuser
 
@@ -35,7 +35,7 @@ class ServersController < ApplicationController
   def update
     raise AccessError unless @server.can_update? cuser
 
-    if @server.update_attributes params[:server]
+    if @server.update_attributes(Server.params(params, cuser))
       flash[:notice] = t(:server_update)
       redirect_to @server
     else

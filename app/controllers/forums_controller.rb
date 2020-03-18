@@ -31,7 +31,7 @@ class ForumsController < ApplicationController
   end
 
   def create
-    @forum = Forum.new(params[:forum])
+    @forum = Forum.new(Forum.params(params, cuser))
     raise AccessError unless @forum.can_create? cuser
 
     if @forum.save
@@ -44,7 +44,7 @@ class ForumsController < ApplicationController
 
   def update
     raise AccessError unless @forum.can_update? cuser
-    if @forum.update_attributes(params[:forum])
+    if @forum.update_attributes(Forum.params(params, cuser))
       flash[:notice] = t(:forums_update)
       redirect_to(@forum)
     else

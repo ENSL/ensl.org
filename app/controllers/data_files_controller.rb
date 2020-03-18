@@ -27,7 +27,7 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    @file = DataFile.new params[:data_file]
+    @file = DataFile.new(DataFile.params(params, cuser))
     @file.size = 0
     raise AccessError unless @file.can_create? cuser
 
@@ -47,7 +47,7 @@ class DataFilesController < ApplicationController
 
   def update
     raise AccessError unless @file.can_update? cuser
-    if @file.update_attributes params[:data_file]
+    if @file.update_attributes(DataFile.params(params, cuser))
       flash[:notice] = t(:files_update)
       redirect_to(@file)
     else

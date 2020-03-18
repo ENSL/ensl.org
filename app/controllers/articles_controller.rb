@@ -53,7 +53,7 @@ class ArticlesController < ApplicationController
 
   def update
     raise AccessError unless @article.can_update? cuser, Article.article_params(params, cuser)
-    if @article.update_attributes(article_params)
+    if @article.update_attributes(Article.article_params(params, cuser))
       flash[:notice] = t(:articles_update)
       redirect_to @article
     else

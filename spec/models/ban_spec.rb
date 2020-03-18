@@ -3,16 +3,23 @@
 # Table name: bans
 #
 #  id         :integer          not null, primary key
-#  steamid    :string(255)
-#  user_id    :integer
 #  addr       :string(255)
-#  server_id  :integer
+#  ban_type   :integer
 #  expiry     :datetime
+#  ip         :string(255)
 #  reason     :string(255)
+#  steamid    :string(255)
 #  created_at :datetime
 #  updated_at :datetime
-#  ban_type   :integer
-#  ip         :string(255)
+#  creator_id :integer
+#  server_id  :integer
+#  user_id    :integer
+#
+# Indexes
+#
+#  index_bans_on_creator_id  (creator_id)
+#  index_bans_on_server_id   (server_id)
+#  index_bans_on_user_id     (user_id)
 #
 
 require "rails_helper"

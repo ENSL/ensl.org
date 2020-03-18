@@ -7,7 +7,7 @@ class BracketsController < ApplicationController
   end
 
   def create
-    @bracket = Bracket.new params[:bracket]
+    @bracket = Bracket.new Bracket.params(params, cuser)
     raise AccessError unless @bracket.can_create? cuser
 
     if @bracket.save
@@ -20,7 +20,7 @@ class BracketsController < ApplicationController
   def update
     raise AccessError unless @bracket.can_update? cuser
 
-    if @bracket.update_attributes params[:bracket] and @bracket.update_cells(params[:cell])
+    if @bracket.update_attributes(Bracket.params(params, cuser)) and @bracket.update_cells(params.permit(:cell)[:cell])
       flash[:notice] = t(:brackets_update)
     end
 

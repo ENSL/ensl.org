@@ -1,15 +1,20 @@
+
 # == Schema Information
 #
 # Table name: directories
 #
 #  id          :integer          not null, primary key
-#  name        :string(255)
 #  description :string(255)
+#  hidden      :boolean          default("0"), not null
+#  name        :string(255)
 #  path        :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
 #  parent_id   :integer
-#  hidden      :boolean          default(FALSE), not null
+#
+# Indexes
+#
+#  index_directories_on_parent_id  (parent_id)
 #
 
 class Directory < ActiveRecord::Base
@@ -59,7 +64,7 @@ class Directory < ActiveRecord::Base
   def update_timestamp
     self.created_at = File.mtime(path) if File.exists?(path)
   end
-
+  
   def remove_files
     files.each do |subdir|
       subdir.destroy
@@ -112,5 +117,9 @@ class Directory < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:directory).permit(:description, :hidden, :name, :parent_id)
   end
 end

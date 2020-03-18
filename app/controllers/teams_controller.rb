@@ -24,7 +24,7 @@ class TeamsController < ApplicationController
   end
 
   def create
-    @team = Team.new params[:team]
+    @team = Team.new(Team.params(params, cuser))
     @team.founder = cuser
     raise AccessError unless @team.can_create? cuser
 
@@ -38,7 +38,7 @@ class TeamsController < ApplicationController
 
   def update
     raise AccessError unless @team.can_update? cuser
-    if @team.update_attributes params[:team]
+    if @team.update_attributes(Team.params(params, cuser))
       if params[:rank]
         @team.teamers.present.each do |member|
           # Contains new rank as given by submitted parameters

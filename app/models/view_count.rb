@@ -3,11 +3,15 @@
 # Table name: view_counts
 #
 #  id            :integer          not null, primary key
-#  viewable_id   :integer
-#  viewable_type :string(255)
 #  ip_address    :string(255)
 #  logged_in     :boolean
+#  viewable_type :string(255)
 #  created_at    :date
+#  viewable_id   :integer
+#
+# Indexes
+#
+#  index_view_counts_on_viewable_type_and_viewable_id  (viewable_type,viewable_id)
 #
 
 class ViewCount < ActiveRecord::Base

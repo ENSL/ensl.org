@@ -3,20 +3,29 @@
 # Table name: challenges
 #
 #  id            :integer          not null, primary key
-#  contester1_id :integer
-#  contester2_id :integer
-#  match_time    :datetime
 #  default_time  :datetime
-#  mandatory     :boolean
-#  server_id     :integer
-#  user_id       :integer
 #  details       :string(255)
+#  mandatory     :boolean
+#  match_time    :datetime
 #  response      :string(255)
+#  status        :integer          default("0"), not null
 #  created_at    :datetime
 #  updated_at    :datetime
+#  contester1_id :integer
+#  contester2_id :integer
 #  map1_id       :string(255)
 #  map2_id       :string(255)
-#  status        :integer          default(0), not null
+#  server_id     :integer
+#  user_id       :integer
+#
+# Indexes
+#
+#  index_challenges_on_contester1_id  (contester1_id)
+#  index_challenges_on_contester2_id  (contester2_id)
+#  index_challenges_on_map1_id        (map1_id)
+#  index_challenges_on_map2_id        (map2_id)
+#  index_challenges_on_server_id      (server_id)
+#  index_challenges_on_user_id        (user_id)
 #
 
 class Challenge < ActiveRecord::Base
@@ -255,5 +264,9 @@ class Challenge < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and (contester1.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING# and autodefault.future?
+  end
+
+  def self.params params, cuser
+    params.require(:challenge).permit(:contester1_id, :contester2_id, :match_time, :mandatory, :server_id, :details, :response, :map1_id, :map2_id)
   end
 end

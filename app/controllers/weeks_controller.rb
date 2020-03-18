@@ -12,7 +12,7 @@ class WeeksController < ApplicationController
   end
 
   def create
-    @week = Week.new(params[:week])
+    @week = Week.new(Weeks.params(params, cuser))
     raise AccessError unless @week.can_create? cuser
 
     if @week.save
@@ -26,7 +26,7 @@ class WeeksController < ApplicationController
   def update
     raise AccessError unless @week.can_update? cuser
 
-    if @week.update_attributes(params[:week])
+    if @week.update_attributes(Week.params(params, cuser))
       flash[:notice] = t(:weeks_update)
       redirect_to @week.contest
     else

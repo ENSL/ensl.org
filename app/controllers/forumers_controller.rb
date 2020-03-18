@@ -1,6 +1,6 @@
 class ForumersController < ApplicationController
   def create
-    @forumer = Forumer.new params[:forumer]
+    @forumer = Forumer.new(Forumer.params(params, cuser))
     raise AccessError unless @forumer.can_create? cuser
 
     if @forumer.save
@@ -16,7 +16,7 @@ class ForumersController < ApplicationController
     @forumer = Forumer.find params[:id]
     raise AccessError unless @forumer.can_update? cuser
 
-    if @forumer.update_attributes params[:forumer]
+    if @forumer.update_attributes(Forumer.params(params, cuser))
       flash[:notice] = t(:groups_acl_update)
     else
       flash[:error] = @forumer.errors.full_messages.to_s

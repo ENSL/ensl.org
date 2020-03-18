@@ -1,6 +1,6 @@
 class VotesController < ApplicationController
   def create
-    @vote = Vote.new(params[:vote])
+    @vote = Vote.new(Vote.params(params, cuser))
     @vote.user = cuser
     raise AccessError unless @vote.can_create? cuser
 

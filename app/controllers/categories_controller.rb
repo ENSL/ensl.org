@@ -23,10 +23,11 @@ class CategoriesController < ApplicationController
   end
 
   def create
-    @category = Category.new params[:category]
+    @category = Category.new Category.params(params, cuser)
     raise AccessError unless @category.can_create? cuser
 
     if @category.save
+      # FIXME: move to model
       @category.update_attribute :sort, @category.id
       flash[:notice] = t(:articles_category)
       redirect_to :categories
@@ -37,7 +38,7 @@ class CategoriesController < ApplicationController
 
   def update
     raise AccessError unless @category.can_update? cuser
-    if @category.update_attributes params[:category]
+    if @category.update_attributes Category.params(params, cuser)
       flash[:notice] = t(:articles_category_update)
       redirect_to :categories
     end

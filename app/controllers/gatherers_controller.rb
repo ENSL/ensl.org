@@ -4,9 +4,9 @@ class GatherersController < ApplicationController
   def create
     Gather.transaction do
       Gatherer.transaction do
-        @gatherer = Gatherer.new params[:gatherer]
+        @gatherer = Gatherer.new(Gatherer.params(params, cuser))
         @gatherer.gather.lock!
-        raise AccessError unless @gatherer.can_create? cuser, params[:gatherer]
+        raise AccessError unless @gatherer.can_create?(cuser, Gatherer.params(params, cuser))
 
         if @gatherer.save
           flash[:notice] = t(:gathers_join)
@@ -21,9 +21,9 @@ class GatherersController < ApplicationController
 
   def update
     @gatherer = Gatherer.find params[:gatherer][:id]
-    raise AccessError unless @gatherer.can_update? cuser, params[:gatherer]
+    raise AccessError unless @gatherer.can_update?(cuser, Gatherer.params(params, cuser))
 
-    if @gatherer.update_attributes params[:gatherer]
+    if @gatherer.update_attributes(Gatherer.params(params, cuser))
       flash[:notice] = t(:gatherers_update)
     else
       flash[:error] = @gatherer.errors.full_messages.to_s

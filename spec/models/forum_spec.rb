@@ -3,12 +3,16 @@
 # Table name: forums
 #
 #  id          :integer          not null, primary key
-#  title       :string(255)
 #  description :string(255)
-#  category_id :integer
+#  position    :integer
+#  title       :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
-#  position    :integer
+#  category_id :integer
+#
+# Indexes
+#
+#  index_forums_on_category_id  (category_id)
 #
 
 require "rails_helper"

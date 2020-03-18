@@ -3,12 +3,18 @@
 # Table name: matchers
 #
 #  id           :integer          not null, primary key
-#  match_id     :integer          not null
-#  user_id      :integer          not null
-#  contester_id :integer          not null
+#  merc         :boolean          not null
 #  created_at   :datetime
 #  updated_at   :datetime
-#  merc         :boolean          not null
+#  contester_id :integer          not null
+#  match_id     :integer          not null
+#  user_id      :integer          not null
+#
+# Indexes
+#
+#  index_matchers_on_contester_id  (contester_id)
+#  index_matchers_on_match_id      (match_id)
+#  index_matchers_on_user_id       (user_id)
 #
 
 class Matcher < ActiveRecord::Base

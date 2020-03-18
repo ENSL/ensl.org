@@ -6,6 +6,48 @@ GIT
       multi_json (~> 1.6)
       multi_xml (~> 0.5)
 
+GIT
+  remote: https://github.com/rspec/rspec-core
+  revision: 725b0d2eadaa9ac9f816a6d2d7ef1e507a6705cd
+  specs:
+    rspec-core (3.10.0.pre)
+      rspec-support (= 3.10.0.pre)
+
+GIT
+  remote: https://github.com/rspec/rspec-expectations
+  revision: 3c997d98f49731b2d28d01e070b88aef6bb3c68b
+  specs:
+    rspec-expectations (3.10.0.pre)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (= 3.10.0.pre)
+
+GIT
+  remote: https://github.com/rspec/rspec-mocks
+  revision: 81c17e89b2722cb225d602e08b600e4a4f6148a4
+  specs:
+    rspec-mocks (3.10.0.pre)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (= 3.10.0.pre)
+
+GIT
+  remote: https://github.com/rspec/rspec-rails
+  revision: 84e79259c8978fdff34ea2a327316b638ff00b85
+  specs:
+    rspec-rails (4.0.0.pre)
+      actionpack (>= 4.2)
+      activesupport (>= 4.2)
+      railties (>= 4.2)
+      rspec-core (= 3.10.0.pre)
+      rspec-expectations (= 3.10.0.pre)
+      rspec-mocks (= 3.10.0.pre)
+      rspec-support (= 3.10.0.pre)
+
+GIT
+  remote: https://github.com/rspec/rspec-support
+  revision: 9cec8e858228ee1d1395e4e6186ac39c2a83d705
+  specs:
+    rspec-support (3.10.0.pre)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -306,27 +348,6 @@ GEM
     retriable (3.1.2)
     rexml (3.2.4)
     rmagick (4.0.0)
-    rspec (3.9.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
-    rspec-core (3.9.1)
-      rspec-support (~> 3.9.1)
-    rspec-expectations (3.9.1)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-mocks (3.9.1)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-rails (3.9.1)
-      actionpack (>= 3.0)
-      activesupport (>= 3.0)
-      railties (>= 3.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
-      rspec-support (~> 3.9.0)
-    rspec-support (3.9.2)
     rubocop (0.80.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -384,6 +405,8 @@ GEM
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
+    time_difference (0.5.0)
+      activesupport
     timecop (0.9.1)
     tinymce-rails (5.2.0)
       railties (>= 3.1.1)
@@ -454,8 +477,11 @@ DEPENDENCIES
   rake (< 11.0)
   responders
   rmagick
-  rspec
-  rspec-rails
+  rspec-core!
+  rspec-expectations!
+  rspec-mocks!
+  rspec-rails!
+  rspec-support!
   rubocop
   sanitize
   sass-rails (~> 5.0.3)
@@ -465,6 +491,7 @@ DEPENDENCIES
   spring (= 2.0.2)
   steam-condenser!
   test-unit
+  time_difference
   timecop
   tinymce-rails
   uglifier (~> 2.5.0)

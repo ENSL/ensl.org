@@ -29,7 +29,7 @@ class MessagesController < ApplicationController
   end
 
   def create
-    @message = Message.new(params[:message])
+    @message = Message.new(Message.params(params, cuser))
     @message.sender = @message.sender_raw == "" ? cuser : cuser.active_teams.find(@message.sender_raw)
     raise AccessError unless @message.can_create? cuser
 

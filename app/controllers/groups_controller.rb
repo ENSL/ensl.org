@@ -19,7 +19,7 @@ class GroupsController < ApplicationController
   end
 
   def create
-    @group = Group.new params[:group]
+    @group = Group.new(Group.params(params, cuser))
     @group.founder = cuser
     raise AccessError unless @group.can_create? cuser
     if @group.save
@@ -32,7 +32,7 @@ class GroupsController < ApplicationController
 
   def update
     raise AccessError unless @group.can_update? cuser
-    if @group.update_attributes params[:group]
+    if @group.update_attributes(Group.params(params, cuser))
       flash[:notice] = t(:groups_update)
       redirect_to @group
     else

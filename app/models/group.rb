@@ -8,6 +8,10 @@
 #  updated_at :datetime
 #  founder_id :integer
 #
+# Indexes
+#
+#  index_groups_on_founder_id  (founder_id)
+#
 
 class Group < ActiveRecord::Base
   include Extra
@@ -24,7 +28,6 @@ class Group < ActiveRecord::Base
   GATHER_MODERATORS = 14
   CONTRIBUTORS = 16
 
-  #attr_protected :id, :updated_at, :created_at, :founder_id
   validates_length_of :name, :maximum => 20
 
   has_and_belongs_to_many :users
@@ -117,5 +120,9 @@ class Group < ActiveRecord::Base
       contributors << g unless contributors.include? g
     end
     contributors
+  end
+
+  def self.params(params, cuser)
+    params.require(:gather).permit(:task)
   end
 end

@@ -1,6 +1,6 @@
 class LocksController < ApplicationController
   def create
-    @lock = Lock.new params[:lock]
+    @lock = Lock.new(Lock.params(params, cuser))
     raise AccessError unless @lock.can_create? cuser
 
     if @lock.save

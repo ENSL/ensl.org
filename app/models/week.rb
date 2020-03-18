@@ -5,11 +5,17 @@
 #  id         :integer          not null, primary key
 #  name       :string(255)
 #  start_date :date
+#  created_at :datetime
+#  updated_at :datetime
 #  contest_id :integer
 #  map1_id    :integer
 #  map2_id    :integer
-#  created_at :datetime
-#  updated_at :datetime
+#
+# Indexes
+#
+#  index_weeks_on_contest_id  (contest_id)
+#  index_weeks_on_map1_id     (map1_id)
+#  index_weeks_on_map2_id     (map2_id)
 #
 
 class Week < ActiveRecord::Base
@@ -41,5 +47,9 @@ class Week < ActiveRecord::Base
 
   def can_destroy? cuser
     cuser and cuser.admin?
+  end
+
+  def self.params(params, cuser)
+    params.require(:week).permit(:name, :start_date, :contest_id, :map1_id, :map2_id)
   end
 end
