@@ -88,9 +88,9 @@ class Match < ActiveRecord::Base
   scope :on_day, -> (day) { where("match_time > ? and match_time < ?", day.beginning_of_day, day.end_of_day) }
   scope :on_week, -> (time) { where("match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week) }
   scope :of_contester, -> (contester) { where("contester1_id = ? OR contester2_id = ?", contester.id, contester.id) }
-  scope :of_user, -> (user) { includes(:matchers).where("matchers.user_id = ?",  user.id) }
+  scope :of_user, -> (user) { includes(:matchers).where(matchers: {user_id: user.id}) }
   scope :of_team, -> (team) { includes({:contester1 => :team, :contester2 => :team}).where("teams.id = ? OR teams_contesters.id = ?", team.id, team.id) }
-  scope :of_userteam, -> (user, team) { eager_load({:matchers => {:contester => :team}}).where("teams.id = ? AND matchers.user_id = ?", team.id, user.id) }
+  scope :of_userteam, -> (user, team) { includes({:matchers => {:contester => :team}}).where(teams: {id: team.id}, matchers: {user_id: user.id}) }
   scope :within_time, -> (from, to) { where("match_time > ? AND match_time < ?", from.utc, to.utc) }
   scope :around, -> (time) { where("match_time > ? AND match_time < ?", time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc) }
   scope :after, -> (time) { where("match_time > ? AND match_time < ?", time.utc, time.ago(-MATCH_LENGTH).utc) }

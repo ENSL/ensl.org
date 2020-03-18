@@ -40,8 +40,6 @@ class Contest < ActiveRecord::Base
   TYPE_LEAGUE = 1
   TYPE_BRACKET = 2
 
-  #attr_protected :id, :updated_at, :created_at
-
   scope :active, -> { where.not(status: STATUS_CLOSED) }
   scope :inactive, -> { where(status: STATUS_CLOSED) }
   scope :joinable, -> { where(status: STATUS_OPEN) }
@@ -57,7 +55,7 @@ class Contest < ActiveRecord::Base
   has_many :predictions, :through => :matches
   has_many :brackets
   has_many :preds_with_score, -> {
-            select("predictions.id, predictions.user_id
+            select("predictions.id, predictions.user_id,
                     SUM(result) AS correct,
                     SUM(result)/COUNT(*)*100 AS score,
                     COUNT(*) AS total")

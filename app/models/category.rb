@@ -43,7 +43,7 @@ class Category < ActiveRecord::Base
   scope :nospecial, -> { where.not(name: 'Special') }
   scope :newest, -> { includes(:articles).order("articles.created_at DESC") }
   # scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
-  scope :of_user, -> (user) { where("articles.user_id", user.id).includes(:articles) }
+  scope :of_user, -> (user) { where(articles: {user: user}).includes(:articles) }
 
   has_many :articles, -> { order("created_at DESC") }
   has_many :issues, -> { order("created_at DESC") }

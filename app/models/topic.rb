@@ -109,7 +109,7 @@ class Topic < ActiveRecord::Base
     return false unless cuser
     errors.add :bans, I18n.t(:bans_mute) if cuser.banned?(Ban::TYPE_MUTE) and forum != Forum::BANS
     errors.add :bans, I18n.t(:registered_for_week) unless cuser.verified?
-    (Forum.available_to(cuser, Forumer::ACCESS_TOPIC).of_forum(forum).first and errors.size == 0)
+    Forum.available_to(cuser, Forumer::ACCESS_TOPIC).where(id: forum_id) and errors.size == 0
   end
 
   def can_update? cuser
@@ -129,6 +129,6 @@ class Topic < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.permit(:state, :title, :forum_id, :user_id)
+    params.require(:topic).permit(:state, :title, :forum_id, :user_id, :first_post)
   end
 end

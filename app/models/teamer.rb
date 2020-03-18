@@ -41,7 +41,7 @@ class Teamer < ActiveRecord::Base
   scope :active, -> { where("teamers.rank >= ?", RANK_MEMBER) }
   scope :leaders, -> { where("teamers.rank >= ?", RANK_DEPUTEE) }
   scope :of_team, -> (team) { where("teamers.team_id" => team.id) }
-  scope :active_teams, -> { includes(:team).where("teams.active = ?", true) }
+  scope :active_teams, -> { includes(:team).where(teams: {active: true}) }
   scope :unique_by_team, -> { group("user_id, team_id") }
   scope :ordered, -> { order("rank DESC, created_at ASC") }
   scope :historic, ->  (user, time) {
