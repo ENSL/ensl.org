@@ -56,7 +56,7 @@ class TopicsController < ApplicationController
 
   def update
     raise AccessError unless @topic.can_update? cuser
-    if @topic.update_attributes(params[:topic])
+    if @topic.update_attributes(Topic.params(params, cuser))
       flash[:notice] = t(:topics_update)
       redirect_to(@topic)
     else
