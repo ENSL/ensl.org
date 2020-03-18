@@ -355,6 +355,6 @@ class User < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:user).permit(:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter)
+    params.require(:user).permit(:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter, :team_id)
   end
 end
