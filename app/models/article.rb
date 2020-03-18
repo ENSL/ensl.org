@@ -41,6 +41,9 @@ class Article < ActiveRecord::Base
   G_RULES = 464
   COMPMOD = 998
 
+  attribute :text_coding, :integer, default: CODING_HTML
+  attribute :status, :integer, default: STATUS_DRAFT
+
   scope :recent, -> { order('created_at DESC').limit(8) }
   scope :with_comments, -> {
     select("articles.*, COUNT(C.id) AS comment_num").
@@ -101,8 +104,8 @@ class Article < ActiveRecord::Base
   end
 
   def init_variables
-    self.status = STATUS_DRAFT unless user.admin?
-    self.text_coding = CODING_BBCODE if !user.admin? and text_coding = CODING_HTML
+    self.status = STATUS_DRAFT unless user&.admin?
+    self.text_coding = CODING_BBCODE if (!user&.admin? and text_coding == CODING_HTML)
   end
 
   def format_text

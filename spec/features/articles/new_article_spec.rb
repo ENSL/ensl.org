@@ -15,7 +15,7 @@ feature 'User creates new article', js: :true do
 
       it 'creates an article successfully' do
         fill_in attribute_translation(:article, :title), with: article[:title]
-        fill_tinymce "#article_text", article[:text]
+        fill_tinymce "article_text", article[:text]
         click_button I18n.t('helpers.submit.post.create')
 
         expect(page).to have_content(I18n.t('articles_create'))
@@ -23,7 +23,7 @@ feature 'User creates new article', js: :true do
 
       it 'creates an article with a text length greater than 65535 bytes' do
         fill_in attribute_translation(:article, :title), with: article[:title]
-        fill_tinymce "#article_text", long_text
+        fill_tinymce "article_text", long_text
         click_button I18n.t('helpers.submit.post.create')
 
         expect(page).to have_content(I18n.t('articles_create'))

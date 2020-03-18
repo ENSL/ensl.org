@@ -16,18 +16,19 @@ class ArticlesController < ApplicationController
 
   def admin
     raise AccessError unless cuser and cuser.admin?
+    # FIXME: something better?
     @articles = {"Drafts" => Article.drafts.ordered, "Special" => Article.category(Category::SPECIAL).ordered}
   end
 
   def show
     raise AccessError unless @article.can_show? cuser
     @article.mark_as_read! for: cuser if cuser
+    # OBSOLETE
     # @article.record_view_count(request.remote_ip, cuser.nil?)
   end
 
   def new
     @article = Article.new
-    @article.text_coding = Article::CODING_HTML
     raise AccessError unless @article.can_create? cuser
   end
 
@@ -39,7 +40,7 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new Article.article_params(params, cuser)
+    @article = Article.new(Article.article_params(params, cuser))
     @article.user = cuser
     raise AccessError unless @article.can_create? cuser
 
@@ -52,7 +53,7 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    raise AccessError unless @article.can_update? cuser, Article.article_params(params, cuser)
+    raise AccessError unless @article.can_update?(cuser, Article.article_params(params, cuser))
     if @article.update_attributes(Article.article_params(params, cuser))
       flash[:notice] = t(:articles_update)
       redirect_to @article
@@ -61,6 +62,7 @@ class ArticlesController < ApplicationController
     end
   end
 
+  # TODO: link it somewhere
   def cleanup
     raise AccessError unless @article.can_update? cuser
     @article.text = strip(@article.text)
