@@ -47,7 +47,7 @@ class PostsController < ApplicationController
   def trash
     raise AccessError unless @post.can_destroy? cuser
     @post.trash
-    if Topic.exists? @post.topic
+    if @post.topic.exists?
       redirect_to @post.topic
     else
       redirect_to @post.topic.forum
@@ -57,7 +57,7 @@ class PostsController < ApplicationController
   def destroy
     raise AccessError unless @post.can_destroy? cuser
     @post.destroy
-    if Topic.exists? @post.topic
+    if @post.topic.exists?
       redirect_to @post.topic
     else
       redirect_to @post.topic.forum

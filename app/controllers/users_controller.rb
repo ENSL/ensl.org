@@ -53,7 +53,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(User.params(params, cuser))
+    @user = User.new(User.params(params, cuser, "create"))
     # FIXME: move to model
     @user.lastvisit = Date.today
     @user.lastip = request.env['REMOTE_ADDR']
@@ -75,7 +75,7 @@ class UsersController < ApplicationController
     raise AccessError unless @user.can_update? cuser
     # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update_attributes(User.params(params, cuser))
+    if @user.update_attributes(User.params(params, cuser, "update"))
       flash[:notice] = t(:users_update)
       redirect_to_back
     else

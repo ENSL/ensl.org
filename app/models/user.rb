@@ -115,7 +115,7 @@ class User < ActiveRecord::Base
   validates_length_of :email, :maximum => 50
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_length_of :steamid, :maximum => 30
-  validates_format_of :steamid, :with => /\A([0-9]{1,10}:){2}[0-9]{1,10}\Z/
+  validates_format_of :steamid, :with => /\ASTEAM_[0-5]:[01]:\d+\Z/
   validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
   validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
   validate :validate_team
@@ -354,10 +354,12 @@ class User < ActiveRecord::Base
     Group.find(Group::CASTERS).users.order(:username)
   end
 
-  def self.params(params, cuser)
-    profile_attrs = cuser.profile.attributes.keys - ["id", "created_at", "updated_at"]
-    allowed = [:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter, :time_zone, :team_id, profile_attributes: [profile_attrs]]
-    allowed << :username if cuser.admin?
+  def self.params(params, cuser, operation)
+    profile_attrs ||= cuser.profile.attributes.keys - ["id", "created_at", "updated_at"] if cuser
+    allowed = [:raw_password, :firstname, :lastname, :email, :steamid, :country, \
+               :birthdate, :timezone, :public_email, :filter, :time_zone, :team_id, \
+               profile_attributes: [profile_attrs]]
+    allowed << :username if cuser&.admin? || operation == 'create'
     params.require(:user).permit(*allowed)
   end
 end
