@@ -28,6 +28,16 @@
 
 require 'digest/md5'
 
+class SteamIdValidator < ActiveModel::Validator
+  def validate(record)
+    record.errors.add :steamid unless \
+      record.steamid.nil? ||
+        (m = record.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
+        (id = m[3].to_i) &&
+        id >= 1 && id <= 2147483647
+  end
+end
+
 class User < ActiveRecord::Base
   include Extra
 
@@ -115,7 +125,8 @@ class User < ActiveRecord::Base
   validates_length_of :email, :maximum => 50
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_length_of :steamid, :maximum => 30
-  validates_format_of :steamid, :with => /\ASTEAM_[0-5]:[01]:\d+\Z/
+  validates_with SteamIdValidator
+  # validates_format_of :steamid, :with => /\A(STEAM_)?[0-5]:[01]:\d+\Z/
   validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
   validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
   validate :validate_team
@@ -269,14 +280,6 @@ class User < ActiveRecord::Base
 
   def unread_issues
     issues.unread_by(self)
-  end
-
-  def validate_steamid
-    errors.add :steamid unless
-	  steamid.nil? ||
-      (m = steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
-      (id = m[3].to_i) &&
-      id >= 1 && id <= 2147483647
   end
 
   def correct_steamid_universe
