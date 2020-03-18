@@ -67,6 +67,6 @@ class Comment < ActiveRecord::Base
   end
 
   def self.params params, cuser
-    params.require(:ban).permit(:text, :user_id, :commentable_type, :commentable_id)
+    params.require(:comment).permit(:text, :user_id, :commentable_type, :commentable_id)
   end
 end

@@ -50,7 +50,7 @@ class ContestersController < ApplicationController
 
     if @contester.update_attributes(Contester.params(params, cuser))
       flash[:notice] = t(:contests_contester_update)
-      redirect_to @contester.contest
+      redirect_to_back
     else
       render :edit
     end

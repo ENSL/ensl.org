@@ -16,7 +16,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = Comment.new Comment.params(parmas, cuser)
+    @comment = Comment.new(Comment.params(params, cuser))
     @comment.user = cuser
     raise AccessError unless @comment.can_create? cuser
 

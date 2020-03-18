@@ -128,6 +128,6 @@ class Contester < ActiveRecord::Base
   end
 
   def self.params params, cuser
-    params.require(:contester).permit(:team_id, :score, :win, :lowss, :draw, :contest_id, :active, :extra)
+    params.require(:contester).permit(:team_id, :score, :win, :lowss, :draw, :contest_id, :active, :extra, :user)
   end
 end

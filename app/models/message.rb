@@ -98,6 +98,6 @@ class Message < ActiveRecord::Base
 
   def self.params(params, cuser)
     # FIXME: check this
-    params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id)
+    params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id, :sender_raw)
   end
 end
