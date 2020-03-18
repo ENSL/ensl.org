@@ -7,7 +7,7 @@ module Features
     end
 
     def fill_tinymce(element, contents)
-      page.execute_script("$('#{element}').tinymce().setContent('#{contents}')")
+      page.execute_script("tinymce.get('#{element}').setContent('#{contents}')")
     end
 
     def submit(model, action)
