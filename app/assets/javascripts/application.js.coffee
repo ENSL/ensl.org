@@ -3,7 +3,6 @@
 //= require jquery.periodicalupdater
 //= require jquery.jplayer.min
 //= require flowplayer
-//= require tinymce-jquery
 //= require yetii
 //= require local
 //= require shoutbox

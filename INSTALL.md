@@ -1,16 +1,8 @@
-# Production Install (Ubuntu LTS)
+# Install (Ubuntu LTS)
 
 ENSL Website is fairly easy to run.
 
-## 1. Install reverse proxy
-
-Install apache, nginx etc. reverse proxy. It will take requests from the users and pass them to ENSL website. Sample configuration availble @ ext/nginx.
-
-https://www.nginx.com/resources/wiki/start/
-
-    sudo apt-get install nginx
-
-## 2. Install docker and docker-compose
+## 1. Install docker and docker-compose
 
 https://docs.docker.com/install/
 https://docs.docker.com/compose/install/
@@ -20,9 +12,13 @@ Install docker + docker-compose:
     wget -O - 'https://get.docker.com/'|bash
     sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 
-## 3. Install git
+## 2. Install git
 
-## 4. Download ENSL website and install it
+https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+
+    sudo apt-get install nginx
+
+## 3. Download ENSL website and install it
 
 Now create the required directories, e.g. `/srv/ensl.org`
 
@@ -39,3 +35,13 @@ Finally, Start the docker containers.
 
     docker-compose build
     docker-compose --rm up
+
+## 4. Install reverse proxy
+
+Install apache, nginx etc. reverse proxy. It will take requests from the users and pass them to ENSL website. Sample configuration availble @ ext/nginx.
+
+https://www.nginx.com/resources/wiki/start/
+
+    sudo apt-get install nginx
+
+*Skip this step if you are only doing development.*

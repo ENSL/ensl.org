@@ -35,10 +35,8 @@ Ensl::Application.configure do
   # config.threadsafe!
   config.eager_load = false
 
-  config.web_console.whitelisted_ips = '172.18.0.0/16'
+  config.web_console.whitelisted_ips = '172.0.0.0/8'
   config.web_console.whiny_requests = true
 
-  config.eager_load = false
-
-  config.assets.debug = true
+  config.serve_static_assets = true
 end

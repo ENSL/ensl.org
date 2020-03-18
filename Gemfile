@@ -113,5 +113,6 @@ group :test do
 end
 
 group :development, :test do
+  gem 'pry-rails'
   gem 'pry-byebug', '~> 1.3.2'
 end

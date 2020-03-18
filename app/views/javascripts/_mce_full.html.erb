@@ -1,15 +1,2 @@
-<script type="text/javascript">
-  $(function() {
-    $('textarea').tinymce({
-      mode: "textareas",
-      theme: "advanced",
-      plugins: "inlinepopups,contextmenu,nonbreaking,template",
-      theme_advanced_buttons1: "bold,italic,blockquote,|,bullist,numlist,|,formatselect,|,link,unlink,image,|,cleanup,code",
-      theme_advanced_buttons2: "",
-      theme_advanced_buttons3: "",
-      theme_advanced_buttons4: "",
-      convert_urls: false,
-      content_css: '<%= asset_path "application.css" %>'
-    });
-  });
-</script>
+<%= tinymce_assets %>
+<%= tinymce :articles, :content_css => asset_path('application.scss') %>

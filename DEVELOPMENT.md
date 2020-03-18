@@ -1,5 +1,7 @@
 # Development
 
+Install instructions in INSTALL.md
+
 This is just random tips for development. Not a full documentation.
 
 # Handy commands

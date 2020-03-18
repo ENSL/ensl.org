@@ -17,7 +17,7 @@ $ ->
 
     $select.trigger 'DOMSubtreeModified'
 
-  $('a[href=#form_submit]').click ->
+  $('a[href=\\#form_submit]').click ->
     $(this).closest('form').submit()
     return false
 
