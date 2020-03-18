@@ -53,7 +53,8 @@ class Issue < ActiveRecord::Base
 
   before_validation :init_variables, :if => Proc.new{|issue| issue.new_record?}
   before_save :parse_text
-  after_save :remove_readings
+  # FIXME
+  # after_save :remove_readings
 
   acts_as_readable
 

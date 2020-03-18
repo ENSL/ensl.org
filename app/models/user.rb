@@ -355,6 +355,9 @@ class User < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:user).permit(:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter, :team_id)
+    profile_attrs = cuser.profile.attributes.keys - ["id", "created_at", "updated_at"]
+    allowed = [:raw_password, :firstname, :lastname, :email, :steamid, :country, :birthdate, :timezone, :public_email, :filter, :time_zone, :team_id, profile_attributes: [profile_attrs]]
+    allowed << :username if cuser.admin?
+    params.require(:user).permit(*allowed)
   end
 end

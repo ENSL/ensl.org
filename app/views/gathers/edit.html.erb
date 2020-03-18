@@ -1,73 +1,73 @@
 <h1>Gather Admin: #<%= @gather.id %></h1>
 
 <div class="restart">
-  <h3>Restart Gather</h3>
+    <h3>Restart Gather</h3>
 
-  <%= form_for(@gather, html: { class: 'square' }) do |f| %>
+    <%= form_for(@gather, html: { class: 'square' }) do |f| %>
     <%= render 'shared/errors', messages: @gather.errors.full_messages %>
-    
+
     <%= f.hidden_field :admin %>
 
     <div class="fields horizontal">
-      <%= f.label :captain1 %>
-      <%= f.select :captain1_id, @gather.gatherers.collect{|c| [c, c.id]} %>
+        <%= f.label :captain1 %>
+        <%= f.select :captain1_id, @gather.gatherers.collect{|c| [c, c.id]} %>
     </div>
     <div class="fields horizontal">
-      <%= f.label :captain2 %>
-      <%= f.select :captain2_id, @gather.gatherers.collect{|c| [c, c.id]} %>
+        <%= f.label :captain2 %>
+        <%= f.select :captain2_id, @gather.gatherers.collect{|c| [c, c.id]} %>
     </div>
 
     <div class="controls">
-      <%= f.submit 'Restart Gather' %>
+        <%= f.submit 'Restart Gather' %>
     </div>
-  <% end %>
+    <% end %>
 </div>
 
 <div class="turns">
-  <h3>Change Turns</h3>
+    <h3>Change Turns</h3>
 
-  <%= form_for(@gather, html: { class: 'square' }) do |f| %>
+    <%= form_for(@gather, html: { class: 'square' }) do |f| %>
     <%= render 'shared/errors', messages: @gather.errors.full_messages %>
 
     <div class="fields horizontal">
-      <%= f.label :turn %>
-      <%= f.select :turn, ['Team 1', 'Team 2'] %>
+        <%= f.label :turn %>
+        <%= f.select :turn, ['Team 1', 'Team 2'] %>
     </div>
     <div class="controls">
-      <%= f.submit 'Change Turn' %>
+        <%= f.submit 'Change Turn' %>
     </div>
-  <% end %>
+    <% end %>
 </div>
 
 
 <div class="replace">
-  <h3>Replace Players</h3>
+    <h3>Replace Players</h3>
 
-  <% if @gather.gatherers.first %>
+    <% if @gather.gatherers.first %>
     <%= form_for(@gather.gatherers.first, html: { class: 'square' }) do |f| %>
-      <div class="fields horizontal">
+    <div class="fields horizontal">
         <%= f.label :id, "Select Player" %>
         <%= f.select :id, @gather.gatherers.collect{|g| [g.user, g.id]} %>
-      </div>
-      <div class="fields horizontal">
+    </div>
+    <div class="fields horizontal">
         <%= f.label :username, "Replace with:" %>
         <%= f.text_field :username %>
-      </div>
-      <div class="controls">
+    </div>
+    <div class="controls">
         <%= f.submit 'Replace Player' %>
-      </div>
+    </div>
     <% end %>
-  <% end %>
+    <% end %>
 </div>
 
 <div class="restart">
-  <h3>Start New</h3>
-  <%= form_for Gather.new do |f| %>
+    <h3>Start New</h3>
+    <%= form_for Gather.new do |f| %>
     <% f.object.category = @gather.category %>
     <%= f.hidden_field :category_id %>
 
     <div class="controls">
-      <%= f.submit "Start New Gather (#{f.object.category})" %>
+        <%= f.submit "Start New Gather (#{f.object.category})" %>
     </div>
-  <% end %>
+    <% end %>
 </div>
