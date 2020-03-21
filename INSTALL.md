@@ -2,7 +2,7 @@
 
 ENSL Website is fairly easy to run.
 
-## 1. Install docker and docker-compose
+## 1. Install requirements: docker, docker-compose and git
 
 https://docs.docker.com/install/
 https://docs.docker.com/compose/install/
@@ -12,9 +12,7 @@ Install docker + docker-compose:
     wget -O - 'https://get.docker.com/'|bash
     sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 
-## 2. Install git
-
-https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+Install git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
     sudo apt-get install nginx
 
@@ -36,7 +34,7 @@ Finally, Start the docker containers.
     docker-compose build
     docker-compose --rm up
 
-## 4. Install reverse proxy
+## 4. Install reverse proxy (production only)
 
 Install apache, nginx etc. reverse proxy. It will take requests from the users and pass them to ENSL website. Sample configuration availble @ ext/nginx.
 

@@ -83,6 +83,7 @@ services:
     #tty: true
     command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
+    container_name: ensl_dev_db
     volumes:
      - "./db_data:/var/lib/mysql"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
