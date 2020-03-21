@@ -104,7 +104,11 @@ group :test do
   gem 'test-unit'
   gem 'timecop'
 
+  # FOr JS test
+  gem 'mime-types'
+
   # Use dev versions because of rspec bug
+  
   gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
   gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
   gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'

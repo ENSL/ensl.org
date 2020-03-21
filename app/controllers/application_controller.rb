@@ -45,7 +45,7 @@ class ApplicationController < ActionController::Base
     end
 
     rescue_from Error do |exception|
-      render text: exception.message, layout: true
+      render text: exception.message, layout: true, status: 500
     end
 
     rescue_from ActiveRecord::StaleObjectError do |exception|

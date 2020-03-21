@@ -32,6 +32,8 @@ Ensl::Application.routes.draw do
   resources :categories
   resources :options
   resources :polls
+  resources :custom_urls, only: [:create, :update, :destroy]
+  resources :brackets
 
   get 'comments/quote'
 
@@ -51,7 +53,12 @@ Ensl::Application.routes.draw do
   get 'forums/down'
 
   resources :forums
-  resources :users
+  resources :users do
+    collection do
+      get 'forgot'
+      post 'forgot'
+    end
+  end
   resources :locks
   resources :contesters
 
@@ -83,8 +90,6 @@ Ensl::Application.routes.draw do
   resources :posts do |p|
     get :quote
   end
-
-  resources :brackets
 
   get 'about/action'
   get 'about/staff'
@@ -133,12 +138,9 @@ Ensl::Application.routes.draw do
   get 'users/login'
   get 'users/logout'
   get 'users/popup'
-  get 'users/forgot', to: "users#forgot"
 
   get 'votes/create'
   get "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
-
-  resources :custom_urls, only: [:create, :update, :destroy]
 
   get "custom_urls", to: "custom_urls#administrate"
 

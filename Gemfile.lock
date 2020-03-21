@@ -464,6 +464,7 @@ DEPENDENCIES
   i18n-js
   i18n_country_select
   jquery-rails
+  mime-types
   mysql2
   neat (~> 1.6.0)
   newrelic_rpm

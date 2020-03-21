@@ -2,9 +2,11 @@ class UsersController < ApplicationController
   before_action :get_user, only: [:show, :history, :popup, :agenda, :edit, :update, :destroy]
   respond_to :html, :js
 
+  PAGES = ["general", "favorites", "computer", "articles", "movies", "teams", "matches", "predictions", "comments"]
+
   def index
     search = params[:search]
-    if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser && cuser.admin?
+    if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser&.admin?
       @users = User.where(lastip: $1).paginate(per_page: 40, page: params[:page])
     else
       if params[:filter] == 'lately'
@@ -19,26 +21,25 @@ class UsersController < ApplicationController
     @page = "general"
     respond_to do |format|
       format.js do
-        pages = ["general", "favorites", "computer", "articles", "movies", "teams", "matches", "predictions", "comments"]
-        if pages.include?(params[:page])
-          @page = params[:page]
-        end
+        @page = params[:page] if self.PAGES.include?(params[:page])
       end
       format.html {}
     end
   end
 
+  # FIXME: consider merging
+  def popup
+    render layout: false
+  end
+
   def agenda
+    raise AccessError unless @user == cuser or cuser&.admin?
     @teamer = Teamer.new
     @teamer.user = @user
   end
 
   def history
-    raise AccessError unless cuser and cuser.admin?
-  end
-
-  def popup
-    render layout: false
+    raise AccessError unless cuser&.admin?
   end
 
   def new
@@ -72,7 +73,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    raise AccessError unless @user.can_update? cuser
+    raise AccessError unless @user.can_update? cuser  
     # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser
     if @user.update_attributes(User.params(params, cuser, "update"))
@@ -89,37 +90,35 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  # FIXME: maybe move to session controller
   def login
-    return unless request.post?
-
-    if u = User.authenticate(params[:login][:username].downcase, params[:login][:password])
-      raise Error, t(:accounts_locked) if u.banned? Ban::TYPE_SITE
-
-      flash[:notice] = t(:login_successful)
-      save_session u
-
-      if session[:return_to]
-        return_to
+    if params[:login] && (u = User.authenticate(params[:login]))
+      if u.banned? Ban::TYPE_SITE
+        flash[:notice] = t(:accounts_locked)
       else
-        redirect_to_back
+        flash[:notice] = t(:login_successful)
+        save_session u
       end
     else
       flash[:error] = t(:login_unsuccessful)
+    end
+    # FIXME: check return on rails 6
+    if session[:return_to]
+      return_to
+    else
       redirect_to_back
     end
   end
 
   def logout
-    if request.post?
-      session[:user] = nil
-      flash[:notice] = t(:login_out)
-      redirect_to :root
-    end
+    session[:user] = nil
+    flash[:notice] = t(:login_out)
+    redirect_to :root
   end
 
   def forgot
     if request.post?
-      if u = User.first(:conditions => {:username => params[:username], :email => params[:email]}) and u.send_new_password
+      if (user1 = User.where(username: params[:username], email: params[:email]).first) && user1.send_new_password
         flash[:notice] = t(:passwords_sent)
       else
         flash[:error] = t(:incorrect_information)
@@ -137,6 +136,6 @@ class UsersController < ApplicationController
     session[:user] = user.id
     user.lastip = request.ip
     user.lastvisit = DateTime.now
-    user.save()
+    user.save
   end
 end

@@ -8,7 +8,7 @@ FactoryBot.define do
     lastname "Player"
     country "EU"
     raw_password "PasswordABC123"
-    lastvisit "Sun, 15 Mar 2020 13:31:06 +0000"
+    # lastvisit "Sun, 15 Mar 2020 13:31:06 +0000"
 
     after(:create) do |user|
       create(:profile, user: user)

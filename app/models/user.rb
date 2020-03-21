@@ -299,6 +299,7 @@ class User < ActiveRecord::Base
     self.time_zone = "Amsterdam"
   end
 
+  # Password  should store password and password_hash shoulds store
   def update_password
     self.password = Digest::MD5.hexdigest(raw_password) if raw_password and raw_password.length > 0
   end
@@ -329,8 +330,8 @@ class User < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.authenticate(username, password)
-    where("LOWER(username) = LOWER(?)", username).where(:password => Digest::MD5.hexdigest(password)).first
+  def self.authenticate(login)
+    where("LOWER(username) = LOWER(?)", login[:username]).where(password: Digest::MD5.hexdigest(login[:password])).first
   end
 
   def self.get id
