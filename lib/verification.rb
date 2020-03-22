@@ -1,3 +1,4 @@
+# FIXME: this is very stupid, use PKI
 module Verification
   def self.verify(input)
     md5 = Digest::MD5.hexdigest("9WvcZ9hX" + input + "KF7L4luQ").upcase.split(//)
