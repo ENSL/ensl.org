@@ -16,11 +16,11 @@ Just run and open http://localhost:4000/
     sudo echo `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ensl_dev_db` db >> /etc/hosts
 1. VS Code and RubyMine are great IDE's/editors.
 1. To run VS Code plugin Ruby Test Explorer in docker container you need to create path to custom 
-
-This is just random tips for development. Not a full documentation.
+1. Do not commit too much without testing. Also keep commits small for documentation and reversability issues.
 
 ## Best practices
 
+1. https://nvie.com/posts/a-successful-git-branching-model/
 1. https://github.com/rubocop-hq/ruby-style-guide
 1. https://rails-bestpractices.com/
 1. http://www.betterspecs.org/
