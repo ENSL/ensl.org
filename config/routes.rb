@@ -143,6 +143,7 @@ Ensl::Application.routes.draw do
   get "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
 
   get "custom_urls", to: "custom_urls#administrate"
+  get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
 
   get ':controller/:action', requirements: { action: /A-Za-z/ }
   get ':controller/:action/:id'
