@@ -11,4 +11,8 @@ FactoryBot.define do
   trait :game do
     domain Category::DOMAIN_GAMES
   end
+
+  trait :forums do
+    domain Category::DOMAIN_FORUMS
+  end
 end

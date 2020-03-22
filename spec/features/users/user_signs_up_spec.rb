@@ -9,6 +9,7 @@ feature "Visitor signs up", js: :true do
 
   scenario "with valid Username, Email, Password and Steam ID" do
     within registration_form do
+
       fill_form(:user, user.slice(*sign_up_attributes))
       click_button submit(:user, :create)
     end
