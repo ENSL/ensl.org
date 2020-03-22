@@ -22,6 +22,7 @@ services:
      #- spring
      #- selenium
      #- redis
+     container_name: ensl_dev
 
   test:
     # Debug
@@ -57,6 +58,7 @@ services:
 
   selenium:
     image: selenium/standalone-chrome-debug
+    container_name: ensl_dev_selenium
     ports:
       - 5900:5900
       - 4444:4444
