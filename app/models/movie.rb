@@ -108,6 +108,16 @@ class Movie < ActiveRecord::Base
     #end
   end
 
+  def preview_url
+    if preview
+      preview.url
+    elsif movie.url.ends_with?(".mp4")
+      file.url
+    else
+      False
+    end
+  end
+
   def make_preview x, y
     result = file.full_path.gsub(/\.\w{3}$/, "") + "_preview.mp4"
     params = "-vcodec libx264 -vpre hq -b 1200k -bt 1200k -acodec libmp3lame -ab 128k -ac 2"

@@ -2,7 +2,6 @@
 //= require jquery_ujs
 //= require jquery.periodicalupdater
 //= require jquery.jplayer.min
-//= require flowplayer
 //= require yetii
 //= require local
 //= require shoutbox

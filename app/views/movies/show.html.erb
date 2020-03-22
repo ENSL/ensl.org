@@ -1,28 +1,19 @@
 <div class="movie-full">
-  <h1 class="fancy">
-    <span><%= namelink @movie %></span>
-  </h1>
+    <h1 class="fancy">
+        <span><%= namelink @movie %></span>
+    </h1>
 
-  <%= render partial: "movie", object: @movie %>
+    <%= render partial: "movie", object: @movie %>
 
-  <% if @movie.preview %>
+    <% if @movie.preview_url %>
     <div class="player">
-      <%= javascript_include_tag 'flowplayer' %>
+        <video src="<%= @movie.preview.url %>" controls></video>
 
-      <script>
-        flowplayer("player", "/flash/flowplayer-3.1.3.swf", {
-          clip: {
-            autoPlay: false,
-            autoBuffering: false
-          }
-        });
-      </script>
-
-      <a id="player" href="<%= @movie.preview.url %>"></a>
-
-      <p>This is a low quality version. Please download better version from above. For broken links: try changing /ns1videos/ to /videos/ in the link.</p>
+        <p>This is a preview version and video quality may not be full. For best experince please download the movie and use eg. <a href="https://www.videolan.org/vlc/">VLC</a></p>
     </div>
-  <% end %>
+    <% else %>
+    <p>There is no preview available. Please download the movie and use eg. <a href="https://www.videolan.org/vlc/">VLC</a></p>
+    <% end %>
 </div>
 
 <%= add_comments @movie.file %>

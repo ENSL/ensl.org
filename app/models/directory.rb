@@ -34,7 +34,7 @@ class Directory < ActiveRecord::Base
   has_many :files, -> { order("name") }, :class_name => "DataFile"
 
   scope :ordered, ->  { order("name ASC") }
-  scope :filtered, -> { where(hidden: true) }
+  scope :filtered, -> { where(hidden: false) }
   scope :of_parent, -> (parent) { where(parent_id: parent.id) }
 
   validates_length_of [:name, :path], :in => 1..255

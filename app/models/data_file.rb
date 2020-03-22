@@ -21,15 +21,17 @@
 #  index_data_files_on_related_id    (related_id)
 #
 
+# DataFile uses CarrierWave to manage files. The attrribute 'name' is the most crucial attribute.
+# Avoid using .path for anything, rather use .location which is alias.
+
 require 'digest/md5'
 
 class DataFile < ActiveRecord::Base
   include Extra
 
-  MEGABYTE = 1048576
+  MEGABYTE = 1_048_576
 
   attr_accessor :related_id
-  #attr_protected :id, :updated_at, :created_at, :path, :size, :md5
 
   scope :recent, -> { order("created_at DESC").limit(8) }
   scope :demos, -> { order("created_at DESC").where("directory_id IN (SELECT id FROM directories WHERE parent_id = ?)", Directory::DEMOS) }
@@ -57,7 +59,7 @@ class DataFile < ActiveRecord::Base
   mount_uploader :name, FileUploader
 
   def to_s
-    (description.nil? or description.empty?) ? File.basename(name.to_s) : description
+    description&.empty? ? File.basename(name.to_s) : description
   end
 
   def md5_s
@@ -72,6 +74,7 @@ class DataFile < ActiveRecord::Base
     (size.to_f/MEGABYTE).round(2).to_s + " MB"
   end
 
+  # Just an alias, use this to find the file's current path
   def location
     name.current_path
   end
@@ -82,6 +85,7 @@ class DataFile < ActiveRecord::Base
 
   def process_file
     self.md5 = "e948c22100d29623a1df48e1760494df"
+
     if article
       self.directory_id = Directory::ARTICLES
     end
@@ -92,12 +96,14 @@ class DataFile < ActiveRecord::Base
       self.created_at = File.mtime(location)
     end
 
+    # Update the path on creation
     if path.nil? or directory_id_changed?
       self.path = File.join(directory.path, File.basename(name.to_s))
     end
 
+    # Move the file if it has moved
     if !new_record? and directory_id_changed? and File.exists?(name.current_path)
-      FileUtils.mv(location, path)
+      FileUtils.mv(location, path) 
     end
 
     if description.nil? or description.empty?

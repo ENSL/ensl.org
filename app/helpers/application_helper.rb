@@ -29,11 +29,13 @@ module ApplicationHelper
             when "Comment"
               model.commentable
             when "Post"
-              model.topic 
+              model.topic
             else
               model
             end
     str = model.to_s
+    
+    # Reduce length of too long model names
     if length and str.length > length
       link_to str.to_s[0, length] + "...", model, class: model.class.to_s.downcase
     else
@@ -96,7 +98,8 @@ module ApplicationHelper
         next if str == "" or str.nil?
 
       if model[key].instance_of?(Time)
-        result << shorttime(str)
+        # result << shorttime(str)
+        result << model[key].to_formatted_s(:long_ordinal)
       elsif element.instance_of?(Symbol)
         result << namelink(str)
       elsif key.to_s.match(/^(.*)_b$/)
