@@ -35,4 +35,4 @@ USER root
 # Temporary fix for assets
 RUN mv /var/www/public/assets /home/web/assets
 
-CMD ["/var/www/script/entry.sh"]
+CMD ["/var/www/bin/script/entry.sh"]

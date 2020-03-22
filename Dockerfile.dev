@@ -30,4 +30,4 @@ RUN bundle config github.https true && \
     bundle install --jobs 8
 
 USER root
-CMD ["/var/www/script/entry.sh"]
+CMD ["/var/www/bin/script/entry.sh"]
