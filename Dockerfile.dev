@@ -29,5 +29,4 @@ RUN bundle config github.https true && \
     bundle config set path '/var/bundle' && \
     bundle install --jobs 8
 
-USER root
 CMD ["/var/www/bin/script/entry.sh"]

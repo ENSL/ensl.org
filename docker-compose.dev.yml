@@ -2,16 +2,17 @@ version: "3"
 
 services:
   web:
-    # Debug
+    command: "bundle exec puma"
+    tty: true
     stdin_open: true
-    command: /bin/bash 
-    tty: true 
+    # Debug
+    # command: /bin/bash
     container_name: ensl_dev
     build:
       context: ./
       dockerfile: Dockerfile.dev
-      args:
-        buildno: 1
+#      args:
+#        buildno: 1
     volumes:
      - ".:/var/www/"
     ports:
@@ -99,5 +100,6 @@ services:
 
   memcached:
     image: memcached:latest
+  
   #redis:
   #  image: redis

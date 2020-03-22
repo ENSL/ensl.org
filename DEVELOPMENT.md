@@ -29,7 +29,9 @@ Just run and open http://localhost:4000/
 
 ## Handy commands
 
+    docker-compose -f docker-compose.dev.yml exec -u root web /bin/bash`
     docker-compose -f docker-compose.dev.yml exec -u web web /bin/bash`
+    docker-compose -f docker-compose.dev.yml exec -u root test /bin/bash`
     docker-compose -f docker-compose.dev.yml exec -u web test /bin/bash`
     docker-compose -f docker-compose.dev.yml restart web`
     docker-compose -f docker-compose.dev.yml exec -u web test bundle exec rspec`
