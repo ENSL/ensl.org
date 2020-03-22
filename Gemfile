@@ -110,7 +110,6 @@ group :test do
   gem 'mime-types'
 
   # Use dev versions because of rspec bug
-  
   gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
   gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
   gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'
@@ -120,5 +119,5 @@ end
 
 group :development, :test do
   gem 'pry-rails'
-  gem 'pry-byebug', '~> 1.3.2'
+  gem 'pry-byebug'
 end
