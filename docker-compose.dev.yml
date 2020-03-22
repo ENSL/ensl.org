@@ -6,6 +6,7 @@ services:
     stdin_open: true
     command: /bin/bash 
     tty: true 
+    container_name: ensl_dev
     build:
       context: ./
       dockerfile: Dockerfile.dev
@@ -22,7 +23,6 @@ services:
      #- spring
      #- selenium
      #- redis
-     container_name: ensl_dev
 
   test:
     # Debug
