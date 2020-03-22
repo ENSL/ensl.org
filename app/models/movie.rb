@@ -26,8 +26,6 @@
 #  index_movies_on_user_id     (user_id)
 #
 
-# Rails.root.join('lib/plugins/acts_as_rateable/init.rb')
-
 class Movie < ActiveRecord::Base
   include Extra
 
