@@ -23,6 +23,8 @@ gem 'puma'
 # Model plugins
 # FIXME: using this b/c ruby 2.4 not supported
 gem 'unread', '0.10.1'
+# gem 'impressionist'
+# gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 # View helper gems
