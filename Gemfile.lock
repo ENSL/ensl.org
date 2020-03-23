@@ -352,7 +352,7 @@ GEM
       railties (>= 5.0)
     retriable (3.1.2)
     rexml (3.2.4)
-    rmagick (4.0.0)
+    rmagick (4.1.0)
     rubocop (0.80.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -423,7 +423,7 @@ GEM
       json (>= 1.8.0)
     unicode-display_width (1.6.1)
     unicode_utils (1.4.0)
-    unread (0.10.1)
+    unread (0.11.0)
       activerecord (>= 3)
     web-console (3.7.0)
       actionview (>= 5.0)
@@ -479,7 +479,7 @@ DEPENDENCIES
   pry-rails
   public_suffix
   puma
-  rails (~> 6.0.2.1)
+  rails (~> 6.0.2.2)
   rails-controller-testing
   rails_autolink
   rake (< 11.0)
@@ -503,12 +503,12 @@ DEPENDENCIES
   timecop
   tinymce-rails
   uglifier (~> 2.5.0)
-  unread (= 0.10.1)
+  unread
   web-console (= 3.7.0)
   will_paginate
 
 RUBY VERSION
-   ruby 2.5.7p206
+   ruby 2.6.5p114
 
 BUNDLED WITH
    2.1.4

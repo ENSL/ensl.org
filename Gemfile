@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 source 'http://rubygems.org'
-ruby '2.5.7'
+ruby '2.6.5'
 
 # Rails core
-gem 'rails', '~> 6.0.2.1'
+gem 'rails', '~> 6.0.2.2'
 gem 'rake', '< 11.0'
 
 # Dotenv
@@ -21,8 +21,7 @@ gem 'faraday', '~> 0.9.0'
 gem 'puma'
 
 # Model plugins
-# FIXME: using this b/c ruby 2.4 not supported
-gem 'unread', '0.10.1'
+gem 'unread'
 # gem 'impressionist'
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
