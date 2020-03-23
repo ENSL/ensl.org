@@ -97,7 +97,7 @@ module ApplicationHelper
       str = eval("model.#{key}")
         next if str == "" or str.nil?
 
-      if model[key].instance_of?(Time)
+      if model[key].instance_of?(Time) or model[key].instance_of?(ActiveSupport::TimeWithZone)
         # result << shorttime(str)
         result << model[key].to_formatted_s(:long_ordinal)
       elsif element.instance_of?(Symbol)
