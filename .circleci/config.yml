@@ -24,7 +24,7 @@ jobs:
       - checkout
       - run:
           name: Bundle Update
-          command: gem update --system && bundle update --bundler
+          command: gem update --system && gem install bundler 
       # Which version of bundler?
       - run:
           name: Which bundler?
