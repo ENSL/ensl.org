@@ -18,11 +18,12 @@ describe Api::V1::MapsController do
       expect(json["maps"].length).to eq(20)
     end
 
-    # FIXME
-    #it "return right map id" do
-    #  map = create(:map)
-    #  get :index
-    #  expect(json["maps"].last["id"]).to eq(map.id)
-    #end
+    # FIXME. Find the right map id
+    it "return right map id" do
+      skip
+      map = create(:map)
+      get :index
+      expect(json["maps"].last["id"]).to eq(map.id)
+    end
   end
 end

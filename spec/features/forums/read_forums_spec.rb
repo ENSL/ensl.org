@@ -17,16 +17,18 @@ feature 'User reads forums', js: :true do
       expect(page).to have_selector("td.forum h5")
     end
 
-    #it 'has forum description' do
-    #  visit forums_path
-    #  expect("td.forum").to have_content()
-    #end
+    it 'has forum description' do
+      skip
+      visit forums_path
+      expect("td.forum").to have_content()
+    end
 
     # FIXME
-    #it 'can click last post' do
-    #  find('td.last>a').click
-    #  expect(response).to have_http_status(200)
-    #end
+    it 'can click last post' do
+      skip
+      find('td.last>a').click
+      expect(response).to have_http_status(200)
+    end
   end
 
   private
