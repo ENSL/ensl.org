@@ -22,6 +22,9 @@ jobs:
       - *default_docker_ruby_executor
     steps:
       - checkout
+      - run:
+          name: Bundle Update
+          command: bundle update --bundler
       # Which version of bundler?
       - run:
           name: Which bundler?
@@ -31,9 +34,6 @@ jobs:
           keys:
             - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
             - rails-demo-bundle-v2-
-      - run:
-          name: Bundle Update
-          command: bundle update --bundler
       - run:
           name: Bundle Install
           command: bundle check || bundle install
