@@ -14,7 +14,7 @@ references:
       MYSQL_USERNAME: ensl
       MYSQL_PASSWORD: ensl
       MYSQL_ROOT_PASSWORD: ensl
-      MYSQL_ROOT_HOST: %
+      MYSQL_ROOT_HOST: "%"
 
 jobs:
   build:
