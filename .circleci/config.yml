@@ -43,18 +43,18 @@ jobs:
           paths:
             - vendor/bundle
       # Only necessary if app uses webpacker or yarn in some other way
-      - restore_cache:
-          keys:
-            - rails-demo-yarn-{{ checksum "yarn.lock" }}
-            - rails-demo-yarn-
-      - run:
-          name: Yarn Install
-          command: yarn install --cache-folder ~/.cache/yarn
+      #- restore_cache:
+      #    keys:
+      #      - rails-demo-yarn-{{ checksum "yarn.lock" }}
+      #      - rails-demo-yarn-
+      #- run:
+      #    name: Yarn Install
+      #    command: yarn install --cache-folder ~/.cache/yarn
       # Store yarn / webpacker cache
-      - save_cache:
-          key: rails-demo-yarn-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
+      #- save_cache:
+      #    key: rails-demo-yarn-{{ checksum "yarn.lock" }}
+      #    paths:
+      #      - ~/.cache/yarn
   test:
     parallelism: 3
     docker:
@@ -75,10 +75,10 @@ jobs:
       - run:
           name: Bundle Install
           command: bundle check || bundle install
-      - restore_cache:
-          keys:
-            - rails-demo-yarn-{{ checksum "yarn.lock" }}
-            - rails-demo-yarn-
+      #- restore_cache:
+      #    keys:
+      #      - rails-demo-yarn-{{ checksum "yarn.lock" }}
+      #      - rails-demo-yarn-
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
