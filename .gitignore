@@ -66,3 +66,4 @@ pickle-email-*.html
 
 # Staging files
 tmp/*.gz
+.byebug_history
