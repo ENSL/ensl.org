@@ -62,6 +62,10 @@ class Teamer < ActiveRecord::Base
   def ranks
     {RANK_JOINER => "Joining", RANK_MEMBER => "Member", RANK_DEPUTEE => "Deputee", RANK_LEADER => "Leader"}
   end
+  
+  def rank_s
+    ranks[rank]
+  end
 
   def validate_team
     if user.teamers.of_team(team).present.count > 0

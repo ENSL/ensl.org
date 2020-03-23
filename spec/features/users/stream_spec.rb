@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 feature "User Stream Information" do
   let(:password) { "foobar" }

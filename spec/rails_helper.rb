@@ -33,12 +33,12 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
-  #config.include Controllers::JsonHelpers, type: :controller
+  config.include Controllers::JsonHelpers, type: :controller
+  config.include Controllers::SessionHelpers, :type => :controller
+
   config.include Features::FormHelpers, type: :feature
   config.include Features::ServerHelpers, type: :feature
   config.include Features::SessionHelpers, type: :feature
-
-  config.include Controllers::SessionHelpers, :type => :controller
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"

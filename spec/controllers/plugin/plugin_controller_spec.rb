@@ -12,17 +12,17 @@ describe PluginController do
     let!(:user) { create :user_with_team }
 
     it "returns user data" do
-      get :user, id: user.steamid
-      expect(response).to be_success
+      get :user, params: { id: user.steamid }
+      expect(response).to have_http_status(:success)
       expect(response.body).to include(user.username)
     end
 
     it "definitely does not return IP address" do
-      last_ip = "127.0.0.1"
+      last_ip = "127.2.4.2"
       user.lastip = last_ip
       user.save!
-      get :user, id: user.steamid
-      expect(response).to be_success
+      get :user, params: { id: user.steamid }
+      expect(response).to have_http_status(:success)
       expect(response).to_not include(last_ip)
     end
   end

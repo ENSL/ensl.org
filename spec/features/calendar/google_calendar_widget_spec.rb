@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 feature "Google Calendar widget", js: :true do
   let(:timezone_name) { Time.zone.name }

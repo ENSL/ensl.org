@@ -209,6 +209,10 @@ class User < ActiveRecord::Base
     created_at.strftime("%d %b %y")
   end
 
+  def current_teamer
+    team ? teamers.active.of_team(team).first : nil
+  end
+
   def banned? type = Ban::TYPE_SITE
     Ban.where("expiry > UTC_TIMESTAMP() AND user_id = ? AND ban_type = ?", self.id, type).exists?
   end
@@ -311,7 +315,7 @@ class User < ActiveRecord::Base
   end
 
   def can_play?
-    (gathers.count(:conditions => ["gathers.status > ?", Gather::STATE_RUNNING]) > 0) or created_at < 2.years.ago
+    (gathers.where("gathers.status > ?", Gather::STATE_RUNNING).count > 0) or created_at < 2.years.ago
   end
 
   def can_create? cuser

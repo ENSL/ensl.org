@@ -39,6 +39,7 @@ class Ban < ActiveRecord::Base
   scope :ordered,  -> {order("created_at DESC")}
   scope :effective, -> {where("expiry > UTC_TIMESTAMP()")}
   scope :ineffective, -> {where("expiry < UTC_TIMESTAMP()")}
+  scope :server_ban, -> (steamid) { where("expiry > UTC_TIMESTAMP() AND steamid = ? AND ban_type = ?", steamid, Ban::TYPE_SERVER) }
 
   before_validation :check_user
 
