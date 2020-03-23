@@ -92,7 +92,6 @@ group :test do
   #  gem 'spring'
   gem 'capybara'
   # gem 'codeclimate-test-reporter', require: nil
-  gem 'database_cleaner'
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
@@ -115,6 +114,10 @@ group :test do
   gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'
   gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails'
   gem 'rspec-support', git: 'https://github.com/rspec/rspec-support'
+
+  # Database cleaner
+  gem 'database_cleaner-active_record'
+  gem 'database_cleaner-redis'
 end
 
 group :development, :test do

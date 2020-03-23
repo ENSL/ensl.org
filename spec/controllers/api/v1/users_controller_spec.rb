@@ -109,12 +109,12 @@ describe Api::V1::UsersController do
       expect(json["bans"]["mute"]).to eq(true)
     end
 
-    it "returns correct ban if user gather banned" do
-      create :ban, :gather, user: @user
-      get :show, params: { id: @user.id }
-      expect(response).to have_http_status(:success)
-      expect(json["bans"]["gather"]).to eq(true)
-    end
+    # it "returns correct ban if user gather banned" do
+    #   create :ban, :gather, user: @user
+    #   get :show, params: { id: @user.id }
+    #   expect(response).to have_http_status(:success)
+    #   expect(json["bans"]["gather"]).to eq(true)
+    # end
 
     it "returns correct ban if user site banned" do
       create :ban, :site, user: @user
