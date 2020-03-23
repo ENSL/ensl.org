@@ -65,6 +65,9 @@ jobs:
           fingerprints:
             - "b7:35:a6:4e:9b:0d:6d:d4:78:1e:9a:97:2a:66:6b:be"
       - checkout
+      - run:
+          name: Bundle Update
+          command: gem update --system && gem install bundler 
       - restore_cache:
           keys:
             - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
