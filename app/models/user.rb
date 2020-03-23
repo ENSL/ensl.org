@@ -108,7 +108,7 @@ class User < ActiveRecord::Base
      .order("num DESC") }
   scope :banned, -> {
       joins("LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()")
-      .conditions("bans.id IS NOT NULL") }
+      .where("bans.id IS NOT NULL") }
   scope :idle, -> {
       where("lastvisit < ?", 30.minutes.ago.utc) }
   scope :lately, -> {

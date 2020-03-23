@@ -16,8 +16,8 @@ describe Api::V1::TeamsController do
     end
 
     it "returns team data" do
-      get :show, id: @team.id
-      expect(response).to be_success
+      get :show, params: { id: @team.id }
+      expect(response).to have_http_status(:success)
       expect(json["id"]).to eq(@team.id)
       expect(json["name"]).to eq(@team.name)
 
@@ -28,7 +28,7 @@ describe Api::V1::TeamsController do
 
     it "returns 404 if team not found" do
       expect {
-        get :show, id: Team.last.id + 1
+        get :show, params: { id: Team.last.id + 1 }
       }.to raise_error(ActionController::RoutingError)
     end
   end

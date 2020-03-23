@@ -73,7 +73,7 @@ class Contester < ActiveRecord::Base
   end
 
   def get_matches
-    contest.matches.all :conditions => ["contester1_id = ? OR contester2_id = ?", id, id]
+    contest.matches.where("contester1_id = ? OR contester2_id = ?", id, id)
   end
 
   def init_variables

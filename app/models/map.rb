@@ -22,9 +22,7 @@ class Map < ActiveRecord::Base
   scope :basic, -> { where(deleted: false).order("name") }
   scope :with_name, -> (name) { where(name: name) }
   scope :classic, -> { where("name LIKE 'ns_%'") }
-  scope :of_category,
-    lambda { |category| {
-    :conditions => {:category_id => category.id} }}
+  scope :of_category, ->(category) { where(category_id: category.id) }
 
   validates_length_of :name, :maximum => 20
   validates_length_of :download, :maximum => 100

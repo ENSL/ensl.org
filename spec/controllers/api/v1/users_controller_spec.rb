@@ -31,16 +31,16 @@ describe Api::V1::UsersController do
     end
 
     it "returns user data" do
-      get :show, id: @user.id
+      get :show, params: { id: @user.id }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       user_expectation(json, @user)
     end
 
     it "returns user data for query with id specified as format" do
-      get :show, id: @user.id, format: "id"
+      get :show, params: { id: @user.id, format: "id" }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       user_expectation(json, @user)
     end
 
@@ -48,16 +48,16 @@ describe Api::V1::UsersController do
       m = @user.steamid.match(/\A0:([01]):(\d{1,10})\Z/)
       steamid = (m[2].to_i << 1) + m[1].to_i
 
-      get :show, id: steamid, format: "steamid"
+      get :show, params: { id: steamid, format: "steamid" }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       user_expectation(json, @user)
     end
 
     it "returns user data for a string steamid query" do
-      get :show, id: @user.steamid, format: "steamidstr"
+      get :show, params: { id: @user.steamid, format: "steamidstr" }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       user_expectation(json, @user)
     end
 
@@ -65,27 +65,27 @@ describe Api::V1::UsersController do
       @user.steamid = nil
       @user.save!
 
-      get :show, id: @user.id
+      get :show, params: { id: @user.id }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       expect(json["steam"]).to be_nil
     end
 
     it "returns gather moderator status" do
       group = create :group, :gather_moderator
       create :grouper, user: @user, group: group
-      get :show, id: @user.id
+      get :show, params: { id: @user.id }
       expect(json["moderator"]).to eq(true)
     end
 
     it "returns 404 if user does not exist" do
-      get :show, id: -1
+      get :show, params: { id: -1 }
       expect(response.status).to eq(404)
       expect(json["error"]).to eq("User not found")
     end
 
     it "returns 404 if user does not exist by steamid" do
-      get :show, id: -1, format: "steamid"
+      get :show, params: { id: -1, format: "steamid" }
       expect(response.status).to eq(404)
       expect(json["error"]).to eq("User not found")
     end
@@ -93,9 +93,9 @@ describe Api::V1::UsersController do
     it "queries the steam condenser for an invalid steamid" do
       @user.update_attribute(:steamid, "0:0:0")
 
-      get :show, id: @user.id
+      get :show, params: { id: @user.id }
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       expect(json["steam"]).to_not be_nil
       expect(json["steam"]["id"]).to eq(@user.steamid)
       expect(json["steam"]["url"]).to be_nil
@@ -104,30 +104,30 @@ describe Api::V1::UsersController do
 
     it "returns correct ban if user muted" do
       create :ban, :mute, user: @user
-      get :show, id: @user.id
-      expect(response).to be_success
+      get :show, params: { id: @user.id }
+      expect(response).to have_http_status(:success)
       expect(json["bans"]["mute"]).to eq(true)
     end
 
     it "returns correct ban if user gather banned" do
       create :ban, :gather, user: @user
-      get :show, id: @user.id
-      expect(response).to be_success
+      get :show, params: { id: @user.id }
+      expect(response).to have_http_status(:success)
       expect(json["bans"]["gather"]).to eq(true)
     end
 
     it "returns correct ban if user site banned" do
       create :ban, :site, user: @user
-      get :show, id: @user.id
-      expect(response).to be_success
+      get :show, params: { id: @user.id }
+      expect(response).to have_http_status(:success)
       expect(json["bans"]["site"]).to eq(true)
     end
 
     it "returns team information" do
       @user.destroy
       @user_with_team = create :user_with_team, :chris
-      get :show, id: @user_with_team.id
-      expect(response).to be_success
+      get :show, params: { id: @user_with_team.id }
+      expect(response).to have_http_status(:success)
       expect(json["team"]["id"]).to eq(@user_with_team.team.id)
       expect(json["team"]["name"]).to eq(@user_with_team.team.name)
     end
@@ -143,7 +143,7 @@ describe Api::V1::UsersController do
 
       get :index
 
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       expect(json["users"].size).to eq(users.size)
     end
 

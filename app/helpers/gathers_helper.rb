@@ -5,7 +5,7 @@ module GathersHelper
       
       render partial: 'running', layout: false
     elsif @gather.status == Gather::STATE_VOTING
-      if @gatherer and @gather.gatherer_votes.first(conditions: { user_id: cuser.id })
+      if @gatherer and @gather.gatherer_votes.where(user_id: cuser.id)
         headers['Gather'] = 'voted'
       else
         headers['Gather'] = 'voting'

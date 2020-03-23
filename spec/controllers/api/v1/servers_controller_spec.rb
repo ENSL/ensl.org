@@ -11,7 +11,7 @@ describe Api::V1::ServersController do
 
     it "returns a list of servers" do
       get :index
-      expect(response).to be_success
+      expect(response).to have_http_status(:success)
       expect(json["servers"].length).to eq(1)
       json_server = json["servers"][0]
       expect(json_server["id"]).to eq(server.id)

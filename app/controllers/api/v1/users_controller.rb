@@ -8,9 +8,9 @@ class Api::V1::UsersController < Api::V1::BaseController
       @user = User.find(params[:id])
     elsif params[:format] == "steamid"
       steamid_i = params[:id].to_i
-      @user = User.first(conditions: { steamid: format("0:%d:%d", steamid_i % 2, steamid_i >> 1) })
+      @user = User.where(steamid: format("0:%d:%d", steamid_i % 2, steamid_i >> 1)).first
     elsif params[:format] == "steamidstr"
-      @user = User.first(conditions: { steamid: params[:id] })
+      @user = User.where(steamid: params[:id]).first
     end
 
     if @user.nil?

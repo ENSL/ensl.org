@@ -131,7 +131,7 @@ class Server < ActiveRecord::Base
   end
 
   def self.move addr, newaddr, newpwd
-    self.hltvs.all(:conditions => {:reservation => addr}).each do |hltv|
+    self.hltvs.where(reservation => addr).each do |hltv|
       hltv.reservation = newaddr
       hltv.pwd = newpwd
       hltv.save!
@@ -139,7 +139,7 @@ class Server < ActiveRecord::Base
   end
 
   def self.stop addr
-    self.hltvs.all(:conditions => {:reservation => addr}).each do |hltv|
+    self.hltvs.where(:reservation => addr).each do |hltv|
       hltv.reservation = nil
       hltv.save!
     end

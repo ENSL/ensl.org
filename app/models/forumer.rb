@@ -22,8 +22,7 @@ class Forumer < ActiveRecord::Base
 
   include Extra
 
-  scope :access,
-    lambda { |level| {:conditions => ["access >= ?", level]} }
+  scope :access, -> (level) { where("access >= ?", level) }
 
   validates_uniqueness_of :group_id, :scope => [:forum_id, :access]
   validates_presence_of [:group_id, :forum_id]
