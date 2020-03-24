@@ -117,6 +117,9 @@ group :test do
   # Database cleaner
   gem 'database_cleaner-active_record'
   gem 'database_cleaner-redis'
+
+  # For circle ci
+  gem 'rspec_junit_formatter'
 end
 
 group :development, :test do

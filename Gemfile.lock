@@ -353,6 +353,8 @@ GEM
     retriable (3.1.2)
     rexml (3.2.4)
     rmagick (4.1.0)
+    rspec_junit_formatter (0.4.1)
+      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (0.80.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -490,6 +492,7 @@ DEPENDENCIES
   rspec-mocks!
   rspec-rails!
   rspec-support!
+  rspec_junit_formatter
   rubocop
   sanitize
   sass-rails (~> 5.0.3)
