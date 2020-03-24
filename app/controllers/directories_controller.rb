@@ -6,7 +6,7 @@ class DirectoriesController < ApplicationController
       @files = @directory.files
       render partial: 'data_files/list', layout: true
     else
-      @directories = Directory.ordered.filtered.where(parent_id: 1)
+      @directories = Directory.ordered.filtered.where(parent_id: Directory::ROOT)
     end
   end
 
