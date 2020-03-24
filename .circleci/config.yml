@@ -4,14 +4,17 @@ references:
   default_docker_ruby_executor: &default_docker_ruby_executor
     image: circleci/ruby:2.6.5-buster-node-browsers
     environment:
+      BUNDLE_JOBS: '3'
+      BUNDLE_RETRY: '3'
+      BUNDLE_PATH: vendor/bundle
       RACK_ENV: test
       RAILS_ENV: test
+      MYSQL_HOST: '127.0.0.1'
   mariadb: &mariadb
     image: circleci/mariadb:10.1.44
     environment:
       MYSQL_DATABASE: ensl_test
       MYSQL_USER: ensl
-      MYSQL_USERNAME: ensl
       MYSQL_PASSWORD: ensl
       MYSQL_ROOT_PASSWORD: ensl
       MYSQL_ROOT_HOST: "%"
