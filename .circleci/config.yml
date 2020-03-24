@@ -6,8 +6,8 @@ references:
     environment:
       RACK_ENV: test
       RAILS_ENV: test
-  mysql: &mysql
-    image: cricleci/mysql:10.3-bionic-ram
+  mariadb: &mariadb
+    image: cricleci/mariadb:10.3-bionic-ram
     environment:
       MYSQL_DATABASE: ensl
       MYSQL_USER: ensl
@@ -59,7 +59,7 @@ jobs:
     parallelism: 3
     docker:
       - *default_docker_ruby_executor
-      - *mysql
+      - *mariadb
     steps:
       - add_ssh_keys:
           fingerprints:
