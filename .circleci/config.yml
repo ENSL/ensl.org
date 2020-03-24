@@ -7,7 +7,7 @@ references:
       RACK_ENV: test
       RAILS_ENV: test
   mysql: &mysql
-    image: cricleci/mysql:latest
+    image: cricleci/mysql:10.3-bionic-ram
     environment:
       MYSQL_DATABASE: ensl
       MYSQL_USER: ensl
@@ -24,7 +24,7 @@ jobs:
       - checkout
       - run:
           name: Bundle Update
-          command: gem update --system && gem install bundler 
+          command: gem update --system && gem install bundler
       # Which version of bundler?
       - run:
           name: Which bundler?
