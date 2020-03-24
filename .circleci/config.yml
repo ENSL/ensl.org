@@ -53,11 +53,11 @@ jobs:
 #            sudo composer self-update
 #            composer install -n --prefer-dist
       # download test reporter as a static binary
-      - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
+#      - run:
+#          name: Setup Code Climate test-reporter
+#          command: |
+#            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+#            chmod +x ./cc-test-reporter
       # Only necessary if app uses webpacker or yarn in some other way
       #- restore_cache:
       #    keys:
@@ -105,10 +105,10 @@ jobs:
       - run:
           command: |
             mkdir /tmp/test-results
-            ./cc-test-reporter before-build
+#            ./cc-test-reporter before-build
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
             bundle exec rspec $TESTFILES --profile 10 -r rspec_junit_formatter --format RspecJunitFormatter --out /tmp/test-results/rspec.xml --format progress
-            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
+#            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:

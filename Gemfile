@@ -90,7 +90,7 @@ end
 group :test do
   #  gem 'spring'
   gem 'capybara'
-  # gem 'codeclimate-test-reporter', require: nil
+  gem 'codeclimate-test-reporter', require: nil
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
