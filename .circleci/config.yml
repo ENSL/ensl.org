@@ -47,11 +47,11 @@ jobs:
           key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-      - run:
-          name: Setup dependencies
-          command: |
-            sudo composer self-update
-            composer install -n --prefer-dist
+#      - run:
+#          name: Setup dependencies
+#          command: |
+#            sudo composer self-update
+#            composer install -n --prefer-dist
       # download test reporter as a static binary
       - run:
           name: Setup Code Climate test-reporter
