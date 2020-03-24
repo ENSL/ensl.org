@@ -82,7 +82,7 @@ services:
 
   db:
     # Debug
-    #command: bash 
+    #command: bash
     #tty: true
     command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
