@@ -6,7 +6,7 @@ services:
     tty: true
     stdin_open: true
     # Debug
-    # command: /bin/bash
+    command: /bin/bash
     container_name: ensl_dev
     build:
       context: ./
