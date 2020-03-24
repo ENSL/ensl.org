@@ -7,9 +7,9 @@ references:
       RACK_ENV: test
       RAILS_ENV: test
   mariadb: &mariadb
-    image: cricleci/mariadb:10.3-bionic-ram
+    image: circleci/mariadb:10.3-bionic-ram
     environment:
-      MYSQL_DATABASE: ensl
+      MYSQL_DATABASE: ensl_test
       MYSQL_USER: ensl
       MYSQL_USERNAME: ensl
       MYSQL_PASSWORD: ensl
