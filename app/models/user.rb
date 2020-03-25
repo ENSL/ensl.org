@@ -46,7 +46,7 @@ class User < ActiveRecord::Base
   #attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password
 
-  #attribute :lastvisit, :string, default: DateTime.now
+  attribute :lastvisit, :datetime, default: Time.now.utc
 
   belongs_to :team
   has_one :profile, :dependent => :destroy
@@ -192,13 +192,13 @@ class User < ActiveRecord::Base
 
   def age
     return 0 unless birthdate
-    a = Date.today.year - birthdate.year
-    a-= 1 if Date.today < birthdate + a.years
+    a = Time.zone.today.year - birthdate.year
+    a-= 1 if Time.zone.today < birthdate + a.years
     a
   end
 
   def idle
-    "%d m" % [TimeDifference.between(DateTime.now, lastvisit).in_minutes.floor]
+    "%d m" % [TimeDifference.between(Time.now.utc, lastvisit).in_minutes.floor]
   end
 
   def current_layout
@@ -214,7 +214,7 @@ class User < ActiveRecord::Base
   end
 
   def banned? type = Ban::TYPE_SITE
-    Ban.where("expiry > UTC_TIMESTAMP() AND user_id = ? AND ban_type = ?", self.id, type).exists?
+    bans.effective.where(ban_type: type).count > 0
   end
 
   def admin?

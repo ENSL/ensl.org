@@ -5,7 +5,7 @@ RSpec.describe UsersController, type: :controller do
   let!(:params) { FactoryBot.attributes_for(:user) }
   let!(:invalid_params) { params.merge(:steamid => (50..150).map { (65 + rand(26)).chr }.join) }
   let!(:admin) { create(:user, :admin) } 
-  let!(:user) { create(:user) }
+  let!(:user) { create(:user).reload }
 
   before :all do
     create(:user)

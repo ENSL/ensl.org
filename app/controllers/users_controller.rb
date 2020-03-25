@@ -55,8 +55,6 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(User.params(params, cuser, "create"))
-    # FIXME: move to model
-    @user.lastvisit = Date.today
     @user.lastip = request.env['REMOTE_ADDR']
 
     raise AccessError unless @user.can_create? cuser
@@ -135,7 +133,7 @@ class UsersController < ApplicationController
   def save_session user
     session[:user] = user.id
     user.lastip = request.ip
-    user.lastvisit = DateTime.now
+    user.lastvisit = Time.now.utc
     user.save
   end
 end

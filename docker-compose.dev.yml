@@ -6,7 +6,7 @@ services:
     tty: true
     stdin_open: true
     # Debug
-    command: /bin/bash
+    # command: /bin/bash
     container_name: ensl_dev
     build:
       context: ./
@@ -29,6 +29,7 @@ services:
     # Debug
     #stdin_open: true
     command: ["/bin/bash", "-c", "--", "while true; do sleep 100; done;"]
+    container_name: ensl_test
     build:
       context: ./
       dockerfile: Dockerfile.dev
@@ -56,6 +57,7 @@ services:
 
   redis:
     image: 'redis:4.0-alpine'
+    container_name: ensl_dev_redis
 
   selenium:
     image: selenium/standalone-chrome-debug

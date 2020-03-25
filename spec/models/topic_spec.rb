@@ -42,7 +42,7 @@ describe Topic do
         topic = create :topic, first_post: "Foo"
         topics.push(topic)
       end
-      recent_topics = Topic.recent_topicsbyebug
+      recent_topics = Topic.recent_topics
       topics.last(5).each do |topic|
         expect(recent_topics).to include(topic)
       end

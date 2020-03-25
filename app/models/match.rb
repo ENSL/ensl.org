@@ -301,8 +301,8 @@ class Match < ActiveRecord::Base
   end
 
   def hltv_record(addr, pwd)
-    if (match_time - MATCH_LENGTH * 10) > DateTime.now.utc ||
-       (match_time + MATCH_LENGTH * 10) < DateTime.now.utc
+    if (match_time - MATCH_LENGTH * 10) > Time.now.utc ||
+       (match_time + MATCH_LENGTH * 10) < Time.now.utc
       raise Error, I18n.t(:hltv_request_20)
     end
     if hltv && hltv.recording
