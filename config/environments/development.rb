@@ -29,14 +29,14 @@ Ensl::Application.configure do
   config.assets.debug = true
 
   # Use a different cache store
-  config.cache_store = :dalli_store
+  config.cache_store = :dalli_store, 'memcached'
 
   # Enable threaded mode
   # config.threadsafe!
   config.eager_load = false
 
-  config.web_console.whitelisted_ips = '172.0.0.0/8'
-  config.web_console.whiny_requests = true
+  config&.web_console.whitelisted_ips = '172.0.0.0/8'
+  config&.web_console.whiny_requests = true
 
   config.serve_static_assets = true
 end

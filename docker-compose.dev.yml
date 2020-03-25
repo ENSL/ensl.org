@@ -6,7 +6,7 @@ services:
     tty: true
     stdin_open: true
     # Debug
-    # command: /bin/bash
+    #command: /bin/bash
     container_name: ensl_dev
     build:
       context: ./
@@ -41,7 +41,7 @@ services:
       - 3005:3005 # Capybara listens here
     links:
       - db
-      - selenium
+    #  - selenium
     volumes:
       - ".:/var/www"
     # command: bin/spring server
@@ -102,6 +102,7 @@ services:
 
   memcached:
     image: memcached:latest
+    container_name: ensl_dev_memcached
   
   #redis:
   #  image: redis

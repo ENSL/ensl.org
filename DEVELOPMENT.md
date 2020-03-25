@@ -19,6 +19,7 @@ Just run and open http://localhost:4000/
 1. VS Code and RubyMine are great IDE's/editors.
 1. To run VS Code plugin Ruby Test Explorer in docker container you need to create path to custom 
 1. Do not commit too much without testing. Also keep commits small for documentation and reversability issues.
+1. You need to rebuild the docker image when you change gems.
 
 ## Best practices
 
@@ -38,6 +39,10 @@ Just run and open http://localhost:4000/
 FIXME, TODO, EXPLAIN, OBSOLETE
 
 ## Handy commands
+
+Build or rebuild
+    
+    docker-compose -f docker-compose.dev.yml build`
 
 To get inside docker web+test containers:
 
