@@ -132,6 +132,9 @@ GEM
       sass (>= 3.2.0)
       thor
     builder (3.2.4)
+    bullet (6.1.0)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     byebug (11.1.1)
     capybara (3.31.0)
       addressable
@@ -427,6 +430,7 @@ GEM
       json (>= 1.8.0)
     unicode-display_width (1.6.1)
     unicode_utils (1.4.0)
+    uniform_notifier (1.13.0)
     unread (0.11.0)
       activerecord (>= 3)
     web-console (3.7.0)
@@ -454,6 +458,7 @@ DEPENDENCIES
   binding_of_caller
   bluecloth
   bourbon (~> 3.1.8)
+  bullet
   capybara
   carrierwave
   codeclimate-test-reporter

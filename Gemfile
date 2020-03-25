@@ -88,25 +88,6 @@ group :development do
 end
 
 group :test do
-  #  gem 'spring'
-  gem 'capybara'
-  gem 'codeclimate-test-reporter', require: nil
-  # FIXME: Downgraded b/c of deprecations, fix static attributes
-  gem 'factory_bot_rails', '4.10.0'
-  gem 'phantomjs', require: 'phantomjs/poltergeist'
-  gem 'poltergeist'
-  gem 'selenium-webdriver'
-  # Fix FF issue
-  gem 'geckodriver-helper'
-  # Fix legacy issue
-  gem 'rails-controller-testing'
-  gem 'simplecov', require: false
-  gem 'test-unit'
-  gem 'timecop'
-
-  # FOr JS test
-  gem 'mime-types'
-
   # Use dev versions because of rspec bug
   gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
   gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
@@ -114,15 +95,44 @@ group :test do
   gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails'
   gem 'rspec-support', git: 'https://github.com/rspec/rspec-support'
 
+  # FIXME: Downgraded b/c of deprecations, fix static attributes
+  gem 'factory_bot_rails', '4.10.0'
+
+  gem 'capybara'
+  gem 'phantomjs', require: 'phantomjs/poltergeist'
+  gem 'poltergeist'
+  gem 'selenium-webdriver'
+
+  # Fix FF issue
+  gem 'geckodriver-helper'
+  # Fix legacy issue
+  gem 'rails-controller-testing'
+
+  # Goverage
+  gem 'simplecov', require: false
+  gem 'timecop'
+
+  # Do I need this?
+  gem 'test-unit'
+
+  # For JS test
+  gem 'mime-types'
+
   # Database cleaner
   gem 'database_cleaner-active_record'
   gem 'database_cleaner-redis'
 
-  # For circle ci
+  # For circle ci + CC
   gem 'rspec_junit_formatter'
+  gem 'codeclimate-test-reporter', require: nil
 end
 
 group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
+
+  #  gem 'spring'
+
+  # For n+1 uqeries
+  gem 'bullet'
 end
