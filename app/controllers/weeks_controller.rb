@@ -12,7 +12,7 @@ class WeeksController < ApplicationController
   end
 
   def create
-    @week = Week.new(Weeks.params(params, cuser))
+    @week = Week.new(Week.params(params, cuser))
     raise AccessError unless @week.can_create? cuser
 
     if @week.save

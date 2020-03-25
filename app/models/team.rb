@@ -133,6 +133,6 @@ class Team < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:team).except(:id, :active, :founder_id, :created_at, :updated_at).permit!
+    params.permit(:team).except(:id, :active, :founder_id, :created_at, :updated_at).permit!
   end
 end

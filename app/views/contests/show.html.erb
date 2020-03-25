@@ -22,7 +22,7 @@
 
     <%= link_to 'Scheduled Matches', confirmed_matches_path(@contest), class: 'button' %>
 
-    <% if cuser and cuser.admin? %>
+    <% if @contest.can_update?(cuser) %>
       <%= link_to 'Edit Contest', edit_contest_path(@contest), class: 'button' %>
     <% end %>
   </div>

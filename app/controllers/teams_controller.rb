@@ -39,6 +39,7 @@ class TeamsController < ApplicationController
   def update
     raise AccessError unless @team.can_update? cuser
     if @team.update_attributes(Team.params(params, cuser))
+      # FIXME: move this logic to model
       if params[:rank]
         @team.teamers.present.each do |member|
           # Contains new rank as given by submitted parameters
