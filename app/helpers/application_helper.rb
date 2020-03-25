@@ -183,11 +183,11 @@ module ApplicationHelper
   end
 
   def upcoming_matches
-      calendar.upcoming || []
+    ENV['GOOGLE_CALENDAR'] == "disabled" ? (calendar.upcoming || []) : []
   end
 
   def upcoming_nsltv
-    calendar.upcoming_nsltv || []
+    ENV['GOOGLE_CALENDAR'] == "disabled" ? (calendar.upcoming || []) : []
   end
 
   def gathers_url
