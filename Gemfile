@@ -13,12 +13,13 @@ gem 'dotenv-rails'
 # DB
 # Fixme: using this bc puma startup problem
 gem 'active_record_union'
-gem 'dalli', '~> 2.7.0'
+gem 'dalli'
 gem 'mysql2'
 
 # Web server
-gem 'faraday', '~> 0.9.0'
+gem 'faraday'
 gem 'puma'
+gem 'unicorn'
 
 # Model plugins
 gem 'unread'
@@ -43,7 +44,7 @@ gem 'time_difference'
 
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
-gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+gem 'steam-condenser', g  ithub: 'koraktor/steam-condenser-ruby'
 
 # FIXME: Legacy feature shims
 gem 'rails_autolink'
@@ -54,9 +55,6 @@ gem 'coffee-rails'
 gem 'jquery-rails'
 gem 'tinymce-rails'
 gem 'i18n-js'
-
-# Please install nodejs locally.
-# gem 'therubyracer', '~> 0.12.1' if RUBY_PLATFORM == 'x86_64-linux'
 
 gem 'bourbon','~> 3.1.8'
 
@@ -82,8 +80,7 @@ group :development do
   gem 'annotate'
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'spring', '2.0.2'
-  gem 'web-console', '3.7.0'
+  gem 'web-console'
   gem 'rubocop'
 end
 
@@ -98,6 +95,7 @@ group :test do
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
 
+  # Feature testing
   gem 'capybara'
   gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'poltergeist'
@@ -105,10 +103,11 @@ group :test do
 
   # Fix FF issue
   gem 'geckodriver-helper'
+
   # Fix legacy issue
   gem 'rails-controller-testing'
 
-  # Goverage
+  # Coverage
   gem 'simplecov', require: false
   gem 'timecop'
 
@@ -130,9 +129,7 @@ end
 group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
-
-  #  gem 'spring'
-
+  gem 'spring'
   # For n+1 uqeries
-  gem 'bullet'
+  # gem 'bullet'
 end

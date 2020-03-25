@@ -31,9 +31,9 @@ GIT
 
 GIT
   remote: https://github.com/rspec/rspec-rails
-  revision: e886b55c7f6d311b4bc5a7785a288c0ea5032fb6
+  revision: 0cafe7ff69d3b11a35e007c76e16e27069f67d6d
   specs:
-    rspec-rails (4.0.0.pre)
+    rspec-rails (4.1.0.pre)
       actionpack (>= 4.2)
       activesupport (>= 4.2)
       railties (>= 4.2)
@@ -113,7 +113,7 @@ GEM
       zeitwerk (~> 2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    annotate (3.1.0)
+    annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
     archive-zip (0.12.0)
@@ -132,9 +132,6 @@ GEM
       sass (>= 3.2.0)
       thor
     builder (3.2.4)
-    bullet (6.1.0)
-      activesupport (>= 3.0.0)
-      uniform_notifier (~> 1.11)
     byebug (11.1.1)
     capybara (3.31.0)
       addressable
@@ -197,7 +194,7 @@ GEM
     factory_bot_rails (4.10.0)
       factory_bot (~> 4.10.0)
       railties (>= 3.0.0)
-    faraday (0.9.2)
+    faraday (0.17.3)
       multipart-post (>= 1.2, < 3)
     ffi (1.12.2)
     font-awesome-sass (4.1.0)
@@ -215,13 +212,12 @@ GEM
       mime-types (>= 1.6)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
-    googleauth (0.5.1)
-      faraday (~> 0.9)
-      jwt (~> 1.4)
-      logging (~> 2.0)
-      memoist (~> 0.12)
+    googleauth (0.9.0)
+      faraday (~> 0.12)
+      jwt (>= 1.4, < 3.0)
+      memoist (~> 0.16)
       multi_json (~> 1.11)
-      os (~> 0.9)
+      os (>= 0.9, < 2.0)
       signet (~> 0.7)
     haml (5.1.2)
       temple (>= 0.8.0)
@@ -250,11 +246,8 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.3.0)
-    jwt (1.5.6)
-    little-plugger (1.1.4)
-    logging (2.2.2)
-      little-plugger (~> 1.1)
-      multi_json (~> 1.10)
+    jwt (2.2.1)
+    kgio (2.11.3)
     loofah (2.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -285,7 +278,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
-    os (0.9.6)
+    os (1.0.1)
     parallel (1.19.1)
     parser (2.7.0.5)
       ast (~> 2.4.0)
@@ -342,6 +335,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
     rainbow (3.0.0)
+    raindrops (0.19.1)
     rake (10.5.0)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
@@ -402,8 +396,7 @@ GEM
     sixarm_ruby_unaccent (1.2.0)
     sort_alphabetical (1.1.0)
       unicode_utils (>= 1.2.2)
-    spring (2.0.2)
-      activesupport (>= 4.2)
+    spring (2.1.0)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -420,7 +413,7 @@ GEM
     time_difference (0.5.0)
       activesupport
     timecop (0.9.1)
-    tinymce-rails (5.2.0)
+    tinymce-rails (5.2.1)
       railties (>= 3.1.1)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
@@ -430,14 +423,16 @@ GEM
       json (>= 1.8.0)
     unicode-display_width (1.6.1)
     unicode_utils (1.4.0)
-    uniform_notifier (1.13.0)
+    unicorn (5.5.4)
+      kgio (~> 2.6)
+      raindrops (~> 0.7)
     unread (0.11.0)
       activerecord (>= 3)
-    web-console (3.7.0)
-      actionview (>= 5.0)
-      activemodel (>= 5.0)
+    web-console (4.0.1)
+      actionview (>= 6.0.0)
+      activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
-      railties (>= 5.0)
+      railties (>= 6.0.0)
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
@@ -458,19 +453,18 @@ DEPENDENCIES
   binding_of_caller
   bluecloth
   bourbon (~> 3.1.8)
-  bullet
   capybara
   carrierwave
   codeclimate-test-reporter
   coffee-rails
   country_select
-  dalli (~> 2.7.0)
+  dalli
   database_cleaner-active_record
   database_cleaner-redis
   dotenv-rails
   dynamic_form
   factory_bot_rails (= 4.10.0)
-  faraday (~> 0.9.0)
+  faraday
   font-awesome-sass (~> 4.1.0.0)
   geckodriver-helper
   google-api-client (~> 0.10.3)
@@ -507,15 +501,16 @@ DEPENDENCIES
   selenium-webdriver
   signet (= 0.11.0)
   simplecov
-  spring (= 2.0.2)
+  spring
   steam-condenser!
   test-unit
   time_difference
   timecop
   tinymce-rails
   uglifier (~> 2.5.0)
+  unicorn
   unread
-  web-console (= 3.7.0)
+  web-console
   will_paginate
 
 RUBY VERSION
