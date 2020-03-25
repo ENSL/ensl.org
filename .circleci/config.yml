@@ -23,6 +23,8 @@ jobs:
   build:
     environment:
       CC_TEST_REPORTER_ID: b3db5b7df9a0a1d0fd3503e72d7431ffbfa172492c2840d590ccb2fafd9172d3
+      RAILS_ENV: test
+      RACK_ENV: test
     docker:
       - *default_docker_ruby_executor
     steps:

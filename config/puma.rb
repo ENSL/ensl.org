@@ -7,7 +7,6 @@ preload_app!
 daemonize false
 
 # FIXME
-#base_path = (ENV['DEPLOY_PATH'] || Dir.pwd)
 #stderr_path = "#{base_path}/log/puma.stderr.log"
 #stdout_path = "#{base_path}/log/puma.stdout.log"
 #directory base_path
@@ -30,6 +29,7 @@ on_worker_boot do
   end
 end
 
+# EXPLAIN This has been added here but why?
 on_restart do
   ENV["BUNDLE_GEMFILE"] = "#{current_path}/Gemfile"
   Dotenv.overload

@@ -32,7 +32,10 @@ Just run and open http://localhost:4000/
 ## TODO issues for dev
 
 1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker-compose up
-1. 
+
+# Tags in code
+
+FIXME, TODO, EXPLAIN, OBSOLETE
 
 ## Handy commands
 

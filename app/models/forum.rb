@@ -83,6 +83,6 @@ class Forum < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:data_file).permit(:description, :position, :title, :category_id)
+    params.require(:forum).permit(:description, :position, :title, :category_id)
   end
 end
