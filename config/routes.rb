@@ -69,8 +69,12 @@ Ensl::Application.routes.draw do
   resources :predictions
   resources :rounds
   resources :matches do |m|
-    get :admin, to: "matches#admin", on: :collection
-    get :ref, to: "matches#ref"
+    member do
+      get :ref
+    end
+    collection do
+      get :admin
+    end
     resources :match_proposals, path: "proposals", as: :proposals, only: [:index, :new, :create, :update]
   end
 
