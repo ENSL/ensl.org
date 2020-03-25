@@ -1,7 +1,7 @@
 <div class="players">
   <% contester.lineup.each do |teamer| %>
     <div class="player fields">
-      <% if matcher = @match.matchers.first(conditions: { user_id: teamer.user_id, contester_id: contester.id }) %>
+      <% if matcher = @match.matchers.where(user_id: teamer.user_id, contester_id: contester.id).first %>
         <%= hidden_field_tag "match[matchers_attributes][#{@n}][id]", matcher.id %>
       <% end %>
 

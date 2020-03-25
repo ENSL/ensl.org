@@ -25,7 +25,7 @@
     </div>
     <div class="fields horizontal">
       <%= f.label :referee_id %>
-      <%= f.select :referee_id, Group.find(Group::REFEREES).users.collect{|u| [u, u.id]}, {:include_blank => true} %>
+      <%= f.select :referee_id, Group.referees.collect{|u| [u, u.id]}, {:include_blank => true} %>
     </div>
     <div class="fields horizontal">
       <%= f.label :week_id %>

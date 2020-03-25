@@ -11,7 +11,7 @@
       <th class="maps">Maps</th>
     <% end %>
     <th class="score">Score</th>
-    <% if matches&.first.contest.contest_type == Contest::TYPE_LADDER %>
+    <% if matches.first&.contest&.contest_type == Contest::TYPE_LADDER %>
       <th class="points">Points</th>
     <% end %>
   </tr>

@@ -59,6 +59,8 @@ class Match < ActiveRecord::Base
   has_many :users, :through => :matchers
   has_many :predictions, :dependent => :destroy
   has_many :comments, -> { order("created_at") }, :as => :commentable, :dependent => :destroy
+  has_many :match_proposals, inverse_of: :match, dependent: :destroy
+  
   belongs_to :challenge
   belongs_to :contest
   belongs_to :contester1, -> { includes('team') }, :class_name => "Contester"

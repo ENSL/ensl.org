@@ -48,6 +48,7 @@ class MatchesController < ApplicationController
 
   def update
     raise AccessError unless @match.can_update? cuser, params[:match]
+    # FIXME: better implementation
     if params[:match][:matchers_attributes]
       params[:match][:matchers_attributes].each do |key, matcher|
         matcher["_destroy"] = matcher["_destroy"] == "keep" ? false : true
