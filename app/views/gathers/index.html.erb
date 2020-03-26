@@ -1,19 +1,30 @@
 <h1>Gather Archive</h1>
 <h5 class="title">Players starred were captains for their respective teams.</h5>
 
+
+<%= will_paginate @gathers %>
+
 <table class="gathers striped">
   <tr>
-    <th class="date">Date</th>
+    <th class="info">Info</th>
     <th class="team1">Team 1</th>
     <th class="team2">Team 2</th>
   </tr>
 
   <% @gathers.each do |gather| %>
     <tr class="<%= cycle('even', 'odd') %>">
-      <td><%= link_to gather.updated_at.strftime("%Y/%m/%d %H:%M:%S"), gather %></td>
+      <td>
+        <p>
+        <%= link_to gather.updated_at.strftime("%Y/%m/%d %H:%M:%S"), gather %>
+        </p>
+        <p>
+        <%= namelink gather&.map1&.map %>
+        <%= namelink gather&.map2&.map %>
+        </p>
+      </td>
       <td>
         <ul>
-          <% gather.gatherers.each do |gatherer| %>
+          <% gather.gatherers.ordered.each do |gatherer| %>
             <li>
               <% if gatherer.team == 1 %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
@@ -27,7 +38,7 @@
       </td>
       <td>
         <ul>
-          <% gather.gatherers.each do |gatherer| %>
+          <% gather.gatherers.ordered.each do |gatherer| %>
             <li>
               <% if gatherer.team == 2 %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
@@ -42,3 +53,5 @@
     </tr>
   <% end %>
 </table>
+
+<%= will_paginate @gathers %>

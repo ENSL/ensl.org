@@ -41,7 +41,7 @@ class Gather < ActiveRecord::Base
   scope :basic, -> { includes(:captain1, :captain2, :map1, :map2, :server) }
   scope :active, -> { where("gathers.status IN (?, ?, ?) AND gathers.updated_at > ?",
                             STATE_VOTING, STATE_PICKING, STATE_RUNNING, 12.hours.ago.utc) }
-  
+
   belongs_to :server, :optional => true
   belongs_to :captain1, :class_name => "Gatherer", :optional => true
   belongs_to :captain2, :class_name => "Gatherer", :optional => true

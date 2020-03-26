@@ -3,7 +3,7 @@ class GathersController < ApplicationController
   respond_to :html, :js
 
   def index
-    @gathers = Gather.ordered.limit(50).all
+    @gathers = Gather.ordered.limit(50).all.paginate(per_page: 40, page: params[:page])
   end
 
   def show

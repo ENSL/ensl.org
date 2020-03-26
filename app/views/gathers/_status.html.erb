@@ -23,12 +23,18 @@
           <a href="javascript:" id="gatherJoinBtn" class="button">
             Click to join gather!
           </a>
+          <%= link_to gathers_path(), class: 'button' do %>
+            Gather archive
+          <% end %>
+          </a>
         </p>
       <% end %>
 
     <% else %>
       <p>Log in to join the gather.</p>
-
+      <%= link_to gathers_path(), class: 'button tiny' do %>
+        Gather archive
+      <% end %>
     <% end %>
 
   <% elsif @gather.status == Gather::STATE_VOTING %>
@@ -60,11 +66,14 @@
       <% end %>
     </p>
 
+    <p>
     <% if @gather.server and @gather.server.ip and @gather.server.password %>
-      <p>
-        <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny' %>
-      </p>
+      <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny' %>
     <% end %>
+    <%= link_to gathers_path(), class: 'button tiny' do %>
+      Gather archive
+    <% end %>
+    </p>
   <% end %>
 
 
