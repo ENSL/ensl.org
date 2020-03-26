@@ -21,7 +21,7 @@ class UsersController < ApplicationController
     @page = "general"
     respond_to do |format|
       format.js do
-        @page = params[:page] if self.PAGES.include?(params[:page])
+        @page = params[:page] if PAGES.include?(params[:page])
       end
       format.html {}
     end

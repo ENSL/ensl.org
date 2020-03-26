@@ -3,4 +3,4 @@ require 'verification'
 require 'exceptions'
 
 ActiveSupport::Deprecation.silenced = true
-Rails.Application.initialize!
+Rails.application.initialize!
