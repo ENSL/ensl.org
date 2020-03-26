@@ -23,8 +23,8 @@ class MatchProposal < ActiveRecord::Base
   # latest time before a match to be confirmed/rejected (in minutes)
   CONFIRMATION_LIMIT = 30
 
-  belongs_to :match
-  belongs_to :team
+  belongs_to :match, :optional => true
+  belongs_to :team, :optional => true
   #has_many :confirmed_by, class_name: 'Team', uniq: true
   # FIXME: attr_accessible :proposed_time, :status
 

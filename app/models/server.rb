@@ -74,8 +74,8 @@ class Server < ActiveRecord::Base
   has_many :logs
   has_many :matches
   has_many :challenges
-  belongs_to :user
-  belongs_to :recordable, :polymorphic => true
+  belongs_to :user, :optional => true
+  belongs_to :recordable, :polymorphic => true, :optional => true
 
   before_create :set_category
 

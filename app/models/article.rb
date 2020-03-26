@@ -61,8 +61,8 @@ class Article < ActiveRecord::Base
   #scope :nospecial, -> { where("category_id != ?", Category::SPECIAL) }
   scope :interviews, -> { where(category_id: Category::INTERVIEWS) }
 
-  belongs_to :user
-  belongs_to :category
+  belongs_to :user, :optional => true
+  belongs_to :category, :optional => true
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :files, class_name: 'DataFile', dependent: :destroy
 

@@ -31,8 +31,8 @@ class Contester < ActiveRecord::Base
   #attr_protected :id, :updated_at, :created_at, :trend
   attr_accessor :user
 
-  belongs_to :team
-  belongs_to :contest
+  belongs_to :team, :optional => true
+  belongs_to :contest, :optional => true
 
   scope :active, -> { includes(:team).where(active: true) }
   # ranked is used for ladder. lower score the higher the rank

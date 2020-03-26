@@ -65,9 +65,9 @@ class Contest < ActiveRecord::Base
             :source => :predictions,
             :through => :matches
   has_and_belongs_to_many :maps
-  belongs_to :demos, :class_name => "Directory"
-  belongs_to :winner, :class_name => "Contester"
-  belongs_to :rules, :class_name => "Article"
+  belongs_to :demos, :class_name => "Directory", :optional => true
+  belongs_to :winner, :class_name => "Contester", :optional => true
+  belongs_to :rules, :class_name => "Article", :optional => true
 
   validates_presence_of :name, :start, :end, :status, :default_time
   validates_length_of :name, :in => 1..50

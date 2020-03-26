@@ -45,9 +45,9 @@ class DataFile < ActiveRecord::Base
   has_one :movie, :foreign_key => :file_id, :dependent => :destroy
   has_one :preview, :class_name => "Movie", :foreign_key => :preview_id, :dependent => :nullify
   has_one :match, :foreign_key => :demo_id
-  belongs_to :directory
-  belongs_to :related, :class_name => "DataFile"
-  belongs_to :article
+  belongs_to :directory, :optional => true
+  belongs_to :related, :class_name => "DataFile", :optional => true
+  belongs_to :article, :optional => true
 
   validates_length_of [:description, :path], :maximum => 255
 

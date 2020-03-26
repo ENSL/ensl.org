@@ -24,8 +24,8 @@ class Shoutmsg < ActiveRecord::Base
   validates_length_of :text, :in => 1..100
   validates_presence_of :user
 
-  belongs_to :user
-  belongs_to :shoutable, :polymorphic => true
+  belongs_to :user, :optional => true
+  belongs_to :shoutable, :polymorphic => true, :optional => true
 
 
   scope :recent, -> { includes(:user).order("id DESC").limit(8) }

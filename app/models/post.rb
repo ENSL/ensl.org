@@ -29,8 +29,8 @@ class Post < ActiveRecord::Base
   before_save :parse_text
   after_destroy :remove_topics, :if => Proc.new {|post| post.topic.posts.count == 0}
 
-  belongs_to :user
-  belongs_to :topic
+  belongs_to :user, :optional => true
+  belongs_to :topic, :optional => true
 
   def number pages, i
     if i != -1

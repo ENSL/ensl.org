@@ -34,7 +34,7 @@ class Forum < ActiveRecord::Base
   has_many :forumers
   has_many :groups, :through => :forumers
   has_one :forumer
-  belongs_to :category
+  belongs_to :category, :optional => true
 
   after_create :update_position
   

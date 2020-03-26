@@ -22,9 +22,9 @@ class Matcher < ActiveRecord::Base
 
   #attr_protected :id, :updated_at, :created_at
 
-  belongs_to :match
-  belongs_to :user
-  belongs_to :contester
+  belongs_to :match, :optional => true
+  belongs_to :user, :optional => true
+  belongs_to :contester, :optional => true
   has_many :teams, :through => :contester
 
   scope :stats, -> {

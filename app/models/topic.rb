@@ -28,8 +28,8 @@ class Topic < ActiveRecord::Base
   #attr_protected :id, :updated_at, :created_at
   attr_accessor :first_post
 
-  belongs_to :user
-  belongs_to :forum
+  belongs_to :user, :optional => true
+  belongs_to :forum, :optional => true
   has_one :lock, :as => :lockable
   has_one :latest, -> { order("id DESC") }, :class_name => "Post"
   has_many :posts, -> { order("id ASC") }, :dependent => :destroy

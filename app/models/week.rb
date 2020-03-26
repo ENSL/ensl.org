@@ -28,9 +28,9 @@ class Week < ActiveRecord::Base
 
   scope :ordered, -> { order("start_date ASC") }
 
-  belongs_to :contest
-  belongs_to :map1, :class_name => "Map"
-  belongs_to :map2, :class_name => "Map"
+  belongs_to :contest, :optional => true
+  belongs_to :map1, :class_name => "Map", :optional => true
+  belongs_to :map2, :class_name => "Map", :optional => true
   has_many :matches
 
   def to_s

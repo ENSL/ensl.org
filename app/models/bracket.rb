@@ -19,7 +19,7 @@ class Bracket < ActiveRecord::Base
 
   #attr_protected :id, :created_at, :updated_at
 
-  belongs_to :contest
+  belongs_to :contest, :optional => true
   has_many :bracketers
 
   def to_s

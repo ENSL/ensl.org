@@ -22,8 +22,8 @@ class Vote < ActiveRecord::Base
   validates_uniqueness_of :user_id, :scope => :votable_id
   validates_presence_of :user_id, :votable_id, :votable_type
 
-  belongs_to :user
-  belongs_to :votable, :polymorphic => true
+  belongs_to :user, :optional => true
+  belongs_to :votable, :polymorphic => true, :optional => true
 
   after_create :increase_votes
   after_destroy :decrease_votes

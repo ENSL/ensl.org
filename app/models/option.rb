@@ -22,7 +22,7 @@ class Option < ActiveRecord::Base
   validates_length_of :option, :in => 1..30
 
   has_many :real_votes, :class_name => "Vote", :as => :votable
-  belongs_to :poll
+  belongs_to :poll, :optional => true
 
   def to_s
     self.option

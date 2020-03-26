@@ -42,12 +42,12 @@ class Gather < ActiveRecord::Base
   scope :active, -> { where("gathers.status IN (?, ?, ?) AND gathers.updated_at > ?",
                             STATE_VOTING, STATE_PICKING, STATE_RUNNING, 12.hours.ago.utc) }
   
-  belongs_to :server
-  belongs_to :captain1, :class_name => "Gatherer"
-  belongs_to :captain2, :class_name => "Gatherer"
-  belongs_to :map1, :class_name => "GatherMap"
-  belongs_to :map2, :class_name => "GatherMap"
-  belongs_to :category
+  belongs_to :server, :optional => true
+  belongs_to :captain1, :class_name => "Gatherer", :optional => true
+  belongs_to :captain2, :class_name => "Gatherer", :optional => true
+  belongs_to :map1, :class_name => "GatherMap", :optional => true
+  belongs_to :map2, :class_name => "GatherMap", :optional => true
+  belongs_to :category, :optional => true
 
   has_many :gatherers
   has_many :users, :through => :gatherers

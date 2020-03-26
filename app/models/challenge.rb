@@ -71,12 +71,12 @@ class Challenge < ActiveRecord::Base
 
   has_one :match
   
-  belongs_to :map1, :class_name => "Map"
-  belongs_to :map2, :class_name => "Map"
-  belongs_to :user
-  belongs_to :server
-  belongs_to :contester1, :class_name => "Contester"
-  belongs_to :contester2, :class_name => "Contester"
+  belongs_to :map1, :class_name => "Map", :optional => true
+  belongs_to :map2, :class_name => "Map", :optional => true
+  belongs_to :user, :optional => true
+  belongs_to :server, :optional => true
+  belongs_to :contester1, :class_name => "Contester", :optional => true
+  belongs_to :contester2, :class_name => "Contester", :optional => true
 
   def statuses
     {STATUS_PENDING => "Pending response",

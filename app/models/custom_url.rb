@@ -16,7 +16,7 @@
 
 # FIXME: move this to a gem
 class CustomUrl < ActiveRecord::Base
-  belongs_to :article
+  belongs_to :article, :optional => true
   # FIXME: attr_accessible :name
 
   validates :name,

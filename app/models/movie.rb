@@ -50,11 +50,11 @@ class Movie < ActiveRecord::Base
     .group("movies.id") }
   scope :active_streams, -> { where("status > 0") }
 
-  belongs_to :user
-  belongs_to :file, :class_name => "DataFile"
-  belongs_to :preview, :class_name => "DataFile"
-  belongs_to :match
-  belongs_to :category
+  belongs_to :user, :optional => true
+  belongs_to :file, :class_name => "DataFile", :optional => true
+  belongs_to :preview, :class_name => "DataFile", :optional => true
+  belongs_to :match, :optional => true
+  belongs_to :category, :optional => true
   has_many :ratings, :as => :rateable
   has_many :shoutmsgs, :as => :shoutable
   has_many :watchers

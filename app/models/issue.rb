@@ -37,9 +37,9 @@ class Issue < ActiveRecord::Base
   #attr_protected :id, :created_at, :updated_at
 
   has_many :comments, :as => :commentable
-  belongs_to :category
-  belongs_to :author, :class_name => "User"
-  belongs_to :assigned, :class_name => "User"
+  belongs_to :category, :optional => true
+  belongs_to :author, :class_name => "User", :optional => true
+  belongs_to :assigned, :class_name => "User", :optional => true
 
   #scope :unread_by,
   #  lambda { |user| {

@@ -25,7 +25,7 @@ class Poll < ActiveRecord::Base
   validates_length_of :question, :in => 1..50
   #validates_datetime :end_date
 
-  belongs_to :user
+  belongs_to :user, :optional => true
   has_many :options, :class_name => "Option", :dependent => :destroy
   has_many :real_votes, :through => :options
 

@@ -48,8 +48,8 @@ class Teamer < ActiveRecord::Base
                      where("user_id = ? AND created_at < ? AND ((updated_at > ? AND rank = ?) OR rank >= ?)",
                      user.id, time.utc, time.utc, RANK_REMOVED, RANK_MEMBER) }
 
-  belongs_to :user
-  belongs_to :team
+  belongs_to :user, :optional => true
+  belongs_to :team, :optional => true
   has_many :other_teamers, -> { where("teamers.id != ?", object_id) }, :through => :user, :source => :teamers
   has_many :contesters, :through => :team
 

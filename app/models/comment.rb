@@ -30,8 +30,8 @@ class Comment < ActiveRecord::Base
   scope :filtered, -> { where.not({"commentable_type" => 'Issue'}) }
   scope :ordered, -> { order("id ASC") }
 
-  belongs_to :user
-  belongs_to :commentable, :polymorphic => true
+  belongs_to :user, :optional => true
+  belongs_to :commentable, :polymorphic => true, :optional => true
 
   validates_presence_of :commentable, :user
   validates_length_of :text, :in => 1..10000

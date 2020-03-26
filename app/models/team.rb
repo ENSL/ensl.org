@@ -50,7 +50,7 @@ class Team < ActiveRecord::Base
   scope :ordered, -> { order("name") }
   scope :recruiting, -> { where("recruiting IS NOT NULL AND recruiting != ''") }
 
-  belongs_to :founder, :class_name => "User"
+  belongs_to :founder, :class_name => "User", :optional => true
 
   has_many :active_teamers, -> { where("rank >= ?", Teamer::RANK_MEMBER) }
   has_many :teamers, :dependent => :destroy, :counter_cache => true

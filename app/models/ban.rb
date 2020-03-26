@@ -50,10 +50,10 @@ class Ban < ActiveRecord::Base
   validates :addr, format: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
   validates :reason, length: {maximum: 255}, allow_blank: true
 
-  belongs_to :user
-  belongs_to :server
+  belongs_to :user, :optional => true
+  belongs_to :server, :optional => true
 
-  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User'
+  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User', :optional => true
 
   def color
     expiry.past? ? "green" : "red"

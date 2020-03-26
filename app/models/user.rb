@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   attribute :lastvisit, :datetime, default: Time.now.utc
 
-  belongs_to :team, :optional => true
+  belongs_to :team, :optional => true, :optional => true
   has_one :profile, :dependent => :destroy
   has_many :bans, :dependent => :destroy
   has_many :articles, :dependent => :destroy

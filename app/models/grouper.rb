@@ -19,8 +19,8 @@ class Grouper < ActiveRecord::Base
   #attr_protected :id, :created_at, :updated_at
   attr_accessor :username
 
-  belongs_to :group
-  belongs_to :user
+  belongs_to :group, :optional => true
+  belongs_to :user, :optional => true
 
   validates_associated :group, :user
   validates :group, :user, :presence => true

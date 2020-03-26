@@ -28,8 +28,8 @@ class Forumer < ActiveRecord::Base
   validates_presence_of [:group_id, :forum_id]
   validates_inclusion_of :access, :in => 0..2
 
-  belongs_to :forum
-  belongs_to :group
+  belongs_to :forum, :optional => true
+  belongs_to :group, :optional => true
 
   before_create :init_variables
 

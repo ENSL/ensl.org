@@ -65,7 +65,7 @@ class Profile < ActiveRecord::Base
 
   #attr_protected :user_id, :id, :updated_at, :created_at
 
-  belongs_to :user
+  belongs_to :user, :optional => true
 
   validates_length_of :msn, :maximum => 50
   validates_format_of :msn, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i, :allow_blank => true

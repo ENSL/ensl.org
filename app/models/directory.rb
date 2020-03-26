@@ -29,7 +29,7 @@ class Directory < ActiveRecord::Base
 
   #attr_protected :id, :updated_at, :created_at, :path
 
-  belongs_to :parent, :class_name => "Directory"
+  belongs_to :parent, :class_name => "Directory", :optional => true
   has_many :subdirs, :class_name => "Directory", :foreign_key => :parent_id
   has_many :files, -> { order("name") }, :class_name => "DataFile"
 

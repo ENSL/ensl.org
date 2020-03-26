@@ -15,7 +15,7 @@
 
 class Lock < ActiveRecord::Base
   include Extra
-  belongs_to :lockable, :polymorphic => true
+  belongs_to :lockable, :polymorphic => true, :optional => true
 
   def can_create? cuser
     cuser and cuser.admin?

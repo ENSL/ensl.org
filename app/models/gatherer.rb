@@ -63,8 +63,8 @@ class Gatherer < ActiveRecord::Base
     joins("LEFT JOIN users ON users.id = gatherers.user_id").
     where("lastvisit < ?", 30.minutes.ago.utc) }
 
-  belongs_to :user
-  belongs_to :gather
+  belongs_to :user, :optional => true
+  belongs_to :gather, :optional => true
   has_many :real_votes, :class_name => "Vote", :as => :votable, :dependent => :destroy
 
   validates_uniqueness_of :user_id, :scope => :gather_id

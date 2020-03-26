@@ -23,9 +23,9 @@ class Bracketer < ActiveRecord::Base
 
   #attr_protected :id, :updated_at, :created_at
 
-  belongs_to :contest
-  belongs_to :match
-  belongs_to :contester, :foreign_key => "team_id"
+  belongs_to :contest, :optional => true
+  belongs_to :match, :optional => true
+  belongs_to :contester, :foreign_key => "team_id", :optional => true
 
   scope :pos, -> (row, col) { where(row: row, column: col) }
 

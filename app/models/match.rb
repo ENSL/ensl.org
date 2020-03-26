@@ -61,20 +61,20 @@ class Match < ActiveRecord::Base
   has_many :comments, -> { order("created_at") }, :as => :commentable, :dependent => :destroy
   has_many :match_proposals, inverse_of: :match, dependent: :destroy
   
-  belongs_to :challenge
-  belongs_to :contest
-  belongs_to :contester1, -> { includes('team') }, :class_name => "Contester"
-  belongs_to :contester2, -> { includes('team') }, :class_name => "Contester"
-  belongs_to :map1, :class_name => "Map"
-  belongs_to :map2, :class_name => "Map"
-  belongs_to :server
-  belongs_to :referee, class_name: "User"
-  belongs_to :motm, class_name: "User"
-  belongs_to :demo, class_name: "DataFile"
-  belongs_to :week
-  belongs_to :hltv, :class_name => "Server"
-  belongs_to :stream, :class_name => "Movie"
-  belongs_to :caster, :class_name => "User"
+  belongs_to :challenge, :optional => true
+  belongs_to :contest, :optional => true
+  belongs_to :contester1, -> { includes('team') }, :class_name => "Contester", :optional => true
+  belongs_to :contester2, -> { includes('team') }, :class_name => "Contester", :optional => true
+  belongs_to :map1, :class_name => "Map", :optional => true
+  belongs_to :map2, :class_name => "Map", :optional => true
+  belongs_to :server, :optional => true
+  belongs_to :referee, class_name: "User", :optional => true
+  belongs_to :motm, class_name: "User", :optional => true
+  belongs_to :demo, class_name: "DataFile", :optional => true
+  belongs_to :week, :optional => true
+  belongs_to :hltv, :class_name => "Server", :optional => true
+  belongs_to :stream, :class_name => "Movie", :optional => true
+  belongs_to :caster, :class_name => "User", :optional => true
 
   scope :future, -> { where("match_time > UTC_TIMESTAMP()") }
   scope :future5, -> { where("match_time > UTC_TIMESTAMP()").limit(5) }

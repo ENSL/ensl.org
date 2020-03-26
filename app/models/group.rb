@@ -33,7 +33,7 @@ class Group < ActiveRecord::Base
   has_and_belongs_to_many :users
   has_many :groupers
   has_many :users, :through => :groupers
-  belongs_to :founder, :class_name => "User"
+  belongs_to :founder, :class_name => "User", :optional => true
 
   def to_s
     name

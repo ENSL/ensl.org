@@ -29,8 +29,8 @@ class Prediction < ActiveRecord::Base
 
   scope :with_contest, -> { includes({:match => :contest}) }
 
-  belongs_to :match
-  belongs_to :user
+  belongs_to :match, :optional => true
+  belongs_to :user, :optional => true
 
   def can_create? cuser
     cuser and match.match_time.future? and !match.score1 and !match.score2 and !cuser.predictions.exists?(:match_id => match.id)
