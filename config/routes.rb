@@ -1,5 +1,5 @@
 Ensl::Application.routes.draw do
-  if not Rails.env.development?
+  if Rails.env.production?
     %w(403 404 422 500).each do |code|
       get code, to: "errors#show", code: code
     end

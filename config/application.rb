@@ -14,7 +14,7 @@ module Ensl
     config.exceptions_app = self.routes
 
     # Load Rails 5
-    config.load_defaults 5.0
+    # config.load_defaults 5.0
 
     # Additional assets
     config.assets.precompile += ["themes/*/theme.css", "themes/*/errors.css"]
