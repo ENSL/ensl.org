@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   attribute :lastvisit, :datetime, default: Time.now.utc
 
-  belongs_to :team
+  belongs_to :team, :optional => true
   has_one :profile, :dependent => :destroy
   has_many :bans, :dependent => :destroy
   has_many :articles, :dependent => :destroy
@@ -132,7 +132,6 @@ class User < ActiveRecord::Base
   validate :validate_team
 
   before_create :init_variables
-
   before_save :correct_steamid_universe
 
   accepts_nested_attributes_for :profile
@@ -292,8 +291,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  # FIXME: if team has been removed
   def validate_team
     if team and !active_teams.exists?({:id => team.id})
+      byebug
+      self.team = nil
+      self.save!
       errors.add :team
     end
   end
