@@ -66,7 +66,11 @@
 </div>
 
 <% if @contester.can_update? cuser %>
-  <%= link_to 'Edit', edit_contester_path(@contester), class: 'button' %>
+  <%= link_to 'Edit Contester', edit_contester_path(@contester), class: 'button' %>
+<% end %>
+
+<% if @contester.team.can_update? cuser %>
+  <%= link_to 'Edit Team', edit_team_path(@contester.team), class: 'button' %>
 <% end %>
 
 <script type="text/javascript">
