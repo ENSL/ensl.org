@@ -6,8 +6,9 @@ module Features
       end
     end
 
-    def fill_tinymce(element, contents)
-      page.execute_script("tinymce.get('#{element}').setContent('#{contents}')")
+    def fill_tinymce(element = first, contents)
+      page.execute_script("tinymce.editors[0].setContent('#{contents}')")
+      # page.execute_script("tinymce.get('#{element}').setContent('#{contents}')")
     end
 
     def submit(model, action)

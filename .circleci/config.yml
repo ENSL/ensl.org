@@ -102,7 +102,7 @@ jobs:
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
       - run:
           name: Database setup
-          command: bundle exec rails db:schema:load --trace
+          command: bundle exec rake db:test:prepare --trace
       # Run rspec in parallel
       #            ./cc-test-reporter before-build
       #            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
