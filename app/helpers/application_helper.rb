@@ -1,6 +1,7 @@
 module ApplicationHelper
   def full_title(page_title)
     base_title = "NSL"
+    base_title << " " + Rails.env.upcase unless Rails.env.production?
 
     if page_title.empty?
       base_title
