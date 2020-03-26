@@ -44,7 +44,7 @@ gem 'time_difference'
 
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
-gem 'steam-condenser', g  ithub: 'koraktor/steam-condenser-ruby'
+gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
 # FIXME: Legacy feature shims
 gem 'rails_autolink'

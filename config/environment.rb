@@ -1,6 +1,6 @@
-require File.expand_path('../application', __FILE__)
+require_relative 'application'
 require 'verification'
 require 'exceptions'
 
 ActiveSupport::Deprecation.silenced = true
-Ensl::Application.initialize!
+Rails.Application.initialize!

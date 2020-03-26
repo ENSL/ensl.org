@@ -1,8 +1,9 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
-Bundler.require(*Rails.groups(assets: %w(development test)))
+# Bundler.require(*Rails.groups(assets: %w(development test)))
+Bundler.require(*Rails.groups)
 
 # FIXME
 ActionController::Parameters.permit_all_parameters = true
@@ -11,6 +12,9 @@ module Ensl
   class Application < Rails::Application
     # Custom error pages
     config.exceptions_app = self.routes
+
+    # Load Rails 5
+    config.load_defaults 5.0
 
     # Additional assets
     config.assets.precompile += ["themes/*/theme.css", "themes/*/errors.css"]
