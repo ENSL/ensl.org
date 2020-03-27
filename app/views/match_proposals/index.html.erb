@@ -14,7 +14,7 @@
     <% end %>
   </tr>
   <% @match.match_proposals.each do |proposal| %>
-    <tr class="<%=cycle('even', 'odd') %>">
+    <tr class="<%=cycle('even', 'odd') %>">-
       <td><%= proposal.team.name %></td>
       <td><%= longtime proposal.proposed_time %> </td>
       <td><%= MatchProposal.status_strings[proposal.status] %></td>
@@ -22,18 +22,19 @@
       <td class="actions">
         <% unless proposal.state_immutable? %>
           <%= form_for proposal, url: match_proposal_path(@match, proposal) do |f| %>
+            <%= f.hidden_field :id, value: 0 %>
             <%= f.hidden_field :status, value: 0 %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_CONFIRMED) %>
-              <%= link_to_function icon('check'), "proposalStateSubmit(#{MatchProposal::STATUS_CONFIRMED},#{proposal.id})", title: 'Confirm' %>
+              <%= link_to icon('check'), "#", 'data-id': "#{MatchProposal::STATUS_CONFIRMED}", title: 'Confirm' %>
             <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REJECTED) %>
-              <%= link_to_function icon('times'), "proposalStateSubmit(#{MatchProposal::STATUS_REJECTED},#{proposal.id})", title: 'Reject' %>
-            <% end %>
+              <%= link_to icon('times'), "#", 'data-id': "#{MatchProposal::STATUS_REJECTED}", title: 'Reject' %>
+            <% end %> 
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REVOKED) %>
-              <%= link_to_function icon('undo'), "proposalStateSubmit(#{MatchProposal::STATUS_REVOKED},#{proposal.id})", title: 'Revoke' %>
+              <%= link_to icon('undo'), "#", 'data-id': "#{MatchProposal::STATUS_REVOKED}", title: 'Revoke' %>
             <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
-              <%= link_to_function icon('hourglass'), "proposalStateSubmit(#{MatchProposal::STATUS_DELAYED},#{proposal.id})", title: 'Delay' %>
+              <%= link_to icon('hourglass'), "#", 'data-id': "#{MatchProposal::STATUS_DELAYED}", title: 'Delay' %>
             <% end %>
           <% end %>
         <% end %>
@@ -42,20 +43,6 @@
     </tr>
   <% end %>
 </table>
-    <script type="text/javascript">
-      function proposalStateSubmit(newState, formID) {
-          var form = $('#edit_match_proposal_' + formID);
-          form.children("input[type='hidden']").val(newState);
-          $.post(form.attr('action'),form.serialize(), function(data) {
-              tr = form.closest('tr');
-              tr.children('td').eq(2).text(data.status);
-              if(data.status === 'Revoked' || data.status === 'Rejected') tr.children('td').eq(3).empty();
-          }, 'json')
-            .error(function (err) {
-                errjson = JSON.parse(err.responseText);
-                alert(errjson.error.message);
-            });
-      }
-    </script>
+
 <% end %>
 <%= link_to 'Back', match_path(@match), class: 'button' %><%= link_to 'Propose match time', new_match_proposal_path(@match), class: 'button' %>

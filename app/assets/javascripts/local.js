@@ -49,6 +49,20 @@ $(function() {
   });
 
   // Submit TODO
+  $("form.edit_match_proposal a").on('click', function() {
+    var form = $(this).closest('form.edit_match_proposal');
+    form.children("input#match_proposal_status").val($(this).dataset.id);
+    $.post(form.attr('action'),form.serialize(), function(data) {
+      tr = form.closest('tr');
+      tr.children('td').eq(2).text(data.status);
+      if(data.status === 'Revoked' || data.status === 'Rejected') tr.children('td').eq(3).empty();
+    }, 'json')
+      .error(function (err) {
+        errjson = JSON.parse(err.responseText);
+        alert(errjson.error.message);
+      });
+    }
+  );
 
   $("a.submit").on('click', function() {
     $(this).closest('form').submit()
@@ -121,6 +135,10 @@ function QuoteText(id, type) {
     dataType: "script"
   });
 }
+
+// Match proposal
+
+
 
 // Fields removing and adding dynamically
 

@@ -1,5 +1,6 @@
 module PollsHelper
   def add_option_link(name, form)
+    # FIXME: not used atm.
     link_to_function name do |page|
       option = render :partial => 'option', :locals => { :pf => form, :options => Option.new }
       page << %{
