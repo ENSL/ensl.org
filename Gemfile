@@ -5,16 +5,14 @@ ruby '2.6.5'
 
 # Rails core
 gem 'rails', '~> 6.0.2.2'
-gem 'rake', '< 11.0'
+gem 'rake'
 
 # Dotenv
 gem 'dotenv-rails'
 
 # DB
-# Fixme: using this bc puma startup problem
-gem 'active_record_union'
-gem 'dalli'
 gem 'mysql2'
+gem 'dalli'
 
 # Web server
 gem 'faraday'
@@ -27,49 +25,47 @@ gem 'unread'
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
-# View helper gems
-gem 'active_link_to'
-gem 'bbcoder'
-gem 'bluecloth'
-gem 'carrierwave'
-gem 'nokogiri'
-gem 'rmagick'
-gem 'country_select', require: 'country_select_without_sort_alphabetical'
-gem 'i18n_country_select'
-gem 'dynamic_form'
-gem 'public_suffix'
-gem 'sanitize'
-gem 'will_paginate'
-gem 'time_difference'
-
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
-# FIXME: Legacy feature shims
-gem 'rails_autolink'
-gem 'responders'
+# View and model helper gems
+gem 'time_difference'
+gem 'public_suffix'
+gem 'carrierwave'
+gem 'bbcoder'
+gem 'bluecloth'
+gem 'nokogiri'
+gem 'sanitize'
+gem 'rmagick'
+gem 'will_paginate'
+gem 'active_link_to'
+gem 'country_select', require: 'country_select_without_sort_alphabetical'
+gem 'i18n_country_select'
+gem 'dynamic_form'
+
+# Views
+gem 'haml'
 
 # Javascript
 gem 'coffee-rails'
 gem 'jquery-rails'
 gem 'tinymce-rails'
 gem 'i18n-js'
+gem 'uglifier'
 
+# CSS
+gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
 gem 'bourbon','~> 3.1.8'
+gem 'neat', '~> 1.6.0' # Upgrading will cause issues
+gem 'font-awesome-sass', '~> 4.1.0.0' # Fix icons before updating
 
-# Fix icons before updating
-gem 'font-awesome-sass', '~> 4.1.0.0'
-gem 'haml'
+# FIXME: Legacy feature shims
+gem 'rails_autolink'
+gem 'responders'
+gem 'active_record_union'
 
-# Upgrading will cause issues
-gem 'neat', '~> 1.6.0'
-
-# This it outdated by sassc
-gem 'sass-rails', '~> 5.0.3'
-gem 'uglifier', '~> 2.5.0'
-
-# Dependency version fix
+# FIXME: Dependency version fix
 gem 'signet', '0.11.0'
 
 group :production do
@@ -77,15 +73,20 @@ group :production do
 end
 
 group :development do
+  # Check models
+  gem 'rubocop'
+  
+  # annotate models
   gem 'annotate'
+
+  # error message
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'web-console'
-  gem 'rubocop'
 end
 
 group :test do
-  # Use dev versions because of rspec bug
+  # FIXME: Use dev versions because of rspec bug
   gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
   gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
   gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'
@@ -97,8 +98,8 @@ group :test do
 
   # Feature testing
   gem 'capybara'
-  gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'poltergeist'
+  gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'selenium-webdriver'
 
   # Fix FF issue
@@ -130,6 +131,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'spring'
+  gem "rails_best_practices"
   # For n+1 uqeries
   # gem 'bullet'
 end
