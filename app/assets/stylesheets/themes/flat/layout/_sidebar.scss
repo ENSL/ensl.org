@@ -14,7 +14,12 @@
     h4 {
       @include span-columns(12);
       margin-bottom: 20px;
+      margin-top: 20px;
       color: $light-blue;
+    }
+
+    h4:first-child {
+      margin-top: 0px;
     }
 
     .widget-content-wrapper {

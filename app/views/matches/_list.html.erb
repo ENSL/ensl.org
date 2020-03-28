@@ -1,6 +1,6 @@
-<table id="matches" class="<%= 'contest' if contest %> striped">
+<table id="matches" class="<%= 'contest' if defined? contest and contest %> striped">
   <tr>
-    <% if contest %>
+    <% if defined? contest and contest %>
       <th class="contest">Contest</th>
       <th class="opponent">Opponent</th>
     <% else %>
@@ -17,9 +17,9 @@
   </tr>
 
   <% matches.each do |match| %>
-    <% match.friendly = friendly %>
+    <% match.friendly = defined? friendly ? friendly : nil %>
     <tr>
-      <% if contest %>
+      <% if defined? contest and contest %>
         <td>
           <%= namelink match.contest %>
         </td>
@@ -37,14 +37,14 @@
       <% end %>
       <td class="score">
         <%= link_to match, :class => "bold #{match.score_color}" do %>
-          <% if friendly == match.contester1.team %>
+          <% if match.friendly == match.contester1.team %>
             <%=h match.score1 %> - <%=h match.score2 %>
           <% else %>
             <%=h match.score2 %> - <%=h match.score1 %>
           <% end %>
         <% end %>
       </td>
-      <% if match.contest.contest_type == Contest::TYPE_LADDER %>
+      <% if match.contest.contest_type == Contest::TYPE_LADDER and !(max_columns < 4 if (defined? max_columns)) %>
         <td>
           <% if match.get_friendly(:points) > 0 %>
             <%= icon 'chevron-up' %>

@@ -110,7 +110,10 @@
             <%= hidden_field_tag :type, 'contest' %>
 
             <%= f.hidden_field :contest_id %>
-
+            <div class="fields horizontal">
+                <%= f.label :name %>
+                <%= f.text_field :name %>
+            </div>
             <div class="fields horizontal">
                 <%= f.label :slots %>
                 <%= f.text_field :slots %>

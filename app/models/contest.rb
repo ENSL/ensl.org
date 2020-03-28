@@ -42,7 +42,7 @@ class Contest < ActiveRecord::Base
 
   scope :active, -> { where.not(status: STATUS_CLOSED) }
   scope :inactive, -> { where(status: STATUS_CLOSED) }
-  scope :joinable, -> { where(status: STATUS_OPEN) }
+  scope :joinable, -> { where(table[:status].eq(STATUS_OPEN).and(table[:end].gt(Time.now.utc))) }
   scope :with_contesters, -> { includes(:contesters) }
   scope :ordered, -> { order("start DESC") }
   scope :nsls1, -> { where("name LIKE ?", "NSL S1:%") }
@@ -132,6 +132,12 @@ class Contest < ActiveRecord::Base
     c.uniq.pluck(:score).count == c.count
   end
 
+  def can_join?(cuser)
+    byebug
+    cuser and !cuser&.banned?(Ban::TYPE_LEAGUE) and \
+      (cuser&.lead_teams.not_in_contest(self).exists?) and \
+      Contest.joinable.where(id: self).exists?
+  end
 
   def can_create? cuser
     cuser and cuser.admin?

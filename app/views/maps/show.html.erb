@@ -14,6 +14,11 @@
     <p><%= link_to (h @map.download), (h @map.download) %></p>
   <% end %>
 
+  <h4>Played in these matches (<%= @map.matches.count %>):</h4>
+  <ul class="disc">
+    <%= render partial: 'matches/list', locals: {matches: @map.matches} %>
+  </ul>
+
   <h4>Played in Contests</h4>
   <ul class="disc">
     <% @map.contests.each do |contest| %>

@@ -164,6 +164,7 @@ class Match < ActiveRecord::Base
     matchers.where(contester_id: contester2_id)
   end
 
+  # FIXME: this is a view helper and doesn't belong here
   def get_friendly(param = nil)
     if param.nil?
       friendly == contester1.team ? contester1 : contester2
@@ -174,6 +175,7 @@ class Match < ActiveRecord::Base
     end
   end
 
+  # FIXME: this is a view helper and doesn't belong here
   def get_opponent(param = nil)
     if param.nil?
       friendly == contester1.team ? contester2 : contester1

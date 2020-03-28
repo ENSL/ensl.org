@@ -20,10 +20,26 @@
       <dd>Sunday: <%= Time.use_zone(timezone_offset) { @contest.default_time.strftime("%H:%M %Z") } %></dd>
     </dl>
 
-    <%= link_to 'Scheduled Matches', confirmed_matches_path(@contest), class: 'button' %>
+    <%= link_to 'Scheduled Matches', confirmed_matches_path(@contest), class: 'button big' %>
 
     <% if @contest.can_update?(cuser) %>
       <%= link_to 'Edit Contest', edit_contest_path(@contest), class: 'button' %>
+    <% end %>
+
+    <h4>Join Contest</h4>
+
+    <% if @contest.can_join?(cuser) %>
+      <%= form_for @contest.contesters.build, html: { class: 'square' } do |f| %>
+        <%= f.hidden_field :contest_id %>
+
+        <div class="fields inline">
+          <%= f.collection_select :team_id, cuser.lead_teams, :id, :name %>
+        </div>
+
+        <div class="controls inline">
+          <%= f.submit "Join Contest" %>  
+        </div>
+      <% end %>
     <% end %>
   </div>
 <% end %>

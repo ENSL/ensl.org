@@ -23,7 +23,11 @@ class Bracket < ActiveRecord::Base
   has_many :bracketers
 
   def to_s
-    "#" + self.id.to_s
+    if name
+      name
+    else
+      "Bracket #%d" % [id]
+    end
   end
 
   def get_bracketer row, col

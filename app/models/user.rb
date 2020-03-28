@@ -68,6 +68,8 @@ class User < ActiveRecord::Base
   has_many :teamers, :dependent => :destroy
   has_many :active_teams, -> { where("teamers.rank >= ? AND teams.active = ?", Teamer::RANK_MEMBER, true) }, \
            :through => :teamers, :source => "team"
+  has_many :lead_teams, -> { where("teamers.rank >= ? AND teams.active = ?", Teamer::RANK_DEPUTEE, true) }, \
+           :through => :teamers, :source => "team"
   has_many :active_contesters, -> { where("contesters.active = ?", true) }, \
            :through => :active_teams, :source => "contesters"
   has_many :active_contests, -> { where("contests.status != ?", Contest::STATUS_CLOSED) }, \

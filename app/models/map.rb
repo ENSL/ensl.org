@@ -18,6 +18,7 @@ class Map < ActiveRecord::Base
   #attr_protected :id, :updated_at, :created_at, :deleted
 
   has_and_belongs_to_many :contests
+  has_many :matches, -> (map){ unscope(:where).where("map1_id = :id OR map2_id = :id", id: map.id) }
 
   scope :basic, -> { where(deleted: false).order("name") }
   scope :with_name, -> (name) { where(name: name) }

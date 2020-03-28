@@ -49,6 +49,7 @@ class Team < ActiveRecord::Base
   scope :inactive, -> { where(active: false) }
   scope :ordered, -> { order("name") }
   scope :recruiting, -> { where("recruiting IS NOT NULL AND recruiting != ''") }
+  scope :not_in_contest, -> (contest) { joins(:contests).where.not('contests.id': contest.id) }
 
   belongs_to :founder, :class_name => "User", :optional => true
 

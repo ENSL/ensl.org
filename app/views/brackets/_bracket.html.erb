@@ -1,3 +1,7 @@
+<h3>
+  <%= bracket.name if !bracket.name&.empty? and !defined? edit %>
+</h3>
+
 <table class="brackets">
   <% rows = bracket.slots*2-1 %>
   <% cols = 2+(bracket.slots/4) %>
@@ -23,7 +27,7 @@
 
         <td class="<%= element_class %>">
           <% if element_class == "team" %>
-            <% if params[:action] == "edit" %>
+            <% if defined? edit %>
               <%= select_tag "cell[#{row}][#{col}]", options_for_select(bracket.options, :selected => bracket.default(row, col)) %>
             <% elsif bracketer %>
               <% if bracketer.match %>

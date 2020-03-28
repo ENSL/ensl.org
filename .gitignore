@@ -60,6 +60,11 @@ pickle-email-*.html
 # Sublime
 *.sublime*
 
+# Vscode
+.vscode/
+.rakeTasks
+.generators
+
 # Gemtags
 *.tags
 *.gemtags
