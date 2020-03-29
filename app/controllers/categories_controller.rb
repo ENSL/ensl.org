@@ -46,13 +46,13 @@ class CategoriesController < ApplicationController
 
   def up
     raise AccessError unless @category.can_update? cuser
-    @category.move_up(["domain = ?", @category.domain], "sort")
+    @category.move_up(Category.where(domain: @category.domain), 'sort')
     redirect_to :categories
   end
 
   def down
     raise AccessError unless @category.can_update? cuser
-    @category.move_down(["domain = ?", @category.domain], "sort")
+    @category.move_down(Category.where(domain: @category.domain), 'sort')
     redirect_to :categories
   end
 

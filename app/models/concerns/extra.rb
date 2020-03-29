@@ -29,27 +29,26 @@ module Extra
       Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, "<br>").html_safe
     end
 
-    def move_up(scope, column = "position")
+    def move_up(objects, column = "position")
       n = 0
-      objects = self.class.all(conditions: scope, order: column)
-      objects.each do |item|
+      # the objects need to be assigned before loop or the order is not right
+      (objects = objects.order(column)).each_with_index do |item, i|
         if item.id == id and n > 0
           old_position = item[column]
-          item.update_attribute(column, objects.fetch(n-1)[column])
-          objects.fetch(n-1).update_attribute(column, old_position)
+          item.update_attribute(column, objects[i-1][column])
+          objects[i-1].update_attribute(column, old_position)
         end
         n = n + 1
       end
     end
 
-    def move_down(scope, column = "position")
+    def move_down(objects, column = "position")
       n = 0
-      objects = self.class.all(conditions: scope, order: column)
-      objects.each do |item|
+      (objects = objects.order(column)).each_with_index do |item, i|
         if item.id == id and n < (objects.length-1)
           old_position = item[column]
-          item.update_attribute(column, objects.fetch(n+1)[column])
-          objects.fetch(n+1).update_attribute(column, old_position)
+          item.update_attribute(column, objects[n+1][column])
+          objects[n+1].update_attribute(column, old_position)
         end
         n = n + 1
       end
