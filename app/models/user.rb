@@ -296,7 +296,6 @@ class User < ActiveRecord::Base
   # FIXME: if team has been removed
   def validate_team
     if team and !active_teams.exists?({:id => team.id})
-      byebug
       self.team = nil
       self.save!
       errors.add :team

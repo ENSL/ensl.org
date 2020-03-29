@@ -60,7 +60,11 @@ Ensl::Application.routes.draw do
     end
   end
   resources :locks
-  resources :contesters
+  resources :contesters do
+    collection do
+      get :recalc
+    end
+  end
 
   get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
   resources :contests
@@ -112,8 +116,6 @@ Ensl::Application.routes.draw do
   get 'data_files/addFile'
   get 'data_files/delFile'
   get 'data_files/trash'
-
-  get 'contesters/recalc'
 
   get 'directories', to: "directories#show", id: 1
 

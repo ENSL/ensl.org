@@ -5,8 +5,9 @@ services:
     command: "bundle exec puma"
     tty: true
     stdin_open: true
+    # NOtE: Use attach rather than this
     # Debug
-    #command: /bin/bash
+    # command: /bin/bash
     container_name: ensl_dev
     build:
       context: ./

@@ -9,14 +9,6 @@ class ChallengesController < ApplicationController
     return_here
   end
 
-  def refresh
-    Challenge.past.pending.each do |c|
-      c.destroy
-    end
-
-    render text: t(:challenges_cleared)
-  end
-
   def new
     #No new challenges for now.
     raise AccessError
@@ -66,6 +58,16 @@ class ChallengesController < ApplicationController
     raise AccessError unless @challenge.can_destroy? cuser
     @challenge.destroy
     #return_to FIX ME from challenge side
+    render text: t(:challenges_cleared)
+  end
+
+  # Custom method
+
+  def refresh
+    Challenge.past.pending.each do |c|
+      c.destroy
+    end
+
     render text: t(:challenges_cleared)
   end
 
