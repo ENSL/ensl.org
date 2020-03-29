@@ -4,6 +4,7 @@
       <%= link_to (h @contester.team.name), team_url(@contester.team, team: 'matches', anchor: "contest_#{@contester.contest.id}") %>
     </span>
   </h1>
+  <h4 class="fancy">in <%= namelink @contester.contest %></h4>
 
   <% if @contester.team.logo %>
     <div class="logo">
@@ -12,7 +13,7 @@
   <% end %>
 </div>
 
-<h4 class="nane"><%= namelink @contester.contest %></h4>
+
 
 <div id="matches" class="tabbed">
   <ul id="matches-nav" class="tabs">
