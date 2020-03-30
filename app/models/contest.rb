@@ -104,8 +104,8 @@ class Contest < ActiveRecord::Base
   end
 
   def recalculate
-    Match.update_all("diff = null, points1 = null, points2 = null", {:contest_id => self.id})
-    Contester.update_all("score = 0, win = 0, loss = 0, draw = 0, extra = 0", {:contest_id => self.id})
+    Match.where(contest_id: self.id).update_all("diff = null, points1 = null, points2 = null")
+    Contester.where(contest_id: self.id).update_all("score = 0, win = 0, loss = 0, draw = 0, extra = 0")
     matches.finished.chrono.each do |match|
       match.recalculate
       match.save

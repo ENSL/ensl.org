@@ -174,7 +174,7 @@
                     <td><%= contester.statuses[contester.active] %></td>
                     <td class="actions">
                         <% if contester.active %>
-                        <%= link_to icon('pencil'), edit_contester_path(contester) %>
+                        <%= link_to icon('pencil'), edit_contester_path(contester) %> 
                         <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
                         <% else %>
                         <%= form_for contester do |c| %>
@@ -266,6 +266,10 @@
             <%= link_to "New Match", { controller: :matches, action: :new, id: @contest }, { class: 'button' } %>
         </div>
     </div>
+    
+    <%= link_to "Recalculate points", recalc_contest_path(@contest), class: :button %>
+
+    <%= link_to "Show", @contest, class: :button %>
 </div>
 
 <script type="text/javascript">

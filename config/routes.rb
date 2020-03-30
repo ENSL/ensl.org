@@ -60,14 +60,14 @@ Ensl::Application.routes.draw do
     end
   end
   resources :locks
-  resources :contesters do
-    collection do
+  resources :contesters
+
+  get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
+  resources :contests do
+    member do
       get :recalc
     end
   end
-
-  get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
-  resources :contests
   resources :challenges
   resources :servers
   resources :predictions

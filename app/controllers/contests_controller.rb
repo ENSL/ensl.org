@@ -39,8 +39,9 @@ class ContestsController < ApplicationController
   end
 
   def recalc
+    raise AccessError unless @contest.can_update? cuser
     @contest.recalculate
-    render :text => t(:score_recalc), :layout => true
+    redirect_to_back
   end
 
   def new
