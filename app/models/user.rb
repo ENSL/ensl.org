@@ -11,7 +11,7 @@
 #  lastname     :string(255)
 #  lastvisit    :datetime
 #  password     :string(255)
-#  public_email :boolean          default("0"), not null
+#  public_email :boolean          default(FALSE), not null
 #  steamid      :string(255)
 #  time_zone    :string(255)
 #  username     :string(255)

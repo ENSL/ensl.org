@@ -3,7 +3,7 @@
 # Table name: maps
 #
 #  id          :integer          not null, primary key
-#  deleted     :boolean          default("0"), not null
+#  deleted     :boolean          default(FALSE), not null
 #  download    :string(255)
 #  name        :string(255)
 #  picture     :string(255)

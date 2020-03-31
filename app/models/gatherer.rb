@@ -3,9 +3,9 @@
 # Table name: gatherers
 #
 #  id         :integer          not null, primary key
-#  status     :integer          default("0"), not null
+#  status     :integer          default(0), not null
 #  team       :integer
-#  votes      :integer          default("0"), not null
+#  votes      :integer          default(0), not null
 #  created_at :datetime
 #  updated_at :datetime
 #  gather_id  :integer

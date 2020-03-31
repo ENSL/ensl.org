@@ -5,7 +5,7 @@
 #  id          :integer          not null, primary key
 #  status      :integer          not null
 #  text        :text(16777215)
-#  text_coding :integer          default("0"), not null
+#  text_coding :integer          default(0), not null
 #  text_parsed :text(16777215)
 #  title       :string(255)
 #  version     :integer

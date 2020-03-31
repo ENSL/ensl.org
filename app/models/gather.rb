@@ -7,7 +7,7 @@
 #  lastpick2   :datetime
 #  status      :integer
 #  turn        :integer
-#  votes       :integer          default("0"), not null
+#  votes       :integer          default(0), not null
 #  created_at  :datetime
 #  updated_at  :datetime
 #  captain1_id :integer

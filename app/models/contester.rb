@@ -3,13 +3,13 @@
 # Table name: contesters
 #
 #  id         :integer          not null, primary key
-#  active     :boolean          default("1"), not null
-#  draw       :integer          default("0"), not null
+#  active     :boolean          default(TRUE), not null
+#  draw       :integer          default(0), not null
 #  extra      :integer          not null
-#  loss       :integer          default("0"), not null
-#  score      :integer          default("0"), not null
+#  loss       :integer          default(0), not null
+#  score      :integer          default(0), not null
 #  trend      :integer          not null
-#  win        :integer          default("0"), not null
+#  win        :integer          default(0), not null
 #  created_at :datetime
 #  updated_at :datetime
 #  contest_id :integer

@@ -8,7 +8,7 @@
 #  mandatory     :boolean
 #  match_time    :datetime
 #  response      :string(255)
-#  status        :integer          default("0"), not null
+#  status        :integer          default(0), not null
 #  created_at    :datetime
 #  updated_at    :datetime
 #  contester1_id :integer

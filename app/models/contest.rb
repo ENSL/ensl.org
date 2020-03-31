@@ -3,7 +3,7 @@
 # Table name: contests
 #
 #  id           :integer          not null, primary key
-#  contest_type :integer          default("0"), not null
+#  contest_type :integer          default(0), not null
 #  default_time :time
 #  end          :datetime
 #  modulus_3to1 :float(24)

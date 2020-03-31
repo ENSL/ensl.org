@@ -5,7 +5,7 @@
 #  id         :integer          not null, primary key
 #  end_date   :datetime
 #  question   :string(255)
-#  votes      :integer          default("0"), not null
+#  votes      :integer          default(0), not null
 #  created_at :datetime
 #  updated_at :datetime
 #  user_id    :integer

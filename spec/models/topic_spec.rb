@@ -3,7 +3,7 @@
 # Table name: topics
 #
 #  id         :integer          not null, primary key
-#  state      :integer          default("0"), not null
+#  state      :integer          default(0), not null
 #  title      :string(255)
 #  created_at :datetime
 #  updated_at :datetime

@@ -31,12 +31,12 @@
 #  music               :string(255)
 #  notify_any_match    :boolean
 #  notify_articles     :boolean
-#  notify_challenge    :boolean          default("1"), not null
+#  notify_challenge    :boolean          default(TRUE), not null
 #  notify_gather       :boolean
 #  notify_movies       :boolean
 #  notify_news         :boolean
 #  notify_own_match    :boolean
-#  notify_pms          :boolean          default("1"), not null
+#  notify_pms          :boolean          default(TRUE), not null
 #  psu                 :string(255)
 #  ram                 :string(255)
 #  res                 :string(255)

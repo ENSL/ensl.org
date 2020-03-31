@@ -3,10 +3,10 @@
 # Table name: servers
 #
 #  id              :integer          not null, primary key
-#  active          :boolean          default("1"), not null
+#  active          :boolean          default(TRUE), not null
 #  description     :string(255)
 #  dns             :string(255)
-#  domain          :integer          default("0"), not null
+#  domain          :integer          default(0), not null
 #  idle            :datetime
 #  ip              :string(255)
 #  irc             :string(255)

@@ -65,6 +65,7 @@ class ContestsController < ApplicationController
     end
   end
 
+  # FIXME: don't use this kind of update
   def update
     raise AccessError unless @contest.can_update? cuser
     if update_type == "contest"
