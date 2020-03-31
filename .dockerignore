@@ -1,5 +1,6 @@
 Dockerfile
 db_data
+db/data/
 dkim
 log/*
 public/*

@@ -18,6 +18,10 @@
 # Database and files
 db_data/*
 !db_data/.placeholder
+db/data/
+!db/data/.placeholder
+db/initdb.d/*
+!db/initdb.d/.placeholder
 *.sql*
 
 # ignore dkim keys

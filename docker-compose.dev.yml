@@ -13,7 +13,7 @@ services:
       context: ./
       dockerfile: Dockerfile.dev
 #      args:
-#        buildno: 1
+#        buildno: 1    
     volumes:
      - ".:/var/www/"
     ports:
@@ -87,11 +87,13 @@ services:
     # Debug
     #command: bash
     #tty: true
-    command: mysqld_safe --skip-grant-tables
+    # command: mysqld_safe --skip-grant-tables
     image: mariadb:latest
     container_name: ensl_dev_db
+    user: "mysql:mysql"
     volumes:
-     - "./db_data:/var/lib/mysql"
+     - "./db/data:/var/lib/mysql"
+     - "./db/initdb.d:/docker-entrypoint-initdb.d"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
     environment:
      - MYSQL_DATABASE=ensl

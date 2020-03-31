@@ -33,6 +33,8 @@ First build the ENSL docker containers.
 
     docker-compose build
 
+Put any database dumps to `db/initdb.d`.
+
 a) Then start for **production**:
     
     docker-compose up
