@@ -41,9 +41,17 @@ FIXME, TODO, EXPLAIN, OBSOLETE
 
 ## Handy commands
 
-Build or rebuild
+Start:
+
+    docker-compose -f docker-compose.dev.yml up -d --build`
+
+Build or rebuild:
 
     docker-compose -f docker-compose.dev.yml build`
+
+Debug:
+
+    docker attach ensl_dev
 
 To get inside docker web+test containers:
 
