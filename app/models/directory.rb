@@ -108,10 +108,10 @@ class Directory < ActiveRecord::Base
     logger.info 'Starting recreate on %d, root: %s' % [id, root]
     ActiveRecord::Base.transaction do
       # We use destroy lists so technically there can be seperate roots
-      destroy_list = Hash.new
+      destroy_dirs = Hash.new
       update_attribute :path, root
-      destroy_list = recreate(destroy_list)
-      destroy_list.each do |key, dir|
+      destroy_dirs = recreate(destroy_dirs)
+      destroy_dirs.each do |key, dir|
         logger.info 'Removed dir: %s' % dir.full_path
         # dir.destroy!
       end
@@ -122,26 +122,26 @@ class Directory < ActiveRecord::Base
   end
 
   # QUESTION Symlinks?
-  def recreate(destroy_list, path = self.full_path)
+  def recreate(destroy_dirs, path = self.full_path)
     # Convert all subdirs into a hash and mark them to be deleted
     # FIXME: better oneliner
-    destroy_list.merge!(subdirs.all.map{ |s| [s.id,s] }.to_h)
+    destroy_dirs.merge!(subdirs.all.map{ |s| [s.id,s] }.to_h)
 
     # Go through all subdirectories (no recursion)
-    Dir.glob("%s/*" % path).each do |subdir_path|
-      if File.directory? subdir_path
-        subdir_name = File.basename(subdir_path)
+    Dir.glob("%s/*" % path).each do |subitem_path|
+      if File.directory? subitem_path
+        subdir_name = File.basename(subitem_path)
 
         # We find by name only, ignore path
         # Find existing subdirs from current path. Keep those we find
-        if (subdir = find_existing(subdir_name))
+        if (subdir = find_existing(subdir_name, subitem_path))
           if subdir.parent_id != self.id
             old_path = subdir.full_path
             subdir.parent = self
             subdir.save!
             logger.info 'Renamed dir: %s -> %s' % [old_path, subdir.full_path]
           end
-          destroy_list.delete subdir.id
+          destroy_dirs.delete subdir.id
         # In case its a new directory
         else
           # Attempt to find it in existing directories
@@ -152,13 +152,24 @@ class Directory < ActiveRecord::Base
         end
 
         # Recreate the directory
-        destroy_list = subdir.recreate(destroy_list)
+        destroy_dirs = subdir.recreate(destroy_dirs)
+      elsif File.file? subitem_path
+        if dbfile = DataFile.find_existing(subitem_path, subitem_name)
+          dbfile.directory = self
+          dbfile.save!
+        elsif (File.mtime(file) + 100).past?
+          dbfile = DataFile.new
+          dbfile.path = file
+          dbfile.directory = self
+          dbfile.save!
+        end
+        # TODO: handle files that are only in database
       end
     end
-    return destroy_list
+    return destroy_dirs
   end
 
-  def find_existing(subdir_name)
+  def find_existing(subdir_name, subitem_path)
     # Find by name
     if (dir = subdirs.where(name: subdir_name)).exists?
       return dir.first
@@ -169,42 +180,28 @@ class Directory < ActiveRecord::Base
           return dir
         end
       end
+      # TODO: use filter_map here
+      # NOTE: we don't use the logic from dat_file
+      file_count = Dir["%s/*" % subitem_path].count{|f| File.file?(f) }
+      Directory.joins(:files).group('data_files.directory_id')\
+        .having('count(data_files.id) = ? and count(data_files.id) > 0', file_count).each do |dir|
+          Dir.glob(File.join(dir.full_path, '*')).each do |filename|
+            return false if File.size(file) != dir.files.where(name: filename).first&.size
+          end
+        return dir
+      end
     # TODO: Find by number of files + hash of files
     end
     return false
   end
 
-  # TODO check that you can download files
-
-  def process_dir
-    ActiveRecord::Base.transaction do
-      Dir.glob("#{full_path}/*").each do |file|
-        if File.directory?(file)
-          if dir = Directory.find_by_path(file)
-            dir.save!
-          else
-            dir = Directory.new
-            dir.name = File.basename(file)
-            dir.path = file
-            dir.parent = self
-            dir.save!
-          end
-          dir.process_dir
-        else
-          if dbfile = DataFile.find_by_path(file)
-            dbfile.directory = self
-            dbfile.save!
-          elsif (File.mtime(file) + 100).past?
-            dbfile = DataFile.new
-            dbfile.path = file
-            dbfile.directory = self
-            dbfile.save!
-          end
-        end
-      end
-    end
+  # TODO
+  def recreate_check
+    true
   end
 
+  # TODO check that you can download files
+  
   def can_create? cuser
     cuser and cuser.admin?
   end

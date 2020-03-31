@@ -20,6 +20,11 @@ class DirectoriesController < ApplicationController
     raise AccessError unless @directory.can_update? cuser
   end
 
+  def recreate
+    @directory.recreate_transaction
+    render text: t(:directories_update)
+  end
+
   def refresh
     @directory.process_dir
     render text: t(:directories_update)

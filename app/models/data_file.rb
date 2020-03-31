@@ -97,7 +97,7 @@ class DataFile < ActiveRecord::Base
     end
 
     # Update the path on creation
-    if path.nil? or directory_id_changed?
+    if path.nil?
       self.path = File.join(directory.path, File.basename(name.to_s))
     end
 
@@ -145,6 +145,11 @@ class DataFile < ActiveRecord::Base
 
   def rateable? user
     user and !rated_by?(user)
+  end
+
+  def self.find_existing(subdir_name, subitem_path)
+    DataFile.where(arel_tabe(:path).eq(subitem_path)\
+      .or(arel_table(:md5).eq(Digest::MD5.hexdigest(File.read(subitem_path))))).first
   end
 
   def can_create? cuser
