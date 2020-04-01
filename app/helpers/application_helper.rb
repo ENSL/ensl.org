@@ -22,7 +22,7 @@ module ApplicationHelper
     stylesheet_link_tag "themes/#{active_theme}/theme"
   end
 
-  def namelink model, length = nil
+  def namelink(model, length = nil)
     return if model.nil?
     model = case model.class.to_s
             when "DataFile"
@@ -35,13 +35,24 @@ module ApplicationHelper
               model
             end
     str = model.to_s
-    
+
     # Reduce length of too long model names
     if length and str.length > length
-      link_to str.to_s[0, length] + "...", model, class: model.class.to_s.downcase
+      link_to(str.to_s[0, length] + "...", model, class: model.class.to_s.downcase)
     else
-      link_to str, model, class: model.class.to_s.downcase
+      link_to(str, model, class: model.class.to_s.downcase)
     end
+  end
+
+  def directory_links(directory)
+    output = ""
+    Directory.directory_traverse(directory).reverse_each do |dir|
+      output << namelink(dir) + "\n"
+      unless dir == directory
+        output << " &raquo; \n"
+      end
+    end
+    output.html_safe
   end
 
   def shorten str, length

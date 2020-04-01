@@ -21,13 +21,9 @@ class DirectoriesController < ApplicationController
   end
 
   def recreate
-    @directory.recreate_transaction
-    render text: t(:directories_update)
-  end
-
-  def refresh
-    @directory.process_dir
-    render text: t(:directories_update)
+    raise AccessError unless @cuser&.admin?
+    @result = @directory.recreate_transaction
+    @nobody = true
   end
 
   def create
@@ -55,7 +51,7 @@ class DirectoriesController < ApplicationController
   def destroy
     raise AccessError unless @directory.can_destroy? cuser
     @directory.destroy
-    redirect_to directories_url
+    redirect_to directory_path(Directory.find(Directory::ROOT))
   end
 
   private

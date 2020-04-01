@@ -17,19 +17,16 @@
 #
 #  index_directories_on_parent_id  (parent_id)
 #
+require 'stringio'
 
 ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
 
-# class SteamIdValidator < ActiveModel::Validator
-#   def validate(record)
-#     record.errors.add :steamid unless \
-#       record.steamid.nil? ||
-#         (m = record.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
-#         (id = m[3].to_i) &&
-#         id >= 1 && id <= 2147483647
-#   end
-# end
-
+class PathValidator < ActiveModel::Validator
+  def validate(record)
+    record.errors.add :path, "doesn't match generated path" unless \
+      record.full_path == record.path
+  end
+end
 
 class Directory < ActiveRecord::Base
   include Extra
@@ -41,43 +38,84 @@ class Directory < ActiveRecord::Base
   MOVIES = 30
   ARTICLES = 39
 
-  #attr_protected :id, :updated_at, :created_at, :path
+  attr_accessor :preserve_files
 
   belongs_to :parent, :class_name => "Directory", :optional => true
   has_many :subdirs, :class_name => "Directory", :foreign_key => :parent_id
   has_many :files, -> { order("name") }, :class_name => "DataFile"
 
   scope :ordered, ->  { order("name ASC") }
+  scope :path_sorted, ->  { order("path ASC") }
   scope :filtered, -> { where(hidden: false) }
   scope :of_parent, -> (parent) { where(parent_id: parent.id) }
 
-  validates_length_of [:name, :path], :in => 1..255
+  # FIXME: different validation for user?
+  validates_length_of [:name, :path, :title], :in => 1..255
   validates_format_of :name, :with => /\A[A-Za-z0-9]{1,20}\z/, :on => :create
-  validates_length_of :name, :in => 1..25
+  validates_length_of :name, :in => 1..255
   validates_inclusion_of :hidden, :in => [true, false]
+  validates_presence_of :title
+  validates_with PathValidator
   # TODO: add validation for path
 
-  before_validation :init_variables
+  before_validation :init_variables, on: :create
   after_create :make_path
   after_save :update_timestamp
-  before_destroy :remove_files
+  before_destroy :remove_files, unless: Proc.new { preserve_files }
   after_destroy :remove_path
 
   def to_s
     name
   end
 
-  def init_variables
-    self.path = full_path if parent
-    self.hidden = false if hidden.nil?
+  def parent_root?
+    parent.id == Directory::ROOT
+  end
+
+  def root?
+    id == Directory::ROOT
+  end
+
+  def full_title
+    output = ""
+    Directory.directory_traverse(self).reverse_each do |dir|
+      unless dir.title&.empty?
+        output << "%s" % dir.title
+      else
+        output << dir.name
+      end
+      output << " » " unless self == dir
+    end
+    output
+  end
+
+  def self.directory_traverse(directory, list = [])
+    unless directory.root?
+      list << directory
+      return directory_traverse(directory.parent, list)
+    else
+      return list
+    end
+  end
+
+  # Use this
+  def full_path
+    parent ? File.join(parent.full_path, name.downcase) : path
+  end
+
+  def relative_path
+    parent ? File.join(parent.relative_path, name.downcase).sub(/^\//, '') : ""
   end
 
   def path_exists?
     File.directory?(full_path)
   end
 
-  def full_path
-    parent ? File.join(parent.full_path, name.downcase) : path
+  def init_variables
+    # Force path to use parent which is the authoritative source
+    self.path = full_path if parent
+    self.title = File.basename(self.path).capitalize
+    self.hidden = false if hidden.nil?
   end
 
   def make_path
@@ -93,6 +131,7 @@ class Directory < ActiveRecord::Base
       subdir.destroy
     end
     subdirs.each do |subdir|
+      subdir.preserve_files = self.preserve_files
       subdir.destroy
     end
   end
@@ -103,65 +142,86 @@ class Directory < ActiveRecord::Base
 
   # TODO: make tests for this, moving etc.
   # TODO: mutate instead of return.
-  def recreate_transaction(root = ENV['FILES_ROOT'])
-    logger = Rails.logger
-    logger.info 'Starting recreate on %d, root: %s' % [id, root]
+  # TODO: move to its own class
+  # TODO: also remove files
+  # TODO: need log to rails log too
+  def recreate_transaction
+    strio = StringIO.new
+    logger = Logger.new(strio)
+    logger.info 'Starting recreate on Directory(%d): %s.' % [id, name]
     ActiveRecord::Base.transaction do
       # We use destroy lists so technically there can be seperate roots
       destroy_dirs = Hash.new
-      update_attribute :path, root
-      destroy_dirs = recreate(destroy_dirs)
+      if id == Directory::ROOT
+        update_attribute :path, ENV['FILES_ROOT']
+      end
+      logger.info 'Path: %s' % [path]
+      destroy_dirs = recreate(destroy_dirs, logger: logger)
       destroy_dirs.each do |key, dir|
         logger.info 'Removed dir: %s' % dir.full_path
-        # dir.destroy!
+        dir.destroy!
       end
     end
     logger.info 'Finish recreate'
-    return nil
+    return strio
     # TODO: check items that weren't checked.
   end
 
   # QUESTION Symlinks?
-  def recreate(destroy_dirs, path = self.full_path)
+  def recreate(destroy_dirs, logger: Rails.logger)
     # Convert all subdirs into a hash and mark them to be deleted
     # FIXME: better oneliner
+    # logger.debug 'recreate: %s' % full_path
     destroy_dirs.merge!(subdirs.all.map{ |s| [s.id,s] }.to_h)
 
     # Go through all subdirectories (no recursion)
-    Dir.glob("%s/*" % path).each do |subitem_path|
-      if File.directory? subitem_path
-        subdir_name = File.basename(subitem_path)
+    Dir.glob(File.join(full_path, '*')).each do |subitem_path|
+      subitem_name = File.basename(subitem_path)
 
+      if File.directory? subitem_path
+        # logger.debug 'Processing dir: %s' % subitem_path
         # We find by name only, ignore path
         # Find existing subdirs from current path. Keep those we find
-        if (subdir = find_existing(subdir_name, subitem_path))
+        if (subdir = find_existing(subitem_name, subitem_path))
           if subdir.parent_id != self.id
             old_path = subdir.full_path
             subdir.parent = self
             subdir.save!
             logger.info 'Renamed dir: %s -> %s' % [old_path, subdir.full_path]
+          elsif !subdir.valid?
+            subdir.errors.full_messages.each do |err|
+              logger.error err
+            end
+            subdir.init_variables
+            logger.info 'Fixed attributes: %s' % [subdir.full_path]
+            subdir.save!
           end
           destroy_dirs.delete subdir.id
         # In case its a new directory
         else
           # Attempt to find it in existing directories
-          subdir = subdirs.build(name: subdir_name)
+          subdir = subdirs.build(name: subitem_name)
           # FIXME: find a better solution
           subdir.save!(validate: false)
           logger.info 'New dir: %s' % subdir.full_path
         end
-
         # Recreate the directory
-        destroy_dirs = subdir.recreate(destroy_dirs)
+        destroy_dirs = subdir.recreate(destroy_dirs, logger: logger)
       elsif File.file? subitem_path
+        # logger.debug 'Processing file: %s' % subitem_path
         if dbfile = DataFile.find_existing(subitem_path, subitem_name)
-          dbfile.directory = self
-          dbfile.save!
-        elsif (File.mtime(file) + 100).past?
+          if dbfile.directory_id != self.id
+            dbfile.directory = self
+            dbfile.save!
+            logger.info 'Update file: %s' % dbfile.name
+          end
+        elsif (File.mtime(subitem_path) + 100).past?
           dbfile = DataFile.new
-          dbfile.path = file
+          # dbfile.name = subitem_name
           dbfile.directory = self
+          dbfile.manual_upload(subitem_path)
           dbfile.save!
+          logger.info 'Added file: %s' % dbfile.name
         end
         # TODO: handle files that are only in database
       end
@@ -181,7 +241,7 @@ class Directory < ActiveRecord::Base
         end
       end
       # TODO: use filter_map here
-      # NOTE: we don't use the logic from dat_file
+      # NOTE: we don't use the logic from date_file
       file_count = Dir["%s/*" % subitem_path].count{|f| File.file?(f) }
       Directory.joins(:files).group('data_files.directory_id')\
         .having('count(data_files.id) = ? and count(data_files.id) > 0', file_count).each do |dir|
@@ -193,11 +253,6 @@ class Directory < ActiveRecord::Base
     # TODO: Find by number of files + hash of files
     end
     return false
-  end
-
-  # TODO
-  def recreate_check
-    true
   end
 
   # TODO check that you can download files

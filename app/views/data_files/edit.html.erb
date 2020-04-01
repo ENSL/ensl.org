@@ -12,7 +12,7 @@
 
   <div class="fields horizontal">
     <%= f.label :directory_id %>
-    <%= f.select :directory_id, Directory.all.collect { |c| ["#{c.path} - #{c.name}", c.id] } %>
+    <%= f.select :directory_id, Directory.path_sorted.collect { |c| ["#{c.full_title} (#{c.relative_path})", c.id] } %>
   </div>
 
   <div class="controls">

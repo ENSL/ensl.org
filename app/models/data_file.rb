@@ -83,6 +83,12 @@ class DataFile < ActiveRecord::Base
     name.url
   end
 
+  def manual_upload(manual_location)
+    File.open(manual_location) do |f|
+      self.name = f
+    end
+  end
+
   def process_file
     self.md5 = "e948c22100d29623a1df48e1760494df"
 
@@ -90,7 +96,7 @@ class DataFile < ActiveRecord::Base
       self.directory_id = Directory::ARTICLES
     end
 
-    if File.exists?(location) and (size != File.size(location) or created_at != File.mtime(location))
+    if File.exists?(location) and (new_record? or size != File.size(location) or created_at != File.mtime(location))
       self.md5 = Digest::MD5.hexdigest(File.read(location))
       self.size = File.size(location)
       self.created_at = File.mtime(location)
@@ -147,9 +153,11 @@ class DataFile < ActiveRecord::Base
     user and !rated_by?(user)
   end
 
-  def self.find_existing(subdir_name, subitem_path)
-    DataFile.where(arel_tabe(:path).eq(subitem_path)\
-      .or(arel_table(:md5).eq(Digest::MD5.hexdigest(File.read(subitem_path))))).first
+  # TODO: instead of using path, use name + directory path
+  def self.find_existing(subitem_path, subitem_name)
+    hash = Digest::MD5.hexdigest(File.read(subitem_path))
+    DataFile.where(arel_table[:path].eq(subitem_path)\
+      .or(arel_table[:md5].eq(hash))).first
   end
 
   def can_create? cuser

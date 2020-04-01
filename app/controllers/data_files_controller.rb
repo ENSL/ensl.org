@@ -74,7 +74,7 @@ class DataFilesController < ApplicationController
   def destroy
     raise AccessError unless @file.can_destroy? cuser
     @file.destroy
-    redirect_to_back
+    redirect_to directory_path(@file.directory)
   end
 
   def rate

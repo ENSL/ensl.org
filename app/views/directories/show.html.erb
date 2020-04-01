@@ -1,6 +1,14 @@
 <h1 class="title">Files</h1>
 
-<% 
+<p>
+<% if @directory.root? %>
+  In case there are any problems with this browser, you can find files
+  <%= link_to "here", "/files/" %>
+  too.
+<% end%>
+</p>
+
+<%
   active = 1
   n = 1
 %>
@@ -15,9 +23,8 @@
   <div class="tabbed-contents">
     <% @directories.each do |dir| %>
       <div class="tab" id="dir_<%= dir.id %>">
-      
         <%
-          if @directory.path.include?(dir.path)
+          if @directory.full_path.include?(dir.full_path)
             dir = @directory
             active = n
           end
@@ -25,24 +32,23 @@
         %>
 
         <div class="directories">
-          <% if !dir.subdirs.ordered.empty? or dir.parent.id != Directory::ROOT %>
-            <h3>Directories</h3>
+        <% if !dir.parent_root? %>
+          <h3><%= directory_links @directory %></h3>
+        <% end %>
+        <% if !dir.subdirs.ordered.empty?  %>
+          <% if dir.parent_root?  %>
+            <h3>Sub-directories</h3>
           <% end %>
-
-          <div class="subdirectories">
-            <ul class="disc">
-              <% if dir.parent.id != Directory::ROOT %>
-                <li class="parent">
-                  <%= link_to "Parent", dir.parent %>
-                </li>
-              <% end %>
-              <% dir.subdirs.ordered.each do |subdir| %>
-                <li><%= namelink subdir %></li>
-              <% end %>
-            </ul>
-          </div>
+            <div class="subdirectories">
+              <ul class="disc">
+                <% dir.subdirs.ordered.each do |subdir| %>
+                  <li><%= link_to subdir.name, subdir %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
         </div>
-      
+
         <h3>Files</h3>
 
         <% dir.files.unrelated.each do |file| %>
@@ -77,7 +83,7 @@
         <% if cuser and cuser.admin? %>
           <div class="controls">
             <%= link_to "Edit Directory", edit_directory_path(dir), class: 'button' %>
-            <%= link_to "Delete Directory", dir, confirm: "Are you REALLY sure?", method: :delete, class: 'button' %>
+            <%= link_to "Delete Directory", dir,  data: { confirm: "Are you sure?" }, class: 'button' %>
             <%= link_to "New Directory", { controller: "directories", action: "new", id: dir }, { class: 'button' } %>
             <%= link_to "New File", { controller: "data_files", action: "new", id: dir }, { class: 'button' } %>
           </div>

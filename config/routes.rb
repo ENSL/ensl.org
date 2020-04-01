@@ -85,7 +85,11 @@ Ensl::Application.routes.draw do
   resources :maps
   resources :logs
   resources :log_files
-  resources :directories
+  resources :directories do
+    member do
+      get :recreate
+    end
+  end
   resources :data_files
   resources :predictions
   resources :weeks

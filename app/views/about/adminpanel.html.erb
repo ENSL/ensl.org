@@ -2,25 +2,53 @@
     <h1>
         Admin Menu
     </h1>
+    <h4>
+      Articles
+    </h4>
     <ul class="disc">
         <li><%= link_to 'New Article', new_article_path %></li>
         <li><%= link_to "Article Admin", controller: "articles", action: "admin" %></li>
+    </ul>
+
+    <h4>
+      Files
+    </h4>
+    <ul class="disc">
         <% if Directory.first %>
+        <li><%= link_to "Recreate Root", recreate_directory_path(Directory.find(Directory::ROOT)) %></li>
         <li><%= link_to "Files Admin", controller: "directories", action: "show", id: Directory.first %></li>
         <% end %>
+    </ul>
+
+    <h4>
+      Contests
+    </h4>
+    <ul class="disc">
+        <li><%= link_to "Contests", contests_path %></li>
+        <li><%= link_to "Challenges", challenges_path %></li>
+        <li><%= link_to "Maps", maps_path %></li>
+    </ul>
+
+    <h4>
+      Users and groups
+    </h4>
+    <ul class="disc">
+        <li><%= link_to "Users", users_path %></li>
+        <li><%= link_to "Groups", groups_path %></li>
+        <li><%= link_to "Bans", bans_path %></li>
+    </ul>
+
+    <h4>
+      Website
+    </h4>
+    <ul class="disc">
+        <li><%= link_to "Categories", categories_path %></li>
+        <li><%= link_to "Custom Article URLs", custom_urls_path %></li>
         <li>
             <%= link_to issues_path do %>
             Issues (<%= Issue.with_status(0).count %>)
             <% end %>
         </li>
-        <li><%= link_to "Bans", bans_path %></li>
-        <li><%= link_to "Groups", groups_path %></li>
-        <li><%= link_to "Categories", categories_path %></li>
         <li><%= link_to "Polls", polls_path %></li>
-        <li><%= link_to "Contests", contests_path %></li>
-        <li><%= link_to "Challenges", challenges_path %></li>
-        <li><%= link_to "Maps", maps_path %></li>
-        <li><%= link_to "Users", users_path %></li>
-        <li><%= link_to "Custom Article URLs", custom_urls_path %></li>
     </ul>
 </div>
