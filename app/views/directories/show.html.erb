@@ -83,7 +83,7 @@
         <% if cuser and cuser.admin? %>
           <div class="controls">
             <%= link_to "Edit Directory", edit_directory_path(dir), class: 'button' %>
-            <%= link_to "Delete Directory", dir,  data: { confirm: "Are you sure?" }, class: 'button' %>
+            <%= link_to "Delete Directory", dir,  data: { confirm: "Are you sure?" }, method: 'delete', class: 'button' %>
             <%= link_to "New Directory", { controller: "directories", action: "new", id: dir }, { class: 'button' } %>
             <%= link_to "New File", { controller: "data_files", action: "new", id: dir }, { class: 'button' } %>
           </div>

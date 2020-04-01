@@ -58,7 +58,7 @@ class Directory < ActiveRecord::Base
   validates_with PathValidator
   # TODO: add validation for path
 
-  before_validation :init_variables, on: :create
+  before_validation :init_variables
   after_create :make_path
   after_save :update_timestamp
   before_destroy :remove_files, unless: Proc.new { preserve_files }

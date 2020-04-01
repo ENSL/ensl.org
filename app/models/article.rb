@@ -89,11 +89,11 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.first&.(where("id < ?", self.id).order("id DESC"))
+    category.articles.nodrafts.where("id < ?", self.id).order("id DESC").first
   end
 
   def next_article
-    category.articles.nodrafts.first&.(where("id > ?", self.id).order("id ASC"))
+    category.articles.nodrafts.where("id > ?", self.id).order("id ASC").first
   end
 
   def statuses

@@ -90,7 +90,10 @@ module ApplicationHelper
     end
   end
 
+  # Print the attributes from the list
   def cascade model, list
+    return "" if model.nil?
+
     out = list.map do |element|
       name = key = element
       item = ""
@@ -104,10 +107,15 @@ module ApplicationHelper
       if m = key.to_s.match(/^(.*)_b$/)
         name = m[1]
         key = m[1]
+      end        
+
+      begin
+        str = eval("model.#{key}")
+      rescue
+        next
       end
 
-      str = eval("model.#{key}")
-        next if str == "" or str.nil?
+      next if str == "" or str.nil?
 
       if model[key].instance_of?(Time) or model[key].instance_of?(ActiveSupport::TimeWithZone)
         # result << shorttime(str)
