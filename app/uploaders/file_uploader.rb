@@ -4,7 +4,11 @@ class FileUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    model.directory.full_path
+    if model and model.directory
+      model.directory.full_path
+    else
+      Directory.find(Directory::ROOT).full_path
+    end
     # .gsub(/public\//, '')
   end
 

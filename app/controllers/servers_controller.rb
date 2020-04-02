@@ -2,8 +2,8 @@ class ServersController < ApplicationController
   before_action :get_server, except: [:index, :refresh, :new, :create]
 
   def index
-    @servers = Server.hlds.active.ordered.all :include => :user
-    @ns2 = Server.ns2.active.ordered.all :include => :user
+    @servers = Server.hlds.active.ordered.includes(:user).all
+    @ns2 = Server.ns2.active.ordered.includes(:user).all
     @officials = Server.ns2.active.ordered.where ["name LIKE ?", "%NSL%"]
   end
 

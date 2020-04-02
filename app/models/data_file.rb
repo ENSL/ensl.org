@@ -123,7 +123,7 @@ class DataFile < ActiveRecord::Base
 
     if location.include? "_preview.mp4" and !related
       stripped = location.gsub(/_preview\.mp4/, "")
-      DataFile.all(:conditions => ["path LIKE ?", stripped + "%"]).each do |r|
+      DataFile.where(["path LIKE ?", stripped + "%"]).each do |r|
         if r.location.match(/#{stripped}\.\w{1,5}$/)
           self.related = r
         end

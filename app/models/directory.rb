@@ -149,6 +149,7 @@ class Directory < ActiveRecord::Base
     strio = StringIO.new
     logger = Logger.new(strio)
     logger.info 'Starting recreate on Directory(%d): %s.' % [id, name]
+    logger.info 'DataFiles: %d Directories: %d' % [DataFile.all.count, Directory.all.count]
     ActiveRecord::Base.transaction do
       # We use destroy lists so technically there can be seperate roots
       destroy_dirs = Hash.new
@@ -159,9 +160,11 @@ class Directory < ActiveRecord::Base
       destroy_dirs = recreate(destroy_dirs, logger: logger)
       destroy_dirs.each do |key, dir|
         logger.info 'Removed dir: %s' % dir.full_path
+        dir.preserve_files = true
         dir.destroy!
       end
     end
+    logger.info 'DataFiles: %d Directories: %d' % [DataFile.all.count, Directory.all.count]
     logger.info 'Finish recreate'
     return strio
     # TODO: check items that weren't checked.

@@ -47,7 +47,7 @@ class GroupsController < ApplicationController
   end
 
   def addUser
-    @user = User.first conditions: {username: params[:username]}
+    @user = User.where(username: params[:username])
     raise AccessError unless @group.can_update? cuser
     raise Error, t(:duplicate_user) if @group.users.include? @user
 
