@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_31_020637) do
+ActiveRecord::Schema.define(version: 2020_04_01_031046) do
 
   create_table "article_versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "article_id"
@@ -805,6 +805,7 @@ ActiveRecord::Schema.define(version: 2020_03_31_020637) do
     t.string "time_zone"
     t.integer "version"
     t.boolean "public_email", default: false, null: false
+    t.integer "password_hash", default: 1
     t.index ["lastvisit"], name: "index_users_on_lastvisit"
     t.index ["team_id"], name: "index_users_on_team_id"
   end

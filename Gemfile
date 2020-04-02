@@ -21,6 +21,7 @@ gem 'unicorn'
 
 # Model plugins
 gem 'unread'
+gem 'scrypt'
 # gem 'impressionist'
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"

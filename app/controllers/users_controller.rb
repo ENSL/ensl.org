@@ -90,15 +90,18 @@ class UsersController < ApplicationController
 
   # FIXME: maybe move to session controller
   def login
-    if params[:login] && (u = User.authenticate(params[:login]))
-      if u.banned? Ban::TYPE_SITE
-        flash[:notice] = t(:accounts_locked)
+    if params[:login]
+      if (u = User.authenticate(params[:login]))
+        if u.banned? Ban::TYPE_SITE
+          flash[:notice] = t(:accounts_locked)
+        else
+          flash[:notice] = "%s (%s)" % [t(:login_successful), u.password_hash_s]
+          flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if u.password_hash_changed?
+          save_session u
+        end
       else
-        flash[:notice] = t(:login_successful)
-        save_session u
+        flash[:error] = t(:login_unsuccessful)
       end
-    else
-      flash[:error] = t(:login_unsuccessful)
     end
     # FIXME: check return on rails 6
     if session[:return_to]

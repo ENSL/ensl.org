@@ -2,23 +2,24 @@
 #
 # Table name: users
 #
-#  id           :integer          not null, primary key
-#  birthdate    :date
-#  country      :string(255)
-#  email        :string(255)
-#  firstname    :string(255)
-#  lastip       :string(255)
-#  lastname     :string(255)
-#  lastvisit    :datetime
-#  password     :string(255)
-#  public_email :boolean          default(FALSE), not null
-#  steamid      :string(255)
-#  time_zone    :string(255)
-#  username     :string(255)
-#  version      :integer
-#  created_at   :datetime
-#  updated_at   :datetime
-#  team_id      :integer
+#  id            :integer          not null, primary key
+#  birthdate     :date
+#  country       :string(255)
+#  email         :string(255)
+#  firstname     :string(255)
+#  lastip        :string(255)
+#  lastname      :string(255)
+#  lastvisit     :datetime
+#  password      :string(255)
+#  password_hash :integer          default(0)
+#  public_email  :boolean          default(FALSE), not null
+#  steamid       :string(255)
+#  time_zone     :string(255)
+#  username      :string(255)
+#  version       :integer
+#  created_at    :datetime
+#  updated_at    :datetime
+#  team_id       :integer
 #
 # Indexes
 #
@@ -27,6 +28,7 @@
 #
 
 require 'digest/md5'
+require "scrypt"
 
 class SteamIdValidator < ActiveModel::Validator
   def validate(record)
@@ -43,10 +45,15 @@ class User < ActiveRecord::Base
 
   VERIFICATION_TIME = 604800
 
+  PASSWORD_SCRYPT = 0
+  PASSWORD_MD5 = 1
+  PASSWORD_MD5_SCRYPT = 2
+
   #attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
-  attr_accessor :raw_password
+  attr_accessor :raw_password, :password_updated
 
   attribute :lastvisit, :datetime, default: Time.now.utc
+  attribute :password_hash, :integer, default: PASSWORD_SCRYPT
 
   belongs_to :team, :optional => true
   has_one :profile, :dependent => :destroy
@@ -121,8 +128,8 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :username, :email, :steamid
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
   validates_length_of :lastname, :in => 1..25, :allow_blank => true
-  validates_length_of :username, :in => 2..20
-  validates_format_of :username, :with => /\A[A-Za-z0-9_\-\+]{2,20}\Z/
+  validates_length_of :username, :in => 1..30
+  validates_format_of :username, :with => /\A[A-Za-z0-9_\-\+]{1,30}\Z/
   validates_presence_of :raw_password, :on => :create
   validates_length_of :email, :maximum => 50
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
@@ -131,6 +138,7 @@ class User < ActiveRecord::Base
   # validates_format_of :steamid, :with => /\A(STEAM_)?[0-5]:[01]:\d+\Z/
   validates_length_of :time_zone, :maximum => 100, :allow_blank => true, :allow_nil => true
   validates_inclusion_of [:public_email], :in => [true, false], :allow_nil => true
+  # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team
 
   before_create :init_variables
@@ -152,10 +160,23 @@ class User < ActiveRecord::Base
   non_versioned_columns << 'birthdate'
   non_versioned_columns << 'time_zone'
   non_versioned_columns << 'public_email'
+  non_versioned_columns << 'password_hash'
   non_versioned_columns << 'created_at'
 
   def to_s
     username
+  end
+
+  def password_hash_s
+    case self.password_hash
+    when User::PASSWORD_MD5
+      "MD5"
+    when User::PASSWORD_SCRYPT
+      "Scrypt"
+    when User::PASSWORD_MD5_SCRYPT
+      "Scrypt+MD5"
+    else
+    end
   end
 
   def email_s
@@ -307,9 +328,17 @@ class User < ActiveRecord::Base
     self.time_zone = "Amsterdam"
   end
 
-  # Password  should store password and password_hash shoulds store
+  # NOTE: function does not call save
+  # Maybe it should return to not waste save?
   def update_password
-    self.password = Digest::MD5.hexdigest(raw_password) if raw_password and raw_password.length > 0
+    if raw_password and raw_password.length > 0
+      self.password = SCrypt::Password.create(raw_password)
+      self.password_hash = User::PASSWORD_SCRYPT
+    elsif password_hash == User::PASSWORD_MD5
+      # Scrypt(Md5(passsword))
+      self.password = SCrypt::Password.create(password)
+      self.password_hash = User::PASSWORD_MD5_SCRYPT
+    end
   end
 
   def send_new_password
@@ -339,7 +368,31 @@ class User < ActiveRecord::Base
   end
 
   def self.authenticate(login)
-    where("LOWER(username) = LOWER(?)", login[:username]).where(password: Digest::MD5.hexdigest(login[:password])).first
+    if (user = where("LOWER(username) = LOWER(?)", login[:username]).first)
+      case user.password_hash
+      when User::PASSWORD_SCRYPT
+        pass = SCrypt::Password.new(user.password)
+        return user if pass == login[:password]
+      when User::PASSWORD_MD5_SCRYPT
+        pass = SCrypt::Password.new(user.password)
+        # Match to Scrypt(Md5(password))
+        if pass == Digest::MD5.hexdigest(login[:password])
+          user.raw_password = login[:password]
+          user.update_password
+          user.save!
+          return user
+        end
+      # when User::PASSWORD_MD5
+      else
+        if user.password == Digest::MD5.hexdigest(login[:password])
+          user.raw_password = login[:password]
+          user.update_password
+          user.save!
+          return user
+        end
+      end
+    end
+    return nil
   end
 
   def self.get id

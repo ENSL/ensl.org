@@ -84,6 +84,7 @@ en:
   login_out: "Logged out."
   login_status: "Logged in as"
   passwords_sent: "Password has been sent."
+  password_md5_scrypt: "Password has been upgraded to higher security level (MD5->SCRYPT)."
   incorrect_information: "Incorrect Information."
   weeks_create: "Week was successfully created."
   weeks_update: "Week was successfully updated."

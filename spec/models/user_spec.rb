@@ -2,23 +2,24 @@
 #
 # Table name: users
 #
-#  id           :integer          not null, primary key
-#  birthdate    :date
-#  country      :string(255)
-#  email        :string(255)
-#  firstname    :string(255)
-#  lastip       :string(255)
-#  lastname     :string(255)
-#  lastvisit    :datetime
-#  password     :string(255)
-#  public_email :boolean          default(FALSE), not null
-#  steamid      :string(255)
-#  time_zone    :string(255)
-#  username     :string(255)
-#  version      :integer
-#  created_at   :datetime
-#  updated_at   :datetime
-#  team_id      :integer
+#  id            :integer          not null, primary key
+#  birthdate     :date
+#  country       :string(255)
+#  email         :string(255)
+#  firstname     :string(255)
+#  lastip        :string(255)
+#  lastname      :string(255)
+#  lastvisit     :datetime
+#  password      :string(255)
+#  password_hash :integer          default(0)
+#  public_email  :boolean          default(FALSE), not null
+#  steamid       :string(255)
+#  time_zone     :string(255)
+#  username      :string(255)
+#  version       :integer
+#  created_at    :datetime
+#  updated_at    :datetime
+#  team_id       :integer
 #
 # Indexes
 #
