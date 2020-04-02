@@ -21,9 +21,8 @@ db_data/*
 db/data/
 !db/data/.placeholder
 db/initdb.d/*
-!db/initdb.d/*setup.sql
 !db/initdb.d/.placeholder
-*.sql*
+!db/initdb.d/*setup*.sql
 
 # ignore dkim keys
 dkim
