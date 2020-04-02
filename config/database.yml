@@ -13,6 +13,9 @@ base: &db
 development:
   <<: *db
 
+staging:
+  <<: *db
+
 test:
   <<: *db
   database: ensl_test
