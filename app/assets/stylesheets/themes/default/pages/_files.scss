@@ -71,7 +71,7 @@ table.movie {
     display: none;
   }
 
-  #player {
+  .player {
     display: block;
     position: relative;
     width: 100%;
@@ -79,6 +79,13 @@ table.movie {
     padding-bottom: 56%;
     padding-top: 50px;
     margin-bottom: 20px;
+
+    video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+    }
 
     object {
       position: absolute;
