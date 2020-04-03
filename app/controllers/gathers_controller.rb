@@ -46,6 +46,7 @@ class GathersController < ApplicationController
     redirect_to @gather
   end
 
+  # FIXME: Use gatherers.update
   def pick
     @gatherer = @gather.gatherers.find(params[:player])
     raise AccessError unless @gatherer.can_update? cuser, params

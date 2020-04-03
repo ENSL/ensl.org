@@ -30,7 +30,7 @@ class Gatherer < ActiveRecord::Base
 
   #attr_protected :id
   attr_accessor :confirm, :username
-  cattr_accessor :skip_callbacks
+  attr_accessor :skip_callbacks
 
   scope :team, -> (team) { where(team: team) }
   scope :of_user, -> (user) { where(user_id: user.id) }
@@ -83,7 +83,7 @@ class Gatherer < ActiveRecord::Base
 
   def validate_username
     if username
-      if u = User.where(username: username).exists?
+      if (u = User.where(username: username).first)
         self.user = u
       else
         errors.add(:username, t(:gatherer_wrong_username))
@@ -171,6 +171,6 @@ class Gatherer < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:gatherer).permit(:status, :user_id, :gather_id, :team, :votes)
+    params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes)
   end
 end

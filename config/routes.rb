@@ -41,7 +41,19 @@ Ensl::Application.routes.draw do
   resources :shoutmsgs
   resources :teamers
   resources :teams
-  resources :gathers
+  resources :gathers do |g|
+    collection do
+      get :refresh
+    end
+    member do
+      post :pick
+    end
+  end
+  get 'gathers/latest/:game', to: "gathers#latest", via: :get
+  get 'gather', to: "gathers#latest", game: "ns2", via: :get
+
+  get 'gatherers/:id/status', to: "gatherers#status", via: :post
+
   resources :gatherers
   resources :groups
   resources :groupers
@@ -122,12 +134,6 @@ Ensl::Application.routes.draw do
   get 'data_files/trash'
 
   get 'directories', to: "directories#show", id: 1
-
-  get 'gathers/refresh'
-  get 'gathers/latest/:game', to: "gathers#latest", via: :get
-  get 'gather', to: "gathers#latest", game: "ns2", via: :get
-
-  get 'gatherers/:id/status', to: "gatherers#status", via: :post
 
   get 'groups/addUser'
   get 'groups/delUser'

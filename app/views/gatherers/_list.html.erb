@@ -5,7 +5,7 @@
   <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
 </h4>
 
-<%= form_tag "/gathers/pick/#{@gather.id}" do %>
+<%= form_tag pick_gather_path(@gather) do %>
   <ul class="gatherers">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
       <li>
