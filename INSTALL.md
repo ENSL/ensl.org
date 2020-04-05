@@ -18,34 +18,34 @@ Install git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ## 2. Download ENSL website and install it
 
-Now create the required directories, e.g. `/srv/ensl.org`
-
     git clone git@github.com:ENSL/ensl.org.git
 
-First select your environment (eg. development). Then use a script to load the env vars to your shell env:
+## 3. Second build the ENSL docker containers.
+
+    cd ensl.org
+    docker-compose build
+
+## 4. First select your environment (eg. development). Then use a script to load the env vars to your shell env:
 
     source script/env.sh .env .env.development
 
-Second build the ENSL docker containers.
+## 5. Put any database dumps to `db/initdb.d`.
 
-    docker-compose build
+    cp dump.sql db/initdb.d/00_dump.sql
 
-Put any database dumps to `db/initdb.d`.
+You need to manually copy it to staging database on same db server for now.
 
-a) Then start for **production**:
-    
+## 6. Then start the whole thing
+
     docker-compose up
+    docker-compose down
 
-b) ... or start for **development**:
+## 7. Install reverse proxy (production only)
 
-    docker-compose -f docker-compose.yml up
+a) The docker-compose contains basic nginx setup. Use that.
 
-## 3. Install reverse proxy (production only)
-
-Install apache, nginx etc. reverse proxy. It will take requests from the users and pass them to ENSL website. Sample configuration availble @ ext/nginx.
+b) If you have your own NGINX setup, just use the sample site file from the ext/nginx.conf.d
 
 https://www.nginx.com/resources/wiki/start/
 
     sudo apt-get install nginx
-
-*Skip this step if you are only doing development.*
