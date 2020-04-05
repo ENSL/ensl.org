@@ -22,14 +22,11 @@ Now create the required directories, e.g. `/srv/ensl.org`
 
     git clone git@github.com:ENSL/ensl.org.git
 
-Create the `.env` file by copying `.env.example` with the appropriate credentials.
+First select your environment (eg. development). Then use a script to load the env vars to your shell env:
 
-    cd ensl.org && cp .env.example .env
-    gedit .env
+    source script/env.sh .env .env.development
 
-If the database does not exist, it will be created with settings from .env file so make sure you configure it.
-
-First build the ENSL docker containers.
+Second build the ENSL docker containers.
 
     docker-compose build
 

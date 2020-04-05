@@ -107,8 +107,8 @@ services:
 
   nginx:
     image: nginx:latest
-    command: /bin/bash
     container_name: ensl_${RAILS_ENV}_nginx
+    command: /bin/bash -c "envsubst '$$PUMA_PORT' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     volumes:
       - ./ext/ssl/fullchain.pem:/etc/ssl/certs/ensl_fullchain.pem
       - ./ext/ssl/privkey.pem:/etc/ssl/private/ensl_privkey.pem
@@ -122,7 +122,6 @@ services:
       - APP_PORT=$APP_PORT
       - PUMA_PORT=$PUMA_PORT
       - RAILS_ENV=$RAILS_ENV
-    # command: /bin/bash -c "envsubst '$$PUMA_PORT' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
 
 #  spring:
 #    build:

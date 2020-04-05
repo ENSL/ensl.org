@@ -1,7 +1,6 @@
-# Load dev vars
-# FIXME: right dev file is not loaded
+# Load dev vars. These are loaded in application but puma needs them too.
 require "dotenv"
-Dotenv.load(".env.local", '.env' + ENV['RAILS_ENV'] + '.local', '.env' + ENV['RAILS_ENV'], '.env')
+Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
 tag 'ENSL'
 
