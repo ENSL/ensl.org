@@ -1,7 +1,7 @@
 # Load dev vars
 # FIXME: right dev file is not loaded
 require "dotenv"
-Dotenv.load()
+Dotenv.load(".env.local", '.env' + ENV['RAILS_ENV'] + '.local', '.env' + ENV['RAILS_ENV'], '.env')
 
 tag 'ENSL'
 

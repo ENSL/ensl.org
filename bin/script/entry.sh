@@ -2,7 +2,7 @@
 
 cd /var/www
 
-source /var/www/.env
+source script/env.sh .env .env.$RAILS_ENV .env.$RAILS_ENV.local .env.local
 
 if [ $RAILS_ENV = "production" ]; then
   rm -rf /var/www/public/assets

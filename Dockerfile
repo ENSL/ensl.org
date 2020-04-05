@@ -1,11 +1,9 @@
-FROM ruby:2.6.5
+FROM ruby:2.6.5 AS ensl_development
 
-ENV RAILS_ENV production
+ENV RAILS_ENV development
 
-# Add 'web' user which will run the application
-RUN adduser web --home /home/web --shell /bin/bash --disabled-password --gecos ""
-
-RUN apt-get update && apt-get -y upgrade \
+RUN adduser web --home /home/web --shell /bin/bash --disabled-password --gecos "" && \
+    apt-get update && apt-get -y upgrade \
     && apt-get -y install \
         libmariadb-dev libmariadb-dev-compat \
         libssl-dev  \
@@ -20,19 +18,48 @@ RUN apt-get update && apt-get -y upgrade \
 ADD Gemfile Gemfile.lock /var/www/
 
 RUN gem install bundler && \
-    mkdir -p /var/bundle && chown -R web:web /var/bundle && chown -R web:web /var/www
+    mkdir -p /var/bundle && chown -R web:web /var/bundle && \
+    chown -R web:web /var/www
 
 WORKDIR /var/www
 USER web
 
 RUN bundle config github.https true && \
     bundle config set path '/var/bundle' && \
-    bundle install --jobs 8 && \
-    bundle exec rake assets:precompile
+    bundle install --jobs 8
 
 USER root
 
-# Temporary fix for assets
-RUN mv /var/www/public/assets /home/web/assets
+# ENTRYPOINT ["/bin/bash"]
+# CMD ["/var/www/bin/script/entry.sh"]
 
+# Staging
+
+FROM ensl_development AS ensl_staging
+
+ENV RAILS_ENV staging
+
+USER root
+
+ENTRYPOINT ["/bin/bash"]
+CMD ["/var/www/bin/script/entry.sh"]
+
+# Production
+
+FROM ensl_development AS ensl_production
+
+ENV RAILS_ENV production
+
+ADD . /var/www
+
+WORKDIR /var/www
+
+RUN chown -R web:web /var/www
+
+USER web
+RUN bundle exec rake assets:precompile && \
+    # Temporary fix for assets
+    mv /var/www/public/assets /home/web/assets
+
+ENTRYPOINT ["/bin/bash"]
 CMD ["/var/www/bin/script/entry.sh"]

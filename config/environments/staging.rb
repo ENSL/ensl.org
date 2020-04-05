@@ -9,10 +9,11 @@ Ensl::Application.configure do
   config.action_controller.perform_caching = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
-  config.serve_static_assets = false
+  config.serve_static_assets = true
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
+  config.assets.js_compressor = :uglifier
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
   config.assets.compile = true
@@ -51,9 +52,10 @@ Ensl::Application.configure do
   # Use sendmail
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.raise_delivery_errors = true
-
-  # Enable threaded mode
-  config.threadsafe!
+  config.action_mailer.smtp_settings = {
+    address: 'smtp',
+    domain: 'ensl.org'
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation can not be found)
@@ -63,7 +65,7 @@ Ensl::Application.configure do
   config.active_support.deprecation = :notify
 
   # Custom Session Store config to allow gathers.staging.ensl.org
-  config.session_store :cookie_store, key: "_ENSL_session_key_staging", expire_after: 30.days.to_i, domain: ".staging.ensl.org"
+  config.session_store :cookie_store, key: "_ENSL_session_key_staging", expire_after: 30.days.to_i
 
   config.eager_load = true
 end

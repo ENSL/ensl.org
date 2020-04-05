@@ -24,6 +24,7 @@ module Ensl
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]
 
     # Load secrets from .env
+    ENV['APP_SECRET'] ||= (0...32).map { (65 + rand(26)).chr }.join
     config.secret_token = ENV['APP_SECRET']
 
     # Use cookies

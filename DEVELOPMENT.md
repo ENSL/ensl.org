@@ -6,7 +6,7 @@ Install instructions in INSTALL.md
 
 Just run and open http://localhost:4000/
 
-    docker-compose -f docker-compose.dev.yml up`
+    docker-compose -f docker-compose.yml up`
 
 ## Tips
 
@@ -22,6 +22,57 @@ and it still fails a bit. https://github.com/connorshea/vscode-ruby-test-adapter
 1. Do not commit too much without testing. Also keep commits small for documentation and reversability issues.
 1. You need to rebuild the docker image when you change gems.
 
+## TODO issues for dev
+
+1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker-compose up
+1. Should directories exist?
+
+# Tags in code
+
+FIXME, TODO, EXPLAIN, OBSOLETE
+
+## Handy commands
+
+Load env variables:
+
+    export $(cat .env.development | xargs) && export $(cat .env | xargs)
+
+Start:
+
+    docker-compose -f docker-compose.yml up -d --build`
+
+Build or rebuild:
+
+    docker-compose -f docker-compose.yml build`
+
+Debug:
+
+    docker attach ensl_dev
+
+To get inside docker web+test containers:
+
+    docker-compose -f docker-compose.yml exec -u root web /bin/bash`
+    docker-compose -f docker-compose.yml exec -u web web /bin/bash`
+    docker-compose -f docker-compose.yml exec -u root test /bin/bash`
+    docker-compose -f docker-compose.yml exec -u web test /bin/bash`
+
+Restart the web container
+
+    docker-compose -f docker-compose.yml restart web`
+
+Run some tests:
+
+    docker-compose -f docker-compose.yml exec -u web test bundle exec rspec`
+    docker-compose -f docker-compose.yml exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
+
+# Design of ENSL Application
+
+Read this to understand design decisions and follow them!
+
+1. Env variables should be used everywhere and loaded from .env* files using Dotenv
+1. The app contents are added to the docker image on build but it is mounted as **volume**.
+1. Use rails / ruby best practices in section below.
+
 ## Best practices
 
 1. https://nvie.com/posts/a-successful-git-branching-model/
@@ -30,41 +81,3 @@ and it still fails a bit. https://github.com/connorshea/vscode-ruby-test-adapter
 1. http://www.betterspecs.org/
 1. https://github.com/rubocop-hq/rspec-style-guide
 1. Run rubocop
-
-## TODO issues for dev
-
-1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker-compose up
-
-# Tags in code
-
-FIXME, TODO, EXPLAIN, OBSOLETE
-
-## Handy commands
-
-Start:
-
-    docker-compose -f docker-compose.dev.yml up -d --build`
-
-Build or rebuild:
-
-    docker-compose -f docker-compose.dev.yml build`
-
-Debug:
-
-    docker attach ensl_dev
-
-To get inside docker web+test containers:
-
-    docker-compose -f docker-compose.dev.yml exec -u root web /bin/bash`
-    docker-compose -f docker-compose.dev.yml exec -u web web /bin/bash`
-    docker-compose -f docker-compose.dev.yml exec -u root test /bin/bash`
-    docker-compose -f docker-compose.dev.yml exec -u web test /bin/bash`
-
-Restart the web container
-
-    docker-compose -f docker-compose.dev.yml restart web`
-
-Run some tests:
-
-    docker-compose -f docker-compose.dev.yml exec -u web test bundle exec rspec`
-    docker-compose -f docker-compose.dev.yml exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`

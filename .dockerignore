@@ -1,6 +1,12 @@
 Dockerfile
-db_data
-db/data/
+docker-compose.yml
+*.md
+.idea
 dkim
-log/*
+log/.log*
+tmp/
 public/*
+db_data
+db/data
+db/initdb.d/
+ext/

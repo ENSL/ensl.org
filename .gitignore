@@ -2,14 +2,14 @@
 /log/*
 /tmp/*
 /spec/tmp/*
-/env/production.sh
-/env/development.sh
 .ruby-version
 .ruby-gemset
 .env
 .env*.local
 .tmp*
 .rspec
+
+# Cache files
 .sass-cache
 *.sassc
 *.rbc
@@ -26,37 +26,26 @@ db/initdb.d/*
 
 # ignore dkim keys
 dkim
+ext/dkim
 
-# OS X
-.DS_Store
+# ignore SSL
+ext/ssl
+!ext/ssl/.placeholder
+
+# Nginx
+ext/nginx.conf.d/default.conf
 
 # Uploaded Assets
 /public/system/*
-/public/files/*
+/public/files
 /public/local
 /public/uploads
 /public/assets
-
-# RubyMine
-/.idea
-
-# VIM
-**.swp
-
-# Git junk
-**.orig
 
 # Bundler
 /.bundle
 /vendor/bundle/
 .bundle
-
-# Misc
-/coverage/
-/backups
-/index/*
-rerun.txt
-pickle-email-*.html
 
 # Direnv
 .envrc
@@ -69,10 +58,28 @@ pickle-email-*.html
 .rakeTasks
 .generators
 
+# OS X
+.DS_Store
+
+# RubyMine
+.idea/
+
+# VIM
+**.swp
+
+# Git junk
+**.orig
+
+# Misc
+/coverage/
+/backups
+/index/*
+rerun.txt
+pickle-email-*.html
+
 # Gemtags
 *.tags
 *.gemtags
 
-# Staging files
-tmp/*.gz
+# Debug files
 .byebug_history

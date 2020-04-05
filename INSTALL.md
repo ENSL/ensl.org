@@ -41,7 +41,7 @@ a) Then start for **production**:
 
 b) ... or start for **development**:
 
-    docker-compose -f docker-compose.dev.yml up
+    docker-compose -f docker-compose.yml up
 
 ## 3. Install reverse proxy (production only)
 

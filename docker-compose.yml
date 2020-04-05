@@ -1,40 +1,140 @@
-version: "3"
+version: "3.4"
 
 services:
+  #
+  # Main service
+  #
   web:
-    image: ensl/ensl.org:latest
+    # For debug; Use attach rather than this
+    # command: /bin/bash
+    command: "bundle exec puma"
+    tty: true
+    stdin_open: true
+    container_name: "ensl_${RAILS_ENV}"
+    user: "web:web"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: ensl_${RAILS_ENV}
     volumes:
-     - "../public:/var/www/public"
-     - "../logs:/var/www/log"
+     - ".:/var/www/"
+    environment:
+      RAILS_ENV: $RAILS_ENV
     ports:
-     - "4000:4000"
-    depends_on:
+     - "${PUMA_PORT}:${PUMA_PORT}"
+     - "35729:35729"
+    links:
      - db
      - memcached
      - smtp
-  #    - redis
+     #- spring
+     #- redis
+
+  #
+  # Testing
+  #
+
+  # Seperate test container so dev / test don't cause problems
+  test:
+    command: ["bash", "-c", "while true; do sleep 100; done;"]
+    container_name: ensl_test
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: ensl_development
+    env_file:
+      - .env.test
+    ports:
+      - ${TEST_APP_PORT}:${TEST_APP_PORT} # Capybara listens here
+    links:
+      - db
+      - memcached
+      - selenium
+    volumes:
+      - ".:/var/www"
+    # command: bin/spring server
+    environment:
+      RAILS_ENV: test
+    networks:
+      default:
+        aliases:
+          - test
+
+  selenium:
+    image: selenium/standalone-chrome-debug
+    container_name: ensl_${RAILS_ENV}_selenium
+    ports:
+      - 5900:5900
+      - 4444:4444
+
+  #
+  # Common services: These are shared by all envs.
+  #
+
+  memcached:
+    image: memcached:alpine
+    container_name: ensl_${RAILS_ENV}_memcached
+
+  redis:
+    image: 'redis:4.0-alpine'
+    container_name: ensl_${RAILS_ENV}_redis
+
   db:
     image: mariadb:latest
-    command: mysqld
+    container_name: ensl_${RAILS_ENV}_db
+    user: "mysql:mysql"
+    # debug; command: mysqld_safe --skip-grant-tables
     volumes:
-     - "./db_data:/var/lib/mysql"
+     - "./db/data:/var/lib/mysql"
+     - "./db/initdb.d:/docker-entrypoint-initdb.d"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
     environment:
-     - MYSQL_DATABASE
-     - MYSQL_USER
-     - MYSQL_USERNAME
-     - MYSQL_PASSWORD
-     - MYSQL_ROOT_PASSWORD
-#     - MYSQL_ROOT_HOST
-  memcached:
-    image: memcached:latest
+     - MYSQL_DATABASE=$MYSQL_DATABASE
+     - MYSQL_USER=$MYSQL_USER
+     - MYSQL_PASSWORD=$MYSQL_PASSWORD
+     - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+     - MYSQL_ROOT_HOST=$MYSQL_ROOT_HOST
+
   smtp:
     image: mwader/postfix-relay:latest
+    container_name: ensl_${RAILS_ENV}_smtp
     restart: always
     volumes:
-     - "../dkim:/etc/opendkim/keys"
+     - "./ext/dkim:/etc/opendkim/keys"
     environment:
-      - POSTFIX_myhostname=ensl.org
-      - OPENDKIM_DOMAINS=ensl.org
-  #redis:
-  #  image: redis
+      - POSTFIX_myhostname=$APP_DOMAIN
+      - OPENDKIM_DOMAINS=$APP_DOMAIN
+
+  nginx:
+    image: nginx:latest
+    command: /bin/bash
+    container_name: ensl_${RAILS_ENV}_nginx
+    volumes:
+      - ./ext/ssl/fullchain.pem:/etc/ssl/certs/ensl_fullchain.pem
+      - ./ext/ssl/privkey.pem:/etc/ssl/private/ensl_privkey.pem
+      - ./ext/nginx.conf.d/:/etc/nginx/conf.d/
+      - ./public:/var/www
+    ports:
+      - $APP_PORT:80
+      - $APP_PORT_SSL:443
+    environment:
+      - APP_DOMAIN=$APP_DOMAIN
+      - APP_PORT=$APP_PORT
+      - PUMA_PORT=$PUMA_PORT
+      - RAILS_ENV=$RAILS_ENV
+    # command: /bin/bash -c "envsubst '$$PUMA_PORT' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
+#  spring:
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile.dev
+#      args:
+#        buildno: 1
+#    volumes:
+#      - .:/var/www
+#    command: spring server
+# This ensures that the pid namespace is shared between the host
+# and the container. It's not necessary to be able to run spring
+# commands, but it is necessary for "spring status" and "spring stop"
+# to work properly.
+# pid: host
