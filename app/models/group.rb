@@ -30,9 +30,10 @@ class Group < ActiveRecord::Base
 
   validates_length_of :name, :maximum => 20
 
-  has_and_belongs_to_many :users
   has_many :groupers
   has_many :users, :through => :groupers
+  has_and_belongs_to_many :users
+  
   belongs_to :founder, :class_name => "User", :optional => true
 
   def to_s

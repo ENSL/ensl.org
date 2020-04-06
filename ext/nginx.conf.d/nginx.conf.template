@@ -67,7 +67,7 @@ server {
   }
   location /files/ {
     # try_files $uri $uri/ @puma;
-    # alias root /var/www/files/;
+    # alias root /var/www/public/files/;
     autoindex on;
   }
   location @puma {
