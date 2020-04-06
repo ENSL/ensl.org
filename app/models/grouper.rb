@@ -50,5 +50,7 @@ class Grouper < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  
+  def self.params(params, cuser)
+    params.require(:grouper).permit(:username, :user_id, :group_id, :task)
+  end
 end
