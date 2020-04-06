@@ -4,12 +4,18 @@ cd /var/www
 
 source script/env.sh .env .env.$RAILS_ENV .env.$RAILS_ENV.local .env.local
 
-if [ $RAILS_ENV = "production" ]; then
-  rm -rf /var/www/public/assets
-  mv /home/web/assets /var/www/public/
-  chown -R web:web /var/www
+# Make sure we have all assets
+su -c "bundle config github.https true; cd $DEPLOY_PATH && bundle install --path /var/bundle --jobs 4" -s /bin/bash -l web
+
+if [ -z $ASSETS_PRECOMPILE ] && [ $ASSETS_PRECOMPILE -eq 1 ]; then
+  if [[ -z "$ASSETS_PATH" ]] && [ -d "$ASSETS_PATH"]; then
+    rm -rf "${DEPLOY_PATH}/public/assets"
+    mv "$ASSETS_PATH" "${DEPLOY_PATH}/public/assets"
+  else
+    su -c "cd $DEPLOY_PATH && bundle assets:precompile" -s /bin/bash -l web
+  fi
+  chown -R web:web $DEPLOY_PATH
 fi
 
-su -c "bundle config github.https true; cd /var/www && bundle install --path /var/bundle --jobs 4" -s /bin/bash -l web
-su -c "cd /var/www && bundle exec puma -C config/puma.rb" -s /bin/bash -l web
+su -c "cd $DEPLOY_PATH && bundle exec puma -C config/puma.rb" -s /bin/bash -l web
 bash

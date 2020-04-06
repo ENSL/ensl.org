@@ -47,6 +47,9 @@ ext/nginx.conf.d/default.conf
 /vendor/bundle/
 .bundle
 
+# Yarn
+.yarn-integrity
+
 # Direnv
 .envrc
 

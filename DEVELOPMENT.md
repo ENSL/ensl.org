@@ -6,7 +6,7 @@ Install instructions in INSTALL.md
 
 Just run and open http://localhost:4000/
 
-    docker-compose -f docker-compose.yml up`
+    docker-compose up`
 
 ## Tips
 
@@ -35,15 +35,15 @@ FIXME, TODO, EXPLAIN, OBSOLETE
 
 Load env variables:
 
-    export $(cat .env.development | xargs) && export $(cat .env | xargs)
+    source script/env.sh .env .env.development
 
 Start:
 
-    docker-compose -f docker-compose.yml up -d --build`
+    docker-compose up -d --build`
 
 Build or rebuild:
 
-    docker-compose -f docker-compose.yml build`
+    docker-compose build`
 
 Debug:
 
@@ -51,19 +51,19 @@ Debug:
 
 To get inside docker web+test containers:
 
-    docker-compose -f docker-compose.yml exec -u root web /bin/bash`
-    docker-compose -f docker-compose.yml exec -u web web /bin/bash`
-    docker-compose -f docker-compose.yml exec -u root test /bin/bash`
-    docker-compose -f docker-compose.yml exec -u web test /bin/bash`
+    docker-compose exec -u root web /bin/bash`
+    docker-compose exec -u web web /bin/bash`
+    docker-compose exec -u root test /bin/bash`
+    docker-compose exec -u web test /bin/bash`
 
 Restart the web container
 
-    docker-compose -f docker-compose.yml restart web`
+    docker-compose restart web`
 
 Run some tests:
 
-    docker-compose -f docker-compose.yml exec -u web test bundle exec rspec`
-    docker-compose -f docker-compose.yml exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
+    docker-compose exec -u web test bundle exec rspec`
+    docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
 
 # Design of ENSL Application
 
