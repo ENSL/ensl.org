@@ -96,6 +96,7 @@ class UsersController < ApplicationController
           flash[:notice] = t(:accounts_locked)
         else
           flash[:notice] = "%s (%s)" % [t(:login_successful), u.password_hash_s]
+          # FIXME: this doesn't work because model is saved before
           flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if u.password_hash_changed?
           save_session u
         end

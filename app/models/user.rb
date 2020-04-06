@@ -54,6 +54,7 @@ class User < ActiveRecord::Base
 
   attribute :lastvisit, :datetime, default: Time.now.utc
   attribute :password_hash, :integer, default: PASSWORD_SCRYPT
+  attr_accessor :password_force
 
   belongs_to :team, :optional => true
   has_one :profile, :dependent => :destroy
@@ -331,13 +332,20 @@ class User < ActiveRecord::Base
   # NOTE: function does not call save
   # Maybe it should return to not waste save?
   def update_password
+    # Standard logic for saving password
     if raw_password and raw_password.length > 0
-      self.password = SCrypt::Password.create(raw_password)
-      self.password_hash = User::PASSWORD_SCRYPT
-    elsif password_hash == User::PASSWORD_MD5
+      # Allow old hash too
+      if password_hash == User::PASSWORD_MD5 and password_force
+        self.password = Digest::MD5.hexdigest(raw_password)
+      else
+        self.password_hash = User::PASSWORD_SCRYPT
+        self.password = SCrypt::Password.create(raw_password)
+      end
+    # Update MD5 to MD5+Scrypt
+    elsif password_hash == User::PASSWORD_MD5 and !password_force
       # Scrypt(Md5(passsword))
-      self.password = SCrypt::Password.create(password)
       self.password_hash = User::PASSWORD_MD5_SCRYPT
+      self.password = SCrypt::Password.create(password)
     end
   end
 
