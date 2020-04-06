@@ -49,7 +49,11 @@ class Group < ActiveRecord::Base
   end
 
   def can_destroy? cuser
-    cuser and cuser.admin? and id != Group::ADMINS
+    cuser and cuser.admin? and id != Group::ADMINS and !Group.protected_groups.include?(id)
+  end
+
+  def self.protected_groups
+    Group.constants(false).map {|n| Group.const_get(n)}
   end
 
   def self.staff
@@ -124,6 +128,6 @@ class Group < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:gather).permit(:task)
+    params.require(:group).permit(:name)
   end
 end
