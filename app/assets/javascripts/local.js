@@ -32,10 +32,13 @@ $(function() {
     $(this).scrollTop(scrollTop-Math.round(delta));
   });
 
-
   // Forums fast reply
-  $("a#fastReply").on('click', function() {
-    $('#reply').fadeIn('slow')
+  $("a.fastReply").on('click', function() {
+    $('#reply').fadeIn('fast',
+    function() {
+      $(this).focus();
+      $("a.fastReply").hide();
+    });
   });
 
   // Gather stuff
