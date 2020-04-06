@@ -1,6 +1,8 @@
 # Rails, Ruby, etc
 /log/*
+!log/.placeholder
 /tmp/*
+!tmp/.placeholder
 /spec/tmp/*
 .ruby-version
 .ruby-gemset
