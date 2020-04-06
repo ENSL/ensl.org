@@ -85,6 +85,7 @@ en:
   login_status: "Logged in as"
   passwords_sent: "Password has been sent."
   password_md5_scrypt: "Password has been upgraded to higher security level (MD5->SCRYPT)."
+  password_corrupt: "Your password has become corrupt, please reset via forget password or contact admin."
   incorrect_information: "Incorrect Information."
   weeks_create: "Week was successfully created."
   weeks_update: "Week was successfully updated."

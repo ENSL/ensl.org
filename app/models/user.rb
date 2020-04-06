@@ -369,27 +369,34 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login)
     if (user = where("LOWER(username) = LOWER(?)", login[:username]).first)
-      case user.password_hash
-      when User::PASSWORD_SCRYPT
-        pass = SCrypt::Password.new(user.password)
-        return user if pass == login[:password]
-      when User::PASSWORD_MD5_SCRYPT
-        pass = SCrypt::Password.new(user.password)
-        # Match to Scrypt(Md5(password))
-        if pass == Digest::MD5.hexdigest(login[:password])
-          user.raw_password = login[:password]
-          user.update_password
-          user.save!
-          return user
+      begin
+        case user.password_hash
+        when User::PASSWORD_SCRYPT
+          # FIXME: If exception occurs here, user cannot log in
+          pass = SCrypt::Password.new(user.password)
+          return user if pass == login[:password]
+        when User::PASSWORD_MD5_SCRYPT
+          pass = SCrypt::Password.new(user.password)
+          # Match to Scrypt(Md5(password))
+          if pass == Digest::MD5.hexdigest(login[:password])
+            user.raw_password = login[:password]
+            user.update_password
+            user.save!
+            return user
+          end
+        # when User::PASSWORD_MD5
+        else
+          if user.password == Digest::MD5.hexdigest(login[:password])
+            user.raw_password = login[:password]
+            user.update_password
+            user.save!
+            return user
+          end
         end
-      # when User::PASSWORD_MD5
-      else
-        if user.password == Digest::MD5.hexdigest(login[:password])
-          user.raw_password = login[:password]
-          user.update_password
-          user.save!
-          return user
-        end
+      # TODO: controller needs to handle this
+      #rescue Exception => ex
+      #  user.errors.add(:password, "%s (%s)" % [I18n.t(:password_corrupt), ex.class.to_s])
+      #  return nil
       end
     end
     return nil

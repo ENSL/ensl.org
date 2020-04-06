@@ -4,7 +4,7 @@
 /spec/tmp/*
 .ruby-version
 .ruby-gemset
-.env
+# .env
 .env*.local
 .tmp*
 .rspec
