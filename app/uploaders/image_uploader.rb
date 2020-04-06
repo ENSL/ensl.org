@@ -6,7 +6,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   storage :file
 
   def store_dir
-    "images"
+    File.join("local", "maps")
   end
 
   def filename

@@ -16,8 +16,8 @@
   <div class="fields horizontal">
     <%= f.label :picture %>
     <div class="inputs">
-      <% if @map.picture.length > 0 %>
-        <%= image_tag @map.picture %><br>
+      <% if @map.picture&.file&.exists? %>
+        <%= image_tag @map.picture.url %><br>
       <% end %>
       <%= f.file_field :picture %>
     </div>
