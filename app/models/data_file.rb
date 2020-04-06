@@ -103,13 +103,14 @@ class DataFile < ActiveRecord::Base
     end
 
     # Update the path on creation
-    if path.nil?
-      self.path = File.join(directory.path, File.basename(name.to_s))
-    end
 
     # Move the file if it has moved
-    if !new_record? and directory_id_changed? and File.exists?(name.current_path)
-      FileUtils.mv(location, path) 
+    if !new_record? and directory_id_changed? and File.exists?(path)
+      FileUtils.mv(path, location)
+    end
+
+    if path.nil? or directory_id_changed?
+      self.path = File.join(directory.full_path, File.basename(name.to_s))
     end
 
     if description.nil? or description.empty?

@@ -5,6 +5,7 @@ class FileUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
     if model and model.directory
+      # This is a recursive look up
       model.directory.full_path
     else
       Directory.find(Directory::ROOT).full_path
