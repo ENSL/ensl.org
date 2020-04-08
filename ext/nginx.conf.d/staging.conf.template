@@ -31,12 +31,18 @@ upstream puma {
 
 server {
   listen *:$STAGING_PORT default_server;
-  # SSL disabled for now
+  ## SSL disabled for now
   # listen *:STAGING_PORT_SSL ssl default_server;
-  # domain_agnostic staging
+
+  ## domain_agnostic staging
   # server_name $STAGING_DOMAIN;
   root $APP_PATH_PUBLIC;
   index index.html index.htm index.php;
+
+  # Add basic auth
+  # TODO: add htpassword generation
+  # auth_basic           "Staging Area";
+  # auth_basic_user_file "/etc/nginx/conf.d/.htpasswd_staging";
 
   # ssl_certificate /etc/ssl/certs/ensl_fullchain.pem;
   # ssl_certificate_key /etc/ssl/private/ensl_privkey.pem;

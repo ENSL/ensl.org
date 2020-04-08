@@ -36,6 +36,7 @@ ext/ssl
 
 # Nginx; only the default cfg is ignored.
 ext/nginx.conf.d/default.conf
+!ext/nginx.conf.d/.ht*
 
 # Uploaded Assets
 /public/system/*
