@@ -38,6 +38,7 @@ Run some tests:
 
 ## Tips
 
+1. You might have to `sudo chown -R 999:999 for` for `db/data` if you have permission issues with docker.
 1. If you need to run stuff on your host (eg. ruby, rubocop, bundle install etc) run all commands from the: `Dockerfile.dev`. It should setup identical setup for your machine.
 1. Add docker container names to /etc/hosts. This makes it possible to run test from local machine without using the container since editor/IDE don't integrate with Docker so well.
 
