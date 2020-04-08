@@ -3,7 +3,7 @@ docker-compose.yml
 *.md
 .idea
 dkim
-log/.log*
+log/*.log*
 tmp/
 public/*
 db_data

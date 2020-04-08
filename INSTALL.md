@@ -25,24 +25,25 @@ Install git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
     cd ensl.org
     docker-compose build
 
-## 4. First select your environment (eg. production). Then use a script to load the env vars to your shell env:
+## 4. Put any database dumps to `db/initdb.d`. (optional)
 
-    source script/env.sh .env .env.production
-
-## 5. Put any database dumps to `db/initdb.d`. (optional)
-
-    cp dump.sql db/initdb.d/00_dump.sql
+    mysqldump --opt -h DATABASE_IP -u USERNAME DATABASE_NAME > 00_ensl.org.`date +%F`.sql
+    mv 00_ensl.org.`date +%F`.sql db/initdb.d/00_ensl.org.`date +%F`.sql
 
 You need to manually copy it to staging database on same db server for now.
 
+## 5. First select your environment (eg. production). Then use a script to load the env vars to your shell env:
+
+    source script/env.sh .env .env.production
+
 ## 6. Then start the whole thing
 
-    docker-compose up
+    docker-compose up production
     docker-compose down
 
 ## 7. Install reverse proxy (production only)
 
-a) The docker-compose contains basic nginx setup. Use that.
+a) The docker-compose contains basic nginx setup. It's in docker-compose. Use that.
 
 b) If you have your own NGINX setup, just use the sample site file from the ext/nginx.conf.d
 

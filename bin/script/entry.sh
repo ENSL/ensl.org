@@ -1,21 +1,28 @@
 #!/bin/bash
 
-cd /var/www
+cd $APP_PATH
 
 source script/env.sh .env .env.$RAILS_ENV .env.$RAILS_ENV.local .env.local
 
 # Make sure we have all assets
-su -c "bundle config github.https true; cd $DEPLOY_PATH && bundle install --path /var/bundle --jobs 4" -s /bin/bash -l web
+bundle config github.https true
+bundle config set path '/var/bundle'
+bundle install --jobs 8
 
-if [ -z $ASSETS_PRECOMPILE ] && [ $ASSETS_PRECOMPILE -eq 1 ]; then
-  if [[ -z "$ASSETS_PATH" ]] && [ -d "$ASSETS_PATH"]; then
-    rm -rf "${DEPLOY_PATH}/public/assets"
-    mv "$ASSETS_PATH" "${DEPLOY_PATH}/public/assets"
+if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
+  echo "Fetching assets..."
+  if false; then
+  #if [[ -z "$ASSETS_PATH" ]] && [ -d "$ASSETS_PATH"]; then
+    rm -rf "${APP_PATH}/public/assets"
+    mv "$ASSETS_PATH" "${APP_PATH}/public/assets"
   else
-    su -c "cd $DEPLOY_PATH && bundle assets:precompile" -s /bin/bash -l web
+    cd $APP_PATH
+    bundle exec rake assets:clean
+    bundle exec rake assets:precompile
   fi
-  chown -R web:web $DEPLOY_PATH
+  chown -R web:web $APP_PATH
 fi
 
-su -c "cd $DEPLOY_PATH && bundle exec puma -C config/puma.rb" -s /bin/bash -l web
+cd $APP_PATH
+bundle exec puma -C config/puma.rb
 bash

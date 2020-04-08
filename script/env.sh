@@ -13,6 +13,7 @@ do
   ARGS=$(cat $FILE |grep -vE '^[[:space:]]*(#.*)*$')
 
   export $(echo $ARGS|xargs)
-  echo "$ARGS\n" 
+  echo "$ARGS"
+  echo
 done
 

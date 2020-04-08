@@ -3,36 +3,39 @@
 # Use it in production or copy it over
 
 upstream puma {
-  server localhost:$PUMA_PORT;
+  server staging:$PUMA_PORT;
   # server unix:/var/tmp/puma.$RAILS_ENV.sock fail_timeout=0;
 }
 
 # root-level -> www redirect
-server {
-  listen *:80;
-  listen *:443 ssl;
+#server {
+#  listen *:$STAGING_PORT;
+#  listen *:$STAGING_PORT_SSL ssl;
 
+  # FIXME
   # ssl_certificate /etc/ssl/certs/ensl_fullchain.pem;
   # ssl_certificate_key /etc/ssl/private/ensl_privkey.pem;
   # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
-  server_name ensl.org;
-  root /var/www/public;
-  return 301 https://www.ensl.org$request_uri;
-}
+#  #server_name $STAGING_ROOT_DOMAIN;
+#  #root $APP_PATH_PUBLIC;
+#  return 301 https://$STAGING_DOMAIN$request_uri;
+#}
 
 # HTTP -> HTTPS redirect
 #server {
-#  listen *:80;
-#  server_name www.ensl.org;
-#  return 301 https://www.ensl.org$request_uri;
+#  listen *:STAGING_PORT;
+#  server_name $STAGING_DOMAIN;
+#  return 301 https://$STAGING_DOMAIN$request_uri;
 #}
 
 server {
-  # listen *:443 ssl default_server;
-  listen *:80 default_server;
-  # server_name www.ensl.org;
-  root /var/www/public;
+  listen *:$STAGING_PORT default_server;
+  # SSL disabled for now
+  # listen *:STAGING_PORT_SSL ssl default_server;
+  # domain_agnostic staging
+  # server_name $STAGING_DOMAIN;
+  root $APP_PATH_PUBLIC;
   index index.html index.htm index.php;
 
   # ssl_certificate /etc/ssl/certs/ensl_fullchain.pem;
@@ -60,14 +63,18 @@ server {
     allow all;
     autoindex on;
   }
+
+  # FIXME: use env. var
   location ^~ /assets/ {
     gzip_static on;
     expires max;
     add_header Cache-Control public;
   }
+
+  # FIXME: use env. var
   location /files/ {
     # try_files $uri $uri/ @puma;
-    # alias root /var/www/public/files/;
+    # alias root $APP_PATH_PUBLIC/files/;
     autoindex on;
   }
   location @puma {

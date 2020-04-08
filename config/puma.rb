@@ -15,11 +15,11 @@ rackup DefaultRackup
 
 # Set vars as we cannmot load them
 rails_env = ENV['RAILS_ENV'] || 'development'
-app_dir = ENV['DEPLOY_PATH'] || '/var/www'
+app_dir = ENV['APP_PATH'] || '/var/www'
 
 # Set basic puma settings
 environment rails_env
-bind "unix://#{app_dir}/tmp/sockets/puma.sock"
+bind "unix://#{app_dir}/tmp/sockets/puma.#{rails_env}.sock"
 port Integer(ENV['PUMA_PORT'] || 4000)
 
 # Redirect stdout only in production. Dev mode needs it for debug
@@ -50,6 +50,6 @@ end
 # EXPLAIN This has been added here but why?
 on_restart do
   ENV["BUNDLE_GEMFILE"] = "#{app_dir}/Gemfile"
-  Dotenv.overload
+  Dotenv.overload('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
   ActiveRecord::Base.connection.disconnect!
 end

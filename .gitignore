@@ -34,7 +34,7 @@ ext/dkim
 ext/ssl
 !ext/ssl/.placeholder
 
-# Nginx
+# Nginx; only the default cfg is ignored.
 ext/nginx.conf.d/default.conf
 
 # Uploaded Assets

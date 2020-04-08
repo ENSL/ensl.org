@@ -1,4 +1,7 @@
 -- FIXME: this should be somewhere else probably
+CREATE DATABASE ensl_development;
+GRANT ALL PRIVILEGES ON ensl_development.* TO 'ensl'@'%' WITH GRANT OPTION;
+
 CREATE DATABASE ensl_test;
 GRANT ALL PRIVILEGES ON ensl_test.* TO 'ensl'@'%' WITH GRANT OPTION;
 

@@ -2,15 +2,61 @@ version: "3.4"
 
 services:
   #
-  # Main service
+  # Main services
   #
-  web:
+  production:
+    command: "bundle exec puma"
+    tty: true
+    stdin_open: true
+    container_name: "ensl_production"
+    user: "web:web"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: ensl_production
+    volumes:
+     - ".:/var/www/"
+    environment:
+      RAILS_ENV: production
+    ports:
+     - "${PUMA_PORT}:${PUMA_PORT}"
+     # Guard livereload
+     # - "35729:35729"
+    links:
+     - db
+     - memcached
+     - smtp
+
+  staging:
+    # command: "/bin/bash"
+    # command: "/var/www/bin/script/entry.sh"
+    command: "bundle exec puma"
+    tty: true
+    stdin_open: true
+    container_name: "ensl_staging"
+    user: "web:web"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: ensl_staging
+    volumes:
+     - ".:/var/www/"
+    environment:
+      RAILS_ENV: staging
+    ports:
+     - "9000:${PUMA_PORT}"
+    links:
+     - db
+     - memcached
+     - smtp
+
+  development:
     # For debug; Use attach rather than this
     # command: /bin/bash
     command: "bundle exec puma"
     tty: true
     stdin_open: true
-    container_name: "ensl_${RAILS_ENV}"
+    container_name: "ensl_development"
     user: "web:web"
     build:
       context: ./
@@ -26,27 +72,6 @@ services:
     links:
      - db
      - memcached
-     - smtp
-     #- spring
-     #- redis
-
-  nginx:
-    image: nginx:latest
-    container_name: ensl_${RAILS_ENV}_nginx
-    command: /bin/bash -c "envsubst '$$PUMA_PORT' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
-    volumes:
-      - ./ext/ssl/fullchain.pem:/etc/ssl/certs/ensl_fullchain.pem
-      - ./ext/ssl/privkey.pem:/etc/ssl/private/ensl_privkey.pem
-      - ./ext/nginx.conf.d/:/etc/nginx/conf.d/
-      - ./public:/var/www/public
-    #ports:
-    #  - $APP_PORT:80
-    #  - $APP_PORT_SSL:443
-    environment:
-      - APP_DOMAIN=$APP_DOMAIN
-      - APP_PORT=$APP_PORT
-      - PUMA_PORT=$PUMA_PORT
-      - RAILS_ENV=$RAILS_ENV
 
   #
   # Testing
@@ -120,8 +145,32 @@ services:
     volumes:
      - "./ext/dkim:/etc/opendkim/keys"
     environment:
-      - POSTFIX_myhostname=$APP_DOMAIN
-      - OPENDKIM_DOMAINS=$APP_DOMAIN
+      - POSTFIX_myhostname=$MAIL_DOMAIN
+      - OPENDKIM_DOMAINS=$MAIL_DOMAIN
+
+  nginx:
+    image: nginx:latest
+    container_name: ensl_nginx
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "envsubst '$$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' < /etc/nginx/conf.d/*.conf.template > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
+    volumes:
+      - ./ext/ssl/fullchain.pem:/etc/ssl/certs/ensl_fullchain.pem
+      - ./ext/ssl/privkey.pem:/etc/ssl/private/ensl_privkey.pem
+      - ./ext/nginx.conf.d/:/etc/nginx/conf.d/
+      - ./public:/var/www/public
+    ports:
+      - $STAGING_PORT:$STAGING_PORT
+      - $STAGING_PORT_SSL:$STAGING_PORT_SSL
+    environment:
+      - PUMA_PORT=$PUMA_PORT
+      - STAGING_ROOT_DOMAIN=$STAGING_ROOT_DOMAIN
+      - STAGING_DOMAIN=$STAGING_DOMAIN
+      - STAGING_PORT=$STAGING_PORT
+      - STAGING_PORT_SSL=$STAGING_PORT_SSL
+      - RAILS_ENV=$RAILS_ENV
+      - APP_PATH=$APP_PATH
+      - APP_PATH_PUBLIC=$APP_PATH_PUBLIC
 
 #  spring:
 #    build:

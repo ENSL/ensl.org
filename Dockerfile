@@ -1,7 +1,7 @@
 FROM ruby:2.6.5 AS ensl_development
 
 ENV RAILS_ENV development
-ENV DEPLOY_PATH /var/www
+ENV APP_PATH /var/www
 
 RUN \
     # Add web
@@ -13,7 +13,7 @@ RUN \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     # Dependencies
-    apt-get -y install \
+    apt-get -y install --upgrade \
       # For MySQL/MariaDB
       libmariadb-dev libmariadb-dev-compat \
       # SSL libs
@@ -30,13 +30,13 @@ RUN \
       yarn \
       # For poltergeist
       phantomjs \
-      firefox-esr
+      firefox-esr && \
+    # Install bundler and bundle path
+    gem install bundler && \
+    mkdir -p /var/bundle && chown -R web:web /var/bundle
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
-ADD Gemfile Gemfile.lock /var/www/
-
-RUN gem install bundler && \
-    mkdir -p /var/bundle && chown -R web:web /var/bundle /var/www
+ADD --chown=web Gemfile Gemfile.lock /var/www/
 
 USER web
 WORKDIR /var/www
