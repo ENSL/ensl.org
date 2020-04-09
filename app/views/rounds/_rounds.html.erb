@@ -1,0 +1,23 @@
+<table class="data">
+  <tr>
+    <th><%= sort_link "Date", :start %></th>
+    <th><%= sort_link "Server", :server %></th>
+    <th><%= sort_link "Team 1", :team1 %></th>
+    <th><%= sort_link "Team 2", :team2 %></th>
+    <th><%= sort_link "Map", :map %></th>
+    <th><%= sort_link "commander", :commander %></th>
+  </tr>
+
+  <% rounds.each do |round| %>
+    <tr class="<%= cycle('even', 'odd') %>">
+      <td><%= link_to (shorttime round.start), round %></td>
+      <td><%= namelink round.server %></td>
+      <td><%= namelink round.team1 if round.team1 %></td>
+      <td><%= namelink round.team2 if round.team2 %></td>
+      <td><%= round.map.nil? ? h(round.map_name) : namelink(round.map) %></td>
+      <td><%= (round.commander.nil? or round.commander.user.nil?) ? h(round.commander) : namelink(round.commander.user) %></td>
+    </tr>
+  <% end %>
+</table>
+
+<%= will_paginate rounds %>
