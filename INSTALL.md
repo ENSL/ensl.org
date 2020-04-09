@@ -27,6 +27,8 @@ Install git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ## 4. Put any database dumps to `db/initdb.d`. (optional)
 
+You can use `script/db_dump.sh` to dump production database.
+
     mysqldump --opt -h DATABASE_IP -u USERNAME DATABASE_NAME > 00_ensl.org.`date +%F`.sql
     mv 00_ensl.org.`date +%F`.sql db/initdb.d/00_ensl.org.`date +%F`.sql
 

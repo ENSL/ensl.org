@@ -23,6 +23,6 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   chown -R web:web $APP_PATH
 fi
 
-cd $APP_PATH
+bundle exec rake db:migrate
 bundle exec puma -C config/puma.rb
 bash
