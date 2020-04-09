@@ -23,16 +23,15 @@ upstream puma {
 #}
 
 # HTTP -> HTTPS redirect
-#server {
-#  listen *:STAGING_PORT;
-#  server_name $STAGING_DOMAIN;
-#  return 301 https://$STAGING_DOMAIN$request_uri;
-#}
+server {
+  listen *:$STAGING_PORT;
+  # server_name $STAGING_DOMAIN;
+  return 301 https://$STAGING_DOMAIN$request_uri;
+}
 
 server {
-  listen *:$STAGING_PORT default_server;
-  ## SSL disabled for now
-  # listen *:STAGING_PORT_SSL ssl default_server;
+  #listen *:$STAGING_PORT default_server;
+  listen *:$STAGING_PORT_SSL ssl default_server;
 
   ## domain_agnostic staging
   # server_name $STAGING_DOMAIN;
@@ -44,8 +43,8 @@ server {
   # auth_basic           "Staging Area";
   # auth_basic_user_file "/etc/nginx/conf.d/.htpasswd_staging";
 
-  # ssl_certificate /etc/ssl/certs/ensl_fullchain.pem;
-  # ssl_certificate_key /etc/ssl/private/ensl_privkey.pem;
+  ssl_certificate /etc/ssl/ensl/fullchain.pem;
+  ssl_certificate_key /etc/ssl/ensl/privkey.pem;
 
   # ssl-cert /etc/ssl/certs/ssl-cert-snakeoil.pem
   # ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key

@@ -155,8 +155,7 @@ services:
     stdin_open: true
     command: /bin/bash -c "envsubst '$$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' < /etc/nginx/conf.d/*.conf.template > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
     volumes:
-      - ./ext/ssl/fullchain.pem:/etc/ssl/certs/ensl_fullchain.pem
-      - ./ext/ssl/privkey.pem:/etc/ssl/private/ensl_privkey.pem
+      - ./ext/ssl:/etc/ssl/ensl
       - ./ext/nginx.conf.d/:/etc/nginx/conf.d/
       - ./public:/var/www/public
     ports:
