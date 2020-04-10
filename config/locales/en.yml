@@ -90,6 +90,7 @@ en:
   weeks_create: "Week was successfully created."
   weeks_update: "Week was successfully updated."
   votes_success: "Voted successfully."
+  users_signup_steam: "You have created an account via steam, please update your user details."
   error: "error"
   prohibited: "prohibited"
   news:

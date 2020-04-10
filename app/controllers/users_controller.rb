@@ -88,7 +88,8 @@ class UsersController < ApplicationController
   def callback
     @user = User.focfah(auth_hash, request.ip)
     login_user(@user)
-    if @user.created_at > (Time.zone.now - 1.week.ago)
+    if @user.created_at > (Time.zone.now - 1.week)
+      flash[:notice] << t(:users_signup_steam)
       render :edit
     else
       return_back

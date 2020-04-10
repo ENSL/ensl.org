@@ -51,8 +51,15 @@ class User < ActiveRecord::Base
   PASSWORD_MD5 = 1
   PASSWORD_MD5_SCRYPT = 2
 
+  # TODO: move this to a file
+  PASSWORD_MESSAGE = \
+    "Hello %s, \n" + \
+    "Your new password is: %s \n \n \n" + \
+    "(Make sure you copy all characters and no whitespace when using copy-paste)\n" + \
+    "(Security information: your password is stored with hash %s)\n"
+
   #attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
-  attr_accessor :raw_password, :password_updated, :password_force, :fullname
+  attr_accessor :raw_password, :password_updated, :password_force, :fullname, :random_password
 
   attribute :lastvisit, :datetime, default: Time.now.utc
   attribute :password_hash, :integer, default: PASSWORD_SCRYPT
@@ -144,8 +151,9 @@ class User < ActiveRecord::Base
   validate :validate_team
 
   before_validation :set_name
-  before_create :init_variables
+  before_validation :init_variables, on: :create
   after_create :create_profile
+  after_create :send_new_password, if: Proc.new{ random_password == true }
   before_save :correct_steamid_universe
 
   accepts_nested_attributes_for :profile
@@ -341,12 +349,23 @@ class User < ActiveRecord::Base
   def init_variables
     self.public_email = false
     self.time_zone = "Amsterdam"
-    self.raw_password = SecureRandom.base64(32) unless raw_password and new_record?
-    self.profile = profile.build unless profile&.present?
+    if !raw_password and new_record?
+      generate_password
+    end
+    unless profile&.present?
+      self.profile = Profile.new
+    end
+  end
+
+  def generate_password
+    self.raw_password = SecureRandom.alphanumeric(24)
+    self.password_hash = User::PASSWORD_SCRYPT
+    self.random_password = true
   end
 
   def create_profile
     if profile
+      profile.user_id = self.id
       profile.save
     end
   end
@@ -371,10 +390,24 @@ class User < ActiveRecord::Base
     end
   end
 
+  # This serves multiple functions
   def send_new_password
-    newpass = Verification.random_string 10
-    update_attribute :password, Digest::MD5.hexdigest(newpass)
-    Notifications.password(self, newpass).deliver
+    generate_password unless self.raw_password&.length > 0
+    self.save!
+
+    # TODO: consider moving these two to callbacks
+    self.send_password_message
+    Notifications.password(self, raw_password).deliver
+  end
+
+  def send_password_message(text = User::PASSWORD_MESSAGE)
+    msg = Message.new
+    msg.title = "New password for ENSL website"
+    msg.text = text % [username, raw_password, password_hash_s]
+    msg.sender_type = 'System'
+    msg.recipient_type = 'User'
+    msg.recipient = self
+    msg.save
   end
 
   def can_play?
@@ -391,9 +424,15 @@ class User < ActiveRecord::Base
       loop do
         new_username = "%s%d" % [username, i]
         i+=1
-        break if User.find_by_username(new_username).count == 0 or i > 50
+        if User.where(username: new_username).count == 0 or i > 50
+          self.username = new_username
+          break
+        end
       end
-      self.username = new_username
+      
+    end
+    if errors[:email]
+      self.email = "%s@ensl.org" % cleanup_string(username)
     end
   end
 
@@ -479,7 +518,6 @@ class User < ActiveRecord::Base
 
   def self.focfah(auth_hash, lastip)
     return nil unless auth_hash&.include?(:provider)
-    byebug
     case auth_hash[:provider]
     when 'steam'
       return nil unless auth_hash&.include?(:uid)
