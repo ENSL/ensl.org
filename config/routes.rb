@@ -1,4 +1,4 @@
-Ensl::Application.routes.draw do
+Rails.application.routes.draw do
   if Rails.env.production?
     %w(403 404 422 500).each do |code|
       get code, to: "errors#show", code: code
@@ -71,6 +71,7 @@ Ensl::Application.routes.draw do
       post 'forgot'
     end
   end
+  post 'auth/:provider/callback', to: 'users#callback'
   resources :locks
   resources :contesters
 

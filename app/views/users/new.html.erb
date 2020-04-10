@@ -1,31 +1,49 @@
 <div id="registration">
   <h1>Registration</h1>
 
-  <%= link_to "You can use this tool to find your SteamID.", "/files/client/steamid_finder.exe" %>
-
   <%= form_for @user, html: { class: "square" } do |f| %>
     <%= render 'shared/errors', messages: @user.errors.full_messages %>
 
     <div class="fields">
       <div class="horizontal text-field">
+      <%= link_to "Create your account via Steam", "/auth/steam", method: :POST %>
+      </div>
+      <div class="horizontal text-field">
         <%= f.label :username %>
         <%= f.text_field :username %>
+      </div>
+      <div class="horizontal text-field">
+        Pick unique nickname for yourself.
       </div>
       <div class="horizontal text-field">
         <%= f.label :raw_password, "Password" %>
         <%= f.password_field :raw_password %>
       </div>
       <div class="horizontal text-field">
+        Please don't use same password as any important place.
+      </div>
+      <div class="horizontal text-field">
         <%= f.label :email %>
         <%= f.text_field :email %>
+      </div>
+      <div class="horizontal text-field">
+        The email is needed to reset password, verify identity and send account related emails. We don't send spam or sell your email. By default the email is private and only seen by admins.
       </div>
       <div class="horizontal text-field">
         <%= f.label :steamid %>
         <%= f.text_field :steamid, placeholder: "0:1:23456789" %>
       </div>
+      <div class="horizontal text-field">
+        You can use <%= link_to "this tool", steamid_tool %> or
+        <%= link_to "this web page", 'https://steamidfinder.com/' %>
+        to find your SteamID. We need the steam id to identify unique players. If you use fake one, some things on website might be broken.
+      </div>
       <div class="horizontal">
         <%= f.label :birthdate %>
-        <%= date_select :user, :birthdate, order: [:year, :month, :day], start_year: 1950 %>
+        <%= date_select :user, :birthdate, order: [:year, :month, :day], start_year: 1950, include_blank: true, default: nil %>
+      </div>
+      <div class="horizontal text-field">
+        Only needed for fun stats (age etc.). You don't need to give valid one.
       </div>
     </div>
     <div class="controls submit-field">

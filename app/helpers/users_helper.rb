@@ -18,4 +18,9 @@ module UsersHelper
 
     # link_to_remote text, options, html_options
   end
+
+  def steamid_tool
+    df = DataFile.where("name LIKE '%SteamID Finder%'").first
+    df ? data_file_url(df) : "/"
+  end
 end

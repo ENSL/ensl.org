@@ -13,22 +13,31 @@ gem 'dotenv-rails'
 # DB
 gem 'mysql2'
 gem 'dalli'
+gem 'connection_pool' # Needed for MT
 
 # Web server
 gem 'faraday'
 gem 'puma'
-gem 'unicorn'
+# gem 'unicorn'
 
 # Model plugins
 gem 'unread'
 gem 'scrypt'
-# gem 'impressionist'
+gem 'active_flag'
+# gem 'impressionist
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 # External APIs
 gem 'google-api-client', '~> 0.10.3'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+
+# Auth
+gem 'omniauth'
+gem 'omniauth-steam'
+gem 'omniauth-rails_csrf_protection'
+# FIXME
+# gem 'rails_csrf_protection'
 
 # View and model helper gems
 gem 'time_difference'
@@ -133,6 +142,7 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'spring'
   gem "rails_best_practices"
+  gem 'awesome_print'
   # For n+1 uqeries
   # gem 'bullet'
 end

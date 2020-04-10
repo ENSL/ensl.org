@@ -60,9 +60,6 @@ class UsersController < ApplicationController
     raise AccessError unless @user.can_create? cuser
 
     if @user.valid? and @user.save
-      @user.profile = Profile.new
-      @user.profile.user = @user
-      @user.profile.save!
       redirect_to action: :show, id: @user.id
       save_session @user
     else
@@ -88,28 +85,26 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  def callback
+    @user = User.focfah(auth_hash, request.ip)
+    login_user(@user)
+    if @user.created_at > (Time.zone.now - 1.week.ago)
+      render :edit
+    else
+      return_back
+    end
+  end
+
   # FIXME: maybe move to session controller
   def login
     if params[:login]
       if (u = User.authenticate(params[:login]))
-        if u.banned? Ban::TYPE_SITE
-          flash[:notice] = t(:accounts_locked)
-        else
-          flash[:notice] = "%s (%s)" % [t(:login_successful), u.password_hash_s]
-          # FIXME: this doesn't work because model is saved before
-          flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if u.password_hash_changed?
-          save_session u
-        end
+        login_user(u)
       else
         flash[:error] = t(:login_unsuccessful)
       end
     end
-    # FIXME: check return on rails 6
-    if session[:return_to]
-      return_to
-    else
-      redirect_to_back
-    end
+    return_back
   end
 
   def logout
@@ -134,10 +129,25 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  def login_user(user)
+    if user.banned? Ban::TYPE_SITE
+      flash[:error] = t(:accounts_locked)
+    else
+      flash[:notice] = "%s (%s)" % [t(:login_successful), user.password_hash_s]
+      # FIXME: this doesn't work because model is saved before
+      flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if user.password_hash_changed?
+      save_session user
+    end
+  end
+
   def save_session user
     session[:user] = user.id
     user.lastip = request.ip
     user.lastvisit = Time.now.utc
-    user.save
+    user.save!
+  end
+
+  def auth_hash
+    request.env['omniauth.auth']
   end
 end

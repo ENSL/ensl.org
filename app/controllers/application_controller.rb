@@ -7,7 +7,9 @@ class ApplicationController < ActionController::Base
   before_action :update_user
   before_action :set_controller_and_action_names
 
-  protect_from_forgery
+  # Omniauth has its own CSRF
+  protect_from_forgery :except => [:callback]
+  
   respond_to :html, :js
 
   def cuser
@@ -22,6 +24,18 @@ class ApplicationController < ActionController::Base
     addr = session[:return_to]
     session[:return_to] = nil
     redirect_to addr
+  end
+
+  def return_back
+    if session[:return_to]
+      return_to
+    elsif request.env["HTTP_REFERER"]
+      redirect_to request.env["HTTP_REFERER"]
+    else
+      redirect_to "/"
+    end
+  rescue
+    redirect_to "/"
   end
 
   def redirect_to_back

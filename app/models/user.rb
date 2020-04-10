@@ -28,7 +28,9 @@
 #
 
 require 'digest/md5'
+require 'steamid'
 require "scrypt"
+require 'securerandom'
 
 class SteamIdValidator < ActiveModel::Validator
   def validate(record)
@@ -50,11 +52,10 @@ class User < ActiveRecord::Base
   PASSWORD_MD5_SCRYPT = 2
 
   #attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
-  attr_accessor :raw_password, :password_updated
+  attr_accessor :raw_password, :password_updated, :password_force, :fullname
 
   attribute :lastvisit, :datetime, default: Time.now.utc
   attribute :password_hash, :integer, default: PASSWORD_SCRYPT
-  attr_accessor :password_force
 
   belongs_to :team, :optional => true
   has_one :profile, :dependent => :destroy
@@ -142,7 +143,9 @@ class User < ActiveRecord::Base
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team
 
+  before_validation :set_name
   before_create :init_variables
+  after_create :create_profile
   before_save :correct_steamid_universe
 
   accepts_nested_attributes_for :profile
@@ -166,6 +169,17 @@ class User < ActiveRecord::Base
 
   def to_s
     username
+  end
+
+  def set_name
+    return unless fullname
+    if fullname.include?(" ")
+      # TODO: check this
+      self.firstname = fullname.match(/(?:^|(?:\.\s))(\w+)/)[1]
+      self.surname = fullname.match(/\s(\w+)$/)[1]
+    else
+      self.firstname = fullname
+    end
   end
 
   def password_hash_s
@@ -327,6 +341,14 @@ class User < ActiveRecord::Base
   def init_variables
     self.public_email = false
     self.time_zone = "Amsterdam"
+    self.raw_password = SecureRandom.base64(32) unless raw_password and new_record?
+    self.profile = profile.build unless profile&.present?
+  end
+
+  def create_profile
+    if profile
+      profile.save
+    end
   end
 
   # NOTE: function does not call save
@@ -361,6 +383,18 @@ class User < ActiveRecord::Base
 
   def can_create? cuser
     true
+  end
+
+  def fix_attributes
+    if errors[:username]
+      i = 2
+      loop do
+        new_username = "%s%d" % [username, i]
+        i+=1
+        break if User.find_by_username(new_username).count == 0 or i > 50
+      end
+      self.username = new_username
+    end
   end
 
   def can_update? cuser
@@ -410,8 +444,8 @@ class User < ActiveRecord::Base
     return nil
   end
 
-  def self.get id
-    id ? find(id) : ""
+  def self.get(id)
+    id ? User.find(id) : ""
   end
 
   def self.historic steamid
@@ -441,5 +475,27 @@ class User < ActiveRecord::Base
                profile_attributes: [profile_attrs]]
     allowed << :username if cuser&.admin? || operation == 'create'
     params.require(:user).permit(*allowed)
+  end
+
+  def self.focfah(auth_hash, lastip)
+    return nil unless auth_hash&.include?(:provider)
+    byebug
+    case auth_hash[:provider]
+    when 'steam'
+      return nil unless auth_hash&.include?(:uid)
+      steamid = SteamID::from_steamID64(auth_hash[:uid])
+      user = User.where("LOWER(steamid) = LOWER(?)", steamid).first
+      unless user
+        user = User.new(username: auth_hash[:info][:nickname], lastip: lastip, fullname: auth_hash[:info][:name], steamid: steamid)
+        user.fix_attributes
+        # TODO: user make valid by force
+        # user.profile.country
+        # get profile picture, :image
+        # This really shouldn't fail.
+        user.save!
+      end
+      return user
+    end
+    return nil
   end
 end
