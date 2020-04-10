@@ -2,7 +2,7 @@
 /log/*
 !log/.placeholder
 /tmp/*
-!tmp/.placeholder
+!tmp/**/.placeholder
 /spec/tmp/*
 .ruby-version
 .ruby-gemset

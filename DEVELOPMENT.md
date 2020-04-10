@@ -22,8 +22,8 @@ Debug:
 
 To get inside docker web+test containers:
 
-    docker-compose exec -u root web /bin/bash`
-    docker-compose exec -u web web /bin/bash`
+    docker-compose exec -u root development /bin/bash`
+    docker-compose exec -u web development /bin/bash`
     docker-compose exec -u root test /bin/bash`
     docker-compose exec -u web test /bin/bash`
 
@@ -36,9 +36,15 @@ Run some tests:
     docker-compose exec -u web test bundle exec rspec`
     docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
 
+## Unresolved issues
+
+There are some unresolved issues to setup dev env.
+
+1. Make sure tmp, tmp/sockets, tmp/pids and log exist.
+1. Make sure docker has access to its dirs. You might have to `sudo chown -R 999:999 for` for `db/data` if you have permission issues with docker.
+
 ## Tips
 
-1. You might have to `sudo chown -R 999:999 for` for `db/data` if you have permission issues with docker.
 1. If you need to run stuff on your host (eg. ruby, rubocop, bundle install etc) run all commands from the: `Dockerfile.dev`. It should setup identical setup for your machine.
 1. Add docker container names to /etc/hosts. This makes it possible to run test from local machine without using the container since editor/IDE don't integrate with Docker so well.
 
