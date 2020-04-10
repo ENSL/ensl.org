@@ -29,6 +29,14 @@ module Extra
       Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, "<br>").html_safe
     end
 
+    def cleanup_string(str, len=20)
+      str = str.gsub(/[^0-9A-Za-z\-_]/, '')
+      if str.length > len
+        str = str.to_s[0, len]
+      end
+      return str
+    end
+
     def move_up(objects, column = "position")
       n = 0
       # the objects need to be assigned before loop or the order is not right
