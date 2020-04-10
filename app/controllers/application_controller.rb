@@ -13,7 +13,12 @@ class ApplicationController < ActionController::Base
   respond_to :html, :js
 
   def cuser
-    @cuser ||= User.find(session[:user]) if session[:user]
+    begin
+      @cuser ||= User.find(session[:user]) 
+    rescue
+      session[:user] = nil
+      @cuser = nil
+    end
   end
 
   def return_here
