@@ -26,6 +26,9 @@ db/initdb.d/*
 !db/initdb.d/.placeholder
 !db/initdb.d/*setup*.sql
 
+# secrets
+**/*secrets*.yml
+
 # ignore dkim keys
 dkim
 ext/dkim
