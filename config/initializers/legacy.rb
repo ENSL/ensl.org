@@ -10,7 +10,7 @@ Dir.glob(File.join(Rails.root, "lib/plugins/*")).sort.each do |directory|
     initializer = File.join(directory, "init.rb")
 
     if File.file?(initializer)
-      config = Ensl::Application.config
+      config = Rails.application.config
       eval(File.read(initializer), binding, initializer)
     end
   end

@@ -1,4 +1,4 @@
-Ensl::Application.configure do
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
@@ -27,10 +27,7 @@ Ensl::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
-
-  # Use a different cache store
-  config.cache_store = :dalli_store, 'memcached'
-
+  
   # Enable threaded mode
   # config.threadsafe!
   config.eager_load = false
