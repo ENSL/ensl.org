@@ -25,6 +25,7 @@ Rails.application.configure do
   config.assets.digest = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+  # Keep this off, causes weird redirection bug
   config.force_ssl = false
 
   # See everything in the log (default is :info)

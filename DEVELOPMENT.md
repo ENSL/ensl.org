@@ -60,6 +60,13 @@ There are some unresolved issues to setup dev env.
 1. You can run tests easier if you setup the stuff on your own computer.
 1. Do not commit too much without testing. Also keep commits small for documentation and reversability issues.
 1. You need to rebuild the docker image when you change gems.
+1. To restart NGINX
+
+    docker-compose exec nginx nginx -s
+
+1. To restart PUMA
+
+    touch tmp/restart.txt
 
 ## Design of ENSL Application
 
