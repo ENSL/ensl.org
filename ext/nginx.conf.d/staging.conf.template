@@ -23,15 +23,18 @@ upstream puma {
 #}
 
 # HTTP -> HTTPS redirect
-server {
-  listen *:$STAGING_PORT;
-  # server_name $STAGING_DOMAIN;
-  return 301 https://$STAGING_DOMAIN$request_uri;
-}
+#server {
+#  listen *:$STAGING_PORT;
+#  server_name $STAGING_DOMAIN;
+#  return 301 https://$STAGING_DOMAIN$request_uri;
+#}
 
 server {
   #listen *:$STAGING_PORT default_server;
   listen *:$STAGING_PORT_SSL ssl default_server;
+
+  # Redirect to HTTPS
+  error_page 497 https://$host:$server_port$request_uri;
 
   ## domain_agnostic staging
   # server_name $STAGING_DOMAIN;

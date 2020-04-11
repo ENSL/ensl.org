@@ -42,6 +42,7 @@ There are some unresolved issues to setup dev env.
 
 1. Make sure tmp, tmp/sockets, tmp/pids and log exist.
 1. Make sure docker has access to its dirs. You might have to `sudo chown -R 999:999 for` for `db/data` if you have permission issues with docker.
+1. You might have to run migrations manually.
 
 ## Tips
 
