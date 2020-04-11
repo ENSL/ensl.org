@@ -2,10 +2,12 @@ FROM ruby:2.6.5 AS ensl_development
 
 ENV RAILS_ENV development
 ENV APP_PATH /var/www
+ENV WEB_UID 1000
+ENV WEB_GID 1000
 
 RUN \
     # Add web
-    adduser web --home /home/web --shell /bin/bash --disabled-password --gecos "" && \
+    adduser web --uid $WEB_UID --home /home/web --shell /bin/bash --disabled-password --gecos "" && \
     apt-get update && apt-get -y upgrade && \
     # Pre-dependencies
     apt-get -y install curl && \
@@ -34,6 +36,8 @@ RUN \
     # Install bundler and bundle path
     gem install bundler && \
     mkdir -p /var/bundle && chown -R web:web /var/bundle
+    # Clean up
+    # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
 ADD --chown=web Gemfile Gemfile.lock /var/www/
