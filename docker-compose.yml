@@ -5,7 +5,8 @@ services:
   # Main services
   #
   production:
-    command: "bundle exec puma"
+    # command: "bundle exec puma"
+    command: "/var/www/bin/script/entry.sh"
     tty: true
     stdin_open: true
     container_name: "ensl_production"
@@ -28,9 +29,9 @@ services:
      - smtp
 
   staging:
+    command: "/var/www/bin/script/entry.sh"
+    # command: "bundle exec puma"
     # command: "/bin/bash"
-    # command: "/var/www/bin/script/entry.sh"
-    command: "bundle exec puma"
     tty: true
     stdin_open: true
     container_name: "ensl_staging"
