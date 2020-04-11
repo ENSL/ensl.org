@@ -56,11 +56,11 @@ header .banner {
       img {
         padding-top: 4px;
         padding-right: 5px;
-        @include span-columns(2 of 12);
+        @include span-columns(3 of 12);
       }
 
       input {
-        @include span-columns(5 of 12);
+        @include span-columns(4 of 12);
         margin-bottom: 10px;
       }
     }
@@ -127,11 +127,12 @@ header .banner {
 
       .login {
         @include span-columns(5 of 12);
-        @include shift(1.7);
+        @include shift(1.6);
       }
 
       .register {
         @include span-columns(5 of 12);
+        @include shift(-1);
 
         .password-reset {
           float: right;
