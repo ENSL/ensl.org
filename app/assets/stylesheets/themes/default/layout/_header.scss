@@ -53,10 +53,15 @@ header .banner {
     .fields { 
       @include span-columns(12);
 
-      img {
-        padding-top: 4px;
-        padding-right: 5px;
+      .steam {
         @include span-columns(3 of 12);
+
+        img {
+          padding-top: 0px;
+          padding-right: 5px;
+          width: 40px;
+          float: right;
+        }
       }
 
       input {
@@ -127,7 +132,7 @@ header .banner {
 
       .login {
         @include span-columns(5 of 12);
-        @include shift(1.6);
+        @include shift(1.8);
       }
 
       .register {
