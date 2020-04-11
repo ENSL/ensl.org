@@ -2,9 +2,9 @@
 
 Install instructions in INSTALL.md
 
-## Bassic commands for development
+## Basic commands for development
 
-Load env variables:
+Load env variables (don't skip this step):
 
     source script/env.sh .env .env.development
 
@@ -36,13 +36,13 @@ Run some tests:
     docker-compose exec -u web test bundle exec rspec`
     docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
 
-## Unresolved issues
+## Unresolved issues for dev
 
 There are some unresolved issues to setup dev env.
 
 1. Make sure tmp, tmp/sockets, tmp/pids and log exist.
 1. Make sure docker has access to its dirs. You might have to `sudo chown -R 999:999 for` for `db/data` if you have permission issues with docker.
-1. You might have to run migrations manually.
+1. You might have to run migrations manually. `bundle exec rake db:migrate`
 
 ## Tips
 
@@ -53,6 +53,7 @@ There are some unresolved issues to setup dev env.
 
 1. VS Code and RubyMine are great IDE's/editors.
 1. To run VS Code plugin Ruby Test Explorer in docker container you need to create path to custom path, copy the formatter and it whines about and it [still fails a bit](https://github.com/connorshea/vscode-ruby-test-adapter/issues/21).
+1. You can run tests easier if you setup the stuff on your own computer.
 1. Do not commit too much without testing. Also keep commits small for documentation and reversability issues.
 1. You need to rebuild the docker image when you change gems.
 
@@ -61,10 +62,17 @@ There are some unresolved issues to setup dev env.
 Read this to understand design decisions and follow them!
 
 1. Env variables should be used everywhere and loaded from .env* files using Dotenv
+  * Load order is in [here]|(https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use)
+  * Local changes go to .env*local and NOT .env
+  * Passwords are in ENV variables for now so they don't have to duplicated between DB and Rails.
 1. Everything should be running on containers.
-1. Docker-compose is the heart of deployment
-1. Dockerfile should contain the gems and prebuilt assets for production
-1. The app contents are added to the docker image *on build* but it is mounted as **volume**. It will override the Dockerfile content.
+  * Docker-compose is the heart of deployment
+  * Dockerfile should contain the gems and prebuilt assets for production
+  * The app contents are added to the docker image *on build* but it is mounted as **volume**. It will override the Dockerfile content.
+1. The public directory contains everything public. NGINX will try to find files there and ask from PUMA if it doesn't.
+  * The local public directories (images, files, icons, avatars etc.) are to be addeed to .gitignore
+  * Assets are compiled on-fly in development mode.
+  * In production/staging etc. assets are precompiled and stored. Entry script can do this.
 
 ## Tags in code
 

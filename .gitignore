@@ -26,8 +26,10 @@ db/initdb.d/*
 !db/initdb.d/.placeholder
 !db/initdb.d/*setup*.sql
 
-# secrets
-**/*secrets*.yml
+# secrets.yml
+# use env vars for now
+# **/*secrets*.yml
+# !**/*secrets*sample*.yml
 
 # ignore dkim keys
 dkim
@@ -41,7 +43,7 @@ ext/ssl
 ext/nginx.conf.d/default.conf
 !ext/nginx.conf.d/.ht*
 
-# Uploaded Assets
+# Uploaded assets, local uploads
 /public/system/*
 /public/files
 /public/local
