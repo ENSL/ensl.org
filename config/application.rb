@@ -1,4 +1,9 @@
 require_relative 'boot'
+require 'securerandom'
+
+# FIXME
+# Set random value for this
+ENV["APP_SECRET_KEY_BASE"] ||= SecureRandom.alphanumeric(32)
 
 require 'rails/all'
 
