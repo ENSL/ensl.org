@@ -4,7 +4,7 @@ Install instructions in INSTALL.md
 
 ## Basic commands for development
 
-Load env variables (don't skip this step):
+Load env variables (**don't skip this step**):
 
     source script/env.sh .env .env.development
 
@@ -83,6 +83,8 @@ FIXME, TODO, EXPLAIN, OBSOLETE
 1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker-compose up
 1. Should directories exist?
 1. docker-compose has some .env specific vars and then
+1. The env variables are not always loaded causing mysterious issues.
+1. How much in env vars?
 
 ## Best practices
 
