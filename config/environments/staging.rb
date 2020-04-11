@@ -5,8 +5,8 @@ Rails.application.configure do
   config.eager_load = true
 
   # Code is not reloaded between requests
-  config.cache_classes = true
-  config.action_controller.perform_caching = true
+  config.cache_classes = false
+  config.action_controller.perform_caching = false
 
   # Full error reports are disabled and caching is turned on
   config.consider_all_requests_local = false
@@ -25,7 +25,7 @@ Rails.application.configure do
   config.assets.digest = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = false
+  config.force_ssl = true
 
   # See everything in the log (default is :info)
   config.log_level = :info
