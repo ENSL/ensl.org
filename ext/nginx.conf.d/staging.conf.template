@@ -75,7 +75,7 @@ server {
   # FIXME: use env. var
   location ^~ /assets/ {
     gzip_static on;
-    expires max;
+    expires 1m;
     add_header Cache-Control public;
   }
 
