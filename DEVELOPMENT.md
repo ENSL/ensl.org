@@ -1,6 +1,6 @@
 # Development
 
-Install instructions in INSTALL.md
+Install instructions in INSTALL.md. Read this whole documentation before posting.
 
 ## Basic commands for development
 
@@ -79,11 +79,15 @@ Read this to understand design decisions and follow them!
 1. Everything should be running on containers.
   * Docker-compose is the heart of deployment
   * Dockerfile should contain the gems and prebuilt assets for production
-  * The app contents are added to the docker image *on build* but it is mounted as **volume**. It will override the Dockerfile content.
+  * The app is mounted as **volume**. It will override the Dockerfile content.
+    * The app is only put inside the Dockerfile to precompile assets for production and staging. It could be removed to reduce space.
+    * For production or staging could have the content in either image or as a volume. Doesn't really matter.
 1. The public directory contains everything public. NGINX will try to find files there and ask from PUMA if it doesn't.
   * The local public directories (images, files, icons, avatars etc.) are to be addeed to .gitignore
-  * Assets are compiled on-fly in development mode.
+  * Assets are compiled on-fly in development mode. 
   * In production/staging etc. assets are precompiled and stored. Entry script can do this.
+  * The public folder is a mix of auto-generated data (assets), static data (images) and user-generated data (avatars/files etc.).
+  * No app folder in repo outside public is supposed to shared by webserver.
 
 ## Tags in code
 
