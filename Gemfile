@@ -80,12 +80,13 @@ gem 'signet', '0.11.0'
 
 group :production do
   gem 'newrelic_rpm'
+  gem 'puma_worker_killer'
 end
 
 group :development do
   # Check models
   gem 'rubocop'
-  
+
   # annotate models
   gem 'annotate'
 
