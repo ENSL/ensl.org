@@ -392,7 +392,7 @@ class User < ActiveRecord::Base
 
   # This serves multiple functions
   def send_new_password
-    generate_password unless self.raw_password&.length > 0
+    generate_password unless self.raw_password&.length.to_i > 0
     self.save!
 
     # TODO: consider moving these two to callbacks
