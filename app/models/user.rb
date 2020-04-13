@@ -359,6 +359,7 @@ class User < ActiveRecord::Base
     unless profile&.present?
       self.build_profile
     end
+    self.email = "%s@ensl.org" % cleanup_string(username) if email.blank?
   end
 
   def generate_password
