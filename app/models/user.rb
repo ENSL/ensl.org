@@ -258,6 +258,10 @@ class User < ActiveRecord::Base
     team ? teamers.active.of_team(team).first : nil
   end
 
+  def preformat
+    self.email = "" if self.email.include?("@ensl.org")
+  end
+
   def banned? type = Ban::TYPE_SITE
     bans.effective.where(ban_type: type).count > 0
   end
@@ -353,7 +357,7 @@ class User < ActiveRecord::Base
       generate_password
     end
     unless profile&.present?
-      self.profile = Profile.new
+      self.build_profile
     end
   end
 
@@ -516,7 +520,7 @@ class User < ActiveRecord::Base
     params.require(:user).permit(*allowed)
   end
 
-  def self.focfah(auth_hash, lastip)
+  def self.find_or_build(auth_hash, lastip)
     return nil unless auth_hash&.include?(:provider)
     case auth_hash[:provider]
     when 'steam'
@@ -526,11 +530,11 @@ class User < ActiveRecord::Base
       unless user
         user = User.new(username: auth_hash[:info][:nickname], lastip: lastip, fullname: auth_hash[:info][:name], steamid: steamid)
         user.fix_attributes
+        user.build_profile
         # TODO: user make valid by force
         # user.profile.country
         # get profile picture, :image
         # This really shouldn't fail.
-        user.save!
       end
       return user
     end

@@ -43,10 +43,15 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
+    unless session[:cached_user]&.blank?
+      @user = User.new(JSON.parse(session[:cached_user])) rescue nil
+      session.delete :cached_user
+    end
+    @user ||= User.new
     @user.profile = Profile.new
     @user.lastip = request.env['REMOTE_ADDR']
     @user.can_create? cuser
+    @user.preformat
   end
 
   def edit
@@ -63,6 +68,7 @@ class UsersController < ApplicationController
       redirect_to action: :show, id: @user.id
       save_session @user
     else
+      @user.preformat
       render :new
     end
   end
@@ -86,12 +92,28 @@ class UsersController < ApplicationController
   end
 
   def callback
-    @user = User.focfah(auth_hash, request.ip)
-    login_user(@user)
-    if @user.created_at > (Time.zone.now - 1.week)
-      flash[:notice] << t(:users_signup_steam)
-      render :edit
+    @user = User.find_or_build(auth_hash, request.ip)
+    unless @user and @user.is_a?(ActiveRecord::Base)
+      flash[:error] = t(:users_callback_fail)
+      redirect_to_home
+      return
+    end
+
+    # After steam validates SteamID, we know its right.
+    session[:verified_steamid] = @user.steamid
+
+    # Store user in session store
+    session[:cached_user] = @user.to_json
+
+    if @user.new_record?
+      # If user mistypes username and password, return to user creation page.
+      session[:return_to] = new_user_url(@user)
+
+      # if @user.created_at > (Time.zone.now - 1.week)
+      # flash[:notice] = t(:users_signup_steam)
+      render :new
     else
+      login_user(@user)
       return_back
     end
   end
@@ -134,9 +156,16 @@ class UsersController < ApplicationController
     if user.banned? Ban::TYPE_SITE
       flash[:error] = t(:accounts_locked)
     else
-      flash[:notice] = "%s (%s)" % [t(:login_successful), user.password_hash_s]
+      flash[:notice] = "%s" % [t(:login_successful)]
       # FIXME: this doesn't work because model is saved before
       flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if user.password_hash_changed?
+      if !session[:verified_steamid].blank? and \
+        user.steamid != session[:verified_steamid] and \
+        user.update_attribute(:steamid, session[:verified_steamid])
+          session[:return_to] = edit_user_path(user)
+          flash[:notice] << t(:users_steamid_update) % [user.steamid]
+          session.delete :verified_steamid
+      end
       save_session user
     end
   end

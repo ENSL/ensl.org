@@ -1,8 +1,10 @@
 <%= form_tag({ controller: "users", action: "login" }, { class: 'dark' }) do %>
   <div class="fields">
-    <%= link_to "/auth/steam", method: :POST do %>
-      <%= image_tag '/images/icons/steam_login.png' %>
-    <% end %>
+    <div class="steam">
+      <%= link_to "/auth/steam", method: :POST do %>
+        <%= image_tag '/images/icons/steam_login.png' %>
+      <% end %>
+    </div>
     <%= text_field "login", "username", placeholder: "Username" %>
     <%= password_field "login", "password", placeholder: "Password" %>
   </div>
