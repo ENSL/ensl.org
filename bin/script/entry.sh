@@ -12,6 +12,7 @@ bundle install --jobs 8
 # Precompile assets when needed. Don't assume the ENV
 if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   echo "Fetching assets..."
+  # FIXME: disabled for now
   if false; then
   #if [[ -z "$ASSETS_PATH" ]] && [ -d "$ASSETS_PATH"]; then
     rm -rf "${APP_PATH}/public/assets"
