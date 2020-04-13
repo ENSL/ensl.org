@@ -9,12 +9,13 @@ class ApplicationController < ActionController::Base
 
   # Omniauth has its own CSRF
   protect_from_forgery :except => [:callback]
-  
+
   respond_to :html, :js
 
   def cuser
     begin
       @cuser ||= User.find(session[:user]) 
+    # Don't error if the user is missing.
     rescue
       session[:user] = nil
       @cuser = nil
