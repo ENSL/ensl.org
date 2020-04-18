@@ -45,10 +45,6 @@ module Ensl
       domain: ENV['MAIL_DOMAIN']
     }
 
-    # Specifies the header that your server uses for sending files
-    # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
-    config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
-
     # Use a different logger for distributed setups
     config.logger = Logger.new(Rails.root.join("log", Rails.env + ".log" ), 5 , 10 * 1024 * 1024)
 
