@@ -88,6 +88,7 @@ Read this to understand design decisions and follow them!
   * In production/staging etc. assets are precompiled and stored. Entry script can do this.
   * The public folder is a mix of auto-generated data (assets), static data (images) and user-generated data (avatars/files etc.).
   * No app folder in repo outside public is supposed to shared by webserver.
+1. Do not comment out tests that are taken out of use temporarily but use **skip**
 
 ## Tags in code
 
