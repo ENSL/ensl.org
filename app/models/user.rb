@@ -259,7 +259,7 @@ class User < ActiveRecord::Base
   end
 
   def preformat
-    self.email = "" if self.email.include?("@ensl.org")
+    self.email = "" if self.email&.include?("@ensl.org")
   end
 
   def banned? type = Ban::TYPE_SITE
