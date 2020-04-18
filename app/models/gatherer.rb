@@ -171,6 +171,6 @@ class Gatherer < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes)
+    params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes, :confirm)
   end
 end

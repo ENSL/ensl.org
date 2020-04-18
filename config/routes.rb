@@ -49,12 +49,16 @@ Rails.application.routes.draw do
       post :pick
     end
   end
-  get 'gathers/latest/:game', to: "gathers#latest", via: :get
-  get 'gather', to: "gathers#latest", game: "ns2", via: :get
 
-  get 'gatherers/:id/status', to: "gatherers#status", via: :post
+  resources :gatherers do
+    member do
+      post :status
+    end
+  end
 
-  resources :gatherers
+  get 'gathers/latest/:game', to: "gathers#latest"
+  get 'gather', to: "gathers#latest", game: "ns2"
+
   resources :groups
   resources :groupers
   resources :forumers
