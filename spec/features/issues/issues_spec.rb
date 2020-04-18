@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'Issues' do
-	let!(:user) { create :user }
+  let!(:user) { create :user }
 
 	scenario 'creation' do
 		sign_in_as user

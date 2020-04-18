@@ -41,6 +41,7 @@ Capybara.register_driver :selenium_remote do |app|
     desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome
   )
 end
+Capybara.default_max_wait_time = 8
 
 #Capybara.javascript_driver = :selenium
 #Capybara.javascript_driver = :selenium_remote

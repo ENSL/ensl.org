@@ -8,8 +8,7 @@ feature "User Stream Information" do
     scenario "user updates their stream" do
       visit user_path(user)
       expect(page.html).to_not include("<dt>Stream</dt>")
-      fill_login_form(user, password)
-      click_button submit(:user, :login)
+      sign_in_as(user)
       visit edit_user_path(user)
       stream_url = "twitch.tv/gold_n"
       expect(page).to have_content("Stream")
