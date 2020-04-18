@@ -20,6 +20,8 @@
           <% if cuser.gatherers.count < 5 %>
             <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES) %>, installed NS and Teamspeak3.
           <% end  %>
+        </p>
+        <p>
           <a href="javascript:" id="gatherJoinBtn" class="button">
             Click to join gather!
           </a>
