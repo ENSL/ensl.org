@@ -41,6 +41,7 @@ class ContestsController < ApplicationController
   def recalc
     raise AccessError unless @contest.can_update? cuser
     @contest.recalculate
+    flash[:notice] = "Contest points recalculated."
     redirect_to_back
   end
 
