@@ -85,6 +85,13 @@ class ApplicationController < ActionController::Base
       Time.zone = cuser.time_zone
       cuser.update_attribute :lastvisit, Time.now.utc if cuser&.lastvisit < 2.minutes.ago.utc
 
+      # FIXME: there is a bug in steam auth that causes nil profile
+      unless cuser.profile&.present?
+        flash[:notice] = "Your profile has been removed and recreated."
+        cuser.build_profile
+        cuser.save
+      end
+
       if cuser.banned? Ban::TYPE_SITE
         session[:user] = nil
         @cuser = nil
