@@ -45,7 +45,7 @@ class GatherersController < ApplicationController
       @gatherer.update_attribute(:status, states[params[:status]])
     end
 
-    render :nothing => true, :status => 200
+    render body: nil, :status => 200
   end
 
   def destroy
