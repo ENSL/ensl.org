@@ -6,8 +6,17 @@ module Features
       fill_in "login_username", with: user.username
       fill_in "login_password", with: user.raw_password
 
-      click_button I18n.t("helpers.submit.user.login")
+      # click_button I18n.t("helpers.submit.user.login")
+      find('#authentication .login input').trigger('click')
       expect(page).to have_content(I18n.t('login_successful'))
+    end
+
+    def sign_out
+      visit root_path
+
+      # click_button I18n.t("helpers.submit.user.login")
+      find('a#logout').trigger('click')
+      expect(page).to have_content(I18n.t('login_out'))
     end
 
     def change_timezone_for(user, timezone)
