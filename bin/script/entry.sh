@@ -4,6 +4,9 @@ cd $APP_PATH
 
 source script/env.sh .env .env.$RAILS_ENV .env.$RAILS_ENV.local .env.local
 
+# Create dirs
+mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
+
 # Make sure we have all gems, this fixed some startup issues.
 bundle config github.https true
 bundle config set path '/var/bundle'

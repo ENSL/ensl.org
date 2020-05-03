@@ -1,6 +1,6 @@
 # Development
 
-Install instructions in INSTALL.md. Read this whole documentation before posting.
+Install instructions in INSTALL.md. Read this whole documentation before proceeding.
 
 ## Basic commands for development
 
