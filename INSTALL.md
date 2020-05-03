@@ -11,6 +11,7 @@ Install docker + docker-compose:
 
     wget -O - 'https://get.docker.com/'|bash
     sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
 
 Install git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
@@ -34,7 +35,7 @@ You can use `script/db_dump.sh` to dump production database.
 
 You need to manually copy it to staging database on same db server for now.
 
-## 5. First select your environment (eg. production). Then use a script to load the env vars to your shell env:
+## 5. Select your environment (eg. production). Then use a script to load the env vars to your shell env:
 
     source script/env.sh .env .env.production
 
