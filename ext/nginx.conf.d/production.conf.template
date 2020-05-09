@@ -3,7 +3,7 @@
 # Use it in production or copy it over
 
 upstream puma {
-  server production:$PUMA_PORT;
+  server production:$PRODUCTION_PUMA_PORT;
   # server unix:/var/tmp/puma.$RAILS_ENV.sock fail_timeout=0;
 }
 
@@ -17,7 +17,7 @@ server {
   ssl_certificate_key /etc/ssl/ensl/privkey.pem;
 
   server_name $PRODUCTION_ROOT_DOMAIN;
-  root $APP_PATH_PUBLIC;
+  root $PRODUCTION_NGINX_PUBLIC;
   return 301 https://$PRODUCTION_DOMAIN$request_uri;
 }
 
@@ -36,7 +36,7 @@ server {
   error_page 497 https://$host:$server_port$request_uri;
 
   server_name $PRODUCTION_DOMAIN;
-  root $APP_PATH_PUBLIC;
+  root $PRODUCTION_NGINX_PUBLIC;
   index index.html index.htm index.php;
 
   ssl_certificate /etc/ssl/ensl/fullchain.pem;
