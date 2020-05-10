@@ -157,8 +157,8 @@ class Gather < ActiveRecord::Base
   def refresh cuser
     if status == STATE_RUNNING
       gatherers.idle.destroy_all
-    elsif status == STATE_VOTING and updated_at < 60.seconds.ago and updated_at > 5.days.ago
-      if status == STATE_VOTING and updated_at < 60.seconds.ago
+    elsif status == STATE_VOTING and updated_at < 80.seconds.ago and updated_at > 5.days.ago
+      if status == STATE_VOTING and updated_at < 80.seconds.ago
         self.status = STATE_PICKING
         save!
       end
