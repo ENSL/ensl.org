@@ -34,11 +34,11 @@
       success: function(response, text, request) {
         if (request.getResponseHeader('Gather') == 'voting') {
           if (!played) {
-            var startTime = 110;
+            var startTime = 0;
             $("#jplayer").jPlayer({
               ready: function() {
                 $(this).jPlayer("setMedia", {
-                  mp3: "https://www.ensl.org/sounds/gather-1.mp3"
+                  mp3: "https://www.ensl.org/sounds/gather-6.mp3"
                 }).jPlayer("play", startTime);
 
                 var click = document.ontouchstart === undefined ? 'click' : 'touchstart';
