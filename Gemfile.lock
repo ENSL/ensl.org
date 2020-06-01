@@ -148,7 +148,8 @@ GEM
       multi_json (~> 1.11)
       os (~> 0.9)
       signet (~> 0.7)
-    haml (4.0.7)
+    haml (5.1.2)
+      temple (>= 0.8.0)
       tilt
     hike (1.2.3)
     httpclient (2.8.3)
@@ -293,6 +294,7 @@ GEM
     sshkit (1.15.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    temple (0.8.2)
     test-unit (3.1.9)
       power_assert
     thor (0.20.0)
@@ -346,7 +348,7 @@ DEPENDENCIES
   faraday (~> 0.9.0)
   font-awesome-sass (~> 4.1.0.0)
   google-api-client (~> 0.10.3)
-  haml (~> 4.0.5)
+  haml (~> 5.1.2)
   i18n-js
   jquery-rails (~> 2.0.2)
   mysql2 (~> 0.3.17)
