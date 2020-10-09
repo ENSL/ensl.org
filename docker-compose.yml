@@ -157,11 +157,11 @@ services:
     command: /bin/bash -c "cat /etc/nginx/conf.d/ensl_production/*.conf.template|envsubst '$$PRODUCTION_PUMA_PORT $$PRODUCTION_ROOT_DOMAIN $$PRODUCTION_DOMAIN $$PRODUCTION_PORT $$PRODUCTION_PORT_SSL $$PRODUCTION_NGINX_PUBLIC $$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
     # TODO: use env vars here
     volumes:
-      - ../../ensl/ensl.org/ext/ssl:/etc/ssl
-      - ../../ensl/ensl.org/public:/var/www/public
-      - ../../ensl/ensl.org/ext/nginx.conf.d:/etc/nginx/conf.d/ensl_production
-      - ../../ensl/ensl.org.staging/ext/nginx.conf.d:/etc/nginx/conf.d/ensl_staging
-      - ../../ensl/ensl.org.staging/app/public:/var/staging/public
+      - ext/ssl:/etc/ssl
+      - public/:/var/www
+      - ext/nginx.conf.d:/etc/nginx/conf.d/ensl_production
+      - ext/nginx.conf.d:/etc/nginx/conf.d/ensl_staging
+      - ../ensl.org.staging/app/public:/var/staging/public
     # TODO: use env vars here
     ports:
       - 80:80
