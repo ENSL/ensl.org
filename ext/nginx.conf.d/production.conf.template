@@ -2,7 +2,7 @@
 # The point of this config file is to have near-identical setup in PRODUCTION.
 # Use it in production or copy it over
 
-upstream puma {
+upstream ensl_production {
   server production:$PRODUCTION_PUMA_PORT;
   # server unix:/var/tmp/puma.$RAILS_ENV.sock fail_timeout=0;
 }
