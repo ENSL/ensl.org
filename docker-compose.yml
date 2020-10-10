@@ -127,7 +127,7 @@ services:
     image: mariadb:latest
     container_name: ensl_db
     user: "mysql:mysql"
-    # debug; command: mysqld_safe --skip-grant-tables
+    command: mysqld_safe --skip-grant-tables
     volumes:
      - "./db/data:/var/lib/mysql"
      - "./db/initdb.d:/docker-entrypoint-initdb.d"
@@ -154,7 +154,7 @@ services:
     container_name: ensl_nginx
     tty: true
     stdin_open: true
-    command: /bin/bash -c "cat /etc/nginx/conf.d/ensl_production/*.conf.template|envsubst '$$PRODUCTION_PUMA_PORT $$PRODUCTION_ROOT_DOMAIN $$PRODUCTION_DOMAIN $$PRODUCTION_PORT $$PRODUCTION_PORT_SSL $$PRODUCTION_NGINX_PUBLIC $$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
+    command: /bin/bash -c "cat /etc/nginx/conf.d/ensl_production/prod*.conf.template|envsubst '$$PRODUCTION_PUMA_PORT $$PRODUCTION_ROOT_DOMAIN $$PRODUCTION_DOMAIN $$PRODUCTION_PORT $$PRODUCTION_PORT_SSL $$PRODUCTION_NGINX_PUBLIC $$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
     # TODO: use env vars here
     volumes:
       - ext/ssl:/etc/ssl
@@ -173,7 +173,7 @@ services:
       - PRODUCTION_DOMAIN=$PRODUCTION_DOMAIN
       - PRODUCTION_PORT=$PRODUCTION_PORT
       - PRODUCTION_PORT_SSL=$PRODUCTION_PORT_SSL
-      - PRODUCTION_NGINX_PUBLIC=$PRODUCTION_NGINX_PUBLIC
+      - PRODUCTION_NGINX_PUBLIC=/srv/production
       - STAGING_PUMA_PORT=$STAGING_PUMA_PORT
       - STAGING_ROOT_DOMAIN=$STAGING_ROOT_DOMAIN
       - STAGING_DOMAIN=$STAGING_DOMAIN
