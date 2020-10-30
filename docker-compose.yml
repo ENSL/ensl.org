@@ -157,10 +157,10 @@ services:
     command: /bin/bash -c "cat /etc/nginx/conf.d/ensl_production/prod*.conf.template|envsubst '$$PRODUCTION_PUMA_PORT $$PRODUCTION_ROOT_DOMAIN $$PRODUCTION_DOMAIN $$PRODUCTION_PORT $$PRODUCTION_PORT_SSL $$PRODUCTION_NGINX_PUBLIC $$PUMA_PORT $$APP_PATH $$APP_PATH_PUBLIC $$STAGING_ROOT_DOMAIN $$STAGING_DOMAIN $$STAGING_PORT $$STAGING_PORT_SSL' > /etc/nginx/conf.d/default.conf && cat /etc/nginx/conf.d/*.conf && nginx -g 'daemon off;'"
     # TODO: use env vars here
     volumes:
-      - ext/ssl:/etc/ssl
-      - public/:/var/www
-      - ext/nginx.conf.d:/etc/nginx/conf.d/ensl_production
-      - ext/nginx.conf.d:/etc/nginx/conf.d/ensl_staging
+      - ./ext/ssl:/etc/ssl
+      - ./public/:/var/www
+      - ./ext/nginx.conf.d:/etc/nginx/conf.d/ensl_production
+      - ./ext/nginx.conf.d:/etc/nginx/conf.d/ensl_staging
       - ../ensl.org.staging/app/public:/var/staging/public
     # TODO: use env vars here
     ports:
@@ -195,3 +195,8 @@ services:
 # commands, but it is necessary for "spring status" and "spring stop"
 # to work properly.
 # pid: host
+
+networks:
+  default:
+    external:
+      name: catpack_docker
