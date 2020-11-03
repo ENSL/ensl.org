@@ -46,8 +46,8 @@ server {
   # auth_basic           "Staging Area";
   # auth_basic_user_file "/etc/nginx/conf.d/.htpasswd_staging";
 
-  ssl_certificate /etc/ssl/ensl/fullchain.pem;
-  ssl_certificate_key /etc/ssl/ensl/privkey.pem;
+  ssl_certificate /etc/letsencrypt/live/ensl.org/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/ensl.org/privkey.pem;
 
   # ssl-cert /etc/ssl/certs/ssl-cert-snakeoil.pem
   # ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key

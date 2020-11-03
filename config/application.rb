@@ -18,6 +18,9 @@ module Ensl
     # Custom error pages
     config.exceptions_app = self.routes
 
+    # Secret key
+    config.require_master_key = false 
+
     # Load Rails 5
     # config.load_defaults 5.0
 
