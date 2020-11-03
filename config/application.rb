@@ -13,6 +13,15 @@ Bundler.require(*Rails.groups)
 # FIXME
 ActionController::Parameters.permit_all_parameters = true
 
+class ActionDispatch::Session::MyCustomStore < ActionDispatch::Session::CookieStore
+  private
+
+  def cookie_jar(request)
+    request.cookie_jar.signed
+  end
+end
+
+
 module Ensl
   class Application < Rails::Application
     # Custom error pages
@@ -32,7 +41,8 @@ module Ensl
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]
 
     # Be sure to restart your server when you modify this file.
-    config.session_store :cookie_store, key: '_ensl_session'
+    config.session_store :cookie_store, key: '_ENSL_session_key'
+    # config.session_store :my_custom_store, key: '_ENSL_session_key'
 
     # Load secrets from .env
     ENV['APP_SECRET'] ||= (0...32).map { (65 + rand(26)).chr }.join
