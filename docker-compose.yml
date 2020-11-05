@@ -14,7 +14,7 @@ services:
      - smtp
   #    - redis
   db:
-    image: mariadb:latest
+    image: mariadb:10.4.8
     command: mysqld --skip-grant-tables
     volumes:
      - "./db_data:/var/lib/mysql"
