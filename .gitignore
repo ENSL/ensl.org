@@ -7,12 +7,16 @@
 .ruby-version
 .ruby-gemset
 .env
+.env*.local
 .tmp*
 .rspec
 .sass-cache
 *.sassc
 *.rbc
 *.sassc
+db/data
+ext/ssl
+.htpass*
 
 # Database and files
 db_data/*

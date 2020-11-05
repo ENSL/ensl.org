@@ -1,0 +1,95 @@
+# Staging nginx conf
+# The point of this config file is to have near-identical setup in staging.
+# Use it in production or copy it over
+
+upstream ensl_staging {
+  server staging:$PUMA_STAGING_PORT;
+  # server unix:/var/tmp/puma.$RAILS_ENV.sock fail_timeout=0;
+}
+
+# root-level -> www redirect
+#server {
+#  listen *:$STAGING_PORT;
+#  listen *:$STAGING_PORT_SSL ssl;
+
+  # FIXME
+  # ssl_certificate /etc/ssl/certs/ensl_fullchain.pem;
+  # ssl_certificate_key /etc/ssl/private/ensl_privkey.pem;
+  # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+#  #server_name $STAGING_ROOT_DOMAIN;
+#  #root $APP_PATH_PUBLIC;
+#  return 301 https://$STAGING_DOMAIN$request_uri;
+#}
+
+# HTTP -> HTTPS redirect
+#server {
+#  listen *:$STAGING_PORT;
+#  server_name $STAGING_DOMAIN;
+#  return 301 https://$STAGING_DOMAIN$request_uri;
+#}
+
+server {
+  #listen *:$STAGING_PORT default_server;
+  listen *:$STAGING_PORT_SSL ssl default_server;
+
+  # Redirect to HTTPS
+  error_page 497 https://$host:$server_port$request_uri;
+
+  ## domain_agnostic staging
+  # server_name $STAGING_DOMAIN;
+  root $APP_PATH_PUBLIC;
+  index index.html index.htm index.php;
+
+  # Add basic auth
+  # TODO: add htpassword generation
+  # auth_basic           "Staging Area";
+  # auth_basic_user_file "/etc/nginx/conf.d/.htpasswd_staging";
+
+  ssl_certificate /etc/letsencrypt/live/ensl.org/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/ensl.org/privkey.pem;
+
+  # ssl-cert /etc/ssl/certs/ssl-cert-snakeoil.pem
+  # ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key
+
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA;
+  ssl_session_timeout 1d;
+  ssl_session_cache shared:SSL:50m;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  # add_header Strict-Transport-Security max-age=15768000;
+
+  access_log /var/log/nginx/ensl.access.log;
+  error_log /var/log/nginx/ensl.error.log;
+
+  rewrite_log on;
+  client_max_body_size 20M;
+  keepalive_timeout 10;
+
+  location ~ /.well-known {
+    allow all;
+    autoindex on;
+  }
+
+  # FIXME: use env. var
+  location ^~ /assets/ {
+    gzip_static on;
+    expires 1m;
+    add_header Cache-Control public;
+  }
+
+  # FIXME: use env. var
+  location /files/ {
+    # try_files $uri $uri/ @puma;
+    # alias root $APP_PATH_PUBLIC/files/;
+    autoindex on;
+  }
+  location @puma {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_pass http://puma;
+  }
+
+  try_files $uri/index.html $uri @puma;
+}

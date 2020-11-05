@@ -15,7 +15,7 @@ services:
   #    - redis
   db:
     image: mariadb:latest
-    command: mysqld
+    command: mysqld --skip-grant-tables
     volumes:
      - "./db_data:/var/lib/mysql"
      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
@@ -38,3 +38,8 @@ services:
       - OPENDKIM_DOMAINS=ensl.org
   #redis:
   #  image: redis
+
+networks:
+  default:
+    external:
+      name: catpack_docker
