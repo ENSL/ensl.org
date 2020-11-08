@@ -1,0 +1,48 @@
+upstream gathers {
+  #  server unix:/srv/ensl/puma.production.sock fail_timeout=0;
+  server ensl_gather_production:6500;
+}
+
+server {
+  listen *:443 ssl;
+  server_name gathers.ensl.org;
+  root /srv/ensl/gathers/public;
+  index index.html index.htm index.php;
+
+  # Redirect to HTTPS
+  error_page 497 https://$host:$server_port$request_uri;
+
+  ssl_certificate /etc/letsencrypt/live/ensl.org/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/ensl.org/privkey.pem;
+  # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  # ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA;
+  # ssl_session_timeout 1d;
+  # ssl_session_cache shared:SSL:50m;
+  # ssl_stapling on;
+  # ssl_stapling_verify on;
+  add_header Strict-Transport-Security max-age=0;
+
+  access_log /var/log/nginx/ensl.gathers.access.log;
+  error_log /var/log/nginx/ensl.gathers.error.log;
+
+  rewrite_log on;
+  client_max_body_size 20M;
+  keepalive_timeout 10;
+
+  location ~ /.well-known {
+    allow all;
+    autoindex on;
+  }
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+  location @gathers {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_pass http://gathers;
+  }
+
+  try_files $uri/index.html $uri @gathers;
+}
