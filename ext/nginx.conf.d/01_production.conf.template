@@ -39,8 +39,8 @@ server {
   root $PRODUCTION_NGINX_PUBLIC;
   index index.html index.htm index.php;
 
-  ssl_certificate /etc/letsencrypt/live/ensl.org/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/ensl.org/privkey.pem;
+  ssl_certificate /etc/letsencrypt/live/ensl.org-0001/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/ensl.org-0001/privkey.pem;
 
   # ssl-cert /etc/ssl/certs/ssl-cert-snakeoil.pem
   # ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key
