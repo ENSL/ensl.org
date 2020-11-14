@@ -1,6 +1,6 @@
 # Development
 
-Install instructions in INSTALL.md. Read this whole documentation before proceeding.
+Install instructions in INSTALL.md. Read it before proceeding.
 
 ## Basic commands for development
 
@@ -8,9 +8,9 @@ Load env variables (**don't skip this step**):
 
     source script/env.sh .env .env.development
 
-Start:
+Start development:
 
-    docker-compose up --build development`
+    docker-compose up --build development
 
 Build or rebuild:
 
@@ -33,10 +33,11 @@ Restart the web container
 
 Run some tests:
 
+    docker-compose up --build test
     docker-compose exec -u web test bundle exec rspec`
     docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
 
-## Unresolved issues for dev
+## Unresolved issues for development
 
 There are some unresolved issues to setup dev env.
 
@@ -75,7 +76,7 @@ Read this to understand design decisions and follow them!
 
 1. Env variables should be used everywhere and loaded from .env* files using Dotenv
   * Load order is in [here]|(https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use)
-  * Local changes go to .env*local and NOT .env
+  * Local changes go to .env*local and **not** .env
   * Passwords are in ENV variables for now so they don't have to duplicated between DB and Rails.
 1. Everything should be running on containers.
   * Docker-compose is the heart of deployment
@@ -85,10 +86,10 @@ Read this to understand design decisions and follow them!
     * For production or staging could have the content in either image or as a volume. Doesn't really matter.
 1. The public directory contains everything public. NGINX will try to find files there and ask from PUMA if it doesn't.
   * The local public directories (images, files, icons, avatars etc.) are to be addeed to .gitignore
-  * Assets are compiled on-fly in development mode. 
+  * Assets are compiled on-fly in development mode.
   * In production/staging etc. assets are precompiled and stored. Entry script can do this.
   * The public folder is a mix of auto-generated data (assets), static data (images) and user-generated data (avatars/files etc.).
-  * No app folder in repo outside public is supposed to shared by webserver.
+  * No app folder in repo outside public is supposed to be shared by webserver.
 1. Do not comment out tests that are taken out of use temporarily but use **skip**
 
 ## Tags in code

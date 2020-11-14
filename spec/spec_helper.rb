@@ -43,8 +43,8 @@ Capybara.register_driver :selenium_remote do |app|
 end
 Capybara.default_max_wait_time = 8
 
-#Capybara.javascript_driver = :selenium
-#Capybara.javascript_driver = :selenium_remote
+# Capybara.javascript_driver = :selenium
+# Capybara.javascript_driver = :selenium_remote
 
 #print('selenium %s' % SELENIUM_HOST)
 #print('port %d' % [TEST_APP_PORT])

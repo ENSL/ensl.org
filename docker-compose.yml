@@ -196,8 +196,3 @@ services:
 # commands, but it is necessary for "spring status" and "spring stop"
 # to work properly.
 # pid: host
-
-networks:
-  default:
-    external:
-      name: catpack_docker

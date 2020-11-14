@@ -6,7 +6,11 @@
 
 This is the source code of ENSL website. Currently deployed on [ensl.org](https://www.ensl.org).
 
-Features:
+## Documentation
+
+See [[INSTALL.md]] how to install and [[DEVELOPMENT.md]] how to develop it.
+
+## Features
 
 - Articles
 - Commenting feature for most objects
