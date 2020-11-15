@@ -78,6 +78,8 @@ gem 'active_record_union'
 # FIXME: Dependency version fix
 gem 'signet', '0.11.0'
 
+gem 'bundle-audit'
+
 group :production do
   gem 'newrelic_rpm'
   gem 'puma_worker_killer'

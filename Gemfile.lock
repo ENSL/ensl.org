@@ -135,6 +135,11 @@ GEM
       sass (>= 3.2.0)
       thor
     builder (3.2.4)
+    bundle-audit (0.1.0)
+      bundler-audit
+    bundler-audit (0.7.0.1)
+      bundler (>= 1.2.0, < 3)
+      thor (>= 0.18, < 2)
     byebug (11.1.1)
     capybara (3.31.0)
       addressable
@@ -493,6 +498,7 @@ DEPENDENCIES
   binding_of_caller
   bluecloth
   bourbon (~> 3.1.8)
+  bundle-audit
   capybara
   carrierwave
   codeclimate-test-reporter
