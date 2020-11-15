@@ -37,6 +37,12 @@ Run some tests:
     docker-compose exec -u web test bundle exec rspec`
     docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb`
 
+## Debugging
+
+Enable debug:
+1. For tests, Make sure ``require 'pry-byebug'`` is uncommented at spec_helper.rb
+1. Uncomment  add `byebug` anywhere
+
 ## Unresolved issues for development
 
 There are some unresolved issues to setup dev env.
@@ -94,7 +100,11 @@ Read this to understand design decisions and follow them!
 
 ## Tags in code
 
-FIXME, TODO, EXPLAIN, OBSOLETE
+* ``FIXME`` bugs or bad coding that need to fixed one day
+* ``TODO`` for things that are left undone
+* ``EXPLAIN`` please explain what the following code does
+* ``OBSOLETE`` remove this at some point
+* ``DEBUG`` uncomment following lines to enable debug
 
 ## TODO issues for dev
 
