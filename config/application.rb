@@ -49,7 +49,7 @@ module Ensl
     config.secret_token = ENV['APP_SECRET']
 
     # Use a different cache store
-    config.cache_store = :dalli_store, 'memcached:11211'
+    config.cache_store = :mem_cache_store, 'memcached:11211'
 
     # Use smtp-Server
     config.action_mailer.delivery_method = :smtp
@@ -88,7 +88,7 @@ module Ensl
     config.active_support.deprecation = :notify
 
     # Enable threaded mode
-    # Almost nothing is thread-safe, do not
+    # Almost nothing is thread-safe, do NOT use this
     # config.threadsafe!
   end
 end
