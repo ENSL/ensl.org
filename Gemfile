@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+# Policy here is to not to save version data unless its needed (eg. problems with new version)
+# Version data is in Gemfile.lock, running bundle update will fix it.
+
 source 'http://rubygems.org'
 ruby '2.6.5'
 
 # Rails core
-gem 'rails', '~> 6.0.2.2'
+gem 'rails', '~> 6.0.3.4'
 gem 'rake'
 
 # Dotenv
@@ -66,7 +69,7 @@ gem 'uglifier'
 
 # CSS
 gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
-gem 'bourbon','~> 3.1.8'
+gem 'bourbon','~> 3.1.8' # Upgrading will cause issues
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'font-awesome-sass', '~> 4.1.0.0' # Fix icons before updating
 

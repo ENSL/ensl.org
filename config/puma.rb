@@ -8,7 +8,7 @@ tag 'ENSL'
 preload_app!
 
 # Start in foreground mode
-daemonize false
+# daemonize false
 
 # Rack up?
 rackup DefaultRackup
