@@ -134,7 +134,7 @@ class User < ActiveRecord::Base
 
   before_validation :update_password
 
-  validates_uniqueness_of :username, :email, :steamid
+  validates_uniqueness_of :username, :email, :steamid, :case_sensitive => false
   validates_length_of :firstname, :in => 1..15, :allow_blank => true
   validates_length_of :lastname, :in => 1..25, :allow_blank => true
   validates_length_of :username, :in => 1..30
@@ -454,7 +454,7 @@ class User < ActiveRecord::Base
   end
 
   def self.authenticate(login)
-    user = where('username = ?', login[:username]).first
+    user = where('lower(username) = ?', login[:username].downcase).first
     return nil unless user
 
     begin

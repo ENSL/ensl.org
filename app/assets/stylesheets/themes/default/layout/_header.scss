@@ -136,8 +136,8 @@ header .banner {
       }
 
       .register {
-        @include span-columns(5 of 12);
-        @include shift(-1);
+        @include span-columns(4 of 12);
+        @include shift(0.1);
 
         .password-reset {
           float: right;

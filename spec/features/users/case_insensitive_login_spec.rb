@@ -12,7 +12,7 @@ feature "Case insensitive login", js: :true do
   feature "when a user with mixed-case username signs in" do
     scenario "with a matching case allows the user to sign in" do
       fill_login_form(username)
-      find('.login input').trigger('click')
+      find('#authentication input[name="commit"]').trigger('click')
 
       expect(page).to have_content(I18n.t("login_successful"))
 
@@ -23,7 +23,7 @@ feature "Case insensitive login", js: :true do
 
     scenario "with a non-matching case allows the user to sign in" do
       fill_login_form("CASE_INSENSITIVE")
-      find('.login input').trigger('click')
+      find('#authentication input[name="commit"]').trigger('click')
 
       expect(page).to have_content(I18n.t("login_successful"))
 

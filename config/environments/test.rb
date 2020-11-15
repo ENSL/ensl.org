@@ -34,4 +34,6 @@ Rails.application.configure do
   config.active_support.deprecation = :stderr
 
   config.eager_load = true
+
+  config.assets.compile = true
 end

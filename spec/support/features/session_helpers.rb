@@ -3,18 +3,19 @@ module Features
     def sign_in_as(user)
       visit root_path
 
-      fill_in "login_username", with: user.username
+      find_field("login_username").set(user.username)
       fill_in "login_password", with: user.raw_password
 
+      # Apparently poltergeist does not suppor this
+      find('#authentication input[name="commit"]').click()
       # click_button I18n.t("helpers.submit.user.login")
-      find('#authentication .login input').trigger('click')
+
       expect(page).to have_content(I18n.t('login_successful'))
     end
 
     def sign_out
       visit root_path
-
-      # click_button I18n.t("helpers.submit.user.login")
+      
       find('a#logout').trigger('click')
       expect(page).to have_content(I18n.t('login_out'))
     end
@@ -24,7 +25,7 @@ module Features
 
       click_link I18n.t("profile.locals")
       find("option[value='#{timezone}']").select_option
-
+      
       click_button I18n.t("helpers.submit.user.update")
     end
 

@@ -1,5 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 
+# DEBUG use this
+# require 'pry-byebug'
+
 require 'dotenv'
 Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
@@ -26,22 +29,22 @@ end
 
 Capybara.javascript_driver = :poltergeist
 
-SELENIUM_HOST = ENV['SELENIUM_HOST']
-TEST_APP_HOST = ENV['TEST_APP_HOST']
-TEST_APP_PORT = ENV['TEST_APP_PORT']
+# SELENIUM_HOST = ENV['SELENIUM_HOST']
+# TEST_APP_HOST = ENV['TEST_APP_HOST']
+# TEST_APP_PORT = ENV['TEST_APP_PORT']
 
-Capybara.server_port = TEST_APP_PORT
-Capybara.server_host = '0.0.0.0'
-Capybara.app_host = "http://#{TEST_APP_HOST}:#{TEST_APP_PORT}"
-Capybara.register_driver :selenium_remote do |app|
-  Capybara::Selenium::Driver.new(
-    app,
-    browser: :remote,
-    url: "http://#{SELENIUM_HOST}:4444/wd/hub",
-    desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome
-  )
-end
-Capybara.default_max_wait_time = 8
+# Capybara.server_port = TEST_APP_PORT
+# Capybara.server_host = '0.0.0.0'
+# Capybara.app_host = "http://#{TEST_APP_HOST}:#{TEST_APP_PORT}"
+# Capybara.register_driver :selenium_remote do |app|
+#  Capybara::Selenium::Driver.new(
+#    app,
+#    browser: :remote,
+#    url: "http://#{SELENIUM_HOST}:4444/wd/hub",
+#    desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome
+#  )
+# end
+# Capybara.default_max_wait_time = 8
 
 # Capybara.javascript_driver = :selenium
 # Capybara.javascript_driver = :selenium_remote
