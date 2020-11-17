@@ -127,7 +127,7 @@ services:
     image: mariadb:latest
     container_name: ensl_db
     user: "mysql:mysql"
-    command: mysqld_safe --skip-grant-tables
+    #    command: mysqld_safe --skip-grant-tables
     volumes:
      - "./db/data:/var/lib/mysql"
      - "./db/initdb.d:/docker-entrypoint-initdb.d"
