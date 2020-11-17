@@ -335,6 +335,11 @@ class User < ActiveRecord::Base
     issues.unread_by(self)
   end
 
+  def duplicates
+    # TODO: user arel
+    User.where('lower(username) = ? AND users.id != ?', username.downcase, id)
+  end
+
   def correct_steamid_universe
     if steamid.present?
       steamid[0] = "0"
@@ -344,8 +349,9 @@ class User < ActiveRecord::Base
   # FIXME: if team has been removed
   def validate_team
     if team and !active_teams.exists?({:id => team.id})
+      # Attempts to fix team, gracefully
       self.team = nil
-      self.save!
+      self.save
       errors.add :team
     end
   end
