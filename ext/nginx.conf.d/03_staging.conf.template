@@ -56,8 +56,7 @@ server {
 
   # FIXME: use env. var
   location /files/ {
-    # try_files $uri $uri/ @puma;
-    # alias root $APP_PATH_PUBLIC/files/;
+    alias /srv/ensl_files/;
     autoindex on;
   }
   location @puma {
