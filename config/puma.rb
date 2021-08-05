@@ -1,5 +1,6 @@
 # Load dev vars. These are loaded in application but puma needs them too.
 require "dotenv"
+require 'os'
 Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
 tag 'ENSL'
@@ -19,7 +20,10 @@ app_dir = ENV['APP_PATH'] || '/var/www'
 
 # Set basic puma settings
 environment rails_env
-bind "unix://#{app_dir}/tmp/sockets/puma.#{rails_env}.sock"
+#if OS.posix?
+#  bind "unix://#{app_dir}/tmp/sockets/puma.#{rails_env}.sock"
+#end
+
 port Integer(ENV['PUMA_PORT'] || 4000)
 
 # Redirect stdout only in production. Dev mode needs it for debug

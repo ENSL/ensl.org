@@ -529,6 +529,7 @@ DEPENDENCIES
   omniauth
   omniauth-rails_csrf_protection
   omniauth-steam
+  os
   phantomjs
   poltergeist
   pry-byebug
@@ -571,4 +572,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.1.4
+   2.2.6

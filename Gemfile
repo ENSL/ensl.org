@@ -21,6 +21,7 @@ gem 'connection_pool' # Needed for MT
 # Web server
 gem 'faraday'
 gem 'puma'
+gem 'os'
 # gem 'unicorn'
 
 # Model plugins
