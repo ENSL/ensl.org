@@ -467,7 +467,13 @@ class User < ActiveRecord::Base
       case user.password_hash
       when User::PASSWORD_SCRYPT
         # FIXME: If exception occurs here, user cannot log in
-        pass = SCrypt::Password.new(user.password)
+        begin
+          pass = SCrypt::Password.new(user.password)
+        rescue
+          logger.error "User (%s) password hash is invalid."
+          flash[:error] = "Password hash is invalid, please use forget password functionality or contact admin."
+          return nil
+        end
         return user if pass == login[:password]
       when User::PASSWORD_MD5_SCRYPT
         pass = SCrypt::Password.new(user.password)
