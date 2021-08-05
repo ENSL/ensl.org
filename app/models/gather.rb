@@ -179,7 +179,7 @@ class Gather < ActiveRecord::Base
       elsif turn == 2 and gatherers.team(2).count == 5 and gatherers.team(1).count == 4
         update_attribute :turn, 1
       elsif turn == 1 and gatherers.team(1).count == 6 and gatherers.team(2).count == 5
-        gatherers.lobby.first.update_attributes(:team => 2, :skip_callbacks => true)
+        gatherers.lobby.first&.update_attributes(:team => 2, :skip_callbacks => true)
         update_attribute :turn, 2
       elsif gatherers.team(1).count == 6 and gatherers.team(2).count == 6
         update_attribute :status, STATE_FINISHED
