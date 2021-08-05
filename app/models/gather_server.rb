@@ -3,11 +3,11 @@
 # Table name: gather_servers
 #
 #  id         :integer          not null, primary key
-#  gather_id  :integer
-#  server_id  :integer
 #  votes      :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  gather_id  :integer
+#  server_id  :integer
 #
 
 class GatherServer < ActiveRecord::Base
