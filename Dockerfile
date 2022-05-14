@@ -1,4 +1,4 @@
-FROM ruby:2.6.5 AS ensl_development
+FROM ruby:2.6.10 AS ensl_development
 
 ENV RAILS_ENV development
 ENV APP_PATH /var/www
@@ -31,7 +31,7 @@ RUN \
       # For assets pipeline
       yarn \
       # For poltergeist
-      phantomjs \
+      # phantomjs \
       firefox-esr && \
     # Install bundler and bundle path
     gem install bundler && \

@@ -4,10 +4,10 @@
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
 source 'http://rubygems.org'
-ruby '2.6.5'
+ruby '2.6.10'
 
 # Rails core
-gem 'rails', '~> 6.0.3.4'
+gem 'rails', '~> 6.0.5'
 gem 'rake'
 
 # Dotenv
@@ -104,11 +104,11 @@ end
 
 group :test do
   # FIXME: Use dev versions because of rspec bug
-  gem 'rspec-core', git: 'https://github.com/rspec/rspec-core'
-  gem 'rspec-expectations', git: 'https://github.com/rspec/rspec-expectations'
-  gem 'rspec-mocks', git: 'https://github.com/rspec/rspec-mocks'
-  gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails'
-  gem 'rspec-support', git: 'https://github.com/rspec/rspec-support'
+  gem 'rspec-core'
+  gem 'rspec-expectations'
+  gem 'rspec-mocks'
+  gem 'rspec-rails'
+  gem 'rspec-support'
 
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
