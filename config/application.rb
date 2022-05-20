@@ -41,8 +41,9 @@ module Ensl
     config.autoload_paths += Dir["#{config.root}/app/services/**/", "#{config.root}/app/models/concerns/"]
 
     # Be sure to restart your server when you modify this file.
-    config.session_store :cookie_store, key: '_ENSL_session_key'
+    config.session_store :cookie_store, key: '_ENSL_session_key', domain: ENV[ENV['RAILS_ENV'].upcase + "_DOMAIN"]
     # config.session_store :my_custom_store, key: '_ENSL_session_key'
+    config.action_dispatch.cookies_serializer = :marshal
 
     # Load secrets from .env
     ENV['APP_SECRET'] ||= (0...32).map { (65 + rand(26)).chr }.join
