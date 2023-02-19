@@ -11,9 +11,6 @@ preload_app!
 # Start in foreground mode
 # daemonize false
 
-# Rack up?
-rackup DefaultRackup
-
 # Set vars as we cannmot load them
 rails_env = ENV['RAILS_ENV'] || 'development'
 app_dir = ENV['APP_PATH'] || '/var/www'

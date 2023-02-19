@@ -1,4 +1,4 @@
-class CreateMatchProposals < ActiveRecord::Migration
+class CreateMatchProposals < ActiveRecord::Migration[4.2]
   def up
     create_table :match_proposals do |t|
       t.references :match, index: true, forign_key: true

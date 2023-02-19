@@ -1,4 +1,4 @@
-FROM ruby:2.6.10 AS ensl_development
+FROM ruby:2.7.7 AS ensl_development
 
 ENV RAILS_ENV development
 ENV APP_PATH /var/www
@@ -32,7 +32,8 @@ RUN \
       yarn \
       # For poltergeist
       # phantomjs \
-      firefox-esr && \
+      #firefox-esr && \
+      chromium && \
     # Install bundler and bundle path
     gem install bundler && \
     mkdir -p /var/bundle && chown -R web:web /var/bundle
@@ -62,6 +63,9 @@ ADD --chown=web . /var/www
 # USER root
 # RUN chown -R web:web /var/www
 # USER web
+
+# Generate rake secret
+# RUN rake secret && rails credentials:edit --environment production
 
 # Assets are only compiled for production+
 RUN bundle exec rake assets:precompile && \

@@ -54,7 +54,7 @@ services:
   development:
     # For debug; Use attach rather than this
     # command: /bin/bash
-    command: "bundle exec puma"
+    command: "/var/www/bin/script/entry.sh"
     tty: true
     stdin_open: true
     container_name: "ensl_development"

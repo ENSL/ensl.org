@@ -4,7 +4,7 @@
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
 source 'http://rubygems.org'
-ruby '2.6.10'
+ruby '2.7.7'
 
 # Rails core
 gem 'rails', '~> 6.0.5'
@@ -82,7 +82,15 @@ gem 'active_record_union'
 # FIXME: Dependency version fix
 gem 'signet', '0.11.0'
 
+# FIXME: Fix for warning: https://github.com/ruby/net-imap/issues/16
+gem "net-http"
+
 gem 'bundle-audit'
+
+# https://github.com/DatabaseCleaner/database_cleaner/issues/299
+gem 'mongoid-tree'
+gem 'database_cleaner', git: 'https://github.com/DatabaseCleaner/database_cleaner.git'
+
 
 group :production do
   gem 'newrelic_rpm'
@@ -115,8 +123,9 @@ group :test do
 
   # Feature testing
   gem 'capybara'
-  gem 'poltergeist'
-  gem 'phantomjs', require: 'phantomjs/poltergeist'
+#   gem 'poltergeist'
+  gem 'apparition'
+  # gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'selenium-webdriver'
 
   # Fix FF issue
@@ -137,7 +146,8 @@ group :test do
 
   # Database cleaner
   gem 'database_cleaner-active_record'
-  gem 'database_cleaner-redis'
+  # gem 'database_cleaner-redis'
+  gem 'redis-namespace'
 
   # For circle ci + CC
   gem 'rspec_junit_formatter'

@@ -1,4 +1,4 @@
-class AddTitleToDirectories < ActiveRecord::Migration[6.0]
+class AddTitleToDirectories < ActiveRecord::Migration[4.2][6.0]
   def change
     change_table :directories do |m|
       m.string :title

@@ -9,6 +9,8 @@ Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['
 require "codeclimate-test-reporter"
 require "simplecov"
 
+require 'capybara/apparition'
+
 # CodeClimate::TestReporter.start
 SimpleCov.start "rails"
 
@@ -16,8 +18,10 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "capybara/rspec"
 
-require "capybara/poltergeist"
+# require "capybara/poltergeist"
 Capybara.default_max_wait_time = 5
+Capybara.javascript_driver = :apparition
+=begin
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(
     app,
@@ -26,8 +30,9 @@ Capybara.register_driver :poltergeist do |app|
     phantomjs: Phantomjs.path
   )
 end
+=end
 
-Capybara.javascript_driver = :poltergeist
+# Capybara.javascript_driver = :poltergeist
 
 # SELENIUM_HOST = ENV['SELENIUM_HOST']
 # TEST_APP_HOST = ENV['TEST_APP_HOST']

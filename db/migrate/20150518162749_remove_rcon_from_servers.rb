@@ -1,4 +1,4 @@
-class RemoveRconFromServers < ActiveRecord::Migration
+class RemoveRconFromServers < ActiveRecord::Migration[4.2]
   def up
     remove_column :servers, :rcon
   end

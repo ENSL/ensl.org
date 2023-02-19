@@ -1,4 +1,4 @@
-class CreateCustomUrls < ActiveRecord::Migration
+class CreateCustomUrls < ActiveRecord::Migration[4.2]
   def change
     create_table :custom_urls do |t|
       t.string :name

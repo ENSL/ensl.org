@@ -1,4 +1,3 @@
-#!/bin/bash
 # use source script/env.sh
 
 args=("$@")

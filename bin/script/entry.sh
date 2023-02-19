@@ -1,8 +1,11 @@
 #!/bin/bash
+# Start the app
+# RAILS_ENV needs to be set at minimum, this will allow it to load env variables from the named .env files.
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/../../script/env.sh .env .env.$RAILS_ENV .env.local .env.$RAILS_ENV.local 
 
 cd $APP_PATH
-
-source script/env.sh .env .env.$RAILS_ENV .env.local .env.$RAILS_ENV.local 
 
 # Create dirs
 mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
