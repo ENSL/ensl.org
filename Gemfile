@@ -54,7 +54,8 @@ gem 'sanitize'
 gem 'rmagick'
 gem 'will_paginate'
 gem 'active_link_to'
-gem 'country_select', require: 'country_select_without_sort_alphabetical'
+gem 'country_select'
+# , require: 'country_select_without_sort_alphabetical'
 gem 'i18n_country_select'
 gem 'dynamic_form'
 
@@ -126,10 +127,11 @@ group :test do
 #   gem 'poltergeist'
   gem 'apparition'
   # gem 'phantomjs', require: 'phantomjs/poltergeist'
+  gem 'selenium'
   gem 'selenium-webdriver'
 
   # Fix FF issue
-  gem 'geckodriver-helper'
+  # gem 'geckodriver-helper'
 
   # Fix legacy issue
   gem 'rails-controller-testing'

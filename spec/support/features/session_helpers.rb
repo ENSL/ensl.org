@@ -16,7 +16,7 @@ module Features
     def sign_out
       visit root_path
       
-      find('a#logout').trigger('click')
+      find('a#logout').click()
       expect(page).to have_content(I18n.t('login_out'))
     end
 

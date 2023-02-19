@@ -4,6 +4,7 @@ GIT
   specs:
     database_cleaner (2.0.1)
       database_cleaner-active_record (~> 2.0.0)
+    database_cleaner-core (2.0.1)
 
 GIT
   remote: https://github.com/koraktor/steam-condenser-ruby.git
@@ -87,8 +88,6 @@ GEM
     apparition (0.6.0)
       capybara (~> 3.13, < 4)
       websocket-driver (>= 0.6.5)
-    archive-zip (0.12.0)
-      io-like (~> 0.3.0)
     ast (2.4.2)
     awesome_print (1.9.2)
     bbcoder (1.1.1)
@@ -128,7 +127,6 @@ GEM
       marcel (~> 1.0.0)
       mini_mime (>= 0.1.3)
       ssrf_filter (~> 1.0)
-    childprocess (4.1.0)
     code_analyzer (0.5.5)
       sexp_processor
     codeclimate-test-reporter (1.0.9)
@@ -143,18 +141,15 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.2.0)
     connection_pool (2.3.0)
-    countries (4.2.3)
-      i18n_data (~> 0.16.0)
-      sixarm_ruby_unaccent (~> 1.1)
-    country_select (6.1.1)
-      countries (~> 4.2)
-      sort_alphabetical (~> 1.1)
+    countries (5.3.1)
+      unaccent (~> 0.3)
+    country_select (8.0.1)
+      countries (~> 5.0)
     crass (1.0.6)
-    dalli (3.2.3)
+    dalli (3.2.4)
     database_cleaner-active_record (2.0.1)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
-    database_cleaner-core (2.0.1)
     date (3.3.3)
     debug_inspector (1.1.0)
     declarative (0.0.20)
@@ -181,11 +176,9 @@ GEM
       rake
     font-awesome-sass (4.1.0)
       sass (~> 3.2)
-    geckodriver-helper (0.24.0)
-      archive-zip (~> 0.7)
     get_process_mem (0.2.7)
       ffi (~> 1.0)
-    glob (0.2.0)
+    glob (0.4.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
     google-api-client (0.10.3)
@@ -216,19 +209,18 @@ GEM
     i18n-country-translations (1.4.1)
       i18n (>= 0.9.3, < 2)
       railties (>= 5.0)
-    i18n-js (4.0.1)
-      glob
+    i18n-js (4.2.2)
+      glob (>= 0.4.0)
       i18n
     i18n_country_select (1.2.1)
       i18n (~> 0.9.3)
       i18n-country-translations (~> 1.0, >= 1.3.0)
       unicode_utils (~> 1.0, >= 1.0.0)
-    i18n_data (0.16.0)
-      simple_po_parser (~> 1.1)
     image_processing (1.12.2)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
-    io-like (0.3.1)
+    jar_wrapper (0.1.8)
+      zip
     jquery-rails (4.5.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -249,7 +241,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2022.0105)
+    mime-types-data (3.2023.0218.1)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.1)
@@ -308,12 +300,12 @@ GEM
       ast (~> 2.4.1)
     pkg-config (1.5.1)
     power_assert (2.0.3)
-    pry (0.13.1)
+    pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-byebug (3.9.0)
+    pry-byebug (3.10.1)
       byebug (~> 11.0)
-      pry (~> 0.13.0)
+      pry (>= 0.13, < 0.15)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (5.0.1)
@@ -355,8 +347,10 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.5.0)
       loofah (~> 2.19, >= 2.19.1)
-    rails_autolink (1.1.7)
-      rails (> 3.1)
+    rails_autolink (1.1.8)
+      actionview (> 3.1)
+      activesupport (> 3.1)
+      railties (> 3.1)
     rails_best_practices (1.23.2)
       activesupport
       code_analyzer (~> 0.5.5)
@@ -448,26 +442,24 @@ GEM
       tilt (>= 1.1, < 3)
     scrypt (3.0.7)
       ffi-compiler (>= 1.0, < 2.0)
-    selenium-webdriver (4.1.0)
-      childprocess (>= 0.5, < 5.0)
+    selenium (0.2.11)
+      jar_wrapper
+    selenium-webdriver (4.8.1)
       rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
     sexp_processor (4.16.1)
     signet (0.11.0)
       addressable (~> 2.3)
       faraday (~> 0.9)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    simple_po_parser (1.1.6)
     simplecov (0.13.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    sixarm_ruby_unaccent (1.2.0)
-    sort_alphabetical (1.1.0)
-      unicode_utils (>= 1.2.2)
-    spring (3.1.1)
+    spring (4.1.1)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -481,11 +473,11 @@ GEM
       power_assert
     thor (1.2.1)
     thread_safe (0.3.6)
-    tilt (2.0.11)
+    tilt (2.1.0)
     time_difference (0.5.0)
       activesupport
     timecop (0.9.6)
-    timeout (0.3.1)
+    timeout (0.3.2)
     tinymce-rails (6.3.1)
       railties (>= 3.1.1)
     trailblazer-option (0.1.2)
@@ -494,9 +486,10 @@ GEM
     uber (0.1.0)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
+    unaccent (0.4.0)
     unicode-display_width (2.4.2)
     unicode_utils (1.4.0)
-    unread (0.11.0)
+    unread (0.12.0)
       activerecord (>= 3)
     uri (0.12.0)
     web-console (4.2.0)
@@ -504,6 +497,7 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
+    websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -511,6 +505,7 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.6.7)
+    zip (2.0.2)
 
 PLATFORMS
   aarch64-linux
@@ -530,6 +525,7 @@ DEPENDENCIES
   bluecloth
   bourbon (~> 3.1.8)
   bundle-audit
+  bundler (>= 2.4.7)
   capybara
   carrierwave
   codeclimate-test-reporter
@@ -544,7 +540,6 @@ DEPENDENCIES
   factory_bot_rails (= 4.10.0)
   faraday
   font-awesome-sass (~> 4.1.0.0)
-  geckodriver-helper
   google-api-client (~> 0.10.3)
   haml
   i18n-js
@@ -584,6 +579,7 @@ DEPENDENCIES
   sanitize
   sass-rails (~> 5.0.3)
   scrypt
+  selenium
   selenium-webdriver
   signet (= 0.11.0)
   simplecov

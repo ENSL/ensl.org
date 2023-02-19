@@ -11,7 +11,7 @@ feature 'Gathers', js: true do
   scenario 'Try to join without checking TOS' do
     visit gather_path(gather)
 
-    find('a#gatherJoinBtn').trigger('click')
+    find('a#gatherJoinBtn').click()
 
     # TODO: check error
     expect(page).to have_content("Confirm must be accepted")
@@ -22,7 +22,7 @@ feature 'Gathers', js: true do
     visit gather_path(gather)
 
     check 'gatherer[confirm]'
-    find('a#gatherJoinBtn').trigger('click')
+    find('a#gatherJoinBtn').click()
 
     expect(page).to have_content(I18n.t(:gathers_join))
     expect(gather.gatherers.count).to eq(1)
@@ -42,7 +42,7 @@ feature 'Gathers', js: true do
 
       visit gather_path(gather)
       check 'gatherer[confirm]'
-      find('a#gatherJoinBtn').trigger('click')
+      find('a#gatherJoinBtn').click()
 
       expect(page).to have_content(I18n.t(:gathers_join))
       expect(gather.gatherers.last.user_id).to eq(u.id)

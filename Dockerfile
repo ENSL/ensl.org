@@ -32,7 +32,7 @@ RUN \
       yarn \
       # For poltergeist
       # phantomjs \
-      # firefox-esr && \
+      firefox-esr \
       # For apparition
       chromium chromium-driver && \
     # Fix URI startup issue && \
