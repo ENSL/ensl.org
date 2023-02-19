@@ -32,8 +32,11 @@ RUN \
       yarn \
       # For poltergeist
       # phantomjs \
-      #firefox-esr && \
-      chromium && \
+      # firefox-esr && \
+      # For apparition
+      chromium chromium-driver && \
+    # Fix URI startup issue && \
+    gem update --system && \
     # Install bundler and bundle path
     gem install bundler && \
     mkdir -p /var/bundle && chown -R web:web /var/bundle
