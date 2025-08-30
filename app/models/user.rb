@@ -106,7 +106,7 @@ class User < ActiveRecord::Base
   has_many :received_personal_messages, :class_name => "Message", :as => "recipient", :dependent => :destroy
   has_many :sent_personal_messages, :class_name => "Message", :as => "sender", :dependent => :destroy
   has_many :sent_team_messages, :through => :active_teams, :source => :sent_messages
-  has_many :match_teams, :through => :matchers, :source => :teams
+  has_many :match_teams, -> { group('teams.id') }, :through => :matchers, :source => :teams
 
   scope :active, -> { where(banned: false) }
   scope :with_age, -> {
