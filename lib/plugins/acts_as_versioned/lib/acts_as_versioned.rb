@@ -213,7 +213,7 @@ module ActiveRecord #:nodoc:
           end
 
           class_eval do
-            has_many :versions, version_association_options do
+            has_many :versions, **version_association_options do
               # finds earliest version of this record
               def earliest
                 @earliest ||= order('version').first
