@@ -4,7 +4,7 @@
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
 source 'http://rubygems.org'
-ruby '2.7.7'
+ruby '3.2.5'
 
 # Rails core
 gem 'rails', '~> 6.0.5'
@@ -33,7 +33,7 @@ gem 'active_flag'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 # External APIs
-gem 'google-api-client', '~> 0.10.3'
+gem 'google-api-client'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
 # Auth
@@ -157,6 +157,8 @@ group :test do
 end
 
 group :development, :test do
+  # gem 'ruby-debug-ide'
+  # gem 'debase'
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'spring'
@@ -164,4 +166,6 @@ group :development, :test do
   gem 'awesome_print'
   # For n+1 uqeries
   # gem 'bullet'
+
+  gem "erb2haml"
 end

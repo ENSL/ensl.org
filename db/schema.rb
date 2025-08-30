@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_02_000314) do
+ActiveRecord::Schema.define(version: 2023_09_22_054450) do
 
   create_table "article_versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "article_id"
@@ -361,6 +361,8 @@ ActiveRecord::Schema.define(version: 2020_04_02_000314) do
     t.string "specifics1"
     t.string "specifics2"
     t.integer "log_file_id"
+    t.integer "log_event_id"
+    t.string "specifics3"
     t.index ["actor_id"], name: "index_logs_on_actor_id"
     t.index ["log_file_id"], name: "index_logs_on_log_file_id"
     t.index ["round_id"], name: "index_logs_on_round_id"

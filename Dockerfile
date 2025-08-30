@@ -1,4 +1,4 @@
-FROM ruby:2.7.7 AS ensl_development
+FROM ruby:3.2.5 AS ensl_development
 
 ENV RAILS_ENV development
 ENV APP_PATH /var/www
