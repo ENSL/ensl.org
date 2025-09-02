@@ -44,7 +44,8 @@ RUN \
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
 # Separate Gemfile ADD so that `bundle install` can be cached more effectively
-ADD --chown=web Gemfile Gemfile.lock /var/www/
+#ADD --chown=web Gemfile Gemfile.lock /var/www/
+ADD --chown=web Gemfile /var/www/
 
 USER web
 WORKDIR /var/www
