@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       resources :teams, only: [:show]
       resources :servers, only: [:index]
       resources :maps, only: [:index]
+      get 'sessions/me', to: 'sessions#me'
     end
   end
 
