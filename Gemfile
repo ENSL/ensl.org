@@ -24,6 +24,9 @@ gem 'puma'
 gem 'os'
 # gem 'unicorn'
 
+# API
+gem 'rack-cors'
+
 # Model plugins
 gem 'unread'
 gem 'scrypt'
