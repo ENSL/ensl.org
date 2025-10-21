@@ -164,7 +164,7 @@ group :development, :test do
   # gem 'debase'
   gem 'pry-rails'
   gem 'pry-byebug'
-  gem 'spring'
+  # gem 'spring'
   gem "rails_best_practices"
   gem 'awesome_print'
   # For n+1 uqeries

@@ -1,5 +1,5 @@
-require 'google/apis/calendar_v3'
-
+begin
+  require 'google/apis/calendar_v3'
 CALENDAR = Google::Apis::CalendarV3
 
 class GoogleCalendar
@@ -41,6 +41,8 @@ class GoogleCalendar
 
   def nsltv_regex
     /\[NSLTV\]/i
-  end
-
+  end 
+end
+rescue LoadError
+  # Skip Google Calendar functionality if gem not available
 end

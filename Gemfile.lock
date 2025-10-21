@@ -520,7 +520,6 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    spring (4.4.0)
     sprockets (3.7.5)
       base64
       concurrent-ruby (~> 1.0)
@@ -653,7 +652,6 @@ DEPENDENCIES
   selenium-webdriver
   signet (= 0.11.0)
   simplecov
-  spring
   steam-condenser!
   test-unit
   time_difference
