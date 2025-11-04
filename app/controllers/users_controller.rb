@@ -77,10 +77,11 @@ class UsersController < ApplicationController
     raise AccessError unless @user.can_update? cuser  
     # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update_attributes(User.params(params, cuser, "update"))
-      flash[:notice] = t(:users_update)
-      redirect_to_back
+    if @user.update(User.params(params, cuser, "update"))
+      flash[:notice] = t(:user_updated)
+      redirect_back(fallback_location: user_path(@user))
     else
+      flash[:error] = t(:user_update_failed)
       render :edit
     end
   end

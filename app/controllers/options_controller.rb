@@ -21,7 +21,7 @@ class PollsController < ApplicationController
   def update
     raise AccessError unless @poll.can_update? cuser
 
-    if @poll.update_attributes(Poll.params(params, cuser))
+    if @poll.update(Poll.params(params, cuser))
       flash[:notice] = t(:polls_update)
       redirect_to @poll
     else

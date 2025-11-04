@@ -37,7 +37,7 @@ class GathersController < ApplicationController
 
     Gatherer.transaction do
       Gather.transaction do
-        if @gather.update_attributes(Gather.params(params, cuser))
+        if @gather.update(Gather.params(params, cuser))
           flash[:notice] = 'Gather was successfully updated.'
         end
       end

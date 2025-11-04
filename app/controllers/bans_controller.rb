@@ -32,7 +32,7 @@ class BansController < ApplicationController
 
   def update
     raise AccessError unless @ban.can_update? cuser
-    if @ban.update_attributes(Ban.params(params, cuser))
+    if @ban.update(Ban.params(params, cuser))
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else

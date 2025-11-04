@@ -39,7 +39,7 @@ class MoviesController < ApplicationController
   def update
     raise AccessError unless @movie.can_update? cuser
 
-    if @movie.update_attributes(Movie.params(params, cuser))
+    if @movie.update(Movie.params(params, cuser))
       flash[:notice] = t(:movies_update)
       redirect_to(@movie)
     else

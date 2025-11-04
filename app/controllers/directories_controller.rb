@@ -40,7 +40,7 @@ class DirectoriesController < ApplicationController
 
   def update
     raise AccessError unless @directory.can_update? cuser
-    if @directory.update_attributes(Directory.params(params, cuser))
+    if @directory.update(Directory.params(params, cuser))
       flash[:notice] = t(:directories_update)
       redirect_to @directory
     else

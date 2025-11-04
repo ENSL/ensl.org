@@ -35,7 +35,7 @@ class ServersController < ApplicationController
   def update
     raise AccessError unless @server.can_update? cuser
 
-    if @server.update_attributes(Server.params(params, cuser))
+    if @server.update(Server.params(params, cuser))
       flash[:notice] = t(:server_update)
       redirect_to @server
     else

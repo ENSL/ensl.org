@@ -94,6 +94,8 @@ en:
   users_steamid_update: "Your SteamID has been updated to %s. You can log in via Steam now."
   error: "error"
   prohibited: "prohibited"
+  user_updated: "User was successfully updated."
+  users_update: "User was successfully updated."
   news:
     archive: "Archive"
   gather:

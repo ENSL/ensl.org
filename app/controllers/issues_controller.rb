@@ -54,7 +54,7 @@ class IssuesController < ApplicationController
 
   def update
     raise AccessError unless @issue.can_update?(cuser, params[:issue])
-    if @issue.update_attributes(Issue.params(params, cuser))
+    if @issue.update(Issue.params(params, cuser))
       flash[:notice] = t(:issues_update)
       redirect_to(@issue)
     else

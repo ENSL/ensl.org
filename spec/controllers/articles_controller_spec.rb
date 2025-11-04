@@ -61,7 +61,7 @@ RSpec.describe ArticlesController, type: :controller do
       it "creates the model" do
         login_admin
         post :create, params: {:article => params}
-        # Article.any_instance.should_receive(:update_attributes).with(params)
+        # Article.any_instance.should_receive(:update).with(params)
         expect(Article.last).to have_attributes(params)
       end
 
@@ -77,7 +77,7 @@ RSpec.describe ArticlesController, type: :controller do
         login_admin
         count = Article.count
         post :create, params: {:article => invalid_params}
-        # Article.any_instance.should_receive(:update_attributes).with(params)
+        # Article.any_instance.should_receive(:update).with(params)
         expect(Article.count).to eq(count)
       end
 
@@ -95,7 +95,7 @@ RSpec.describe ArticlesController, type: :controller do
         login_admin
         params = FactoryBot.attributes_for(:article).merge!(category_id: category.id)
         put :update, params: {:id => article.id, :article => params}
-        # Article.any_instance.should_receive(:update_attributes).with(params)
+        # Article.any_instance.should_receive(:update).with(params)
         expect(Article.find(article.id).attributes).not_to eq(article.attributes)
       end
 
@@ -130,7 +130,7 @@ RSpec.describe ArticlesController, type: :controller do
 
         expect(Article.where(id: article.id).count).to eq(0)
         expect(Article.count).to eq(count - 1)
-        # Article.any_instance.should_receive(:update_attributes).with(params)
+        # Article.any_instance.should_receive(:update).with(params)
       end
 
       it "redirects correctly" do

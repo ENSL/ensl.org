@@ -33,7 +33,7 @@ class CommentsController < ApplicationController
 
   def update
     raise AccessError unless @comment.can_update? cuser
-    if @comment.update_attributes(Comment.params(parmas, cuser))
+    if @comment.update(Comment.params(parmas, cuser))
       flash[:notice] = t(:comments_update)
       return_to
     else

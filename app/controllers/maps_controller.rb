@@ -31,7 +31,7 @@ class MapsController < ApplicationController
 
   def update
     raise AccessError unless @map.can_update? cuser
-    if @map.update_attributes(Map.params(params, cuser))
+    if @map.update(Map.params(params, cuser))
       flash[:notice] = t(:maps_update)
       redirect_to @map
     else

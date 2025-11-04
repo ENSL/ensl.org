@@ -60,7 +60,7 @@ class MatchesController < ApplicationController
       end
     end
 
-    if @match.update_attributes(Match.params(params, cuser))
+    if @match.update(Match.params(params, cuser))
       respond_to do |format|
         format.xml { head :ok }
         format.html do

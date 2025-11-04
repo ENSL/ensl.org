@@ -106,7 +106,7 @@ RSpec.describe UsersController, type: :controller do
       it "creates the model" do
         login_admin
         post :create, params: {:user => params}
-        # user.any_instance.should_receive(:update_attributes).with(params)
+        # user.any_instance.should_receive(:update).with(params)
         # FIXME: ignore lastvisit and raw_password
         expect(User.last).to have_attributes(params.except(:raw_password,))
       end
@@ -123,7 +123,7 @@ RSpec.describe UsersController, type: :controller do
         login_admin
         count = User.count
         post :create, params: {:user => invalid_params}
-        # user.any_instance.should_receive(:update_attributes).with(params)
+        # user.any_instance.should_receive(:update).with(params)
         expect(User.count).to eq(count)
       end
 
@@ -141,7 +141,7 @@ RSpec.describe UsersController, type: :controller do
         login_admin
         params = FactoryBot.attributes_for(:user)
         put :update, params: {:id => user.id, :user => params}
-        # user.any_instance.should_receive(:update_attributes).with(params)
+        # user.any_instance.should_receive(:update).with(params)
         expect(User.find(user.id).attributes).not_to eq(user.attributes)
       end
 
@@ -178,7 +178,7 @@ RSpec.describe UsersController, type: :controller do
 
         expect(User.where(id: user.id).count).to eq(0)
         expect(User.count).to eq(count - 1)
-        # user.any_instance.should_receive(:update_attributes).with(params)
+        # user.any_instance.should_receive(:update).with(params)
       end
 
       it "redirects correctly" do

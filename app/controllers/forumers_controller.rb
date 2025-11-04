@@ -16,7 +16,7 @@ class ForumersController < ApplicationController
     @forumer = Forumer.find params[:id]
     raise AccessError unless @forumer.can_update? cuser
 
-    if @forumer.update_attributes(Forumer.params(params, cuser))
+    if @forumer.update(Forumer.params(params, cuser))
       flash[:notice] = t(:groups_acl_update)
     else
       flash[:error] = @forumer.errors.full_messages.to_s

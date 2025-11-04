@@ -32,7 +32,7 @@ class GroupsController < ApplicationController
 
   def update
     raise AccessError unless @group.can_update? cuser
-    if @group.update_attributes(Group.params(params, cuser))
+    if @group.update(Group.params(params, cuser))
       flash[:notice] = t(:groups_update)
       redirect_to @group
     else

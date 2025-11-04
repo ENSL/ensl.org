@@ -16,7 +16,7 @@ class GroupersController < ApplicationController
     @grouper = Grouper.find params[:id]
     raise AccessError unless @grouper.can_update? cuser
 
-    if @grouper.update_attributes(Grouper.params(params, cuser))
+    if @grouper.update(Grouper.params(params, cuser))
       flash[:notice] = t(:groups_user_update)
     else
       flash[:error] = @grouper.errors.full_messages.to_s

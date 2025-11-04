@@ -23,7 +23,7 @@ class GatherersController < ApplicationController
     @gatherer = Gatherer.find params[:gatherer][:id]
     raise AccessError unless @gatherer.can_update?(cuser, Gatherer.params(params, cuser))
 
-    if @gatherer.update_attributes(Gatherer.params(params, cuser))
+    if @gatherer.update(Gatherer.params(params, cuser))
       flash[:notice] = t(:gatherers_update)
     else
       flash[:error] = @gatherer.errors.full_messages.to_s

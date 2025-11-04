@@ -47,7 +47,7 @@ class DataFilesController < ApplicationController
 
   def update
     raise AccessError unless @file.can_update? cuser
-    if @file.update_attributes(DataFile.params(params, cuser))
+    if @file.update(DataFile.params(params, cuser))
       flash[:notice] = t(:files_update)
       redirect_to(@file)
     else

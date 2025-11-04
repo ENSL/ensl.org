@@ -44,7 +44,7 @@ class ForumsController < ApplicationController
 
   def update
     raise AccessError unless @forum.can_update? cuser
-    if @forum.update_attributes(Forum.params(params, cuser))
+    if @forum.update(Forum.params(params, cuser))
       flash[:notice] = t(:forums_update)
       redirect_to(@forum)
     else

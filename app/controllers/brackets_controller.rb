@@ -20,7 +20,7 @@ class BracketsController < ApplicationController
   def update
     raise AccessError unless @bracket.can_update? cuser
 
-    if @bracket.update_attributes(Bracket.params(params, cuser)) and @bracket.update_cells(params.permit(:cell))
+    if @bracket.update(Bracket.params(params, cuser)) and @bracket.update_cells(params.permit(:cell))
       flash[:notice] = t(:brackets_update)
     end
 

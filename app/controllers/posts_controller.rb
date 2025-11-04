@@ -36,7 +36,7 @@ class PostsController < ApplicationController
 
   def update
     raise AccessError unless @post.can_update? cuser, params[:post]
-    if @post.update_attributes(Post.params(params, cuser))
+    if @post.update(Post.params(params, cuser))
       flash[:notice] = t(:posts_update)
       redirect_to @post.topic
     else

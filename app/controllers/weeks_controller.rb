@@ -26,7 +26,7 @@ class WeeksController < ApplicationController
   def update
     raise AccessError unless @week.can_update? cuser
 
-    if @week.update_attributes(Week.params(params, cuser))
+    if @week.update(Week.params(params, cuser))
       flash[:notice] = t(:weeks_update)
       redirect_to @week.contest
     else

@@ -47,7 +47,7 @@ class ChallengesController < ApplicationController
       @challenge.status = Challenge::STATUS_DECLINED
     end
 
-    if @challenge.update_attributes(Challenge.params(params, cuser))
+    if @challenge.update(Challenge.params(params, cuser))
       flash[:notice] = t(:challenges_update)
     end
 

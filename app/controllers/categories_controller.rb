@@ -38,7 +38,7 @@ class CategoriesController < ApplicationController
 
   def update
     raise AccessError unless @category.can_update? cuser
-    if @category.update_attributes Category.params(params, cuser)
+    if @category.update Category.params(params, cuser)
       flash[:notice] = t(:articles_category_update)
       redirect_to :categories
     end
