@@ -7,7 +7,7 @@ source 'http://rubygems.org'
 ruby '3.2.5'
 
 # Rails core
-gem 'rails', '~> 6.0.5'
+gem 'rails', '~> 6.1'
 gem 'rake'
 
 # Dotenv
@@ -59,7 +59,7 @@ gem 'will_paginate'
 gem 'active_link_to'
 gem 'country_select'
 # , require: 'country_select_without_sort_alphabetical'
-gem 'i18n_country_select'
+# gem 'i18n_country_select'
 gem 'dynamic_form'
 
 # Views
