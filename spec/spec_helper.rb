@@ -24,7 +24,7 @@ Capybara.javascript_driver = :selenium_headless
 Capybara.default_max_wait_time = 1
 
 RSpec.configure do |c|
-  c.example_status_persistence_file_path = "examples.txt"
+  c.example_status_persistence_file_path = "tmp/testrun.txt"
 end
 
 # require "capybara/poltergeist"
