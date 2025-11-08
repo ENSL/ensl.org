@@ -10,15 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_04_211931) do
-
+ActiveRecord::Schema[7.2].define(version: 2025_11_04_221842) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.integer "version"
     t.string "title"
     t.text "text", size: :medium
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.text "text_parsed", size: :medium
     t.integer "text_coding", default: 0, null: false
     t.index ["article_id"], name: "index_article_versions_on_article_id"
@@ -30,8 +29,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "category_id"
     t.text "text", size: :medium
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "version"
     t.text "text_parsed", size: :medium
     t.integer "text_coding", default: 0, null: false
@@ -46,10 +45,10 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "user_id"
     t.string "addr"
     t.integer "server_id"
-    t.datetime "expiry"
+    t.datetime "expiry", precision: nil
     t.string "reason"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "ban_type"
     t.string "ip"
     t.integer "creator_id"
@@ -64,8 +63,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "row"
     t.integer "match_id"
     t.integer "team_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["match_id"], name: "index_bracketers_on_match_id"
     t.index ["team_id"], name: "index_bracketers_on_team_id"
   end
@@ -73,8 +72,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "brackets", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
     t.integer "contest_id"
     t.integer "slots"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "name"
     t.index ["contest_id"], name: "index_brackets_on_contest_id"
   end
@@ -82,8 +81,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "categories", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "name"
     t.integer "sort"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "domain"
     t.index ["domain"], name: "index_categories_on_domain"
     t.index ["sort"], name: "index_categories_on_sort"
@@ -92,15 +91,15 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "challenges", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "contester1_id"
     t.integer "contester2_id"
-    t.datetime "match_time"
-    t.datetime "default_time"
+    t.datetime "match_time", precision: nil
+    t.datetime "default_time", precision: nil
     t.boolean "mandatory"
     t.integer "server_id"
     t.integer "user_id"
     t.string "details"
     t.string "response"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "map1_id"
     t.string "map2_id"
     t.integer "status", default: 0, null: false
@@ -117,8 +116,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "user_id"
     t.string "commentable_type"
     t.integer "commentable_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.text "text_parsed"
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
     t.index ["commentable_type", "id"], name: "index_comments_on_commentable_type_and_id"
@@ -128,8 +127,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
 
   create_table "contesters", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "team_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "score", default: 0, null: false
     t.integer "win", default: 0, null: false
     t.integer "loss", default: 0, null: false
@@ -144,11 +143,11 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
 
   create_table "contests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "name"
-    t.datetime "start"
-    t.datetime "end"
+    t.datetime "start", precision: nil
+    t.datetime "end", precision: nil
     t.integer "status"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.time "default_time"
     t.integer "contest_type", default: 0, null: false
     t.integer "winner_id"
@@ -176,8 +175,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "custom_urls", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
     t.string "name"
     t.integer "article_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["article_id"], name: "index_custom_urls_on_article_id"
     t.index ["name"], name: "index_custom_urls_on_name"
   end
@@ -188,8 +187,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "path"
     t.integer "size", null: false
     t.string "md5"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "directory_id"
     t.integer "related_id"
     t.integer "article_id"
@@ -202,8 +201,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "name"
     t.string "description"
     t.string "path"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "parent_id"
     t.boolean "hidden", default: false, null: false
     t.string "title"
@@ -214,8 +213,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "forum_id"
     t.integer "group_id"
     t.integer "access"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["forum_id"], name: "index_forumers_on_forum_id"
     t.index ["group_id"], name: "index_forumers_on_group_id"
   end
@@ -224,8 +223,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "title"
     t.string "description"
     t.integer "category_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "position"
     t.index ["category_id"], name: "index_forums_on_category_id"
   end
@@ -242,16 +241,16 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "gather_id"
     t.integer "server_id"
     t.integer "votes"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
   end
 
   create_table "gatherers", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
     t.integer "user_id"
     t.integer "gather_id"
     t.integer "team"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "votes", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.index ["gather_id"], name: "index_gatherers_on_gather_id"
@@ -266,11 +265,11 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "map1_id"
     t.integer "map2_id"
     t.integer "server_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "turn"
-    t.datetime "lastpick1"
-    t.datetime "lastpick2"
+    t.datetime "lastpick1", precision: nil
+    t.datetime "lastpick2", precision: nil
     t.integer "votes", default: 0, null: false
     t.integer "category_id"
     t.index ["captain1_id"], name: "index_gathers_on_captain1_id"
@@ -289,16 +288,16 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "group_id"
     t.integer "user_id"
     t.string "task"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["group_id"], name: "index_groupers_on_group_id"
     t.index ["user_id"], name: "index_groupers_on_user_id"
   end
 
   create_table "groups", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "founder_id"
     t.index ["founder_id"], name: "index_groups_on_founder_id"
   end
@@ -315,8 +314,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "category_id"
     t.text "text"
     t.integer "author_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.text "solution"
     t.text "text_parsed"
     t.index ["assigned_id"], name: "index_issues_on_assigned_id"
@@ -327,8 +326,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "locks", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
     t.integer "lockable_id"
     t.string "lockable_type", collation: "utf8mb3_general_ci"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["lockable_id", "lockable_type"], name: "index_locks_on_lockable_id_and_lockable_type"
   end
 
@@ -336,8 +335,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "name"
     t.string "description"
     t.integer "team"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
   end
 
   create_table "log_files", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
@@ -345,7 +344,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "md5"
     t.integer "size"
     t.integer "server_id"
-    t.datetime "updated_at"
+    t.datetime "updated_at", precision: nil
     t.index ["server_id"], name: "index_log_files_on_server_id"
   end
 
@@ -353,7 +352,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "server_id"
     t.text "text"
     t.integer "domain"
-    t.datetime "created_at"
+    t.datetime "created_at", precision: nil
     t.integer "round_id"
     t.string "details"
     t.integer "actor_id"
@@ -373,8 +372,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "maps", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "name"
     t.string "download"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.boolean "deleted", default: false, null: false
     t.string "picture"
     t.integer "category_id"
@@ -383,7 +382,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "match_proposals", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
     t.integer "match_id"
     t.integer "team_id"
-    t.datetime "proposed_time"
+    t.datetime "proposed_time", precision: nil
     t.integer "status"
     t.index ["status"], name: "index_match_proposals_on_status"
   end
@@ -392,8 +391,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "match_id", null: false
     t.integer "user_id", null: false
     t.integer "contester_id", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.boolean "merc", null: false
     t.index ["contester_id"], name: "index_matchers_on_contester_id"
     t.index ["match_id"], name: "index_matchers_on_match_id"
@@ -405,12 +404,12 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "contester2_id"
     t.integer "score1"
     t.integer "score2"
-    t.datetime "match_time"
+    t.datetime "match_time", precision: nil
     t.integer "challenge_id"
     t.integer "contest_id"
     t.text "report", collation: "utf8mb3_swedish_ci"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "map1_id"
     t.integer "map2_id"
     t.integer "server_id"
@@ -447,8 +446,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "recipient_id"
     t.string "title"
     t.text "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.text "text_parsed"
     t.index ["recipient_id", "recipient_type"], name: "index_messages_on_recipient_id_and_recipient_type"
     t.index ["sender_id", "sender_type"], name: "index_messages_on_sender_id_and_sender_type"
@@ -460,8 +459,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "format"
     t.integer "user_id"
     t.integer "file_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "picture"
     t.integer "preview_id"
     t.integer "length"
@@ -478,8 +477,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "options", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "option"
     t.integer "poll_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "votes", default: 0, null: false
     t.index ["poll_id"], name: "index_options_on_poll_id"
   end
@@ -487,9 +486,9 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "pcws", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
     t.integer "team_id"
     t.integer "user_id"
-    t.datetime "match_time"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "match_time", precision: nil
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["match_time"], name: "index_pcws_on_match_time"
     t.index ["team_id"], name: "index_pcws_on_team_id"
     t.index ["user_id"], name: "index_pcws_on_user_id"
@@ -497,10 +496,10 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
 
   create_table "polls", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "question"
-    t.datetime "end_date"
+    t.datetime "end_date", precision: nil
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "votes", default: 0, null: false
     t.index ["user_id"], name: "index_polls_on_user_id"
   end
@@ -509,8 +508,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.text "text"
     t.integer "topic_id"
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.text "text_parsed"
     t.index ["topic_id"], name: "index_posts_on_topic_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
@@ -521,8 +520,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "user_id"
     t.integer "score1"
     t.integer "score2"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "result"
     t.index ["match_id"], name: "index_predictions_on_match_id"
     t.index ["user_id"], name: "index_predictions_on_user_id"
@@ -563,7 +562,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "head_phones"
     t.string "speakers"
     t.text "achievements"
-    t.datetime "updated_at"
+    t.datetime "updated_at", precision: nil
     t.string "signature"
     t.string "avatar"
     t.string "clan_search"
@@ -592,8 +591,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "rate_id"
     t.integer "rateable_id"
     t.string "rateable_type", limit: 32
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["rate_id"], name: "index_ratings_on_rate_id"
     t.index ["rateable_id", "rateable_type"], name: "index_ratings_on_rateable_id_and_rateable_type"
   end
@@ -603,7 +602,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "readable_id"
     t.string "reader_type", null: false
     t.integer "reader_id"
-    t.datetime "timestamp"
+    t.datetime "timestamp", precision: nil
     t.index ["readable_type", "readable_id"], name: "index_read_marks_on_readable_type_and_readable_id"
     t.index ["reader_id", "reader_type", "readable_type", "readable_id"], name: "read_marks_reader_readable_index", unique: true
     t.index ["reader_type", "reader_id"], name: "index_read_marks_on_reader_type_and_reader_id"
@@ -613,8 +612,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "readable_type"
     t.integer "readable_id"
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["readable_type", "readable_id"], name: "index_readings_on_readable_type_and_readable_id"
     t.index ["user_id", "readable_id", "readable_type"], name: "index_readings_on_user_id_and_readable_id_and_readable_type"
     t.index ["user_id"], name: "index_readings_on_user_id"
@@ -637,8 +636,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
 
   create_table "rounds", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
     t.integer "server_id"
-    t.datetime "start"
-    t.datetime "end"
+    t.datetime "start", precision: nil
+    t.datetime "end", precision: nil
     t.integer "winner"
     t.integer "match_id"
     t.integer "commander_id"
@@ -657,8 +656,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "server_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "server_id"
     t.integer "version"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "map"
     t.integer "players"
     t.integer "max_players"
@@ -677,8 +676,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "irc"
     t.integer "user_id"
     t.boolean "official"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "map"
     t.integer "players"
     t.integer "max_players"
@@ -687,7 +686,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "domain", default: 0, null: false
     t.string "reservation"
     t.string "recording"
-    t.datetime "idle"
+    t.datetime "idle", precision: nil
     t.integer "default_id"
     t.boolean "active", default: true, null: false
     t.string "recordable_type"
@@ -701,8 +700,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "sessions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data", size: :long
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["session_id"], name: "index_sessions_on_session_id"
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
@@ -710,8 +709,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "shoutmsg_archive", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "shoutable_type"
     t.integer "shoutable_id"
     t.index ["shoutable_type", "shoutable_id"], name: "index_shoutmsgs_on_shoutable_type_and_shoutable_id"
@@ -721,8 +720,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
   create_table "shoutmsgs", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "text"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "shoutable_type"
     t.integer "shoutable_id"
     t.index ["shoutable_type", "shoutable_id"], name: "index_shoutmsgs_on_shoutable_type_and_shoutable_id"
@@ -733,8 +732,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "name"
     t.string "url"
     t.integer "category_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "favicon"
     t.index ["category_id"], name: "index_sites_on_category_id"
     t.index ["created_at"], name: "index_sites_on_created_at"
@@ -745,8 +744,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "user_id", null: false
     t.string "comment"
     t.integer "rank", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["team_id"], name: "index_teamers_on_team_id"
     t.index ["user_id"], name: "index_teamers_on_user_id"
   end
@@ -758,8 +757,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "tag"
     t.string "country"
     t.string "comment"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "logo"
     t.integer "founder_id"
     t.boolean "active", default: true, null: false
@@ -772,8 +771,8 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "title"
     t.integer "user_id"
     t.integer "forum_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.integer "state", default: 0, null: false
     t.index ["forum_id"], name: "index_topics_on_forum_id"
     t.index ["user_id"], name: "index_topics_on_user_id"
@@ -785,7 +784,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "steamid"
     t.string "username"
     t.string "lastip"
-    t.datetime "updated_at"
+    t.datetime "updated_at", precision: nil
     t.index ["steamid"], name: "index_user_versions_on_steamid"
     t.index ["user_id"], name: "index_user_versions_on_user_id"
   end
@@ -798,9 +797,9 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "email"
     t.string "steamid"
     t.integer "team_id"
-    t.datetime "lastvisit"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "lastvisit", precision: nil
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "lastip"
     t.string "country"
     t.date "birthdate"
@@ -818,7 +817,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.string "event", null: false
     t.string "whodunnit"
     t.text "object"
-    t.datetime "created_at"
+    t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
@@ -844,7 +843,7 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "user_id"
     t.integer "movie_id"
     t.boolean "banned", default: false, null: false
-    t.datetime "updated_at"
+    t.datetime "updated_at", precision: nil
     t.index ["movie_id"], name: "index_watchers_on_movie_id"
     t.index ["user_id"], name: "index_watchers_on_user_id"
   end
@@ -855,11 +854,10 @@ ActiveRecord::Schema.define(version: 2025_11_04_211931) do
     t.integer "contest_id"
     t.integer "map1_id"
     t.integer "map2_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["contest_id"], name: "index_weeks_on_contest_id"
     t.index ["map1_id"], name: "index_weeks_on_map1_id"
     t.index ["map2_id"], name: "index_weeks_on_map2_id"
   end
-
 end

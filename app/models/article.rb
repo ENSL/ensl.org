@@ -76,7 +76,7 @@ class Article < ActiveRecord::Base
   before_save :format_text
   after_save :send_notifications
 
-  has_view_count
+  # has_view_count
   acts_as_readable
   acts_as_versioned
 

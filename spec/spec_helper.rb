@@ -12,7 +12,7 @@ require "simplecov"
 # require 'capybara/apparition'
 
 # CodeClimate::TestReporter.start
-SimpleCov.start "rails"
+# SimpleCov.start "rails"
 
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"

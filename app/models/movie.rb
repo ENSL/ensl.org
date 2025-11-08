@@ -59,6 +59,7 @@ class Movie < ActiveRecord::Base
   has_many :shoutmsgs, :as => :shoutable
   has_many :watchers
   has_many :watcher_users, :through => :watchers, :source => :user
+  has_many :view_counts, :as => :viewable, :dependent => :destroy
 
   validates_length_of [:content, :format], :maximum => 100, :allow_blank => true
   validates_inclusion_of :length, :in => 0..50000, :allow_blank => true, :allow_nil => true
@@ -66,7 +67,7 @@ class Movie < ActiveRecord::Base
 
   mount_uploader :picture, MovieUploader
 
-  has_view_count
+  # has_view_count
   acts_as_readable
 
   def to_s
@@ -89,6 +90,10 @@ class Movie < ActiveRecord::Base
 
   def all_files
     file ? ([file] + file.related_files) : []
+  end
+
+  def view_count
+    view_counts.length
   end
 
   def before_validation

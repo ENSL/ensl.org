@@ -44,5 +44,6 @@ class GoogleCalendar
   end 
 end
 rescue LoadError
-  # Skip Google Calendar functionality if gem not available
+  class GoogleCalendar
+  end
 end
