@@ -1,22 +1,22 @@
 module Api
   module V1
     class UsersCollection < Collection
-      # Accept an optional AR relation for easier testing
       def initialize(relation = User.all)
         @relation = relation
       end
 
-      # Return an array of users (simple behavior for specs)
+      # Execute the Arel query and return rows (arrays)
       def execute_query
-        @relation.to_a
+        ActiveRecord::Base.connection.select_rows(arel_query.to_sql)
       end
 
+      # Return Ruby hash (not a JSON string)
       def data
-        { users: execute_query }
+        { users: map_query }
       end
 
       def self.as_json
-        new.data.to_json
+        new.data
       end
 
       private
@@ -30,28 +30,26 @@ module Api
       end
 
       def joins
-        [
-          users_table[:team_id].eq(teams_table[:id])
-        ]
+        [users_table[:team_id].eq(teams_table[:id])]
       end
 
       def columns
         [
-          users_table[:username],
-          users_table[:steamid],
-          teams_table[:name],
-          teams_table[:tag],
-          teams_table[:logo],
-          users_table[:id]
+          users_table[:username],  # 0
+          users_table[:steamid],   # 1
+          teams_table[:name],      # 2
+          teams_table[:tag],       # 3
+          teams_table[:logo],      # 4
+          users_table[:id]         # 5
         ]
       end
 
       def arel_query
         users_table
-        .project(columns)
-        .join(teams_table, Arel::Nodes::OuterJoin)
-        .on(joins)
-        .order(users_table[:id])
+          .project(columns)
+          .join(teams_table, Arel::Nodes::OuterJoin)
+          .on(joins)
+          .order(users_table[:id])
       end
 
       def map_query
@@ -62,7 +60,7 @@ module Api
             steamid: row[1],
             team: {
               name: row[2],
-              tag: row[3],
+              tag:  row[3],
               logo: row[4]
             }
           }
