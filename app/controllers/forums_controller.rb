@@ -11,11 +11,13 @@ class ForumsController < ApplicationController
     raise AccessError unless @forum.can_show? cuser
 
     @topics = Topic.where(forum_id: @forum.id)
-    .joins(posts: :user)
-    .includes(:lock)
-    .group('topics.id')
-    .order('state DESC, (SELECT created_at FROM posts p2 WHERE p2.topic_id = topics.id ORDER BY created_at DESC LIMIT 1) DESC')
-    .paginate(page: params[:page], per_page: 30)
+      .joins(posts: :user)          # INNER JOIN (same as before)
+      .includes(:lock)
+      .select('topics.*, MAX(posts.created_at) AS last_post_at')
+      .group('topics.id')
+      .order(state: :desc)
+      .order(Arel.sql('last_post_at DESC'))
+      .paginate(page: params[:page], per_page: 30)
 
     @forum.mark_as_read! for: cuser if cuser
     @nobody = true

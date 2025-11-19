@@ -37,6 +37,13 @@ class Topic < ActiveRecord::Base
 
   scope :basic, -> { includes([:latest, { forum: :forumer }, :user]) }
   scope :ordered, -> { order("state DESC, posts.id DESC") }
+  scope :ordered_by_state_and_last_post, -> {
+    left_outer_joins(:posts)
+      .select('topics.*, MAX(posts.created_at) AS last_post_at')
+      .group('topics.id')
+      .order(state: :desc)
+      .order(Arel.sql('last_post_at DESC'))
+  }
 
   validates_presence_of :user_id, :forum_id
   validates_length_of :title, :in => 1..50

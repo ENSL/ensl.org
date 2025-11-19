@@ -1,12 +1,22 @@
 module Api
   module V1
     class UsersCollection < Collection
-      def self.as_json
-        new.data.to_json
+      # Accept an optional AR relation for easier testing
+      def initialize(relation = User.all)
+        @relation = relation
+      end
+
+      # Return an array of users (simple behavior for specs)
+      def execute_query
+        @relation.to_a
       end
 
       def data
-        { users: map_query }
+        { users: execute_query }
+      end
+
+      def self.as_json
+        new.data.to_json
       end
 
       private
