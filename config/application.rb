@@ -8,7 +8,8 @@ ENV["APP_SECRET_KEY_BASE"] ||= SecureRandom.alphanumeric(32)
 
 require 'rails/all'
 
-# Bundler.require(*Rails.groups(assets: %w(development test)))
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 # FIXME
@@ -32,7 +33,7 @@ module Ensl
     config.require_master_key = false 
 
     # Load Rails 5
-    # config.load_defaults 5.0
+    config.load_defaults 5.0
 
     # Additional assets
     config.assets.precompile += ["themes/*/theme.css", "themes/*/errors.css"]

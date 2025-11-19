@@ -7,7 +7,7 @@ source 'http://rubygems.org'
 ruby '3.2.5'
 
 # Rails core
-gem 'rails', '~> 7.0'
+gem 'rails', '~> 7.1'
 gem 'rake'
 
 # Dotenv
