@@ -7,7 +7,7 @@ source 'http://rubygems.org'
 ruby '3.2.5'
 
 # Rails core
-gem 'rails', '~> 7.1'
+gem 'rails', '~> 8.1.1'
 gem 'rake'
 
 # Dotenv
@@ -92,8 +92,8 @@ gem "net-http"
 gem 'bundle-audit'
 
 # https://github.com/DatabaseCleaner/database_cleaner/issues/299
-gem 'mongoid-tree'
-gem 'database_cleaner', git: 'https://github.com/DatabaseCleaner/database_cleaner.git'
+#gem 'mongoid-tree'
+gem 'database_cleaner'
 
 
 group :production do
