@@ -69,6 +69,7 @@ ext/nginx.conf.d/default.conf
 .vscode/
 .rakeTasks
 .generators
+.devcontainer
 
 # OS X
 .DS_Store

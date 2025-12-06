@@ -14,23 +14,23 @@ gem 'rake'
 gem 'dotenv-rails'
 
 # DB
-gem 'mysql2'
-gem 'dalli'
 gem 'connection_pool' # Needed for MT
+gem 'dalli'
+gem 'mysql2'
 
 # Web server
 gem 'faraday'
-gem 'puma'
 gem 'os'
+gem 'puma'
 # gem 'unicorn'
 
 # API
 gem 'rack-cors'
 
 # Model plugins
-gem 'unread'
-gem 'scrypt'
 gem 'active_flag'
+gem 'scrypt'
+gem 'unread'
 # gem 'impressionist
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
@@ -41,23 +41,23 @@ gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 
 # Auth
 gem 'omniauth'
-gem 'omniauth-steam'
 gem 'omniauth-rails_csrf_protection'
+gem 'omniauth-steam'
 # FIXME
 # gem 'rails_csrf_protection'
 
 # View and model helper gems
-gem 'time_difference'
-gem 'public_suffix'
-gem 'carrierwave'
+gem 'active_link_to'
 gem 'bbcoder'
 gem 'bluecloth'
-gem 'nokogiri'
-gem 'sanitize'
-gem 'rmagick'
-gem 'will_paginate'
-gem 'active_link_to'
+gem 'carrierwave'
 gem 'country_select'
+gem 'nokogiri'
+gem 'public_suffix'
+gem 'rmagick'
+gem 'sanitize'
+gem 'time_difference'
+gem 'will_paginate'
 # , require: 'country_select_without_sort_alphabetical'
 # gem 'i18n_country_select'
 gem 'dynamic_form'
@@ -67,34 +67,33 @@ gem 'haml'
 
 # Javascript
 gem 'coffee-rails'
+gem 'i18n-js'
 gem 'jquery-rails'
 gem 'tinymce-rails'
-gem 'i18n-js'
 gem 'uglifier'
 
 # CSS
-gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
-gem 'bourbon','~> 3.1.8' # Upgrading will cause issues
-gem 'neat', '~> 1.6.0' # Upgrading will cause issues
+gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues
 gem 'font-awesome-sass', '~> 4.1.0.0' # Fix icons before updating
+gem 'neat', '~> 1.6.0' # Upgrading will cause issues
+gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
 
 # FIXME: Legacy feature shims
+gem 'active_record_union'
 gem 'rails_autolink'
 gem 'responders'
-gem 'active_record_union'
 
 # FIXME: Dependency version fix
 gem 'signet', '0.11.0'
 
 # FIXME: Fix for warning: https://github.com/ruby/net-imap/issues/16
-gem "net-http"
+gem 'net-http'
 
 gem 'bundle-audit'
 
 # https://github.com/DatabaseCleaner/database_cleaner/issues/299
-#gem 'mongoid-tree'
+# gem 'mongoid-tree'
 gem 'database_cleaner'
-
 
 group :production do
   gem 'newrelic_rpm'
@@ -127,7 +126,7 @@ group :test do
 
   # Feature testing
   gem 'capybara'
-#   gem 'poltergeist'
+  #   gem 'poltergeist'
   gem 'apparition'
   # gem 'phantomjs', require: 'phantomjs/poltergeist'
   gem 'selenium'
@@ -155,20 +154,26 @@ group :test do
   gem 'redis-namespace'
 
   # For circle ci + CC
-  gem 'rspec_junit_formatter'
   gem 'codeclimate-test-reporter', require: nil
+  gem 'rspec_junit_formatter'
 end
 
 group :development, :test do
+  # Debugging
+  gem 'rdbg'
+
+  gem 'pry-byebug'
+  gem 'pry-rails'
+
+  gem 'awesome_print'
+  gem 'rails_best_practices'
+
+  # gem 'spring'
   # gem 'ruby-debug-ide'
   # gem 'debase'
-  gem 'pry-rails'
-  gem 'pry-byebug'
-  # gem 'spring'
-  gem "rails_best_practices"
-  gem 'awesome_print'
+
   # For n+1 uqeries
   # gem 'bullet'
 
-  gem "erb2haml"
+  gem 'erb2haml'
 end
