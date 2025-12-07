@@ -1,24 +1,22 @@
 class UsersController < ApplicationController
-  before_action :get_user, only: [:show, :history, :popup, :agenda, :edit, :update, :destroy]
+  before_action :get_user, only: %i[show history popup agenda edit update destroy]
   respond_to :html, :js
 
-  PAGES = ["general", "favorites", "computer", "articles", "movies", "teams", "matches", "predictions", "comments"]
+  PAGES = %w[general favorites computer articles movies teams matches predictions comments]
 
   def index
     search = params[:search]
-    if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser&.admin?
-      @users = User.where(lastip: $1).paginate(per_page: 40, page: params[:page])
-    else
-      if params[:filter] == 'lately'
-        @users = User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
-      else
-        @users = User.search(params[:search]).paginate(per_page: 40, page: params[:page])
-      end
-    end
+    @users = if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser&.admin?
+               User.where(lastip: ::Regexp.last_match(1)).paginate(per_page: 40, page: params[:page])
+             elsif params[:filter] == 'lately'
+               User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
+             else
+               User.search(params[:search]).paginate(per_page: 40, page: params[:page])
+             end
   end
 
   def show
-    @page = "general"
+    @page = 'general'
     respond_to do |format|
       format.js do
         @page = params[:page] if PAGES.include?(params[:page])
@@ -34,6 +32,7 @@ class UsersController < ApplicationController
 
   def agenda
     raise AccessError unless @user == cuser or cuser&.admin?
+
     @teamer = Teamer.new
     @teamer.user = @user
   end
@@ -44,7 +43,11 @@ class UsersController < ApplicationController
 
   def new
     unless session[:cached_user]&.blank?
-      @user = User.new(JSON.parse(session[:cached_user])) rescue nil
+      @user = begin
+        User.new(JSON.parse(session[:cached_user]))
+      rescue StandardError
+        nil
+      end
       session.delete :cached_user
     end
     @user ||= User.new
@@ -59,7 +62,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(User.params(params, cuser, "create"))
+    @user = User.new(User.params(params, cuser, 'create'))
     @user.lastip = request.env['REMOTE_ADDR']
 
     raise AccessError unless @user.can_create? cuser
@@ -74,10 +77,13 @@ class UsersController < ApplicationController
   end
 
   def update
-    raise AccessError unless @user.can_update? cuser  
+    raise AccessError unless @user.can_update? cuser
+
+    print params.inspect
+
     # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update(User.params(params, cuser, "update"))
+    if @user.update(User.params(params, cuser, 'update'))
       flash[:notice] = t(:user_updated)
       redirect_back(fallback_location: user_path(@user))
     else
@@ -88,6 +94,7 @@ class UsersController < ApplicationController
 
   def destroy
     raise AccessError unless @user.can_destroy? cuser
+
     @user.destroy
     redirect_to users_url
   end
@@ -138,12 +145,12 @@ class UsersController < ApplicationController
   end
 
   def forgot
-    if request.post?
-      if (user1 = User.where(username: params[:username], email: params[:email]).first) && user1.send_new_password
-        flash[:notice] = t(:passwords_sent)
-      else
-        flash[:error] = t(:incorrect_information)
-      end
+    return unless request.post?
+
+    if (user1 = User.where(username: params[:username], email: params[:email]).first) && user1.send_new_password
+      flash[:notice] = t(:passwords_sent)
+    else
+      flash[:error] = t(:incorrect_information)
     end
   end
 
@@ -157,21 +164,21 @@ class UsersController < ApplicationController
     if user.banned? Ban::TYPE_SITE
       flash[:error] = t(:accounts_locked)
     else
-      flash[:notice] = "%s" % [t(:login_successful)]
+      flash[:notice] = format('%s', t(:login_successful))
       # FIXME: this doesn't work because model is saved before
       flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if user.password_hash_changed?
       if !session[:verified_steamid].blank? and \
-        user.steamid != session[:verified_steamid] and \
-        user.update_attribute(:steamid, session[:verified_steamid])
-          session[:return_to] = edit_user_path(user)
-          flash[:notice] << t(:users_steamid_update) % [user.steamid]
-          session.delete :verified_steamid
+         user.steamid != session[:verified_steamid] and \
+         user.update_attribute(:steamid, session[:verified_steamid])
+        session[:return_to] = edit_user_path(user)
+        flash[:notice] << format(t(:users_steamid_update), user.steamid)
+        session.delete :verified_steamid
       end
       save_session user
     end
   end
 
-  def save_session user
+  def save_session(user)
     session[:user] = user.id
     user.lastip = request.ip
     user.lastvisit = Time.now.utc

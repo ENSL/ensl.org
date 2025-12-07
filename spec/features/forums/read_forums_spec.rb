@@ -14,13 +14,13 @@ feature 'User reads forums', js: :true do
 
     it 'has forum header' do
       visit forums_path
-      expect(page).to have_selector("td.forum h5")
+      expect(page).to have_css('td.forum h5', wait: 5)
     end
 
     it 'has forum description' do
       skip
       visit forums_path
-      expect("td.forum").to have_content()
+      expect('td.forum').to have_content
     end
 
     # FIXME
@@ -34,6 +34,6 @@ feature 'User reads forums', js: :true do
   private
 
   def long_text(len = 10_000)
-    (0..len).map{ (0...8).map { (65 + rand(26)).chr }.join }.join(" ") # 90008
+    (0..len).map { (0...8).map { rand(65..90).chr }.join }.join(' ') # 90008
   end
 end
