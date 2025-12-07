@@ -8,18 +8,16 @@ class ApplicationController < ActionController::Base
   before_action :set_controller_and_action_names
 
   # Omniauth has its own CSRF
-  protect_from_forgery :except => [:callback]
+  protect_from_forgery except: [:callback]
 
   respond_to :html, :js
 
   def cuser
-    begin
-      @cuser ||= User.find(session[:user]) 
-    # Don't error if the user is missing.
-    rescue
-      session[:user] = nil
-      @cuser = nil
-    end
+    @cuser ||= User.find(session[:user])
+  # Don't error if the user is missing.
+  rescue StandardError
+    session[:user] = nil
+    @cuser = nil
   end
 
   def return_here
@@ -35,45 +33,42 @@ class ApplicationController < ActionController::Base
   def return_back
     if session[:return_to]
       return_to
-    elsif request.env["HTTP_REFERER"]
-      redirect_to request.env["HTTP_REFERER"]
+    elsif request.env['HTTP_REFERER']
+      redirect_to request.env['HTTP_REFERER']
     else
-      redirect_to "/"
+      redirect_to '/'
     end
-  rescue
-    redirect_to "/"
+  rescue StandardError
+    redirect_to '/'
   end
 
   def redirect_to_back
-    if request.env["HTTP_REFERER"]
-      redirect_to request.env["HTTP_REFERER"]
-    else
-      redirect_to "/"
-    end
-  rescue
-    redirect_to "/"
+    redirect_to request.env['HTTP_REFERER'] || '/'
+  rescue StandardError
+    redirect_to '/'
   end
 
   def redirect_to_home
-    redirect_to controller: "articles", action: "news_index"
+    redirect_to controller: 'articles', action: 'news_index'
   end
 
   unless Rails.env.production?
 
-    rescue_from AccessError do |exception|
-      render 'errors/403', status: 403, layout: 'errors'
+    rescue_from AccessError do |_exception|
+      render 'errors/403', status: :forbidden, layout: 'errors'
     end
 
     rescue_from Error do |exception|
-      render text: exception.message, layout: true, status: 500
+      render inline: exception.message.to_s, layout: true, status: :internal_server_error
     end
 
-    rescue_from ActiveRecord::StaleObjectError do |exception|
-      render text: t(:application_stale)
+    rescue_from ActiveRecord::StaleObjectError do |_exception|
+      render inline: t(:application_stale), status: :conflict
     end
 
-    rescue_from ActiveRecord::RecordNotFound do |exception|
-      render :template => 'errors/404.html', :status => :not_found, :layout => 'errors'
+    rescue_from ActiveRecord::RecordNotFound do |_exception|
+      # Correct template reference: 'errors/404' (not 'errors/404.html')
+      render 'errors/404', status: :not_found, layout: 'errors'
     end
   end
 
@@ -81,22 +76,22 @@ class ApplicationController < ActionController::Base
 
   # FIXME: move to model
   def update_user
-    if cuser
-      Time.zone = cuser.time_zone
-      cuser.update_attribute :lastvisit, Time.now.utc if cuser&.lastvisit < 2.minutes.ago.utc
+    return unless cuser
 
-      # FIXME: there is a bug in steam auth that causes nil profile
-      unless cuser.profile&.present?
-        flash[:notice] = "Your profile has been removed and recreated."
-        cuser.build_profile
-        cuser.save
-      end
+    Time.zone = cuser.time_zone
+    cuser.update_attribute :lastvisit, Time.now.utc if cuser&.lastvisit&.< 2.minutes.ago.utc
 
-      if cuser.banned? Ban::TYPE_SITE
-        session[:user] = nil
-        @cuser = nil
-      end
+    # FIXME: there is a bug in steam auth that causes nil profile
+    unless cuser.profile&.present?
+      flash[:notice] = 'Your profile has been removed and recreated.'
+      cuser.build_profile
+      cuser.save
     end
+
+    return unless cuser.banned? Ban::TYPE_SITE
+
+    session[:user] = nil
+    @cuser = nil
   end
 
   def set_controller_and_action_names

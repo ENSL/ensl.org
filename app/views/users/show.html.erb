@@ -41,7 +41,7 @@
 
   <% if cuser and @user.can_update? cuser %>
     <%= link_to 'Edit', edit_user_path(@user), class: 'button' %>
-    <%= link_to 'My Agenda', "/users/agenda/#{cuser.id}", class: 'button' %>
+    <%= link_to 'My Agenda', agenda_user_path(@user), class: 'button' %>
   <% end %>
   <% if cuser and cuser.admin? %>
     <%= link_to 'Show History', "/users/history/#{@user.id}", class: 'button' %>

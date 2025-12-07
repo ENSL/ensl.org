@@ -20,7 +20,7 @@
         <% end %>
       </li>
       <li>
-        <%= link_to "/users/agenda/#{cuser.id}" do %>
+        <%= link_to agenda_user_path(cuser) do %>
           Agenda <%= icon 'calendar' %>
         <% end %>
       </li>

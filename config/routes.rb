@@ -1,13 +1,11 @@
 Rails.application.routes.draw do
-  if Rails.env.production?
-    %w(403 404 422 500).each do |code|
-      get code, to: "errors#show", code: code
-    end
+  %w[403 404 422 500].each do |code|
+    get code, to: 'errors#show', code: code
   end
 
   namespace :api do
     namespace :v1 do
-      resources :users, only: [:show, :index]
+      resources :users, only: %i[show index]
       resources :teams, only: [:show]
       resources :servers, only: [:index]
       resources :maps, only: [:index]
@@ -15,50 +13,69 @@ Rails.application.routes.draw do
     end
   end
 
-  root to: "articles#news_index"
+  root to: 'articles#news_index'
 
   resources :articles do
     resources :versions
+    collection do
+      get :news_index, path: 'news' # /articles/news
+      get :news_archive, path: 'news/archive'
+      get :admin, path: 'news/admin'
+      get :cleanup, path: 'cleanup'
+    end
   end
 
-  get 'contests/del_map'
-  get 'contests/scores'
-  get 'contests/historical', to: "contests#historical"
-
   resources :contests do
-    get "current", on: :collection
+    collection do
+      get :current
+      get :del_map
+      get :scores
+      get :historical
+    end
+    member do
+      get :confirmed_matches, path: 'confirmedmatches'
+      get :recalc
+    end
   end
 
   resources :log_events
   resources :categories
   resources :options
-  resources :polls
-  resources :custom_urls, only: [:create, :update, :destroy]
+  resources :polls do
+    member do
+      get :showvotes, path: 'showvotes'
+    end
+  end
+  resources :custom_urls, only: %i[create update destroy]
+
   resources :brackets
 
   get 'comments/quote'
-
   resources :comments
   resources :shoutmsgs
-  resources :teamers
+  resources :teamers do
+    collection do
+      get :replace
+    end
+  end
   resources :teams
-  resources :gathers do |g|
+
+  resources :gathers do
     collection do
       get :refresh
+      get :latest, path: 'latest/:game'
     end
     member do
       post :pick
     end
   end
+  get 'gather', to: 'gathers#latest', game: 'ns2'
 
   resources :gatherers do
     member do
       post :status
     end
   end
-
-  get 'gathers/latest/:game', to: "gathers#latest"
-  get 'gather', to: "gathers#latest", game: "ns2"
 
   resources :groups
   resources :groupers
@@ -68,36 +85,49 @@ Rails.application.routes.draw do
 
   get 'forums/up'
   get 'forums/down'
-
   resources :forums
+
+  # Users: resourceful + extra member/collection actions
   resources :users do
     collection do
-      get 'forgot'
-      post 'forgot'
+      get :forgot
+      post :forgot
+      get  :recover
+      # simple session-style endpoints (non-REST) kept under users for legacy
+      post :login
+      post :logout
+      get  :login
+      get  :logout
+    end
+    member do
+      get :agenda
+      get :history
+      get :popup
     end
   end
+
+  # Legacy compatibility: allow /users/agenda/:id
+  get 'users/agenda/:id', to: 'users#agenda', as: :legacy_agenda_user
+
+  # OmniAuth callback
   post 'auth/:provider/callback', to: 'users#callback'
+
   resources :locks
   resources :contesters
 
-  get "contests/:id/confirmedmatches" => "contests#confirmed_matches", as: :confirmed_matches
-  resources :contests do
-    member do
-      get :recalc
-    end
-  end
   resources :challenges
   resources :servers
   resources :predictions
   resources :rounds
-  resources :matches do |m|
+
+  resources :matches do
     member do
       get :ref
     end
     collection do
       get :admin
     end
-    resources :match_proposals, path: "proposals", as: :proposals, only: [:index, :new, :create, :update]
+    resources :match_proposals, path: 'proposals', as: :proposals, only: %i[index new create update]
   end
 
   resources :maps
@@ -107,70 +137,56 @@ Rails.application.routes.draw do
     member do
       get :recreate
     end
+    collection do
+      # default directory landing
+      get :show, path: '', defaults: { id: 1 }
+    end
   end
-  resources :data_files
-  resources :predictions
+  resources :data_files do
+    collection do
+      get :admin
+      get :addFile
+      get :delFile
+      get :trash
+    end
+  end
+
   resources :weeks
-  resources :movies
+  resources :movies do
+    member do
+      get :preview
+      get :download
+      get :snapshot
+    end
+  end
+
   resources :messages
-  # resources :sites
+
   resources :bans
   resources :tweets
   resources :issues
-  resources :posts do |p|
-    get :quote
+
+  resources :posts do
+    member do
+      get :quote
+    end
   end
 
+  resources :votes, only: [:create]
+
+  # About pages
   get 'about/action'
   get 'about/staff'
   get 'about/adminpanel'
   get 'about/statistics'
 
-  get 'refresh', to: "application#refresh"
-  get 'search', to: "application#search"
+  # Utility
+  get 'refresh', to: 'application#refresh'
+  get 'search',  to: 'application#search'
 
-  get 'news', to: "articles#news_index"
-  get 'news/archive', to: "articles#news_archive"
-  get 'news/admin', to: "articles#admin"
-  get 'articles/cleanup'
+  # Plugin
+  get 'plugin/user', to: 'plugin#user'
 
-  get 'data_files/admin'
-  get 'data_files/addFile'
-  get 'data_files/delFile'
-  get 'data_files/trash'
-
-  get 'directories', to: "directories#show", id: 1
-
-  get 'groups/addUser'
-  get 'groups/delUser'
-
-  get 'movies/download'
-  get 'movies/preview'
-  get 'movies/snapshot'
-
-  get 'plugin/user'
-
-  get 'users/forgot'
-  get 'users/recover'
-  get 'users/agenda'
-  post 'users/logout'
-  post 'users/login'
-
-  get 'users/agenda'
-  get 'users/login'
-  get 'users/logout'
-  get 'users/popup'
-
-  get 'votes/create'
-  get "polls/showvotes/:id", to: "polls#showvotes", as: "polls_showvotes"
-
-  get "custom_urls", to: "custom_urls#administrate"
-  get ":name", to: "custom_urls#show", requirements: {name: /\A[a-z\-]{2,10}\Z/}
-
-  get ':controller/:action', requirements: { action: /A-Za-z/ }
-  get ':controller/:action/:id'
-  get ':controller/:action/:id.:format'
-  get ':controller/:action/:id/:id2'
-
-  get 'teamers/replace', to: 'teamers#replace', as: 'teamers_replace'
+  get 'custom_urls', to: 'custom_urls#administrate'
+  get ':name', to: 'custom_urls#show', requirements: { name: /\A[a-z-]{2,10}\Z/ }
 end

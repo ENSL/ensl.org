@@ -14,6 +14,7 @@ feature 'User reads forums', js: :true do
 
     it 'has forum header' do
       visit forums_path
+      # print(page.html)
       expect(page).to have_css('td.forum h5', wait: 5)
     end
 

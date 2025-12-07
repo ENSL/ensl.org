@@ -27,7 +27,7 @@
       <% if cuser and movie.can_update? cuser %>
         <div class="controls">
           <%= link_to 'Edit', edit_movie_path(movie), class: 'button tiny' %>
-          <%= link_to 'Make a Preview', { action: "preview", id: movie }, class: 'button tiny' %>
+          <%= link_to 'Make a Preview', preview_movie_path(movie), class: 'button tiny' %>
           <%= link_to 'Destroy', movie, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
         </div>
       <% end %>

@@ -4,7 +4,7 @@ require 'securerandom'
 
 # FIXME
 # Set random value for this
-ENV["APP_SECRET_KEY_BASE"] ||= SecureRandom.alphanumeric(32)
+ENV['APP_SECRET_KEY_BASE'] ||= SecureRandom.alphanumeric(32)
 
 require 'rails/all'
 
@@ -23,20 +23,19 @@ class ActionDispatch::Session::MyCustomStore < ActionDispatch::Session::CookieSt
   end
 end
 
-
 module Ensl
   class Application < Rails::Application
     # Custom error pages
-    config.exceptions_app = self.routes
+    config.exceptions_app = :routes
 
     # Secret key
-    config.require_master_key = false 
+    config.require_master_key = false
 
     # Load Rails 5
     config.load_defaults 5.0
 
     # Additional assets
-    config.assets.precompile += ["themes/*/theme.css", "themes/*/errors.css"]
+    config.assets.precompile += ['themes/*/theme.css', 'themes/*/errors.css']
     config.assets.initialize_on_precompile = false
 
     # Custom directories with classes and modules you want to be autoloadable.
@@ -47,7 +46,8 @@ module Ensl
     config.autoload_paths -= nested_service_dirs
     config.eager_load_paths -= nested_service_dirs
 
-    config.autoload_paths = (config.autoload_paths + [services_root, Rails.root.join('app','models','concerns').to_s]).uniq
+    config.autoload_paths = (config.autoload_paths + [services_root,
+                                                      Rails.root.join('app', 'models', 'concerns').to_s]).uniq
     config.eager_load_paths = (config.eager_load_paths + [services_root]).uniq
 
     # Be sure to restart your server when you modify this file.
@@ -56,12 +56,12 @@ module Ensl
                          domain: (Rails.env.production? ? '.ensl.org' : nil),
                          secure: Rails.env.production?,
                          same_site: :lax
-    
+
     # config.session_store :my_custom_store, key: '_ENSL_session_key'
     config.action_dispatch.cookies_serializer = :marshal
 
     # Load secrets from .env
-    ENV['APP_SECRET'] ||= (0...32).map { (65 + rand(26)).chr }.join
+    ENV['APP_SECRET'] ||= (0...32).map { rand(65..90).chr }.join
     config.secret_token = ENV['APP_SECRET']
 
     # Use a different cache store
@@ -75,14 +75,14 @@ module Ensl
     }
 
     # Use a different logger for distributed setups
-    config.logger = Logger.new(Rails.root.join("log", Rails.env + ".log" ), 5 , 10 * 1024 * 1024)
+    config.logger = Logger.new(Rails.root.join('log', Rails.env + '.log'), 5, 10 * 1024 * 1024)
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     config.time_zone = 'Amsterdam'
 
     # Configure the default encoding used in templates for Ruby 1.9.
-    config.encoding = "utf-8"
+    config.encoding = 'utf-8'
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]

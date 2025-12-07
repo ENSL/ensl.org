@@ -5,7 +5,7 @@
     <% @poll.options.all.each do |opt| %>
       <p class="option">
         <% if cuser and !@poll.voted?(cuser) %>
-          <%= link_to (h opt), controller: "votes", action: "create", vote: { votable_id: opt.id, votable_type: "Option" } %>
+          <%= link_to (h opt), votes_path(vote: { votable_id: opt.id, votable_type: "Option" }) %>
         <% else %>
           <%= opt.option %> <br />
         <% end %>
