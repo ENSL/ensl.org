@@ -9,10 +9,8 @@ FactoryBot.define do
 
     trait :with_content do
       after :create do |topic|
-        rand(1..15).times do
-          post = build :post, :with_content
-          post.topic = topic
-          post.save
+        rand(1..5).times do
+          create(:post, :with_content, topic: topic)
         end
       end
     end

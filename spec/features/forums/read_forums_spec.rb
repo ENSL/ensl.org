@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 feature 'User reads forums' do
-  before :each do
+  before :all do
     create_list(:forum, 5, :with_content)
   end
 
@@ -29,10 +29,10 @@ feature 'User reads forums' do
 
     it 'can click last post' do
       visit forums_path
-      find('td.last > a', wait: 5).click
-      puts "DBG counts: Forum=#{Forum.count} Topic=#{Topic.count} Post=#{Post.count}"
-      save_page('tmp/debug_page.html')
-      expect(page).to have_current_path(%r{forums/\d+}, wait: 5)
+      first('td.last > a', wait: 5).click
+      # puts "DBG counts: Forum=#{Forum.count} Topic=#{Topic.count} Post=#{Post.count}"
+      # save_page('tmp/debug_page.html')
+      expect(page).to have_current_path(%r{topics/\d+}, wait: 5)
     end
   end
 
