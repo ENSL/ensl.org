@@ -3,7 +3,7 @@
 # Policy here is to not to save version data unless its needed (eg. problems with new version)
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 ruby '3.2.5'
 
 # Rails core

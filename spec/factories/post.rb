@@ -3,9 +3,9 @@ FactoryBot.define do
     sequence(:text) { |n| "Post Body #{n}" }
     topic
     user
-    
+
     trait :with_content do
-      text { (0..100).map { (0...8).map { (65 + rand(26)).chr }.join }.join(" ") }
+      text { (0..7).map { (0...8).map { rand(65..90).chr }.join }.join(' ') }
     end
   end
 end

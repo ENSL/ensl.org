@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-feature 'User reads forums', js: :true do
-  before :all do
+feature 'User reads forums' do
+  before :each do
     create_list(:forum, 5, :with_content)
   end
 
@@ -12,23 +12,27 @@ feature 'User reads forums', js: :true do
       sign_in_as(user)
     end
 
+    it 'has forum data' do
+      expect(Forum.count).to be >= 5
+    end
+
     it 'has forum header' do
       visit forums_path
-      # print(page.html)
       expect(page).to have_css('td.forum h5', wait: 5)
     end
 
     it 'has forum description' do
-      skip
       visit forums_path
-      expect('td.forum').to have_content
+      el = first('td.forum', wait: 3)
+      expect(el).to have_text(/Forum Description/i)
     end
 
-    # FIXME
     it 'can click last post' do
-      skip
-      find('td.last>a').click
-      expect(response).to have_http_status(200)
+      visit forums_path
+      find('td.last > a', wait: 5).click
+      puts "DBG counts: Forum=#{Forum.count} Topic=#{Topic.count} Post=#{Post.count}"
+      save_page('tmp/debug_page.html')
+      expect(page).to have_current_path(%r{forums/\d+}, wait: 5)
     end
   end
 

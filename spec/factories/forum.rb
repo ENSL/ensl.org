@@ -10,7 +10,7 @@ FactoryBot.define do
 
     trait :with_content do
       after :create do |forum|
-        (rand(30..100)).times do
+        rand(5..20).times do
           topic = build :topic, :with_content
           topic.forum = forum
           topic.save
