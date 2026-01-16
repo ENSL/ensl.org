@@ -4,17 +4,14 @@
   <div class="contents">
     <h4>Server Votes</h4>
 
-    <ul class="votes">
+    <ul class="votes" id="server-votes">
       <% @gather.gather_servers.ordered.each do |server| %>
         <li>
           <span class="count">
             <%= if server.votes then server.votes else "0" end %>
           </span>
           <% if server.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to server,
-              controller: "votes", action: "create",
-              vote: { votable_id: server.id, votable_type: "GatherServer" },
-              method: "post" %>
+            <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), method: :post %>
             <% vote_servers = true else %>
             <%= server %>
           <% end %>        
@@ -33,15 +30,12 @@
   <div class="contents">
     <h4>Map Votes</h4>
 
-    <ul class="votes">
+    <ul class="votes" id="map-votes">
       <% @gather.gather_maps.ordered.each do |map| %>
         <li>
           <span><%= map.votes %></span>
           <% if map.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to shorten(map, 30),
-              controller: "votes", action: "create",
-              vote: { votable_id: map.id, votable_type: "GatherMap" },
-              method: "post" %>
+            <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), method: :post %>
             <% vote_maps = true %>
           <% else %>
             <%= shorten map, 30 %>
