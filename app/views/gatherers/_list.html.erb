@@ -6,7 +6,7 @@
 </h4>
 
 <%= form_tag pick_gather_path(@gather) do %>
-  <ul class="gatherers">
+  <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
       <li>
         <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
