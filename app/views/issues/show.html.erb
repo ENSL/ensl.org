@@ -5,11 +5,11 @@
   <%= cascade @issue, [:author, :assigned, :category, "status_s"] %>
 
   <h3>Issue details:</h3>
-  <p><%= @issue.text_parsed.html_safe %></p>
+  <p><%= sanitize(@issue.text_parsed) %></p>
 
   <% if @issue.solution and !@issue.solution.empty? %>
     <h3>Solution:</h3>
-    <p><%= @issue.solution_formatted.html_safe %></p>
+    <p><%= sanitize(@issue.solution_formatted) %></p>
   <% end %>
 
   <p>

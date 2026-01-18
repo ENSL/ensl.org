@@ -55,7 +55,7 @@
     </div>
 
     <div class="text">
-      <%= post.text_parsed.html_safe %>  
+      <%= sanitize(post.text_parsed) %>
     </div>
   </div>
 
@@ -65,7 +65,7 @@
     </div>
     
     <div class="signature">
-      <%= post.user.profile.signature_parsed.html_safe if post.user.profile.signature_parsed %>
+      <%= sanitize(post.user.profile.signature_parsed) if post.user.profile.signature_parsed %>
       
       <div class="controls">
         <% if post.topic.posts.build.can_create? cuser %>

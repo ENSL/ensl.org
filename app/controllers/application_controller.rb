@@ -27,29 +27,45 @@ class ApplicationController < ActionController::Base
   def return_to
     addr = session[:return_to]
     session[:return_to] = nil
-    redirect_to addr
+    safe_redirect_to(addr)
   end
 
   def return_back
     if session[:return_to]
       return_to
-    elsif request.env['HTTP_REFERER']
-      redirect_to request.env['HTTP_REFERER']
     else
-      redirect_to '/'
+      redirect_back fallback_location: '/'
     end
   rescue StandardError
     redirect_to '/'
   end
 
   def redirect_to_back
-    redirect_to request.env['HTTP_REFERER'] || '/'
+    redirect_back fallback_location: '/'
   rescue StandardError
     redirect_to '/'
   end
 
   def redirect_to_home
     redirect_to controller: 'articles', action: 'news_index'
+  end
+
+  # Safe redirect helper: only allow redirects to same-host or relative paths.
+  def safe_redirect_to(addr)
+    return redirect_to('/') unless addr.present?
+
+    begin
+      uri = URI.parse(addr)
+      # Allow relative URLs or same-host absolute URLs
+      if uri.host.nil? || uri.host == request.host
+        path = uri.request_uri
+        redirect_to path
+      else
+        redirect_to('/')
+      end
+    rescue StandardError
+      redirect_to('/')
+    end
   end
 
   unless Rails.env.production?

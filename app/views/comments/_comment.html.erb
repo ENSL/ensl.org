@@ -20,7 +20,7 @@
       <% end %>
     </div>
     <div class="comment-body">
-      <%= comment.text_parsed.html_safe %>  
+      <%= sanitize(comment.text_parsed) %>
     </div>
     <p class="comment-detail"><%= comment.created_at.strftime("%-d %B %Y, %H:%M") %></h2>
   </div>

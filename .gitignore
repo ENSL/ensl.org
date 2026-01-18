@@ -96,3 +96,6 @@ pickle-email-*.html
 
 # Debug files
 .byebug_history
+
+# Checklist
+CHECKLIST.md

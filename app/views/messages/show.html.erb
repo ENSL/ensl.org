@@ -8,7 +8,7 @@
         <%= namelink message %>
       </h3>
       <div class="content">
-        <%= raw message.text_parsed %>
+        <%= sanitize(message.text_parsed) %>
       </div>
       <p>Sent by: <% if message.sender_type == 'System' %>System<% else %><%= namelink message.sender %><% end %> on <%= shortdate message.created_at %></p>
       <p>

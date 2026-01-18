@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :get_post, except: [:new, :create]
+  before_action :get_post, except: %i[new create]
   respond_to :html, :js
   layout 'forums'
 
@@ -15,6 +15,7 @@ class PostsController < ApplicationController
 
   def edit
     raise AccessError unless @post.can_update? cuser
+
     render layout: 'forums'
   end
 
@@ -26,7 +27,7 @@ class PostsController < ApplicationController
     respond_to do |format|
       if @post.save
         flash[:notice] = t(:posts_create)
-        format.js  { render }
+        format.js { render }
         format.html { return_to }
       else
         format.html { render :new }
@@ -36,9 +37,10 @@ class PostsController < ApplicationController
 
   def update
     raise AccessError unless @post.can_update? cuser, params[:post]
+
     if @post.update(Post.params(params, cuser))
       flash[:notice] = t(:posts_update)
-      redirect_to @post.topic
+      safe_redirect_to(polymorphic_path(@post.topic))
     else
       render :edit
     end
@@ -46,22 +48,26 @@ class PostsController < ApplicationController
 
   def trash
     raise AccessError unless @post.can_destroy? cuser
+
     @post.trash
-    if @post.topic.exists?
-      redirect_to @post.topic
-    else
-      redirect_to @post.topic.forum
-    end
+    path = if @post.topic.exists?
+             polymorphic_path(@post.topic)
+           else
+             polymorphic_path(@post.topic.forum)
+           end
+    safe_redirect_to(path)
   end
 
   def destroy
     raise AccessError unless @post.can_destroy? cuser
+
     @post.destroy
-    if @post.topic.exists?
-      redirect_to @post.topic
-    else
-      redirect_to @post.topic.forum
-    end
+    path = if @post.topic.exists?
+             polymorphic_path(@post.topic)
+           else
+             polymorphic_path(@post.topic.forum)
+           end
+    safe_redirect_to(path)
   end
 
   private

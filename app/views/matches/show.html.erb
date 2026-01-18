@@ -113,7 +113,7 @@
   <% unless @match.report.nil? or @match.report.empty? %>
     <div class="report">
       <h3>Match Report</h3>
-      <p><%= @match.report.html_safe %></p>
+      <p><%= sanitize(@match.report) %></p>
     </div>
   <% end %>
   <% if cuser and (cuser.admin? or @match.user_in_match? cuser) %>
