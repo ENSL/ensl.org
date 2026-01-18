@@ -42,7 +42,8 @@
 */
 
 div#errors {
-  @extend .flash.error;
+  @extend .flash;
+  @extend .error;
   @include span-columns(12);
   margin-bottom: 20px;
 

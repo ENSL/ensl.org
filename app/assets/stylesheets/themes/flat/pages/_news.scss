@@ -20,7 +20,7 @@ div.article {
     margin-bottom: 40px;
 
     ul {
-      @extend ul.disc;
+      @extend ul, .disc;
     }
   }
 
