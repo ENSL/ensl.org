@@ -79,7 +79,9 @@ class UsersController < ApplicationController
   def update
     raise AccessError unless @user.can_update? cuser
 
-    print params.inspect
+    if defined?(Rails) && Rails.configuration.x.respond_to?(:debug_prints) && Rails.configuration.x.debug_prints
+      Rails.logger.debug(params.inspect)
+    end
 
     # FIXME: use permit
     params[:user].delete(:username) unless @user.can_change_name? cuser

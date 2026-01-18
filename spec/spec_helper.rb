@@ -24,8 +24,8 @@ require 'securerandom'
 
 ENV['CHROME_BIN'] = '/usr/lib/chromium/chromium'
 
-#Selenium::WebDriver.logger.level = :debug
-#Selenium::WebDriver.logger.output = 'tmp/selenium.log'
+# Selenium::WebDriver.logger.level = :debug
+# Selenium::WebDriver.logger.output = 'tmp/selenium.log'
 
 def chrome_service
   Selenium::WebDriver::Chrome::Service.new(
@@ -64,13 +64,17 @@ end
 
 Capybara.register_driver :selenium_chrome do |app|
   opts = build_chrome_options(headless: false)
-  puts "Chrome args: #{opts.args.inspect}"
+  if defined?(Rails) && Rails.configuration.x.respond_to?(:debug_prints) && Rails.configuration.x.debug_prints
+    puts "Chrome args: #{opts.args.inspect}"
+  end
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: opts, service: chrome_service)
 end
 
 Capybara.register_driver :selenium_chrome_headless do |app|
   opts = build_chrome_options(headless: true)
-  puts "Chrome args: #{opts.args.inspect}"
+  if defined?(Rails) && Rails.configuration.x.respond_to?(:debug_prints) && Rails.configuration.x.debug_prints
+    puts "Chrome args: #{opts.args.inspect}"
+  end
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: opts, service: chrome_service)
 end
 
