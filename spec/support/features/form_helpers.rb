@@ -6,9 +6,36 @@ module Features
       end
     end
 
-    def fill_tinymce(element = first, contents)
-      page.execute_script("tinymce.editors[0].setContent('#{contents}')")
-      # page.execute_script("tinymce.get('#{element}').setContent('#{contents}')")
+    def fill_tinymce(element, contents)
+      element_id = element.to_s
+      contents_js = contents.to_json
+
+      wait = Capybara.default_max_wait_time
+      start = Time.now
+
+      # Wait for TinyMCE to be available and set content on its editor
+      while Time.now - start < wait
+        begin
+          present = page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
+        rescue Selenium::WebDriver::Error::WebDriverError
+          present = false
+        end
+
+        if present
+          page.execute_script("tinymce.get(\"#{element_id}\").setContent(#{contents_js})")
+          return
+        end
+
+        sleep 0.1
+      end
+
+      # Fallback: set the underlying textarea (may be hidden)
+      if page.has_selector?("textarea##{element_id}", visible: :all)
+        page.find("textarea##{element_id}", visible: :all).set(contents)
+        return
+      end
+
+      raise "TinyMCE editor not available and textarea##{element_id} not found"
     end
 
     def submit(model, action)
