@@ -1,5 +1,5 @@
 # Load dev vars. These are loaded in application but puma needs them too.
-require "dotenv"
+require 'dotenv'
 require 'os'
 Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
@@ -17,9 +17,9 @@ app_dir = ENV['APP_PATH'] || '/var/www'
 
 # Set basic puma settings
 environment rails_env
-#if OS.posix?
+# if OS.posix?
 #  bind "unix://#{app_dir}/tmp/sockets/puma.#{rails_env}.sock"
-#end
+# end
 
 port Integer(ENV['PUMA_PORT'] || 4000)
 
@@ -33,24 +33,31 @@ pidfile "#{app_dir}/tmp/pids/puma.pid"
 state_path "#{app_dir}/tmp/puma.state"
 
 # FIXME: sometimes the app becomes super slow if workers are used, investigate
-workers Integer(ENV['PUMA_WORKERS']) if (ENV.has_key?("PUMA_WORKERS") && ENV['PUMA_WORKERS'].to_i > 0)
+workers Integer(ENV['PUMA_WORKERS']) if ENV.has_key?('PUMA_WORKERS') && ENV['PUMA_WORKERS'].to_i > 0
 worker_timeout Integer(ENV['PUMA_TIMEOUT'] || 30)
-threads Integer(ENV['PUMA_MIN_THREADS']  || 1), Integer(ENV['PUMA_MAX_THREADS'] || 16)
+threads Integer(ENV['PUMA_MIN_THREADS'] || 1), Integer(ENV['PUMA_MAX_THREADS'] || 16)
 
 # Allow restart via file
 plugin :tmp_restart
 
-on_worker_boot do
-  require "active_record"
-  ActiveSupport.on_load(:active_record) do
-    ActiveRecord::Base.connection.disconnect! rescue ActiveRecord::ConnectionNotEstablished
-    ActiveRecord::Base.establish_connection(YAML.safe_load("#{app_dir}/config/database.yml", aliases: true)[rails_env])
+if ENV['PUMA_WORKERS'] && ENV['PUMA_WORKERS'].to_i > 0
+  before_worker_boot do
+    require 'active_record'
+    ActiveSupport.on_load(:active_record) do
+      begin
+        ActiveRecord::Base.connection.disconnect!
+      rescue StandardError
+        ActiveRecord::ConnectionNotEstablished
+      end
+      ActiveRecord::Base.establish_connection(YAML.safe_load("#{app_dir}/config/database.yml",
+                                                             aliases: true)[rails_env])
+    end
   end
 end
 
 # EXPLAIN This has been added here but why?
-on_restart do
-  ENV["BUNDLE_GEMFILE"] = "#{app_dir}/Gemfile"
+before_restart do
+  ENV['BUNDLE_GEMFILE'] = "#{app_dir}/Gemfile"
   Dotenv.overload('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
   ActiveRecord::Base.connection.disconnect!
 end
