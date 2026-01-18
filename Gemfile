@@ -111,6 +111,9 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'web-console'
+
+  # static code analyzer
+  gem 'brakeman', require: false
 end
 
 group :test do
