@@ -8,6 +8,9 @@ abort('The Rails environment is running in production mode!') if Rails.env.produ
 require 'rspec/rails'
 require 'capybara/rspec'
 
+# HTML 5 validation
+require 'capybara/validate_html5'
+
 ActiveRecord::Migration.maintain_test_schema!
 
 # load support files
