@@ -63,11 +63,11 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
       # FIXME: There is a 5s window here when the page is refreshed
       # Might need a better solution.
-      check 'gatherer[confirm]'
-      click_link 'Click to join gather!'
+      safe_click { check 'gatherer[confirm]' }
+      safe_click { click_link 'Click to join gather!' }
 
       # After joining, expect participant to appear in UI. Replace selector/text as needed.
-      expect(page).to have_content('You have joined the Gather.')
+      safe_expect_text('You have joined the Gather.')
     end
   end
 
@@ -75,26 +75,8 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
   def vote_random_maps(session_name, votes: 2)
     Capybara.using_session(session_name) do
       votes.times do
-        attempts = 0
-        begin
-          ul = find('ul#map-votes', wait: 5)
-          links = ul.all('a')
-          raise Capybara::ElementNotFound, 'no map links found' if links.empty?
-
-          links.sample.click
-          sleep(rand(0.05..0.25))
-        rescue Selenium::WebDriver::Error::UnknownError => e
-          raise unless e.message.include?('Node with given id does not belong to the document')
-
-          attempts += 1
-          retry if attempts < 6
-          raise
-        rescue Capybara::ElementNotFound, StandardError
-          attempts += 1
-          sleep 0.2
-          retry if attempts < 6
-          raise
-        end
+        safe_click { find('ul#map-votes', wait: 5).all('a').sample.click }
+        sleep(rand(0.05..0.25))
       end
     end
   end
@@ -116,7 +98,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     # Start captain vote from one participant
     Capybara.using_session('user_0') do
       # Confirm vote UI is visible (replace text/selector to match your app)
-      expect(page).to have_content('Vote Captains')
+      safe_expect_text('Vote Captains')
     end
 
     # All users cast two random map votes
@@ -124,18 +106,27 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
       vote_random_maps("user_#{i}", votes: 2)
     end
 
+    # Verify in DB that gather has map votes recorded
+    # Ii will always be 22 or less because last joiner can't vote on maps
+    gather.reload
+    expect(gather.map_votes.count).to be >= 20
+
     # Wait for voting phase to finish (about 1 minute). Wait up to 70s for the voting UI to disappear.
     Capybara.using_session('user_0') do
       # Wait up to 70s for the voting UI to disappear.
-      expect(page).to have_content('Captains are picking the teams', wait: 61)
+      safe_expect_text('Captains are picking the teams', wait: 70)
     end
 
-    # Captains pick teams. First we need to find out who the captains are.
+    # Find and verify captains are assigned in DB
     gather.reload
     captain1 = gather.captain1.user
     captain2 = gather.captain2.user
     expect(captain1).not_to be_nil
     expect(captain2).not_to be_nil
+
+    # Verify that captains are the two most-voted users
+    expect(gather.captain1.id).to eq(gather.gatherers.most_voted[1].id)
+    expect(gather.captain2.id).to eq(gather.gatherers.most_voted[0].id)
 
     # Each captain picks 6 players (customizable picking order). Last is auto-picked.
     pick_order = [captain1, captain2, captain2, captain1, captain1, captain2, captain2, captain1, captain1]
@@ -143,46 +134,27 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     pick_order.each do |picking_captain|
       session_name = "user_#{users.index(picking_captain)}"
       Capybara.using_session(session_name) do
-        attempts = 0
-        begin
-          ul = find('ul#lobby-gatherers', wait: 5)
+        # Choose a random radio (player) to pick
+        safe_click { find('ul#lobby-gatherers', wait: 5).all('input[type="radio"]').sample.click }
 
-          # Find candidate radio inputs for picking a player
-          radios = ul.all('input[type="radio"]')
+        # Ensure the "Pick" button exists and click it (adjust selector/text if needed)
+        safe_click { find('input[value="Pick"]').click }
 
-          if radios.empty?
-            puts page.html
-            raise Capybara::ElementNotFound, 'no available player radios found'
-          end
+        # Print the captain and picked player for logging
+        # puts "#{picking_captain.username} picked a player."
 
-          # Choose a random radio (player) to pick
-          radios.sample.click
-
-          # Ensure the "Pick" button exists and click it (adjust selector/text if needed)
-          click_button('Pick')
-
-          # Print the captain and picked player for logging
-          # puts "#{picking_captain.username} picked a player."
-
-          sleep(rand(0.05..0.25))
-        rescue Selenium::WebDriver::Error::UnknownError => e
-          raise unless e.message.include?('Node with given id does not belong to the document')
-
-          attempts += 1
-          retry if attempts < 6
-          raise
-        rescue Capybara::ElementNotFound, StandardError
-          attempts += 1
-          sleep 0.2
-          retry if attempts < 6
-          raise
-        end
+        sleep(rand(0.05..0.25))
       end
+    end
 
-      # Should say "Gather finished" after last pick to anyone
-      Capybara.using_session('user_0') do
-        expect(page).to have_content('Gather finished', wait: 5)
-      end
+    # Check in DB that both teams have 6 players
+    gather.reload
+    expect(gather.gatherers.team(1).count).to eq(6)
+    expect(gather.gatherers.team(2).count).to eq(6)
+
+    # Should say "Gather finished" after last pick to anyone
+    Capybara.using_session('user_0') do
+      safe_expect_text('Gather finished', wait: 5)
     end
   end
 end
