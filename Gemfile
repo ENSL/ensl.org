@@ -89,8 +89,6 @@ gem 'signet', '0.11.0'
 # FIXME: Fix for warning: https://github.com/ruby/net-imap/issues/16
 gem 'net-http'
 
-gem 'bundle-audit'
-
 # https://github.com/DatabaseCleaner/database_cleaner/issues/299
 # gem 'mongoid-tree'
 gem 'database_cleaner'
@@ -101,8 +99,10 @@ group :production do
 end
 
 group :development do
-  # Check models
-  gem 'rubocop'
+  # static code analyzers
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
+  gem 'rubocop-rails', require: false
 
   # annotate models
   gem 'annotate'
@@ -111,9 +111,6 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'web-console'
-
-  # static code analyzer
-  gem 'brakeman', require: false
 end
 
 group :test do
@@ -144,6 +141,9 @@ group :test do
   # Coverage
   gem 'simplecov', require: false
   gem 'timecop'
+
+  # HTML5 validation
+  gem 'capybara-validate_html5'
 
   # Do I need this?
   gem 'test-unit'
