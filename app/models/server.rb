@@ -36,7 +36,7 @@
 #  index_servers_on_user_id             (user_id)
 #
 
-require "yaml"
+require 'yaml'
 
 class Server < ActiveRecord::Base
   include Extra
@@ -46,36 +46,43 @@ class Server < ActiveRecord::Base
   DOMAIN_NS2 = 2
 
   attr_accessor :pwd
-  #attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
-  validates_length_of [:name, :dns,], :in => 1..30
-  validates_length_of [:password, :irc], :maximum => 30, :allow_blank => true
-  validates_length_of :description, :maximum => 255, :allow_blank => true
-  validates_format_of :ip, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
-  validates_format_of :port, :with => /\A[0-9]{1,5}\z/
-  validates_format_of :reservation, :with => /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/, :allow_nil => true
-  validates_format_of :pwd, :with => /\A[A-Za-z0-9_\-]*\z/, :allow_nil => true
+  # attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
-  scope :ordered, -> { order("name") }
-  scope :hlds, -> { where("domain = ?", DOMAIN_HLDS) }
-  scope :ns2, -> { where("domain = ?", DOMAIN_NS2) }
-  scope :hltvs, -> { where("domain = ?", DOMAIN_HLTV) }
-  scope :active, -> { where("active = 1") }
-  scope :with_players, -> { where("players > 0") }
-  scope :reserved, -> { where("reservation IS NOT NULL") }
-  scope :unreserved_now, -> { where("reservation IS NULL") }
-  scope :unreserved_hltv_around, -> (time) {
-    select("servers.*").
-    joins("LEFT JOIN matches ON servers.id = matches.hltv_id
-    AND match_time > '#{(time.ago(Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'
-    AND match_time < '#{(time.ago(-Match::MATCH_LENGTH).utc).strftime("%Y-%m-%d %H:%M:%S")}'").
-    where("matches.hltv_id IS NULL") }
+  validates_length_of %i[name dns], in: 1..30
+  validates_length_of %i[password irc], maximum: 30, allow_blank: true
+  validates_length_of :description, maximum: 255, allow_blank: true
+  validates_format_of :ip, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
+  validates_format_of :port, with: /\A[0-9]{1,5}\z/
+  validates_format_of :reservation, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/,
+                                    allow_nil: true
+  validates_format_of :pwd, with: /\A[A-Za-z0-9_-]*\z/, allow_nil: true
+
+  scope :ordered, -> { order('name') }
+  scope :hlds, -> { where('domain = ?', DOMAIN_HLDS) }
+  scope :ns2, -> { where('domain = ?', DOMAIN_NS2) }
+  scope :hltvs, -> { where('domain = ?', DOMAIN_HLTV) }
+  scope :active, -> { where('active = 1') }
+  scope :with_players, -> { where('players > 0') }
+  scope :reserved, -> { where('reservation IS NOT NULL') }
+  scope :unreserved_now, -> { where('reservation IS NULL') }
+  scope :unreserved_hltv_around, lambda { |time|
+    start_time = time.ago(Match::MATCH_LENGTH).utc
+    end_time = time.ago(-Match::MATCH_LENGTH).utc
+    start_q = ActiveRecord::Base.connection.quote(start_time.strftime('%Y-%m-%d %H:%M:%S'))
+    end_q = ActiveRecord::Base.connection.quote(end_time.strftime('%Y-%m-%d %H:%M:%S'))
+    select('servers.*')
+      .joins("LEFT JOIN matches ON servers.id = matches.hltv_id
+    AND match_time > #{start_q}
+    AND match_time < #{end_q}")
+      .where('matches.hltv_id IS NULL')
+  }
 
   has_many :logs
   has_many :matches
   has_many :challenges
-  belongs_to :user, :optional => true
-  belongs_to :recordable, :polymorphic => true, :optional => true
+  belongs_to :user, optional: true
+  belongs_to :recordable, polymorphic: true, optional: true
 
   before_create :set_category
 
@@ -99,7 +106,7 @@ class Server < ActiveRecord::Base
   non_versioned_columns << 'recordable_id'
 
   def domains
-    {DOMAIN_HLTV => "HLTV", DOMAIN_HLDS => "NS Server", DOMAIN_NS2 => "NS2 Server"}
+    { DOMAIN_HLTV => 'HLTV', DOMAIN_HLDS => 'NS Server', DOMAIN_NS2 => 'NS2 Server' }
   end
 
   def to_s
@@ -107,39 +114,39 @@ class Server < ActiveRecord::Base
   end
 
   def addr
-    ip + ":" + port.to_s
+    ip + ':' + port.to_s
   end
 
   def set_category
-    self.category_id = (domain == DOMAIN_NS2 ? 45 : 44 )
+    self.category_id = (domain == DOMAIN_NS2 ? 45 : 44)
   end
 
-  def is_free time
+  def is_free(time)
     challenges.around(time).pending.count == 0 and matches.around(time).count == 0
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin? or user == cuser
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
-  def self.move addr, newaddr, newpwd
-    self.hltvs.where(reservation => addr).each do |hltv|
+  def self.move(addr, newaddr, newpwd)
+    hltvs.where(reservation => addr).each do |hltv|
       hltv.reservation = newaddr
       hltv.pwd = newpwd
       hltv.save!
     end
   end
 
-  def self.stop addr
-    self.hltvs.where(:reservation => addr).each do |hltv|
+  def self.stop(addr)
+    hltvs.where(reservation: addr).each do |hltv|
       hltv.reservation = nil
       hltv.save!
     end
@@ -148,6 +155,7 @@ class Server < ActiveRecord::Base
   def self.params(params, cuser)
     # FIXME: check this, add user_id
     # TEST
-    params.require(:server).except!(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version, :updated_at).permit!
+    params.require(:server).except!(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version,
+                                    :updated_at).permit!
   end
 end

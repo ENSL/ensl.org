@@ -53,64 +53,77 @@ class Match < ActiveRecord::Base
   include Exceptions
 
   attr_accessor :lineup, :method, :motm_name, :friendly
-  #attr_protected :id, :updated_at, :created_at, :diff, :points1, :points2
 
-  has_many :matchers, :dependent => :destroy
-  has_many :users, :through => :matchers
-  has_many :predictions, :dependent => :destroy
-  has_many :comments, -> { order("created_at") }, :as => :commentable, :dependent => :destroy
+  # attr_protected :id, :updated_at, :created_at, :diff, :points1, :points2
+
+  has_many :matchers, dependent: :destroy
+  has_many :users, through: :matchers
+  has_many :predictions, dependent: :destroy
+  has_many :comments, -> { order('created_at') }, as: :commentable, dependent: :destroy
   has_many :match_proposals, inverse_of: :match, dependent: :destroy
-  
-  belongs_to :challenge, :optional => true
-  belongs_to :contest, :optional => true
-  belongs_to :contester1, -> { includes('team') }, :class_name => "Contester", :optional => true
-  belongs_to :contester2, -> { includes('team') }, :class_name => "Contester", :optional => true
-  belongs_to :map1, :class_name => "Map", :optional => true
-  belongs_to :map2, :class_name => "Map", :optional => true
-  belongs_to :server, :optional => true
-  belongs_to :referee, class_name: "User", :optional => true
-  belongs_to :motm, class_name: "User", :optional => true
-  belongs_to :demo, class_name: "DataFile", :optional => true
-  belongs_to :week, :optional => true
-  belongs_to :hltv, :class_name => "Server", :optional => true
-  belongs_to :stream, :class_name => "Movie", :optional => true
-  belongs_to :caster, :class_name => "User", :optional => true
 
-  scope :future, -> { where("match_time > UTC_TIMESTAMP()") }
-  scope :future5, -> { where("match_time > UTC_TIMESTAMP()").limit(5) }
-  scope :finished, -> { where("score1 != 0 OR score2 != 0") }
-  scope :realfinished, -> { where("score1 IS NOT NULL AND score2 IS NOT NULL") }
-  scope :unfinished, -> { where("score1 IS NULL AND score2 IS NULL") }
+  belongs_to :challenge, optional: true
+  belongs_to :contest, optional: true
+  belongs_to :contester1, -> { includes('team') }, class_name: 'Contester', optional: true
+  belongs_to :contester2, -> { includes('team') }, class_name: 'Contester', optional: true
+  belongs_to :map1, class_name: 'Map', optional: true
+  belongs_to :map2, class_name: 'Map', optional: true
+  belongs_to :server, optional: true
+  belongs_to :referee, class_name: 'User', optional: true
+  belongs_to :motm, class_name: 'User', optional: true
+  belongs_to :demo, class_name: 'DataFile', optional: true
+  belongs_to :week, optional: true
+  belongs_to :hltv, class_name: 'Server', optional: true
+  belongs_to :stream, class_name: 'Movie', optional: true
+  belongs_to :caster, class_name: 'User', optional: true
+
+  scope :future, -> { where('match_time > UTC_TIMESTAMP()') }
+  scope :future5, -> { where('match_time > UTC_TIMESTAMP()').limit(5) }
+  scope :finished, -> { where('score1 != 0 OR score2 != 0') }
+  scope :realfinished, -> { where('score1 IS NOT NULL AND score2 IS NOT NULL') }
+  scope :unfinished, -> { where('score1 IS NULL AND score2 IS NULL') }
   scope :unreffed, -> { where.not(referee_id: nil) }
-  scope :ordered, -> { order("match_time DESC") }
-  scope :chrono, -> { order("match_time ASC") }
-  scope :recent, -> { limit("8") }
-  scope :bigrecent, -> { limit("50") }
-  scope :active, -> { where("contest_id IN (?)", Contest.active) }
-  scope :on_day, -> (day) { where("match_time > ? and match_time < ?", day.beginning_of_day, day.end_of_day) }
-  scope :on_week, -> (time) { where("match_time > ? and match_time < ?", time.beginning_of_week, time.end_of_week) }
-  scope :of_contester, -> (contester) { where("contester1_id = ? OR contester2_id = ?", contester.id, contester.id) }
-  scope :of_user, -> (user) { includes(:matchers).where(matchers: {user_id: user.id}) }
-  scope :of_team, -> (team) { includes({:contester1 => :team, :contester2 => :team}).where("teams.id = ? OR teams_contesters.id = ?", team.id, team.id) }
-  scope :of_userteam, -> (user, team) { includes({:matchers => {:contester => :team}}).where(teams: {id: team.id}, matchers: {user_id: user.id}) }
-  scope :within_time, -> (from, to) { where("match_time > ? AND match_time < ?", from.utc, to.utc) }
-  scope :around, -> (time) { where("match_time > ? AND match_time < ?", time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc) }
-  scope :after, -> (time) { where("match_time > ? AND match_time < ?", time.utc, time.ago(-MATCH_LENGTH).utc) }
-  scope :map_stats, -> { select("map1_id, COUNT(*) as num, maps.name").
-                         joins("LEFT JOIN maps ON maps.id = map1_id").
-                         group("map1_id").
-                         having("map1_id is not null").
-                         order("num DESC") }
-  scope :year_stats, -> { select("id, DATE_FORMAT(match_time, '%Y') as year, COUNT(*) as num").
-                          where("match_time > '2000-01-01 01:01:01'").
-                          group("year").
-                          order("num DESC") }
-  scope :month_stats, -> { select("id, DATE_FORMAT(match_time, '%m') as month_n,
+  scope :ordered, -> { order('match_time DESC') }
+  scope :chrono, -> { order('match_time ASC') }
+  scope :recent, -> { limit('8') }
+  scope :bigrecent, -> { limit('50') }
+  scope :active, -> { where('contest_id IN (?)', Contest.active) }
+  scope :on_day, ->(day) { where('match_time > ? and match_time < ?', day.beginning_of_day, day.end_of_day) }
+  scope :on_week, ->(time) { where('match_time > ? and match_time < ?', time.beginning_of_week, time.end_of_week) }
+  scope :of_contester, ->(contester) { where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id) }
+  scope :of_user, ->(user) { includes(:matchers).where(matchers: { user_id: user.id }) }
+  scope :of_team, lambda { |team|
+    includes({ contester1: :team, contester2: :team }).where('teams.id = ? OR teams_contesters.id = ?', team.id, team.id)
+  }
+  scope :of_userteam, lambda { |user, team|
+    includes({ matchers: { contester: :team } }).where(teams: { id: team.id }, matchers: { user_id: user.id })
+  }
+  scope :within_time, ->(from, to) { where('match_time > ? AND match_time < ?', from.utc, to.utc) }
+  scope :around, lambda { |time|
+    where('match_time > ? AND match_time < ?', time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc)
+  }
+  scope :after, ->(time) { where('match_time > ? AND match_time < ?', time.utc, time.ago(-MATCH_LENGTH).utc) }
+  scope :map_stats, lambda {
+    select('map1_id, COUNT(*) as num, maps.name')
+      .joins('LEFT JOIN maps ON maps.id = map1_id')
+      .group('map1_id')
+      .having('map1_id is not null')
+      .order('num DESC')
+  }
+  scope :year_stats, lambda {
+    select("id, DATE_FORMAT(match_time, '%Y') as year, COUNT(*) as num")
+      .where("match_time > '2000-01-01 01:01:01'")
+      .group('year')
+      .order('num DESC')
+  }
+  scope :month_stats, lambda {
+    select("id, DATE_FORMAT(match_time, '%m') as month_n,
                                    DATE_FORMAT(match_time, '%M') as month,
-                                   COUNT(*) as num").
-                           where("match_time > '2000-01-01 01:01:01'").
-                           group("month").
-                           order("month_n") }
+                                   COUNT(*) as num")
+      .where("match_time > '2000-01-01 01:01:01'")
+      .group('month')
+      .order('month_n')
+  }
 
   validates :contester1, :contester2, :contest, presence: true
   validates :score1, :score2, format: /\A[1-9]?[0-9]\z/, allow_nil: true
@@ -127,29 +140,33 @@ class Match < ActiveRecord::Base
   accepts_nested_attributes_for :matchers, allow_destroy: true
 
   def to_s
-    contester1.to_s + " vs " + contester2.to_s
+    contester1.to_s + ' vs ' + contester2.to_s
   end
 
   def score_color
-    return "black" if score1.nil? || score2.nil? || contester1.nil? || contester2.nil?
-    return "yellow" if score1 == score2
-    return "green" if contester1.team == friendly && score1 > score2
-    return "green" if contester2.team == friendly && score2 > score1
-    return "red" if contester1.team == friendly && score1 < score2
-    "red" if contester2.team == friendly && score2 < score1
+    return 'black' if score1.nil? || score2.nil? || contester1.nil? || contester2.nil?
+    return 'yellow' if score1 == score2
+    return 'green' if contester1.team == friendly && score1 > score2
+    return 'green' if contester2.team == friendly && score2 > score1
+    return 'red' if contester1.team == friendly && score1 < score2
+
+    'red' if contester2.team == friendly && score2 < score1
   end
 
-  def preds contester
-    perc = Prediction.where("match_id = ? AND score#{contester} > 2", id).count()
-    perc != 0 ? (perc/predictions.count.to_f*100).round : 0
+  def preds(contester)
+    cont = contester.to_i
+    raise ArgumentError, 'invalid contester' unless [1, 2].include?(cont)
+
+    perc = Prediction.where(["match_id = ? AND score#{cont} > 2", id]).count
+    perc != 0 ? (perc / predictions.count.to_f * 100).round : 0
   end
 
-  def mercs contester
+  def mercs(contester)
     matchers.where(merc: true, contester_id: contester.id)
   end
 
   def get_hltv
-    self.hltv = hltv ? hltv : Server.hltvs.active.unreserved_hltv_around(match_time).first
+    self.hltv = hltv || Server.hltvs.active.unreserved_hltv_around(match_time).first
   end
 
   def demo_name
@@ -190,19 +207,16 @@ class Match < ActiveRecord::Base
     team == contester1.team ? contester2.team : contester1.team
   end
 
-
   def set_hltv
     get_hltv if match_time.future?
   end
 
   def send_notifications
-    Profile.where("notify_any_match", 1).includes(:user).each do |p|
+    Profile.where('notify_any_match', 1).includes(:user).each do |p|
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|
-      if teamer.user.profile.notify_own_match
-        Notifications.challenge teamer.user, self
-      end
+      Notifications.challenge teamer.user, self if teamer.user.profile.notify_own_match
     end
   end
 
@@ -211,12 +225,12 @@ class Match < ActiveRecord::Base
   end
 
   def set_predictions
-    predictions.update_all "result = 0"
-    predictions.update_all "result = 1", ["score1 = ? AND score2 = ?", score1, score2]
+    predictions.update_all 'result = 0'
+    predictions.update_all 'result = 1', ['score1 = ? AND score2 = ?', score1, score2]
   end
 
   def after_destroy
-    predictions.update_all "result = 0"
+    predictions.update_all 'result = 0'
     contest.recalculate
   end
 
@@ -237,12 +251,12 @@ class Match < ActiveRecord::Base
       contester2.win = contester2.win - 1
     end
 
-    unless contest.contest_type == Contest::TYPE_BRACKET
-      contester1.score = contester1.score - score1_was
-      contester2.score = contester2.score - score2_was
-      contester1.save!
-      contester2.save!
-    end
+    return if contest.contest_type == Contest::TYPE_BRACKET
+
+    contester1.score = contester1.score - score1_was
+    contester2.score = contester2.score - score2_was
+    contester1.save!
+    contester2.save!
   end
 
   def recalculate
@@ -267,7 +281,7 @@ class Match < ActiveRecord::Base
       contester2.trend = Contester::TREND_UP
     end
 
-    self.diff = diff ? diff : (contester2.score - contester1.score)
+    self.diff = diff || (contester2.score - contester1.score)
 
     if contest.contest_type == Contest::TYPE_LADDER
       # Dunno what all this is but its not working anyways
@@ -298,10 +312,10 @@ class Match < ActiveRecord::Base
       contester2.score = contester2.score + points2 < 0 ? 0 : contester2.score + points2
     end
 
-    unless contest.contest_type == Contest::TYPE_BRACKET
-      contester1.save!
-      contester2.save!
-    end
+    return if contest.contest_type == Contest::TYPE_BRACKET
+
+    contester1.save!
+    contester2.save!
   end
 
   def hltv_record(addr, pwd)
@@ -309,12 +323,8 @@ class Match < ActiveRecord::Base
        (match_time + MATCH_LENGTH * 10) < Time.now.utc
       raise Error, I18n.t(:hltv_request_20)
     end
-    if hltv && hltv.recording
-      raise Error, I18n.t(:hltv_already) + hltv.addr
-    end
-    unless get_hltv
-      raise Error, I18n.t(:hltv_notavailable)
-    end
+    raise Error, I18n.t(:hltv_already) + hltv.addr if hltv && hltv.recording
+    raise Error, I18n.t(:hltv_notavailable) unless get_hltv
 
     save!
     hltv.reservation = addr
@@ -325,11 +335,13 @@ class Match < ActiveRecord::Base
 
   def hltv_move(addr, pwd)
     raise Error, I18n.t(:hltv_notset) if hltv.nil? || hltv.recording.nil?
+
     Server.move hltv.reservation, addr, pwd
   end
 
   def hltv_stop
     raise Error, I18n.t(:hltv_notset) if hltv.nil? || hltv.recording.nil?
+
     Server.stop hltv.reservation
   end
 
@@ -344,28 +356,29 @@ class Match < ActiveRecord::Base
     if cuser.ref?
       if referee == cuser
         return true if Verification.contain(params,
-                                            [:score1, :score2, :forfeit, :report, :demo_id,
-                                             :motm_name, :matchers_attributes, :server_id])
+                                            %i[score1 score2 forfeit report demo_id
+                                               motm_name matchers_attributes server_id])
         return true if Verification.contain(params, [:hltv]) && !demo
       end
-      if Verification.contain(params, [:referee_id])
-        return true if (params[:referee_id].to_i == cuser.id && referee_id.blank?) ||
-                       (params[:referee_id].blank? && referee_id == cuser.id)
+      if Verification.contain(params, [:referee_id]) && ((params[:referee_id].to_i == cuser.id && referee_id.blank?) ||
+                       (params[:referee_id].blank? && referee_id == cuser.id))
+        return true
       end
     end
 
     if contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser)
       if match_time.past?
-        return true if Verification.contain(params, [:score1, :score2]) &&
+        return true if Verification.contain(params, %i[score1 score2]) &&
                        !score1 && !score2 && !forfeit
         return true if Verification.contain(params, [:matchers_attributes])
       end
       return true if match_time.today? && Verification.contain(params, [:stream_id])
     end
 
-    if cuser.caster? && Verification.contain(params, [:caster_id])
-      return true if (params[:caster_id].to_i == cuser.id && caster_id.blank?) ||
-                     (params[:caster_id].blank? && caster_id == cuser.id)
+    if cuser.caster? && Verification.contain(params,
+                                             [:caster_id]) && ((params[:caster_id].to_i == cuser.id && caster_id.blank?) ||
+                     (params[:caster_id].blank? && caster_id == cuser.id))
+      return true
     end
 
     false
@@ -385,6 +398,7 @@ class Match < ActiveRecord::Base
 
   def self.params(params, cuser)
     # FIXME: check this
-    params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2, :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_Id, :week_id)
+    params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,
+                                  :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_Id, :week_id)
   end
 end
