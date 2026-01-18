@@ -1,7 +1,7 @@
 module ApplicationHelper
   def full_title(page_title)
-    base_title = "NSL"
-    base_title << " " + Rails.env.upcase unless Rails.env.production?
+    base_title = 'NSL'
+    base_title << ' ' + Rails.env.upcase unless Rails.env.production?
 
     if page_title.empty?
       base_title
@@ -24,12 +24,13 @@ module ApplicationHelper
 
   def namelink(model, length = nil)
     return if model.nil?
+
     model = case model.class.to_s
-            when "DataFile"
-              model.movie ? model.movie : model
-            when "Comment"
+            when 'DataFile'
+              model.movie || model
+            when 'Comment'
               model.commentable
-            when "Post"
+            when 'Post'
               model.topic
             else
               model
@@ -38,51 +39,47 @@ module ApplicationHelper
 
     # Reduce length of too long model names
     if length and str.length > length
-      link_to(str.to_s[0, length] + "...", model, class: model.class.to_s.downcase)
+      link_to(str.to_s[0, length] + '...', model, class: model.class.to_s.downcase)
     else
       link_to(str, model, class: model.class.to_s.downcase)
     end
   end
 
   def directory_links(directory)
-    output = ""
+    output = ''
     Directory.directory_traverse(directory).reverse_each do |dir|
       output << namelink(dir) + "\n"
-      unless dir == directory
-        output << " &raquo; \n"
-      end
+      output << " &raquo; \n" unless dir == directory
     end
     output.html_safe
   end
 
-  def shorten str, length
-    if length and str and str.to_s.length > length
-      str = str.to_s[0, length] + "..."
-    end
+  def shorten(str, length)
+    str = str.to_s[0, length] + '...' if length and str and str.to_s.length > length
     str
   end
 
-  def longtime time
-    printtime time, "%d %B %y %H:%M"
+  def longtime(time)
+    printtime time, '%d %B %y %H:%M'
   end
 
-  def longertime time
-    printtime time, "%e %B %Y - %H:%M %Z"
+  def longertime(time)
+    printtime time, '%e %B %Y - %H:%M %Z'
   end
 
-  def shorttime time
-    printtime time, "%d/%b/%y %H:%M"
+  def shorttime(time)
+    printtime time, '%d/%b/%y %H:%M'
   end
 
-  def shortdate time
-    printtime time, "%d %b %y"
+  def shortdate(time)
+    printtime time, '%d %b %y'
   end
 
-  def longdate time
-    printtime time, "%e %B %Y"
+  def longdate(time)
+    printtime time, '%e %B %Y'
   end
 
-  def printtime time, format
+  def printtime(time, format)
     return unless time
 
     content_tag(:span, style: 'font-style: italic') do
@@ -91,13 +88,13 @@ module ApplicationHelper
   end
 
   # Print the attributes from the list
-  def cascade model, list
-    return "" if model.nil?
+  def cascade(model, list)
+    return '' if model.nil?
 
     out = list.map do |element|
       name = key = element
-      item = ""
-      result = ""
+      item = ''
+      result = ''
 
       if element.instance_of?(Array)
         name = element[0]
@@ -107,26 +104,33 @@ module ApplicationHelper
       if m = key.to_s.match(/^(.*)_b$/)
         name = m[1]
         key = m[1]
-      end        
+      end
 
       begin
-        str = eval("model.#{key}")
-      rescue
+        # Avoid dynamic eval for security; use public_send or [] accessors
+        if model.respond_to?(key)
+          str = model.public_send(key)
+        elsif model.respond_to?(:[]) && model[key]
+          str = model[key]
+        else
+          next
+        end
+      rescue StandardError
         next
       end
 
-      next if str == "" or str.nil?
+      next if str == '' or str.nil?
 
-      if model[key].instance_of?(Time) or model[key].instance_of?(ActiveSupport::TimeWithZone)
-        # result << shorttime(str)
-        result << model[key].to_formatted_s(:long_ordinal)
-      elsif element.instance_of?(Symbol)
-        result << namelink(str)
-      elsif key.to_s.match(/^(.*)_b$/)
-        result << str.bbcode_to_html
-      else
-        result << h(str)
-      end
+      result << if model[key].instance_of?(Time) or model[key].instance_of?(ActiveSupport::TimeWithZone)
+                  # result << shorttime(str)
+                  model[key].to_formatted_s(:long_ordinal)
+                elsif element.instance_of?(Symbol)
+                  namelink(str)
+                elsif key.to_s.match(/^(.*)_b$/)
+                  str.bbcode_to_html
+                else
+                  h(str)
+                end
 
       item << content_tag(:dt) do
         "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}".html_safe
@@ -143,11 +147,11 @@ module ApplicationHelper
     end
   end
 
-  def abslink text, url
+  def abslink(text, url)
     raw link_to text, url
   end
 
-  def flag country
+  def flag(country)
     if country and country.to_s.size > 0
       image_tag 'shared/blank.gif', class: "flag flag-#{country.downcase}"
     else
@@ -160,22 +164,22 @@ module ApplicationHelper
     @comments = object.comments.ordered.with_userteam
 
     return_here
-    render partial: "comments/index"
+    render partial: 'comments/index'
   end
 
   def bbcode
-    link_to "(BBCode)", article_url(id: 536)
+    link_to '(BBCode)', article_url(id: 536)
   end
 
   def sortable(column, title = nil)
     title ||= column.titleize
-    css_class = (column == sort_column) ? "current #{sort_direction}" : nil
-    direction = (column == sort_column && sort_direction == "asc") ? "desc" : "asc"
+    css_class = column == sort_column ? "current #{sort_direction}" : nil
+    direction = column == sort_column && sort_direction == 'asc' ? 'desc' : 'asc'
     link_to title, { sort: column, direction: direction }, { class: css_class }
   end
 
   def link_to_remove_fields(name, f)
-    f.hidden_field(:_destroy) + link_to_function(name, "remove_fields(this)")
+    f.hidden_field(:_destroy) + link_to_function(name, 'remove_fields(this)')
   end
 
   # FIXME: this won't work.
@@ -184,7 +188,7 @@ module ApplicationHelper
     fields = f.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
       render(association.to_s.singularize, f: builder)
     end
-    link_to_function(name, ("add_fields(this, '#{association}', '#{escape_javascript(fields)}')"))
+    link_to_function(name, "add_fields(this, '#{association}', '#{escape_javascript(fields)}')")
   end
 
   def timezone_offset
@@ -199,23 +203,23 @@ module ApplicationHelper
     @calendar ||= GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset)
   end
 
-  def event_start_time event
+  def event_start_time(event)
     event.start.date_time.to_datetime.in_time_zone(timezone_offset)
   end
 
   def upcoming_matches
-    ENV['GOOGLE_CALENDAR'] == "disabled" ? (calendar.upcoming || []) : []
+    ENV['GOOGLE_CALENDAR'] == 'disabled' ? (calendar.upcoming || []) : []
   end
 
   def upcoming_nsltv
-    ENV['GOOGLE_CALENDAR'] == "disabled" ? (calendar.upcoming || []) : []
+    ENV['GOOGLE_CALENDAR'] == 'disabled' ? (calendar.upcoming || []) : []
   end
 
   def gathers_url
     if Rails.env.production?
-      "https://gathers.ensl.org"
+      'https://gathers.ensl.org'
     else
-      "https://gathers.staging.ensl.org"
+      'https://gathers.staging.ensl.org'
     end
   end
 end

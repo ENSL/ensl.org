@@ -13,7 +13,7 @@
     </div>
     <% end %>
 
-    <%= link_to "Download", @file.url, class: 'button' %>
+    <%= link_to "Download", safe_url_for(@file.url), class: 'button' %>
 
     <% if @file.related_files.count > 0 %>
     <div class="files-list">
@@ -29,7 +29,7 @@
             <% @file.related_files.each do |related| %>
             <tr>
                 <td>
-                    <%= link_to (h related.name.filename), related.name.url %>
+                    <%= link_to (h related.name.filename), safe_url_for(related.name.url) %>
                 </td>
                 <td>
                     <%= related.size_s %> MB

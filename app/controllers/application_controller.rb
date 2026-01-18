@@ -4,11 +4,14 @@ class ApplicationController < ActionController::Base
   helper :all
   helper_method :cuser, :strip, :return_here
 
+  helper_method :safe_url_for
+
   before_action :update_user
   before_action :set_controller_and_action_names
 
-  # Omniauth has its own CSRF
-  protect_from_forgery except: [:callback]
+  # Omniauth has its own CSRF handling for the callback endpoint.
+  protect_from_forgery with: :exception
+  skip_before_action :verify_authenticity_token, only: [:callback]
 
   respond_to :html, :js
 
@@ -66,6 +69,23 @@ class ApplicationController < ActionController::Base
     rescue StandardError
       redirect_to('/')
     end
+  end
+
+  # Return a safe URL (allow only http(s) or relative paths). Returns '#' if unsafe.
+  def safe_url_for(url)
+    return '#' unless url.present?
+
+    begin
+      uri = URI.parse(url.to_s)
+      if uri.scheme.nil? && uri.path.present?
+        # relative path
+        return uri.to_s
+      end
+      return uri.to_s if %w[http https].include?(uri.scheme)
+    rescue StandardError
+      return '#'
+    end
+    '#'
   end
 
   unless Rails.env.production?
