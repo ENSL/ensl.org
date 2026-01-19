@@ -157,8 +157,8 @@ group :test do
   gem 'redis-namespace'
 
   # For circle ci + CC
-  gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec_junit_formatter'
+  #gem 'codeclimate-test-reporter', require: nil
+  #gem 'rspec_junit_formatter'
 end
 
 group :development, :test do

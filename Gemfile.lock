@@ -150,8 +150,6 @@ GEM
       ssrf_filter (~> 1.0)
     code_analyzer (0.5.5)
       sexp_processor
-    codeclimate-test-reporter (1.0.9)
-      simplecov (<= 0.13)
     coderay (1.1.3)
     coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
@@ -180,7 +178,7 @@ GEM
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
     diff-lcs (1.6.2)
-    docile (1.1.5)
+    docile (1.4.1)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
@@ -495,8 +493,6 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.6)
-    rspec_junit_formatter (0.6.0)
-      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -558,11 +554,12 @@ GEM
       faraday (~> 0.9)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    simplecov (0.13.0)
-      docile (~> 1.1.0)
-      json (>= 1.8, < 3)
-      simplecov-html (~> 0.10.0)
-    simplecov-html (0.10.2)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     sprockets (3.7.5)
       base64
       concurrent-ruby (~> 1.0)
@@ -642,7 +639,6 @@ DEPENDENCIES
   capybara
   capybara-validate_html5
   carrierwave
-  codeclimate-test-reporter
   coffee-rails
   connection_pool
   country_select
@@ -689,7 +685,6 @@ DEPENDENCIES
   rspec-mocks
   rspec-rails
   rspec-support
-  rspec_junit_formatter
   rubocop-rails
   sanitize
   sass-rails (~> 5.0.3)
