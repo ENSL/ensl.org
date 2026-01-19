@@ -4,13 +4,14 @@ ENV RAILS_ENV development
 ENV APP_PATH /var/www
 ENV WEB_UID 1000
 ENV WEB_GID 1000
+ENV NVM_DIR /usr/local/nvm
 
 RUN \
     # Add web
     adduser web --uid $WEB_UID --home /home/web --shell /bin/bash --disabled-password --gecos "" && \
     apt-get update && apt-get -y upgrade && \
     # Pre-dependencies
-    apt-get -y install curl && \
+    apt-get -y install curl build-essential && \
     # Yarn repo
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
@@ -26,10 +27,6 @@ RUN \
       libxslt1-dev libxml2-dev \
       # For carrierwave/rmagick
       imagemagick libmagickwand-dev \
-      # For javascript gems
-      nodejs \
-      # For assets pipeline
-      yarn \
       # For poltergeist
       # phantomjs \
       firefox-esr \
@@ -39,7 +36,22 @@ RUN \
     gem update --system && \
     # Install bundler and bundle path
     gem install bundler && \
-    mkdir -p /var/bundle && chown -R web:web /var/bundle
+    mkdir -p /var/bundle && chown -R web:web /var/bundle && \
+    # Install nvm, Node (LTS) and yarn (installed via npm global)
+    mkdir -p $NVM_DIR && \
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash && \
+    # Make nvm available in this shell, install Node LTS and set default
+    . $NVM_DIR/nvm.sh && \
+    nvm install --lts && nvm alias default 'lts/*' && \
+    NODE_VERSION=$(ls -1 $NVM_DIR/versions/node | tail -n 1) && \
+    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/local/bin/node && \
+    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/local/bin/npm && \
+    npm install -g yarn && \
+    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/yarn /usr/local/bin/yarn && \
+    # Make nvm available for all users/shells
+    echo "export NVM_DIR=$NVM_DIR" > /etc/profile.d/nvm.sh && \
+    echo "[ -s $NVM_DIR/nvm.sh ] && . $NVM_DIR/nvm.sh" >> /etc/profile.d/nvm.sh && \
+    chown -R web:web $NVM_DIR
     # Clean up
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
