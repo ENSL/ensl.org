@@ -30,11 +30,11 @@ module Features
     end
 
     def user_status
-      find "#authentication"
+      find("#authentication")
     end
 
     def registration_form
-      find "#new_user"
+      find("#new_user")
     end
   end
 end
