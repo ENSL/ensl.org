@@ -33,6 +33,8 @@ RSpec.configure do |config|
   config.include Features::FormHelpers,    type: :system
   config.include Features::SessionHelpers, type: :feature
   config.include Features::SessionHelpers, type: :system
+  config.include Features::ServerHelpers,  type: :feature
+  config.include Features::ServerHelpers,  type: :system
 
   # If you also rely on JSON helpers in controller/request specs:
   config.include Controllers::JsonHelpers, type: :controller
