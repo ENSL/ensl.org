@@ -7,22 +7,22 @@ require 'dotenv'
 Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
 # require 'codeclimate-test-reporter'
-require 'simplecov'
 
-# require 'capybara/apparition'
+if ENV['SIMPLECOV'] == '1'
+  require 'simplecov'
 
-# CodeClimate::TestReporter.start
-SimpleCov.start "rails" do
-  enable_coverage :branch
-  add_filter %r{^/spec/}
-  add_filter %r{^/config/}
-  add_filter %r{^/db/}
-  add_filter %r{^/vendor/}
+  SimpleCov.start "rails" do
+    enable_coverage :branch
+    add_filter %r{^/spec/}
+    add_filter %r{^/config/}
+    add_filter %r{^/db/}
+    add_filter %r{^/vendor/}
 
-  add_group "Controllers", "app/controllers"
-  add_group "Models",      "app/models"
-  add_group "Jobs",        "app/jobs"
-  add_group "Services",    "app/services"
+    add_group "Controllers", "app/controllers"
+    add_group "Models",      "app/models"
+    add_group "Jobs",        "app/jobs"
+    add_group "Services",    "app/services"
+  end
 end
 
 require File.expand_path('../config/environment', __dir__)
