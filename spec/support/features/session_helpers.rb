@@ -34,7 +34,7 @@ module Features
     end
 
     def registration_form
-      find("#new_user")
+      "#new_user"
     end
   end
 end
