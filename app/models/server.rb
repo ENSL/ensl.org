@@ -155,7 +155,7 @@ class Server < ActiveRecord::Base
   def self.params(params, cuser)
     # FIXME: check this, add user_id
     # TEST
-    params.require(:server).except!(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version,
+    params.require(:server).except(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version,
                                     :updated_at).permit!
   end
 end
