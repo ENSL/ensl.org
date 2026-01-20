@@ -164,6 +164,8 @@ end
 group :development, :test do
   # Debugging
   gem 'rdbg'
+  gem 'ruby-lsp'
+  gem 'ruby-lsp-rails'
 
   gem 'pry-byebug'
   gem 'pry-rails'
