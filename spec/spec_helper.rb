@@ -70,7 +70,8 @@ def build_chrome_options(headless:)
     opts.add_argument('--headless') unless args.any? { |a| a.include?('headless') }
   end
 
-  opts
+  # Enable browser console logging (for test diagnostics)
+  opts.add_option('goog:loggingPrefs', browser: 'ALL')
 end
 
 Capybara.register_driver :selenium_chrome do |app|
