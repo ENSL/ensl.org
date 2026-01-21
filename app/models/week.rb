@@ -21,31 +21,31 @@
 class Week < ActiveRecord::Base
   include Extra
 
-  #attr_protected :id, :updated_at, :created_at
+  # attr_protected :id, :updated_at, :created_at
 
   validates_presence_of :contest, :map1, :map2
-  validates_length_of :name, :in => 1..30
+  validates_length_of :name, in: 1..30
 
-  scope :ordered, -> { order("start_date ASC") }
+  scope :ordered, -> { order('start_date ASC') }
 
-  belongs_to :contest, :optional => true
-  belongs_to :map1, :class_name => "Map", :optional => true
-  belongs_to :map2, :class_name => "Map", :optional => true
+  belongs_to :contest, optional: true
+  belongs_to :map1, class_name: 'Map', optional: true
+  belongs_to :map2, class_name: 'Map', optional: true
   has_many :matches
 
   def to_s
-    self.name
+    name
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
