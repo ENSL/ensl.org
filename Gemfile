@@ -105,7 +105,8 @@ group :development do
   gem 'rubocop-rails', require: false
 
   # annotate models
-  gem 'annotate'
+  # Does not support AR 8 yet
+  # gem 'annotate'
 
   # error message
   gem 'better_errors'
@@ -157,8 +158,8 @@ group :test do
   gem 'redis-namespace'
 
   # For circle ci + CC
-  #gem 'codeclimate-test-reporter', require: nil
-  #gem 'rspec_junit_formatter'
+  # gem 'codeclimate-test-reporter', require: nil
+  # gem 'rspec_junit_formatter'
 end
 
 group :development, :test do
