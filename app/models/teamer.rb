@@ -71,7 +71,8 @@ class Teamer < ActiveRecord::Base
   def validate_team
     return unless user && team
 
-    return unless user.teamers.of_team(team).exists?
+    # prevent joining the same team twice (exclude self when checking)
+    return unless Teamer.where(user_id: user.id, team_id: team.id).where.not(id: id).exists?
 
     errors.add :team, I18n.t(:teams_join_twice)
   end
@@ -85,11 +86,14 @@ class Teamer < ActiveRecord::Base
   end
 
   def destroy
-    user.update_attribute :team, nil if user.team == team
-    if rank == Teamer::RANK_JOINER
-      super
-    else
-      update_attribute :rank, Teamer::RANK_REMOVED
+    transaction do
+      user.update_column(:team_id, nil) if user && user.team_id == team_id
+
+      if rank == Teamer::RANK_JOINER
+        super
+      else
+        update!(rank: Teamer::RANK_REMOVED)
+      end
     end
   end
 

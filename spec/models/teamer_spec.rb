@@ -1,6 +1,63 @@
 require 'rails_helper'
 
 RSpec.describe Teamer, type: :model do
+  describe 'init_variables' do
+    it 'sets default rank to RANK_JOINER' do
+      t = Teamer.new
+      t.send(:init_variables)
+      expect(t.rank).to eq(Teamer::RANK_JOINER)
+    end
+  end
+
+  describe 'validate_team' do
+    it 'prevents a user joining same team twice' do
+      user = create(:user)
+      team = create(:team)
+      create(:teamer, user: user, team: team)
+      t2 = Teamer.new(user: user, team: team)
+      expect(t2.valid?).to be false
+      expect(t2.errors[:team]).not_to be_empty
+    end
+  end
+
+  describe 'destroy behavior' do
+    it 'destroys record if rank is JOINER and clears user team_id' do
+      user = create(:user)
+      team = create(:team)
+      user.update_column(:team_id, team.id)
+      t = Teamer.create!(user: user, team: team, rank: Teamer::RANK_JOINER)
+      t.destroy
+      expect(Teamer.where(id: t.id)).to be_empty
+      expect(user.reload.team_id).to be_nil
+    end
+
+    it 'marks rank REMOVED for non-joiner' do
+      user = create(:user)
+      team = create(:team)
+      t = Teamer.create!(user: user, team: team, rank: Teamer::RANK_MEMBER)
+      t.destroy
+      expect(t.reload.rank).to eq(Teamer::RANK_REMOVED)
+    end
+  end
+
+  describe 'permissions' do
+    it 'allows destroy for owner, leader, or admin' do
+      owner = create(:user)
+      leader = create(:user)
+      admin = create(:user, :admin)
+      team = create(:team)
+      te = Teamer.create!(user: owner, team: team, rank: Teamer::RANK_MEMBER)
+      Teamer.create!(user: leader, team: team, rank: Teamer::RANK_LEADER)
+
+      expect(te.can_destroy?(owner)).to be true
+      expect(te.can_destroy?(leader)).to be true
+      expect(te.can_destroy?(admin)).to be true
+    end
+  end
+end
+require 'rails_helper'
+
+RSpec.describe Teamer, type: :model do
   describe 'basic helpers' do
     it 'init_variables sets joiner rank by default' do
       t = Teamer.new
