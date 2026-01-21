@@ -10,32 +10,32 @@ Load environment variables (**don't skip this step**):
 
 Start development:
 
-    docker-compose up --build development
+    docker compose up --build
 
 Build or rebuild:
 
-    docker-compose build
+    docker compose build
 
 Debug:
 
-    docker attach ensl_development
+    docker compose attach development
 
 To get inside docker web+test containers:
 
-    docker-compose exec -u root development /bin/bash
-    docker-compose exec -u web development /bin/bash
-    docker-compose exec -u root test /bin/bash
-    docker-compose exec -u web test /bin/bash
+    docker compose exec -u root development /bin/bash
+    docker compose exec -u web development /bin/bash
+    docker compose --profile test exec -u root test /bin/bash
+    docker compose --profile test exec -u web test /bin/bash
 
 Restart the web container
 
-    docker-compose restart web`
+    docker compose restart development
 
 Run some tests:
 
-    docker-compose up --build test
-    docker-compose exec -u web test bundle exec rspec
-    docker-compose exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb
+    docker compose --profile test up --build test
+    docker compose --profile test exec -u web test bundle exec rspec
+    docker compose --profile test exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb
 
 ## Debugging
 
@@ -86,7 +86,7 @@ Read this to understand design decisions and follow them!
   * Local changes go to .env*local and **not** .env (unlike previous versions)
   * Passwords are in ENV variables for now so they don't have to duplicated between DB and Rails.
 1. Everything should be running on containers.
-  * Docker-compose is the heart of deployment
+    * Docker Compose is the heart of deployment
   * Dockerfile should contain the gems and prebuilt assets for production
   * The app is mounted as **volume**. It will override the Dockerfile content.
     * The app is only put inside the Dockerfile to precompile assets for production and staging. It could be removed to reduce space.
@@ -120,9 +120,9 @@ Read this to understand design decisions and follow them!
 
 ## TODO issues for dev
 
-1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker-compose up
+1. Puma should be running (eg. spring), and if debugger is used it should be able to connect via docker compose up
 1. Should directories exist?
-1. docker-compose has some .env specific vars and then
+1. docker compose has some .env specific vars and then
 1. The env variables are not always loaded causing mysterious issues.
 1. How much in env vars?
 

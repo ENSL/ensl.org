@@ -1,0 +1,114 @@
+x-app: &app
+  command: /var/www/bin/script/entry.sh
+  tty: true
+  stdin_open: true
+  user: "web:web"
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: ensl_${RAILS_ENV:-development}
+  volumes:
+    - .:/var/www
+  environment:
+    RAILS_ENV: ${RAILS_ENV:-development}
+  depends_on:
+    - db
+    - memcached
+    - smtp
+
+services:
+  #
+  # Main services
+  #
+  development:
+    <<: *app
+    ports:
+      - "${PUMA_PORT}:${PUMA_PORT}"
+      - "35729:35729"
+
+  staging:
+    <<: *app
+    profiles: ["staging"]
+    environment:
+      RAILS_ENV: staging
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ensl_staging
+    ports:
+      - "9000:${PUMA_PORT}"
+
+  production:
+    <<: *app
+    profiles: ["production"]
+    environment:
+      RAILS_ENV: production
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ensl_production
+    ports:
+      - "${PUMA_PORT}:${PUMA_PORT}"
+
+  #
+  # Testing
+  #
+
+  test:
+    <<: *app
+    profiles: ["test"]
+    command: ["bash", "-c", "while true; do sleep 100; done;"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ensl_development
+    env_file:
+      - .env.test
+    environment:
+      RAILS_ENV: test
+    ports:
+      - "${TEST_APP_PORT}:${TEST_APP_PORT}" # Capybara listens here
+    depends_on:
+      - db
+      - memcached
+      - selenium
+
+  selenium:
+    image: selenium/standalone-chrome-debug
+    profiles: ["test"]
+    ports:
+      - "5900:5900"
+      - "4444:4444"
+
+  #
+  # Common services: These are shared by all envs.
+  #
+
+  memcached:
+    image: memcached:alpine
+
+  redis:
+    image: redis:4.0-alpine
+
+  db:
+    image: mariadb:10.7
+    user: "mysql:mysql"
+    volumes:
+      - "./db/data:/var/lib/mysql"
+      - "./db/initdb.d:/docker-entrypoint-initdb.d"
+      - "./ext/mysql.conf.d:/etc/mysql/conf.d"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+
+  smtp:
+    image: mwader/postfix-relay:latest
+    restart: always
+    volumes:
+      - "./ext/dkim:/etc/opendkim/keys"
+    environment:
+      POSTFIX_myhostname: ${MAIL_DOMAIN}
+      OPENDKIM_DOMAINS: ${MAIL_DOMAIN}
