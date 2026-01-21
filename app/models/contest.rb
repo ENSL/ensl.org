@@ -150,14 +150,14 @@ class Contest < ActiveRecord::Base
 
   def update_ranks(contester, old_rank, new_rank)
     if old_rank < new_rank
-      Contester.update_all(['score = score -1, trend = ?', Contester::TREND_UP],
-                           ['contest_id = ? and score > ? and score <= ?',
-                            id, old_rank, new_rank])
+      Contester.where(contest_id: id)
+               .where('score > ? AND score <= ?', old_rank, new_rank)
+               .update_all(['score = score - 1, trend = ?', Contester::TREND_UP])
       contester.trend = Contester::TREND_DOWN
     elsif old_rank > new_rank
-      Contester.update_all(['score = score + 1, trend = ?', Contester::TREND_DOWN],
-                           ['contest_id = ? and score < ? and score >= ?',
-                            id, old_rank, new_rank])
+      Contester.where(contest_id: id)
+               .where('score < ? AND score >= ?', old_rank, new_rank)
+               .update_all(['score = score + 1, trend = ?', Contester::TREND_DOWN])
       contester.trend = Contester::TREND_UP
     end
     contester.score = new_rank

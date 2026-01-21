@@ -141,7 +141,7 @@ class Match < ActiveRecord::Base
     match.will_save_change_to_score1? || match.will_save_change_to_score2?
   }
   before_destroy :reset_contest
-  after_save :recalculate, if: proc { |match| match.saved_change_to_score1? || match.saved_change_to_score2? }
+  after_save :handle_score_change, if: proc { |match| match.saved_change_to_score1? || match.saved_change_to_score2? }
   after_save :set_predictions, if: proc { |match| match.saved_change_to_score1? || match.saved_change_to_score2? }
   after_destroy :after_destroy
 
@@ -233,21 +233,22 @@ class Match < ActiveRecord::Base
   end
 
   def set_predictions
-    predictions.update_all 'result = 0'
-    predictions.update_all 'result = 1', ['score1 = ? AND score2 = ?', score1, score2]
+    predictions.update_all(result: 0)
+    predictions.where(score1: score1, score2: score2).update_all(result: 1)
   end
 
   def after_destroy
-    predictions.update_all 'result = 0'
+    predictions.update_all(result: 0)
     contest.recalculate
   end
 
-  # Since ladders are broken anyway, they are not handled here
+  # Adjust contesters' points and records to remove this match's effects
   def reset_contest
     return if score1_was.nil? || score2_was.nil?
     return if contest.contest_type == Contest::TYPE_LEAGUE &&
               !contester2.active || !contester1.active
 
+    # Revert win/draw/loss records
     if score1_was == score2_was
       contester1.draw = contester1.draw - 1
       contester2.draw = contester2.draw - 1
@@ -261,12 +262,52 @@ class Match < ActiveRecord::Base
 
     return if contest.contest_type == Contest::TYPE_BRACKET
 
+    if contest.contest_type == Contest::TYPE_LADDER
+      return if diff.nil?
+
+      score_diff_was = score2_was - score1_was
+      prior_diff = diff
+
+      if score_diff_was.zero?
+        if prior_diff.negative?
+          # original: update_ranks(contester1, a, b - 1)
+          old_rank = contester1.score
+          new_rank = contester1.score + 1 - prior_diff
+          contest.update_ranks(contester1, old_rank, new_rank)
+        else
+          # original: update_ranks(contester2, b, a - 1)
+          old_rank = contester2.score
+          new_rank = contester1.score - 1 + prior_diff
+          contest.update_ranks(contester2, old_rank, new_rank)
+        end
+      elsif score_diff_was.negative? && prior_diff.negative?
+        # original: update_ranks(contester1, a, b)
+        old_rank = contester1.score
+        new_rank = contester1.score - prior_diff
+        contest.update_ranks(contester1, old_rank, new_rank)
+      elsif score_diff_was.positive? && prior_diff.positive?
+        # original: update_ranks(contester2, b, a)
+        old_rank = contester2.score
+        new_rank = contester2.score + prior_diff
+        contest.update_ranks(contester2, old_rank, new_rank)
+      end
+
+      contester1.save!
+      contester2.save!
+      return
+    end
+
     contester1.score = contester1.score - score1_was
     contester2.score = contester2.score - score2_was
     contester1.save!
     contester2.save!
   end
 
+  def handle_score_change
+    recalculate
+  end
+
+  # Recalculate contesters' points and records based on current match scores
   def recalculate
     return if score1.nil? || score2.nil?
     return if contest.contest_type == Contest::TYPE_LEAGUE &&
@@ -292,7 +333,7 @@ class Match < ActiveRecord::Base
     self.diff = diff || (contester2.score - contester1.score)
 
     if contest.contest_type == Contest::TYPE_LADDER
-      # Dunno what all this is but its not working anyways
+      # Old ELO-based ranking system (disabled)
       # self.points1 = contest.elo_score score1, score2, diff
       # self.points2 = contest.elo_score score2, score1, -(diff)
       # contester1.extra = contester1.extra + contest.modulus_base / 10

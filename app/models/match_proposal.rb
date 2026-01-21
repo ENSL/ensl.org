@@ -13,7 +13,6 @@
 #  index_match_proposals_on_status  (status)
 #
 class MatchProposal < ActiveRecord::Base
-
   STATUS_PENDING   = 0
   STATUS_REVOKED   = 1
   STATUS_REJECTED  = 2
@@ -23,78 +22,79 @@ class MatchProposal < ActiveRecord::Base
   # latest time before a match to be confirmed/rejected (in minutes)
   CONFIRMATION_LIMIT = 30
 
-  belongs_to :match, :optional => true
-  belongs_to :team, :optional => true
-  #has_many :confirmed_by, class_name: 'Team', uniq: true
+  belongs_to :match, optional: true
+  belongs_to :team, optional: true
+  # has_many :confirmed_by, class_name: 'Team', uniq: true
   # FIXME: attr_accessible :proposed_time, :status
 
   validates_presence_of :match, :team, :proposed_time
 
   scope :of_match, ->(match) { where('match_id = ?', match.id) }
   scope :confirmed_for_match, ->(match) { where('match_id = ? AND status = ?', match.id, STATUS_CONFIRMED) }
-  scope :confirmed_upcoming, ->{ where('status = ? AND proposed_time > UTC_TIMESTAMP()', STATUS_CONFIRMED) }
-  scope :confirmed_for_contest,
-        ->(contest){ includes(:match).where(matches:{contest_id: contest.id}, status: STATUS_CONFIRMED).all}
+  scope :confirmed_upcoming, -> { where('status = ? AND proposed_time > UTC_TIMESTAMP()', STATUS_CONFIRMED) }
+  scope :confirmed_for_contest, lambda { |contest|
+    includes(:match).where(matches: { contest_id: contest.id }, status: STATUS_CONFIRMED)
+  }
 
   def self.status_strings
-    {STATUS_PENDING   => 'Pending',
-     STATUS_REVOKED   => 'Revoked',
-     STATUS_REJECTED  => 'Rejected',
-     STATUS_CONFIRMED => 'Confirmed',
-     STATUS_DELAYED   => 'Delayed'}
+    { STATUS_PENDING => 'Pending',
+      STATUS_REVOKED => 'Revoked',
+      STATUS_REJECTED => 'Rejected',
+      STATUS_CONFIRMED => 'Confirmed',
+      STATUS_DELAYED => 'Delayed' }
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     return false unless cuser && match
     return true if cuser.admin?
+
     match.can_make_proposal?(cuser)
   end
 
-  def can_update? cuser, params = {}
+  def can_update?(cuser, params = {})
     return false unless cuser && match && (cuser.admin? || match.can_make_proposal?(cuser))
 
-    if params.key?(:status) && (self.status !=(new_status = params[:status].to_i))
-      return status_change_allowed?(cuser,new_status)
+    if params.key?(:status) && (status != (new_status = params[:status].to_i))
+      return status_change_allowed?(cuser, new_status)
     end
+
     true
   end
 
-  def can_destroy?
+  def can_destroy?(cuser)
     cuser && cuser.admin?
   end
 
   def state_immutable?
-    status == STATUS_REJECTED ||
-      status == STATUS_DELAYED ||
-      status == STATUS_REVOKED
+    [STATUS_REJECTED, STATUS_DELAYED, STATUS_REVOKED].include?(status)
   end
 
   def status_change_allowed?(cuser, new_status)
     case new_status
-      when STATUS_PENDING
-        # never go back to pending
-        return false
-      when STATUS_DELAYED
-        # only confirmed matches can be set to delayed
-        # only admins can set matches to delayed and only if they are not playing in that match
-        # matches can only be delayed if they are not to far in the future
-        return self.status == STATUS_CONFIRMED && cuser.admin? &&
-            !self.match.user_in_match?(cuser) && self.proposed_time <= CONFIRMATION_LIMIT.minutes.from_now
-      when STATUS_REVOKED
-        # unconfirmed can only be revoked by team making the proposal
-        # confirmed can only be revoked if soon enough before match time
-        return self.status == STATUS_PENDING && self.team == cuser.team ||
-            self.status == STATUS_CONFIRMED && self.proposed_time > CONFIRMATION_LIMIT.minutes.from_now
-      when STATUS_CONFIRMED, STATUS_REJECTED
-        # only team proposed to can reject or confirm and only if soon enough before match time
-        status_ok = self.status == STATUS_PENDING
-        team_ok = self.team != cuser.team
-        time_ok = CONFIRMATION_LIMIT.minutes.from_now < self.proposed_time
+    when STATUS_PENDING
+      # never go back to pending
+      false
+    when STATUS_DELAYED
+      # only confirmed matches can be set to delayed
+      # only admins can set matches to delayed and only if they are not playing in that match
+      # matches can only be delayed if they are not to far in the future
+      status == STATUS_CONFIRMED && cuser.admin? &&
+        !match.user_in_match?(cuser) && proposed_time <= CONFIRMATION_LIMIT.minutes.from_now
+    when STATUS_REVOKED
+      # unconfirmed can only be revoked by team making the proposal
+      # confirmed can only be revoked if soon enough before match time
+      status == STATUS_PENDING && team == cuser.team ||
+        status == STATUS_CONFIRMED && proposed_time > CONFIRMATION_LIMIT.minutes.from_now
+    when STATUS_CONFIRMED, STATUS_REJECTED
+      # only team proposed to can reject or confirm and only if soon enough before match time
+      status_ok = status == STATUS_PENDING
+      team_ok = team != cuser.team
+      time_ok = CONFIRMATION_LIMIT.minutes.from_now < proposed_time
 
-        return status_ok && team_ok && time_ok
-      else
-        # invalid status
-        return false
+      status_ok && team_ok && time_ok
+    else
+      # invalid status
+      false
     end
   end
 
