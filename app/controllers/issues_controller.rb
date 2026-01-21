@@ -40,6 +40,14 @@ class IssuesController < ApplicationController
     @issue.author = cuser if cuser
     raise AccessError unless @issue.can_create? cuser
 
+    # verify reCAPTCHA for anonymous users
+    if cuser.nil?
+      unless verify_recaptcha(model: @issue)
+        render :new
+        return
+      end
+    end
+
     if @issue.save
       flash[:notice] = t(:issues_create)
       if cuser

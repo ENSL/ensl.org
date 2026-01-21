@@ -1,0 +1,4 @@
+en:
+  captcha_placeholder: "Enter the letters you see"
+  captcha_incorrect: "CAPTCHA incorrect, please try again"
+  captcha_expired: "CAPTCHA expired, please try again"

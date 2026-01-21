@@ -31,4 +31,9 @@
   <div class="controls">
     <%= f.submit 'Submit' %>
   </div>
+  <% unless cuser %>
+    <div class="fields horizontal captcha">
+      <%= recaptcha_tags %>
+    </div>
+  <% end %>
 <% end %>
