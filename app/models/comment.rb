@@ -22,26 +22,26 @@
 class Comment < ActiveRecord::Base
   include Extra
 
-  #attr_protected :id, :updated_at, :created_at, :user_id
+  # attr_protected :id, :updated_at, :created_at, :user_id
 
-  scope :with_userteam, -> { includes({:user => :team}) }
-  scope :recent, -> (n) { order("id DESC").limit(n) }
-  scope :recent5, -> { order("id DESC").limit(5).group("commentable_id, commentable_type") }
-  scope :filtered, -> { where.not({"commentable_type" => 'Issue'}) }
-  scope :ordered, -> { order("id ASC") }
+  scope :with_userteam, -> { includes({ user: :team }) }
+  scope :recent, ->(n) { order('id DESC').limit(n) }
+  scope :recent5, -> { order('id DESC').limit(5).group('commentable_id, commentable_type') }
+  scope :filtered, -> {  where.not({ 'commentable_type' => 'Issue' }) }
+  scope :ordered, -> { order('id ASC') }
 
-  belongs_to :user, :optional => true
-  belongs_to :commentable, :polymorphic => true, :optional => true
+  belongs_to :user, optional: true
+  belongs_to :commentable, polymorphic: true, optional: true
 
   validates_presence_of :commentable, :user
-  validates_length_of :text, :in => 1..10000
+  validates_length_of :text, in: 1..10_000
 
   before_save :parse_text
 
   def parse_text
-    if self.text
-      self.text_parsed = bbcode_to_html(self.text)
-    end
+    return unless text
+
+    self.text_parsed = bbcode_to_html(text)
   end
 
   def after_create
@@ -50,23 +50,24 @@ class Comment < ActiveRecord::Base
     #		end
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     return false unless cuser
-    #errors.add_to_base I18n.t(:comments_locked) if !commentable.lock.nil? and commentable.lock
-    errors.add_to_base I18n.t(:bans_mute) if cuser.banned? Ban::TYPE_MUTE
-    errors.add_to_base I18n.t(:registered_for_week) unless cuser.verified?
-    return errors.count == 0
+
+    # errors.add_to_base I18n.t(:comments_locked) if !commentable.lock.nil? and commentable.lock
+    errors.add :base, I18n.t(:bans_mute) if cuser.banned? Ban::TYPE_MUTE
+    errors.add :base, I18n.t(:registered_for_week) unless cuser.verified?
+    errors.count == 0
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and user == cuser or cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
-  def self.params params, cuser
+  def self.params(params, cuser)
     params.require(:comment).permit(:text, :user_id, :commentable_type, :commentable_id)
   end
 end

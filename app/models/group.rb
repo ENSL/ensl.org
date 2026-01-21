@@ -28,32 +28,32 @@ class Group < ActiveRecord::Base
   GATHER_MODERATORS = 14
   CONTRIBUTORS = 16
 
-  validates_length_of :name, :maximum => 20
+  validates_length_of :name, maximum: 20
 
   has_many :groupers
-  has_many :users, :through => :groupers
-  has_and_belongs_to_many :users
-  
-  belongs_to :founder, :class_name => "User", :optional => true
+  has_many :users, through: :groupers
+  # Removed erroneous HABTM declaration that conflicted with `has_many :users, through: :groupers`
+
+  belongs_to :founder, class_name: 'User', optional: true
 
   def to_s
     name
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin? and id != Group::ADMINS and !Group.protected_groups.include?(id)
   end
 
   def self.protected_groups
-    Group.constants(false).map {|n| Group.const_get(n)}
+    Group.constants(false).map { |n| Group.const_get(n) }
   end
 
   def self.staff
@@ -74,7 +74,7 @@ class Group < ActiveRecord::Base
     referee_group = where(id: REFEREES).first
     return referees unless referee_group
 
-    (referee_group.groupers).each do |g|
+    referee_group.groupers.each do |g|
       referees << g unless referees.include? g
     end
     referees
@@ -96,10 +96,10 @@ class Group < ActiveRecord::Base
 
   def self.casters
     casters = []
-    caster_group = where(id:CASTERS).first
+    caster_group = where(id: CASTERS).first
     return casters unless caster_group
 
-    (caster_group.groupers).each do |g|
+    caster_group.groupers.each do |g|
       casters << g unless casters.include? g
     end
     casters
@@ -107,10 +107,10 @@ class Group < ActiveRecord::Base
 
   def self.gathermods
     gathermods = []
-    gathermod_group = where(id:GATHER_MODERATORS).first
+    gathermod_group = where(id: GATHER_MODERATORS).first
     return gathermods unless gathermod_group
 
-    (gathermod_group.groupers).each do |g|
+    gathermod_group.groupers.each do |g|
       gathermods << g unless gathermods.include? g
     end
     gathermods
@@ -118,10 +118,10 @@ class Group < ActiveRecord::Base
 
   def self.contributors
     contributors = []
-    group_contrib = where(id:CONTRIBUTORS).first
+    group_contrib = where(id: CONTRIBUTORS).first
     return contributors unless group_contrib
 
-    (group_contrib.groupers).each do |g|
+    group_contrib.groupers.each do |g|
       contributors << g unless contributors.include? g
     end
     contributors
