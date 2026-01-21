@@ -5,6 +5,9 @@ ENV APP_PATH /var/www
 ENV WEB_UID 1000
 ENV WEB_GID 1000
 ENV NVM_DIR /usr/local/nvm
+ENV GEM_HOME /var/bundle
+ENV GEM_PATH /var/bundle
+ENV PATH /var/bundle/bin:/usr/local/bundle/bin:${PATH}
 
 RUN \
     # Add web
@@ -36,7 +39,7 @@ RUN \
     gem update --system && \
     # Install bundler and bundle path
     gem install bundler && \
-    mkdir -p /var/bundle && chown -R web:web /var/bundle && \
+    mkdir -p /var/bundle /usr/local/bundle && chown -R web:web /var/bundle /usr/local/bundle && \
     # Install nvm, Node (LTS) and yarn (installed via npm global)
     mkdir -p $NVM_DIR && \
     curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash && \
