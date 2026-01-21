@@ -72,6 +72,7 @@ def build_chrome_options(headless:)
 
   # Enable browser console logging (for test diagnostics)
   opts.add_option('goog:loggingPrefs', browser: 'ALL')
+  opts
 end
 
 Capybara.register_driver :selenium_chrome do |app|
