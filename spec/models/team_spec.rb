@@ -1,6 +1,52 @@
 require 'rails_helper'
 
 RSpec.describe Team, type: :model do
+  describe 'init and leader assignment' do
+    it 'initializes active and recruiting' do
+      t = Team.new
+      t.send(:init_variables)
+      expect(t.active).to be true
+      expect(t.recruiting).to be_nil
+    end
+
+    it 'adds founder as leader on create' do
+      user = create(:user)
+      team = Team.create!(name: 'TeamX', tag: 'TX', founder: user)
+      expect(team.leaders.count).to eq(1)
+      expect(user.reload.team_id).to eq(team.id)
+    end
+  end
+
+  describe 'destroy behavior' do
+    it 'clears users team_id when destroying' do
+      team = create(:team)
+      user = create(:user)
+      # set team without invoking user validations
+      user.update_column(:team_id, team.id)
+      team.destroy
+      expect(user.reload.team_id).to be_nil
+    end
+
+    it 'marks inactive and updates teamers when matches exist' do
+      team = create(:team)
+      create(:teamer, team: team)
+      # create a contester and match to simulate matches.present?
+      contest = create(:contest)
+      contester = create(:contester, team: team, contest: contest)
+      other = create(:contester, contest: contest)
+      create(:match, contest: contest, contester1: contester, contester2: other, score1: 1, score2: 0)
+
+      expect(team.matches.count).to be > 0
+      team.destroy
+      team.reload
+      expect(team.active).to be false
+      expect(team.teamers.pluck(:rank)).to include(Teamer::RANK_REMOVED)
+    end
+  end
+end
+require 'rails_helper'
+
+RSpec.describe Team, type: :model do
   describe 'basic methods' do
     it 'initializes variables with init_variables' do
       t = Team.new

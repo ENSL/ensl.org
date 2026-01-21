@@ -96,12 +96,12 @@ class Team < ActiveRecord::Base
   def add_leader
     return unless founder
 
-    teamer = Teamer.new
-    teamer.user = founder
-    teamer.team = self
-    teamer.rank = Teamer::RANK_LEADER
-    teamer.save
-    founder.update_attribute :team_id, id
+    transaction do
+      teamer = Teamer.create!(user: founder, team: self, rank: Teamer::RANK_LEADER)
+      # set founder's team_id without invoking validations that may block assignment
+      founder.update_column(:team_id, id)
+      teamer
+    end
   end
 
   def self.search(search)
@@ -109,15 +109,22 @@ class Team < ActiveRecord::Base
   end
 
   def destroy
-    User.where(team_id: id).each do |user|
-      user.update_attribute(:team_id, nil)
+    has_matches = matches.count > 0
+
+    transaction do
+      User.where(team_id: id).update_all(team_id: nil)
+      if has_matches
+        update!(active: false)
+        teamers.update_all(rank: Teamer::RANK_REMOVED)
+      end
     end
-    if matches.count > 0
-      update_attribute :active, false
-      teamers.update_all ['rank = ?', Teamer::RANK_REMOVED]
-    else
-      super
-    end
+
+    # If no matches exist, destroy dependent associations then remove the record
+    return if has_matches
+
+    teamers.destroy_all
+    contesters.destroy_all
+    delete
   end
 
   def recover
