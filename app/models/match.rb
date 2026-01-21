@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: matches
@@ -82,27 +84,30 @@ class Match < ActiveRecord::Base
   scope :finished, -> { where('score1 != 0 OR score2 != 0') }
   scope :realfinished, -> { where('score1 IS NOT NULL AND score2 IS NOT NULL') }
   scope :unfinished, -> { where('score1 IS NULL AND score2 IS NULL') }
-  scope :unreffed, -> { where.not(referee_id: nil) }
+  scope :unreffed, -> { where(referee_id: nil) }
   scope :ordered, -> { order('match_time DESC') }
   scope :chrono, -> { order('match_time ASC') }
-  scope :recent, -> { limit('8') }
-  scope :bigrecent, -> { limit('50') }
-  scope :active, -> { where('contest_id IN (?)', Contest.active) }
+  scope :recent, -> { limit(8) }
+  scope :bigrecent, -> { limit(50) }
+  scope :active, -> { where(contest_id: Contest.active.select(:id)) }
   scope :on_day, ->(day) { where('match_time > ? and match_time < ?', day.beginning_of_day, day.end_of_day) }
   scope :on_week, ->(time) { where('match_time > ? and match_time < ?', time.beginning_of_week, time.end_of_week) }
   scope :of_contester, ->(contester) { where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id) }
   scope :of_user, ->(user) { includes(:matchers).where(matchers: { user_id: user.id }) }
   scope :of_team, lambda { |team|
-    includes({ contester1: :team, contester2: :team }).where('teams.id = ? OR teams_contesters.id = ?', team.id, team.id)
+    where(
+      'contester1_id IN (SELECT id FROM contesters WHERE team_id = ?) OR contester2_id IN (SELECT id FROM contesters WHERE team_id = ?)',
+      team.id, team.id
+    )
   }
   scope :of_userteam, lambda { |user, team|
     includes({ matchers: { contester: :team } }).where(teams: { id: team.id }, matchers: { user_id: user.id })
   }
   scope :within_time, ->(from, to) { where('match_time > ? AND match_time < ?', from.utc, to.utc) }
   scope :around, lambda { |time|
-    where('match_time > ? AND match_time < ?', time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc)
+    where('match_time > ? AND match_time < ?', (time - MATCH_LENGTH).utc, (time + MATCH_LENGTH).utc)
   }
-  scope :after, ->(time) { where('match_time > ? AND match_time < ?', time.utc, time.ago(-MATCH_LENGTH).utc) }
+  scope :after, ->(time) { where('match_time > ? AND match_time < ?', time.utc, (time + MATCH_LENGTH).utc) }
   scope :map_stats, lambda {
     select('map1_id, COUNT(*) as num, maps.name')
       .joins('LEFT JOIN maps ON maps.id = map1_id')
@@ -132,15 +137,18 @@ class Match < ActiveRecord::Base
   before_create :set_hltv
   after_create :send_notifications
   before_save :set_motm, if: proc { |match| match.motm_name && !match.motm_name.empty? }
-  before_update :reset_contest, if: proc { |match| match.score1_changed? || match.score2_changed? }
+  before_update :reset_contest, if: proc { |match|
+    match.will_save_change_to_score1? || match.will_save_change_to_score2?
+  }
   before_destroy :reset_contest
-  after_save :recalculate, if: proc { |match| match.score1_changed? || match.score2_changed? }
-  after_save :set_predictions, if: proc { |match| match.score1_changed? || match.score2_changed? }
+  after_save :recalculate, if: proc { |match| match.saved_change_to_score1? || match.saved_change_to_score2? }
+  after_save :set_predictions, if: proc { |match| match.saved_change_to_score1? || match.saved_change_to_score2? }
+  after_destroy :after_destroy
 
   accepts_nested_attributes_for :matchers, allow_destroy: true
 
   def to_s
-    contester1.to_s + ' vs ' + contester2.to_s
+    "#{contester1} vs #{contester2}"
   end
 
   def score_color
@@ -208,7 +216,7 @@ class Match < ActiveRecord::Base
   end
 
   def set_hltv
-    get_hltv if match_time.future?
+    get_hltv if match_time && match_time > Time.now.utc
   end
 
   def send_notifications
@@ -291,25 +299,25 @@ class Match < ActiveRecord::Base
       # contester2.extra = contester2.extra + contest.modulus_base / 10
 
       score_diff = score2 - score1
-      if score_diff == 0 # Draw
-        if diff < 0 # contester2 has higher rank
+      if score_diff.zero? # Draw
+        if diff.negative? # contester2 has higher rank
           # set contester1s rank one below contester2
           contest.update_ranks(contester1, contester1.score, contester2.score - 1)
         else
           # set contester2s rank one below contester1
           contest.update_ranks(contester2, contester2.score, contester1.score - 1)
         end
-      elsif score_diff < 0 && diff < 0 # contester1 won and contester2 has higher rank
+      elsif score_diff.negative? && diff.negative? # contester1 won and contester2 has higher rank
         contest.update_ranks(contester1, contester1.score, contester2.score)
-      elsif score_diff > 0 && diff > 0 # contester2 won and contester1 has higher rank
+      elsif score_diff.positive? && diff.positive? # contester2 won and contester1 has higher rank
         contest.update_ranks(contester2, contester2.score, contester1.score)
       end
 
     elsif contest.contest_type == Contest::TYPE_LEAGUE
       self.points1 = score1
       self.points2 = score2
-      contester1.score = contester1.score + points1 < 0 ? 0 : contester1.score + points1
-      contester2.score = contester2.score + points2 < 0 ? 0 : contester2.score + points2
+      contester1.score = (contester1.score + points1).negative? ? 0 : contester1.score + points1
+      contester2.score = (contester2.score + points2).negative? ? 0 : contester2.score + points2
     end
 
     return if contest.contest_type == Contest::TYPE_BRACKET
@@ -323,7 +331,7 @@ class Match < ActiveRecord::Base
        (match_time + MATCH_LENGTH * 10) < Time.now.utc
       raise Error, I18n.t(:hltv_request_20)
     end
-    raise Error, I18n.t(:hltv_already) + hltv.addr if hltv && hltv.recording
+    raise Error, I18n.t(:hltv_already) + hltv.addr if hltv&.recording
     raise Error, I18n.t(:hltv_notavailable) unless get_hltv
 
     save!
@@ -346,7 +354,7 @@ class Match < ActiveRecord::Base
   end
 
   def can_create?(cuser)
-    cuser && cuser.admin?
+    cuser&.admin?
   end
 
   def can_update?(cuser, params = {})
@@ -385,7 +393,7 @@ class Match < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser && cuser.admin?
+    cuser&.admin?
   end
 
   def can_make_proposal?(cuser)
@@ -396,9 +404,9 @@ class Match < ActiveRecord::Base
     user && (user.team == contester1.team || user.team == contester2.team)
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     # FIXME: check this
     params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,
-                                  :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_Id, :week_id)
+                                  :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_id, :week_id)
   end
 end
