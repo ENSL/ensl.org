@@ -193,7 +193,7 @@ class User < ActiveRecord::Base
     if fullname.include?(' ')
       # TODO: check this
       self.firstname = fullname.match(/(?:^|(?:\.\s))(\w+)/)[1]
-      self.surname = fullname.match(/\s(\w+)$/)[1]
+      self.lastname = fullname.match(/\s(\w+)$/)[1]
     else
       self.firstname = fullname
     end
