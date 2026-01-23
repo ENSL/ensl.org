@@ -58,7 +58,7 @@
   <% end %>
 
   <div class="details">
-    <h3 class="contest"><%= @match.contest %></h3>
+    <h3 class="contest"><%= namelink @match.contest %></h3>
     <h5 class="date"><%= @match.match_time.strftime("%A %e %B %Y") %></h5>
     <h5 class="date"><%= Time.use_zone(timezone_offset) { @match.match_time.strftime("%H:%M %Z") } %></h5>
   </div>

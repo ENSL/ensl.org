@@ -52,7 +52,7 @@
             </div>
             <div class="fields horizontal">
                 <%= f.label :rules_id %>
-                <%= f.select :rules_id, Category.find(Category::RULES).articles.collect { |a| [a, a.id] }, include_blank: true %>
+                <%= f.select :rules_id, (Category.find_by(id: Category::RULES)&.articles || []).collect { |a| [a, a.id] }, include_blank: true %>
             </div>
 
             <% if @contest.contest_type == Contest::TYPE_LADDER %>

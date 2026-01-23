@@ -20,7 +20,7 @@
       <dd>Sunday: <%= Time.use_zone(timezone_offset) { @contest.default_time.strftime("%H:%M %Z") } %></dd>
     </dl>
 
-    <%= link_to 'Scheduled Matches', confirmed_matches_path(@contest), class: 'button big' %>
+    <%= link_to 'Scheduled Matches', confirmed_matches_contest_path(@contest), class: 'button big' %>
 
     <% if @contest.can_update?(cuser) %>
       <%= link_to 'Edit Contest', edit_contest_path(@contest), class: 'button' %>

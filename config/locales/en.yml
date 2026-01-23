@@ -149,3 +149,7 @@ en:
               invalid: "is invalid"
             steamid:
               invalid: "is invalid"
+        match:
+          attributes:
+            base:
+              match_same_team_error: "Contesters must be from different teams."

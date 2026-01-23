@@ -133,6 +133,7 @@ class Match < ActiveRecord::Base
   validates :contester1, :contester2, :contest, presence: true
   validates :score1, :score2, format: /\A[1-9]?[0-9]\z/, allow_nil: true
   validates :report, length: { maximum: 64_000 }, allow_blank: true
+  validate :validate_different_teams
 
   before_create :set_hltv
   after_create :send_notifications
@@ -213,6 +214,14 @@ class Match < ActiveRecord::Base
 
   def get_opposing_team(team)
     team == contester1.team ? contester2.team : contester1.team
+  end
+
+  def validate_different_teams
+    return if contester1.nil? || contester2.nil?
+
+    return unless contester1.team == contester2.team
+
+    errors.add(:base, :match_same_team_error)
   end
 
   def set_hltv
