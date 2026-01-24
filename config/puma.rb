@@ -59,5 +59,11 @@ end
 before_restart do
   ENV['BUNDLE_GEMFILE'] = "#{app_dir}/Gemfile"
   Dotenv.overload('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
-  ActiveRecord::Base.connection.disconnect!
+  if defined?(ActiveRecord::Base)
+    begin
+      ActiveRecord::Base.clear_active_connections!
+    rescue StandardError
+      # best-effort: avoid raising during puma restart
+    end
+  end
 end
