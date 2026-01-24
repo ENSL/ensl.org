@@ -51,10 +51,10 @@ gem 'active_link_to'
 gem 'bbcoder'
 gem 'bluecloth'
 gem 'carrierwave'
-gem 'recaptcha', require: 'recaptcha/rails'
 gem 'country_select'
 gem 'nokogiri'
 gem 'public_suffix'
+gem 'recaptcha', require: 'recaptcha/rails'
 gem 'rmagick'
 gem 'sanitize'
 gem 'time_difference'
@@ -79,6 +79,9 @@ gem 'font-awesome-sass', '~> 4.1.0.0' # Fix icons before updating
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
 
+# Redis is a common Action Cable adapter (useful in production)
+gem 'redis', '~> 4.0'
+
 # FIXME: Legacy feature shims
 gem 'active_record_union'
 gem 'rails_autolink'
@@ -92,7 +95,12 @@ gem 'net-http'
 
 # https://github.com/DatabaseCleaner/database_cleaner/issues/299
 # gem 'mongoid-tree'
-gem 'database_cleaner'
+
+# Importmap for Rails. JS management without nodejs.
+gem 'importmap-rails', '~> 2.2'
+
+# Hotwire Turbo (Turbo Streams) for real-time updates
+gem 'turbo-rails'
 
 group :production do
   gem 'newrelic_rpm'
@@ -126,13 +134,16 @@ group :test do
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
 
-  # Feature testing
-  gem 'capybara'
-  #   gem 'poltergeist'
+  # Feature testing.
+  # Capybara for integration testing
+  # Apparition for headless browser testing
+  # Selenium for real browser testing
   gem 'apparition'
-  # gem 'phantomjs', require: 'phantomjs/poltergeist'
+  gem 'capybara'
   gem 'selenium'
   gem 'selenium-webdriver'
+  # gem 'poltergeist'
+  # gem 'phantomjs', require: 'phantomjs/poltergeist'
 
   # Fix FF issue
   # gem 'geckodriver-helper'
@@ -154,8 +165,11 @@ group :test do
   gem 'mime-types'
 
   # Database cleaner
+  gem 'database_cleaner'
   gem 'database_cleaner-active_record'
   # gem 'database_cleaner-redis'
+
+  # Redis namespace for testing
   gem 'redis-namespace'
 
   # For circle ci + CC
@@ -165,21 +179,27 @@ end
 
 group :development, :test do
   # Debugging
-  gem 'rdbg'
+  gem 'debug'
+
+  # LSP support. For editors like VSCode
   gem 'ruby-lsp'
   gem 'ruby-lsp-rails'
 
+  # Better console with breakpoints
   gem 'pry-byebug'
   gem 'pry-rails'
 
+  # Better output
   gem 'awesome_print'
+
+  # Static analysis / code quality
   gem 'rails_best_practices'
 
   # gem 'spring'
   # gem 'ruby-debug-ide'
   # gem 'debase'
 
-  # For n+1 uqeries
+  # For n+1 query detection
   # gem 'bullet'
 
   gem 'erb2haml'

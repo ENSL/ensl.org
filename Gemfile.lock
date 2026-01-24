@@ -170,7 +170,7 @@ GEM
       database_cleaner-core (~> 2.0)
     database_cleaner-core (2.0.1)
     date (3.5.1)
-    debug (1.11.0)
+    debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
@@ -254,6 +254,10 @@ GEM
     image_processing (1.14.0)
       mini_magick (>= 4.9.5, < 6)
       ruby-vips (>= 2.0.17, < 3)
+    importmap-rails (2.2.3)
+      actionpack (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      railties (>= 6.0.0)
     io-console (0.8.2)
     irb (1.16.0)
       pp (>= 0.6.0)
@@ -450,17 +454,12 @@ GEM
       ffi (~> 1.0)
     rbs (3.10.2)
       logger
-    rdbg (0.1.0)
-      debug (>= 1.2.2)
     rdoc (7.1.0)
       erb
       psych (>= 4.0.0)
       tsort
     recaptcha (5.21.1)
-    redis (5.4.1)
-      redis-client (>= 0.22.0)
-    redis-client (0.26.1)
-      connection_pool
+    redis (4.8.1)
     redis-namespace (1.11.0)
       redis (>= 4)
     regexp_parser (2.11.3)
@@ -588,6 +587,9 @@ GEM
     tinymce-rails (8.2.0)
       railties (>= 3.1.1)
     tsort (0.2.0)
+    turbo-rails (2.0.21)
+      actionpack (>= 7.1.0)
+      railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uglifier (4.2.1)
@@ -650,6 +652,7 @@ DEPENDENCIES
   dalli
   database_cleaner
   database_cleaner-active_record
+  debug
   dotenv-rails
   dynamic_form
   erb2haml
@@ -659,6 +662,7 @@ DEPENDENCIES
   google-api-client
   haml
   i18n-js
+  importmap-rails (~> 2.2)
   jquery-rails
   mime-types
   mysql2
@@ -681,8 +685,8 @@ DEPENDENCIES
   rails_autolink
   rails_best_practices
   rake
-  rdbg
   recaptcha
+  redis (~> 4.0)
   redis-namespace
   responders
   rmagick
@@ -706,6 +710,7 @@ DEPENDENCIES
   time_difference
   timecop
   tinymce-rails
+  turbo-rails
   uglifier
   unread
   web-console

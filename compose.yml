@@ -22,6 +22,8 @@ services:
   #
   development:
     <<: *app
+#    environment:
+#      DISABLE_PUMA: 1
     ports:
       - "${PUMA_PORT}:${PUMA_PORT}"
       - "35729:35729"

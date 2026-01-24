@@ -34,7 +34,20 @@ fi
 # Run migrations
 bundle exec rake db:migrate
 
-# Start puma
+# Start puma unless disabled for debugging
+if [[ "$DISABLE_PUMA" -eq 1 ]]; then
+  echo "Puma is disabled, dropping to shell."
+  /bin/bash -c "while true; do sleep 60; done"
+  exit 0
+fi
+
+# Start puma in debug mode if needed
+if [[ "$RAILS_DEBUG" -eq 1 ]]; then
+  echo "Starting in developer mode with rdbg..."
+  bundle exec rdbg --open --port 12345 -c -- puma -C config/puma.rb
+  exit 0
+fi
+
 bundle exec puma -C config/puma.rb
 
 # After puma dies, leave us a shell
