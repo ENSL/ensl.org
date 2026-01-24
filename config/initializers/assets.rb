@@ -15,3 +15,7 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 # Precompile TinyMCE assets used by tinymce-rails
 Rails.application.config.assets.precompile += %w[tinymce.js]
+# Precompile Action Cable client when served from app/assets in production
+Rails.application.config.assets.precompile += %w[actioncable.js]
+# Precompile the importmap-built application module so sprockets can serve it
+Rails.application.config.assets.precompile += %w[importmap_application.js]

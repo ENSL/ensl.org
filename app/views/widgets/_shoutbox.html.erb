@@ -1,6 +1,14 @@
 <div class="widget shoutbox">
   <h4><%= t('widget.shoutbox') %></h4>
   <div class="widget-content-wrapper">
+    <%# Capture and log the turbo_stream_from output for debugging signed-stream presence %>
+    <% begin %>
+      <% __ts_html = turbo_stream_from 'shoutbox' %>
+      <% Rails.logger.debug "turbo_stream_from HTML: #{__ts_html.to_s.inspect}" %>
+      <%= raw __ts_html %>
+    <% rescue => e %>
+      <% Rails.logger.error "turbo_stream_from render error: #{e.class}: #{e.message}" %>
+    <% end %>
     <div id="shoutbox" class="transcript">
       <%= render partial: "shoutmsgs/shoutmsg", collection: Shoutmsg.recent.box, locals: { popup: "$('shoutbox')" } %>
     </div>
@@ -8,15 +16,3 @@
   <%= render partial: "shoutmsgs/new", locals: { shoutmsg: Shoutmsg.new } %>
   <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
 </div>
-
-<script type="text/javascript">
-        $(document).ready(function () {
-                $.PeriodicalUpdater("/shoutmsgs/index.js", {
-                  method: "GET",
-                  type: "script",
-                  minTimeout: 20000,
-                  multiplier: 3,
-                  maxTimeout: 300000
-                });
-        });
-</script>

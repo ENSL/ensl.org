@@ -26,7 +26,7 @@
         </ul>
       </li>
       <li class="dropdown">
-        <%= link_to gathers_url, class: 'gathers', target: "_blank" do %>
+        <%= link_to article_url(464), class: 'gathers', target: "_blank" do %>
           Gathers 
           <span class="count" id="gathercount"></span>
         <% end %>
@@ -86,17 +86,3 @@
     </ul>
   </div>
 </nav>
-<script>
-$((function gather () {
-    $.ajax({
-      datatype: "json",
-      url: "<%= gathers_url %>/gathers/current", 
-      success: function (data) {
-        $("#gathercount").html(data.gatherers.length + "/12");
-      },
-      complete: function() {
-      	setTimeout(gather, 10000);
-      }
-    });
-  })());
-</script>

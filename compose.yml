@@ -14,7 +14,7 @@ x-app: &app
   depends_on:
     - db
     - memcached
-    - smtp
+    - redis
 
 services:
   #
@@ -51,6 +51,8 @@ services:
       target: ensl_production
     ports:
       - "${PUMA_PORT}:${PUMA_PORT}"
+    depends_on:
+      - smtp
 
   #
   # Testing
@@ -90,7 +92,7 @@ services:
     image: memcached:alpine
 
   redis:
-    image: redis:4.0-alpine
+    image: redis:8.4.0
 
   db:
     image: mariadb:10.7

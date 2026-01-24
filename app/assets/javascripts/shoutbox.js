@@ -27,6 +27,12 @@ ShoutboxController.prototype.init = function (options) {
 			self.enableShoutbox();
 		}
 	});
+	// Initialize button state based on current input value
+	if (self.$input.val().length > 100) {
+		self.disableShoutbox();
+	} else {
+		self.enableShoutbox();
+	}
 	return self;
 };
 

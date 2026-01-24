@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require_relative '../config/application'
+# Ensure local node_modules/.bin is on PATH so jspm (installed locally) is found
+ENV['PATH'] = File.expand_path('../../node_modules/.bin', __dir__) + ':' + ENV['PATH']
+require 'importmap/commands'

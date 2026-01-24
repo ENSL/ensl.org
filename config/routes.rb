@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Mount Action Cable for Turbo Streams / Action Cable subscriptions
+  mount ActionCable.server => '/cable'
+
   %w[403 404 422 500].each do |code|
     get code, to: 'errors#show', code: code
   end

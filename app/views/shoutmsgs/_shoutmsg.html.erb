@@ -1,7 +1,12 @@
 <div class="shoutmsg">
   <div class="user">
-    <span class="username">
-      <%= namelink shoutmsg.user %>
+      <span class="username">
+      <% display_user = local_assigns[:user] || shoutmsg.user %>
+      <% if display_user && display_user.respond_to?(:id) && display_user.id.present? %>
+        <%= namelink(display_user) %>
+      <% else %>
+        <%= h(display_user.to_s) %>
+      <% end %>
     </span>
     <span class="time">
       <%= shoutmsg.created_at ? shoutmsg.created_at.strftime("%H:%M") : Time.now.strftime("%H:%M") %>
@@ -10,7 +15,7 @@
   <div class="message">
     <div class="contents">
       <%= auto_link shoutmsg.text, html: { target: '_blank' } %>
-      <% if shoutmsg.can_destroy? cuser %>
+      <% if local_assigns.key?(:cuser) && shoutmsg.can_destroy?(local_assigns[:cuser]) %>
         <%= link_to icon('times'), shoutmsg, method: :delete, class: 'destroy' %>
       <% end %>
     </div>

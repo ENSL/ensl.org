@@ -2,26 +2,29 @@
   <% if cuser.banned? Ban::TYPE_MUTE %>
     You have been muted.
   <% else %>
-    <% scroll = shoutmsg.domain == "shoutbox" ? "" : "$('#{shoutmsg.domain}').scrollTop = $('#{shoutmsg.domain}').scrollHeight;" %>
-    <%= form_for(shoutmsg, remote: true, html: { id: "new_#{shoutmsg.domain}", class: 'new-shout' }) do |f| %>
+    <%= form_with(model: shoutmsg, id: "new_#{shoutmsg.domain}", html: { class: 'new-shout', data: { turbo: true } }, local: false) do |f| %>
       <% if shoutmsg.shoutable %>
         <%= f.hidden_field :shoutable_type %>
         <%= f.hidden_field :shoutable_id %>
       <% end %>
       <div class="fields">
         <%= f.text_field :text, size: 12, id: "#{shoutmsg.domain}_text", class: "shout_input" %>
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
       </div>
       <div class="controls">
-        <%= submit_tag "Shout!" %>
+        <%= button_tag "Shout!", type: 'submit', class: 'shout-submit' %>
       </div>
     <% end %>
   <% end %>
 <% end %>
 
 <script type="text/javascript">
-$(function () {
-  ShoutboxController({
-    context: $('<%= "#new_#{shoutmsg.domain}" %>')
-  });
+document.addEventListener("turbo:load", function() {
+  try {
+    ShoutboxController({ context: $("#new_<%= shoutmsg.domain %>") });
+  } catch (e) {
+    // shoutbox controller may not be available in some test environments
+  }
 });
 </script>
+

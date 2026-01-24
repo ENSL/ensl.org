@@ -99,3 +99,8 @@ pickle-email-*.html
 
 # Checklist
 CHECKLIST.md
+
+# Ignore vendored importmap assets (created at build/startup)
+/app/assets/javascripts/vendor
+
+node_modules/
