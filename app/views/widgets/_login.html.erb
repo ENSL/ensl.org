@@ -9,8 +9,8 @@
       <% end %>
     </div>
 
-    <%= text_field "login", "username", placeholder: "Username" %>
-    <%= password_field "login", "password", placeholder: "Password" %>
+    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username" %>
+    <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password" %>
   </div>
   <div class="buttons">
     <div class="login">

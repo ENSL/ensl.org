@@ -8,7 +8,7 @@
       look for your account <%= link_to "here", users_path, target: "_blank" %>.
     </div>
 
-    <%= form_tag(users_login_path(), { class: 'square' }) do %>
+    <%= form_tag(users_login_path(), { class: 'square', data: { turbo: false } }) do %>
       <div class="horizontal fields ">
         <%= text_field "login", "username", placeholder: "Username" %>
         <%= password_field "login", "password", placeholder: "Password" %>
@@ -19,7 +19,7 @@
     <% end %>
   <% end %>
 
-  <%= form_for @user, html: { class: "square" } do |f| %>
+  <%= form_for @user, html: { class: "square", data: { turbo: false } } do |f| %>
     <%= render 'shared/errors', messages: @user.errors.full_messages %>
     <% unless session[:verified_steamid] %>
       <div class="horizontal fields">
@@ -28,7 +28,7 @@
     <% end %>
     <div class="horizontal fields">
       <%= f.label :username %>
-      <%= f.text_field :username %>
+      <%= f.text_field :username, autocomplete: "username" %>
     </div>
     <div class="horizontal fields">
       Pick unique nickname for yourself.
@@ -36,10 +36,11 @@
     <% unless session[:verified_steamid] %>
       <div class="horizontal fields">
         <%= f.label :raw_password, "Password" %>
-        <%= f.password_field :raw_password %>
+        <%= f.password_field :raw_password, autocomplete: "new-password" %>
       </div>
       <div class="horizontal fields">
-        Please don't use same password as any important place.
+        Please don't use same password as any important place. The password is however
+        stored securely with a hashing algorithm that is resistant to DB leaks.
       </div>
     <% end %>
     <div class="horizontal fields">
@@ -57,7 +58,9 @@
       <div class="horizontal fields">
         You can use <%= link_to "this tool", steamid_tool %> or
         <%= link_to "this web page", 'https://steamidfinder.com/' %>
-        to find your SteamID. We need the steam id to identify unique players. If you use fake one, some things on website might be broken.
+        to find your SteamID. We need the steam id to identify unique players. If you use fake
+        one, some things on website might be broken. It can also be used to recover your account
+        if you lose password, and can be used to link your in-game stats to your account.
       </div>
     <% end %>
     <div class="horizontal fields">
