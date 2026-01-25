@@ -166,26 +166,17 @@ class User < ActiveRecord::Base
   # Enforce uniqueness when there are no prior duplicates; if duplicates already
   # exist for a given steamid we skip the uniqueness error to avoid blocking
   # logins/creation for records that match an existing (broken) state.
+  # FIXME: this is a temporary measure until all duplicates are resolved.
   def steamid_uniqueness
     return if steamid.nil? || steamid.to_s.strip.empty?
 
-    sid = steamid.to_s.downcase
-    existing = User.where('LOWER(steamid) = ?', sid)
-    # Exclude current record when checking
-    existing = existing.where.not(id: id) if persisted?
+    # If updating and steamid didn't change, skip uniqueness check.
+    return true unless steamid_changed?
 
-    case existing.count
-    when 0
-      # no conflict
-      true
-    when 1
-      # exactly one other record has this steamid -> uniqueness violation
-      errors.add(:steamid, :taken)
-    else
-      # more than one existing record (pre-existing duplicates) -> allow
-      Rails.logger.warn("SteamID #{steamid} has existing duplicates; skipping uniqueness validation") if defined?(Rails)
-      true
-    end
+    existing = User.where('LOWER(steamid) = ?', steamid.to_s.downcase).where.not(id: id)
+    return true if existing.nil? || existing.count.zero?
+
+    errors.add(:steamid, :taken)
   end
 
   before_validation :set_name
