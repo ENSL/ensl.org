@@ -57,7 +57,6 @@ module Ensl
                          secure: Rails.env.production?,
                          same_site: :lax
 
-    # config.session_store :my_custom_store, key: '_ENSL_session_key'
     config.action_dispatch.cookies_serializer = :marshal
 
     # Load secrets from .env

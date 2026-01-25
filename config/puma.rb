@@ -15,7 +15,7 @@ tag 'ENSL'
 # Preload to save memory,
 preload_app!
 
-# Start in foreground mode
+# Start in foreground mode because its started in tmux
 # daemonize false
 
 # Set basic puma settings
