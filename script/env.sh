@@ -8,6 +8,11 @@ fi
 
 for FILE in "$@"
 do
+  # Check if file exists
+  if [ ! -f "$FILE" ]; then 
+    continue
+  fi
+  
   echo "Loading env vars from: $FILE"
   ARGS=$(cat $FILE |grep -vE '^[[:space:]]*(#.*)*$')
 

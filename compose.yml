@@ -23,7 +23,8 @@ services:
   development:
     <<: *app
 #    environment:
-#      DISABLE_PUMA: 1
+#      DISABLE_PUMA: 0
+#      RAILS_DEBUG: 0
     ports:
       - "${PUMA_PORT}:${PUMA_PORT}"
       - "35729:35729"
@@ -93,6 +94,7 @@ services:
 
   redis:
     image: redis:8.4.0
+    command: ["redis-server", "--loglevel", "warning"]
 
   db:
     image: mariadb:10.7
