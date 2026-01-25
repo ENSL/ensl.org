@@ -173,6 +173,9 @@ group :test do
   # Redis namespace for testing
   gem 'redis-namespace'
 
+  # Block external HTTP in tests
+  gem 'webmock'
+
   # For circle ci + CC
   # gem 'codeclimate-test-reporter', require: nil
   # gem 'rspec_junit_formatter'

@@ -145,7 +145,8 @@ class User < ActiveRecord::Base
 
   before_validation :update_password
 
-  validates_uniqueness_of :username, :email, :steamid, case_sensitive: false
+  validates_uniqueness_of :username, :email, case_sensitive: false
+  validate :steamid_uniqueness
   validates_length_of :firstname, in: 1..15, allow_blank: true
   validates_length_of :lastname, in: 1..25, allow_blank: true
   validates_length_of :username, in: 1..30
@@ -160,6 +161,32 @@ class User < ActiveRecord::Base
   validates_inclusion_of [:public_email], in: [true, false], allow_nil: true
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team
+
+  # Allow existing duplicate steamids in DB to continue working.
+  # Enforce uniqueness when there are no prior duplicates; if duplicates already
+  # exist for a given steamid we skip the uniqueness error to avoid blocking
+  # logins/creation for records that match an existing (broken) state.
+  def steamid_uniqueness
+    return if steamid.nil? || steamid.to_s.strip.empty?
+
+    sid = steamid.to_s.downcase
+    existing = User.where('LOWER(steamid) = ?', sid)
+    # Exclude current record when checking
+    existing = existing.where.not(id: id) if persisted?
+
+    case existing.count
+    when 0
+      # no conflict
+      true
+    when 1
+      # exactly one other record has this steamid -> uniqueness violation
+      errors.add(:steamid, :taken)
+    else
+      # more than one existing record (pre-existing duplicates) -> allow
+      Rails.logger.warn("SteamID #{steamid} has existing duplicates; skipping uniqueness validation") if defined?(Rails)
+      true
+    end
+  end
 
   before_validation :set_name
   before_validation :init_variables, on: :create

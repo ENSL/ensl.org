@@ -71,6 +71,18 @@ header .banner {
           -webkit-filter: brightness(0) invert(1);
           filter: brightness(0) invert(1);
         }
+
+        .steam-login-form {
+          display: inline;
+
+          button.steam-login-link {
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            display: inline-block;
+          }
+        }
       }
 
       input {

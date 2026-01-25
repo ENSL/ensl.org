@@ -1,7 +1,7 @@
 <%= form_tag({ controller: "users", action: "login" }, { class: 'dark' }) do %>
   <div class="fields">
     <div class="header-icons">
-      <%= link_to "/auth/steam", method: :POST do %>
+      <%= link_to "/auth/steam", class: 'steam-login', rel: 'noopener' do %>
         <%= image_tag '/images/icons/steam_login.png' %>
       <% end %>
       <%= link_to ENV['DISCORD_URL'], target: '_blank', rel: 'noopener noreferrer' do %>
@@ -18,7 +18,10 @@
     </div>
     <div class="register">
       <%= link_to t('helpers.submit.user.create'), new_user_path %>
-      <%= link_to t('sessions.form.forgot_password'), "/users/forgot/1", class: "password-reset" %>  
+      <%= link_to t('sessions.form.forgot_password'), forgot_users_path, class: "password-reset" %>
     </div>
   </div>
+<% end %>
+
+<%= form_tag "/auth/steam", method: :post, id: 'steam-auth-form', style: 'display:none;' do %>
 <% end %>

@@ -4,19 +4,9 @@
   <% if session[:verified_steamid] %>
     <div class="horizontal fields">
       Your SteamID (<strong><%= session[:verified_steamid] %></strong>) does not have an existing account. You can easily finish creating Steam-linked account here.
-      Before doing so, please check you do not already have an account. If you do, click here and type username and password below. You can look
+      Before doing so, please check you do not already have an account. If you do, check above and type username and password. You can look
       look for your account <%= link_to "here", users_path, target: "_blank" %>.
     </div>
-
-    <%= form_tag(users_login_path(), { class: 'square', data: { turbo: false } }) do %>
-      <div class="horizontal fields ">
-        <%= text_field "login", "username", placeholder: "Username" %>
-        <%= password_field "login", "password", placeholder: "Password" %>
-      </div>
-      <div class="buttons">
-        <%= submit_tag t('helpers.submit.user.login'), class: "button" %>
-      </div>
-    <% end %>
   <% end %>
 
   <%= form_for @user, html: { class: "square", data: { turbo: false } } do |f| %>

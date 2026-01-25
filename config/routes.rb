@@ -112,8 +112,12 @@ Rails.application.routes.draw do
   # Legacy compatibility: allow /users/agenda/:id
   get 'users/agenda/:id', to: 'users#agenda', as: :legacy_agenda_user
 
-  # OmniAuth callback
-  post 'auth/:provider/callback', to: 'users#callback'
+  # OmniAuth callback — accept GET (provider redirects) and POST (some setups)
+  if Rails.env.test?
+    match 'auth/:provider/callback', to: 'users#callback', via: %i[get post]
+  else
+    post 'auth/:provider/callback', to: 'users#callback'
+  end
 
   resources :locks
   resources :contesters

@@ -156,3 +156,15 @@ function add_fields(link, association, content) {
   var regexp = new RegExp("new_" + association, "g")
   $(link).parent().before(content.replace(regexp, new_id));
 }
+
+// Bind steam-login anchors: prefer submitting a hidden Rails form if present
+$(function() {
+  $(document).on('click', 'a.steam-login', function(e) {
+    e.preventDefault();
+    var hidden = document.getElementById('steam-auth-form');
+    if (hidden) {
+      hidden.submit();
+      return;
+    }
+  });
+});
