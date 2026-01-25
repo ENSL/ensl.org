@@ -2,12 +2,12 @@ FactoryBot.define do
   factory :user do
     sequence(:username) { |n| "Player#{n}" }
     sequence(:email)    { |n| "player#{n}@ensl.org" }
-    sequence(:steamid)  { |n| "0:1:#{n}" }
+    sequence(:steamid)  { |n| "STEAM_0:1:#{n + 1}" }
 
-    firstname "ENSL"
-    lastname "Player"
-    country "EU"
-    raw_password "PasswordABC123"
+    firstname 'ENSL'
+    lastname 'Player'
+    country 'EU'
+    raw_password 'PasswordABC123'
     # lastvisit "Sun, 15 Mar 2020 13:31:06 +0000"
 
     trait :admin do
@@ -32,7 +32,7 @@ FactoryBot.define do
     end
 
     trait :chris do
-      steamid "0:1:58097444"
+      steamid 'STEAM_0:1:58097444'
     end
 
     factory :user_with_team do

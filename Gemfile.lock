@@ -574,6 +574,8 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     ssrf_filter (1.3.0)
+    steam-id2 (0.4.5)
+      steam-condenser (~> 1.3)
     stringio (3.2.0)
     temple (0.10.4)
     test-unit (3.7.0)
@@ -706,6 +708,7 @@ DEPENDENCIES
   signet (= 0.11.0)
   simplecov
   steam-condenser!
+  steam-id2
   test-unit
   time_difference
   timecop

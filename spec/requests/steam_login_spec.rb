@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'steamid'
 
 RSpec.describe 'Steam OmniAuth callback', type: :request do
   before do
@@ -12,7 +11,7 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
   end
 
   it 'logs in existing user with matching steamid and updates lastvisit' do
-    steamid = SteamID.from_steamID64(uid)
+    steamid = User.normalize_steamid(uid)
     user = create(:user, steamid: steamid)
 
     OmniAuth.config.mock_auth[:steam] = auth_hash

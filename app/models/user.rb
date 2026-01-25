@@ -28,17 +28,20 @@
 #
 
 require 'digest/md5'
-require 'steamid'
+require 'steam_id'
 require 'scrypt'
 require 'securerandom'
 
 class SteamIdValidator < ActiveModel::Validator
   def validate(record)
-    record.errors.add :steamid unless \
-      record.steamid.nil? ||
-      (m = record.steamid.match(/\A([01]):([01]):(\d{1,10})\Z/)) &&
-      (id = m[3].to_i) &&
-      id >= 1 && id <= 2_147_483_647
+    return if record.steamid.nil? || record.steamid.to_s.strip.empty?
+
+    normalized = User.normalize_steamid(record.steamid)
+    if normalized
+      record.steamid = normalized
+    else
+      record.errors.add :steamid
+    end
   end
 end
 
@@ -185,6 +188,28 @@ class User < ActiveRecord::Base
 
   def to_s
     username
+  end
+
+  def self.normalize_steamid(value)
+    return nil if value.nil?
+
+    str = value.to_s.strip
+    return nil if str.empty?
+
+    # Allow legacy format without STEAM_ prefix for convenience
+    str = "STEAM_#{str}" if str.match?(/\A[01]:[01]:\d+\Z/)
+
+    sid = SteamID.from_string(str)
+    return nil unless sid
+    return nil if sid.respond_to?(:valid?) && !sid.valid?
+
+    legacy = sid.id.to_s
+    legacy = legacy.sub(/\ASTEAM_/, '')
+    return nil unless legacy.match?(/\A[01]:[01]:\d+\Z/)
+
+    legacy
+  rescue StandardError
+    nil
   end
 
   def set_name
@@ -550,7 +575,7 @@ class User < ActiveRecord::Base
     when 'steam'
       return nil unless auth_hash&.include?(:uid)
 
-      steamid = SteamID.from_steamID64(auth_hash[:uid])
+      steamid = User.normalize_steamid(auth_hash[:uid])
       user = User.where('LOWER(steamid) = LOWER(?)', steamid).first
       unless user
         user = User.new(username: auth_hash[:info][:nickname], lastip: lastip, fullname: auth_hash[:info][:name],

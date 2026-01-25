@@ -38,6 +38,7 @@ gem 'unread'
 # External APIs
 gem 'google-api-client'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
+gem 'steam-id2'
 
 # Auth
 gem 'omniauth'
