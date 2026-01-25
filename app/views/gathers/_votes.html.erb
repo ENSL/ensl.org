@@ -11,10 +11,10 @@
             <%= if server.votes then server.votes else "0" end %>
           </span>
           <% if server.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), method: :post %>
+            <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), data: { turbo_method: :post }, class: 'vote-link' %>
             <% vote_servers = true else %>
             <%= server %>
-          <% end %>        
+          <% end %>
         </li>
       <% end %>
     </ul>
@@ -35,7 +35,7 @@
         <li>
           <span><%= map.votes %></span>
           <% if map.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), method: :post %>
+            <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), data: { turbo_method: :post }, class: 'vote-link' %>
             <% vote_maps = true %>
           <% else %>
             <%= shorten map, 30 %>

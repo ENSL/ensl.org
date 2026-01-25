@@ -31,9 +31,14 @@ class ShoutmsgsController < ApplicationController
       else
         format.turbo_stream do
           Rails.logger.debug "Shoutmsgs#create save failed: #{@shoutmsg.errors.full_messages.join(', ')}"
-          flash.now[:error] = t(:invalid_message)
-          render turbo_stream: turbo_stream.replace("new_#{@shoutmsg.domain}", partial: 'shoutmsgs/new',
-                                                                               locals: { shoutmsg: @shoutmsg })
+          flash.now[:error] =
+            @shoutmsg.errors.full_messages.any? ? @shoutmsg.errors.full_messages.join(', ') : t(:invalid_message)
+          streams = []
+          streams << turbo_stream.replace("new_#{@shoutmsg.domain}", partial: 'shoutmsgs/new',
+                                                                     locals: { shoutmsg: @shoutmsg })
+          # Replace notification area so flash.now[:error] is shown to the user
+          streams << turbo_stream.replace('notification', partial: 'application/messages')
+          render turbo_stream: streams
         end
         format.html do
           flash[:error] = t(:invalid_message)
