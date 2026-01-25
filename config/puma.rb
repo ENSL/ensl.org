@@ -1,7 +1,14 @@
 # Load dev vars. These are loaded in application but puma needs them too.
 require 'dotenv'
 require 'os'
-Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
+
+# Set vars as we cannot load them
+app_dir = ENV['APP_PATH'] || '/var/www'
+
+# Lock environment early so restart doesn't drift.
+# .load has left-to-right precedence
+rails_env = ENV.fetch('RAILS_ENV', 'development')
+Dotenv.load(".env.#{rails_env}.local", '.env.local', ".env.#{rails_env}", '.env')
 
 tag 'ENSL'
 
@@ -11,12 +18,9 @@ preload_app!
 # Start in foreground mode
 # daemonize false
 
-# Set vars as we cannmot load them
-rails_env = ENV['RAILS_ENV'] || 'development'
-app_dir = ENV['APP_PATH'] || '/var/www'
-
 # Set basic puma settings
 environment rails_env
+
 # if OS.posix?
 #  bind "unix://#{app_dir}/tmp/sockets/puma.#{rails_env}.sock"
 # end
@@ -57,8 +61,6 @@ end
 
 # EXPLAIN This has been added here but why?
 before_restart do
-  ENV['BUNDLE_GEMFILE'] = "#{app_dir}/Gemfile"
-  Dotenv.overload('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
   if defined?(ActiveRecord::Base)
     begin
       ActiveRecord::Base.clear_active_connections!
