@@ -53,7 +53,7 @@ header .banner {
     .fields { 
       @include span-columns(12);
 
-      .steam {
+      .header-icons {
         @include span-columns(3 of 12);
 
         img {
@@ -61,6 +61,15 @@ header .banner {
           padding-right: 5px;
           width: 40px;
           float: right;
+        }
+
+        img.discord {
+          padding-top: 0px;
+          padding-right: 10px;
+          width: 40px;
+          float: right;
+          -webkit-filter: brightness(0) invert(1);
+          filter: brightness(0) invert(1);
         }
       }
 
@@ -170,4 +179,11 @@ header .banner {
       padding: 30px 0;
     }
   }
+}
+
+/* Strong selector to ensure the discord image filter applies in all builds */
+header .banner #authentication .fields .header-icons img.discord {
+  padding-right: 10px;
+  -webkit-filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1);
 }

@@ -1,10 +1,14 @@
 <%= form_tag({ controller: "users", action: "login" }, { class: 'dark' }) do %>
   <div class="fields">
-    <div class="steam">
+    <div class="header-icons">
       <%= link_to "/auth/steam", method: :POST do %>
         <%= image_tag '/images/icons/steam_login.png' %>
       <% end %>
+      <%= link_to ENV['DISCORD_URL'], target: '_blank', rel: 'noopener noreferrer' do %>
+        <%= image_tag 'shared/discord.png', class: 'discord', alt: 'Go to ENSL Discord!' %>
+      <% end %>
     </div>
+
     <%= text_field "login", "username", placeholder: "Username" %>
     <%= password_field "login", "password", placeholder: "Password" %>
   </div>
