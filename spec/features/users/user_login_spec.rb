@@ -55,4 +55,35 @@ RSpec.describe 'User login', type: :request do
     u.reload
     expect(u.password_hash).to eq(User::PASSWORD_MD5)
   end
+
+  it 'sends a password reset email and internal message when requested' do
+    u = create(:user, username: 'reset_me', email: 'reset@example.com')
+    ActionMailer::Base.deliveries.clear
+
+    post '/users/forgot', params: { username: u.username, email: u.email }
+    expect(flash[:notice]).to be_present
+
+    # Mail was enqueued/sent via Notifications.password
+    expect(ActionMailer::Base.deliveries.size).to eq(1)
+    mail = ActionMailer::Base.deliveries.last
+    expect(mail.to).to include(u.email)
+
+    # Check for raw password in email body
+    body = mail.body.encoded
+    expect(body).to match(/Your new ENSL account password is:/)
+    reset_password = body.match(/password is:\s+([^\s<]+)/)[1]
+    expect(reset_password.length).to be >= 8
+
+    # Internal message should be created for the user
+    expect(Message.where(recipient_type: 'User', recipient_id: u.id).exists?).to be_truthy
+  end
+
+  it 'does not send reset email for incorrect info' do
+    u = create(:user, username: 'no_email', email: 'nope@example.com')
+    ActionMailer::Base.deliveries.clear
+
+    post '/users/forgot', params: { username: u.username, email: 'wrong@example.com' }
+    expect(flash[:error]).to be_present
+    expect(ActionMailer::Base.deliveries).to be_empty
+  end
 end
