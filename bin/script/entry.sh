@@ -10,11 +10,6 @@ cd $APP_PATH
 # Create dirs
 mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
 
-# Make sure we have all gems, this fixed some startup issues.
-bundle config github.https true
-bundle config set path '/var/bundle'
-bundle install --jobs 8
-
 # Precompile assets when needed. Don't assume the ENV
 if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   echo "Precompiling assets..."
