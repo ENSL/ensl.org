@@ -118,3 +118,5 @@ services:
     environment:
       POSTFIX_myhostname: ${MAIL_DOMAIN}
       OPENDKIM_DOMAINS: ${MAIL_DOMAIN}
+      RSYSLOG_LOG_TO_FILE: yes
+      RSYSLOG_TIMESTAMP: yes
