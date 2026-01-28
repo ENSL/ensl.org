@@ -119,6 +119,35 @@ describe User do
       # should have been upgraded to scrypt-based storage
       expect([User::PASSWORD_SCRYPT, User::PASSWORD_MD5_SCRYPT]).to include(auth.password_hash)
     end
+
+    it 'migrates MD5 to MD5_SCRYPT without plaintext, then upgrades on login' do
+      username = 'md5wrap'
+      raw = 'wizardpw123!'
+      u = User.new(username: username, email: 'md5wrap@example.com')
+      u.password_hash = User::PASSWORD_MD5
+      u.password = Digest::MD5.hexdigest(raw)
+      u.raw_password = nil
+      u.save!(validate: false)
+
+      # Confirm DB has the MD5 hash stored (no plaintext)
+      u_db = User.find_by(username: username)
+      expect(u_db).to be_present
+      expect(u_db.password_hash).to eq(User::PASSWORD_MD5)
+      expect(u_db.password).to eq(Digest::MD5.hexdigest(raw))
+
+      # Simulate migration: wraps existing MD5 hash with scrypt
+      u.update_password
+      u.save!(validate: false)
+
+      expect(u.password_hash).to eq(User::PASSWORD_MD5_SCRYPT)
+      expect(SCrypt::Password.new(u.password)).to eq(Digest::MD5.hexdigest(raw))
+
+      # Login should verify and upgrade to full scrypt(plaintext)
+      auth = User.authenticate(username: username, password: raw)
+      expect(auth).to be_present
+      expect(auth.password_hash).to eq(User::PASSWORD_SCRYPT)
+      expect(SCrypt::Password.new(auth.password)).to eq(raw)
+    end
   end
 
   describe 'additional safety checks' do
