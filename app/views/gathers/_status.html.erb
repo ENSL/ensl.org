@@ -18,7 +18,7 @@
 
         <p>
           <% if cuser.gatherers.count < 5 %>
-            <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES) %>, installed NS and Teamspeak3.
+            <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES) %>, installed NS and Discord.
           <% end  %>
         </p>
         <p>
@@ -56,7 +56,7 @@
     </p>
 
   <% elsif @gather.status == Gather::STATE_FINISHED and @gather.server %>
-    <p>Gather finished, join the Server and TeamSpeak 3.</p>
+    <p>Gather finished, join the Server and voice communication.</p>
 
     <p>
       <strong>Maps</strong>: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br>

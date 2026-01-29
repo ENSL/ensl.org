@@ -150,7 +150,7 @@
         <h6>Follow these steps to play</h6>
         <ol>
           <li><%= link_to "Instructions", article_path(1086) %></li>
-          <li><%= link_to "Join the discord", "https://discord.gg/a8dT2cn" %></li>
+          <li><%= link_to "Join the discord", ENV['DISCORD_NS1_URL'] %></li>
           <li><%= link_to "Connect to game server", "steam://connect/51.15.77.137:27015/europe// -noforcemparms" %></li>
         </ol>
       </div>
@@ -173,9 +173,8 @@
       <div class="info">
         <h6>Voice Communication</h6>
         <ul>
-          <li><%= link_to "Teamspeak 3", "http://www.teamspeak.com/?page=downloads" %></li>
-          <li><strong>Click to join:</strong> <a href="ts3server://ensl.org?channel=NS1%20Gathers">ensl.org</a></li>
-          <li><strong>TS password:</strong> europe </li>
+          <li><%= link_to "Discord", "https://www.discord.com" %></li>
+          <li><strong>Click to join:</strong> <a href="<%= ENV['DISCORD_NS1_URL'] %>">NS1 Discord</a></li>
         </ul>
       </div>
 
