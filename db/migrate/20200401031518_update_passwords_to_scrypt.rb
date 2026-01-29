@@ -1,21 +1,21 @@
-
-ENV['SCRYPT_MAX_TIME'] ||= "1"
+ENV['SCRYPT_MAX_TIME'] ||= '1'
 class UpdatePasswordsToScrypt < ActiveRecord::Migration[4.2][6.0]
   require 'scrypt'
 
   def up
-    puts("SCRYPT_MAX_TIME=%s" % ENV['SCRYPT_MAX_TIME'])
-    puts("Migration takes about %0.0f seconds." % ENV['SCRYPT_MAX_TIME'].to_f*User.all.count*3)
+    puts('SCRYPT_MAX_TIME=%s' % ENV['SCRYPT_MAX_TIME'])
     SCrypt::Engine.calibrate!(max_time: ENV['SCRYPT_MAX_TIME'].to_f)
-    ActiveRecord::Base.transaction do
-      User.all.order(:id).each do |user|
-        user.team = nil unless user&.team&.present?
-        if user.valid?
-          user.update_password
-          user.save!
-          puts("User %s (%d) updated" % [user.username, user.id])
-        end
-      end
+
+    println('Updating passwords to scrypt...')
+
+    # Migrate passwords to scrypt
+    User.all.order(:id).find_each(batch_size: 200) do |user|
+      user.team = nil unless user&.team&.present?
+      user.update_password
+      user.save!(validate: false)
+      print(format('%s (%d) ', user.username, user.id))
+    rescue StandardError => e
+      puts(format('User %s (%d) skipped: %s', user.username, user.id, e.message))
     end
   end
 end

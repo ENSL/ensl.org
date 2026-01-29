@@ -3,10 +3,12 @@ class AddTitleToDirectories < ActiveRecord::Migration[4.2][6.0]
     change_table :directories do |m|
       m.string :title
     end
-    Directory.all.each do |dir|
-      dir.title = dir.name
-      dir.name = File.basename(dir.path)
-      dir.save!
+
+    # Migrate existing data
+    Directory.find_each(batch_size: 200) do |dir|
+      new_title = dir.name
+      new_name = dir.path.present? ? File.basename(dir.path) : dir.name
+      dir.update_columns(title: new_title, name: new_name)
     end
   end
 end

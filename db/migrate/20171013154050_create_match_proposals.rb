@@ -1,8 +1,8 @@
 class CreateMatchProposals < ActiveRecord::Migration[4.2]
   def up
     create_table :match_proposals do |t|
-      t.references :match, index: true, forign_key: true
-      t.references :team, forign_key: true
+      t.references :match, index: true, foreign_key: true
+      t.references :team, foreign_key: true
       t.datetime :proposed_time
       t.integer :status
     end
