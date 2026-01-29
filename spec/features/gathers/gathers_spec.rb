@@ -140,6 +140,9 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
         # Ensure the "Pick" button exists and click it (adjust selector/text if needed)
         safe_click { find('input[value="Pick"]').click }
 
+        # Confirm pick success message appears
+        safe_expect_text('You have picked a player for your team.', wait: 5)
+
         # Print the captain and picked player for logging
         # puts "#{picking_captain.username} picked a player."
 

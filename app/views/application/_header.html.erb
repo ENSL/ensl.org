@@ -1,4 +1,4 @@
-<header>
+<header data-turbo="false">
   <div class="banner <%= 'authenticated' if cuser %>">
     <div class="wrapper">
       <div id="authentication" class="<%= 'admin' if cuser && cuser.admin? %>">

@@ -1,5 +1,6 @@
 class GathersController < ApplicationController
-  before_action :get_gather, except: [:latest, :index, :create]
+  before_action :get_gather, except: %i[latest index create]
+
   respond_to :html, :js
 
   def index
@@ -24,9 +25,7 @@ class GathersController < ApplicationController
     @gather.category_id = params[:gather][:category_id]
     raise AccessError unless @gather.can_create? cuser
 
-    if @gather.save
-      flash[:notice] = t(:gather_create)
-    end
+    flash[:notice] = t(:gather_create) if @gather.save
 
     redirect_to_back
   end
@@ -37,9 +36,7 @@ class GathersController < ApplicationController
 
     Gatherer.transaction do
       Gather.transaction do
-        if @gather.update(Gather.params(params, cuser))
-          flash[:notice] = 'Gather was successfully updated.'
-        end
+        flash[:notice] = 'Gather was successfully updated.' if @gather.update(Gather.params(params, cuser))
       end
     end
 

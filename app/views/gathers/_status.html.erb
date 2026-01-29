@@ -3,7 +3,7 @@
 
     <% if @gatherer and @gatherer.can_destroy? cuser %>
       <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
-      <%= link_to 'Leave Gather', @gatherer, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+      <%= button_to 'Leave Gather', @gatherer, method: :delete, form: { data: { turbo: false }, class: 'inline' }, class: 'button', data: { confirm: 'Are you sure?' } %>
 
     <% elsif (g = Gatherer.new(gather: @gather, user: cuser)).can_create?(cuser) %>
       <%= form_for g do |f| %>
@@ -79,7 +79,7 @@
   <% end %>
 
 
-  <%= link_to "Mute", '#', id: "mute", class: 'button tiny' %>
+  <%= link_to "Mute", '#', id: "mute", class: 'button' %>
   <% if cuser and (cuser.admin? or cuser.gather_moderator?) %>
     <%= link_to "Admin Page", edit_gather_url, class: 'admin button' %>
   <% end %>

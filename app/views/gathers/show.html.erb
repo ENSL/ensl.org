@@ -121,7 +121,7 @@
   });
 </script>
 
-<div id="gather">
+<div id="gather" data-turbo="false">
   <h1 class="fancy">
     <span>
       <%= link_to @gather do %>
@@ -196,5 +196,6 @@
     <%= render_gather %>
   </div>
 
-  <%= render partial: 'shoutmsgs/index', locals: { object: @gather } %>
 </div>
+
+<%= render partial: 'shoutmsgs/index', locals: { object: @gather } %>

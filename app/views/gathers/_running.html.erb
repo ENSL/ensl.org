@@ -11,8 +11,12 @@
             <%= namelink gatherer.user %>
             ( <%= gatherer.user.idle %> )
             <% if cuser and gatherer.can_destroy?(cuser) %>
-              <%= link_to gatherer, method: :delete, class: 'delete' do %>
-                <%= icon 'times' %>
+              <%= form_tag gatherer, method: :post, id: "delete_gatherer_#{gatherer.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
+                <%= hidden_field_tag :_method, 'delete' %>
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <%= link_to '#', class: 'delete delete-gatherer', data: { form_id: "delete_gatherer_#{gatherer.id}" } do %>
+                  <%= icon 'times' %>
+                <% end %>
               <% end %>
             <% end %>
           </li>

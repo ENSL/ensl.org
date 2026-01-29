@@ -51,6 +51,25 @@ $(function() {
     $('form#new_gatherer').submit();
   });
 
+  $(document).on('click', 'a.delete-gatherer', function(e) {
+    e.preventDefault();
+    var formId = $(this).data('form-id');
+    var form = document.getElementById(formId);
+    if (form) {
+      form.submit();
+    }
+  });
+
+  $(document).on('click', 'a.vote-link', function(e) {
+    e.preventDefault();
+    var url = $(this).data('url') || this.href;
+    var $shared = $('#vote_form');
+    if ($shared.length && url) {
+      $shared.attr('action', url);
+      $shared[0].submit();
+    }
+  });
+
   // Submit TODO
 
   $("a.submit").on('click', function() {

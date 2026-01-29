@@ -11,7 +11,7 @@
             <%= if server.votes then server.votes else "0" end %>
           </span>
           <% if server.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), data: { turbo_method: :post }, class: 'vote-link' %>
+            <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), class: 'vote-link', data: { url: votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), turbo: false } %>
             <% vote_servers = true else %>
             <%= server %>
           <% end %>
@@ -26,6 +26,10 @@
   </div>
 </div>
 
+<%= form_tag '', method: :post, id: 'vote_form', data: { turbo: false }, style: 'display:none;' do %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+<% end %>
+
 <div class="data">
   <div class="contents">
     <h4>Map Votes</h4>
@@ -35,7 +39,7 @@
         <li>
           <span><%= map.votes %></span>
           <% if map.real_votes.build(user: cuser).can_create? cuser %>
-            <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), data: { turbo_method: :post }, class: 'vote-link' %>
+            <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), class: 'vote-link', data: { url: votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), turbo: false } %>
             <% vote_maps = true %>
           <% else %>
             <%= shorten map, 30 %>
