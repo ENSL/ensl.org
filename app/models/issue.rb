@@ -23,7 +23,7 @@
 
 class Issue < ActiveRecord::Base
   include Extra
-  
+
   STATUS_OPEN = 0
   STATUS_SOLVED = 1
   STATUS_REJECTED = 2
@@ -34,29 +34,30 @@ class Issue < ActiveRecord::Base
   CATEGORY_GATHER = 54
 
   attr_accessor :assigned_name
-  #attr_protected :id, :created_at, :updated_at
 
-  has_many :comments, :as => :commentable
-  belongs_to :category, :optional => true
-  belongs_to :author, :class_name => "User", :optional => true
-  belongs_to :assigned, :class_name => "User", :optional => true
+  # attr_protected :id, :created_at, :updated_at
 
-  #scope :unread_by,
+  has_many :comments, as: :commentable
+  belongs_to :category, optional: true
+  belongs_to :author, class_name: 'User', optional: true
+  belongs_to :assigned, class_name: 'User', optional: true
+
+  # scope :unread_by,
   #  lambda { |user| {
   #  :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
   #  :conditions => "readings.user_id IS NULL"} }
-  scope :with_status, -> (s) { where(status: s) }
+  scope :with_status, ->(s) { where(status: s) }
 
-  validates_length_of :title, :in => 1..50
-  validates_length_of :text, :in => 1..65000
+  validates_length_of :title, in: 1..50
+  validates_length_of :text, in: 1..65_000
   validate :validate_status
 
-  before_validation :init_variables, :if => Proc.new{|issue| issue.new_record?}
+  before_validation :init_variables, if: proc { |issue| issue.new_record? }
   before_save :parse_text
   # FIXME
   # after_save :remove_readings
 
-  acts_as_readable
+  acts_as_readable on: :created_at
 
   def to_s
     title
@@ -67,16 +68,16 @@ class Issue < ActiveRecord::Base
   end
 
   def statuses
-    {STATUS_OPEN => "Open", STATUS_SOLVED => "Solved", STATUS_REJECTED => "Rejected"}
+    { STATUS_OPEN => 'Open', STATUS_SOLVED => 'Solved', STATUS_REJECTED => 'Rejected' }
   end
 
   def color
     if status == STATUS_SOLVED
-      "green"
+      'green'
     elsif status == STATUS_OPEN
-      "yellow"
+      'yellow'
     elsif status == STATUS_REJECTED
-      "red"
+      'red'
     end
   end
 
@@ -90,41 +91,41 @@ class Issue < ActiveRecord::Base
   end
 
   def parse_text
-    if self.text
-      self.text_parsed = bbcode_to_html(self.text)
-    end
+    return unless text
+
+    self.text_parsed = bbcode_to_html(text)
   end
 
   def solution_formatted
     bbcode_to_html(solution)
   end
 
-  def can_show? cuser
+  def can_show?(cuser)
     return false unless cuser
     return true if cuser.admin?
 
-    ((author == cuser) or (Issue::allowed_categories(cuser).include?(self.category_id)))
-
+    ((author == cuser) or Issue.allowed_categories(cuser).include?(category_id))
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     true
   end
 
   def can_update?(cuser, params = {})
     return false unless cuser
     return true if cuser.admin?
-    return false unless Issue::allowed_categories(cuser).include?(self.category_id)
-    !(params.member?(:category_id) && (self.category_id.to_s != params[:category_id]))
+    return false unless Issue.allowed_categories(cuser).include?(category_id)
+
+    !(params.member?(:category_id) && (category_id.to_s != params[:category_id]))
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
   # STATIC METHODS
 
-  def self.allowed_categories cuser
+  def self.allowed_categories(cuser)
     allowed = []
     allowed << CATEGORY_GATHER if cuser.admin? || cuser.gather_moderator? # gather
     allowed << CATEGORY_WEBSITE if cuser.admin? # website

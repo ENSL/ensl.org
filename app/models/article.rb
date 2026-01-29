@@ -45,39 +45,42 @@ class Article < ActiveRecord::Base
   attribute :status, :integer, default: STATUS_DRAFT
 
   scope :recent, -> { order('created_at DESC').limit(8) }
-  scope :with_comments, -> {
-    select("articles.*, COUNT(C.id) AS comment_num").
-    joins("LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id").
-    group("articles.id") }
-  scope :ordered, ->  { order('articles.created_at DESC') }
+  scope :with_comments, lambda {
+    select('articles.*, COUNT(C.id) AS comment_num')
+      .joins("LEFT JOIN comments C ON C.commentable_type = 'Article' AND C.commentable_id = articles.id")
+      .group('articles.id')
+  }
+  scope :ordered, -> { order('articles.created_at DESC') }
   scope :limited, -> { limit(5) }
   scope :nodrafts, -> { where(status: STATUS_PUBLISHED) }
   scope :drafts, -> { where(status: STATUS_DRAFT) }
-  scope :articles, -> { where(["category_id IN (SELECT id FROM categories WHERE domain = ?)", Category::DOMAIN_ARTICLES]) }
+  scope :articles, -> { where(['category_id IN (SELECT id FROM categories WHERE domain = ?)', Category::DOMAIN_ARTICLES]) }
   # FIXME: shorter
   scope :onlynews, -> { where(category_id: Category.select(:id).where(domain: Category::DOMAIN_NEWS)) }
-  scope :category, -> (cat) { where(category_id: cat) }
-  scope :domain, -> (domain) { includes(:category).where("categories.domain = '?'", domain) }
-  #scope :nospecial, -> { where("category_id != ?", Category::SPECIAL) }
+  scope :category, ->(cat) { where(category_id: cat) }
+  scope :domain, ->(domain) { includes(:category).where("categories.domain = '?'", domain) }
+  # scope :nospecial, -> { where("category_id != ?", Category::SPECIAL) }
   scope :interviews, -> { where(category_id: Category::INTERVIEWS) }
 
-  belongs_to :user, :optional => true
-  belongs_to :category, :optional => true
+  belongs_to :user, optional: true
+  belongs_to :category, optional: true
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :files, class_name: 'DataFile', dependent: :destroy
 
-  validates_length_of :title, :in => 1..50
-  validates_length_of :text, :in => 1..16000000
+  validates_length_of :title, in: 1..50
+  validates_length_of :text, in: 1..16_000_000
 
   validates_presence_of :user, :category
   validate :validate_status
 
-  before_validation :init_variables, :if => Proc.new{ |model| model.new_record? }
+  before_validation :init_variables, if: proc { |model| model.new_record? }
   before_save :format_text
   after_save :send_notifications
 
   # has_view_count
-  acts_as_readable
+  # FIXME: consider migrating to updated_at to allow
+  #        read marks to update on edit
+  acts_as_readable on: :created_at
   acts_as_versioned
 
   non_versioned_columns << 'category_id'
@@ -89,15 +92,15 @@ class Article < ActiveRecord::Base
   end
 
   def previous_article
-    category.articles.nodrafts.where("id < ?", self.id).order("id DESC").first
+    category.articles.nodrafts.where('id < ?', id).order('id DESC').first
   end
 
   def next_article
-    category.articles.nodrafts.where("id > ?", self.id).order("id ASC").first
+    category.articles.nodrafts.where('id > ?', id).order('id ASC').first
   end
 
   def statuses
-    {STATUS_PUBLISHED => "Published", STATUS_DRAFT => "Draft"}
+    { STATUS_PUBLISHED => 'Published', STATUS_DRAFT => 'Draft' }
   end
 
   def validate_status
@@ -106,7 +109,7 @@ class Article < ActiveRecord::Base
 
   def init_variables
     self.status = STATUS_DRAFT unless user&.admin?
-    self.text_coding = CODING_BBCODE if (!user&.admin? and text_coding == CODING_HTML)
+    self.text_coding = CODING_BBCODE if !user&.admin? and text_coding == CODING_HTML
   end
 
   def format_text
@@ -118,16 +121,16 @@ class Article < ActiveRecord::Base
   end
 
   def send_notifications
-    if (new_record? or status_changed?) and status == STATUS_PUBLISHED
-      case category.domain
-      when Category::DOMAIN_NEWS
-        Profile.includes(:user).where("notify_news = 1").each do |p|
-          Notifications.news p.user, self if p.user
-        end
-      when Category::DOMAIN_ARTICLES
-        Profile.includes(:user).where("notify_articles = 1").each do |p|
-          Notifications.article p.user, self if p.user
-        end
+    return unless (new_record? or status_changed?) and status == STATUS_PUBLISHED
+
+    case category.domain
+    when Category::DOMAIN_NEWS
+      Profile.includes(:user).where('notify_news = 1').each do |p|
+        Notifications.news p.user, self if p.user
+      end
+    when Category::DOMAIN_ARTICLES
+      Profile.includes(:user).where('notify_articles = 1').each do |p|
+        Notifications.article p.user, self if p.user
       end
     end
   end
@@ -137,24 +140,24 @@ class Article < ActiveRecord::Base
     Reading.delete_all ["readable_type = 'Category' AND readable_id = ?", category_id]
   end
 
-  def can_show? cuser
+  def can_show?(cuser)
     status != STATUS_DRAFT or (cuser and (user == cuser or cuser.admin?))
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
   end
 
-  def can_update? cuser, params = {}
-    cuser and !cuser.banned?(Ban::TYPE_MUTE) and (cuser.admin? or (user == cuser and !params.keys.include? "status"))
+  def can_update?(cuser, params = {})
+    cuser and !cuser.banned?(Ban::TYPE_MUTE) and (cuser.admin? or (user == cuser and !params.keys.include? 'status'))
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
-  def self.article_params params, cuser
-    p = [:title, :category_id, :text, :text_coding]
+  def self.article_params(params, cuser)
+    p = %i[title category_id text text_coding]
     p << :status if cuser.admin?
     params.require(:article).permit(*p)
   end

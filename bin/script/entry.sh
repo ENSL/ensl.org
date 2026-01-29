@@ -23,8 +23,13 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   chown -R web:web $APP_PATH
 fi
 
-# Run migrations
-bundle exec rake db:migrate
+# Run migrations and run sleep loop on failure
+echo "Running database migrations..."
+bundle exec rake db:migrate || {
+  echo "Database migrations failed, dropping to shell."
+  /bin/bash -c "while true; do sleep 60; done"
+  exit 1
+}
 
 # Start puma unless disabled for debugging
 if [[ "$DISABLE_PUMA" -eq 1 ]]; then

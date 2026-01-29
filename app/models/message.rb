@@ -22,29 +22,29 @@
 class Message < ActiveRecord::Base
   include Extra
 
-  #attr_protected :id, :created_at, :updated_at
+  # attr_protected :id, :created_at, :updated_at
   attr_accessor :sender_raw
 
-  validates_length_of :title, :in => 1..100
-  validates_length_of :text, :in => 1..65000
+  validates_length_of :title, in: 1..100
+  validates_length_of :text, in: 1..65_000
 
-  scope :ordered, -> { order("created_at DESC") }
+  scope :ordered, -> { order('created_at DESC') }
 
   # FIXME: check before removing, provided by unread
-  #scope :read_by,
+  # scope :read_by,
   #  lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
-  #scope :unread_by,
+  # scope :unread_by,
   #  lambda { |user| {
-   # :joins => "LEFT JOIN readings ON readable_type = 'Message' AND readable_id = messages.id AND readings.user_id = #{user.id}",
-   # :conditions => "readings.user_id IS NULL"} }
+  # :joins => "LEFT JOIN readings ON readable_type = 'Message' AND readable_id = messages.id AND readings.user_id = #{user.id}",
+  # :conditions => "readings.user_id IS NULL"} }
 
-  belongs_to :sender, :polymorphic => true, :optional => true
-  belongs_to :recipient, :polymorphic => true, :optional => true
+  belongs_to :sender, polymorphic: true, optional: true
+  belongs_to :recipient, polymorphic: true, optional: true
 
   before_save :parse_text
   after_create :send_notifications
 
-  acts_as_readable
+  acts_as_readable on: :created_at
 
   def to_s
     title
@@ -63,41 +63,36 @@ class Message < ActiveRecord::Base
   end
 
   def parse_text
-    if self.text
-      self.text_parsed = bbcode_to_html(self.text)
-    end
+    return unless text
+
+    self.text_parsed = bbcode_to_html(text)
   end
 
   def send_notifications
     if recipient.instance_of?(User)
-      if recipient.profile.notify_pms
-        Notifications.pm recipient, self
-      end
+      Notifications.pm recipient, self if recipient.profile.notify_pms
     elsif recipient.instance_of?(Group)
       recipient.users.each do |u|
-        if u.profile.notify_pms
-          Notifications.pm u, self
-        end
+        Notifications.pm u, self if u.profile.notify_pms
       end
     elsif recipient.instance_of?(Team)
       recipient.teamers.active.each do |teamer|
-        if teamer.user.profile.notify_pms
-          Notifications.pm teamer.user, self
-        end
+        Notifications.pm teamer.user, self if teamer.user.profile.notify_pms
       end
     end
   end
 
-  def can_show? cuser
+  def can_show?(cuser)
     cuser and (cuser.received_messages.include?(self) or cuser.sent_messages.include?(self))
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
   end
 
   def self.params(params, cuser)
     # FIXME: check this
-    params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id, :sender_raw)
+    params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id,
+                                    :sender_raw)
   end
 end

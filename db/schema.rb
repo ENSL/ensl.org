@@ -353,13 +353,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_221842) do
     t.datetime "created_at", precision: nil
     t.string "details"
     t.integer "domain"
-    t.integer "log_event_id"
     t.integer "log_file_id"
     t.integer "round_id"
     t.integer "server_id"
     t.string "specifics1"
     t.string "specifics2"
-    t.string "specifics3"
     t.integer "target_id"
     t.text "text"
     t.index ["actor_id"], name: "index_logs_on_actor_id"
@@ -597,15 +595,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_221842) do
     t.index ["rateable_id", "rateable_type"], name: "index_ratings_on_rateable_id_and_rateable_type"
   end
 
-  create_table "read_marks", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
-    t.integer "readable_id"
+  create_table "read_marks", charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
+    t.bigint "readable_id", null: false
     t.string "readable_type", null: false
-    t.integer "reader_id"
+    t.bigint "reader_id", null: false
     t.string "reader_type", null: false
     t.datetime "timestamp", precision: nil
-    t.index ["readable_type", "readable_id"], name: "index_read_marks_on_readable_type_and_readable_id"
     t.index ["reader_id", "reader_type", "readable_type", "readable_id"], name: "read_marks_reader_readable_index", unique: true
-    t.index ["reader_type", "reader_id"], name: "index_read_marks_on_reader_type_and_reader_id"
   end
 
   create_table "readings", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
