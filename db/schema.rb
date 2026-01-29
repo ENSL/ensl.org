@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_04_221842) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_000000) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -596,7 +596,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_221842) do
   end
 
   create_table "read_marks", charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
-    t.bigint "readable_id", null: false
+    t.bigint "readable_id"
     t.string "readable_type", null: false
     t.bigint "reader_id", null: false
     t.string "reader_type", null: false
