@@ -1,5 +1,5 @@
 class BansController < ApplicationController
-  before_action :get_ban, only: [:show, :edit, :update, :destroy]
+  before_action :get_ban, only: %i[show edit update destroy]
 
   def index
     @bans = Ban.ordered
@@ -20,28 +20,31 @@ class BansController < ApplicationController
   def create
     @ban = Ban.new(Ban.params(params, cuser))
     raise AccessError unless @ban.can_create? cuser
+
     @ban.creator = cuser
 
     if @ban.save
       flash[:notice] = t(:bans_create)
       redirect_to(@ban)
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
   def update
     raise AccessError unless @ban.can_update? cuser
+
     if @ban.update(Ban.params(params, cuser))
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     raise AccessError unless @ban.can_destroy? cuser
+
     @ban.destroy
     redirect_to(bans_url)
   end

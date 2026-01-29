@@ -27,7 +27,7 @@
             <%= link_to icon('pencil'), edit_ban_path(ban) %>
           <% end %>
           <% if ban.can_destroy? cuser %>
-            <%= link_to icon('times'), ban, confirm: 'Are you sure?', method: :delete %>
+            <%= link_to icon('times'), ban, data: { turbo_method: :delete, confirm: 'Are you sure?' }, class: 'delete' %>
           <% end %>
         </td>
       <% end %>

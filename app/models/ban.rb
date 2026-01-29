@@ -31,41 +31,40 @@ class Ban < ActiveRecord::Base
   TYPE_SERVER = 3
   TYPE_VENT = 4
   TYPE_GATHER = 5
-  VENT_BANS = "tmp/bans.txt"
+  VENT_BANS = 'tmp/bans.txt'
 
-  #attr_protected :id, :created_at, :updated_at
+  # attr_protected :id, :created_at, :updated_at
   attr_accessor :len, :user_name
 
-  scope :ordered,  -> {order("created_at DESC")}
-  scope :effective, -> {where("expiry > UTC_TIMESTAMP()")}
-  scope :ineffective, -> {where("expiry < UTC_TIMESTAMP()")}
-  scope :server_ban, -> (steamid) { where("expiry > UTC_TIMESTAMP() AND steamid = ? AND ban_type = ?", steamid, Ban::TYPE_SERVER) }
+  scope :ordered, -> { order('created_at DESC') }
+  scope :effective, -> { where('expiry > UTC_TIMESTAMP()') }
+  scope :ineffective, -> { where('expiry < UTC_TIMESTAMP()') }
+  scope :server_ban, ->(steamid) { where('expiry > UTC_TIMESTAMP() AND steamid = ? AND ban_type = ?', steamid, Ban::TYPE_SERVER) }
 
   before_validation :check_user
 
   validate :validate_type
   validate :validate_ventban
-  validate :validate_permission
-  validates :steamid, length: {maximum: 14}, format: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
+  validates :steamid, length: { maximum: 14 }, format: /\A0:[01]:[0-9]{1,10}\Z/, allow_blank: true
   validates :addr, format: /\A([0-9]{1,3}\.){3}[0-9]{1,3}:?[0-9]{0,5}\z/, allow_blank: true
-  validates :reason, length: {maximum: 255}, allow_blank: true
+  validates :reason, length: { maximum: 255 }, allow_blank: true
 
-  belongs_to :user, :optional => true
-  belongs_to :server, :optional => true
+  belongs_to :user, optional: true
+  belongs_to :server, optional: true
 
-  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User', :optional => true
+  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User', optional: true
 
   def color
-    expiry.past? ? "green" : "red"
+    expiry.past? ? 'green' : 'red'
   end
 
   def types
-    {TYPE_SITE => "Website Logon",
-     TYPE_MUTE => "Commenting",
-     TYPE_LEAGUE => "Contests",
-     TYPE_SERVER => "NS Servers",
-     TYPE_VENT => "Ventrilo",
-     TYPE_GATHER => "Gather"}
+    { TYPE_SITE => 'Website Logon',
+      TYPE_MUTE => 'Commenting',
+      TYPE_LEAGUE => 'Contests',
+      TYPE_SERVER => 'NS Servers',
+      TYPE_VENT => 'Ventrilo',
+      TYPE_GATHER => 'Gather' }
   end
 
   def validate_type
@@ -73,39 +72,38 @@ class Ban < ActiveRecord::Base
   end
 
   def validate_ventban
-    if ban_type == TYPE_VENT and !ip.match(/\A([0-9]{1,3}\.){3}[0-9]{1,3}\z/)
-      errors.add :ip, I18n.t(:ventrilos_ip_ban)
-    end
-  end
+    return unless ban_type == TYPE_VENT and !ip.match(/\A([0-9]{1,3}\.){3}[0-9]{1,3}\z/)
 
-  def validate_permission
-    unless creator.nil? or creator.admin? or (creator.gather_moderator? and self.ban_type == TYPE_GATHER)
-      errors.add :ban_type, 'Gather Moderators can only create gather bans'
-    end
+    errors.add :ip, I18n.t(:ventrilos_ip_ban)
   end
 
   def check_user
-    if user_name
+    if user_name.present?
       self.user = User.find_by_username(user_name)
+      errors.add :user_name, 'User not found' if user.nil? && ban_type != TYPE_SERVER
     else
       self.user = User.where(steamid: steamid).first
       self.server = Server.where("CONCAT(ip, ':', port) = ?", addr).first
+
+      if user.nil? && server.nil? && ban_type != TYPE_SERVER
+        errors.add :base, 'User or server must be specified for this ban type'
+      end
     end
   end
 
-  def can_create? cuser
-    cuser and cuser.allowed_to_ban?
+  def can_create?(cuser)
+    cuser&.allowed_to_ban?
   end
 
-  def can_update? cuser
-    cuser and (cuser.admin? or (self.creator == cuser and cuser.allowed_to_ban?))
+  def can_update?(cuser)
+    cuser and (cuser.admin? or (creator == cuser and cuser.allowed_to_ban?))
   end
 
-  def can_destroy? cuser
-    cuser and (cuser.admin? or (self.creator == cuser and cuser.allowed_to_ban?))
+  def can_destroy?(cuser)
+    cuser and (cuser.admin? or (creator == cuser and cuser.allowed_to_ban?))
   end
 
-  def self.params params, cuser
-    params.require(:ban).permit(:steamid, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
+  def self.params(params, cuser)
+    params.require(:ban).permit(:steamid, :user_name, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
   end
 end

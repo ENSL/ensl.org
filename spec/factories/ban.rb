@@ -5,7 +5,8 @@ FactoryBot.define do
     # When adding the time, its in previous day and the time is set to 00:00
     # read: http://danilenko.org/2012/7/6/rails_timezones/
     expiry { Time.now.utc + 1.day }
-    
+    reason { 'Violation of rules, poor behavior.' }
+
     # Hack because of the awkward way bans are created (requires user_name)
     before(:create) do |ban|
       if ban.user.nil?
@@ -19,17 +20,17 @@ FactoryBot.define do
     trait :mute do
       ban_type { Ban::TYPE_MUTE }
     end
-  
+
     trait :site do
       ban_type { Ban::TYPE_SITE }
     end
-  
+
     trait :gather do
-      ban_type { Ban::TYPE_GATHER }
+      ban_type { Ban::TYPE_GATHER  }
     end
-  
+
     trait :expired do
-      expiry { Time.now.utc - 1.day  }
+      expiry { Time.now.utc - 1.day }
     end
   end
 end

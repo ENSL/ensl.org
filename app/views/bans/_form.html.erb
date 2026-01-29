@@ -24,6 +24,6 @@
     <%= f.text_area :reason %>
   </div>
   <div class="controls">
-    <%= f.submit 'Create' %>
+    <%= f.submit @ban.new_record? ? 'Create' : 'Update' %>
   </div>
 <% end %>
