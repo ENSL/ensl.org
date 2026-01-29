@@ -189,8 +189,27 @@ ul.navigation {
               display: block;
               color: $navbar-text;
               padding: 0 20px;
+              position: relative;
+
+              &.gathers {
+                padding-right: 65px;
+              }
             }
 
+            .count {
+              position: absolute;
+              top: 50%;
+              right: 12px;
+              transform: translateY(-50%);
+              border-radius: $base-border-radius;
+              background-color: $light-blue;
+              display: inline-block;
+              color: white;
+              line-height: 18px;
+              padding: 0 6px;
+              font-size: 12px;
+              font-weight: bold;
+            }
             &:hover a {
               background: $light-blue;
             }
