@@ -14,8 +14,9 @@ feature 'User creates new article', js: :true do
       end
 
       it 'creates an article successfully' do
-        expect(page).to have_field('Title', wait: 5)
-        fill_in attribute_translation(:article, :title), with: article[:title]
+        expect(page).to have_selector('#article_title', wait: 5)
+        fill_in 'article_title', with: article[:title]
+        expect(page).to have_selector('#article_text', visible: :all, wait: 5)
         fill_tinymce 'article_text', article[:text]
         click_button I18n.t('helpers.submit.post.create')
 
@@ -23,7 +24,9 @@ feature 'User creates new article', js: :true do
       end
 
       it 'creates an article with a text length greater than 65535 bytes' do
-        fill_in attribute_translation(:article, :title), with: article[:title]
+        expect(page).to have_selector('#article_title', wait: 5)
+        fill_in 'article_title', with: article[:title]
+        expect(page).to have_selector('#article_text', visible: :all, wait: 5)
         fill_tinymce 'article_text', long_text
         click_button I18n.t('helpers.submit.post.create')
 

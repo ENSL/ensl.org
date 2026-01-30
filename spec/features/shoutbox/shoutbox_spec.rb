@@ -64,7 +64,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
   scenario 'creating shout while banned' do
     Ban.create!(ban_type: Ban::TYPE_MUTE, expiry: Time.now.utc + 10.days, user_name: user.username)
     visit root_path
-    expect(find('#sidebar')).to have_content 'You have been muted.'
+    expect(page).to have_selector('#sidebar', text: 'You have been muted.')
   end
 
   scenario 'another user sees shout without reload' do
