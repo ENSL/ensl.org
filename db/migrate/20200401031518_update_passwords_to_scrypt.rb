@@ -6,7 +6,7 @@ class UpdatePasswordsToScrypt < ActiveRecord::Migration[4.2][6.0]
     puts('SCRYPT_MAX_TIME=%s' % ENV['SCRYPT_MAX_TIME'])
     SCrypt::Engine.calibrate!(max_time: ENV['SCRYPT_MAX_TIME'].to_f)
 
-    println('Updating passwords to scrypt...')
+    puts('Updating passwords to scrypt...')
 
     # Migrate passwords to scrypt
     User.all.order(:id).find_each(batch_size: 200) do |user|
