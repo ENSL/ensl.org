@@ -1,11 +1,6 @@
 require 'logger'
 require_relative 'boot'
 require 'securerandom'
-
-# FIXME
-# Set random value for this
-ENV['APP_SECRET_KEY_BASE'] ||= SecureRandom.alphanumeric(32)
-
 require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
@@ -57,10 +52,10 @@ module Ensl
                          secure: Rails.env.production?,
                          same_site: :lax
 
-    config.action_dispatch.cookies_serializer = :marshal
+    config.action_dispatch.cookies_serializer = :hybrid
 
     # Load secrets from .env
-    ENV['APP_SECRET'] ||= (0...32).map { rand(65..90).chr }.join
+    ENV['APP_SECRET'] ||= SecureRandom.hex(64)
     config.secret_token = ENV['APP_SECRET']
 
     # Use a different cache store
