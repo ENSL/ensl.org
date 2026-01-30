@@ -55,21 +55,22 @@ class Topic < ActiveRecord::Base
 
   def self.recent_topics
     find_by_sql '
-      SELECT DISTINCT topics.*
-        FROM  (SELECT max(id) as max_id, topic_id
-                FROM   posts
-                GROUP  BY topic_id
-                ORDER  BY max_id DESC
-                LIMIT  200) AS T
-               INNER JOIN topics
-                       ON T.topic_id = topics.id
-               INNER JOIN forums
-                       ON forums.id = topics.forum_id
-               LEFT OUTER JOIN forumers
-                            ON forumers.forum_id = forums.id
-        WHERE forumers.id IS NULL
-        LIMIT  5
-    '
+        SELECT DISTINCT topics.*
+    FROM  (SELECT max(id) as max_id, topic_id
+      FROM   posts
+      GROUP  BY topic_id
+      ORDER  BY max_id DESC
+      LIMIT  200) AS T
+           INNER JOIN topics
+             ON T.topic_id = topics.id
+           INNER JOIN forums
+             ON forums.id = topics.forum_id
+           LEFT OUTER JOIN forumers
+            ON forumers.forum_id = forums.id
+    WHERE forumers.id IS NULL
+    ORDER BY T.max_id DESC
+    LIMIT  5
+      '
   end
 
   def to_s
