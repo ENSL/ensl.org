@@ -108,6 +108,11 @@ class Movie < ActiveRecord::Base
     view_counts.length
   end
 
+  def record_view_count(ip_address, logged_in = false)
+    view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
+    self
+  end
+
   def before_validation
     self.user = if user_name and !user_name.empty?
                   User.find_by_username(user_name)

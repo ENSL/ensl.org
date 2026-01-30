@@ -63,7 +63,9 @@
     </div>
   <% end %>
 
-  <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: @user }, { class: 'button tiny' } %>
+  <% if cuser && Message.new.can_create?(cuser) && @user != cuser %>
+    <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: @user }, { class: 'button tiny' } %>
+  <% end %>
 </div>
 
 <div class="group">

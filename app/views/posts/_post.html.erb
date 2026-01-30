@@ -61,7 +61,9 @@
 
   <div class="base">
     <div class="user">
-      <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: post.user }, class: 'button tiny' %>  
+      <% if cuser && Message.new.can_create?(cuser) && post.user.present? && post.user != cuser %>
+        <%= link_to "Send PM", new_message_path(id: 'User', id2: post.user.id), class: 'button tiny' %>
+      <% end %>
     </div>
     
     <div class="signature">

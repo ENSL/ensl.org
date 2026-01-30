@@ -20,6 +20,8 @@
     <% if article.can_destroy? cuser %>
       <%= link_to 'Destroy', article, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
     <% end %>
-    <%= link_to "History", article_versions_path(article), class: 'button tiny' %>
+    <% if cuser %>
+      <%= link_to "History", article_versions_path(article), class: 'button tiny' %>
+    <% end %>
   </div>
 </div>

@@ -7,7 +7,7 @@
 </div>
 
 <div class="actions-bottom">
-  <%= link_to t('news.archive'), '/news/archive', class: 'button' %>
+  <%= link_to t('news.archive'), news_archive_articles_path, class: 'button' %>
 
   <% if cuser and cuser.admin? %>
     <%= link_to t('helpers.submit.post.new'), new_article_path, class: "button" %>

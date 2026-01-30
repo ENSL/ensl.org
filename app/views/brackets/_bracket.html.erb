@@ -2,10 +2,14 @@
   <%= bracket.name if !bracket.name&.empty? and !defined? edit %>
 </h3>
 
-<table class="brackets">
-  <% rows = bracket.slots*2-1 %>
-  <% cols = 2+(bracket.slots/4) %>
-  <% content = Array.new((bracket.slots*2-1)/4) %>
+<% slots = (bracket.slots || 0).to_i %>
+<% if slots <= 0 %>
+  <p class="notice">Bracket not configured.</p>
+<% else %>
+  <table class="brackets">
+    <% rows = slots*2-1 %>
+    <% cols = 2+(slots/4) %>
+    <% content = Array.new((slots*2-1)/4) %>
   <% (0..rows).each do |row| %>
     <tr>
       <% (0..cols).each do |col| %>
@@ -45,3 +49,5 @@
     </tr>
   <% end %>
 </table>
+  </table>
+<% end %>

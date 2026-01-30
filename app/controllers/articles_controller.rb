@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
-  before_action :get_article, only: [:show, :edit, :update, :cleanup, :destroy]
+  before_action :get_article, only: %i[show edit update cleanup destroy]
 
   def index
     @categories = Category.ordered.nospecial.domain Category::DOMAIN_ARTICLES
@@ -16,15 +16,16 @@ class ArticlesController < ApplicationController
 
   def admin
     raise AccessError unless cuser and cuser.admin?
+
     # FIXME: something better?
-    @articles = {"Drafts" => Article.drafts.ordered, "Special" => Article.category(Category::SPECIAL).ordered}
+    @articles = { 'Drafts' => Article.drafts.ordered, 'Special' => Article.category(Category::SPECIAL).ordered }
   end
 
   def show
     raise AccessError unless @article.can_show? cuser
+
     @article.mark_as_read! for: cuser if cuser
-    # OBSOLETE
-    # @article.record_view_count(request.remote_ip, cuser.nil?)
+    @article.record_view_count(request.remote_ip, cuser.nil?)
   end
 
   def new
@@ -34,6 +35,7 @@ class ArticlesController < ApplicationController
 
   def edit
     raise AccessError unless @article.can_update? cuser
+
     @file = DataFile.new
     @file.directory_id = Directory::ARTICLES
     @file.article = @article
@@ -54,6 +56,7 @@ class ArticlesController < ApplicationController
 
   def update
     raise AccessError unless @article.can_update?(cuser, Article.article_params(params, cuser))
+
     if @article.update(Article.article_params(params, cuser))
       flash[:notice] = t(:articles_update)
       redirect_to @article
@@ -65,6 +68,7 @@ class ArticlesController < ApplicationController
   # TODO: link it somewhere
   def cleanup
     raise AccessError unless @article.can_update? cuser
+
     @article.text = strip(@article.text)
     @article.save!
     redirect_to @article
@@ -72,6 +76,7 @@ class ArticlesController < ApplicationController
 
   def destroy
     raise AccessError unless @article.can_destroy? cuser
+
     @article.destroy
     redirect_to_back
   end

@@ -66,6 +66,7 @@ class Article < ActiveRecord::Base
   belongs_to :category, optional: true
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :files, class_name: 'DataFile', dependent: :destroy
+  has_many :view_counts, as: :viewable, dependent: :destroy
 
   validates_length_of :title, in: 1..50
   validates_length_of :text, in: 1..16_000_000
@@ -133,6 +134,15 @@ class Article < ActiveRecord::Base
         Notifications.article p.user, self if p.user
       end
     end
+  end
+
+  def view_count
+    view_counts.length
+  end
+
+  def record_view_count(ip_address, logged_in = false)
+    view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
+    self
   end
 
   # FIXME

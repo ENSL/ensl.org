@@ -33,7 +33,7 @@ Rails.application.routes.draw do
       get :current
       get :del_map
       get :scores
-      get :historical
+      get :historical, path: 'historical(/:id)'
     end
     member do
       get :confirmed_matches, path: 'confirmedmatches'
