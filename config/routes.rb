@@ -61,7 +61,11 @@ Rails.application.routes.draw do
       get :replace
     end
   end
-  resources :teams
+  resources :teams do
+    member do
+      get :recover
+    end
+  end
 
   resources :gathers do
     collection do

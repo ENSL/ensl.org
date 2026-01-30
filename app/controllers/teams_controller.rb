@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  before_action :get_team, only: [:show, :edit, :update, :destroy, :recover]
+  before_action :get_team, only: %i[show edit update destroy recover]
 
   def index
     @teams = Team.search(params[:search]).paginate(per_page: 80, page: params[:page]).ordered
@@ -38,6 +38,7 @@ class TeamsController < ApplicationController
 
   def update
     raise AccessError unless @team.can_update? cuser
+
     if @team.update(Team.params(params, cuser))
       # FIXME: move this logic to model
       if params[:rank]
@@ -45,17 +46,16 @@ class TeamsController < ApplicationController
           # Contains new rank as given by submitted parameters
           new_rank = params[:rank]["#{member.id}"]
           # Can only set own rank to equal or lower than current rank
-          if cuser.admin? or (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
-            # Don't allow setting members back to rank joining
-            next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
+          next unless cuser.admin? or (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
+          # Don't allow setting members back to rank joining
+          next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
 
-            # Update team when rank changes from joiner to member or higher
-            if member.rank == Teamer::RANK_JOINER && new_rank.to_i >= Teamer::RANK_MEMBER
-              member.user.update_attribute :team, @team
-            end
-            member.update_attribute :rank, new_rank
-            member.update_attribute :comment, params[:comment]["#{member.id}"]
+          # Update team when rank changes from joiner to member or higher
+          if member.rank == Teamer::RANK_JOINER && new_rank.to_i >= Teamer::RANK_MEMBER
+            member.user.update_attribute :team, @team
           end
+          member.update_attribute :rank, new_rank
+          member.update_attribute :comment, params[:comment]["#{member.id}"]
         end
       end
       flash[:notice] = t(:teams_update)
@@ -67,12 +67,14 @@ class TeamsController < ApplicationController
 
   def destroy
     raise AccessError unless @team.can_destroy? cuser
+
     @team.destroy
     redirect_to(teams_url)
   end
 
   def recover
     raise AccessError unless @team.can_destroy? cuser
+
     @team.recover
     redirect_to(teams_url)
   end
