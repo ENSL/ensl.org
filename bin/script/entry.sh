@@ -10,6 +10,14 @@ cd $APP_PATH
 # Create dirs
 mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
 
+# Run migrations and run sleep loop on failure
+echo "Running database migrations..."
+bundle exec rake db:migrate || {
+  echo "Database migrations failed, dropping to shell."
+  /bin/bash -c "while true; do sleep 60; done"
+  exit 1
+}
+
 # Precompile assets when needed. Don't assume the ENV
 if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   echo "Precompiling assets..."
@@ -22,14 +30,6 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   bundle exec rake assets:precompile
   chown -R web:web $APP_PATH
 fi
-
-# Run migrations and run sleep loop on failure
-echo "Running database migrations..."
-bundle exec rake db:migrate || {
-  echo "Database migrations failed, dropping to shell."
-  /bin/bash -c "while true; do sleep 60; done"
-  exit 1
-}
 
 # Start puma unless disabled for debugging
 if [[ "$DISABLE_PUMA" -eq 1 ]]; then
