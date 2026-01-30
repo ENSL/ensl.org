@@ -1,33 +1,50 @@
 [mysqld]
 
+# Disable hostname cache
 skip-host-cache
+# Skip DNS lookups and rely on IPs; reduces connection latency.
 skip-name-resolve
 
+# MyISAM index cache.
 key_buffer_size         = 150M
+# Max packet size.
 max_allowed_packet      = 20M
+# Per-thread stack size.
 thread_stack            = 196K
+# Cache for reusable threads.
 thread_cache_size       = 16
 
-max_connections        = 96
-table_cache            = 2000
-table_definition_cache = 800
-; thread_concurrency     = 128
+# Max client connections.
+max_connections         = 96
+# Table cache (Open tables).
+table_cache             = 2000
+# Table definition cache.
+table_definition_cache  = 800
 
+# Query cache (deprecated/removed in MySQL 8)
 query_cache_limit       = 30M
+# Query cache size.
 query_cache_size        = 150M
+# OS file descriptor limit for mysqld.
 open_files_limit        = 1800
+# Per-join buffer.
 join_buffer_size        = 1M
+# Per-sort buffer.
 sort_buffer_size        = 1M
+# Sequential read buffer.
 read_buffer_size        = 128K
+# Temp table memory limit.
 tmp_table_size          = 500M
+# Max memory temp table size.
 max_heap_table_size     = 500M
 
+# InnoDB buffer pool.
 innodb_buffer_pool_size         = 1280M
+# Durability vs speed.
 innodb_flush_log_at_trx_commit  = 1
-innodb_thread_concurrency       = 16
+# Use O_DIRECT to avoid double buffering.
 innodb_flush_method             = O_DIRECT
-#innodb_additional_mem_pool_size = 20M
+# Store each InnoDB table in its own file.
 innodb_file_per_table           = 1
+# Default isolation level.
 transaction-isolation           = READ-COMMITTED
-
-innodb_file_per_table=1
