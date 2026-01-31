@@ -26,14 +26,16 @@ $(document).ready(function(){
   }
 });
 
-$(function() {
-  $("div#shoutbox").bind("mousewheel",function(ev, delta) {
+function bindLocalHandlers() {
+  $(document).off('mousewheel', 'div#shoutbox');
+  $(document).on('mousewheel', 'div#shoutbox', function(ev, delta) {
     var scrollTop = $(this).scrollTop();
     $(this).scrollTop(scrollTop-Math.round(delta));
   });
 
   // Forums fast reply
-  $("a.fastReply").on('click', function() {
+  $(document).off('click', 'a.fastReply');
+  $(document).on('click', 'a.fastReply', function() {
     $('#reply').fadeIn('fast',
     function() {
       $(this).focus();
@@ -43,14 +45,12 @@ $(function() {
 
   // Gather stuff
 
-  $("a#gather-info-hide").on('click', function() {
+  $(document).off('click', 'a#gather-info-hide');
+  $(document).on('click', 'a#gather-info-hide', function() {
     $("div#gather-info").fadeOut('slow', 0);
   });
 
-  $("a#gatherJoinBtn").on('click', function() {
-    $('form#new_gatherer').submit();
-  });
-
+  $(document).off('click', 'a.delete-gatherer');
   $(document).on('click', 'a.delete-gatherer', function(e) {
     e.preventDefault();
     var formId = $(this).data('form-id');
@@ -60,6 +60,7 @@ $(function() {
     }
   });
 
+  $(document).off('click', 'a.vote-link');
   $(document).on('click', 'a.vote-link', function(e) {
     e.preventDefault();
     var url = $(this).data('url') || this.href;
@@ -72,15 +73,18 @@ $(function() {
 
   // Submit TODO
 
-  $("a.submit").on('click', function() {
+  $(document).off('click', 'a.submit');
+  $(document).on('click', 'a.submit', function() {
     $(this).closest('form').submit()
   });
 
-  $('form.new_shoutmsg').submit(function(){
+  $(document).off('submit', 'form.new_shoutmsg');
+  $(document).on('submit', 'form.new_shoutmsg', function(){
     $('input[type=submit]', this).attr('disabled', 'disabled');
   });
 
-  $('form.new_shoutmsg').on("ajax:complete", function(event, xhr, status){
+  $(document).off('ajax:complete', 'form.new_shoutmsg');
+  $(document).on("ajax:complete", 'form.new_shoutmsg', function(event, xhr, status){
     var self = this;
 
     $(this)[0].reset();
@@ -93,7 +97,8 @@ $(function() {
   $user_tabs = $("#user-profile .tabs");
 
   // User page
-  $("#user-profile li a").click(function() {
+  $(document).off('click', '#user-profile li a');
+  $(document).on('click', '#user-profile li a', function() {
     $user_tabs.find("li").removeClass("activeli");
     $(this).parent().addClass("activeli");
 
@@ -105,23 +110,27 @@ $(function() {
   });
 
   // Users page
-  $("#users th a, #users .pagination a").on("click", function() {
+  $(document).off('click', '#users th a, #users .pagination a');
+  $(document).on("click", "#users th a, #users .pagination a", function() {
     $.getScript(this.href);
     return false;
   });
 
-  $("#users_search input").keyup(function() {
+  $(document).off('keyup', '#users_search input');
+  $(document).on('keyup', '#users_search input', function() {
     $.get($("#users_search").attr("action"), $("#users_search").serialize(), null, "script");
     return false;
   });
 
   // Poll page
-  $("a#option").click(function() {
+  $(document).off('click', 'a#option');
+  $(document).on('click', 'a#option', function() {
   });
   
   // Match proposal
 
-  $("form.edit_match_proposal a").on('click', function() {
+  $(document).off('click', 'form.edit_match_proposal a');
+  $(document).on('click', 'form.edit_match_proposal a', function() {
     var form = $(this).closest('form.edit_match_proposal');
     form.children("input#match_proposal_status").val($(this).data('id'));
     $.post(form.attr('action'),form.serialize(), function(data) {
@@ -135,6 +144,13 @@ $(function() {
       });
     }
   );
+}
+
+$(function() {
+  bindLocalHandlers();
+  $(document).on('turbo:load', function() {
+    bindLocalHandlers();
+  });
 });
 
 // User search

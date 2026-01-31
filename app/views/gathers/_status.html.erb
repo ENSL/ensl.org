@@ -6,9 +6,9 @@
       <%= button_to 'Leave Gather', @gatherer, method: :delete, form: { data: { turbo: false }, class: 'inline' }, class: 'button', data: { confirm: 'Are you sure?' } %>
 
     <% elsif (g = Gatherer.new(gather: @gather, user: cuser)).can_create?(cuser) %>
-      <%= form_for g do |f| %>
-        <%= f.hidden_field :gather_id %>
-        <%= f.hidden_field :user_id %>
+      <%= form_for g, url: gatherers_path, html: { id: "new_gatherer_#{@gather.id}", data: { turbo: false } } do |f| %>
+        <%= f.hidden_field :gather_id, value: @gather.id %>
+        <%= f.hidden_field :user_id, value: cuser.id %>
 
         <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
         <p>
@@ -22,13 +22,10 @@
           <% end  %>
         </p>
         <p>
-          <a href="javascript:" id="gatherJoinBtn" class="button">
-            Click to join gather!
-          </a>
+          <%= f.submit 'Click to join gather!', class: 'button' %>
           <%= link_to gathers_path(), class: 'button' do %>
             Gather archive
           <% end %>
-          </a>
         </p>
       <% end %>
 

@@ -35,10 +35,10 @@
         <% end %>
       </li>
       <li>
-        <%= form_tag(controller: 'users', action: 'logout') do %>
-          <%= link_to '#', id: 'logout' do %>
-            Logout <%= icon 'key' %>
-          <% end %>
+        <%= link_to '#', id: 'logout-link' do %>
+          Logout <%= icon 'key' %>
+        <% end %>
+        <%= form_tag({ controller: 'users', action: 'logout' }, id: 'logout-form', style: 'display:none;', data: { turbo: false }) do %>
         <% end %>
       </li>
     </ul>
