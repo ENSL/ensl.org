@@ -4,6 +4,7 @@ class UsersController < ApplicationController
 
   # OmniAuth callback is a cross-origin GET from the provider; skip CSRF checks here.
   skip_forgery_protection only: :callback
+  prepend_before_action :reject_js_callback, only: :callback
 
   PAGES = %w[general favorites computer articles movies teams matches predictions comments]
 
@@ -160,6 +161,12 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def reject_js_callback
+    return unless request.format.js?
+
+    head :not_acceptable
+  end
 
   def get_user
     @user = User.find(params[:id])

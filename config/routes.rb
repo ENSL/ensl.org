@@ -117,11 +117,8 @@ Rails.application.routes.draw do
   get 'users/agenda/:id', to: 'users#agenda', as: :legacy_agenda_user
 
   # OmniAuth callback — accept GET (provider redirects) and POST (some setups)
-  if Rails.env.test?
-    match 'auth/:provider/callback', to: 'users#callback', via: %i[get post]
-  else
-    post 'auth/:provider/callback', to: 'users#callback'
-  end
+  # Disallow format extensions to avoid cross-origin JS embedding attempts.
+  match 'auth/:provider/callback', to: 'users#callback', via: %i[get post], format: false
 
   resources :locks
   resources :contesters
