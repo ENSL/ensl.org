@@ -64,7 +64,13 @@ class ApplicationController < ActionController::Base
       # Allow relative URLs or same-host absolute URLs
       if uri.host.nil? || uri.host == request.host
         path = uri.request_uri
-        redirect_to path
+        begin
+          Rails.application.routes.recognize_path(path)
+          redirect_to path
+        rescue StandardError
+          flash[:notice] = t(:invalid_message) if respond_to?(:flash)
+          redirect_to('/')
+        end
       else
         redirect_to('/')
       end
