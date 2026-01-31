@@ -28,6 +28,9 @@ Rails.application.configure do
   # Keep this off, causes weird redirection bug
   config.force_ssl = false
 
+  # Trust SSL terminated at the proxy so request.base_url uses https
+  config.assume_ssl = true
+
   # See everything in the log (default is :info)
   config.log_level = :error
 
@@ -45,6 +48,5 @@ Rails.application.configure do
   config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Secret key
-  config.require_master_key = false 
-
+  config.require_master_key = false
 end
