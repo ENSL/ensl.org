@@ -54,6 +54,11 @@ services:
       - "${PUMA_PORT}:${PUMA_PORT}"
     depends_on:
       - smtp
+    networks:
+      default: {}
+      catpack_docker:
+        aliases:
+          - ensl_production
 
   #
   # Testing
@@ -120,3 +125,7 @@ services:
       OPENDKIM_DOMAINS: ${MAIL_DOMAIN}
       RSYSLOG_LOG_TO_FILE: yes
       RSYSLOG_TIMESTAMP: yes
+
+networks:
+  catpack_docker:
+    external: true
