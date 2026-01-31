@@ -24,6 +24,8 @@ class ApplicationController < ActionController::Base
   end
 
   def return_here
+    return unless request.get? && request.format.html?
+
     session[:return_to] = request.url
   end
 
@@ -88,12 +90,11 @@ class ApplicationController < ActionController::Base
     '#'
   end
 
+  rescue_from AccessError do |_exception|
+    render 'errors/403', status: :forbidden, layout: 'errors'
+  end
+
   unless Rails.env.production?
-
-    rescue_from AccessError do |_exception|
-      render 'errors/403', status: :forbidden, layout: 'errors'
-    end
-
     rescue_from Error do |exception|
       render inline: exception.message.to_s, layout: true, status: :internal_server_error
     end
