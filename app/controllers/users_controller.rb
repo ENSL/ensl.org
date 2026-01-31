@@ -201,9 +201,7 @@ class UsersController < ApplicationController
 
   def save_session(user)
     session[:user] = user.id
-    user.lastip = request.ip
-    user.lastvisit = Time.now.utc
-    user.save!
+    user.update_columns(lastip: request.ip, lastvisit: Time.now.utc)
   end
 
   def auth_hash
