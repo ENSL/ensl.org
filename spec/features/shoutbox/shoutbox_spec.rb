@@ -97,4 +97,28 @@ feature 'Shoutbox (Turbo Streams)', js: true do
       end
     end
   end
+
+  scenario 'gather shoutbox maintains chronological order' do
+    gather = create(:gather, :running)
+    visit gather_path(gather)
+    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+
+    first_shout = SecureRandom.hex(6)
+    fill_in "shout_Gather_#{gather.id}_text", with: first_shout
+    click_button 'Shout!'
+
+    within("#shout_Gather_#{gather.id}") do
+      expect(page).to have_content(first_shout, wait: 5)
+    end
+
+    second_shout = SecureRandom.hex(6)
+    fill_in "shout_Gather_#{gather.id}_text", with: second_shout
+    click_button 'Shout!'
+
+    within("#shout_Gather_#{gather.id}") do
+      expect(page).to have_content(second_shout, wait: 5)
+      expect(page).to have_content(first_shout)
+      expect(page).to have_text(/#{Regexp.escape(first_shout)}.*#{Regexp.escape(second_shout)}/m)
+    end
+  end
 end

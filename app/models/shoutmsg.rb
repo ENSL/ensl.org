@@ -63,7 +63,7 @@ class Shoutmsg < ActiveRecord::Base
       html = ApplicationController.render(partial: 'shoutmsgs/shoutmsg', locals: { shoutmsg: shout, user: shout.user })
       Rails.logger.info "Shoutmsg broadcast: stream_name=#{shout.domain.inspect} target=#{shout.domain.inspect} payload_size=#{html.bytesize}"
       if shout.shoutable_type.present?
-        broadcast_prepend_to shout.domain, target: shout.domain, html: html
+        broadcast_append_to shout.domain, target: shout.domain, html: html
       else
         broadcast_prepend_to 'shoutbox', target: 'shoutbox', html: html
       end
