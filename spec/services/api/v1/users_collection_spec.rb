@@ -1,13 +1,10 @@
 require 'rails_helper'
 
 describe Api::V1::UsersCollection do
-  let(:collection) { Api::V1::UsersCollection.new }
-
   describe '#execute_query' do
     describe 'when there are users with no teams' do
-      before do
-        3.times { create(:user) }
-      end
+      let!(:users) { create_list(:user, 3) }
+      let(:collection) { Api::V1::UsersCollection.new(User.where(id: users.map(&:id))) }
 
       it 'returns 3 results' do
         expect(collection.execute_query.size).to eq(3)
@@ -16,9 +13,8 @@ describe Api::V1::UsersCollection do
 
     # FIXME: weird user count issue, expected 3 but got 300+
     describe 'when there are some users with teams' do
-      before :all do
-        3.times { create(:user_with_team) }
-      end
+      let!(:users_with_team) { create_list(:user_with_team, 3) }
+      let(:collection) { Api::V1::UsersCollection.new(User.where(id: users_with_team.map(&:id))) }
 
       it 'returns 3 results' do
         expect(collection.execute_query.size).to eq(3)

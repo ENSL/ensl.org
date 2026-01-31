@@ -191,28 +191,40 @@ describe User do
 
     it 'normalizes SteamID2/3/64 and rejects invalid steamid' do
       # SteamID2 (legacy with prefix)
-      u2 = build(:user, steamid: 'STEAM_0:1:123')
+      u2 = build(:user, steamid: 'STEAM_0:1:124')
       u2.valid?
       expect(u2.errors[:steamid]).to be_empty
-      expect(u2.steamid).to eq('0:1:123')
+      expect(u2.steamid).to eq('0:1:124')
 
       # SteamID2 without prefix
-      u2b = build(:user, steamid: '0:1:123')
+      u2b = build(:user, steamid: '0:1:125')
       u2b.valid?
       expect(u2b.errors[:steamid]).to be_empty
-      expect(u2b.steamid).to eq('0:1:123')
+      expect(u2b.steamid).to eq('0:1:125')
 
       # SteamID3
-      u3 = build(:user, steamid: '[U:1:246]')
+      u3 = build(:user, steamid: '[U:1:248]')
       u3.valid?
       expect(u3.errors[:steamid]).to be_empty
-      expect(u3.steamid).to eq('0:0:123')
+      expect(u3.steamid).to eq('0:0:124')
 
       # SteamID64
-      u64 = build(:user, steamid: '76561197960265974')
+      u64 = build(:user, steamid: '76561197960265976')
       u64.valid?
       expect(u64.errors[:steamid]).to be_empty
-      expect(u64.steamid).to eq('0:0:123')
+      expect(u64.steamid).to eq('0:0:124')
+
+      # Duplicate steamid is allowed to exist (legacy), but new users cannot take it
+      existing = create(:user, steamid: '0:1:123')
+      legacy_dup = create(:user)
+      legacy_dup.update_column(:steamid, existing.steamid)
+      legacy_dup.reload
+      legacy_dup.valid?
+      expect(legacy_dup.errors[:steamid]).to be_empty
+
+      newcomer = build(:user, steamid: '0:1:123')
+      newcomer.valid?
+      expect(newcomer.errors[:steamid]).not_to be_empty
 
       # Invalid
       ubad = build(:user, steamid: 'not-a-steamid')

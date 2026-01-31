@@ -5,9 +5,9 @@ module Api
         @relation = relation
       end
 
-      # Execute the Arel query and return rows (arrays)
+      # Execute the query and return rows (arrays)
       def execute_query
-        ActiveRecord::Base.connection.select_rows(arel_query.to_sql)
+        relation_query.pluck(*columns)
       end
 
       # Return Ruby hash (not a JSON string)
@@ -22,15 +22,11 @@ module Api
       private
 
       def users_table
-        User.arel_table
+        @relation.arel_table
       end
 
       def teams_table
         Team.arel_table
-      end
-
-      def joins
-        [users_table[:team_id].eq(teams_table[:id])]
       end
 
       def columns
@@ -44,12 +40,8 @@ module Api
         ]
       end
 
-      def arel_query
-        users_table
-          .project(columns)
-          .join(teams_table, Arel::Nodes::OuterJoin)
-          .on(joins)
-          .order(users_table[:id])
+      def relation_query
+        @relation.left_outer_joins(:team).order(users_table[:id])
       end
 
       def map_query
@@ -60,7 +52,7 @@ module Api
             steamid: row[1],
             team: {
               name: row[2],
-              tag:  row[3],
+              tag: row[3],
               logo: row[4]
             }
           }
