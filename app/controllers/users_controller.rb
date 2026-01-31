@@ -2,6 +2,9 @@ class UsersController < ApplicationController
   before_action :get_user, only: %i[show history popup agenda edit update destroy]
   respond_to :html, :js
 
+  # OmniAuth callback is a cross-origin GET from the provider; skip CSRF checks here.
+  skip_forgery_protection only: :callback
+
   PAGES = %w[general favorites computer articles movies teams matches predictions comments]
 
   def index
