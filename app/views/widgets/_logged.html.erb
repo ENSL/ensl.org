@@ -1,4 +1,6 @@
 <div class="logged">
+  <%# Hidden current username for JS/selectors and accessibility %>
+  <span id="current_user" class="invisible"><%= h(cuser.username) %></span>
   <div class="links">
     <ul>
       <% if cuser.admin? %>
