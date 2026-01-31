@@ -57,6 +57,7 @@ module Ensl
     # Load secrets from .env
     ENV['APP_SECRET'] ||= SecureRandom.hex(64)
     config.secret_token = ENV['APP_SECRET']
+    config.secret_key_base = ENV['APP_SECRET']
 
     # Use a different cache store
     config.cache_store = :mem_cache_store, 'memcached:11211'
