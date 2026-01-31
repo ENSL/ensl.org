@@ -32,7 +32,7 @@ Rails.application.configure do
   config.assume_ssl = true
 
   # See everything in the log (default is :info)
-  config.log_level = :error
+  config.log_level = (ENV['LOG_LEVEL'] || 'error').to_sym
 
   # Disable delivery errors, bad email addresses will be ignored
   config.action_mailer.raise_delivery_errors = false

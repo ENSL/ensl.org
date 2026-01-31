@@ -135,9 +135,18 @@ class UsersController < ApplicationController
   # FIXME: maybe move to session controller
   def login
     if params[:login]
+      Rails.logger.info(
+        "Login attempt username=#{params[:login][:username].to_s.inspect} " \
+        "ip=#{request.ip} ua=#{request.user_agent.to_s.inspect}"
+      )
       if (u = User.authenticate(params[:login]))
+        Rails.logger.info("Login success user_id=#{u.id} username=#{u.username}")
         login_user(u)
       else
+        Rails.logger.warn(
+          "Login failed username=#{params[:login][:username].to_s.inspect} " \
+          "ip=#{request.ip}"
+        )
         flash[:error] = t(:login_unsuccessful)
       end
     end
