@@ -505,8 +505,12 @@ class User < ActiveRecord::Base
   end
 
   def self.authenticate(login)
-    user = where('lower(username) = ?', login[:username].downcase).first
-    return nil unless user
+    username = login[:username].to_s
+    user = where('lower(username) = ?', username.downcase).first
+    unless user
+      Rails.logger.info("Auth failed: username not found username=#{username.inspect}")
+      return nil
+    end
 
     case user.password_hash
     when User::PASSWORD_SCRYPT
@@ -514,28 +518,31 @@ class User < ActiveRecord::Base
       begin
         pass = SCrypt::Password.new(user.password)
       rescue StandardError
-        logger.error 'User (%s) password hash is invalid.'
-        flash[:error] = 'Password hash is invalid, please use forget password functionality or contact admin.'
+        Rails.logger.error("Auth failed: invalid scrypt hash user_id=#{user.id} username=#{user.username}")
         return nil
       end
-      user if pass == login[:password]
+      return user if pass == login[:password]
+
+      Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=scrypt")
     when User::PASSWORD_MD5_SCRYPT
       pass = SCrypt::Password.new(user.password)
       # Match to Scrypt(Md5(password))
       if pass == Digest::MD5.hexdigest(login[:password])
         user.raw_password = login[:password]
         user.update_password
-        user.save!
-        user
+        user.save!(validate: false)
+        return user
       end
+      Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5_scrypt")
     # when User::PASSWORD_MD5
     else
       if user.password == Digest::MD5.hexdigest(login[:password])
         user.raw_password = login[:password]
         user.update_password
-        user.save!
-        user
+        user.save!(validate: false)
+        return user
       end
+      Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5")
     end
     # TODO: controller needs to handle this
     # rescue Exception => ex
