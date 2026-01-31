@@ -105,6 +105,15 @@ class ApplicationController < ActionController::Base
     render 'errors/404', status: :not_found, layout: 'errors'
   end
 
+  rescue_from ActionController::InvalidAuthenticityToken do |_exception|
+    Rails.logger.error(
+      "CSRF failure path=#{request.fullpath} method=#{request.request_method} " \
+      "ip=#{request.ip} referer=#{request.referer.to_s.inspect} " \
+      "ua=#{request.user_agent.to_s.inspect} params=#{request.filtered_parameters.inspect}"
+    )
+    render 'errors/422', status: :unprocessable_entity, layout: 'errors'
+  end
+
   unless Rails.env.production?
     rescue_from Error do |exception|
       render inline: exception.message.to_s, layout: true, status: :internal_server_error

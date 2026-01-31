@@ -506,7 +506,7 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login)
     username = login[:username].to_s
-    user = where('lower(username) = ?', username.downcase).first
+    user = where('BINARY username = ?', username).first
     unless user
       Rails.logger.info("Auth failed: username not found username=#{username.inspect}")
       return nil
