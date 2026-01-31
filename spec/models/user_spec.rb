@@ -148,6 +148,34 @@ describe User do
       expect(auth.password_hash).to eq(User::PASSWORD_SCRYPT)
       expect(SCrypt::Password.new(auth.password)).to eq(raw)
     end
+
+    it 'upgrades MD5 password even if user record is invalid (duplicate username)' do
+      username = 'dupuser'
+      raw = 'legacyPass123'
+
+      # Create a legacy MD5 user with duplicate username and bypass validations
+      legacy = User.new(username: username, email: 'dup1@example.com')
+      legacy.password_hash = User::PASSWORD_MD5
+      legacy.password = Digest::MD5.hexdigest(raw)
+      legacy.raw_password = nil
+      legacy.save!(validate: false)
+
+      # Create a duplicate username entry to make legacy record invalid
+      dup_user = User.new(username: username, email: 'dup2@example.com')
+      dup_user.password_hash = User::PASSWORD_SCRYPT
+      dup_user.password = SCrypt::Password.create('otherpass')
+      dup_user.raw_password = nil
+      dup_user.save!(validate: false)
+
+      auth = nil
+      expect do
+        auth = User.authenticate(username: username, password: raw)
+      end.not_to raise_error
+
+      expect(auth).to be_present
+      expect(auth.id).to eq(legacy.id)
+      expect([User::PASSWORD_SCRYPT, User::PASSWORD_MD5_SCRYPT]).to include(auth.password_hash)
+    end
   end
 
   describe 'additional safety checks' do

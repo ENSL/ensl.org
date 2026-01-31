@@ -36,6 +36,48 @@ RSpec.describe 'User login', type: :request do
     expect(flash[:notice]).to be_present
   end
 
+  it 'redirects to root if return_to points to an error page' do
+    u = create(:user, username: 'return_user', raw_password: raw_password)
+
+    session_store = Class.new(Hash) do
+      attr_accessor :id
+
+      def enabled?
+        true
+      end
+    end.new
+    session_store.id = 'test-session'
+    session_store[:return_to] = '/404'
+
+    post '/users/login',
+         params: { login: { username: u.username, password: raw_password } },
+         headers: {
+           'rack.session' => session_store,
+           'rack.session.options' => { id: 'test-session' }
+         }
+
+    expect(response).to redirect_to('/')
+  end
+
+  it 'allows login when user record is invalid due to duplicate username' do
+    legacy = User.new(username: 'dup_login', email: 'dup1@example.com')
+    legacy.password_hash = User::PASSWORD_MD5
+    legacy.password = Digest::MD5.hexdigest(raw_password)
+    legacy.raw_password = nil
+    legacy.save!(validate: false)
+
+    duplicate = User.new(username: 'dup_login', email: 'dup2@example.com')
+    duplicate.password_hash = User::PASSWORD_SCRYPT
+    duplicate.password = SCrypt::Password.create('otherpass')
+    duplicate.raw_password = nil
+    duplicate.save!(validate: false)
+
+    login_post('dup_login', raw_password)
+    expect(flash[:notice]).to be_present
+    legacy.reload
+    expect(legacy.lastvisit).to be_within(5).of(Time.now.utc)
+  end
+
   it 'does not allow empty password to authenticate or upgrade' do
     u = create(:user, username: 'empty_pw')
     u.update_columns(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
