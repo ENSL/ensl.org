@@ -65,4 +65,91 @@ describe Topic do
       expect(Topic.recent_topics).to_not include(restricted_topic)
     end
   end
+
+  describe '#can_show?' do
+    it 'allows public forum for anonymous user' do
+      topic = create(:topic, user: user, forum: forum)
+      expect(topic.can_show?(nil)).to be true
+    end
+
+    it 'blocks restricted forum for anonymous user' do
+      restricted_topic = create(:topic, user: user, forum: forum)
+      create(:forumer, forum: restricted_topic.forum, access: Forumer::ACCESS_READ)
+      expect(restricted_topic.can_show?(nil)).to be false
+    end
+
+    it 'allows restricted forum for group member' do
+      restricted_topic = create(:topic, user: user, forum: forum)
+      group = create(:group)
+      create(:forumer, forum: restricted_topic.forum, group: group, access: Forumer::ACCESS_READ)
+      create(:grouper, user: user, group: group)
+
+      expect(restricted_topic.can_show?(user)).to be_truthy
+    end
+  end
+
+  describe '#can_create?' do
+    it 'returns false for anonymous user' do
+      topic = build(:topic, user: user, forum: forum)
+      expect(topic.can_create?(nil)).to be false
+    end
+
+    it 'returns false for muted users' do
+      topic = build(:topic, user: user, forum: forum)
+      create(:ban, :mute, user: user)
+      expect(topic.can_create?(user)).to be false
+      expect(topic.errors[:bans]).not_to be_empty
+    end
+
+    it 'returns true when user is allowed and not muted' do
+      topic = build(:topic, user: user, forum: forum)
+      expect(topic.can_create?(user)).to be true
+    end
+  end
+
+  describe '#can_update? and #can_destroy?' do
+    it 'allows admin' do
+      admin = create(:user)
+      admin_group = create(:group, :admin)
+      create(:grouper, user: admin, group: admin_group)
+      topic = create(:topic, user: admin, forum: forum)
+
+      expect(topic.can_update?(admin)).to be true
+      expect(topic.can_destroy?(admin)).to be true
+    end
+
+    it 'blocks non-admin' do
+      topic = create(:topic, user: user, forum: forum)
+      expect(topic.can_update?(user)).to be false
+      expect(topic.can_destroy?(user)).to be false
+    end
+  end
+
+  describe '#last_page and #states' do
+    it 'computes last_page based on posts count' do
+      topic = create(:topic, user: user, forum: forum, first_post: 'Foo')
+      expect(topic.last_page).to eq(1)
+
+      Topic::POSTS_PAGE.times do
+        create(:post, topic: topic, user: user)
+      end
+
+      expect(topic.last_page).to eq(2)
+    end
+
+    it 'returns states mapping' do
+      topic = build(:topic, user: user, forum: forum)
+      expect(topic.states).to eq({ Topic::STATE_NORMAL => 'Normal', Topic::STATE_STICKY => 'Sticky' })
+    end
+  end
+
+  describe '#record_view_count and #view_count' do
+    it 'records views and counts them' do
+      topic = create(:topic, user: user, forum: forum, first_post: 'Foo')
+      topic.record_view_count('127.0.0.1', true)
+      topic.record_view_count('127.0.0.2', false)
+
+      expect(topic.view_count).to eq(2)
+    end
+  end
 end
