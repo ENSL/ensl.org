@@ -81,7 +81,6 @@ server {
   # FIXME: use env. var
   location /files/ {
     # Safety guard: if $PRODUCTION_FILES is empty, don't serve anything.
-    if ($PRODUCTION_FILES = "") { return 404; }
     # try_files $uri $uri/ @puma;
     alias $PRODUCTION_FILES;
     autoindex on;
