@@ -21,7 +21,7 @@ end
 module Ensl
   class Application < Rails::Application
     # Custom error pages
-    config.exceptions_app = :routes
+    config.exceptions_app = ->(env) { Rails.application.routes.call(env) }
 
     # Secret key
     config.require_master_key = false
@@ -55,7 +55,8 @@ module Ensl
     config.action_dispatch.cookies_serializer = :hybrid
 
     # Load secrets from .env
-    ENV['APP_SECRET'] ||= SecureRandom.hex(64)
+    ENV['APP_SECRET'] = ENV['APP_SECRET'].to_s
+    ENV['APP_SECRET'] = SecureRandom.hex(64) if ENV['APP_SECRET'].empty?
     config.secret_token = ENV['APP_SECRET']
     config.secret_key_base = ENV['APP_SECRET']
 
