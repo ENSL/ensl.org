@@ -53,6 +53,8 @@ RSpec.configure do |config|
   config.include Features::SessionHelpers, type: :system
   config.include Features::ServerHelpers,  type: :feature
   config.include Features::ServerHelpers,  type: :system
+  config.include Features::GatherHelpers,  type: :feature
+  config.include Features::GatherHelpers,  type: :system
 
   # If you also rely on JSON helpers in controller/request specs:
   config.include Controllers::JsonHelpers, type: :controller

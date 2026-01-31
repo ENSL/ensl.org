@@ -9,11 +9,12 @@
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
       <li>
-        <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
+          <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
           <% pick = true %>
-          <%= radio_button_tag :player, gatherer.id %> 
-          <%= flag gatherer.user.country %> 
-          <%= namelink gatherer.user %>
+          <%= radio_button_tag :player, gatherer.id %>
+          <%= flag gatherer.user.country %>
+          <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
 
         <% else %>
           <%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %>
@@ -22,7 +23,8 @@
             <%= icon 'chevron-right' %>
           <% end %>
 
-          <%= namelink gatherer.user %>
+          <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
 
           <% if gatherer == captain %>
             <span class="captain">

@@ -11,17 +11,17 @@ Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['
 if ENV['SIMPLECOV'] == '1'
   require 'simplecov'
 
-  SimpleCov.start "rails" do
+  SimpleCov.start 'rails' do
     enable_coverage :branch
     add_filter %r{^/spec/}
     add_filter %r{^/config/}
     add_filter %r{^/db/}
     add_filter %r{^/vendor/}
 
-    add_group "Controllers", "app/controllers"
-    add_group "Models",      "app/models"
-    add_group "Jobs",        "app/jobs"
-    add_group "Services",    "app/services"
+    add_group 'Controllers', 'app/controllers'
+    add_group 'Models',      'app/models'
+    add_group 'Jobs',        'app/jobs'
+    add_group 'Services',    'app/services'
   end
 end
 
@@ -95,7 +95,7 @@ Capybara.register_driver :selenium_headless do |app|
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: build_chrome_options(headless: true))
 end
 
-Capybara.server = :puma
+Capybara.server = :puma, { Silent: true }
 Capybara.default_driver = :rack_test
 Capybara.javascript_driver = :selenium_chrome_headless
 Capybara.default_max_wait_time = 10
@@ -189,7 +189,7 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
   config.order = 'random'
-  # config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = false
   config.color = true
   config.formatter = :documentation
   config.infer_spec_type_from_file_location!

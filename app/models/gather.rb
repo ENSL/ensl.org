@@ -217,6 +217,6 @@ class Gather < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id)
+    params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
   end
 end
