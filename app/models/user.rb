@@ -524,6 +524,7 @@ class User < ActiveRecord::Base
       return user if pass == login[:password]
 
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=scrypt")
+      return nil
     when User::PASSWORD_MD5_SCRYPT
       pass = SCrypt::Password.new(user.password)
       # Match to Scrypt(Md5(password))
@@ -534,6 +535,7 @@ class User < ActiveRecord::Base
         return user
       end
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5_scrypt")
+      return nil
     # when User::PASSWORD_MD5
     else
       if user.password == Digest::MD5.hexdigest(login[:password])
@@ -543,11 +545,13 @@ class User < ActiveRecord::Base
         return user
       end
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5")
+      return nil
     end
     # TODO: controller needs to handle this
     # rescue Exception => ex
     #  user.errors.add(:password, "%s (%s)" % [I18n.t(:password_corrupt), ex.class.to_s])
     #  return nil
+    nil
   end
 
   def self.get(id)
