@@ -65,6 +65,22 @@
   }
 }
 
+.shoutbox-messages {
+  display: block;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  .user {
+    display: inline;
+  }
+
+  .timestamp {
+    float: right;
+    margin: 0 5px 5px;
+  }
+}
+
 #gather-info {
   @include span-columns(12);
   margin: 20px 0;

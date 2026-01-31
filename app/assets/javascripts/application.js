@@ -5,6 +5,7 @@
 // = require jquery.periodicalupdater
 // = require jquery.jplayer.min
 // = require yetii
+// = require shoutbox
 // = require local
 // = require misc
 

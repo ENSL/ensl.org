@@ -60,6 +60,17 @@
   }
 }
 
+.shoutbox-messages {
+  @include span-columns(12);
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  .timestamp {
+    margin: 0 5px 5px;
+  }
+}
+
 #gather-info {
   @include span-columns(12);
   margin: 20px 0;

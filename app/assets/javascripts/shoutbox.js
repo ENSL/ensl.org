@@ -1,5 +1,32 @@
 // Shoutbox Controller manages input validation on shoutmsg form
 
+function initShoutboxAutoscroll() {
+	var $transcripts = $("#shoutbox, .shoutbox-messages");
+	$transcripts.each(function() {
+		var el = this;
+		// Always scroll to bottom
+		el.scrollTop = el.scrollHeight;
+		if (el.dataset && el.dataset.shoutboxAutoscroll === "1") {
+			return;
+		}
+		if (el.dataset) {
+			el.dataset.shoutboxAutoscroll = "1";
+		}
+		var observer = new MutationObserver(function() {
+			setTimeout(function() { el.scrollTop = el.scrollHeight; }, 10);
+		});
+		observer.observe(el, { childList: true, subtree: true });
+	});
+}
+
+document.addEventListener("DOMContentLoaded", initShoutboxAutoscroll);
+document.addEventListener("turbo:load", initShoutboxAutoscroll);
+document.addEventListener("turbo:render", initShoutboxAutoscroll);
+document.addEventListener("turbo:before-stream-render", function() {
+	setTimeout(initShoutboxAutoscroll, 0);
+});
+document.addEventListener("turbo:frame-load", initShoutboxAutoscroll);
+
 function ShoutboxController (options) {
 	if (!(this instanceof ShoutboxController)) {
     return new ShoutboxController(options);
@@ -20,6 +47,9 @@ ShoutboxController.prototype.init = function (options) {
 	self.$input = self.$context.find(".shout_input");
 	self.$button = self.$context.find('input[type="submit"]');
 	self.$messageBox = null;
+
+	// Ensure autoscroll is initialized for all shoutbox transcripts
+	initShoutboxAutoscroll();
 	self.$input.bind("keyup change", function () {
 		if (self.$input.val().length > 100) {
 			self.disableShoutbox();
