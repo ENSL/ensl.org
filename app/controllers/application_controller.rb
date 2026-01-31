@@ -65,8 +65,13 @@ class ApplicationController < ActionController::Base
       if uri.host.nil? || uri.host == request.host
         path = uri.request_uri
         begin
-          Rails.application.routes.recognize_path(path)
-          redirect_to path
+          route = Rails.application.routes.recognize_path(path)
+          # Avoid redirecting to error pages after login
+          if route[:controller] == 'errors' || path.match?(%r{\A/(403|404|422|500)\b})
+            redirect_to('/')
+          else
+            redirect_to path
+          end
         rescue StandardError
           flash[:notice] = t(:invalid_message) if respond_to?(:flash)
           redirect_to('/')
