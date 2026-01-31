@@ -105,7 +105,7 @@ gem 'importmap-rails', '~> 2.2'
 gem 'turbo-rails'
 
 group :production do
-  gem 'newrelic_rpm'
+  # gem 'newrelic_rpm'
   gem 'puma_worker_killer'
 end
 
