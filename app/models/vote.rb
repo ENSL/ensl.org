@@ -19,7 +19,7 @@ class Vote < ActiveRecord::Base
 
   # attr_protected :id, :updated_at, :created_at, :user_id
 
-  validates_uniqueness_of :user_id, scope: :votable_id
+  validates_uniqueness_of :user_id, scope: %i[votable_id votable_type]
   validates_presence_of :user_id, :votable_id, :votable_type
 
   belongs_to :user, optional: true
@@ -60,11 +60,12 @@ class Vote < ActiveRecord::Base
         return false if votable.gather.gatherer_votes.where(user_id: user.id).count > 1
       when 'GatherMap'
         return false if votable.gather.status == Gather::STATE_FINISHED
-        # FIXME: Do not let user vote for same map twice
-        return false if votable.gather.map_votes.where(user_id: user.id).count > 1
+        # Do not let user vote for same map twice
+        return false if votable.gather.map_votes.where(user_id: user.id, votable_id: votable.id).count > 0
       when 'GatherServer'
         return false if votable.gather.status == Gather::STATE_FINISHED
-        return false if votable.gather.server_votes.where(user_id: user.id).count > 0
+        # Allow up to two server votes per user
+        return false if votable.gather.server_votes.where(user_id: user.id).count >= 2
       end
     end
 

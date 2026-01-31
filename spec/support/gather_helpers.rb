@@ -16,7 +16,7 @@ module Features
         expect(page).to have_content('Join')
 
         safe_click { check 'gatherer[confirm]' }
-        safe_click { click_link 'Click to join gather!' }
+        safe_click { click_button 'Click to join gather!' }
 
         safe_expect_text('You have joined the Gather.')
       end
@@ -27,6 +27,16 @@ module Features
       Capybara.using_session(session_name) do
         votes.times do
           safe_click { find('ul#map-votes', wait: 5).all('a').sample.click }
+          sleep(rand(0.05..0.25))
+        end
+      end
+    end
+
+    # Vote randomly on servers (each user can cast `votes` clicks)
+    def vote_random_servers(session_name, votes: 2)
+      Capybara.using_session(session_name) do
+        votes.times do
+          safe_click { find('ul#server-votes', wait: 5).all('a').sample.click }
           sleep(rand(0.05..0.25))
         end
       end

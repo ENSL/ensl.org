@@ -38,10 +38,19 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
       vote_random_maps("user_#{i}", votes: 2)
     end
 
+    # All users cast two random server votes
+    users.each_with_index do |_, i|
+      vote_random_servers("user_#{i}", votes: 2)
+    end
+
     # Verify in DB that gather has map votes recorded
     # Ii will always be 22 or less because last joiner can't vote on maps
     gather.reload
     expect(gather.map_votes.count).to be >= 20
+
+    # Verify in DB that gather has server votes recorded
+    gather.reload
+    expect(gather.server_votes.count).to be >= 20
 
     # Wait for voting phase to finish (about 1 minute). Wait up to 70s for the voting UI to disappear.
     Capybara.using_session('user_0') do

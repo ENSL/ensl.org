@@ -1,3 +1,6 @@
+require 'database_cleaner'
+require 'database_cleaner/active_record'
+
 RSpec.configure do |config|
   config.before(:suite) do
     # Clean the database to ensure a fresh state
