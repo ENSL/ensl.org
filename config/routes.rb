@@ -195,6 +195,9 @@ Rails.application.routes.draw do
   # Plugin
   get 'plugin/user', to: 'plugin#user'
 
+  # Catch-all for unmatched routes (must be last)
+  match '*path', to: 'errors#show', via: :all, defaults: { code: 404 }
+
   get 'custom_urls', to: 'custom_urls#administrate'
   get ':name', to: 'custom_urls#show', requirements: { name: /\A[a-z-]{2,10}\Z/ }
 end

@@ -100,6 +100,11 @@ class ApplicationController < ActionController::Base
     render 'errors/403', status: :forbidden, layout: 'errors'
   end
 
+  rescue_from ActiveRecord::RecordNotFound do |_exception|
+    # Correct template reference: 'errors/404' (not 'errors/404.html')
+    render 'errors/404', status: :not_found, layout: 'errors'
+  end
+
   unless Rails.env.production?
     rescue_from Error do |exception|
       render inline: exception.message.to_s, layout: true, status: :internal_server_error
@@ -107,11 +112,6 @@ class ApplicationController < ActionController::Base
 
     rescue_from ActiveRecord::StaleObjectError do |_exception|
       render inline: t(:application_stale), status: :conflict
-    end
-
-    rescue_from ActiveRecord::RecordNotFound do |_exception|
-      # Correct template reference: 'errors/404' (not 'errors/404.html')
-      render 'errors/404', status: :not_found, layout: 'errors'
     end
   end
 
