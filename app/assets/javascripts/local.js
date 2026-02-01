@@ -239,3 +239,28 @@ function add_fields(link, association, content) {
   var regexp = new RegExp("new_" + association, "g")
   $(link).parent().before(content.replace(regexp, new_id));
 }
+
+showEdit = function (url_id) {
+    var parent = $('#' + url_id);
+    parent.find('> td').toggleClass('hidden');
+};
+
+submitEdit = function (url_id) {
+    var parent = $('#' + url_id);
+    var form = parent.find('form');
+
+    $.post('<%= custom_urls_path %>/' + url_id, form.serialize())
+        .done(function (data) {
+            var nameField = parent.children('.name');
+            var articleField = parent.children('.article');
+
+            nameField.text(data.obj.name);
+            articleField.text(data.obj.title);
+            parent.find('> td').toggleClass('hidden');
+
+            alert(data.message);
+        }).fail(function (errorRes) {
+            var error = JSON.parse(errorRes.responseText);
+            alert(error.message);
+        });
+}

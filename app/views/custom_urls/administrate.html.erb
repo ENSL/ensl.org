@@ -18,8 +18,8 @@
             <td class="name"><%= url.name %></td>
             <td class="article"><%= url.article.title %></td>
             <td>
-              <%= link_to_function icon('pencil'), "showEdit(#{url.id})" %>
-              <%= link_to_function icon('times'), "deleteUrl(#{url.id})" %>
+              <%= link_to icon('pencil'), '#', onclick: "showEdit(#{url.id}); return false;" %>
+              <%= link_to icon('times'), custom_url_path(url), method: :delete, data: { confirm: 'Are you sure you want to delete this item?' } %>
             </td>
             <td class="edit hidden" colspan="3">
               <%= form_for url do |f| %>
@@ -28,7 +28,7 @@
                     <%= f.text_field :name %>
                   </div>
                   <%= f.select :article_id, Article.all.collect {|t| [t.title, t.id]} %>
-                  <%= link_to_function 'Save', "submitEdit(#{url.id})", class: 'button' %>
+                  <%= link_to 'Save', '#', onclick: "submitEdit(#{url.id}); return false;", class: 'button' %>
                 </div>
             <% end %>
             </td>
@@ -57,7 +57,4 @@
         </div>
   <% end %>
   </div>
-  <script type="text/javascript">
-    <%= render 'controls.js' %>
-  </script>
 </div>

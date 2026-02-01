@@ -49,6 +49,8 @@ Rails.application.routes.draw do
       get :showvotes, path: 'showvotes'
     end
   end
+  # Make GET /custom_urls show the administrate view by default
+  get 'custom_urls', to: 'custom_urls#administrate'
   resources :custom_urls, only: %i[create update destroy]
 
   resources :brackets
@@ -196,8 +198,8 @@ Rails.application.routes.draw do
   get 'plugin/user', to: 'plugin#user'
 
   # Catch-all for unmatched routes (must be last)
-  match '*path', to: 'errors#show', via: :all, defaults: { code: 404 }
-
-  get 'custom_urls', to: 'custom_urls#administrate'
+  # Allow single-segment custom URLs to be resolved before the catch-all
   get ':name', to: 'custom_urls#show', requirements: { name: /\A[a-z-]{2,10}\Z/ }
+
+  match '*path', to: 'errors#show', via: :all, defaults: { code: 404 }
 end
