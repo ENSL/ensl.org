@@ -146,6 +146,7 @@ class User < ActiveRecord::Base
   before_validation :update_password
 
   validates_uniqueness_of :username, :email, case_sensitive: false
+  validates_presence_of :email
   validate :steamid_uniqueness
   validates_length_of :firstname, in: 1..15, allow_blank: true
   validates_length_of :lastname, in: 1..25, allow_blank: true
@@ -412,7 +413,7 @@ class User < ActiveRecord::Base
     self.time_zone = 'Amsterdam'
     generate_password if !raw_password and new_record?
     build_profile unless profile&.present?
-    self.email = '%s@ensl.org' % cleanup_string(username) if email.blank?
+    # Email is required; do not auto-fill when blank.
   end
 
   def generate_password
@@ -477,19 +478,19 @@ class User < ActiveRecord::Base
   end
 
   def fix_attributes
-    if errors[:username]
-      i = 2
-      loop do
-        new_username = format('%s%d', username, i)
-        i += 1
-        if User.where(username: new_username).count == 0 or i > 50
-          self.username = new_username
-          break
-        end
-      end
+    return unless errors[:username]
 
+    i = 2
+    loop do
+      new_username = format('%s%d', username, i)
+      i += 1
+      if User.where(username: new_username).count == 0 or i > 50
+        self.username = new_username
+        break
+      end
     end
-    self.email = '%s@ensl.org' % cleanup_string(username) if errors[:email]
+
+    # Email is required and should be provided by user; do not auto-fill here.
   end
 
   def can_update?(cuser)

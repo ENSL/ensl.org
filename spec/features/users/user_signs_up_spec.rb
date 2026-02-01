@@ -43,6 +43,24 @@ feature 'Visitor signs up', js: :true do
     expect(page).to have_content(error_message('steamid.invalid'))
   end
 
+  scenario 'with missing Email' do
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge(email: ''))
+      click_button submit(:user, :create)
+    end
+
+    expect(page).to have_content("Email can't be blank")
+  end
+
+  scenario 'with missing Steam ID' do
+    within registration_form do
+      fill_form(:user, user.slice(*sign_up_attributes).merge(steamid: nil))
+      click_button submit(:user, :create)
+    end
+
+    expect(user_status).to have_content('ACCOUNT')
+  end
+
   scenario 'with out of range Steam ID' do
     skip
     within registration_form do

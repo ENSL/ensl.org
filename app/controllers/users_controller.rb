@@ -46,7 +46,13 @@ class UsersController < ApplicationController
   end
 
   def new
-    unless session[:cached_user]&.blank?
+    if cuser && !cuser.admin?
+      flash[:notice] = 'You are already logged in.'
+      redirect_to edit_user_path(cuser)
+      return
+    end
+    # Use cached OAuth-created user only for anonymous visitors.
+    if session[:cached_user]&.present? && cuser.nil?
       @user = begin
         User.new(JSON.parse(session[:cached_user]))
       rescue StandardError
@@ -66,6 +72,11 @@ class UsersController < ApplicationController
   end
 
   def create
+    if cuser && !cuser.admin?
+      flash[:notice] = 'You are already logged in.'
+      redirect_to edit_user_path(cuser)
+      return
+    end
     @user = User.new(User.params(params, cuser, 'create'))
     @user.lastip = request.env['REMOTE_ADDR']
 
