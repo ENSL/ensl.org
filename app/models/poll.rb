@@ -18,36 +18,50 @@
 class Poll < ActiveRecord::Base
   include Extra
 
-  default_scope -> { order("created_at DESC") }
+  default_scope -> { order('created_at DESC') }
 
-  #attr_protected :id, :updated_at, :created_at, :votes, :user_id
+  # attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
-  validates_length_of :question, :in => 1..50
-  #validates_datetime :end_date
+  validates_length_of :question, in: 1..50
+  # validates_datetime :end_date
 
-  belongs_to :user, :optional => true
-  has_many :options, :class_name => "Option", :dependent => :destroy
-  has_many :real_votes, :through => :options
+  belongs_to :user, optional: true
+  has_many :options, class_name: 'Option', dependent: :destroy
+  has_many :real_votes, through: :options
 
-  accepts_nested_attributes_for :options, :allow_destroy => true
+  accepts_nested_attributes_for :options, allow_destroy: true
 
-  def voted? user
+  validate :must_have_at_least_two_options
+
+  def voted?(user)
     real_votes.where(user_id: user.id).count > 0
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
   def self.params(params, cuser)
-    params.require(:poll).permit(:end_date, :question)
+    params.require(:poll).permit(:end_date, :question, options_attributes: %i[id option _destroy poll_id])
+  end
+
+  private
+
+  def must_have_at_least_two_options
+    valid_options = options.reject do |o|
+      o.marked_for_destruction? || o.option.to_s.strip.empty?
+    end
+
+    return unless valid_options.size < 2
+
+    errors.add(:base, 'Poll must have at least two options')
   end
 end

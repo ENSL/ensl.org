@@ -3,9 +3,9 @@
     <h5><%= @poll.question %></h5>
 
     <% @poll.options.all.each do |opt| %>
-      <p class="option">
+      <div class="option">
         <% if cuser and !@poll.voted?(cuser) %>
-          <%= link_to (h opt), votes_path(vote: { votable_id: opt.id, votable_type: "Option" }) %>
+          <%= link_to h(opt), votes_path(vote: { votable_id: opt.id, votable_type: 'Option' }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: opt.id, votable_type: 'Option' }), turbo: false } %>
         <% else %>
           <%= opt.option %> <br />
         <% end %>
@@ -13,7 +13,11 @@
           <%= content_tag :div, "", { class: "bar", style: "width: #{opt.votes*100/@poll.votes}%;" } %>
         <% end %>
         <span><%= opt.votes %></span>
-      </p>
+      </div>
+    <% end %>
+
+    <%= form_tag '', method: :post, id: 'vote_form', data: { turbo: false }, style: 'display:none;' do %>
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <% end %>
   </div>
 
