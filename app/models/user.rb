@@ -321,32 +321,32 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    groups.exists? id: Group::ADMINS
+    has_group_cached(Group::ADMINS)
   end
 
   def ref?
-    groups.exists? id: Group::REFEREES
+    has_group_cached(Group::REFEREES)
   end
 
   def staff?
-    groups.exists? id: Group::STAFF
+    has_group_cached(Group::STAFF)
   end
 
   def caster?
-    groups.exists? id: Group::CASTERS
+    has_group_cached(Group::CASTERS)
   end
 
   # might seem redundant but allows for later extensions like forum moderators
   def moderator?
-    groups.exists? id: Group::GATHER_MODERATORS
+    has_group_cached(Group::GATHER_MODERATORS)
   end
 
   def gather_moderator?
-    groups.exists? id: Group::GATHER_MODERATORS
+    has_group_cached(Group::GATHER_MODERATORS)
   end
 
   def contributor?
-    groups.exists? id: Group::CONTRIBUTORS
+    has_group_cached(Group::CONTRIBUTORS)
   end
 
   def allowed_to_ban?
@@ -358,8 +358,21 @@ class User < ActiveRecord::Base
   end
 
   def has_access?(groups)
-    admin? or groups.exists?(id: group)
+    admin? or has_group_cached(groups)
   end
+
+  private
+
+  # Cache membership checks for the lifetime of this model instance to
+  # avoid repeated DB queries when role checks are called frequently from views.
+  def has_group_cached(group_id)
+    @group_membership_cache ||= {}
+    return @group_membership_cache[group_id] unless @group_membership_cache[group_id].nil?
+
+    @group_membership_cache[group_id] = groups.exists?(id: group_id)
+  end
+
+  public
 
   def new_messages
     received_personal_messages.union(received_team_messages).unread_by(self)
