@@ -2,12 +2,11 @@
 // NOTE: jquery_ujs can conflict with Turbo (double-submits).
 // To disable, comment out the require below by adding a space after //.
 // require jquery_ujs
-// = require jquery.periodicalupdater
-// = require jquery.jplayer.min
-// = require yetii
+// = require vendor/jquery.periodicalupdater
+// = require vendor/jquery.jplayer.min
+// = require vendor/yetii
 // = require shoutbox
 // = require local
-// = require misc.js
 
 /*
  This file is the Sprockets application manifest converted from CoffeeScript.
