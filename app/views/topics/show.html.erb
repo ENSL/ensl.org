@@ -62,10 +62,10 @@
     <% end %>
 
     <% if @lock.new_record? and @lock.can_create? cuser %>
-      <%= form_for @lock do |f| %>
+        <%= form_for @lock do |f| %>
         <%= f.hidden_field :lockable_type %>
         <%= f.hidden_field :lockable_id %>
-        <%= link_to "Lock", "#", class: 'button submitButton' %>
+        <%= link_to "Lock", '#', class: 'button submitButton', data: { submit_form: true } %>
       <% end %>
     <% elsif @lock.can_destroy? cuser %>
       <%= link_to 'Unlock', @lock, class: 'button', confirm: 'Are you sure?', method: :delete %>

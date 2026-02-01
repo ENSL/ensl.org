@@ -27,6 +27,7 @@ $(document).ready(function(){
 });
 
 function bindLocalHandlers() {
+  // Shoutbox mousewheel scrolling
   $(document).off('mousewheel', 'div#shoutbox');
   $(document).on('mousewheel', 'div#shoutbox', function(ev, delta) {
     var scrollTop = $(this).scrollTop();
@@ -50,32 +51,35 @@ function bindLocalHandlers() {
     $("div#gather-info").fadeOut('slow', 0);
   });
 
-  $(document).off('click', 'a.delete-gatherer');
-  $(document).on('click', 'a.delete-gatherer', function(e) {
+  // Submit TODO (legacy `a.submit` removed — use `data-submit-form` links)
+
+  // Generic link-to-form submitter
+  // Usage: <a href="#" data-submit-form data-form-id="my-form">Submit</a>
+  // or:    <a href="#" data-submit-form data-form-selector="#my-form">Submit</a>
+  $(document).off('click', 'a[data-submit-form]');
+  $(document).on('click', 'a[data-submit-form]', function(e) {
     e.preventDefault();
     var formId = $(this).data('form-id');
-    var form = document.getElementById(formId);
+    var formSelector = $(this).data('form-selector');
+    var form = null;
+
+    if (formId) {
+      form = document.getElementById(formId);
+    } else if (formSelector) {
+      form = document.querySelector(formSelector);
+    } else {
+      form = $(this).closest('form')[0];
+    }
+
+    // If the link provides a URL, set the target form's action before submit
+    var url = $(this).data('url') || $(this).data('form-action');
+    if (form && url) {
+      try { form.action = url; } catch (err) { /* ignore */ }
+    }
+
     if (form) {
       form.submit();
     }
-  });
-
-  $(document).off('click', 'a.vote-link');
-  $(document).on('click', 'a.vote-link', function(e) {
-    e.preventDefault();
-    var url = $(this).data('url') || this.href;
-    var $shared = $('#vote_form');
-    if ($shared.length && url) {
-      $shared.attr('action', url);
-      $shared[0].submit();
-    }
-  });
-
-  // Submit TODO
-
-  $(document).off('click', 'a.submit');
-  $(document).on('click', 'a.submit', function() {
-    $(this).closest('form').submit()
   });
 
   $(document).off('submit', 'form.new_shoutmsg');
@@ -116,6 +120,8 @@ function bindLocalHandlers() {
     return false;
   });
 
+  // User search
+  // Description: Auto-submit user search form on keyup
   $(document).off('keyup', '#users_search input');
   $(document).on('keyup', '#users_search input', function() {
     $.get($("#users_search").attr("action"), $("#users_search").serialize(), null, "script");
@@ -127,8 +133,9 @@ function bindLocalHandlers() {
   $(document).on('click', 'a#option', function() {
   });
   
-  // Match proposal
-
+  // Match proposals
+  // Description: Handle match proposal status update links
+  // in the match proposals list page.
   $(document).off('click', 'form.edit_match_proposal a');
   $(document).on('click', 'form.edit_match_proposal a', function() {
     var form = $(this).closest('form.edit_match_proposal');
@@ -144,12 +151,6 @@ function bindLocalHandlers() {
       });
     }
   );
-
-  $(document).off('click', '#logout-link');
-  $(document).on('click', '#logout-link', function (e) {
-    e.preventDefault();
-    $('#logout-form').submit();
-  });
 
   $('select').each(function (_i, el) {
     var $select = $(el);
@@ -169,12 +170,6 @@ function bindLocalHandlers() {
     });
 
     $select.trigger('DOMSubtreeModified');
-  });
-
-  $(document).off('click', 'a[href=\\#form_submit]');
-  $(document).on('click', 'a[href=\\#form_submit]', function () {
-    $(this).closest('form').submit();
-    return false;
   });
 
   $(document).off('change', 'select.autosubmit');
@@ -244,15 +239,3 @@ function add_fields(link, association, content) {
   var regexp = new RegExp("new_" + association, "g")
   $(link).parent().before(content.replace(regexp, new_id));
 }
-
-// Bind steam-login anchors: prefer submitting a hidden Rails form if present
-$(function() {
-  $(document).on('click', 'a.steam-login', function(e) {
-    e.preventDefault();
-    var hidden = document.getElementById('steam-auth-form');
-    if (hidden) {
-      hidden.submit();
-      return;
-    }
-  });
-});

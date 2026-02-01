@@ -10,7 +10,7 @@
             <td>
               (<%= gatherer.votes %>)
               <% if @gatherer and gatherer.real_votes.build(user: cuser).can_create? cuser %>
-                <%= link_to gatherer.user, votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), class: 'vote-link', data: { url: votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), turbo: false } %>
+                <%= link_to gatherer.user, votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), class: 'vote-link', data: { submit_form: true, url: votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), turbo: false } %>
               <% else %>
                 <%= namelink gatherer.user %>
               <% end %>

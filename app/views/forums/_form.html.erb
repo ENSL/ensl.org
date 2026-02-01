@@ -34,16 +34,14 @@
         <tr>
           <td><%= namelink forumer.group %></td>
           <td>
-            <%= form_for forumer do |g| %>
+            <%= form_for forumer, html: { id: "edit_forumer_#{forumer.id}" } do |g| %>
               <div class="fields">
                 <%= g.select :access, forumer.accesses.invert, size: 20 %>
               </div>
             <% end %>
           </td>
           <td>
-            <%= content_tag :a, { class: 'button tiny', data: { forumer: forumer.id } } do %>
-              Update
-            <% end %>
+            <%= link_to 'Update', '#', class: 'button tiny', data: { submit_form: true, form_id: "edit_forumer_#{forumer.id}" } %>
             <%= link_to "Remove", forumer, method: :delete, class: 'button tiny' %>
           </td>
         </tr>
@@ -65,10 +63,4 @@
       </div>
     <% end %>
   <% end %>
-
-  <script>
-    $('a[data-forumer]').click(function() {
-      $('#edit_forumer_' + $(this).data('forumer')).submit();
-    });
-  </script>
 </div>

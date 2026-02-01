@@ -180,7 +180,7 @@
                         <%= form_for contester do |c| %>
                         <%= c.hidden_field :active, { value: 1 } %>
                         <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                        <%= link_to icon('rotate-left'), "#form_submit" %>
+                        <%= link_to icon('rotate-left'), '#', data: { submit_form: true } %>
                         <% end %>
                         <% end %>
                     </td>

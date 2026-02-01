@@ -24,12 +24,12 @@
             = h match.score1
             \- #{h match.score2}
         %td
-          - if match.caster
+                - if match.caster
             = form_for match do |f|
               = f.hidden_field :caster_id, {:value => nil}
               = namelink match.caster
               - if match.can_update?(cuser, {:caster_id => nil})
-                = link_to "#form_submit" do
+                = link_to '#', data: { submit_form: true } do
                   %i.fa.fa-times
           - elsif match.can_update?(cuser, {:caster_id => cuser.id})
             = form_for match do |f|
@@ -37,14 +37,14 @@
                 = f.collection_select :caster_id, User.casters, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
               - else
                 = f.hidden_field :caster_id, {:value => cuser.id}
-                = link_to "Take!", "#form_submit"
+                = link_to "Take!", '#', data: { submit_form: true }
         %td
-          - if match.referee
+            - if match.referee
             = form_for match do |f|
               = f.hidden_field :referee_id, {:value => nil}
               = namelink match.referee
               - if match.can_update?(cuser, {:referee_id => nil})
-                = link_to "#form_submit" do
+                = link_to '#', data: { submit_form: true } do
                   %i.fa.fa-times
           - elsif match.can_update?(cuser, {:referee_id => cuser.id})
             = form_for match do |f|
@@ -52,7 +52,7 @@
                 = f.collection_select :referee_id, User.refadmins, :id, :username, {:include_blank => true}, {:class => "autosubmit"}
               - else
                 = f.hidden_field :referee_id, {:value => cuser.id}
-                = link_to "Take!", "#form_submit"
+                = link_to "Take!", '#', data: { submit_form: true }
         %td.actions
           - if cuser.ref? || cuser.admin?
             = link_to "Admin", "/matches/ref/#{match.id}"

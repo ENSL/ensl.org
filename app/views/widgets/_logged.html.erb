@@ -35,7 +35,7 @@
         <% end %>
       </li>
       <li>
-        <%= link_to '#', id: 'logout-link' do %>
+        <%= link_to '#', data: { submit_form: true, form_id: 'logout-form' } do %>
           Logout <%= icon 'key' %>
         <% end %>
         <%= form_tag({ controller: 'users', action: 'logout' }, id: 'logout-form', style: 'display:none;', data: { turbo: false }) do %>

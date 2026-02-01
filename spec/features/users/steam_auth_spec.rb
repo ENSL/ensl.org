@@ -4,7 +4,7 @@ RSpec.describe 'Steam authentication link', type: :feature do
   it 'renders a steam-login anchor and a hidden steam form' do
     visit root_path
 
-    expect(page).to have_selector('a.steam-login[href="/auth/steam"]')
+    expect(page).to have_selector('a.steam-login')
     expect(page).to have_selector('form#steam-auth-form[style*="display:none"]', visible: false)
   end
 

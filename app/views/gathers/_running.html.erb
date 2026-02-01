@@ -14,7 +14,7 @@
               <%= form_tag gatherer, method: :post, id: "delete_gatherer_#{gatherer.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
                 <%= hidden_field_tag :_method, 'delete' %>
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <%= link_to '#', class: 'delete delete-gatherer', data: { form_id: "delete_gatherer_#{gatherer.id}" } do %>
+                <%= link_to '#', class: 'delete delete-gatherer', data: { submit_form: true, form_id: "delete_gatherer_#{gatherer.id}" } do %>
                   <%= icon 'times' %>
                 <% end %>
               <% end %>
