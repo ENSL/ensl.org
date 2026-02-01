@@ -57,15 +57,17 @@ class Vote < ActiveRecord::Base
       case votable_type
       when 'Gatherer'
         return false if votable.gather.status != Gather::STATE_VOTING
-        return false if votable.gather.gatherer_votes.where(user_id: user.id).count > 1
+        return false if votable.gather.gatherer_votes.where(user_id: cuser.id).count > 1
       when 'GatherMap'
         return false if votable.gather.status == Gather::STATE_FINISHED
         # Do not let user vote for same map twice
-        return false if votable.gather.map_votes.where(user_id: user.id, votable_id: votable.id).count > 0
+        return false if votable.gather.map_votes.where(user_id: cuser.id, votable_id: votable.id).count > 0
+        # Limit total map votes per user per gather to 2
+        return false if votable.gather.map_votes.where(user_id: cuser.id).count >= 2
       when 'GatherServer'
         return false if votable.gather.status == Gather::STATE_FINISHED
         # Allow up to two server votes per user
-        return false if votable.gather.server_votes.where(user_id: user.id).count >= 2
+        return false if votable.gather.server_votes.where(user_id: cuser.id).count >= 2
       end
     end
 
@@ -74,5 +76,30 @@ class Vote < ActiveRecord::Base
 
   def self.params(params, cuser)
     params.require(:vote).permit(:votable_type, :votable_id, :poll_id, :user_id)
+  end
+
+  validate :validate_gather_vote_limits, on: :create
+
+  private
+
+  def validate_gather_vote_limits
+    return unless %w[GatherMap GatherServer].include?(votable_type)
+    return unless votable && votable.respond_to?(:gather) && user
+
+    if votable.gather.nil?
+      errors.add(:base, 'Invalid gather')
+      return
+    end
+
+    case votable_type
+    when 'GatherMap'
+      if votable.gather.map_votes.where(user_id: user.id).count >= 2
+        errors.add(:base, 'Maximum map votes reached for this gather')
+      end
+    when 'GatherServer'
+      if votable.gather.server_votes.where(user_id: user.id).count >= 2
+        errors.add(:base, 'Maximum server votes reached for this gather')
+      end
+    end
   end
 end

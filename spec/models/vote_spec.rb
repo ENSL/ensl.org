@@ -47,4 +47,17 @@ RSpec.describe Vote, type: :model do
     expect(other_map_vote.can_create?(user)).to be true
     expect { other_map_vote.save! }.to change(Vote, :count).by(1)
   end
+
+  it 'prevents more than two map votes per user per gather' do
+    map1 = create_gather_map(name: 'ns_map_a')
+    map2 = create_gather_map(name: 'ns_map_b')
+    map3 = create_gather_map(name: 'ns_map_c')
+
+    Vote.create!(user: user, votable: map1)
+    Vote.create!(user: user, votable: map2)
+
+    third_vote = Vote.new(user: user, votable: map3)
+    expect(third_vote.can_create?(user)).to be false
+    expect { third_vote.save }.to raise_error(ActiveRecord::RecordInvalid).or change(Vote, :count).by(0)
+  end
 end
