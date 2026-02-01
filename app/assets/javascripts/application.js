@@ -7,7 +7,7 @@
 // = require yetii
 // = require shoutbox
 // = require local
-// = require misc
+// = require misc.js
 
 /*
  This file is the Sprockets application manifest converted from CoffeeScript.

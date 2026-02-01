@@ -69,7 +69,6 @@ gem 'dynamic_form'
 gem 'haml'
 
 # Javascript
-gem 'coffee-rails'
 gem 'i18n-js'
 gem 'jquery-rails'
 gem 'tinymce-rails'
