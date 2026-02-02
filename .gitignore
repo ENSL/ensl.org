@@ -84,7 +84,7 @@ ext/nginx.conf.d/default.conf
 **.orig
 
 # Misc
-/coverage/
+/coverage*/
 /backups
 /index/*
 rerun.txt

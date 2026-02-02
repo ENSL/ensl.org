@@ -8,7 +8,8 @@ Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['
 
 # require 'codeclimate-test-reporter'
 
-if ENV['SIMPLECOV'] == '1'
+enable_simplecov = ENV['SIMPLECOV'] == '1' && !ARGV.any? { |a| a =~ /--only-failures|--next-failure/ }
+if enable_simplecov
   require 'simplecov'
 
   SimpleCov.start 'rails' do
