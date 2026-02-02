@@ -5,7 +5,8 @@ feature 'Shoutbox (Turbo Streams)', js: true do
   let!(:other_user) { create :user }
 
   background do
-    sign_in_as user
+    sign_in_via_session(user)
+    visit root_path
     # Run ActiveJob inline so Turbo Stream broadcasts are delivered in-process
     ActiveJob::Base.queue_adapter = :inline
   end
@@ -69,13 +70,13 @@ feature 'Shoutbox (Turbo Streams)', js: true do
 
   scenario 'another user sees shout without reload' do
     Capybara.using_session(:sender) do
-      sign_in_as user
+      sign_in_via_session(user)
       visit root_path
       expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
     end
 
     Capybara.using_session(:receiver) do
-      sign_in_as other_user
+      sign_in_via_session(other_user)
       visit root_path
       expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
       expect(page).to have_selector('#shoutbox')

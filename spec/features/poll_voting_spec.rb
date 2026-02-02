@@ -16,12 +16,7 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
     Capybara.javascript_driver = :selenium_chrome_headless
 
     user = FactoryBot.create(:user)
-
-    # login
-    visit '/users/login'
-    fill_in 'login[username]', with: user.username
-    fill_in 'login[password]', with: user.raw_password
-    click_button 'Login'
+    sign_in_via_session(user)
 
     # Visit front page where poll widget appears
     visit '/'

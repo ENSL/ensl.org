@@ -13,7 +13,9 @@ feature 'Visitor signs up', js: :true do
       click_button submit(:user, :create)
     end
 
-    expect(user_status).to have_content('ACCOUNT')
+    within user_status do
+      expect(page).to have_content('ACCOUNT')
+    end
   end
 
   scenario 'with invalid Email' do
@@ -58,7 +60,9 @@ feature 'Visitor signs up', js: :true do
       click_button submit(:user, :create)
     end
 
-    expect(user_status).to have_content('ACCOUNT')
+    within user_status do
+      expect(page).to have_content('ACCOUNT')
+    end
   end
 
   scenario 'with out of range Steam ID' do

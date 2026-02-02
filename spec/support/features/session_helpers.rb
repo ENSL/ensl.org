@@ -45,7 +45,7 @@ module Features
     end
 
     def user_status
-      find('#authentication')
+      '#authentication'
     end
 
     def registration_form

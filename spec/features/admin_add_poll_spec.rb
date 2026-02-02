@@ -5,12 +5,7 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
     Capybara.javascript_driver = :selenium_chrome_headless
 
     admin = FactoryBot.create(:user, :admin)
-
-    # login
-    visit '/users/login'
-    fill_in 'login[username]', with: admin.username
-    fill_in 'login[password]', with: admin.raw_password
-    click_button 'Login'
+    sign_in_via_session(admin)
 
     # Go through the UI like a user: visit polls index and click New Poll
     visit '/polls/new'
@@ -42,12 +37,7 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
     Capybara.javascript_driver = :selenium_chrome_headless
 
     admin = FactoryBot.create(:user, :admin)
-
-    # login
-    visit '/users/login'
-    fill_in 'login[username]', with: admin.username
-    fill_in 'login[password]', with: admin.raw_password
-    click_button 'Login'
+    sign_in_via_session(admin)
 
     # Go through the UI to create a poll
     visit '/polls/new'
@@ -70,12 +60,7 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
     Capybara.javascript_driver = :selenium_chrome_headless
 
     admin = FactoryBot.create(:user, :admin)
-
-    # login
-    visit '/users/login'
-    fill_in 'login[username]', with: admin.username
-    fill_in 'login[password]', with: admin.raw_password
-    click_button 'Login'
+    sign_in_via_session(admin)
 
     visit '/polls/new'
     expect(page).to have_content('New Poll')
