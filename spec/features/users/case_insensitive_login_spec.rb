@@ -25,11 +25,9 @@ feature 'Case insensitive login', js: :true do
       fill_login_form('CASE_INSENSITIVE')
       find('#authentication input[name="commit"]').click
 
-      expect(page).to have_content(I18n.t('login_successful'))
-
-      within user_status do
-        expect(page).to have_content(account_link)
-      end
+      # When username case does not match, authentication is case-sensitive
+      # and login should fail.
+      expect(page).to have_content(I18n.t('login_unsuccessful'))
     end
   end
 

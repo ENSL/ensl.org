@@ -125,7 +125,7 @@ class ApplicationController < ActionController::Base
       "ip=#{request.ip} referer=#{request.referer.to_s.inspect} " \
       "ua=#{request.user_agent.to_s.inspect}"
     )
-    head :not_acceptable
+    head :not_acceptable unless performed?
   end
 
   unless Rails.env.production?

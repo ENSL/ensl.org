@@ -176,6 +176,9 @@ group :test do
   # Block external HTTP in tests
   gem 'webmock'
 
+  # Flaky tests
+  # gem 'rspec-flaky'
+
   # For circle ci + CC
   # gem 'codeclimate-test-reporter', require: nil
   # gem 'rspec_junit_formatter'

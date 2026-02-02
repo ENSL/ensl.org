@@ -51,7 +51,7 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
 
     # Go through the UI to create a poll
     visit '/polls/new'
-    find_field('poll_question', disabled: false).set('Front Page Poll')
+    fill_in 'poll_question', with: 'Front Page Poll'
     first_option = all("input[name^='poll[options_attributes]'][name$='[option]']").first
     first_option.set('Alpha')
     click_link 'Add an Option'

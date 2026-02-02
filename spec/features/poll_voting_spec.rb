@@ -4,9 +4,10 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
   let!(:category) { FactoryBot.create(:category, :news) }
   let!(:author) { FactoryBot.create(:user) }
   let!(:poll) do
-    p = Poll.create!(question: 'Which?')
-    p.options.create!(option: 'A')
-    p.options.create!(option: 'B')
+    p = Poll.new(question: 'Which?')
+    p.options.build(option: 'A')
+    p.options.build(option: 'B')
+    p.save!
     p
   end
 

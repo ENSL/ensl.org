@@ -57,20 +57,7 @@ module Features
         visit gather_path(gather_arg || gather)
         expect(page).to have_content('Join')
         safe_click { check 'gatherer[confirm]' }
-        safe_click { click_link 'Click to join gather!' }
-        safe_expect_text('You have joined the Gather.')
-      end
-    end
-
-    # Sign in a user and join the gather in a single helper.
-    # If gather_arg is provided it will visit that gather, otherwise uses local `gather`.
-    def sign_in_and_join(session_name, user, gather_arg = nil)
-      Capybara.using_session(session_name) do
-        sign_in_via_session(user)
-        visit gather_path(gather_arg || gather)
-        expect(page).to have_content('Join')
-        safe_click { check 'gatherer[confirm]' }
-        safe_click { click_link 'Click to join gather!' }
+        safe_click { click_button 'Click to join gather!' }
         safe_expect_text('You have joined the Gather.')
       end
     end
