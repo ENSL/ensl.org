@@ -38,7 +38,7 @@ module Features
           tries = 0
           begin
             tries += 1
-            safe_click { find('ul#map-votes', wait: 10).all('a').sample.click }
+            safe_click { all('ul#map-votes a', minimum: 1, wait: 10).sample.click }
           rescue Capybara::ElementNotFound, Net::ReadTimeout
             return if tries >= 5
 
@@ -67,7 +67,7 @@ module Features
           tries = 0
           begin
             tries += 1
-            safe_click { find('ul#server-votes', wait: 10).all('a').sample.click }
+            safe_click { all('ul#server-votes a', minimum: 1, wait: 10).sample.click }
           rescue Capybara::ElementNotFound, Net::ReadTimeout
             return if tries >= 5
 

@@ -92,7 +92,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
             visit gather_path(gather)
 
             if page.has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 2)
-              safe_click { find('ul#lobby-gatherers', wait: 5).all('input[type="radio"]').sample.click }
+              safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
               safe_click { find('input[value="Pick"]').click }
               safe_expect_text('You have picked a player for your team.', wait: 5)
               picked = true

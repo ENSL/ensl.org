@@ -214,7 +214,9 @@ class Gather < ActiveRecord::Base
   end
 
   def voting_timeout
-    Rails.env.test? ? 5 : VOTING_TIMEOUT_SECONDS
+    return VOTING_TIMEOUT_SECONDS unless Rails.env.test?
+
+    Integer(ENV.fetch('GATHER_VOTING_TIMEOUT_TEST', 10))
   end
 
   def can_update?(cuser)
