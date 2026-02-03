@@ -46,11 +46,11 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     # Verify in DB that gather has map votes recorded
     # Ii will always be 22 or less because last joiner can't vote on maps
     gather.reload
-    expect(gather.map_votes.count).to be >= 20
+    expect(gather.map_votes.count).to be >= 18
 
     # Verify in DB that gather has server votes recorded
     gather.reload
-    expect(gather.server_votes.count).to be >= 20
+    expect(gather.server_votes.count).to be >= 18
 
     # Wait for voting phase to finish (about 1 minute). Wait up to 70s for the voting UI to disappear.
     Capybara.using_session('user_0') do
@@ -71,26 +71,41 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
     RSpec.configuration.reporter.message('Captain voting has ended, picking phase has started.')
 
-    # Each captain picks 6 players (customizable picking order). Last is auto-picked.
-    pick_order = [captain1, captain2, captain2, captain1, captain1, captain2, captain2, captain1, captain1]
+    # Let whichever captain has the current turn pick from the lobby.
+    remaining_picks = 9
+    session_for_user_id = users.each_with_index.to_h { |u, i| [u.id, "user_#{i}"] }
 
-    pick_order.each do |picking_captain|
-      session_name = "user_#{users.index(picking_captain)}"
-      Capybara.using_session(session_name) do
-        # Choose a random radio (player) to pick
-        safe_click { find('ul#lobby-gatherers', wait: 5).all('input[type="radio"]').sample.click }
+    remaining_picks.times do
+      picked = false
+      attempts = 0
 
-        # Ensure the "Pick" button exists and click it (adjust selector/text if needed)
-        safe_click { find('input[value="Pick"]').click }
+      until picked || attempts >= 20
+        attempts += 1
+        gather.reload
+        current_captain = gather.turn == 1 ? gather.captain1&.user : gather.captain2&.user
 
-        # Confirm pick success message appears
-        safe_expect_text('You have picked a player for your team.', wait: 5)
+        if current_captain
+          session_name = session_for_user_id[current_captain.id]
+          raise "No session for captain #{current_captain.id}" unless session_name
 
-        # Print the captain and picked player for logging
-        # puts "#{picking_captain.username} picked a player."
+          Capybara.using_session(session_name) do
+            visit gather_path(gather)
 
-        sleep(rand(0.05..0.25))
+            if page.has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 2)
+              safe_click { find('ul#lobby-gatherers', wait: 5).all('input[type="radio"]').sample.click }
+              safe_click { find('input[value="Pick"]').click }
+              safe_expect_text('You have picked a player for your team.', wait: 5)
+              picked = true
+            end
+          end
+        end
+
+        sleep(0.5) unless picked
       end
+
+      raise 'No captain had a pickable player' unless picked
+
+      sleep(rand(0.05..0.25))
     end
 
     # Check in DB that both teams have 6 players

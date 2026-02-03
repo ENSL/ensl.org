@@ -1,5 +1,6 @@
 class GathersController < ApplicationController
   before_action :get_gather, except: %i[latest index create version]
+  skip_before_action :update_user, only: :version
 
   respond_to :html, :js
 
@@ -74,12 +75,14 @@ class GathersController < ApplicationController
   end
 
   def version
-    gather = Gather.basic.find(params[:id])
-    previous_status = gather.status
-    gather.refresh(cuser)
-    Gathers::Broadcaster.call(gather) if gather.status != previous_status
+    Rails.logger.silence do
+      gather = Gather.basic.find(params[:id])
+      previous_status = gather.status
+      gather.refresh(nil)
+      Gathers::Broadcaster.call(gather) if gather.status != previous_status
 
-    render json: { id: gather.id, version: gather.version }
+      render json: { id: gather.id, version: gather.version }
+    end
   end
 
   private

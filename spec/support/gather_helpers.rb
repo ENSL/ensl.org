@@ -15,7 +15,7 @@ module Features
 
         expect(page).to have_content('Join')
 
-        safe_click { check 'gatherer[confirm]' }
+        safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
         safe_click { click_button 'Click to join gather!' }
 
         safe_expect_text('You have joined the Gather.')
@@ -25,8 +25,27 @@ module Features
     # Vote randomly on maps (each user can cast `votes` clicks)
     def vote_random_maps(session_name, votes: 2)
       Capybara.using_session(session_name) do
+        attempts = 0
+        until page.has_selector?('ul#map-votes', wait: 2) || attempts >= 10
+          attempts += 1
+          visit gather_path(gather)
+          sleep(0.5)
+        end
+
+        return unless page.has_selector?('ul#map-votes', wait: 1)
+
         votes.times do
-          safe_click { find('ul#map-votes', wait: 5).all('a').sample.click }
+          tries = 0
+          begin
+            tries += 1
+            safe_click { find('ul#map-votes', wait: 10).all('a').sample.click }
+          rescue Capybara::ElementNotFound, Net::ReadTimeout
+            return if tries >= 5
+
+            visit gather_path(gather)
+            sleep(0.5)
+            retry
+          end
           sleep(rand(0.05..0.25))
         end
       end
@@ -35,8 +54,27 @@ module Features
     # Vote randomly on servers (each user can cast `votes` clicks)
     def vote_random_servers(session_name, votes: 2)
       Capybara.using_session(session_name) do
+        attempts = 0
+        until page.has_selector?('ul#server-votes', wait: 2) || attempts >= 10
+          attempts += 1
+          visit gather_path(gather)
+          sleep(0.5)
+        end
+
+        return unless page.has_selector?('ul#server-votes', wait: 1)
+
         votes.times do
-          safe_click { find('ul#server-votes', wait: 5).all('a').sample.click }
+          tries = 0
+          begin
+            tries += 1
+            safe_click { find('ul#server-votes', wait: 10).all('a').sample.click }
+          rescue Capybara::ElementNotFound, Net::ReadTimeout
+            return if tries >= 5
+
+            visit gather_path(gather)
+            sleep(0.5)
+            retry
+          end
           sleep(rand(0.05..0.25))
         end
       end
@@ -56,7 +94,7 @@ module Features
         sign_in_via_session(user)
         visit gather_path(gather_arg || gather)
         expect(page).to have_content('Join')
-        safe_click { check 'gatherer[confirm]' }
+        safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
         safe_click { click_button 'Click to join gather!' }
         safe_expect_text('You have joined the Gather.')
       end

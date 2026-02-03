@@ -1,7 +1,7 @@
 <div id="gather" data-controller="gather-sync"
                  data-gather-sync-gather-id-value="<%= @gather.id %>"
                  data-gather-sync-version-value="<%= @gather.version %>"
-                 data-gather-sync-poll-interval-value="<%= Rails.env.test? ? 1000 : 8000 %>">
+                 data-gather-sync-poll-interval-value="<%= Rails.env.test? ? 5000 : 8000 %>">
   <% if cuser %>
     <%= turbo_stream_from [@gather, cuser] %>
   <% else %>

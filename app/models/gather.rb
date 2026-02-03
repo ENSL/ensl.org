@@ -34,6 +34,7 @@ class Gather < ActiveRecord::Base
   NOTIFY = 6
   FULL = 12
   SERVERS = [3, 5, 23, 21, 22]
+  VOTING_TIMEOUT_SECONDS = 60
 
   attr_accessor :admin
 
@@ -179,8 +180,8 @@ class Gather < ActiveRecord::Base
   def refresh(cuser)
     if status == STATE_RUNNING
       gatherers.idle.destroy_all
-    elsif status == STATE_VOTING and updated_at < 60.seconds.ago and updated_at > 5.days.ago
-      if status == STATE_VOTING and updated_at < 60.seconds.ago
+    elsif status == STATE_VOTING and updated_at < voting_timeout.seconds.ago and updated_at > 5.days.ago
+      if status == STATE_VOTING and updated_at < voting_timeout.seconds.ago
         self.status = STATE_PICKING
         save!
       end
@@ -210,6 +211,10 @@ class Gather < ActiveRecord::Base
 
   def can_create?(cuser)
     true if cuser.admin? or cuser.gather_moderator?
+  end
+
+  def voting_timeout
+    Rails.env.test? ? 5 : VOTING_TIMEOUT_SECONDS
   end
 
   def can_update?(cuser)
