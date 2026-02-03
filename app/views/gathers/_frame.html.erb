@@ -1,8 +1,20 @@
-<% @gather = gather %>
-<% @gatherer = gatherer %>
+<% @gather ||= local_assigns[:gather] %>
+<% @gatherer ||= local_assigns[:gatherer] %>
 
-<div id="gather_<%= @gather.id %>_version" data-version="<%= @gather.version %>"></div>
+<%= turbo_frame_tag dom_id(@gather, :frame), data: { src: gather_path(@gather) } do %>
+  <div id="gather_<%= @gather.id %>_version" data-version="<%= @gather.version %>"></div>
 
-<div id="gather-area">
-  <%= render_gather %>
-</div>
+  <% if flash.any? %>
+    <div id="gather-notification">
+      <% flash.each do |type, message| %>
+        <div class="message <%= type %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div id="gather-area">
+    <%= render_gather %>
+  </div>
+<% end %>

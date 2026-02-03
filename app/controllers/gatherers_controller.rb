@@ -8,10 +8,26 @@ class GatherersController < ApplicationController
     if result.success?
       flash[:notice] = t(:gathers_join)
     else
-      flash[:error] = @gatherer&.errors&.full_messages&.to_s || result.error.to_s
+      flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || result.error.to_s
     end
 
-    redirect_to(result.gather || @gatherer&.gather || '/')
+    respond_to do |format|
+      format.turbo_stream do
+        @gather = result.gather || @gatherer&.gather
+        @gatherer = result.gatherer || @gather&.gatherers&.of_user(cuser)&.first
+        if result.success?
+          flash.now[:notice] = flash[:notice]
+        else
+          flash.now[:error] = flash[:error]
+        end
+        render turbo_stream: [
+          turbo_stream.replace('notification', partial: 'application/messages'),
+          turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
+                                                                     locals: { gather: @gather, gatherer: @gatherer })
+        ]
+      end
+      format.html { redirect_to(result.gather || @gatherer&.gather || '/') }
+    end
   end
 
   def update
@@ -22,7 +38,7 @@ class GatherersController < ApplicationController
       flash[:notice] = t(:gatherers_update)
       Gathers::Broadcaster.call(@gatherer.gather)
     else
-      flash[:error] = @gatherer.errors.full_messages.to_s
+      flash[:error] = @gatherer.errors.full_messages.to_sentence
     end
 
     redirect_to_back

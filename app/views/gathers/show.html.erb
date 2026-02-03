@@ -1,9 +1,11 @@
 <div id="gather" data-controller="gather-sync"
                  data-gather-sync-gather-id-value="<%= @gather.id %>"
-                 data-gather-sync-version-value="<%= @gather.version %>">
-  <%= turbo_stream_from @gather %>
+                 data-gather-sync-version-value="<%= @gather.version %>"
+                 data-gather-sync-poll-interval-value="<%= Rails.env.test? ? 1000 : 8000 %>">
   <% if cuser %>
     <%= turbo_stream_from [@gather, cuser] %>
+  <% else %>
+    <%= turbo_stream_from @gather %>
   <% end %>
   <h1 class="fancy">
     <span>
@@ -70,9 +72,7 @@
     </div>
   <% end %>
 
-  <%= turbo_frame_tag dom_id(@gather, :frame) do %>
-    <%= render partial: 'gathers/frame', locals: { gather: @gather, gatherer: @gatherer } %>
-  <% end %>
+  <%= render partial: 'gathers/frame', locals: { gather: @gather, gatherer: @gatherer } %>
 
 </div>
 

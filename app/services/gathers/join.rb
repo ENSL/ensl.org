@@ -21,7 +21,7 @@ module Gathers
         end
       end
 
-      Broadcaster.call(gatherer.gather)
+      Broadcaster.call(gatherer.gather, skip_user_ids: [@actor&.id])
       Result.new(gather: gatherer.gather, gatherer: gatherer)
     rescue StandardError => e
       Result.new(gather: gatherer&.gather, gatherer: gatherer, error: e)

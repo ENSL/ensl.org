@@ -16,6 +16,7 @@ module Gathers
 
       vote.save!
       gather = vote.votable.gather
+      gather.touch
       Broadcaster.call(gather)
       Result.new(gather: gather, vote: vote)
     rescue StandardError => e

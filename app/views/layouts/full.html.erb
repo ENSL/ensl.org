@@ -10,8 +10,9 @@
     <%= javascript_include_tag 'application' %>
     <%= javascript_importmap_tags %>
     <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
   </head>
-  <body>
+  <body data-disable-flash-fade="<%= Rails.env.test? %>">
     <div id="container">
       <%= render partial: "header" %>
       <%= render partial: "navigation" %>

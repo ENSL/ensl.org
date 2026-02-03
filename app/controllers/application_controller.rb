@@ -16,10 +16,18 @@ class ApplicationController < ActionController::Base
   respond_to :html, :js
 
   def cuser
-    @cuser ||= User.find(session[:user])
-  # Don't error if the user is missing.
+    return @cuser if defined?(@cuser) && @cuser
+
+    user_id = nil
+    begin
+      user_id = session[:user]
+    rescue StandardError
+      user_id = nil
+    end
+
+    @cuser = User.find(user_id) if user_id
+    @cuser
   rescue StandardError
-    session[:user] = nil
     @cuser = nil
   end
 

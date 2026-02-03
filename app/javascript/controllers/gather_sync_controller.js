@@ -1,10 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { gatherId: Number, version: Number }
+  static values = { gatherId: Number, version: Number, pollInterval: Number }
 
   connect() {
-    this.poll = setInterval(() => this.checkVersion(), 8000)
+    const interval = this.pollIntervalValue || 8000
+    this.poll = setInterval(() => this.checkVersion(), interval)
+    this.checkVersion()
     this.onVisibilityChange = () => {
       if (!document.hidden) this.checkVersion()
     }
@@ -45,6 +47,10 @@ export default class extends Controller {
     const frame = document.getElementById(`gather_${this.gatherIdValue}_frame`)
     if (frame && typeof frame.reload === "function") {
       frame.reload()
+      return
+    }
+    if (frame && frame.dataset && frame.dataset.src) {
+      frame.src = frame.dataset.src
       return
     }
     if (frame && frame.src) {

@@ -10,7 +10,7 @@
           <span class="count">
             <%= if server.votes then server.votes else "0" end %>
           </span>
-          <% if server.real_votes.build(user: cuser).can_create? cuser %>
+          <% if server.real_votes.build(user: gather_current_user).can_create? gather_current_user %>
             <%= link_to server, votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: server.id, votable_type: "GatherServer" }), turbo: false } %>
             <% vote_servers = true else %>
             <%= server %>
@@ -38,7 +38,7 @@
       <% @gather.gather_maps.ordered.each do |map| %>
         <li>
           <span><%= map.votes %></span>
-          <% if map.real_votes.build(user: cuser).can_create? cuser %>
+          <% if map.real_votes.build(user: gather_current_user).can_create? gather_current_user %>
             <%= link_to shorten(map, 30), votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: map.id, votable_type: "GatherMap" }), turbo: false } %>
             <% vote_maps = true %>
           <% else %>

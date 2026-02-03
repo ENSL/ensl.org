@@ -55,11 +55,30 @@ class GathersController < ApplicationController
       flash[:error] = result.error.to_s
     end
 
-    redirect_to @gather
+    respond_to do |format|
+      format.turbo_stream do
+        @gatherer = @gather.gatherers.of_user(cuser).first if cuser
+        if result.success?
+          flash.now[:notice] = flash[:notice]
+        else
+          flash.now[:error] = flash[:error]
+        end
+        render turbo_stream: [
+          turbo_stream.replace('notification', partial: 'application/messages'),
+          turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
+                                                                     locals: { gather: @gather, gatherer: @gatherer })
+        ]
+      end
+      format.html { redirect_to @gather }
+    end
   end
 
   def version
-    gather = Gather.select(:id, :version).find(params[:id])
+    gather = Gather.basic.find(params[:id])
+    previous_status = gather.status
+    gather.refresh(cuser)
+    Gathers::Broadcaster.call(gather) if gather.status != previous_status
+
     render json: { id: gather.id, version: gather.version }
   end
 

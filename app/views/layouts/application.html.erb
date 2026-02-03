@@ -13,7 +13,7 @@
       <%= javascript_include_tag 'application' %>
       <%= javascript_importmap_tags %>
   </head>
-  <body>
+  <body data-disable-flash-fade="<%= Rails.env.test? %>">
     <div id="container">
       <%= render partial: "messages" %>
       <%= render partial: "header" %>

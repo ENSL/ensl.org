@@ -5,11 +5,11 @@
   <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
 </h4>
 
-<%= form_tag pick_gather_path(@gather) do %>
+<%= form_tag pick_gather_path(@gather), data: { turbo_stream: true } do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
       <li>
-          <% if @gatherer and gatherer.can_update? cuser, { team: @gatherer.team } %>
+          <% if @gatherer and gatherer.can_update? gather_current_user, { team: @gatherer.team } %>
           <% pick = true %>
           <%= radio_button_tag :player, gatherer.id %>
           <%= flag gatherer.user.country %>

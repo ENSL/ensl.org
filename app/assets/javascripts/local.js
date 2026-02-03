@@ -177,7 +177,9 @@ function bindLocalHandlers() {
     $(this).closest('form').submit();
   });
 
-  $('#notification').delay(3000).fadeOut();
+  if (!(document.body && document.body.dataset && document.body.dataset.disableFlashFade === 'true')) {
+    $('#notification').delay(3000).fadeOut();
+  }
 
   $(document).off('click', '#steam-search a');
   $(document).on('click', '#steam-search a', function (event) {
