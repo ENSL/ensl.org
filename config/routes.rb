@@ -75,6 +75,7 @@ Rails.application.routes.draw do
       get :latest, path: 'latest/:game'
     end
     member do
+      get :version
       post :pick
     end
   end

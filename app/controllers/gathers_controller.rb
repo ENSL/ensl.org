@@ -1,5 +1,5 @@
 class GathersController < ApplicationController
-  before_action :get_gather, except: %i[latest index create]
+  before_action :get_gather, except: %i[latest index create version]
 
   respond_to :html, :js
 
@@ -36,7 +36,10 @@ class GathersController < ApplicationController
 
     Gatherer.transaction do
       Gather.transaction do
-        flash[:notice] = 'Gather was successfully updated.' if @gather.update(Gather.params(params, cuser))
+        if @gather.update(Gather.params(params, cuser))
+          Gathers::Broadcaster.call(@gather)
+          flash[:notice] = 'Gather was successfully updated.'
+        end
       end
     end
 
@@ -45,20 +48,19 @@ class GathersController < ApplicationController
 
   # FIXME: Use gatherers.update
   def pick
-    @gatherer = @gather.gatherers.find(params[:player])
-    raise AccessError unless @gatherer.can_update? cuser, params
-
-    Gatherer.transaction do
-      Gather.transaction do
-        if @gatherer.update_attribute :team, @gatherer.gather.turn
-          flash[:notice] = t(:gathers_user_pick)
-        else
-          flash[:error] = @gatherer.errors.full_messages.to_s
-        end
-      end
+    result = Gathers::CaptainPick.call(actor: cuser, gather: @gather, player_id: params[:player])
+    if result.success?
+      flash[:notice] = t(:gathers_user_pick)
+    else
+      flash[:error] = result.error.to_s
     end
 
     redirect_to @gather
+  end
+
+  def version
+    gather = Gather.select(:id, :version).find(params[:id])
+    render json: { id: gather.id, version: gather.version }
   end
 
   private

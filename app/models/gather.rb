@@ -118,6 +118,12 @@ class Gather < ActiveRecord::Base
     self.status = STATE_RUNNING
   end
 
+  def bump_version!
+    with_lock do
+      increment!(:version)
+    end
+  end
+
   def add_maps_and_server
     category.maps.basic.classic.each do |m|
       maps << m

@@ -2,21 +2,16 @@ class GatherersController < ApplicationController
   before_action :get_gatherer, except: [:create]
 
   def create
-    Gather.transaction do
-      Gatherer.transaction do
-        @gatherer = Gatherer.new(Gatherer.params(params, cuser))
-        @gatherer.gather.lock!
-        raise AccessError unless @gatherer.can_create?(cuser, Gatherer.params(params, cuser))
+    result = Gathers::Join.call(actor: cuser, params: Gatherer.params(params, cuser))
+    @gatherer = result.gatherer
 
-        if @gatherer.save
-          flash[:notice] = t(:gathers_join)
-        else
-          flash[:error] = @gatherer.errors.full_messages.to_s
-        end
-      end
+    if result.success?
+      flash[:notice] = t(:gathers_join)
+    else
+      flash[:error] = @gatherer&.errors&.full_messages&.to_s || result.error.to_s
     end
 
-    redirect_to @gatherer.gather
+    redirect_to(result.gather || @gatherer&.gather || '/')
   end
 
   def update
@@ -25,6 +20,7 @@ class GatherersController < ApplicationController
 
     if @gatherer.update(Gatherer.params(params, cuser))
       flash[:notice] = t(:gatherers_update)
+      Gathers::Broadcaster.call(@gatherer.gather)
     else
       flash[:error] = @gatherer.errors.full_messages.to_s
     end
@@ -36,24 +32,34 @@ class GatherersController < ApplicationController
     raise AccessError unless @gatherer.can_destroy? cuser
 
     states = {
-      "leaving" => Gatherer::STATE_LEAVING,
-      "away" => Gatherer::STATE_AWAY,
-      "active" => Gatherer::STATE_ACTIVE,
+      'leaving' => Gatherer::STATE_LEAVING,
+      'away' => Gatherer::STATE_AWAY,
+      'active' => Gatherer::STATE_ACTIVE
     }
 
     if states.has_key?(params[:status])
       @gatherer.update_attribute(:status, states[params[:status]])
+      Gathers::Broadcaster.call(@gatherer.gather)
     end
 
-    render body: nil, :status => 200
+    render body: nil, status: 200
   end
 
   def destroy
-    raise AccessError unless @gatherer.can_destroy? cuser
+    service = if cuser && (cuser.admin? || cuser.gather_moderator?) && @gatherer.user != cuser
+                Gathers::Kick
+              else
+                Gathers::Leave
+              end
 
-    @gather = @gatherer.gather
-    @gatherer.destroy
-    redirect_to @gather
+    result = service.call(actor: cuser, gatherer: @gatherer)
+    if result.success?
+      flash[:notice] = t(:gatherers_update)
+    else
+      flash[:error] = result.error.to_s
+    end
+
+    redirect_to(result.gather || @gatherer.gather)
   end
 
   private

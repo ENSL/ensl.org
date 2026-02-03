@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_31_132000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_02_000100) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -271,12 +271,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_31_132000) do
     t.integer "status"
     t.integer "turn"
     t.datetime "updated_at", precision: nil
+    t.integer "version", default: 0, null: false
     t.integer "votes", default: 0, null: false
     t.index ["captain1_id"], name: "index_gathers_on_captain1_id"
     t.index ["captain2_id"], name: "index_gathers_on_captain2_id"
     t.index ["map1_id"], name: "index_gathers_on_map1_id"
     t.index ["map2_id"], name: "index_gathers_on_map2_id"
     t.index ["server_id"], name: "index_gathers_on_server_id"
+    t.index ["version"], name: "index_gathers_on_version"
   end
 
   create_table "gathers_users", id: false, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|

@@ -19,3 +19,6 @@ Rails.application.config.assets.precompile += %w[tinymce.js]
 Rails.application.config.assets.precompile += %w[actioncable.js]
 # Precompile the importmap-built application module so sprockets can serve it
 Rails.application.config.assets.precompile += %w[importmap_application.js]
+# Precompile Stimulus controllers
+Rails.application.config.assets.precompile += %w[controllers/gather_sync_controller.js]
+Rails.application.config.assets.precompile += %w[controllers/index.js]
