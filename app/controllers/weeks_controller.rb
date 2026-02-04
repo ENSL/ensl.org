@@ -1,5 +1,5 @@
 class WeeksController < ApplicationController
-  before_action :get_week, except: [:new, :create]
+  before_action :get_week, except: %i[new create]
 
   def new
     @week = Week.new
@@ -19,7 +19,8 @@ class WeeksController < ApplicationController
       flash[:notice] = t(:weeks_create)
       redirect_to @week.contest
     else
-      render :new
+      flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -30,14 +31,17 @@ class WeeksController < ApplicationController
       flash[:notice] = t(:weeks_update)
       redirect_to @week.contest
     else
-      render :edit
+      flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     raise AccessError unless @week.can_destroy? cuser
+
     @week.destroy
-    redirect_to_back
+    flash[:notice] = t(:weeks_destroy)
+    redirect_to edit_contest_path(@week.contest, anchor: 'weeks')
   end
 
   private

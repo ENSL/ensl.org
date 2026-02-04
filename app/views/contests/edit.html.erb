@@ -139,7 +139,11 @@
                     <td><%= h map.download %></td>
                     <td class="actions">
                         <%= link_to icon('pencil'), edit_map_path(map) %>
-                        <%= link_to icon('times'), action: "del_map", id: @contest.id, id2: map.id  %>
+                        <%= form_tag del_map_contests_path, method: :get, id: "delete_map_#{map.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
+                            <%= hidden_field_tag :id, @contest.id %>
+                            <%= hidden_field_tag :id2, map.id %>
+                            <%= link_to icon('times'), '#', data: { submit_form: true, form_id: "delete_map_#{map.id}", confirm: 'Are you sure?' } %>
+                        <% end %>
                     </td>
                 </tr>
                 <% end %>
@@ -163,19 +167,31 @@
                 <tr>
                     <th class="team">Team</th>
                     <th class="score">Score</th>
+                    <th class="win">Win</th>
+                    <th class="loss">Loss</th>
+                    <th class="draw">Draw</th>
+                    <th class="extra">Bonus</th>
                     <th class="status">Status</th>
                     <th class="actions"></th>
                 </tr>
 
-                <% @contest.contesters.each do |contester| %>
+                <% @contest.contesters.active.each do |contester| %>
                 <tr>
                     <td><%= link_to (h contester.team), contester %></td>
                     <td><%= h contester.score %></td>
+                    <td><%= h contester.win %></td>
+                    <td><%= h contester.loss %></td>
+                    <td><%= h contester.draw %></td>
+                    <td><%= h contester.extra %></td>
                     <td><%= contester.statuses[contester.active] %></td>
                     <td class="actions">
                         <% if contester.active %>
-                        <%= link_to icon('pencil'), edit_contester_path(contester) %> 
-                        <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
+                        <%= link_to icon('pencil'), edit_contester_path(contester) %>
+                        <%= form_tag contester_path(contester), method: :post, id: "delete_contester_#{contester.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
+                            <%= hidden_field_tag :_method, 'delete' %>
+                            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                            <%= link_to icon('times'), '#', data: { submit_form: true, form_id: "delete_contester_#{contester.id}", confirm: 'Are you sure?' } %>
+                        <% end %>
                         <% else %>
                         <%= form_for contester do |c| %>
                         <%= c.hidden_field :active, { value: 1 } %>
@@ -221,7 +237,11 @@
                     <td><%= h week.map2 %></td>
                     <td class="actions">
                         <%= link_to icon('pencil'), edit_week_path(week) %>
-                        <%= link_to icon('times'), week, confirm: 'Are you sure?', method: :delete %>
+                        <%= form_tag week_path(week), method: :post, id: "delete_week_#{week.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
+                            <%= hidden_field_tag :_method, 'delete' %>
+                            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                            <%= link_to icon('times'), '#', data: { submit_form: true, form_id: "delete_week_#{week.id}", confirm: 'Are you sure?' } %>
+                        <% end %>
                     </td>
                 </tr>
                 <% end %>
@@ -257,7 +277,11 @@
                     <td class="actions">
                         <%= link_to icon('flag-checkered'), controller: :matches, action: :ref, id: match %>
                         <%= link_to icon('pencil'), edit_match_path(match) %>
-                        <%= link_to icon('times'), match, confirm: 'Are you sure?', method: :delete %>
+                                                <%= form_tag match_path(match), method: :post, id: "delete_match_#{match.id}", data: { turbo: false }, style: 'display:inline;margin:0;' do %>
+                                                    <%= hidden_field_tag :_method, 'delete' %>
+                                                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                                                    <%= link_to icon('times'), '#', data: { submit_form: true, form_id: "delete_match_#{match.id}", confirm: 'Are you sure?' } %>
+                                                <% end %>
                     </td>
                 </tr>
                 <% end %>

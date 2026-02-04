@@ -1,6 +1,6 @@
 <div class="wide box">
   <%= form_for @match, html: { class: 'square' } do |f| %>
-    <%= f.error_messages %>
+    <%= render 'shared/errors', messages: @match.errors.full_messages %>
     <%= f.hidden_field :contest_id %>
 
     <div class="fields horizontal">

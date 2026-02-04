@@ -59,6 +59,10 @@ function bindLocalHandlers() {
   $(document).off('click', 'a[data-submit-form]');
   $(document).on('click', 'a[data-submit-form]', function(e) {
     e.preventDefault();
+    var confirmMessage = $(this).data('confirm');
+    if (confirmMessage && !window.confirm(confirmMessage)) {
+      return;
+    }
     var formId = $(this).data('form-id');
     var formSelector = $(this).data('form-selector');
     var form = null;

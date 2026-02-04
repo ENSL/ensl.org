@@ -1,5 +1,5 @@
 class ContestsController < ApplicationController
-  before_action :get_contest, only: [:show, :edit, :update, :destroy, :del_map, :scores, :recalc, :confirmed_matches]
+  before_action :get_contest, only: %i[show edit update destroy del_map scores recalc confirmed_matches]
 
   def index
     # @contests = Contest.all
@@ -8,18 +8,17 @@ class ContestsController < ApplicationController
   end
 
   def historical
-    case params[:id]
-    when "NS1"
-      @contests = Contest.all.ordered.includes(:contesters).where("name LIKE ? OR name LIKE ?", "S%:%", "%Night%")
-    else
-      @contests = Contest.all.ordered.includes(:contesters).where("id > ?", "113")
-    end
+    @contests = case params[:id]
+                when 'NS1'
+                  Contest.all.ordered.includes(:contesters).where('name LIKE ? OR name LIKE ?', 'S%:%', '%Night%')
+                else
+                  Contest.all.ordered.includes(:contesters).where('id > ?', '113')
+                end
   end
 
   def current
     @contests = Contest.active
   end
-
 
   def show
     # TODO
@@ -28,20 +27,20 @@ class ContestsController < ApplicationController
 
   def scores
     raise AccessError unless @contest.contest_type == Contest::TYPE_LADDER
+
     @friendly = params[:friendly] ? @contest.contesters.find(params[:friendly]) : @contest.contesters.first
     @rounds = [@contest.modulus_even, @contest.modulus_3to1, @contest.modulus_4to0]
     @rounds.each_index do |key|
-      if params["rounds"] and params["rounds"]["#{key}"]
-        @rounds[key] = params["rounds"]["#{key}"].to_f
-      end
+      @rounds[key] = params['rounds']["#{key}"].to_f if params['rounds'] and params['rounds']["#{key}"]
     end
     @weight = params[:weight] ? params[:weight].to_f : @contest.weight
   end
 
   def recalc
     raise AccessError unless @contest.can_update? cuser
+
     @contest.recalculate
-    flash[:notice] = "Contest points recalculated."
+    flash[:notice] = 'Contest points recalculated.'
     redirect_to_back
   end
 
@@ -69,17 +68,25 @@ class ContestsController < ApplicationController
   # FIXME: don't use this kind of update
   def update
     raise AccessError unless @contest.can_update? cuser
-    if update_type == "contest"
+
+    if update_type == 'contest'
       if @contest.update(Contest.params(params, cuser))
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else
         render :edit
       end
-    elsif update_type == "map"
-      @contest.maps << Map.find(params[:map])
-      render :edit
-    elsif update_type == "team"
+    elsif update_type == 'map'
+      map = Map.find_by(id: params[:map])
+      if map.nil?
+        flash.now[:error] = t(:error)
+        render :edit, status: :unprocessable_entity
+      else
+        @contest.maps << map unless @contest.maps.include?(map)
+        flash[:notice] = t(:maps_update)
+        redirect_to edit_contest_path(@contest, anchor: 'maps')
+      end
+    elsif update_type == 'team'
       contester = Contester.new
       contester.team = Team.find params[:team]
       contester.contest = @contest
@@ -95,12 +102,20 @@ class ContestsController < ApplicationController
 
   def del_map
     raise AccessError unless @contest.can_update? cuser
-    @contest.maps.delete(Map.find(params[:id2]))
-    render :edit
+
+    map = Map.find_by(id: params[:id2])
+    if map
+      @contest.maps.delete(map)
+      flash[:notice] = t(:maps_destroy)
+    else
+      flash[:error] = t(:error)
+    end
+    redirect_to edit_contest_path(@contest, anchor: 'maps')
   end
 
   def destroy
     raise AccessError unless @contest.can_destroy? cuser
+
     @contest.destroy
     redirect_to contests_url
   end

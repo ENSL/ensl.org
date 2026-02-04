@@ -1,5 +1,5 @@
 class MatchesController < ApplicationController
-  before_action :get_match, except: [:index, :new, :create, :admin]
+  before_action :get_match, except: %i[index new create admin]
 
   def index
     @matches = Match.active
@@ -18,8 +18,8 @@ class MatchesController < ApplicationController
 
   def admin
     @matches = Match.active.includes(:contest, :contester1, :contester2, :map1, :map2, :referee)
-               .all.group_by { |t| t.week.to_s }.to_a.reverse
-    render layout: "full"
+                    .all.group_by { |t| t.week.to_s }.to_a.reverse
+    render layout: 'full'
   end
 
   def extra
@@ -27,6 +27,7 @@ class MatchesController < ApplicationController
 
   def ref
     raise AccessError unless @match.can_update? cuser, [:report]
+
     @n = 0
   end
 
@@ -42,20 +43,22 @@ class MatchesController < ApplicationController
       flash[:notice] = t(:matches_create)
       redirect_to edit_contest_path(@match.contest)
     else
-      render :new
+      flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
+      render :new, status: :unprocessable_entity
     end
   end
 
   def update
     raise AccessError unless @match.can_update? cuser, params[:match]
+
     # FIXME: better implementation
     if params[:match][:matchers_attributes]
       params[:match][:matchers_attributes].each do |key, matcher|
-        matcher["_destroy"] = matcher["_destroy"] == "keep" ? false : true
-        if matcher["user_id"] == ""
+        matcher['_destroy'] = !(matcher['_destroy'] == 'keep')
+        if matcher['user_id'] == ''
           params[:match][:matchers_attributes].delete key
-        elsif matcher["user_id"].to_i == 0
-          matcher["user_id"] = User.find_by_username(matcher["user_id"]).id
+        elsif matcher['user_id'].to_i == 0
+          matcher['user_id'] = User.find_by_username(matcher['user_id']).id
         end
       end
     end
@@ -65,7 +68,7 @@ class MatchesController < ApplicationController
         format.xml { head :ok }
         format.html do
           flash[:notice] = t(:matches_update)
-          if URI(request.referer).path.include?("admin")
+          if request.referer.present? && URI(request.referer).path.include?('admin')
             redirect_to_back
           else
             redirect_to @match
@@ -73,11 +76,12 @@ class MatchesController < ApplicationController
         end
       end
     else
-      if URI(request.referer).path == match_ref_path(@match)
+      flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
+      if request.referer.present? && URI(request.referer).path == match_ref_path(@match)
         ref
-        render :ref
+        render :ref, status: :unprocessable_entity
       else
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
   end
@@ -89,21 +93,23 @@ class MatchesController < ApplicationController
       @match.hltv_record params[:addr], params[:pwd]
       flash[:notice] = t(:hltv_recording)
     elsif params[:commit].include? t(:hltv_move)
-      sleep(90) if params[:wait] == "1"
+      sleep(90) if params[:wait] == '1'
       @match.hltv_move params[:addr], params[:pwd]
       flash[:notice] = t(:hltv_moved)
     elsif params[:commit].include? t(:hltv_stop)
-      sleep(90) if params[:wait] == "1"
+      sleep(90) if params[:wait] == '1'
       @match.hltv_stop
       flash[:notice] = t(:hltv_stopped)
     end
-    redirect_to action: "show"
+    redirect_to action: 'show'
   end
 
   def destroy
     raise AccessError unless @match.can_destroy? cuser
+
     @match.destroy
-    redirect_to edit_contest_path(@match.contest)
+    flash[:notice] = t(:matches_destroy)
+    redirect_to edit_contest_path(@match.contest, anchor: 'matches')
   end
 
   private

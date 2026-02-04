@@ -33,7 +33,8 @@
       <%= f.text_field :draw %>
     </div>
     <div class="controls">
-      <%= f.submit 'Update' %>
+      <%= f.submit 'Save Contester' %>
+      <%= link_to 'Back to contest', edit_contest_path(@contester.contest, anchor: 'teams'), class: 'button' %>
     </div>
   <% end %>
 </div>

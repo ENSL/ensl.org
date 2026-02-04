@@ -20,6 +20,8 @@ en:
   contests_update: "Contest was successfully updated."
   contests_join: "Team successfully joined contest."
   contests_contester_update: "Contester was successfully updated."
+  contests_contester_destroy: "Contester was successfully removed."
+  contests_contester_recovered: "Contester was successfully recovered."
   gather_create: "New Gather was started successfully."
   gathers_join: "You have joined the Gather."
   gathers_user_pick: "You have picked a player for your team."
