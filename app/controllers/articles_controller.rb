@@ -50,7 +50,7 @@ class ArticlesController < ApplicationController
       flash[:notice] = t(:articles_create)
       redirect_to @article
     else
-      render :new
+      respond_with_validation_errors(@article, template: :new)
     end
   end
 
@@ -61,7 +61,7 @@ class ArticlesController < ApplicationController
       flash[:notice] = t(:articles_update)
       redirect_to @article
     else
-      render :edit
+      respond_with_validation_errors(@article, template: :edit)
     end
   end
 

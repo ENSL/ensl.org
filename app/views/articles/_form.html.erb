@@ -5,7 +5,9 @@
 <h1>Editing Article</h1>
 
 <%= form_for(@article, html: { class: 'article square' }) do |f| %>
-  <%= render 'shared/errors', messages: @article.errors.full_messages %>
+  <div id="<%= error_wrapper_id_for(@article) %>">
+    <%= render 'shared/errors', messages: @article.errors.full_messages, container_id: error_container_id_for(@article) %>
+  </div>
 
   <div class="fields horizontal">
     <%= f.label :title %>
