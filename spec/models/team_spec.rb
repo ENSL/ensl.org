@@ -1,6 +1,92 @@
 require 'rails_helper'
 
 RSpec.describe Team, type: :model do
+  describe 'callbacks and helpers' do
+    it 'initializes default attributes on create' do
+      team = create(:team)
+      expect(team.active).to be true
+      expect(team.recruiting).to be_nil
+    end
+
+    it 'adds founder as a leader and sets founder.team_id' do
+      founder = create(:user)
+      team = create(:team, founder: founder)
+
+      leader = team.teamers.find_by(user_id: founder.id)
+      expect(leader).not_to be_nil
+      expect(leader.rank).to eq(Teamer::RANK_LEADER)
+      expect(founder.reload.team_id).to eq(team.id)
+    end
+  end
+
+  describe '#destroy' do
+    context 'when no matches exist' do
+      it 'removes the team record and dependent associations' do
+        team = create(:team)
+        create(:teamer, team: team)
+        create(:contester, team: team)
+
+        expect { team.destroy }.to change(Team, :count).by(-1)
+        expect(Team.where(id: team.id)).to be_empty
+      end
+    end
+
+    context 'when matches exist' do
+      it 'soft-deletes the team and marks teamers as removed' do
+        team = create(:team)
+        contest = create(:contest)
+        cont1 = create(:contester, contest: contest, team: team)
+        cont2 = create(:contester, contest: contest)
+        create(:match, contest: contest, contester1: cont1, contester2: cont2)
+        create(:teamer, team: team, rank: Teamer::RANK_MEMBER)
+
+        team.destroy
+
+        expect(Team.exists?(team.id)).to be true
+        expect(team.reload.active).to be false
+        expect(team.teamers.reload.pluck(:rank)).to include(Teamer::RANK_REMOVED)
+      end
+    end
+  end
+
+  describe '#recover' do
+    it 'reactivates a soft-deleted team' do
+      team = create(:team, active: false)
+      team.recover
+      expect(team.reload.active).to be true
+    end
+  end
+
+  describe '#is_leader?' do
+    it 'returns true for a leader user' do
+      user = create(:user)
+      team = create(:team)
+      create(:teamer, team: team, user: user, rank: Teamer::RANK_LEADER)
+
+      expect(team.is_leader?(user)).to be true
+    end
+
+    it 'returns false for non-leader user' do
+      user = create(:user)
+      team = create(:team)
+      expect(team.is_leader?(user)).to be false
+    end
+  end
+
+  describe '.search' do
+    it 'finds by name case-insensitively' do
+      t = create(:team, name: 'Alpha Team')
+      expect(Team.search('alpha')).to include(t)
+    end
+
+    it 'returns all when search is nil' do
+      expect(Team.search(nil)).to match_array(Team.all.to_a)
+    end
+  end
+end
+require 'rails_helper'
+
+RSpec.describe Team, type: :model do
   describe 'init and leader assignment' do
     it 'initializes active and recruiting' do
       t = Team.new

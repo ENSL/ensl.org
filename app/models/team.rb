@@ -94,6 +94,7 @@ class Team < ActiveRecord::Base
   def init_variables
     self.active = true
     self.recruiting = nil
+    self.teamers_count = 0 if teamers_count.nil?
   end
 
   def add_leader
@@ -125,8 +126,9 @@ class Team < ActiveRecord::Base
     # If no matches exist, destroy dependent associations then remove the record
     return if has_matches
 
-    teamers.destroy_all
-    contesters.destroy_all
+    # Delete associated records directly to avoid association inverse counter-cache arithmetic
+    Teamer.where(team_id: id).delete_all
+    Contester.where(team_id: id).delete_all
     delete
   end
 
@@ -151,6 +153,12 @@ class Team < ActiveRecord::Base
   end
 
   def self.params(params, cuser)
-    params.permit(:team).except(:id, :active, :founder_id, :created_at, :updated_at).permit!
+    return {} unless params
+
+    if params[:team].present?
+      params.require(:team).permit!.except(:id, :active, :founder_id, :created_at, :updated_at)
+    else
+      {}
+    end
   end
 end

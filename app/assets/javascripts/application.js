@@ -1,7 +1,8 @@
 // = require jquery
-// NOTE: jquery_ujs can conflict with Turbo (double-submits).
-// To disable, comment out the require below by adding a space after //.
-// require jquery_ujs
+// NOTE: jquery_ujs provides unobtrusive handlers for `data-method` and
+// `data-confirm` used across many views. Enable it so feature tests behave
+// like the browser and link_to(..., method: :delete) works reliably.
+// = require jquery_ujs
 // = require vendor/jquery.periodicalupdater
 // = require vendor/jquery.jplayer.min
 // = require vendor/yetii
