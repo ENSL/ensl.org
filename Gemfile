@@ -191,6 +191,7 @@ group :development, :test do
   # LSP support. For editors like VSCode
   gem 'ruby-lsp'
   gem 'ruby-lsp-rails'
+  gem 'ruby-lsp-rspec', require: false
 
   # Better console with breakpoints
   gem 'pry-byebug'
