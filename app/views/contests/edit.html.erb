@@ -2,14 +2,14 @@
 
 <div id="contest" class="contest-manage tabbed">
     <ul id="contest-nav" class="tabs">
-        <li><a href="#general">General</a></li>
+        <li><a href="#general" data-turbo="false">General</a></li>
         <% if @contest.contest_type == Contest::TYPE_BRACKET %>
-        <li><a href="#brackets">Brackets</a></li>
+        <li><a href="#brackets" data-turbo="false">Brackets</a></li>
         <% end %>
-        <li><a href="#maps">Maps</a></li>
-        <li><a href="#teams">Teams</a></li>
-        <li><a href="#weeks">Weeks</a></li>
-        <li><a href="#matches">Matches</a></li>
+        <li><a href="#maps" data-turbo="false">Maps</a></li>
+        <li><a href="#teams" data-turbo="false">Teams</a></li>
+        <li><a href="#weeks" data-turbo="false">Weeks</a></li>
+        <li><a href="#matches" data-turbo="false">Matches</a></li>
     </ul>
 
     <div class="tabbed-contents">

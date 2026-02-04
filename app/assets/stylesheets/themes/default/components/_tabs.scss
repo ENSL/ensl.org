@@ -66,6 +66,22 @@
     padding: 20px;
   }
 
+  /* Ensure tabs are usable without JavaScript by allowing fragment links to
+     reveal the corresponding tab content. When JS isn't available the
+     :target pseudo-class will show the targeted tab; otherwise the JS
+     controller will manage active classes. Also show the first tab by
+     default for non-fragment navigation. */
+  .tab {
+    display: none;
+  }
+
+  .tab:first-child {
+    display: block;
+  }
+
+  .tab:target {
+    display: block;
+  }
   @for $i from 1 through $grid-columns {
     ul.tabs-#{$i} {
       li {

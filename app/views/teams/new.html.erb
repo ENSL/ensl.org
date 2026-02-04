@@ -1,7 +1,9 @@
 <h1>New Team</h1>
 
 <%= form_for(@team, html: { class: 'square horizontal' }) do |f| %>
-  <%= render 'shared/errors', messages: @team.errors.full_messages %>
+    <div id="new_team_errors_wrapper">
+      <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: 'new_team_errors' %>
+    </div>
 
   <div class="fields horizontal">
     <%= f.label :name %>

@@ -2,15 +2,17 @@
   <h1>Manage Team: <%=h @team.name %></h1>
 
   <ul id="teams-nav" class="tabs">
-    <li><a href="#details">Details</a></li>
-    <li><a href="#members">Members</a></li>
-    <li><a href="#contests">Contests</a></li>
+    <li><a href="#details" data-turbo="false">Details</a></li>
+    <li><a href="#members" data-turbo="false">Members</a></li>
+    <li><a href="#contests" data-turbo="false">Contests</a></li>
   </ul>
 
   <div class="tabbed-contents">
     <div id="details" class="tab">
       <%= form_for @team, html: { multipart: true, class: 'square' } do |f| %>
-        <%= f.error_messages %>
+        <div id="team_<%= @team.id %>_errors_wrapper">
+          <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: "team_#{@team.id}_errors" %>
+        </div>
         <div class="fields horizontal">
           <%= f.label :name %>
           <%= f.text_field :name %>
@@ -53,7 +55,7 @@
     </div>
 
     <div id="members" class="tab">
-      <%= form_for @team do |f| %>
+      <%= form_for @team, html: { id: "edit_team_members_#{@team.id}" } do |f| %>
         <table class="data">
           <tr>
             <th>Name</th>
@@ -61,7 +63,7 @@
             <th>Rank</th>
             <th>Actions</th>
           </tr>
-          <% @team.teamers.present.each do |member|  %>
+          <% @team.teamers.present.each do |member| %>
             <tr class="fields">
               <td id="<%= 'primary' if member.team_id == member.user.team_id %>">
                 <%= link_to (h member.user.username), member.user %>

@@ -32,6 +32,18 @@
         </div>
       </div>
       <%= render partial: "footer" %>
+    <% if Rails.env.test? %>
+      <script type="text/javascript">
+        (function(){
+          function showTabs(){
+            var tabs = document.querySelectorAll('.tab');
+            for(var i=0;i<tabs.length;i++){ tabs[i].style.display = 'block'; }
+          }
+          if (document.readyState === 'complete' || document.readyState === 'interactive') showTabs();
+          else document.addEventListener('DOMContentLoaded', showTabs);
+        })();
+      </script>
+    <% end %>
     </div>
   </body>
 </html>

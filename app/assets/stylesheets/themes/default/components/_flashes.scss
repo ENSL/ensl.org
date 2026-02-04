@@ -41,7 +41,8 @@
   Error Messages
 */
 
-div#errors {
+div#errors,
+div.errors-block {
   @extend .flash;
   @extend .error;
   @include span-columns(12);

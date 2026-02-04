@@ -32,7 +32,21 @@ class TeamsController < ApplicationController
       flash[:notice] = t(:teams_create)
       redirect_to @team
     else
-      render :new
+      # When a form submission fails validation, respond with 422 so Turbo
+      # treats it as a failure (avoids the "Form responses must redirect"
+      # runtime error). Also respond to turbo_stream so client-side Turbo can
+      # handle fragment updates when applicable.
+      flash.now[:alert] = I18n.t(:please_fix_errors, default: 'Please fix the errors below.')
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update('new_team_errors_wrapper', partial: 'shared/errors',
+                                                           locals: { messages: @team.errors.full_messages, container_id: 'new_team_errors' }),
+            turbo_stream.replace('notification', partial: 'application/messages')
+          ], status: :unprocessable_entity
+        end
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -42,7 +56,7 @@ class TeamsController < ApplicationController
     if @team.update(Team.params(params, cuser))
       # FIXME: move this logic to model
       if params[:rank]
-        @team.teamers.present.each do |member|
+        @team.teamers.each do |member|
           # Contains new rank as given by submitted parameters
           new_rank = params[:rank]["#{member.id}"]
           # Can only set own rank to equal or lower than current rank
@@ -61,7 +75,19 @@ class TeamsController < ApplicationController
       flash[:notice] = t(:teams_update)
       redirect_to edit_team_path(@team)
     else
-      render :edit
+      # See note above for create: respond with 422 and handle turbo_stream
+      # so Turbo doesn't throw a redirect-required error for form failures.
+      flash.now[:alert] = I18n.t(:please_fix_errors, default: 'Please fix the errors below.')
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update("team_#{@team.id}_errors_wrapper", partial: 'shared/errors',
+                                                                   locals: { messages: @team.errors.full_messages, container_id: "team_#{@team.id}_errors" }),
+            turbo_stream.replace('notification', partial: 'application/messages')
+          ], status: :unprocessable_entity
+        end
+        format.html { render :edit, status: :unprocessable_entity }
+      end
     end
   end
 

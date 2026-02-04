@@ -1,6 +1,7 @@
 <% if messages && messages.any? %>
-  <div id="errors">
-    <strong><%= t('errors.template.header') %></strong>
+  <% error_container_id = local_assigns[:container_id] || 'errors' %>
+  <div id="<%= error_container_id %>" class="errors-block">
+    <strong><%= t('errors.template.header', default: 'Please review the following errors:') %></strong>
 
     <ul class="errors">
       <% messages.each do |msg| %>
