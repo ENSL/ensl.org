@@ -1,8 +1,8 @@
 <h1>New Team</h1>
 
 <%= form_for(@team, html: { class: 'square horizontal' }) do |f| %>
-    <div id="new_team_errors_wrapper">
-      <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: 'new_team_errors' %>
+    <div id="<%= error_wrapper_id_for(@team) %>">
+      <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: error_container_id_for(@team) %>
     </div>
 
   <div class="fields horizontal">

@@ -1,5 +1,7 @@
 <%= form_for @server, html: { class: 'server square' } do |f| %>
-  <%= f.error_messages %>
+  <div id="<%= error_wrapper_id_for(@server) %>">
+    <%= render 'shared/errors', messages: @server.errors.full_messages, container_id: error_container_id_for(@server) %>
+  </div>
 
   <div class="fields horizontal">
     <%= f.label :dns %>

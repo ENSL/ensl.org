@@ -10,8 +10,8 @@
   <div class="tabbed-contents">
     <div id="details" class="tab">
       <%= form_for @team, html: { multipart: true, class: 'square' } do |f| %>
-        <div id="team_<%= @team.id %>_errors_wrapper">
-          <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: "team_#{@team.id}_errors" %>
+        <div id="<%= error_wrapper_id_for(@team) %>">
+          <%= render 'shared/errors', messages: @team.errors.full_messages, container_id: error_container_id_for(@team) %>
         </div>
         <div class="fields horizontal">
           <%= f.label :name %>

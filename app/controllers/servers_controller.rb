@@ -1,10 +1,10 @@
 class ServersController < ApplicationController
-  before_action :get_server, except: [:index, :refresh, :new, :create]
+  before_action :get_server, except: %i[index refresh new create]
 
   def index
     @servers = Server.hlds.active.ordered.includes(:user).all
     @ns2 = Server.ns2.active.ordered.includes(:user).all
-    @officials = Server.ns2.active.ordered.where ["name LIKE ?", "%NSL%"]
+    @officials = Server.ns2.active.ordered.where ['name LIKE ?', '%NSL%']
   end
 
   def show
@@ -28,7 +28,7 @@ class ServersController < ApplicationController
       flash[:notice] = t(:server_create)
       redirect_to @server
     else
-      render :new
+      respond_with_validation_errors(@server, template: :new)
     end
   end
 
@@ -39,12 +39,13 @@ class ServersController < ApplicationController
       flash[:notice] = t(:server_update)
       redirect_to @server
     else
-      render :edit
+      respond_with_validation_errors(@server, template: :edit)
     end
   end
 
   def default
     raise AccessError unless @server.can_update? cuser
+
     @server.default_record
     render text: 'Ok'
   end
@@ -52,10 +53,10 @@ class ServersController < ApplicationController
   def destroy
     raise AccessError unless @server.can_destroy? cuser
 
-    if @server.destroy
-      flash[:notice] = t(:server_destroy)
-      redirect_to servers_url
-    end
+    return unless @server.destroy
+
+    flash[:notice] = t(:server_destroy)
+    redirect_to servers_url
   end
 
   private

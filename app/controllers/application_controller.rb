@@ -1,8 +1,10 @@
 class ApplicationController < ActionController::Base
   include Exceptions
+  include ActionView::RecordIdentifier
 
   helper :all
   helper_method :cuser, :strip, :return_here
+  helper_method :error_container_id_for, :error_wrapper_id_for
 
   helper_method :safe_url_for
 
@@ -147,6 +149,28 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def error_container_id_for(record)
+    "#{dom_id(record)}_errors"
+  end
+
+  def error_wrapper_id_for(record)
+    "#{dom_id(record)}_errors_wrapper"
+  end
+
+  def respond_with_validation_errors(record, template:)
+    flash.now[:alert] = I18n.t(:please_fix_errors, default: 'Please fix the errors below.')
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.update(error_wrapper_id_for(record), partial: 'shared/errors',
+                                                            locals: { messages: record.errors.full_messages, container_id: error_container_id_for(record) }),
+          turbo_stream.replace('notification', partial: 'application/messages')
+        ], status: :unprocessable_entity
+      end
+      format.html { render template, status: :unprocessable_entity }
+    end
+  end
 
   # FIXME: move to model
   def update_user
