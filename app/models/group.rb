@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: groups
@@ -13,6 +15,7 @@
 #  index_groups_on_founder_id  (founder_id)
 #
 
+# Group model for user groups such as Admins, Referees, Casters, etc.
 class Group < ActiveRecord::Base
   include Extra
 
@@ -28,9 +31,24 @@ class Group < ActiveRecord::Base
   GATHER_MODERATORS = 14
   CONTRIBUTORS = 16
 
-  validates_length_of :name, maximum: 20
+  # All core system groups that are bound to app logic and cannot be deleted
+  RESERVED_GROUP_IDS = [ADMINS, REFEREES, CASTERS, CHAMPIONS, DONORS, MOVIEMAKERS, MOVIES, PREDICTORS, STAFF,
+                        GATHER_MODERATORS, CONTRIBUTORS].freeze
+  # Protected groups cannot be destroyed
+  PROTECTED_GROUP_IDS = RESERVED_GROUP_IDS
 
-  has_many :groupers
+  GROUP_ROLE_MAPPING = {
+    admins: ADMINS,
+    referees: REFEREES,
+    casters: CASTERS,
+    gathermods: GATHER_MODERATORS,
+    contributors: CONTRIBUTORS,
+    predictors: PREDICTORS
+  }.freeze
+
+  validates :name, presence: true, length: { maximum: 20 }
+
+  has_many :groupers, dependent: :destroy
   has_many :users, through: :groupers
   # Removed erroneous HABTM declaration that conflicted with `has_many :users, through: :groupers`
 
@@ -41,93 +59,60 @@ class Group < ActiveRecord::Base
   end
 
   def can_create?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin? || false
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin? || false
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin? and id != Group::ADMINS and !Group.protected_groups.include?(id)
+    (cuser&.admin? || false) && !PROTECTED_GROUP_IDS.include?(id)
   end
 
-  def self.protected_groups
-    Group.constants(false).map { |n| Group.const_get(n) }
-  end
+  class << self
+    # Returns all users belonging to the specified group role
+    # @param role [Symbol] the group role (e.g., :admins, :referees)
+    # @return [Array<User>] array of groupers (users) in the role
+    def group_members(role)
+      group_id = GROUP_ROLE_MAPPING[role]
+      return [] unless group_id
 
-  def self.staff
-    staff = []
-
-    (admins + casters + referees + extras).each do |g|
-      staff << g unless staff.include? g
+      find_by(id: group_id)&.groupers&.valid_users || []
     end
-    staff
-  end
 
-  def self.admins
-    find(ADMINS).groupers.valid_users
-  end
-
-  def self.referees
-    referees = []
-    referee_group = where(id: REFEREES).first
-    return referees unless referee_group
-
-    referee_group.groupers.each do |g|
-      referees << g unless referees.include? g
+    # Dynamically define group member retrieval methods
+    %i[admins referees casters gathermods contributors predictors].each do |role|
+      define_method(role) { group_members(role) }
     end
-    referees
-  end
 
-  def self.extras
-    extras = []
-    extra_group = where(id: PREDICTORS).first
-    staff_group = where(id: STAFF).first
-
-    extra_groupers = extra_group ? extra_group.groupers : []
-    staff_groupers = staff_group ? staff_group.groupers : []
-
-    (extra_groupers + staff_groupers).each do |g|
-      extras << g unless extras.include? g
+    # Returns combined array of staff members (admins, casters, referees, and extras)
+    def staff
+      all_staff = admins + casters + referees + extras
+      all_staff.group_by { |grouper| grouper.user_id }.values.map(&:first)
     end
-    extras
-  end
 
-  def self.casters
-    casters = []
-    caster_group = where(id: CASTERS).first
-    return casters unless caster_group
-
-    caster_group.groupers.each do |g|
-      casters << g unless casters.include? g
+    # Returns extra staff (predictors and staff group members)
+    def extras
+      predictors_users = group_members(:predictors)
+      staff_group = find_by(id: STAFF)
+      staff_users = staff_group ? staff_group.groupers.valid_users : []
+      all_extras = predictors_users + staff_users
+      all_extras.group_by { |grouper| grouper.user_id }.values.map(&:first)
     end
-    casters
-  end
 
-  def self.gathermods
-    gathermods = []
-    gathermod_group = where(id: GATHER_MODERATORS).first
-    return gathermods unless gathermod_group
-
-    gathermod_group.groupers.each do |g|
-      gathermods << g unless gathermods.include? g
+    # Returns protected group IDs that cannot be destroyed
+    def protected_groups
+      PROTECTED_GROUP_IDS
     end
-    gathermods
-  end
 
-  def self.contributors
-    contributors = []
-    group_contrib = where(id: CONTRIBUTORS).first
-    return contributors unless group_contrib
-
-    group_contrib.groupers.each do |g|
-      contributors << g unless contributors.include? g
+    # Returns all reserved/core system group IDs
+    def reserved_groups
+      RESERVED_GROUP_IDS
     end
-    contributors
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:group).permit(:name)
   end
 end
