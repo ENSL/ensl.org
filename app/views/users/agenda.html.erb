@@ -49,7 +49,7 @@
           <h4>Join an existing team</h4>
 
           <div class="fields inline">
-            <%= f.select :team_id, Team.active.collect {|t| [t.name, t.id]} %>
+            <%= f.select :team_id, Team.active.ordered.collect {|t| [t.name, t.id]} %>
           </div>
           <div class="controls inline">
              <%= f.submit "Join", class: 'button' %>

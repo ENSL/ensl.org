@@ -1,8 +1,8 @@
 class MatchProposalsController < ApplicationController
   before_action :get_match
-  
+
   def index
-    raise AccessError unless cuser.admin? || @match.user_in_match?(cuser)
+    raise AccessError unless cuser&.admin? || @match.user_in_match?(cuser)
   end
 
   def new
@@ -23,6 +23,7 @@ class MatchProposalsController < ApplicationController
     @proposal = MatchProposal.new(MatchProposal.params(params, cuser))
     @proposal.match = @match
     raise AccessError unless @proposal.can_create? cuser
+
     @proposal.team = cuser.team
     @proposal.status = MatchProposal::STATUS_PENDING
     if @proposal.save
@@ -41,6 +42,7 @@ class MatchProposalsController < ApplicationController
 
   def update
     raise AccessError unless request.xhr? # Only respond to ajax requests
+
     rjson = {}
     proposal = MatchProposal.find(params[:id])
     unless proposal
@@ -82,7 +84,8 @@ class MatchProposalsController < ApplicationController
     end
   end
 
-private
+  private
+
   def get_match
     @match = Match.find params[:match_id]
   end
