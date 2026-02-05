@@ -16,19 +16,20 @@
 #
 
 class Grouper < ActiveRecord::Base
-  #attr_protected :id, :created_at, :updated_at
+  # attr_protected :id, :created_at, :updated_at
   attr_accessor :username
 
-  belongs_to :group, :optional => true
-  belongs_to :user, :optional => true
+  belongs_to :group, optional: true
+  belongs_to :user, optional: true
 
   validates_associated :group, :user
-  validates :group, :user, :presence => true
-  validates :task, :length => {:maximum => 25}
+  validates :group, :user, presence: true
+  validates :task, length: { maximum: 25 }
+  validates :user_id, uniqueness: { scope: :group_id, message: 'is already a member of this group' }
 
   scope :valid_users, -> { joins(:user).where.not(users: { id: nil }) }
 
-  before_validation :fetch_user, :if => Proc.new {|grouper| grouper.username and !grouper.username.empty?}
+  before_validation :fetch_user, if: proc { |grouper| grouper.username and !grouper.username.empty? }
 
   def to_s
     user.to_s
@@ -38,15 +39,15 @@ class Grouper < ActiveRecord::Base
     self.user = User.find_by_username(username)
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 

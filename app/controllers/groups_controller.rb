@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_action :get_group, except: [:index, :new, :create]
+  before_action :get_group, except: %i[index new create]
 
   def index
     @groups = Group.all
@@ -15,6 +15,7 @@ class GroupsController < ApplicationController
 
   def edit
     @group.users.all
+    @new_grouper = Grouper.new(group: @group)
     raise AccessError unless @group.can_update? cuser
   end
 
@@ -22,26 +23,30 @@ class GroupsController < ApplicationController
     @group = Group.new(Group.params(params, cuser))
     @group.founder = cuser
     raise AccessError unless @group.can_create? cuser
+
     if @group.save
       flash[:notice] = t(:groups_create)
       redirect_to @group
     else
-      render :new
+      respond_with_validation_errors(@group, template: :new)
     end
   end
 
   def update
     raise AccessError unless @group.can_update? cuser
+
     if @group.update(Group.params(params, cuser))
       flash[:notice] = t(:groups_update)
       redirect_to @group
     else
-      render :edit
+      @new_grouper = Grouper.new(group: @group)
+      respond_with_validation_errors(@group, template: :edit)
     end
   end
 
   def destroy
     raise AccessError unless @group.can_destroy? cuser
+
     @group.destroy
     redirect_to groups_url
   end
@@ -52,7 +57,7 @@ class GroupsController < ApplicationController
     raise Error, t(:duplicate_user) if @group.users.include? @user
 
     @group.users << @user if @user
-    redirect_to edit_group_url(@group, groupTab: "groupTabMembers")
+    redirect_to edit_group_url(@group, groupTab: 'groupTabMembers')
   end
 
   def delUser
@@ -60,7 +65,7 @@ class GroupsController < ApplicationController
     raise AccessError unless @group.can_update? cuser
 
     @group.users.delete @user
-    redirect_to edit_group_url(@group, groupTab: "groupTabMembers")
+    redirect_to edit_group_url(@group, groupTab: 'groupTabMembers')
   end
 
   private

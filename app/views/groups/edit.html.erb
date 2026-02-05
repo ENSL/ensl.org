@@ -3,14 +3,16 @@
 
   <div id="group" class="tabbed">
     <ul id="group-nav" class="tabs">
-      <li><a href="#general">General</a></li>
-      <li><a href="#members">Members</a></li>
+      <li><a href="#general" data-turbo="false">General</a></li>
+      <li><a href="#members" data-turbo="false">Members</a></li>
     </ul>
 
     <div class="tabbed-contents">
       <div class="tab" id="general">
-        <%= form_for(@group, html: { class: 'square' }) do |f| %>
-          <%= render 'shared/errors', messages: @group.errors.full_messages %>
+        <%= form_for(@group, html: { class: 'square', data: { turbo: false } }) do |f| %>
+          <div id="<%= error_wrapper_id_for(@group) %>">
+            <%= render 'shared/errors', messages: @group.errors.full_messages, container_id: error_container_id_for(@group) %>
+          </div>
 
           <div class="fields horizontal">
             <%= f.label :name %>
@@ -24,6 +26,7 @@
       </div>
 
       <div class="tab" id="members">
+        <% new_grouper = @new_grouper || Grouper.new(group: @group) %>
         <table class="roles striped">
           <tr>
             <th class="username">Username</th>
@@ -35,9 +38,12 @@
               <td><%= namelink grouper.user %></td>
               <td><%= h grouper.user.realname %></td>
               <td class="actions">
-                <%= form_for grouper do |g| %>
+                <%= form_for grouper, html: { data: { turbo: false } } do |g| %>
+                  <div id="<%= error_wrapper_id_for(grouper) %>">
+                    <%= render 'shared/errors', messages: grouper.errors.full_messages, container_id: error_container_id_for(grouper) %>
+                  </div>
                   <div class="fields inline">
-                    <%= g.text_field :task, size: 20 %>
+                    <%= g.text_field :task, size: 20, value: grouper.task %>
                   </div>
                   <div class="controls">
                     <%= g.submit 'Update', class: 'button tiny' %>
@@ -52,7 +58,10 @@
         <div class="add">
           <h3>Add a Member</h3>
 
-          <%= form_for @group.groupers.build, html: { class: 'square' } do |f| %>
+          <%= form_for(new_grouper, html: { class: 'square', data: { turbo: false } }) do |f| %>
+            <div id="<%= error_wrapper_id_for(new_grouper) %>">
+              <%= render 'shared/errors', messages: new_grouper.errors.full_messages, container_id: error_container_id_for(new_grouper) %>
+            </div>
             <%= f.hidden_field :group_id %>
 
             <div class="fields horizontal">
@@ -78,5 +87,13 @@
     new Yetii({
       id: 'group'
     });
+
+    <% if @group_tab.present? %>
+      (function() {
+        var tab = '<%= @group_tab %>';
+        if (tab && tab[0] !== '#') { tab = '#' + tab; }
+        if (tab) { window.location.hash = tab; }
+      })();
+    <% end %>
   </script>
 </div>
