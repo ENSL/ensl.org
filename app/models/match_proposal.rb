@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: match_proposals
@@ -62,7 +64,7 @@ class MatchProposal < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser && cuser.admin?
+    cuser&.admin?
   end
 
   def state_immutable?
@@ -98,7 +100,7 @@ class MatchProposal < ActiveRecord::Base
     end
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:match_proposal).permit(:status, :match_id, :team_id, :proposed_time)
   end
 end
