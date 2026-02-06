@@ -1,2 +1,7 @@
-$("#reply").find("textarea").val("").end().hide();
+$("#reply-errors").html("");
+$("#reply-form")[0].reset();
+$("#reply").fadeOut('fast');
 $("#posts").append("<%= escape_javascript(render(partial: 'post', locals: { post: @post, n: -1 })) %>");
+$(".fastReply").removeClass('invisible');
+bindLocalHandlers();
+

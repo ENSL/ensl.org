@@ -69,6 +69,8 @@ en:
   polls_update: "Poll was successfully updated."
   posts_create: "Post was successfully created."
   posts_update: "Post was successfully updated."
+  posts_destroy: "Post was successfully deleted."
+  posts_trash: "Post was successfully trashed."
   predictions_create: "Prediction was successfully created."
   servers_updated: "Servers updated."
   servers_create: "Server was successfully created."

@@ -230,6 +230,7 @@ div#categories {
     background: $content-color;
     padding: 20px;
     box-shadow: $light-shadow;
+    position: relative;
 
     .avatar {
       @include span-columns(3);
@@ -284,6 +285,16 @@ div#categories {
       }
     }
 
+    .controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+
+      a:last-child {
+        margin-right: 0;
+      }
+    }
+
     .base {
       @include span-columns(12);
       padding-top: 20px;
@@ -296,17 +307,6 @@ div#categories {
       .signature {
         @include span-columns(9);
         @include omega;
-        position: relative;
-
-        .controls {
-          position: absolute;
-          top: 0;
-          right: 0;
-
-          a:last-child {
-            margin-right: 0;
-          }
-        }
       }
     }
   }

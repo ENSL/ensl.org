@@ -1,0 +1,1 @@
+$("#reply-errors").html("<%= escape_javascript(render('shared/errors', messages: @newpost.error_messages, container_id: 'reply-errors')) %>");

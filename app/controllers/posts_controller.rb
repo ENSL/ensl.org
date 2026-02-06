@@ -30,6 +30,9 @@ class PostsController < ApplicationController
         format.js { render }
         format.html { return_to }
       else
+        # For AJAX/fast reply, render errors as JSON/JS
+        @newpost = @post
+        format.js { render action: 'create_error' }
         format.html { render :new }
       end
     end
@@ -40,7 +43,7 @@ class PostsController < ApplicationController
 
     if @post.update(Post.params(params, cuser))
       flash[:notice] = t(:posts_update)
-      safe_redirect_to(polymorphic_path(@post.topic))
+      redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}")
     else
       render :edit
     end
@@ -50,7 +53,8 @@ class PostsController < ApplicationController
     raise AccessError unless @post.can_destroy? cuser
 
     @post.trash
-    path = if @post.topic.exists?
+    flash[:notice] = t(:posts_trash)
+    path = if @post.topic&.persisted?
              polymorphic_path(@post.topic)
            else
              polymorphic_path(@post.topic.forum)
@@ -62,7 +66,8 @@ class PostsController < ApplicationController
     raise AccessError unless @post.can_destroy? cuser
 
     @post.destroy
-    path = if @post.topic.exists?
+    flash[:notice] = t(:posts_destroy)
+    path = if @post.topic&.persisted?
              polymorphic_path(@post.topic)
            else
              polymorphic_path(@post.topic.forum)

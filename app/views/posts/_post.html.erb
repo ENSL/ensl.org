@@ -14,24 +14,22 @@
 
     <dl>
       <% if post.user.groups.count > 0 %>
-      <dd>
-        <% if post.user.admin?%>
+        <% if post.user.admin? %>
           <dt><%= namelink Group.find(Group::ADMINS) %></dt>
-          <dd><%=  post.user.groupers.where(:group_id => Group::ADMINS).first.task %></dd>
-        <% elsif post.user.staff?%>
+          <dd><%= post.user.groupers.where(:group_id => Group::ADMINS).first.task %></dd>
+        <% elsif post.user.staff? %>
           <dt><%= namelink Group.find(Group::STAFF) %></dt>
-          <dd><%=  post.user.groupers.where(:group_id => Group::STAFF).first.task %></dd>
-        <% elsif post.user.caster?%>
+          <dd><%= post.user.groupers.where(:group_id => Group::STAFF).first.task %></dd>
+        <% elsif post.user.caster? %>
           <dt><%= namelink Group.find(Group::CASTERS) %></dt>
-          <dd><%=  post.user.groupers.where(:group_id => Group::CASTERS).first.task %></dd>
-        <% elsif post.user.ref?%>
+          <dd><%= post.user.groupers.where(:group_id => Group::CASTERS).first.task %></dd>
+        <% elsif post.user.ref? %>
           <dt><%= namelink Group.find(Group::REFEREES) %></dt>
-          <dd><%=  post.user.groupers.where(:group_id => Group::REFEREES).first.task %></dd>
+          <dd><%= post.user.groupers.where(:group_id => Group::REFEREES).first.task %></dd>
         <% else %>
           <dt><%= namelink Group.find(post.user.groupers.first.group_id) %></dt>
-          <dd><%=  post.user.groupers.first.task %></dd>
-      <% end %>
-      </dd>
+          <dd><%= post.user.groupers.first.task %></dd>
+        <% end %>
       <% end %>
       <dt>Posts</dt>
       <dd><%= post.user.posts.count %></dd>
@@ -45,7 +43,7 @@
   <div class="content">
     <div class="header">
       <div class="time">
-        <span id="post_<%= post.id %>">
+        <span id="post_time_<%= post.id %>">
           <%= longertime post.created_at %>
         </span>
       </div>
@@ -59,27 +57,33 @@
     </div>
   </div>
 
+  <div class="controls">
+    <% if post.topic.posts.build.can_create? cuser %>
+       <%= link_to 'Quote', '#', data:{on: :click, call: 'QuoteText', args: "#{post.id}"}, class: 'button tiny' %>
+    <% end %>
+    <% if post.can_update? cuser %>
+      <%= link_to 'Edit', edit_post_path(post), class: 'button tiny' %>
+    <% end %>
+    <% if post.can_destroy? cuser %>
+      <%= link_to 'Delete', post, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'button tiny' %>
+    <% end %>
+  </div>
+
   <div class="base">
     <div class="user">
-      <% if cuser && Message.new.can_create?(cuser) && post.user.present? && post.user != cuser %>
-        <%= link_to "Send PM", new_message_path(id: 'User', id2: post.user.id), class: 'button tiny' %>
+      <% if cuser && post.user.present? && post.user != cuser %>
+        <% begin %>
+          <% if Message.new.can_create?(cuser) %>
+            <%= link_to "Send PM", new_message_path(id: 'User', id2: post.user.id), class: 'button tiny' %>
+          <% end %>
+        <% rescue => e %>
+          <!-- Send PM not available -->
+        <% end %>
       <% end %>
     </div>
     
     <div class="signature">
       <%= sanitize(post.user.profile.signature_parsed) if post.user.profile.signature_parsed %>
-      
-      <div class="controls">
-        <% if post.topic.posts.build.can_create? cuser %>
-          <%= link_to '#', data:{on: :click, call: 'QuoteText', args: "#{post.id}"}, class: 'button tiny' %>
-        <% end %>
-        <% if post.can_update? cuser %>
-          <%= link_to 'Edit', edit_post_path(post), class: 'button tiny' %>
-        <% end %>
-        <% if post.can_destroy? cuser %>
-          <%= link_to 'Delete', post, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
-        <% end %>
-      </div>
     </div>
   </div>
 </div>

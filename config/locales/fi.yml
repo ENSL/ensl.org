@@ -61,6 +61,8 @@
   polls_update: "Äänestys on päivitetty."
   posts_create: "Postaus on luotu."
   posts_update: "Postaus on päivitetty."
+  posts_destroy: "Postaus on poistettu."
+  posts_trash: "Postaus on siirretty roskakoriin."
   predictions_create: "Ennuste on luotu."
   servers_update: "Palvelimet on päivitetty"
   invalid_message: "Viesti on virheellinen."

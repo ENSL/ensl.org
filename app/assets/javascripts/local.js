@@ -35,12 +35,12 @@ function bindLocalHandlers() {
   });
 
   // Forums fast reply
-  $(document).off('click', 'a.fastReply');
-  $(document).on('click', 'a.fastReply', function() {
-    $('#reply').fadeIn('fast',
-    function() {
-      $(this).focus();
-      $("a.fastReply").hide();
+  $(document).off('click', '.fastReply');
+  $(document).on('click', '.fastReply', function(e) {
+    e.preventDefault();
+    $('#reply').fadeIn('fast', function() {
+      $(this).find('textarea').focus();
+      $(".fastReply").addClass('invisible');
     });
   });
 

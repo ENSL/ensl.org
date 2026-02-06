@@ -34,11 +34,12 @@
     <% end %>
   </div>
 
-  <div id="reply">
+  <div id="reply" style="display: none;">
     <h5>New Reply</h5>
     
-    <%= form_for(@newpost, remote: true, html: { class: 'square' }) do |f| %>
-      <%= f.error_messages %>
+    <div id="reply-errors"></div>
+    
+    <%= form_for(@newpost, remote: true, html: { class: 'square', id: 'reply-form' }) do |f| %>
       <%= f.hidden_field :topic_id %>
       <div class="fields horizontal">
         <%= f.label "Enter your post text:" %>
@@ -54,7 +55,7 @@
 
   <div>
     <% if @newpost.can_create? cuser %>
-      <%= link_to 'Fast Reply', "#999", class: 'button fastReply' %>
+      <button class="button fastReply" type="button">Fast Reply</button>
       <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>
     <% end %>
     <% if @topic.can_update? cuser %>
