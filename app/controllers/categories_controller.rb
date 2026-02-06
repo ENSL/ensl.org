@@ -1,12 +1,12 @@
 class CategoriesController < ApplicationController
-  before_action :get_category, except: [:index, :new, :create]
+  before_action :get_category, except: %i[index new create]
 
   def show
-    if [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
-      @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
-      Category.find(params[:id]).mark_as_read! for: cuser if cuser
-      render partial: 'articles/article', collection: @articles.to_a
-    end
+    return unless [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
+
+    @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
+    Category.find(params[:id]).mark_as_read! for: cuser if cuser
+    render partial: 'articles/article', collection: @articles.to_a
   end
 
   def index
@@ -32,32 +32,38 @@ class CategoriesController < ApplicationController
       flash[:notice] = t(:articles_category)
       redirect_to :categories
     else
-      render action: :new
+      respond_with_validation_errors(@category, template: :new)
     end
   end
 
   def update
     raise AccessError unless @category.can_update? cuser
+
     if @category.update Category.params(params, cuser)
       flash[:notice] = t(:articles_category_update)
       redirect_to :categories
+    else
+      respond_with_validation_errors(@category, template: :edit)
     end
   end
 
   def up
     raise AccessError unless @category.can_update? cuser
+
     @category.move_up(Category.where(domain: @category.domain), 'sort')
     redirect_to :categories
   end
 
   def down
     raise AccessError unless @category.can_update? cuser
+
     @category.move_down(Category.where(domain: @category.domain), 'sort')
     redirect_to :categories
   end
 
   def destroy
     raise AccessError unless @category.can_destroy? cuser
+
     @category.destroy
     redirect_to :categories
   end

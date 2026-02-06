@@ -9,10 +9,14 @@ FactoryBot.define do
   end
 
   trait :game do
-    domain Category::DOMAIN_GAMES
+    domain { Category::DOMAIN_GAMES }
   end
 
   trait :forums do
-    domain Category::DOMAIN_FORUMS
+    domain { Category::DOMAIN_FORUMS }
+  end
+
+  trait :articles do
+    domain { Category::DOMAIN_ARTICLES }
   end
 end

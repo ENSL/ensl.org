@@ -1,7 +1,9 @@
 <h1>Editing Category</h1>
 
 <%= form_for @category, html: { class: 'square' } do |f| %>
-  <%= render 'shared/errors', messages: @category.errors.full_messages %>
+  <div id="<%= error_wrapper_id_for(@category) %>">
+    <%= render 'shared/errors', messages: @category.errors.full_messages, container_id: error_container_id_for(@category) %>
+  </div>
 
   <div class="fields horizontal">
     <%= f.label :name %>

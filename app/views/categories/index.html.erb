@@ -14,8 +14,8 @@
           <tr>
             <td><%=h category.name %></td>
             <td class="actions">
-              <%= link_to icon('chevron-up'), controller: :categories, action: "up", id: category.id %>
-              <%= link_to icon('chevron-down'), controller: :categories, action: "down", id: category.id %>
+              <%= link_to icon('chevron-up'), up_category_path(category), method: :patch %>
+              <%= link_to icon('chevron-down'), down_category_path(category), method: :patch %>
               <%= link_to icon('pencil'), edit_category_path(category) %>
               <%= link_to icon('times'), category, :confirm => 'Are you sure?', :method => :delete %>
             </td>

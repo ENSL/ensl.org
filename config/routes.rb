@@ -42,7 +42,12 @@ Rails.application.routes.draw do
   end
 
   resources :log_events
-  resources :categories
+  resources :categories do
+    member do
+      patch :up
+      patch :down
+    end
+  end
   resources :polls do
     member do
       get :showvotes, path: 'showvotes'
