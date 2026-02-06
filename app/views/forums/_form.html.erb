@@ -36,7 +36,7 @@
           <td>
             <%= form_for forumer, html: { id: "edit_forumer_#{forumer.id}" } do |g| %>
               <div class="fields">
-                <%= g.select :access, forumer.accesses.invert, size: 20 %>
+                <%= g.select :access, Forumer.accesses.invert %>
               </div>
             <% end %>
           </td>
@@ -56,7 +56,7 @@
       <div class="fields permissions">
         <h4>Grant Access</h4>
         <%= f.select :group_id, Group.all.collect{|g| [g, g.id]} %>
-        <%= f.select :access, f.object.accesses.invert, :size => 20 %>
+        <%= f.select :access, Forumer.accesses.invert %>
       </div>
       <div class="controls">
         <%= f.submit "Add" %>  

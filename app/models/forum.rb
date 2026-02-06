@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: forums
@@ -15,6 +17,7 @@
 #  index_forums_on_category_id  (category_id)
 #
 
+# Model for a discussion forum.
 class Forum < ActiveRecord::Base
   include Extra
 
@@ -59,15 +62,15 @@ class Forum < ActiveRecord::Base
   end
 
   def can_create?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.available_to(cuser, level)
@@ -83,7 +86,7 @@ class Forum < ActiveRecord::Base
                 id IN (SELECT q.id from (#{Forum.public_forums.to_sql}) q )")
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:forum).permit(:description, :position, :title, :category_id)
   end
 end
