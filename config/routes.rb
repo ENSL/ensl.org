@@ -31,7 +31,7 @@ Rails.application.routes.draw do
   resources :contests do
     collection do
       get :current
-      get :del_map
+      delete :del_map
       get :scores
       get :historical, path: 'historical(/:id)'
     end

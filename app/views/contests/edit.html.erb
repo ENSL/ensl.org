@@ -139,7 +139,7 @@
                     <td><%= h map.download %></td>
                     <td class="actions">
                         <%= link_to icon('pencil'), edit_map_path(map) %>
-                        <%= button_to icon('times'), del_map_contests_path(id: @contest.id, id2: map.id), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to icon('times'), del_map_contests_path(id: @contest.id, id2: map.id), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>
@@ -183,10 +183,10 @@
                     <td class="actions">
                         <% if contester.active %>
                         <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                        <%= button_to icon('times'), contester_path(contester), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to icon('times'), contester_path(contester), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                         <% else %>
                         <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                        <%= button_to icon('rotate-left'), contester_path(contester), method: :patch, params: { contester: { active: 1 } }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to icon('rotate-left'), contester_path(contester), method: :patch, params: { contester: { active: 1 } }, form: { style: 'display:inline;margin:0;' } %>
                         <% end %>
                     </td>
                 </tr>
@@ -226,7 +226,7 @@
                     <td><%= h week.map2 %></td>
                     <td class="actions">
                         <%= link_to icon('pencil'), edit_week_path(week) %>
-                        <%= button_to icon('times'), week_path(week), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to icon('times'), week_path(week), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>

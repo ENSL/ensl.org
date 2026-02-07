@@ -82,19 +82,23 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     visit edit_contest_path(contest)
     find("a[href='#teams']").click
     expect(page).to have_css('#teams table.teams')
+
+    # Delete from the teams table action link for the created team row
     within('#teams') do
       row = find('tr', text: contester.team.name, visible: :all)
       within(row) do
-        delete_link = find('a[data-submit-form]', visible: :all)
-        form = delete_link.find_xpath('ancestor::form').first
-        form_id = form[:id]
-        page.execute_script('window._orig_confirm = window.confirm; window.confirm = function(){return true};')
-        page.execute_script("document.getElementById('#{form_id}').submit();")
-        page.execute_script('if(window._orig_confirm) window.confirm = window._orig_confirm')
+        accept_confirm do
+          find("a[data-method='delete']").click
+        end
       end
     end
 
     expect(page).to have_current_path(edit_contest_path(contest))
+    expect(page).to have_text(I18n.t(:contests_contester_destroy))
+    contester.reload
+    expect(contester.active).to be(false)
+    expect(Contester.active.exists?(contester.id)).to be(false)
+
     # ensure we have a fresh rendering of the contest edit page (avoid stale client DOM)
     visit edit_contest_path(contest)
     find("a[href='#teams']").click
