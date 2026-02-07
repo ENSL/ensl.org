@@ -31,4 +31,6 @@ RSpec.configure do |config|
   config.include Features::ServerHelpers,  type: :system
   config.include Features::GatherHelpers,  type: :feature
   config.include Features::GatherHelpers,  type: :system
+  config.include Features::ContestsHelpers, type: :feature
+  config.include Features::ContestsHelpers, type: :system
 end

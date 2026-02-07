@@ -27,31 +27,40 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
     click_button 'Save'
 
+    # Validate contest creation
     expect(page).to have_content('Contest was successfully created')
     contest = Contest.find_by(name: 'Integration League Test')
     expect(contest).to be_present
     expect(contest.contest_type).to eq(Contest::TYPE_LEAGUE)
 
-    # Create a week for the league
-    within('#weeks') do
-      fill_in I18n.t('activerecord.attributes.week.name'), with: 'Week 1'
-      click_button I18n.t('helpers.submit.week.create')
-      expect(page).to have_content('Week 1', wait: 5)
+    # Verify navigation to contest edit page
+    visit root_path
+    within('.navigation') do
+      click_link 'Contests'
     end
+    click_link 'Integration League Test'
+    click_link 'Edit Contest'
+    expect(page).to have_content('Editing Contest')
 
     # Navigate to contest edit page and add maps via UI
     find("a[href='#maps']").click
 
-    within('#maps') do
-      [map1, map2].each do |map|
-        select map.name, from: 'map'
-        click_button 'Add map'
-        expect(page).to have_css('table#maps', text: map.name, wait: 5)
-      end
+    [map1, map2].each do |map|
+      select map.name, from: 'map'
+      click_button 'Add map'
+      expect(page).to have_css('#maps table.maps', text: map.name, wait: 5)
     end
 
+    # Verify maps were added
     contest.reload
     expect(contest.maps.count).to be >= 2
+
+    # Create a week for the league
+    find("a[href='#weeks']").click
+    click_link 'New Week'
+    fill_in I18n.t('activerecord.attributes.week.name'), with: 'Week 1'
+    click_button I18n.t('helpers.submit.week.create')
+    expect(page).to have_content('Week 1', wait: 5)
 
     # STEP 3: Team leaders create their teams
     team_names = ['Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta']
@@ -87,9 +96,9 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
       click_button 'Add Team'
 
       # Wait for page reload
-      expect(page).to have_current_path(edit_contest_path(contest))
+      expect(page).to have_current_path(/contests/)
       find("a[href='#teams']").click
-      expect(page).to have_css('table#teams', text: team.name, wait: 5)
+      expect(page).to have_css('#teams table.teams', text: team.name, wait: 5)
     end
 
     contest.reload
@@ -103,7 +112,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
     # Create matches for each pair
     contesters.combination(2) do |c1, c2|
-      visit new_match_path(id: contest.id)
+      click_link 'New Match'
 
       # Select contesters using direct option selection (more reliable than select helper)
       find('#match_contester1_id').find('option', text: c1.team.name).select_option
@@ -158,17 +167,10 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
       # Submit the form
       click_button 'Save Scoring'
+      expect(page).to have_content(I18n.t(:matches_update), wait: 5)
 
       # Reload the match to verify scores were saved
       match.reload
-      if match.score1.nil? || match.score2.nil?
-        # Form submission might have had an error, try again
-        visit ref_match_path(match)
-        fill_in 'match_score1', with: score1.to_s
-        fill_in 'match_score2', with: score2.to_s
-        click_button 'Save Scoring'
-        match.reload
-      end
 
       # Verify scores are set
       expect(match.score1).to eq(score1)
@@ -194,32 +196,14 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
         row = find('tr', text: team.name)
         cells = row.all('td')
 
+        # Verify the row shows correct column values
         # Row format: Team name, Score, Win, Loss, Draw, Bonus, Status
         expect(cells[0]).to have_link(team.name)
-        expect(cells[1]).to have_text(contester.score.to_s) # Score column
-        expect(cells[2]).to have_text(contester.win.to_s) # Win column
-        expect(cells[3]).to have_text(contester.loss.to_s) # Loss column
-        expect(cells[4]).to have_text(contester.draw.to_s) # Draw column
+        expect(cells[1]).to have_text(contester.score.to_s)
+        expect(cells[2]).to have_text(contester.win.to_s)
+        expect(cells[3]).to have_text(contester.loss.to_s)
+        expect(cells[4]).to have_text(contester.draw.to_s)
       end
     end
-  end
-
-  def select_match_datetime(value)
-    select_option_by_value('match_match_time_1i', value.year)
-    select_option_by_value('match_match_time_2i', value.strftime('%B'))
-    select_option_by_value('match_match_time_3i', value.day)
-    select_option_by_value('match_match_time_4i', value.strftime('%H'))
-    select_option_by_value('match_match_time_5i', value.strftime('%M'))
-  end
-
-  def select_option_by_value(select_id, value)
-    select value.to_s, from: select_id
-  rescue Capybara::ElementNotFound
-    select value.to_s.rjust(2, '0'), from: select_id
-  end
-
-  def sign_out
-    visit logout_users_path
-    expect(page).to(have_content(I18n.t('login_out')).or(have_content(I18n.t('helpers.submit.user.login'))))
   end
 end

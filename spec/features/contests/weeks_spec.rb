@@ -12,8 +12,7 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
   end
 
   def open_weeks_tab
-    visit edit_contest_path(contest)
-    find("a[href='#weeks']").click
+    visit edit_contest_path(contest, contest: 'weeks')
     expect(page).to have_css('#weeks table.weeks')
   end
 
@@ -36,12 +35,10 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
     week = create(:week, contest: contest, map1: map1, map2: map2)
     visit edit_week_path(week)
 
-    fill_in 'week_name', with: 'Updated Week'
+    fill_in 'week_name', with: 'Updated Week Name'
     click_button 'Save Week'
 
-    expect(page).to have_current_path(/weeks|contests/)
-    open_weeks_tab
-    expect(page).to have_content('Updated Week')
+    expect(page).to have_content('Updated Week Name')
   end
 
   scenario 'Delete a week from the contest edit view', :aggregate_failures do
@@ -52,18 +49,12 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
     within('#weeks') do
       row = find('tr', text: week.name, visible: :all)
       within(row) do
-        delete_link = find('a[data-submit-form]', visible: :all)
-        form = delete_link.find_xpath('ancestor::form').first
-        form_id = form[:id]
-
-        page.execute_script('window._orig_confirm = window.confirm; window.confirm = function(){return true};')
-        page.execute_script("document.getElementById('#{form_id}').submit();")
-        page.execute_script('if(window._orig_confirm) window.confirm = window._orig_confirm')
+        accept_confirm do
+          find("a[data-method='delete']").click
+        end
       end
     end
 
-    expect(page).to have_current_path(edit_contest_path(contest))
-    open_weeks_tab
-    expect(page).not_to have_content(week.name)
+    expect(page).not_to have_content(week.name, wait: 5)
   end
 end

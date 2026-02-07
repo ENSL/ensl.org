@@ -39,7 +39,10 @@ RSpec.feature 'Matches management', type: :feature, js: true do
     click_button 'Save Match'
 
     expect(page).to have_current_path(/matches|contests/) # redirected to match or contest edit
+
+    # Not necessary
     find("a[href='#matches']").click
+
     expect(page).to have_css('#matches table.matches')
     within('#matches') do
       expect(page).to have_content(contester1_opt[:text])
