@@ -135,6 +135,9 @@ group :test do
   # FIXME: Downgraded b/c of deprecations, fix static attributes
   gem 'factory_bot_rails', '4.10.0'
 
+  # Model matchers for associations and validations
+  gem 'shoulda-matchers'
+
   # Feature testing.
   # Capybara for integration testing
   # Apparition for headless browser testing

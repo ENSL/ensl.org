@@ -553,6 +553,8 @@ GEM
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     sexp_processor (4.17.4)
+    shoulda-matchers (7.0.1)
+      activesupport (>= 7.1)
     signet (0.11.0)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -707,6 +709,7 @@ DEPENDENCIES
   scrypt
   selenium
   selenium-webdriver
+  shoulda-matchers
   signet (= 0.11.0)
   simplecov
   steam-condenser!
