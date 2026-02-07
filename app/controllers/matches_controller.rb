@@ -41,7 +41,7 @@ class MatchesController < ApplicationController
 
     if @match.save
       flash[:notice] = t(:matches_create)
-      redirect_to edit_contest_path(@match.contest)
+      redirect_to edit_contest_path(@match.contest, contest: 'matches')
     else
       flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
       render :new, status: :unprocessable_entity

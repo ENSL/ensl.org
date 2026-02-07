@@ -84,7 +84,7 @@ class ContestsController < ApplicationController
       else
         @contest.maps << map unless @contest.maps.include?(map)
         flash[:notice] = t(:maps_update)
-        redirect_to edit_contest_path(@contest, anchor: 'maps')
+        redirect_to edit_contest_path(@contest, contest: 'maps')
       end
     elsif update_type == 'team'
       contester = Contester.new
@@ -110,7 +110,7 @@ class ContestsController < ApplicationController
     else
       flash[:error] = t(:error)
     end
-    redirect_to edit_contest_path(@contest, anchor: 'maps')
+    redirect_to edit_contest_path(@contest, contest: 'maps')
   end
 
   def destroy

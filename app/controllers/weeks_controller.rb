@@ -17,7 +17,7 @@ class WeeksController < ApplicationController
 
     if @week.save
       flash[:notice] = t(:weeks_create)
-      redirect_to @week.contest
+      redirect_to edit_contest_path(@week.contest, contest: 'weeks')
     else
       flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
       render :new, status: :unprocessable_entity
@@ -29,7 +29,7 @@ class WeeksController < ApplicationController
 
     if @week.update(Week.params(params, cuser))
       flash[:notice] = t(:weeks_update)
-      redirect_to @week.contest
+      redirect_to edit_contest_path(@week.contest, contest: 'weeks')
     else
       flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
       render :edit, status: :unprocessable_entity
@@ -41,7 +41,7 @@ class WeeksController < ApplicationController
 
     @week.destroy
     flash[:notice] = t(:weeks_destroy)
-    redirect_to edit_contest_path(@week.contest, anchor: 'weeks')
+    redirect_to edit_contest_path(@week.contest, contest: 'weeks')
   end
 
   private

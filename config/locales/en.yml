@@ -134,6 +134,9 @@ en:
         new: "New Article"
         create: "Create Article"
         update: "Update Article"
+      week:
+        create: "Save Week"
+        update: "Update Week"
   activerecord:
     models:
       gather: "Gather"
@@ -145,6 +148,8 @@ en:
         email: "Email"
         raw_password: "Password"
         steamid: "Steam ID"
+      week:
+        name: "Name"
     errors:
       models:
         user:
