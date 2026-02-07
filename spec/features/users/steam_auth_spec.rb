@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Steam authentication link', type: :feature do
+RSpec.describe 'Steam authentication link', type: :feature, js: true do
   it 'renders a steam-login anchor and a hidden steam form' do
     visit root_path
 

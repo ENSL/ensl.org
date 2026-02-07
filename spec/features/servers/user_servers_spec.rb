@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'User created servers' do
+feature 'User created servers', js: true do
   let!(:user) { create :user }
 
   background do

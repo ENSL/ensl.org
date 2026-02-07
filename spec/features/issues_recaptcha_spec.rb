@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.feature 'Issues reCAPTCHA', type: :feature do
+RSpec.feature 'Issues reCAPTCHA', type: :feature, js: true do
   let!(:category) { create(:category, domain: Category::DOMAIN_ISSUES, name: 'TestIssues') }
 
   scenario 'anonymous user submits issue with valid reCAPTCHA' do
-    allow_any_instance_of(ApplicationController).to receive(:verify_recaptcha).and_return(true)
+    allow_any_instance_of(IssuesController).to receive(:verify_recaptcha).and_return(true)
 
     visit new_issue_path
     fill_in 'Title', with: 'Feature test issue'
@@ -12,13 +12,12 @@ RSpec.feature 'Issues reCAPTCHA', type: :feature do
     fill_in 'Text', with: 'This is a test issue body'
     expect do
       click_button 'Submit'
+      expect(page).to have_content(I18n.t('issues_create'), wait: 5)
     end.to change { Issue.count }.by(1)
-
-    expect(page).to have_content(I18n.t('issues_create'))
   end
 
   scenario 'anonymous user submits issue with invalid reCAPTCHA' do
-    allow_any_instance_of(ApplicationController).to receive(:verify_recaptcha).and_return(false)
+    allow_any_instance_of(IssuesController).to receive(:verify_recaptcha).and_return(false)
 
     visit new_issue_path
     fill_in 'Title', with: 'Feature test issue'

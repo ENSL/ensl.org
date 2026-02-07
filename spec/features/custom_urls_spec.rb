@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature 'CustomUrls administrate', type: :feature do
+RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
   let!(:category) { FactoryBot.create(:category, :news) }
   let!(:author) { FactoryBot.create(:user) }
   let!(:article) { FactoryBot.create(:article, title: 'Test Article', user: author, category: category) }

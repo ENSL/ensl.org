@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-feature 'User reads forums' do
-  before :all do
+feature 'User reads forums', js: true do
+  before do
     create_list(:forum, 5, :with_content)
   end
 
