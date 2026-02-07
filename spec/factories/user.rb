@@ -31,6 +31,13 @@ FactoryBot.define do
       end
     end
 
+    trait :referee do
+      after(:create) do |user|
+        group = create(:group, :ref)
+        create :grouper, user: user, group: group
+      end
+    end
+
     trait :chris do
       steamid '0:1:58097444'
     end

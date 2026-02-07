@@ -50,6 +50,7 @@ en:
   maps_update: "Map was successfully updated."
   matches_create: "Match was successfully created."
   matches_update: "Match was successfully updated."
+  matches_destroy: "Match was successfully deleted."
   hltv_send: "Send HLTV"
   hltv_move: "Move HLTV"
   hltv_stop: "Stop HLTV"
