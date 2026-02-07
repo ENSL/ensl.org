@@ -52,7 +52,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
       click_button 'Update'
     end
 
-    visit edit_team_path(team)
+    expect(page).to have_content('Team was successfully updated.')
     expect(page).to have_field('team_name', with: new_name)
   end
 

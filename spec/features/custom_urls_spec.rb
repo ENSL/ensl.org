@@ -8,11 +8,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
   scenario 'admin creates a custom url and the slug routes to the article' do
     admin = FactoryBot.create(:user, :admin)
 
-    # Login as admin via the login form
-    visit '/users/login'
-    fill_in 'login[username]', with: admin.username
-    fill_in 'login[password]', with: admin.raw_password
-    click_button 'Login'
+    sign_in_via_session(admin)
 
     visit '/custom_urls'
     expect(page).to have_content('Custom URLs - Admin Panel')
