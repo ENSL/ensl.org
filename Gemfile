@@ -118,14 +118,16 @@ group :development do
   # Does not support AR 8 yet
   # gem 'annotate'
 
-  # error message
+  # Error message and console in browser
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'web-console'
+
+  # For converting erb to haml when needed
+  gem 'erb2haml'
 end
 
 group :test do
-  # FIXME: Use dev versions because of rspec bug
   gem 'rspec-core'
   gem 'rspec-expectations'
   gem 'rspec-mocks'
@@ -140,30 +142,20 @@ group :test do
 
   # Feature testing.
   # Capybara for integration testing
-  # Apparition for headless browser testing
-  # Selenium for real browser testing
+  # Playwright for headless browser testing
   gem 'apparition'
   gem 'capybara'
-  gem 'selenium'
-  gem 'selenium-webdriver'
-  # gem 'poltergeist'
-  # gem 'phantomjs', require: 'phantomjs/poltergeist'
-
-  # Fix FF issue
-  # gem 'geckodriver-helper'
-
-  # Fix legacy issue
-  gem 'rails-controller-testing'
-
-  # Coverage
-  gem 'simplecov', require: false
-  gem 'timecop'
+  gem 'capybara-playwright-driver'
+  gem 'playwright-ruby-client'
 
   # HTML5 validation
   gem 'capybara-validate_html5'
 
-  # Do I need this?
-  gem 'test-unit'
+  # Coverage
+  gem 'simplecov', require: false
+
+  # Time helpers for testing time-dependent features
+  gem 'timecop'
 
   # For JS test
   gem 'mime-types'
@@ -179,12 +171,24 @@ group :test do
   # Block external HTTP in tests
   gem 'webmock'
 
+  # Fix legacy issue
+  gem 'rails-controller-testing'
+
   # Flaky tests
   # gem 'rspec-flaky'
 
   # For circle ci + CC
   # gem 'codeclimate-test-reporter', require: nil
   # gem 'rspec_junit_formatter'
+
+  # Old drivers not used atm.
+  # gem 'selenium'
+  # gem 'selenium-webdriver'
+  # gem 'poltergeist'
+  # gem 'phantomjs', require: 'phantomjs/poltergeist'
+
+  # Fix FF issue
+  # gem 'geckodriver-helper'
 end
 
 group :development, :test do
@@ -212,6 +216,4 @@ group :development, :test do
 
   # For n+1 query detection
   # gem 'bullet'
-
-  gem 'erb2haml'
 end

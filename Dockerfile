@@ -9,6 +9,9 @@ ENV NVM_INSTALL_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install
 ENV GEM_HOME=/var/bundle
 ENV GEM_PATH=/var/bundle
 ENV PATH=/var/bundle/bin:/usr/local/bundle/bin:${PATH}
+ENV BUNDLE_WITHOUT=
+ENV BUNDLE_WITH=
+ENV BUNDLER_VERSION=4.0.6
 
 RUN \
     # Add web
@@ -37,7 +40,7 @@ RUN \
     # Fix URI startup issue && \
     gem update --system && \
     # Install bundler and bundle path
-    gem install bundler && \
+    gem install bundler -v $BUNDLER_VERSION && \
     mkdir -p /var/bundle /usr/local/bundle && chown -R web:web /var/bundle /usr/local/bundle && \
     # Install nvm, Node (LTS) and yarn (installed via npm global)
     mkdir -p $NVM_DIR && \
@@ -48,6 +51,7 @@ RUN \
     NODE_VERSION=$(ls -1 $NVM_DIR/versions/node | tail -n 1) && \
     ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/local/bin/node && \
     ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/local/bin/npm && \
+    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/npx /usr/local/bin/npx && \
     # Make nvm available for all users/shells
     echo "export NVM_DIR=$NVM_DIR" > /etc/profile.d/nvm.sh && \
     echo "[ -s $NVM_DIR/nvm.sh ] && . $NVM_DIR/nvm.sh" >> /etc/profile.d/nvm.sh && \
@@ -58,14 +62,23 @@ RUN \
     # Clean up
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
+# Install Playwright dependencies for Chromium
+RUN npx playwright install-deps chromium
+
 # Cache bundle installs
 USER web
 WORKDIR /var/www
 COPY --chown=web Gemfile Gemfile.lock /var/www/
 
-RUN bundle config github.https true && \
+RUN bundle config set github.https true && \
     bundle config set path '/var/bundle' && \
+    bundle config unset without && \
+    bundle config unset with && \
+    bundle config set with 'test' && \
     bundle install --jobs 8
+
+# Install Playwright browsers via Node CLI (independent of Ruby gem)
+RUN npx playwright install chromium
 
 #
 # Production

@@ -4,6 +4,11 @@ RSpec.configure do |config|
   config.after(:each, type: :feature) do |example|
     next unless example.exception
 
+    # Only attempt to save failure artifacts if a driver is available
+    unless Capybara.current_driver && Capybara.current_driver != Capybara.default_driver
+      next
+    end
+
     failures_dir = Rails.root.join('tmp', 'rspec_failures')
     FileUtils.mkdir_p(failures_dir)
 
@@ -12,8 +17,12 @@ RSpec.configure do |config|
     base = failures_dir.join("#{timestamp}-#{name}")
 
     # Save HTML
-    if defined?(page) && page.respond_to?(:html)
-      File.open(base.to_s + '.html', 'wb') { |f| f.write(page.html) }
+    begin
+      if defined?(page) && page.respond_to?(:html)
+        File.open(base.to_s + '.html', 'wb') { |f| f.write(page.html) }
+      end
+    rescue StandardError => e
+      File.open(base.to_s + '.html_error.txt', 'w') { |f| f.write(e.message) }
     end
 
     # Save screenshot
@@ -68,3 +77,4 @@ RSpec.configure do |config|
   #   end
   # end
 end
+

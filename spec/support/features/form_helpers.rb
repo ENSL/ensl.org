@@ -17,7 +17,8 @@ module Features
       while Time.now - start < wait
         begin
           present = page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
-        rescue Selenium::WebDriver::Error::WebDriverError
+        rescue StandardError
+          # Catch any driver errors (Playwright or otherwise) during script evaluation
           present = false
         end
 

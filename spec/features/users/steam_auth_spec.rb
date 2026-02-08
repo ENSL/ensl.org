@@ -14,7 +14,7 @@ RSpec.describe 'Steam authentication link', type: :feature, js: true do
 
     visit root_path
 
-    # click the steam image inside the link so Selenium can interact reliably
+    # click the steam image inside the link so Capybara can interact reliably
     find('a.steam-login img').click
 
     # should land on registration page for Steam-linked account

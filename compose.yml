@@ -84,12 +84,13 @@ services:
       - memcached
       - selenium
 
-  selenium:
-    image: selenium/standalone-chrome-debug
-    profiles: ["test"]
-    ports:
-      - "5900:5900"
-      - "4444:4444"
+  # selenium:
+  #   image: selenium/standalone-chrome-debug
+  #   profiles: ["test"]
+  #   ports:
+  #     - "5900:5900"
+  #     - "4444:4444"
+  #   shm_size: 2gb
 
   #
   # Common services: These are shared by all envs.

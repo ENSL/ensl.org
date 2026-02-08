@@ -9,7 +9,6 @@ RSpec.feature 'Topic locks', type: :feature, js: true do
   let!(:topic) { create(:topic, forum: forum, user: user) }
 
   before do
-    Capybara.javascript_driver = :selenium_chrome_headless
   end
 
   scenario 'admin locks and unlocks a topic from the topic page' do

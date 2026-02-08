@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.feature 'Gather admin actions', type: :feature, js: true do
   before(:all) do
-    Capybara.javascript_driver = :selenium_chrome_headless
     Capybara.default_max_wait_time = 5
   end
 

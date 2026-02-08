@@ -12,9 +12,6 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
   end
 
   scenario 'user votes on a poll' do
-    # ensure JS driver
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     user = FactoryBot.create(:user)
     sign_in_via_session(user)
 
@@ -32,8 +29,6 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
   end
 
   scenario 'user cannot vote twice and options are disabled after voting' do
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     user = FactoryBot.create(:user)
 
     # login

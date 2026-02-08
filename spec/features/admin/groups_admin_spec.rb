@@ -21,7 +21,6 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
   let(:user3) { FactoryBot.create(:user, username: 'testuser3', firstname: 'Test', lastname: 'User Three') }
 
   before do
-    Capybara.javascript_driver = :selenium_chrome_headless
   end
 
   scenario 'admin creates a new custom group' do

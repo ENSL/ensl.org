@@ -2,8 +2,6 @@ require 'rails_helper'
 
 RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
   scenario 'admin creates a poll with options via the admin UI' do
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     admin = FactoryBot.create(:user, :admin)
     sign_in_via_session(admin)
 
@@ -34,8 +32,6 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
   end
 
   scenario 'admin creates a poll and it shows on the main page with options' do
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     admin = FactoryBot.create(:user, :admin)
     sign_in_via_session(admin)
 
@@ -57,8 +53,6 @@ RSpec.feature 'Admin creates poll with options', type: :feature, js: true do
   end
 
   scenario 'creating a poll with fewer than two options shows an error' do
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     admin = FactoryBot.create(:user, :admin)
     sign_in_via_session(admin)
 

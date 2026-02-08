@@ -135,6 +135,10 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    capybara-playwright-driver (0.5.7)
+      addressable
+      capybara
+      playwright-ruby-client (>= 1.16.0)
     capybara-validate_html5 (2.1.0)
       capybara
       rack-test (>= 0.6)
@@ -260,8 +264,6 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jar_wrapper (0.1.8)
-      zip
     jquery-rails (4.6.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -357,7 +359,10 @@ GEM
       ast (~> 2.4.1)
       racc
     pkg-config (1.6.4)
-    power_assert (3.0.0)
+    playwright-ruby-client (1.58.0)
+      base64
+      concurrent-ruby (>= 1.1.6)
+      mime-types (>= 3.0)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -525,7 +530,6 @@ GEM
     ruby_parser (3.21.1)
       racc (~> 1.5)
       sexp_processor (~> 4.16)
-    rubyzip (3.2.2)
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
@@ -544,14 +548,6 @@ GEM
       ffi-compiler (>= 1.0, < 2.0)
       rake (~> 13)
     securerandom (0.4.1)
-    selenium (0.2.11)
-      jar_wrapper
-    selenium-webdriver (4.38.0)
-      base64 (~> 0.2)
-      logger (~> 1.4)
-      rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 4.0)
-      websocket (~> 1.0)
     sexp_processor (4.17.4)
     shoulda-matchers (7.0.1)
       activesupport (>= 7.1)
@@ -579,8 +575,6 @@ GEM
       steam-condenser (~> 1.3)
     stringio (3.2.0)
     temple (0.10.4)
-    test-unit (3.7.0)
-      power_assert
     thor (1.5.0)
     tilt (2.6.1)
     time_difference (0.5.0)
@@ -616,7 +610,6 @@ GEM
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.9.2)
-    websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
@@ -625,7 +618,6 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.4)
-    zip (2.0.2)
 
 PLATFORMS
   aarch64-linux-gnu
@@ -651,6 +643,7 @@ DEPENDENCIES
   brakeman
   bundler-audit
   capybara
+  capybara-playwright-driver
   capybara-validate_html5
   carrierwave
   connection_pool (~> 2.4)
@@ -679,6 +672,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   omniauth-steam
   os
+  playwright-ruby-client
   pry-byebug
   pry-rails
   public_suffix
@@ -707,14 +701,11 @@ DEPENDENCIES
   sanitize
   sass-rails (~> 5.0.3)
   scrypt
-  selenium
-  selenium-webdriver
   shoulda-matchers
   signet (= 0.11.0)
   simplecov
   steam-condenser!
   steam-id2
-  test-unit
   time_difference
   timecop
   tinymce-rails
@@ -729,4 +720,4 @@ RUBY VERSION
   ruby 3.2.5p208
 
 BUNDLED WITH
-  4.0.4
+  4.0.6

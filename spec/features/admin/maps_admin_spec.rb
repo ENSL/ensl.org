@@ -7,7 +7,6 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
   let(:regular_user) { create(:user) }
 
   before do
-    Capybara.javascript_driver = :selenium_chrome_headless
   end
 
   scenario 'regular user can view maps and their details with all fields' do

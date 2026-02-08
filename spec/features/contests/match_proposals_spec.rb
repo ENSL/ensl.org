@@ -15,7 +15,6 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
   let(:match) { create(:match, contest: contest, contester1: cont1, contester2: cont2) }
 
   before do
-    Capybara.javascript_driver = :selenium_chrome_headless
   end
 
   scenario 'team leader views match proposals page' do

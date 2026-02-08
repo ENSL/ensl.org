@@ -14,16 +14,9 @@ module Features
         else
           find(selector, **find_opts).click
         end
-      rescue Selenium::WebDriver::Error::UnknownError => e
-        if e.message && e.message.include?('Node with given id does not belong to the document')
-          attempts += 1
-          raise if attempts > 8
-
-          sleep(0.1)
-          retry
-        end
-        raise
-      rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      rescue Capybara::Playwright::Node::NotActionableError, Capybara::Playwright::Node::StaleReferenceError,
+             Playwright::Error => e
+        # Playwright-specific errors for stale or non-actionable elements
         attempts += 1
         raise if attempts > 8
 
@@ -43,16 +36,14 @@ module Features
       attempts = 0
       begin
         expect(page).to have_content(text, wait: wait)
-      rescue Selenium::WebDriver::Error::UnknownError => e
-        if e.message && e.message.include?('Node with given id does not belong to the document')
-          attempts += 1
-          raise if attempts > 8
+      rescue Capybara::Playwright::Node::NotActionableError, Capybara::Playwright::Node::StaleReferenceError
+        # Playwright-specific errors for stale or non-actionable elements
+        attempts += 1
+        raise if attempts > 8
 
-          sleep(0.1)
-          retry
-        end
-        raise
-      rescue Selenium::WebDriver::Error::StaleElementReferenceError, Capybara::ElementNotFound
+        sleep(0.1)
+        retry
+      rescue Capybara::ElementNotFound
         attempts += 1
         raise if attempts > 8
 

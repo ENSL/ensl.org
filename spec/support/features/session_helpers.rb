@@ -1,14 +1,17 @@
+require 'cgi'
+
 module Features
   module SessionHelpers
     def sign_in_via_session(user)
       session_key = Rails.application.config.session_options[:key]
       cookie_value = session_cookie_for(user, session_key)
 
-      visit root_path
+      visit root_path # This creates the playwright_page
       set_session_cookie(session_key, cookie_value)
-      # visit root_path
-      # expected_name = /#{Regexp.escape(user.username)}/i
-      # expect(page).to have_selector('#current_user', text: expected_name)
+      visit root_path
+
+      expected_name = /#{Regexp.escape(user.username)}/i
+      expect(page).to have_selector('#current_user', text: expected_name, visible: :all)
     end
 
     def sign_in_as(user)
@@ -80,35 +83,74 @@ module Features
     end
 
     def set_session_cookie(session_key, value)
-      driver = page.driver
       return if value.nil?
 
-      unless driver.respond_to?(:browser) && driver.browser.respond_to?(:manage)
-        raise 'Current Capybara driver does not support cookie injection'
-      end
+      driver = page.driver
 
-      # Determine host for the cookie (selenium requires domain without port)
+      # Determine host and URL for the cookie
       require 'uri'
-      host = begin
-        URI.parse(page.current_url).host
+      current_uri = begin
+        URI.parse(page.current_url)
       rescue StandardError
-        Capybara.server_host || '127.0.0.1'
+        URI.parse("http://#{Capybara.server_host || '127.0.0.1'}:#{Capybara.server_port || 3000}")
       end
 
-      cookie = {
-        name: session_key,
-        value: value.to_s,
-        path: '/',
-        domain: host,
-        secure: false,
-        httpOnly: false
-      }
+      host = current_uri.host || '127.0.0.1'
 
-      begin
-        driver.browser.manage.add_cookie(cookie)
-      rescue Selenium::WebDriver::Error::InvalidCookieDomainError
-        # Fallback: try without domain
-        driver.browser.manage.add_cookie(name: session_key, value: value.to_s, path: '/')
+      # Handle different driver types
+      if driver.is_a?(Capybara::Playwright::Driver)
+        # The driver has a @browser which wraps Playwright and has @playwright_page
+        # Access it via send since browser is a private method, or trigger it by calling a public method
+        driver.current_url # This ensures browser is initialized
+
+        # Now access the internal browser wrapper
+        browser_wrapper = driver.instance_variable_get(:@browser)
+        playwright_page = browser_wrapper.instance_variable_get(:@playwright_page)
+
+        raise 'Playwright page not initialized. This should not happen after visiting a page.' if playwright_page.nil?
+
+        # Construct the base URL for the cookie - use the actual current URL
+        current_page_url = playwright_page.url
+
+        # Use the actual page URL for the cookie
+        # Playwright expects string keys, not symbols
+        playwright_cookie = {
+          'name' => session_key,
+          'value' => value.to_s,
+          'url' => current_page_url,
+          'sameSite' => 'Lax'
+        }
+
+        # Clear only the session cookie to avoid conflicts, keep other cookies
+        playwright_page.context.clear_cookies(name: session_key)
+
+        # Add cookie via the page's browser context
+        playwright_page.context.add_cookies([playwright_cookie])
+
+        # Verify the cookie was added
+        added_cookies = playwright_page.context.cookies
+        added_cookie = added_cookies.find { |c| c['name'] == session_key }
+        raise 'Failed to add session cookie - no cookies found after add_cookies' unless added_cookie
+      elsif driver.respond_to?(:browser) && driver.browser.respond_to?(:manage)
+        # Selenium API
+        cookie = {
+          name: session_key,
+          value: value.to_s,
+          path: '/',
+          secure: false,
+          httpOnly: false
+        }
+        # Add domain only for non-localhost
+        cookie[:domain] = host unless host == '127.0.0.1'
+
+        begin
+          driver.browser.manage.add_cookie(cookie)
+        rescue Selenium::WebDriver::Error::InvalidCookieDomainError
+          # Fallback: try without domain
+          driver.browser.manage.add_cookie(name: session_key, value: value.to_s, path: '/')
+        end
+      else
+        raise 'Current Capybara driver does not support cookie injection'
       end
     end
   end

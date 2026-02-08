@@ -7,8 +7,6 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
   let!(:group2) { create(:group, name: 'VIP Users') }
 
   before do
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     # Login as admin
     visit root_path
     find_field('login_username').set(admin.username)
