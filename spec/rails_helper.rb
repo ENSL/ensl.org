@@ -1,5 +1,6 @@
 # Load spec_helper
 require 'spec_helper'
+require 'fileutils'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
@@ -13,6 +14,12 @@ ActiveRecord::Migration.maintain_test_schema!
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
 
 RSpec.configure do |config|
+  config.before(:suite) do
+    log_file = Rails.root.join('log', 'test.log')
+    FileUtils.mkdir_p(log_file.dirname)
+    File.write(log_file, '')
+  end
+
   config.before(:each) do
     Rails.cache.clear
   end
