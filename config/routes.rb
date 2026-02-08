@@ -12,6 +12,13 @@ Rails.application.routes.draw do
       resources :teams, only: [:show]
       resources :servers, only: [:index]
       resources :maps, only: [:index]
+
+      # Backwards compatibility for old URL format: /api/v1/servers/index.:format
+      get 'users/show/:id', to: 'users#show'
+      get 'users/index', to: 'users#index'
+      get 'teams/show/:id', to: 'teams#show'
+      get 'servers/index', to: 'servers#index'
+      get 'maps/index', to: 'maps#index'
       get 'sessions/me', to: 'sessions#me'
     end
   end
