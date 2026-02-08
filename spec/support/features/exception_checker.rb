@@ -56,29 +56,29 @@ module Features
 end
 
 RSpec.configure do |c|
-  # c.include Features::ExceptionChecker, type: :feature
-  # c.include Features::ExceptionChecker, type: :controller
-  # c.include Features::ExceptionChecker, type: :request
-  # c.include Features::ExceptionChecker, type: :view
+  c.include Features::ExceptionChecker, type: :feature
+  c.include Features::ExceptionChecker, type: :controller
+  c.include Features::ExceptionChecker, type: :request
+  c.include Features::ExceptionChecker, type: :view
 
-  # # Initialize log position before each test
-  # c.before(:each) do
-  #   initialize_log_position
-  # end
+  # Initialize log position before each test
+  c.before(:each) do
+    initialize_log_position
+  end
 
-  # # Check after each test (skip if already failing)
-  # c.after(:each) do |example|
-  #   next unless example.exception.nil?
+  # Check after each test (skip if already failing)
+  c.after(:each) do |example|
+    next unless example.exception.nil?
 
-  #   if example.metadata[:expect_log_error]
-  #     begin
-  #       assert_no_log_errors("after #{example.description}")
-  #       raise "Expected log errors but found none (#{example.description})"
-  #     rescue RuntimeError
-  #       # Expected: log errors were detected.
-  #     end
-  #   else
-  #     assert_no_log_errors("after #{example.description}")
-  #   end
-  # end
+    if example.metadata[:expect_log_error]
+      begin
+        assert_no_log_errors("after #{example.description}")
+        raise "Expected log errors but found none (#{example.description})"
+      rescue RuntimeError
+        # Expected: log errors were detected.
+      end
+    else
+      assert_no_log_errors("after #{example.description}")
+    end
+  end
 end
