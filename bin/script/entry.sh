@@ -28,7 +28,7 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   # fi
   bundle exec rake assets:clean
   bundle exec rake assets:precompile
-  chown -R web:web $APP_PATH
+  # chown -R web:web $APP_PATH
 fi
 
 # Start puma unless disabled for debugging
