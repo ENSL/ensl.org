@@ -43,7 +43,7 @@ class Rack::Attack
 
   # --- Response Configuration ---
 
-  self.throttled_response = lambda { |env|
+  self.throttled_responder = lambda { |_req|
     [429, {}, [%({"error":"Throttled"})]]
   }
 
