@@ -26,6 +26,7 @@ gem 'puma'
 # gem 'unicorn'
 
 # API
+gem 'rack-attack'
 gem 'rack-cors'
 
 # Model plugins

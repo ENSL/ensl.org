@@ -387,6 +387,8 @@ GEM
       puma (>= 2.7)
     racc (1.8.1)
     rack (2.2.21)
+    rack-attack (6.8.0)
+      rack (>= 1.0, < 4)
     rack-cors (2.0.2)
       rack (>= 2.0.0)
     rack-openid (1.4.2)
@@ -678,6 +680,7 @@ DEPENDENCIES
   public_suffix
   puma
   puma_worker_killer
+  rack-attack
   rack-cors
   rails (~> 8.1.1)
   rails-controller-testing
