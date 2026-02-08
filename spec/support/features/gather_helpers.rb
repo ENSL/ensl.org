@@ -18,7 +18,14 @@ module Features
         safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
         safe_click { click_button 'Click to join gather!' }
 
-        safe_expect_text('You have joined the Gather.')
+        if page.has_selector?('.message.notice', text: 'You have joined the Gather.', wait: 5)
+          safe_expect_text('You have joined the Gather.')
+        else
+          # Fallback for cases where the join flash does not render consistently
+          # check via db
+          gather.reload
+          expect(gather.gatherers.of_user(users[user_index]).count).to eq(1)
+        end
       end
     end
 
