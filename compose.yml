@@ -22,6 +22,7 @@ services:
   #
   development:
     <<: *app
+    profiles: ["development"]
 #    environment:
 #      DISABLE_PUMA: 0
 #      RAILS_DEBUG: 0
@@ -117,6 +118,7 @@ services:
 
   smtp:
     image: mwader/postfix-relay:latest
+    profiles: ["production"]
     restart: always
     volumes:
       - "./ext/dkim:/etc/opendkim/keys"
