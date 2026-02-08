@@ -155,7 +155,7 @@ class Gather < ActiveRecord::Base
 
   def check_captains
     changed = (respond_to?(:saved_change_to_captain1_id?) ? (saved_change_to_captain1_id? || saved_change_to_captain2_id?) : (captain1_id_changed? || captain2_id_changed?))
-    return unless changed or admin
+    return unless changed
 
     # Ensure attributes persisted before locking and updating other records
     reload

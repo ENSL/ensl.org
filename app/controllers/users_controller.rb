@@ -143,7 +143,7 @@ class UsersController < ApplicationController
 
       # if @user.created_at > (Time.zone.now - 1.week)
       # flash[:notice] = t(:users_signup_steam)
-      render :new
+      render :new, formats: :html
     else
       login_user(@user)
       return_back
@@ -190,7 +190,9 @@ class UsersController < ApplicationController
   private
 
   def reject_js_callback
-    return unless request.format.js?
+    # Reject AJAX/XHR requests to prevent cross-origin AJAX from stealing auth
+    # but allow regular form submissions (even if Turbo/JS-enabled)
+    return unless request.format.js? && request.xhr?
 
     head :not_acceptable
   end
