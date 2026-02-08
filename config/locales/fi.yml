@@ -1,5 +1,6 @@
 ﻿fi:
   access_denied: "Pääsy estetty, varmista että olet kirjautunut sisään!"
+  application_stale: "Tiedot, joita yritit päivittää, on muutettu jonkun muun toimesta. Päivitä sivu ja yritä uudelleen."
   articles_article_views: "Luettu"
   bans_create: "Banni on luotu."
   bans_update: "Banni on päivitetty."

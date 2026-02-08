@@ -187,9 +187,14 @@ class Gather < ActiveRecord::Base
       # DISABLED: gatherers.idle.destroy_all
     elsif status == STATE_VOTING
       # Check if voting timeout has passed based on when voting actually started
+      # Use with_lock to prevent concurrent transitions from causing optimistic locking conflicts
       if voting_start_time && Time.current > voting_start_time + voting_timeout.seconds
-        self.status = STATE_PICKING
-        save!
+        with_lock do
+          # Re-check after acquiring lock to avoid TOCTOU race
+          if status == STATE_VOTING && Time.current > voting_start_time + voting_timeout.seconds
+            update!(status: STATE_PICKING)
+          end
+        end
       end
     elsif status == STATE_PICKING
       # Lock gather while evaluating and applying turn/status updates

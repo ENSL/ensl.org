@@ -142,10 +142,13 @@ class ApplicationController < ActionController::Base
     rescue_from Error do |exception|
       render inline: exception.message.to_s, layout: true, status: :internal_server_error
     end
+  end
 
-    rescue_from ActiveRecord::StaleObjectError do |_exception|
-      render inline: t(:application_stale), status: :conflict
-    end
+  # Handle optimistic locking conflicts in all environments including production
+  rescue_from ActiveRecord::StaleObjectError do |_exception|
+    Rails.logger.warn("StaleObjectError: path=#{request.fullpath} user=#{cuser&.id} ip=#{request.ip}")
+    flash[:error] = t(:application_stale)
+    redirect_to_back
   end
 
   private

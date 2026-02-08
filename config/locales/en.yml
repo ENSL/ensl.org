@@ -1,5 +1,6 @@
 en:
   access_denied: "Access denied, make sure you are logged in!"
+  application_stale: "The data you were trying to update has been modified by someone else. Please refresh and try again."
   articles_article_views: "Views"
   bans_create: "Ban was successfully created."
   bans_update: "Ban was successfully updated."

@@ -1,5 +1,7 @@
 module Gathers
   class CastVote
+    include Exceptions
+
     def self.call(actor:, params:)
       new(actor: actor, params: params).call
     end
@@ -16,7 +18,7 @@ module Gathers
 
       vote.save!
       gather = vote.votable.gather
-      gather.touch
+      # Broadcaster handles version management via bump_version! which uses pessimistic locking
       Broadcaster.call(gather)
       Result.new(gather: gather, vote: vote)
     rescue StandardError => e

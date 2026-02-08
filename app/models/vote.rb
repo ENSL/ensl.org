@@ -29,21 +29,15 @@ class Vote < ActiveRecord::Base
   after_destroy :decrease_votes
 
   def increase_votes
-    if votable_type == 'Option'
-      votable.poll.increment :votes
-      votable.poll.save
-    end
-    votable.increment :votes
-    votable.save
+    votable.poll.increment! :votes if votable_type == 'Option'
+    # Use increment! for atomic update to avoid race conditions
+    votable.increment! :votes
   end
 
   def decrease_votes
-    if votable_type == 'Option'
-      votable.poll.decrement :votes
-      votable.poll.save
-    end
-    votable.decrement :votes
-    votable.save
+    votable.poll.decrement! :votes if votable_type == 'Option'
+    # Use decrement! for atomic update to avoid race conditions
+    votable.decrement! :votes
   end
 
   def can_create?(cuser)
