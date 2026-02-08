@@ -66,6 +66,8 @@ class Vote < ActiveRecord::Base
         return false if votable.gather.map_votes.where(user_id: cuser.id).count >= 2
       when 'GatherServer'
         return false if votable.gather.status == Gather::STATE_FINISHED
+        # Do not let user vote for same server twice
+        return false if votable.gather.server_votes.where(user_id: cuser.id, votable_id: votable.id).exists?
         # Allow up to two server votes per user
         return false if votable.gather.server_votes.where(user_id: cuser.id).count >= 2
       end
@@ -97,6 +99,9 @@ class Vote < ActiveRecord::Base
         errors.add(:base, 'Maximum map votes reached for this gather')
       end
     when 'GatherServer'
+      if votable.gather.server_votes.where(user_id: user.id, votable_id: votable.id).exists?
+        errors.add(:base, 'You have already voted for this server')
+      end
       if votable.gather.server_votes.where(user_id: user.id).count >= 2
         errors.add(:base, 'Maximum server votes reached for this gather')
       end
