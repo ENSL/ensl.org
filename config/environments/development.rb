@@ -31,6 +31,11 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
+  # Compile assets on the fly in development
+  config.assets.compile = true
+  config.assets.digest = false
+  config.assets.cache_store = [:file_store, Rails.root.join('tmp/cache/assets/development')]
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 

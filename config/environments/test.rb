@@ -20,6 +20,8 @@ Rails.application.configure do
 
   # Allow on-the-fly asset compilation in tests to avoid sprockets precompile errors
   config.assets.compile = true
+  config.assets.digest = false
+  config.assets.cache_store = [:file_store, Rails.root.join('tmp/cache/assets/test')]
 
   # Show full error reports.
   config.consider_all_requests_local = true
