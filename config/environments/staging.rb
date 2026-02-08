@@ -30,6 +30,22 @@ Rails.application.configure do
   # See everything in the log (default is :info)
   config.log_level = :info
 
+  # Log one JSON event per request
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+  config.lograge.keep_original_rails_log = false
+  config.lograge.custom_payload do |controller|
+    request = controller.request
+    {
+      request_id: request.request_id,
+      user_id: controller.respond_to?(:cuser) ? controller.cuser&.id : nil,
+      ip: request.remote_ip,
+      user_agent: request.user_agent,
+      method: request.request_method,
+      path: request.fullpath
+    }
+  end
+
   # Disable delivery errors, bad email addresses will be ignored
   config.action_mailer.raise_delivery_errors = false
 

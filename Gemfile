@@ -29,6 +29,9 @@ gem 'puma'
 gem 'rack-attack'
 gem 'rack-cors'
 
+# Logging
+gem 'lograge'
+
 # Model plugins
 gem 'active_flag'
 gem 'scrypt'
