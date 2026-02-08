@@ -14,11 +14,16 @@ RSpec.describe 'Steam authentication link', type: :feature, js: true do
 
     visit root_path
 
+    # Verify the steam login components exist
+    expect(page).to have_selector('a.steam-login')
+    expect(page).to have_selector('form#steam-auth-form[style*="display:none"]', visible: false)
+
     # click the steam image inside the link so Capybara can interact reliably
     find('a.steam-login img').click
 
-    # should land on registration page for Steam-linked account
-    expect(page).to have_content('Registration')
+    # Wait for the page to navigate/load after form submission
+    # The form submission triggers OmniAuth which in test mode immediately calls the callback
+    expect(page).to have_content('Registration', wait: 10)
 
     within('form#new_user') do
       username_field = find('input#user_username')

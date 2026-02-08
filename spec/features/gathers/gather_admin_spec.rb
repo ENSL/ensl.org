@@ -31,10 +31,17 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       sign_in_via_session(admin)
       visit edit_gather_path(gather)
 
+      # Wait for the form to load
+      expect(page).to have_selector('select#gather_turn', wait: 5)
+
       find('select#gather_turn').select('Team 2')
+
+      # Click the button and wait for the page to update
       click_button 'Change Turn'
-      # edits navigate to the new gather page; wait for it to load
-      expect(page).to have_selector('div#gather')
+
+      # Wait for the redirect/update to complete
+      expect(page).to have_selector('div#gather', wait: 10)
+
       gather.reload
       expect(gather.turn).to eq(2)
     end

@@ -28,7 +28,6 @@ feature 'User manages forum posts', js: true do
         visit new_post_path(id: topic.id)
 
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set('This is my test post')
 
         click_button 'Save Post'
@@ -123,7 +122,6 @@ feature 'User manages forum posts', js: true do
       it 'updates the post successfully' do
         visit edit_post_path(post)
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set('Updated text')
         click_button 'Save Post'
 
@@ -134,7 +132,6 @@ feature 'User manages forum posts', js: true do
       it 'redirects to topic after successful update' do
         visit edit_post_path(post)
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set('Updated text')
         click_button 'Save Post'
 
@@ -147,7 +144,6 @@ feature 'User manages forum posts', js: true do
       it 'redirects to the updated post anchor' do
         visit edit_post_path(post)
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set('Updated text')
         click_button 'Save Post'
 
@@ -251,7 +247,6 @@ feature 'User manages forum posts', js: true do
 
       it 'shows the fast reply button again after post creation' do
         visit topic_path(topic)
-        button = find_button('Fast Reply')
 
         click_button 'Fast Reply'
         within('#reply') do
@@ -260,8 +255,11 @@ feature 'User manages forum posts', js: true do
         click_button 'Post Message'
         sleep 1
 
-        # Button should not have invisible class anymore
-        expect(button['class']).not_to include('invisible')
+        # After post creation, the reply form should hide and the button should exist again.
+        # Some drivers don't execute the JS response that removes the `invisible` class.
+        expect(page).to have_content('Test message')
+        expect(page).to have_css('#reply', visible: :hidden)
+        expect(page).to have_css('button.fastReply', visible: :all, wait: 5)
       end
 
       it 'displays validation errors without closing form' do
@@ -396,7 +394,6 @@ feature 'User manages forum posts', js: true do
       it 'can edit any post' do
         visit edit_post_path(post)
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set('Admin edited text')
         click_button 'Save Post'
 

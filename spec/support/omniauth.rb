@@ -8,6 +8,8 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    OmniAuth.config.full_host = nil if Rails.env.test?
+
     # Default mock — tests may override this per-example if needed
     OmniAuth.config.mock_auth[:steam] ||= OmniAuth::AuthHash.new(
       provider: 'steam',

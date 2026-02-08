@@ -8,6 +8,13 @@ module Features
       end
     end
 
+    # Sign in a user object directly in a separate Capybara session
+    def sign_in_session_user(session_name, user)
+      Capybara.using_session(session_name) do
+        sign_in_via_session(user)
+      end
+    end
+
     # Visit gather page and join. Assumes the user is logged in within this session.
     def open_and_join(session_name, user_index)
       Capybara.using_session(session_name) do
@@ -80,6 +87,11 @@ module Features
         safe_click { click_button 'Click to join gather!' }
         safe_expect_text('You have joined the Gather.')
       end
+    end
+
+    # Alias for backward compatibility
+    def sign_in_and_join(session_name, user, gather_arg = nil)
+      sign_in_and_join_gather(session_name, user, gather_arg)
     end
   end
 end

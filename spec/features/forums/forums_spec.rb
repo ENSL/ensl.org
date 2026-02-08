@@ -211,7 +211,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         # Verify it doesn't have a large size attribute (size > 1 would make it a listbox)
         # size of 0, 1, or nil is fine for a normal dropdown
         size_attr = select_element[:size]
-        expect(size_attr).to be_in([nil, '0', '1']) if size_attr
+        expect(size_attr.to_i).to be_in([0, 1]) if size_attr
       end
     end
 

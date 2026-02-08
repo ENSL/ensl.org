@@ -60,15 +60,19 @@ RSpec.configure do |c|
   c.include Features::ExceptionChecker, type: :controller
   c.include Features::ExceptionChecker, type: :request
   c.include Features::ExceptionChecker, type: :view
+  c.include Features::ExceptionChecker, type: :model
+  c.include Features::ExceptionChecker, type: :service
 
-  # Initialize log position before each test
+  # Initialize log position before each test (only for specs that have the method)
   c.before(:each) do
-    initialize_log_position
+    initialize_log_position if respond_to?(:initialize_log_position)
   end
 
   # Check after each test (skip if already failing)
   c.after(:each) do |example|
     next unless example.exception.nil?
+
+    next unless respond_to?(:assert_no_log_errors)
 
     if example.metadata[:expect_log_error]
       begin

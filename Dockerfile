@@ -35,6 +35,8 @@ RUN \
       # For poltergeist
       # phantomjs \
       firefox-esr \
+      # For testing
+      time \
       # For apparition
       chromium chromium-driver && \
     # Fix URI startup issue && \
