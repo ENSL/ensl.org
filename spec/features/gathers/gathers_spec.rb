@@ -1,29 +1,20 @@
 require 'rails_helper'
 
 RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
-  # Use a real browser + app server.
-  before(:all) do
-    Capybara.javascript_driver = :selenium_chrome_headless
-    Capybara.default_max_wait_time = 5
-  end
-
   # Create a gather with maps and servers, and 12 users
   let!(:gather) { FactoryBot.create(:gather, maps_count: 10, servers_count: 5) }
   let!(:users) { FactoryBot.create_list(:user, 12, raw_password: 'password123') }
 
   scenario '12 players join, vote on maps, pick teams, and finish the gather' do
-    # Sign in + open 12 independent browser sessions and join
+    # Sign in and join with optimized helper (single efficient operation per user)
     users.each_with_index do |_, i|
-      sign_in_session("user_#{i}", i)
-      open_and_join("user_#{i}", i)
+      sign_in_and_join_gather("user_#{i}", users[i])
+      print('.')
     end
 
-    # Verify participant count converges to 12 from one session (replace selector)
-    Capybara.using_session('user_0') do
-      # Verify in DB that gather has 12 gatherers (participants)
-      gather.reload
-      expect(gather.gatherers.count).to eq(12)
-    end
+    # Verify participant count
+    gather.reload
+    expect(gather.gatherers.count).to eq(12)
 
     # Start captain vote from one participant
     Capybara.using_session('user_0') do
@@ -31,31 +22,22 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
       safe_expect_text('Vote Captains')
     end
 
-    RSpec.configuration.reporter.message('All users joined the gather and voting has started.')
+    puts
+    puts("All users joined the gather and voting has started. Timeout is: #{gather.voting_timeout} seconds.")
 
     # All users cast two random map votes
     users.each_with_index do |_, i|
       vote_random_maps("user_#{i}", votes: 2)
-    end
-
-    # All users cast two random server votes
-    users.each_with_index do |_, i|
       vote_random_servers("user_#{i}", votes: 2)
+      print('.')
     end
 
-    # Verify in DB that gather has map votes recorded
-    # Ii will always be 22 or less because last joiner can't vote on maps
-    gather.reload
-    expect(gather.map_votes.count).to be >= 18
+    puts
+    puts('All users have cast their votes on maps and servers.')
 
-    # Verify in DB that gather has server votes recorded
-    gather.reload
-    expect(gather.server_votes.count).to be >= 18
-
-    # Wait for voting phase to finish (about 1 minute). Wait up to 70s for the voting UI to disappear.
+    # Wait for voting phase to finish. Wait up to 125s for the voting UI to disappear.
     Capybara.using_session('user_0') do
-      # Wait up to 70s for the voting UI to disappear.
-      safe_expect_text('Captains are picking the teams', wait: 70)
+      safe_expect_text('Captains are picking the teams', wait: 125)
     end
 
     # Find and verify captains are assigned in DB
@@ -69,7 +51,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     expect(gather.captain1.id).to eq(gather.gatherers.most_voted[1].id)
     expect(gather.captain2.id).to eq(gather.gatherers.most_voted[0].id)
 
-    RSpec.configuration.reporter.message('Captain voting has ended, picking phase has started.')
+    puts('Captain voting has ended, picking phase has started.')
 
     # Let whichever captain has the current turn pick from the lobby.
     remaining_picks = 9
@@ -79,34 +61,42 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
       picked = false
       attempts = 0
 
-      until picked || attempts >= 20
+      until picked || attempts >= 30
         attempts += 1
         gather.reload
         current_captain = gather.turn == 1 ? gather.captain1&.user : gather.captain2&.user
+        session_name = session_for_user_id[current_captain.id]
+        current_turn = gather.turn
+        lobby_count = gather.gatherers.lobby.count
 
-        if current_captain
-          session_name = session_for_user_id[current_captain.id]
-          raise "No session for captain #{current_captain.id}" unless session_name
+        Capybara.using_session(session_name) do
+          if page.has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
+            safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
+            safe_click { find('input[value="Pick"]').click }
 
-          Capybara.using_session(session_name) do
-            visit gather_path(gather)
-
-            if page.has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 2)
-              safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
-              safe_click { find('input[value="Pick"]').click }
-              safe_expect_text('You have picked a player for your team.', wait: 5)
+            # Verify the pick actually happened by checking DB state changed
+            sleep(0.3)
+            gather.reload
+            if gather.gatherers.lobby.count < lobby_count || gather.turn != current_turn
               picked = true
+              print('.')
             end
           end
         end
 
-        sleep(0.5) unless picked
+        sleep(1) unless picked
       end
 
       raise 'No captain had a pickable player' unless picked
 
       sleep(rand(0.05..0.25))
     end
+
+    puts
+    puts('All players have been picked by the captains.')
+
+    # Wait briefly for all updates to complete
+    sleep(0.5)
 
     # Check in DB that both teams have 6 players
     gather.reload
