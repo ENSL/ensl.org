@@ -41,7 +41,33 @@
     <% end %>
 
   <% elsif @gather.status == Gather::STATE_VOTING %>
-    <p>Please vote captains and maps.</p>
+    <p>
+      Please vote captains and maps.
+      <% if (remaining = @gather.voting_time_remaining) > 0 %>
+        <span id="voting-timer" data-remaining="<%= remaining %>">
+          (<span class="time-left"><%= remaining %></span>s remaining)
+        </span>
+      <% end %>
+    </p>
+    <script>
+      (function() {
+        const timerEl = document.getElementById('voting-timer');
+        if (!timerEl) return;
+        
+        let remaining = parseInt(timerEl.dataset.remaining);
+        const timeLeftEl = timerEl.querySelector('.time-left');
+        
+        const interval = setInterval(function() {
+          remaining--;
+          if (remaining <= 0) {
+            clearInterval(interval);
+            timeLeftEl.textContent = '0';
+          } else {
+            timeLeftEl.textContent = remaining;
+          }
+        }, 1000);
+      })();
+    </script>
 
   <% elsif @gather.status == Gather::STATE_PICKING %>
     <p>
@@ -82,6 +108,6 @@
 
   <%= link_to "Mute", '#', id: "mute", class: 'button' %>
   <% if gather_current_user and (gather_current_user.admin? or gather_current_user.gather_moderator?) %>
-    <%= link_to "Admin Page", edit_gather_path(@gather), class: 'admin button' %>
+    <%= link_to "Admin Page", edit_gather_path(@gather), class: 'admin button', data: { turbo: false } %>
   <% end %>
 </div>

@@ -159,9 +159,14 @@ class Gather < ActiveRecord::Base
 
     # Ensure attributes persisted before locking and updating other records
     reload
-    self.turn = 1
-    self.status = STATE_PICKING
-    save! if changed
+    if admin
+      # Use update_columns to avoid triggering callbacks again (preventing infinite loop)
+      update_columns(turn: 1, status: STATE_PICKING, updated_at: Time.current)
+    elsif changed
+      self.turn = 1
+      self.status = STATE_PICKING
+      save!
+    end
 
     # Lock gather to avoid concurrent updates to gatherers
     with_lock do
@@ -179,9 +184,10 @@ class Gather < ActiveRecord::Base
 
   def refresh(cuser)
     if status == STATE_RUNNING
-      gatherers.idle.destroy_all
-    elsif status == STATE_VOTING and updated_at < voting_timeout.seconds.ago and updated_at > 5.days.ago
-      if status == STATE_VOTING and updated_at < voting_timeout.seconds.ago
+      # DISABLED: gatherers.idle.destroy_all
+    elsif status == STATE_VOTING
+      # Check if voting timeout has passed based on when voting actually started
+      if voting_start_time && Time.current > voting_start_time + voting_timeout.seconds
         self.status = STATE_PICKING
         save!
       end
@@ -217,6 +223,22 @@ class Gather < ActiveRecord::Base
     return VOTING_TIMEOUT_SECONDS unless Rails.env.test?
 
     Integer(ENV.fetch('GATHER_VOTING_TIMEOUT_TEST', 10))
+  end
+
+  def voting_start_time
+    # Get the time when the last (12th) gatherer joined to start voting
+    return nil unless [STATE_VOTING, STATE_PICKING, STATE_FINISHED].include?(status)
+
+    gatherers.order('created_at ASC').limit(1).offset(FULL - 1).first&.created_at
+  end
+
+  def voting_time_remaining
+    return 0 unless status == STATE_VOTING
+    return 0 unless start_time = voting_start_time
+
+    elapsed = Time.current - start_time
+    remaining = voting_timeout - elapsed.to_i
+    [remaining, 0].max
   end
 
   def can_update?(cuser)

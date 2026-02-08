@@ -35,6 +35,8 @@ class GathersController < ApplicationController
     @gather = Gather.basic.find(params[:id])
     raise AccessError unless @gather.can_update? cuser
 
+    @gather.admin = true
+
     Gatherer.transaction do
       Gather.transaction do
         if @gather.update(Gather.params(params, cuser))
