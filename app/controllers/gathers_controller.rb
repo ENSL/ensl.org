@@ -105,12 +105,12 @@ class GathersController < ApplicationController
 
     # Remove any users that left over 30 seconds ago
     removed_users = false
-    @gather.gatherers.each do |gatherer|
-      if gatherer.status == Gatherer::STATE_LEAVING and gatherer.updated_at < Time.now - 30
-        removed_users = true
-        gatherer.destroy
-      end
-    end
+    # @gather.gatherers.each do |gatherer|
+    #   if gatherer.status == Gatherer::STATE_LEAVING and gatherer.updated_at < Time.now - 30
+    #     removed_users = true
+    #     gatherer.destroy
+    #   end
+    # end
 
     @gather.reload if removed_users
   end
