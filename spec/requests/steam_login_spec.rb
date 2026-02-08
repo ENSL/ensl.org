@@ -34,4 +34,35 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
     cached = JSON.parse(session[:cached_user])
     expect(cached['username']).to match(/^steam_nick/)
   end
+
+  context 'when Steam login fails' do
+    it 'handles missing auth_hash gracefully' do
+      # Simulate OmniAuth failure by not setting mock_auth
+      OmniAuth.config.mock_auth[:steam] = nil
+
+      post '/auth/steam/callback'
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:error]).to be_present
+    end
+
+    it 'handles User.find_or_build returning nil' do
+      OmniAuth.config.mock_auth[:steam] = auth_hash
+      allow(User).to receive(:find_or_build).and_return(nil)
+
+      post '/auth/steam/callback'
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:error]).to be_present
+    end
+
+    it 'handles exception during User.find_or_build' do
+      OmniAuth.config.mock_auth[:steam] = auth_hash
+      allow(User).to receive(:find_or_build).and_raise(StandardError, 'Database error')
+
+      expect do
+        post '/auth/steam/callback'
+      end.to raise_error(StandardError)
+    end
+  end
 end

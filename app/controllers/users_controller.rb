@@ -117,6 +117,13 @@ class UsersController < ApplicationController
   end
 
   def callback
+    unless request.env['omniauth.auth']
+      flash[:error] = t(:users_callback_fail)
+      Rails.logger.warn('Steam callback: auth_hash is missing')
+      redirect_to_home
+      return
+    end
+
     @user = User.find_or_build(auth_hash, request.ip)
     unless @user and @user.is_a?(ActiveRecord::Base)
       flash[:error] = t(:users_callback_fail)

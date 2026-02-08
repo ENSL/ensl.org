@@ -101,6 +101,7 @@ en:
   votes_success: "Voted successfully."
   users_signup_steam: "You have created an account via steam, please update your user details."
   users_steamid_update: "Your SteamID has been updated to %s. You can log in via Steam now."
+  users_callback_fail: "Steam login failed, please try again. This could be a network issue. If the problem persists, please contact staff."
   error: "error"
   prohibited: "prohibited"
   user_updated: "User was successfully updated."
