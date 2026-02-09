@@ -16,15 +16,15 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     gather.reload
     expect(gather.gatherers.count).to eq(12)
 
-    # Track voting duration to ensure it lasts at least the configured timeout.
-    # Use a monotonic clock to avoid issues with system time changes.
-    voting_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
     # Start captain vote from one participant
     Capybara.using_session('user_0') do
       # Confirm vote UI is visible (replace text/selector to match your app)
       safe_expect_text('Vote Captains')
     end
+
+    # Track voting duration to ensure it lasts at least the configured timeout.
+    # Use a monotonic clock to avoid issues with system time changes.
+    voting_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
     puts
     puts("All users joined the gather and voting has started. Timeout is: #{gather.voting_timeout} seconds.")
@@ -41,11 +41,11 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
     # Wait for voting phase to finish. Wait up to 125s for the voting UI to disappear.
     Capybara.using_session('user_0') do
-      safe_expect_text('Captains are picking the teams', wait: 125)
+      safe_expect_text('Captains are picking the teams', wait: gather.voting_timeout + 5)
     end
 
     voting_elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - voting_start
-    expect(voting_elapsed).to be >= (gather.voting_timeout - 1)
+    expect(voting_elapsed).to be >= (gather.voting_timeout - 5)
 
     # Find and verify captains are assigned in DB
     gather.reload

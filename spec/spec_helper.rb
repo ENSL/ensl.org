@@ -58,8 +58,9 @@ RSpec.configure do |config|
   # to individual examples or groups you care about by tagging them with
   # `:focus` metadata. When nothing is tagged with `:focus`, all examples
   # get run.
-  config.filter_run :focus
+  # config.filter_run :focus
   config.run_all_when_everything_filtered = true
+  config.filter_run_excluding :debug
   config.order = 'random'
   config.use_transactional_fixtures = false
   config.color = true
