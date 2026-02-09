@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :user do
-    sequence(:username) { |n| "Player#{n}" }
-    sequence(:email)    { |n| "player#{n}@ensl.org" }
-    sequence(:steamid)  { |n| "0:1:#{n + 1}" }
+    sequence(:username) { |n| "Player#{SecureRandom.hex(8)}" }
+    sequence(:email)    { |n| "player#{SecureRandom.hex(8)}@ensl.org" }
+    sequence(:steamid)  { |n| "0:1:#{Time.now.to_i * 1000 + n + SecureRandom.random_bytes(4).unpack1('N')}" }
 
     firstname 'ENSL'
     lastname 'Player'

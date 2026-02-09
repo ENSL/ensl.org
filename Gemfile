@@ -138,9 +138,6 @@ group :test do
   gem 'rspec-rails'
   gem 'rspec-support'
 
-  # FIXME: Downgraded b/c of deprecations, fix static attributes
-  gem 'factory_bot_rails', '4.10.0'
-
   # Model matchers for associations and validations
   gem 'shoulda-matchers'
 
@@ -213,6 +210,9 @@ group :development, :test do
 
   # Static analysis / code quality
   gem 'rails_best_practices'
+
+  # Used both in development and test for generating realistic data
+  gem 'factory_bot_rails', '4.10.0'
 
   # gem 'spring'
   # gem 'ruby-debug-ide'
