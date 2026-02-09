@@ -44,49 +44,71 @@ class Bracket < ActiveRecord::Base
   # Generates options for selecting matches and teams in the bracket cells.
   # Returns an array of arrays suitable for use in select dropdowns.
   def options
-    [
+    ['-- Special'] +
+      [%w[Empty empty], %w[Disabled disabled]] +
       ["#{SEPARATOR_PREFIX} Matches"] +
-        contest.matches.map { |c| [c, "match_#{c.id}"] } +
-        ["#{SEPARATOR_PREFIX} Teams"] +
-        contest.contesters.map { |c| [c, "contester_#{c.id}"] }
-    ]
+      contest.matches.map { |c| [c, "match_#{c.id}"] } +
+      ["#{SEPARATOR_PREFIX} Teams"] +
+      contest.contesters.map { |c| [c, "contester_#{c.id}"] }
   end
 
   # Returns the default value for a bracket cell at the given row and column.
   # The value indicates whether the cell is linked to a match or a contester (team).
   def default(row, col)
     b = bracketers.pos(row, col).first
-    return unless b
+    return 'empty' unless b
 
-    return unless b.match_id || b.team_id
+    return 'disabled' if b.disabled
+    return 'empty' unless b.match_id || b.team_id
 
     b.match_id ? "match_#{b.match_id}" : "contester_#{b.team_id}"
   end
 
   # Updates the bracket cells based on the provided parameters.
   # Each cell can be linked to either a match or a contester (team).
+  # Also handles disabled status and custom text for cells.
   def update_cells(params)
-    params.each do |row, cols|
-      cols.each do |col, val|
-        next if val.start_with?(SEPARATOR_PREFIX)
+    return true if params.blank?
 
+    params.each do |row, cols|
+      # cols might be Hash or ActionController::Parameters
+      next unless cols.respond_to?(:each)
+
+      cols.each do |col, cell_value|
         b = get_bracketer(row, col)
-        attributes = parse_cell_value(val)
-        b.update(attributes) if attributes
+
+        val_str = cell_value.to_s
+
+        # Handle special values
+        if val_str == 'empty'
+          b.update(match_id: nil, team_id: nil, disabled: false, custom_text: nil)
+        elsif val_str == 'disabled'
+          b.update(match_id: nil, team_id: nil, disabled: true, custom_text: nil)
+        elsif !val_str.blank? && !val_str.start_with?(SEPARATOR_PREFIX)
+          attributes = parse_cell_value(val_str)
+          if attributes
+            update_hash = attributes.merge(disabled: false)
+            b.update(update_hash)
+          end
+        end
       end
     end
+    true
   end
 
-  private
+  # Updates custom text for bracket cells
+  def update_custom_text(params)
+    return true if params.blank?
 
-  # Parses the value of a bracket cell to determine if it references a match or a contester (team).
-  def parse_cell_value(value)
-    case value
-    when MATCH_PATTERN
-      { match_id: value.match(MATCH_PATTERN)[1].to_i, team_id: nil }
-    when CONTESTER_PATTERN
-      { team_id: value.match(CONTESTER_PATTERN)[1].to_i, match_id: nil }
+    params.each do |row, cols|
+      next unless cols.respond_to?(:each)
+
+      cols.each do |col, custom_text|
+        b = get_bracketer(row, col)
+        b.update(custom_text: custom_text.presence) if custom_text
+      end
     end
+    true
   end
 
   def can_create?(cuser)
@@ -103,5 +125,17 @@ class Bracket < ActiveRecord::Base
 
   def self.params(params, _cuser)
     params.require(:bracket).permit(:contest_id, :slots, :name)
+  end
+
+  private
+
+  # Parses the value of a bracket cell to determine if it references a match or a contester (team).
+  def parse_cell_value(value)
+    case value
+    when MATCH_PATTERN
+      { match_id: value.match(MATCH_PATTERN)[1].to_i, team_id: nil }
+    when CONTESTER_PATTERN
+      { team_id: value.match(CONTESTER_PATTERN)[1].to_i, match_id: nil }
+    end
   end
 end

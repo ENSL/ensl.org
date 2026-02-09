@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_000100) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_022123) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -61,6 +61,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_000100) do
     t.integer "bracket_id"
     t.integer "column"
     t.datetime "created_at", precision: nil
+    t.string "custom_text"
+    t.boolean "disabled"
     t.integer "match_id"
     t.integer "row"
     t.integer "team_id"

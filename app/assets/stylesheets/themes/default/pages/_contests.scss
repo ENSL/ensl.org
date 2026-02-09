@@ -92,59 +92,102 @@ div.standings {
   Brackets
 */
 
+.bracket-wrapper {
+  overflow-x: auto;
+  margin: 15px 0;
+  padding: 10px 0;
+}
+
 table.brackets {
-  margin: 20px 0 40px 0;
-  width: auto;
+  border-collapse: collapse;
+  min-width: 100%;
 
   td {
-    padding: 0;
-    border-bottom: 0;
-    text-align: left;
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+    width: 100px;
+    height: 32px;
+    font-size: 0.75em;
 
-    a {
-      display: block;
-      width: 100%;
+    &.team-content {
+      text-align: left;
+      padding: 4px 6px;
+      word-wrap: break-word;
+      white-space: normal;
+      line-height: 1.3;
+      font-size: 1.1em;
     }
+  }
+
+  select {
+    width: 95%;
+    max-width: 150px;
+    padding: 5px 4px;
+    font-size: 0.9em;
   }
 
   .empty {
-    padding: 0;
-  }
-
-  td.flag {
-    width: 34px;
-
-    img {
-      margin-left: 10px;
-    }
-  }
-
-  .team {
-    padding: 5px 0;
-    background-color: $light-gray;
-    border-right: 1px solid $medium-gray;
-    clear: both;
-
-    table {
-      margin: 0;
-    }
-
-    > a {
-      padding-left: 10px;
-    }
-  }
-
-  .bracket {
-    padding: 0 10px 0 0;
-    width: 158px;
+    border: none !important;
+    background: none !important;
   }
 
   .connector {
-    border-right: 1px solid $medium-gray;
+    border: none;
+    border-right: 1px solid $light-blue;
   }
 
-  > tbody > tr > td {
-    width: 150px;
+  .team {
+    border-top: 1px solid $light-blue;
+    border-right: 1px solid $light-blue;
+    border-bottom: 1px solid $light-blue;
+    border-left: 1px solid $light-blue;
+    @include linear-gradient($light-blue, $blue);
+    background-color: $light-blue;
+    color: white;
+    font-weight: bold;
+
+    a {
+      color: white;
+    }
+
+    &.disabled {
+      border: none !important;
+      background: none !important;
+    }
+
+    &.win1 {
+      @include linear-gradient(lighten(#1b5e20, 15), #1b5e20);
+      background-color: #1b5e20;
+      color: white;
+
+      a {
+        color: white;
+        font-weight: bold;
+      }
+    }
+
+    &.win2 {
+      @include linear-gradient(lighten(#b71c1c, 15), #b71c1c);
+      background-color: #b71c1c;
+      color: white;
+
+      a {
+        color: white;
+        font-weight: bold;
+      }
+    }
+
+    &.tie {
+      @include linear-gradient(lighten(#f57f17, 15), #f57f17);
+      background-color: #f57f17;
+      color: white;
+
+      a {
+        color: white;
+        font-weight: bold;
+      }
+    }
   }
 }
 

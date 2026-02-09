@@ -6,48 +6,37 @@
 <% if slots <= 0 %>
   <p class="notice">Bracket not configured.</p>
 <% else %>
-  <table class="brackets">
-    <% rows = slots*2-1 %>
-    <% cols = 2+(slots/4) %>
-    <% content = Array.new((slots*2-1)/4) %>
-  <% (0..rows).each do |row| %>
+  <% is_edit = defined?(edit) %>
+  <% rows = slots*2-1 %>
+  <% cols = [(slots - 1).bit_length + 1, 2].max %>
+  <div class="bracket-wrapper">
+    <table class="brackets">
+    <% (0..rows).each do |row| %>
     <tr>
-      <% (0..cols).each do |col| %>
-        <% exp = 2**(col+1) %>
-        <% element_class = "empty" %>
+      <% (0...cols).each do |col| %>
         <% bracketer = bracket.get_bracketer(row, col) %>
-
-        <% if (row % exp) == exp/2 %>
-          <% if bracketer %>
-            <% element_class = "team" %>
-          <% else %>
-            <% element_class = "empty" %>
-          <% end %>
-        <% elsif ( (((row+exp/2) - (row+exp/2) % exp) / exp) % 2 == 1 ) and col < cols-1 %>
-          <% if ( (((row+exp/2) - (row+exp/2) % exp) / exp) % 2 == 1 ) and col < cols-1 %>
-            <% element_class = "connector" %>
-          <% end %>
-        <% end %>
-
-        <td class="<%= element_class %>">
-          <% if element_class == "team" %>
-            <% if defined? edit %>
-              <%= select_tag "cell[#{row}][#{col}]", options_for_select(bracket.options, :selected => bracket.default(row, col)) %>
-            <% elsif bracketer %>
-              <% if bracketer.match %>
-                <%= link_to bracketer, bracketer.match %>
-              <% elsif bracketer.contester %>
-                <table>
-                  <td class="flag"><%= flag bracketer.contester.team.country %></td>
-                  <td class="bracket"><%= link_to bracketer.contester, bracketer.contester %></td>
-                </table>
-              <% end %>
+        <% cell_class = bracket_cell_class(bracket, bracketer, row, col, cols, is_edit) %>
+        <td class="<%= cell_class %>">
+        <% if bracket_cell_team?(row, col) %>
+          <% if is_edit %>
+            <%= select_tag "cell[#{row}][#{col}]", options_for_select(bracket.options, :selected => bracket.default(row, col)), { :style => "width: 100%; box-sizing: border-box; margin-bottom: 4px;" } %>
+            <div>
+              <%= text_field_tag "cell_custom[#{row}][#{col}]", bracketer&.custom_text || '', placeholder: "Custom text", style: "width: 100%; font-size: 0.7em; box-sizing: border-box;" %>
+            </div>
+          <% elsif bracket_show_content?(bracketer) %>
+            <% if bracketer.match %>
+              <div class="team-content"><%= link_to bracketer, bracketer.match %></div>
+            <% elsif bracketer.contester %>
+              <div class="team-content"><%= link_to bracketer.contester.team.name, bracketer.contester %></div>
+            <% elsif bracketer.custom_text.present? %>
+              <div class="team-content" style="font-size: 0.9em; color: #666;"><%= bracketer.custom_text %></div>
             <% end %>
           <% end %>
-        </td>
+        <% end %>
+          </td>
       <% end %>
     </tr>
   <% end %>
-</table>
-  </table>
+    </table>
+  </div>
 <% end %>
