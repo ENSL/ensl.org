@@ -79,6 +79,12 @@ server {
   }
 
   # FIXME: use env. var
+  location ^~ /files/.trash/ {
+    deny all;
+  }
+  location = /files/.trash {
+    deny all;
+  }
   location /files/ {
     # Safety guard: if $PRODUCTION_FILES is empty, don't serve anything.
     # try_files $uri $uri/ @puma;

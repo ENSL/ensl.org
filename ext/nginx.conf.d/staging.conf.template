@@ -56,6 +56,12 @@ server {
   }
 
   # FIXME: use env. var
+  location ^~ /files/.trash/ {
+    deny all;
+  }
+  location = /files/.trash {
+    deny all;
+  }
   location /files/ {
     alias /srv/ensl_files/;
     autoindex on;
