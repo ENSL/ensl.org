@@ -55,10 +55,15 @@ module Features
     def vote_random_servers(session_name, votes: 2)
       Capybara.using_session(session_name) do
         expect(page).to have_selector('ul#server-votes', wait: 10)
+        expect(page).to have_selector('ul#server-votes a', minimum: 1, wait: 10)
         gather_server_votes = gather.server_votes.count
 
         votes.times do
-          safe_click { all('ul#server-votes a', minimum: 1, wait: 3).sample.click }
+          safe_click do
+            first_choice = find('ul#server-votes a', match: :first, wait: 5)
+            choices = all('ul#server-votes a')
+            (choices.empty? ? first_choice : choices.sample).click
+          end
         end
 
         sleep(1)

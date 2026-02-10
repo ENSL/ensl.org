@@ -102,7 +102,9 @@ class Contester < ActiveRecord::Base
     self.extra = 0
 
     # Initialize ladder contesters with sequential scores to avoid negative values during rank updates
+    # But only if score was not explicitly set
     return unless contest&.contest_type == Contest::TYPE_LADDER
+    return if score.present?
 
     # Get the current max score in this ladder, default to -1 so first contester gets 0
     max_score = contest.contesters.maximum(:score) || -1

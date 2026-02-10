@@ -56,10 +56,10 @@ class Bracket < ActiveRecord::Base
   # The value indicates whether the cell is linked to a match or a contester (team).
   def default(row, col)
     b = bracketers.pos(row, col).first
-    return 'empty' unless b
+    return nil unless b
 
     return 'disabled' if b.disabled
-    return 'empty' unless b.match_id || b.team_id
+    return nil unless b.match_id || b.team_id
 
     b.match_id ? "match_#{b.match_id}" : "contester_#{b.team_id}"
   end

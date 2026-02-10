@@ -45,7 +45,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     sign_in_as(user)
     visit edit_team_path(team)
 
-    new_name = "#{team.name} Updated"
+    new_name = "Team #{team.id} Edit"
     find("a[href='#details']").click
     within('#details') do
       fill_in 'team_name', with: new_name
