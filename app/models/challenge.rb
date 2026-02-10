@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: challenges
@@ -28,6 +30,11 @@
 #  index_challenges_on_user_id        (user_id)
 #
 
+# Challenge model
+# A challenge is created by a team leader to challenge another team to a match.
+# It contains the proposed match time, map, server, and response of the challenged team.
+# If accepted, a match is created with the same parameters as the challenge.
+# rubocop:disable Metrics/ClassLength
 class Challenge < ActiveRecord::Base
   include Extra
 
@@ -36,33 +43,32 @@ class Challenge < ActiveRecord::Base
   STATUS_DEFAULT = 2
   STATUS_FORFEIT = 3
   STATUS_DECLINED = 4
-  AUTO_DEFAULT_TIME = 10_800	# Normal default time: 3 hours
-  CHALLENGE_BEFORE_MANDATORY = 432_000	# Min. time threshold for mandatory matches: 5 days
-  CHALLENGE_BEFORE_VOLUNTARY = 900	# Min. time threshold for voluntary matches: 15 mins
-  ACCEPT_BEFORE_MANDATORY = 86_400	# Time to accept before mandatory match time: 1 day
-  ACCEPT_BEFORE_VOLUNTARY = 300	# Time to accept before voluntary match time: 5 mins
-  MATCH_LENGTH = 7200	# Usual match length (for servers): 2 hours
+  AUTO_DEFAULT_TIME = 10_800 # Normal default time: 3 hours
+  CHALLENGE_BEFORE_MANDATORY = 432_000 # Min. time threshold for mandatory matches: 5 days
+  CHALLENGE_BEFORE_VOLUNTARY = 900 # Min. time threshold for voluntary matches: 15 mins
+  ACCEPT_BEFORE_MANDATORY = 86_400 # Time to accept before mandatory match time: 1 day
+  ACCEPT_BEFORE_VOLUNTARY = 300 # Time to accept before voluntary match time: 5 mins
+  MATCH_LENGTH = 7200 # Usual match length (for servers): 2 hours
 
-  # attr_protected :id, :updated_at, :created_at, :default_time, :user_id, :status
-
-  validates_presence_of :contester1, :contester2
-  validates_presence_of :map2, on: :update, unless: lambda { |c|
+  validates :contester1, :contester2, presence: true
+  validates :map2, presence: true, on: :update, unless: lambda { |c|
     [STATUS_ACCEPTED, STATUS_DEFAULT, STATUS_FORFEIT].include?(c.status)
   }
-  # validates_datetime :match_time, :default_time
-  # validates_length_of [:details, :response], :maximum => 255, :allow_blank => true, :allow_nil => true
-  # validate_on_create:validate_teams
-  # validate_on_create:validate_contest
-  # validate_on_create:validate_mandatory
-  # validate_on_create:validate_match_time
-  # validate_on_create:validate_server
-  # validate_on_create:validate_map1
-  # validate_on_update :validate_map2
-  # validate_on_update :validate_status
+  validates :details, :response, length: { maximum: 255 }, allow_blank: true
+
+  validate :validate_teams, on: :create
+  validate :validate_contest, on: :create
+  validate :validate_mandatory, on: :create
+  validate :validate_match_time, on: :create
+  validate :validate_server, on: :create
+  validate :validate_map1, on: :create
+  validate :validate_map2, on: :update
+  validate :validate_status, on: :update
 
   scope :category, ->(cat) { where(category_id: cat) }
-
-  scope :of_contester, ->(contester) { where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id) }
+  scope :of_contester, lambda { |contester|
+    where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id)
+  }
   scope :within_time, ->(from, to) { where('match_time > ? AND match_time < ?', from.utc, to.utc) }
   scope :around, lambda { |time|
     where('match_time > ? AND match_time < ?', time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc)
@@ -73,7 +79,7 @@ class Challenge < ActiveRecord::Base
   scope :future, -> { where('match_time > UTC_TIMESTAMP()') }
   scope :past, -> { where('match_time < UTC_TIMESTAMP()') }
 
-  has_one :match
+  has_one :match, dependent: :nullify
 
   belongs_to :map1, class_name: 'Map', optional: true
   belongs_to :map2, class_name: 'Map', optional: true
@@ -82,177 +88,215 @@ class Challenge < ActiveRecord::Base
   belongs_to :contester1, class_name: 'Contester', optional: true
   belongs_to :contester2, class_name: 'Contester', optional: true
 
+  before_validation :set_defaults, on: :create
+  after_create :send_challenge_notification
+  after_update :apply_status_change, if: :saved_change_to_status?
+
   def statuses
-    { STATUS_PENDING => 'Pending response',
+    {
+      STATUS_PENDING => 'Pending response',
       STATUS_ACCEPTED => 'Accepted',
       STATUS_DEFAULT => 'Default Time',
       STATUS_FORFEIT => 'Forfeited',
-      STATUS_DECLINED => 'Declined' }
+      STATUS_DECLINED => 'Declined'
+    }
   end
 
   def autodefault
     match_time - (mandatory ? ACCEPT_BEFORE_MANDATORY : ACCEPT_BEFORE_VOLUNTARY)
   end
 
-  def get_margin
+  def margin
     mandatory ? CHALLENGE_BEFORE_MANDATORY : CHALLENGE_BEFORE_VOLUNTARY
   end
 
-  def get_deadline
+  def deadline
     mandatory ? ACCEPT_BEFORE_MANDATORY : ACCEPT_BEFORE_VOLUNTARY
   end
 
-  def get_contester1
+  def set_contester1
     self.contester1 = user.active_contesters.of_contest(contester2.contest).first
   end
 
-  before_validation :set_defaults, on: :create
-
+  # rubocop:disable Metrics/AbcSize
   def set_defaults
     self.status = STATUS_PENDING
     # Ensure contest default_time responds to hour/minute; caller tests should set a Time
-    return unless contester1 && contester1.contest && contester1.contest.default_time.respond_to?(:hour)
+    return unless contester1&.contest && contester1.contest.default_time.respond_to?(:hour)
 
     self.default_time = match_time.end_of_week.change(
       hour: contester1.contest.default_time.hour,
       minute: contester1.contest.default_time.strftime('%M').to_i
     )
   end
+  # rubocop:enable Metrics/AbcSize
 
-  def after_create
+  def send_challenge_notification
     contester2.team.teamers.active.leaders.each do |teamer|
-      Notifications.challenge teamer.user, self if teamer.user.profile.notify_pms
+      Notifications.challenge(teamer.user, self) if teamer.user.profile.notify_pms
     end
   end
 
+  private
+
+  # rubocop:disable Metrics/AbcSize
   def validate_teams
-    errors.add :base, I18n.t(:challenges_yourself) if contester1.team == contester2.team
-    errors.add :base, I18n.t(:challenges_opponent_contest) if contester1.contest != contester2.contest
-    errors.add :base, I18n.t(:challenges_opponent_inactive) if !contester2.active or !contester2.team.active
-    return unless !contester1.active or !contester1.team.active
+    errors.add(:base, I18n.t(:challenges_yourself)) if contester1.team == contester2.team
+    errors.add(:base, I18n.t(:challenges_opponent_contest)) if contester1.contest != contester2.contest
+    errors.add(:base, I18n.t(:challenges_opponent_inactive)) unless contester2.active && contester2.team.active
+    return if contester1.active && contester1.team.active
 
-    errors.add :base, I18n.t(:challenges_inactive)
+    errors.add(:base, I18n.t(:challenges_inactive))
   end
+  # rubocop:enable Metrics/AbcSize
 
+  # rubocop:disable Metrics/AbcSize
   def validate_contest
-    if contester1.contest.end.past? or contester1.contest.status == Contest::STATUS_CLOSED
-      errors.add :base, I18n.t(:contests_closed)
+    if contester1.contest.end.past? || (contester1.contest.status == Contest::STATUS_CLOSED)
+      errors.add(:base, I18n.t(:contests_closed))
     end
-    return unless contester1.contest.contest_type != Contest::TYPE_LADDER and !match
+    return unless (contester1.contest.contest_type != Contest::TYPE_LADDER) && !match
 
-    errors.add :base, I18n.t(:contests_notladder)
+    errors.add(:base, I18n.t(:contests_notladder))
   end
+  # rubocop:enable Metrics/AbcSize
 
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
   def validate_mandatory
-    #  return unless mandatory
+    return unless mandatory
 
-    #  if contester2.score < contester1.score
-    #    errors.add :base, I18n.t(:challenges_mandatory)
-    #  end
-    #  if Challenge.pending.count(:conditions =>  \
-    #                             ["contester1_id = ? AND contester2_id = ? AND	mandatory = true AND default_time < UTC_TIMESTAMP()",
-    #                              contester1.id, contester2.id]) > 0
-    #    errors.add :base, I18n.t(:challenges_mandatory_handled)
-    #  end
-    #  if Match.of_contester(contester2).on_week(match_time).count > 0
-    #    errors.add :base, I18n.t(:challenges_opponent_week)
-    #  end
-    #  if Challenge.of_contester(contester2).mandatory.on_week(match_time).count > 0
-    #    errors.add :base, I18n.t(:challenges_opponent_mandatory_week)
-    #  end
-    #  if Challenge.of_contester(contester2).mandatory.on_week(default_time).count > 0
-    #    errors.add :base, I18n.t(:challenges_opponent_mandatory_week_defaulttime)
-    #  end
-    #  if Match.of_contester(contester2).around(default_time).count > 0
-    #    errors.add :base, I18n.t(:challenges_opponent_defaulttime)
-    #  end
+    errors.add(:base, I18n.t(:challenges_mandatory)) if contester2.score < contester1.score
+
+    if Challenge.pending.where(contester1: contester1, contester2: contester2, mandatory: true)
+                .where('default_time < UTC_TIMESTAMP()').exists?
+      errors.add(:base, I18n.t(:challenges_mandatory_handled))
+    end
+
+    errors.add(:base, I18n.t(:challenges_opponent_week)) if Match.of_contester(contester2).on_week(match_time).exists?
+
+    if Challenge.of_contester(contester2).mandatory.on_week(match_time).exists?
+      errors.add(:base, I18n.t(:challenges_opponent_mandatory_week))
+    end
+
+    if Challenge.of_contester(contester2).mandatory.on_week(default_time).exists?
+      errors.add(:base, I18n.t(:challenges_opponent_mandatory_week_defaulttime))
+    end
+
+    return unless Match.of_contester(contester2).around(default_time).exists?
+
+    errors.add(:base, I18n.t(:challenges_opponent_defaulttime))
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
 
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def validate_match_time
-    #    if (match_time-get_margin).past?
-    #      if get_margin > 86400
-    #        errors.add :base, I18n.t(:matches_time1) + get_margin / 60 / 60 / 24 + I18n.t(:matches_time2)
-    #      else
-    #        errors.add :base, I18n.t(:matches_time1) + get_margin / 60 + I18n.t(:matches_time3)
-    #      end
-    #    end
-    #    if Challenge.of_contester(contester2).around(match_time).pending.count > 0
-    #      errors.add :base, I18n.t(:challenges_opponent_specifictime)
-    #    end
-    #    if Match.of_contester(contester2).around(match_time).count > 0
-    #      errors.add :base, I18n.t(:challenges_opponent_match_specifictime)
-    #    end
-    #    if match_time > contester1.contest.end
-    #      errors.add :base, I18n.t(:contests_end)
-    #    end
-  end
+    if (match_time - margin).past?
+      if margin > 86_400
+        errors.add(:base, "#{I18n.t(:matches_time1)} #{margin / 60 / 60 / 24} #{I18n.t(:matches_time2)}")
+      else
+        errors.add(:base, "#{I18n.t(:matches_time1)} #{margin / 60} #{I18n.t(:matches_time3)}")
+      end
+    end
 
-  def validate_server
-    #   unless server and server.official
-    #     errors.add :base, I18n.t(:servers_notavailable)
-    #   end
-    #   unless server.is_free match_time
-    #     errors.add :base, I18n.t(:servers_notfree_specifictime)
-    #   end
-    #   if !server.is_free default_time
-    #     errors.add :base, I18n.t(:servers_notfree_defaulttime)
-    #   end
+    if Challenge.of_contester(contester2).around(match_time).pending.exists?
+      errors.add(:base, I18n.t(:challenges_opponent_specifictime))
+    end
+
+    if Match.of_contester(contester2).around(match_time).exists?
+      errors.add(:base, I18n.t(:challenges_opponent_match_specifictime))
+    end
+
+    return unless match_time > contester1.contest.end
+
+    errors.add(:base, I18n.t(:contests_end))
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+  # rubocop:disable Metrics/AbcSize
+  def validate_server
+    return unless server # Server is optional, only validate if provided
+
+    unless server.official
+      errors.add(:base, I18n.t(:servers_notavailable))
+      return
+    end
+
+    errors.add(:base, I18n.t(:servers_notfree_specifictime)) unless server.is_free(match_time)
+
+    return if server.is_free(default_time)
+
+    errors.add(:base, I18n.t(:servers_notfree_defaulttime))
+  end
+  # rubocop:enable Metrics/AbcSize
 
   def validate_map1
-    return if contester1.contest.maps.exists?(map1)
+    return unless map1 # Map1 is optional, only validate if provided
+    return if contester1.contest.maps.exists?(map1.id)
 
-    errors.add :base, I18n.t(:contests_map_notavailable)
+    errors.add(:base, I18n.t(:contests_map_notavailable))
   end
 
   def validate_map2
-    return if contester2.contest.maps.exists?(map2)
+    return unless map2 # Only validate if map2 is provided
 
-    errors.add :base, I18n.t(:contests_map_notavailable)
+    return if contester2.contest.maps.exists?(map2.id)
+
+    errors.add(:base, I18n.t(:contests_map_notavailable))
   end
 
   def validate_status
-    if mandatory and ![STATUS_ACCEPTED, STATUS_DEFAULT, STATUS_FORFEIT].include? status
-      errors.add :base, I18n.t(:challenges_mandatory_invalidresult)
+    if mandatory && ![STATUS_ACCEPTED, STATUS_DEFAULT, STATUS_FORFEIT].include?(status)
+      errors.add(:base, I18n.t(:challenges_mandatory_invalidresult))
     end
-    return if statuses.include? status
+    return if statuses.key?(status)
 
-    errors.add :base, I18n.t(:challenges_mandatory_invalidresult)
+    errors.add(:base, I18n.t(:challenges_mandatory_invalidresult))
   end
 
-  after_update :apply_status_change
-
   def apply_status_change
-    return unless saved_change_to_status?
-
-    if status == STATUS_ACCEPTED
-      make_match.save
-    elsif status == STATUS_DEFAULT
-      m = make_match
-      m.match_time = default_time
-      m.save
-    elsif status == STATUS_FORFEIT
-      m = make_match
-      m.forfeit = true
-      m.score1 = 4
-      m.score2 = 0
-      m.match_time = default_time
-      m.save
+    case status
+    when STATUS_ACCEPTED
+      create_accepted_match
+    when STATUS_DEFAULT
+      create_default_match
+    when STATUS_FORFEIT
+      create_forfeit_match
     end
+  end
+
+  def create_accepted_match
+    make_match.save
+  end
+
+  def create_default_match
+    m = make_match
+    m.match_time = default_time
+    m.save
+  end
+
+  def create_forfeit_match
+    m = make_match
+    m.forfeit = true
+    m.score1 = 4
+    m.score2 = 0
+    m.match_time = default_time
+    m.save
   end
 
   def make_match
-    match = Match.new
-    match.contester1 = contester1
-    match.contester2 = contester2
-    match.map1 = map1
-    match.map2 = map2
-    match.contest = contester1.contest
-    match.challenge = self
-    match.server = server
-    match.match_time = match_time
-    match
+    Match.new(
+      contester1: contester1,
+      contester2: contester2,
+      map1: map1,
+      map2: map2,
+      contest: contester1.contest,
+      challenge: self,
+      server: server,
+      match_time: match_time
+    )
   end
+
+  public
 
   def can_create?(cuser)
     return false unless cuser
@@ -260,19 +304,22 @@ class Challenge < ActiveRecord::Base
 
     validate_teams
     validate_contest
-    true if (contester1.team.is_leader?(cuser) or cuser.admin?) and errors.size == 0
+    (contester1.team.is_leader?(cuser) || cuser.admin?) && errors.empty?
   end
 
   def can_update?(cuser)
-    cuser and (contester2.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING # and autodefault.future?
+    cuser && (contester2.team.is_leader?(cuser) || cuser.admin?) && status == STATUS_PENDING
   end
 
   def can_destroy?(cuser)
-    cuser and (contester1.team.is_leader? cuser or cuser.admin?) and status == STATUS_PENDING # and autodefault.future?
+    cuser && (contester1.team.is_leader?(cuser) || cuser.admin?) && status == STATUS_PENDING
   end
 
-  def self.params(params, cuser)
-    params.require(:challenge).permit(:contester1_id, :contester2_id, :match_time, :mandatory, :server_id, :details,
-                                      :response, :map1_id, :map2_id)
+  def self.params(params, _cuser)
+    params.require(:challenge).permit(
+      :contester1_id, :contester2_id, :match_time, :mandatory,
+      :server_id, :details, :response, :map1_id, :map2_id
+    )
   end
 end
+# rubocop:enable Metrics/ClassLength
