@@ -52,7 +52,7 @@ module BracketFactoryHelpers
       c = Contester.find_by(contest: contest, team: teams[idx])
       next unless c
 
-      create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
+      FactoryBot.create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
       cell_effective[[row, 0]] = c
     end
 
@@ -63,15 +63,15 @@ module BracketFactoryHelpers
         c2 = cell_effective[[lower, col - 1]]
         next unless c1 && c2
 
-        match = create(:match, contest: contest, contester1: c1, contester2: c2,
-                               map1: maps[0], map2: maps[1] || maps[0],
-                               match_time: rand(1..14).days.ago)
+        match = FactoryBot.create(:match, contest: contest, contester1: c1, contester2: c2,
+                                          map1: maps[0], map2: maps[1] || maps[0],
+                                          match_time: rand(1..14).days.ago)
         s1 = rand(0..4)
         s2 = rand(0..4)
         s2 = (s1 == s2 ? s1 + 1 : s2) # no ties
         match.update(score1: s1, score2: s2)
 
-        create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
+        FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
         cell_effective[[row, col]] = (s1 > s2 ? c1 : c2)
       end
     end
@@ -91,7 +91,7 @@ module BracketFactoryHelpers
       c = Contester.find_by(contest: contest, team: teams[idx])
       next unless c
 
-      create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
+      FactoryBot.create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
       cell_effective[[row, 0]] = c
     end
 
@@ -102,7 +102,7 @@ module BracketFactoryHelpers
         next if candidates.empty?
 
         winner = candidates.sample
-        create(:bracketer, bracket: bracket, row: row, column: col, team_id: winner.id)
+        FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, team_id: winner.id)
         cell_effective[[row, col]] = winner
       end
     end
@@ -125,8 +125,8 @@ module BracketFactoryHelpers
     team_idx = 0
     col0.each_with_index do |row, idx|
       if text_indices.include?(idx)
-        create(:bracketer, bracket: bracket, row: row, column: 0,
-                           custom_text: CUSTOM_TEXT_SAMPLES.sample)
+        FactoryBot.create(:bracketer, bracket: bracket, row: row, column: 0,
+                                      custom_text: CUSTOM_TEXT_SAMPLES.sample)
         cell_is_text[[row, 0]] = true
       else
         next unless teams[team_idx]
@@ -135,7 +135,7 @@ module BracketFactoryHelpers
         team_idx += 1
         next unless c
 
-        create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
+        FactoryBot.create(:bracketer, bracket: bracket, row: row, column: 0, team_id: c.id)
         cell_effective[[row, 0]] = c
       end
     end
@@ -152,7 +152,7 @@ module BracketFactoryHelpers
         cell_effective.delete([row, 0])
         cell_is_text.delete([row, 0])
       else
-        create(:bracketer, bracket: bracket, row: row, column: 0, disabled: true)
+        FactoryBot.create(:bracketer, bracket: bracket, row: row, column: 0, disabled: true)
       end
     end
 
@@ -167,9 +167,9 @@ module BracketFactoryHelpers
 
         if c1 && c2
           # Both real: create match (some played, some not)
-          match = create(:match, contest: contest, contester1: c1, contester2: c2,
-                                 map1: maps[0], map2: maps[1] || maps[0],
-                                 match_time: rand(-3..5).days.from_now)
+          match = FactoryBot.create(:match, contest: contest, contester1: c1, contester2: c2,
+                                            map1: maps[0], map2: maps[1] || maps[0],
+                                            match_time: rand(-3..5).days.from_now)
           if rand < 0.6 # 60% played
             s1 = rand(0..4)
             s2 = rand(0..4)
@@ -178,13 +178,13 @@ module BracketFactoryHelpers
             winner = s1 > s2 ? c1 : c2
             cell_effective[[row, col]] = winner
           end
-          create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
         elsif c1 && !c2 && !lower_text
           # Only upper has a real team, lower is empty/disabled: team advances
-          create(:bracketer, bracket: bracket, row: row, column: col, team_id: c1.id)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, team_id: c1.id)
           cell_effective[[row, col]] = c1
         elsif c2 && !c1 && !upper_text
-          create(:bracketer, bracket: bracket, row: row, column: col, team_id: c2.id)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, team_id: c2.id)
           cell_effective[[row, col]] = c2
         end
         # If both are text/nil/disabled — cell stays empty (no orphan advancement)
@@ -206,27 +206,27 @@ module BracketFactoryHelpers
         if roll < 10
           # Empty — do nothing
         elsif roll < 20
-          create(:bracketer, bracket: bracket, row: row, column: col, disabled: true)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, disabled: true)
         elsif roll < 35
-          create(:bracketer, bracket: bracket, row: row, column: col,
-                             custom_text: CUSTOM_TEXT_SAMPLES.sample)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col,
+                                        custom_text: CUSTOM_TEXT_SAMPLES.sample)
         elsif roll < 55
           c = all_contesters.sample
-          create(:bracketer, bracket: bracket, row: row, column: col, team_id: c&.id) if c
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, team_id: c&.id) if c
         else
           # Match with random contesters (may not match predecessors at all)
           c1, c2 = all_contesters.sample(2)
           next unless c1 && c2
 
-          match = create(:match, contest: contest, contester1: c1, contester2: c2,
-                                 map1: maps[0], map2: maps[1] || maps[0],
-                                 match_time: rand(-7..7).days.from_now)
+          match = FactoryBot.create(:match, contest: contest, contester1: c1, contester2: c2,
+                                            map1: maps[0], map2: maps[1] || maps[0],
+                                            match_time: rand(-7..7).days.from_now)
           if rand < 0.5
             s1 = rand(0..5)
             s2 = rand(0..5)
             match.update(score1: s1, score2: s2)
           end
-          create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
+          FactoryBot.create(:bracketer, bracket: bracket, row: row, column: col, match_id: match.id)
         end
       end
     end
