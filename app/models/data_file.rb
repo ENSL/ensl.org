@@ -23,8 +23,15 @@
 #  index_data_files_on_related_id    (related_id)
 #
 
-# DataFile uses CarrierWave to manage files. The attrribute 'name' is the most crucial attribute.
-# Avoid using .path for anything, rather use .location which is alias.
+# DataFile manages file uploads through CarrierWave mounted on the 'name' attribute.
+#
+# IMPORTANT - Path vs Location:
+# - location (method): Returns current filesystem path via CarrierWave (name.current_path)
+#   THIS IS THE SOURCE OF TRUTH - always use for file operations
+# - path (column): Cached full path for query performance and tracking moves
+#   Updated automatically when directory changes
+#
+# The filesystem is authoritative - metadata (MD5, size) is synced from actual files on disk.
 
 require 'digest/md5'
 
@@ -33,16 +40,14 @@ class DataFile < ActiveRecord::Base
 
   MEGABYTE = 1_048_576
 
-  attr_accessor :related_id
-
   scope :recent, -> { order('created_at DESC').limit(8) }
   scope :demos, lambda {
-    order('created_at DESC').where('directory_id IN (SELECT id FROM directories WHERE parent_id = ?)', Directory::DEMOS)
+    joins(directory: :parent).where(directories: { parent_id: Directory::DEMOS }).order('data_files.created_at DESC')
   }
   scope :ordered, -> { order('created_at DESC') }
-  scope :movies, -> { order('created_at DESC').where({ directory_id: Directory::MOVIES }) }
-  scope :not, ->(file) { where.not(id: file.id) }
-  scope :unrelated, -> { where('related_id is null') }
+  scope :movies, -> { order('created_at DESC').where(directory_id: Directory::MOVIES) }
+  scope :except_file, ->(file) { where.not(id: file.id) }
+  scope :unrelated, -> { where(related_id: nil) }
 
   has_many :related_files, class_name: 'DataFile', foreign_key: :related_id
   has_many :comments, as: :commentable
@@ -55,15 +60,21 @@ class DataFile < ActiveRecord::Base
 
   validates_length_of %i[description path], maximum: 255
 
-  before_save :process_file
-  after_create :create_movie, if: proc { |file| file.directory_id == Directory::MOVIES and !file.location.include?('_preview.mp4') }
-  after_save :update_relations, if: proc { |file| file.related_id_changed? and related_files.count.positive? }
+  # Callback chain for file processing (order matters)
+  before_save :sync_file_metadata, if: -> { File.exist?(location) }
+  before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
+  before_save :ensure_path_cached, if: :directory
+  before_validation :auto_generate_description, if: -> { description.blank? }
+  before_save :auto_link_preview_file, if: -> { !related && location.include?('_preview.mp4') }
+  after_save :update_movie_metadata, if: -> { movie && saved_change_to_md5? }
+  after_create :create_movie, if: :should_create_movie?
+  after_save :update_relations, if: :should_update_relations?
 
   # acts_as_rateable
   mount_uploader :name, FileUploader
 
   def to_s
-    description && description.empty? ? File.basename(name.to_s) : description
+    description.present? ? description : File.basename(path.to_s)
   end
 
   def md5_s
@@ -78,7 +89,8 @@ class DataFile < ActiveRecord::Base
     "#{(size.to_f / MEGABYTE).round(2)} MB"
   end
 
-  # Just an alias, use this to find the file's current path
+  # Returns the current filesystem path. Source of truth for file location.
+  # Note: disk is authoritative; this should always match what's on disk.
   def location
     name.current_path
   end
@@ -93,41 +105,92 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-  def process_file
-    self.md5 = 'e948c22100d29623a1df48e1760494df'
+  private
 
-    self.directory_id = Directory::ARTICLES if article
+  # Recompute MD5, size, and timestamp from actual file on disk
+  def sync_file_metadata
+    return unless File.exist?(location)
+    return unless new_record? || file_changed_on_disk?
 
-    if File.exist?(location) && (new_record? || (size != File.size(location)) || (created_at != File.mtime(location)))
-      self.md5 = Digest::MD5.hexdigest(File.read(location))
-      self.size = File.size(location)
-      self.created_at = File.mtime(location)
-    end
+    self.md5 = Digest::MD5.hexdigest(File.read(location))
+    self.size = File.size(location)
+    self.created_at = File.mtime(location)
+  end
 
-    # Update the path on creation
+  # Check if the actual file has changed since last save
+  def file_changed_on_disk?
+    size != File.size(location) || created_at != File.mtime(location)
+  end
 
-    # Move the file if it has moved
-    FileUtils.mv(path, location) if !new_record? && directory_id_changed? && File.exist?(path)
+  # Move file on disk when directory changes (uses old cached path and new location)
+  def move_file_between_directories
+    return unless path && File.exist?(path)
+    return unless directory&.full_path # Guard: directory must exist
+    return if path == location # Already in correct location
 
-    self.path = File.join(directory.full_path, File.basename(name.to_s)) if path.nil? || directory_id_changed?
+    FileUtils.mv(path, location)
+    Rails.logger.info("Moved file from #{path} to #{location}")
+  rescue StandardError => e
+    Rails.logger.error("Failed to move file from #{path} to #{location}: #{e.message}")
+    raise ActiveRecord::RecordInvalid, "File system error: Cannot move file - #{e.message}"
+  end
 
-    if description.nil? || description.empty?
-      self.description = File.basename(location).gsub(/[_-]/, ' ').gsub(/\.\w{1,5}$/, '')
-      self.description = description.split(/\s+/).each(&:capitalize!).join(' ')
-    end
+  # Cache the full path in the path attribute for query performance
+  def ensure_path_cached
+    return unless directory
 
-    self.description = "#{match.contester1} vs #{match.contester2}" if match
+    new_path = File.join(directory.full_path, File.basename(name.to_s))
+    self.path = new_path if path.nil? || directory_id_changed?
+  end
 
-    if location.include?('_preview.mp4') && !related
-      stripped = location.gsub(/_preview\.mp4/, '')
-      DataFile.where(['path LIKE ?', "#{stripped}%"]).each do |r|
-        self.related = r if r.location.match(/#{stripped}\.\w{1,5}$/)
+  # Auto-generate description from filename or match data
+  def auto_generate_description
+    self.description = if match
+                         "#{match.contester1} vs #{match.contester2}"
+                       else
+                         generate_description_from_filename
+                       end
+  end
+
+  # Clean up filename to create a readable description
+  def generate_description_from_filename
+    filename = File.basename(location)
+    # Remove file extension and replace underscores/dashes with spaces
+    cleaned = filename.gsub(/\.\w+$/, '').gsub(/[_-]/, ' ')
+    # Capitalize each word
+    cleaned.split(/\s+/).map(&:capitalize).join(' ')
+  end
+
+  # Link preview videos to their full versions
+  def auto_link_preview_file
+    basename = location.gsub(/_preview\.mp4$/, '')
+    find_and_link_related_file(basename)
+  end
+
+  # Find the full-version file matching this preview
+  def find_and_link_related_file(basename)
+    DataFile.where('path LIKE ?', "#{basename}%").each do |candidate|
+      if candidate.location.match?(/#{Regexp.escape(basename)}\.\w+$/)
+        self.related = candidate
+        return
       end
     end
+  end
 
-    return unless movie && (new_record? || md5_changed?)
-
+  # Update movie metadata if movie exists and file changed
+  def update_movie_metadata
     movie.get_length
+  end
+
+  public
+
+  def should_create_movie?
+    directory_id == Directory::MOVIES && !location.include?('_preview.mp4')
+  end
+
+  def should_update_relations?
+    # Check if related_id changed in the previous save and we have related files
+    saved_change_to_related_id? && related_files.any?
   end
 
   def create_movie
@@ -139,37 +202,52 @@ class DataFile < ActiveRecord::Base
 
   def update_relations
     related_files.each do |rf|
-      rf.related = related
-      rf.save
+      rf.update(related: related)
     end
   end
 
   def rateable?(user)
-    user and !rated_by?(user)
+    user && !rated_by?(user)
   end
 
-  # TODO: instead of using path, use name + directory path
+  # Find existing file record by path or checksum (disk-authoritative lookup)
   def self.find_existing(subitem_path, _subitem_name)
-    hash = Digest::MD5.hexdigest(File.read(subitem_path))
-    DataFile.where(arel_table[:path].eq(subitem_path)\
-      .or(arel_table[:md5].eq(hash))).first
+    return DataFile.find_by(path: subitem_path) if File.exist?(subitem_path)
+
+    hash = compute_file_hash(subitem_path)
+    return unless hash
+
+    DataFile.find_by(md5: hash)
+  rescue StandardError => e
+    Rails.logger.error("Error finding existing file for #{subitem_path}: #{e.message}")
+    nil
+  end
+
+  # Safely compute MD5 hash of a file
+  def self.compute_file_hash(file_path)
+    Digest::MD5.hexdigest(File.read(file_path))
+  rescue StandardError => e
+    Rails.logger.warn("Could not compute hash for #{file_path}: #{e.message}")
+    nil
   end
 
   def can_create?(cuser)
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_MUTE)
 
-    (cuser.admin? or \
-     (article&.can_create? cuser) or \
-     (directory_id == Directory::MOVIES and cuser.has_access? Group::MOVIES))
+    cuser.admin? || article&.can_create?(cuser) || (directory_id == Directory::MOVIES && cuser.has_access?(Group::MOVIES))
   end
 
   def can_update?(cuser)
-    cuser&.admin? or (article&.can_create? cuser)
+    return false unless cuser
+
+    cuser.admin? || article&.can_create?(cuser)
   end
 
   def can_destroy?(cuser)
-    cuser&.admin? or (article&.can_create? cuser)
+    return false unless cuser
+
+    cuser.admin? || article&.can_create?(cuser)
   end
 
   def self.params(params, _cuser)

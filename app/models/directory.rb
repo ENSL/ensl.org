@@ -18,16 +18,10 @@
 #
 #  index_directories_on_parent_id  (parent_id)
 #
+require 'securerandom'
 require 'stringio'
 
 ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
-
-class PathValidator < ActiveModel::Validator
-  def validate(record)
-    record.errors.add :path, "doesn't match generated path" unless \
-      record.full_path == record.path
-  end
-end
 
 class Directory < ActiveRecord::Base
   include Extra
@@ -39,7 +33,7 @@ class Directory < ActiveRecord::Base
   MOVIES = 30
   ARTICLES = 39
 
-  attr_accessor :preserve_files
+  attr_accessor :preserve_files, :move_to_trash
 
   belongs_to :parent, class_name: 'Directory', optional: true
   has_many :subdirs, class_name: 'Directory', foreign_key: :parent_id
@@ -50,44 +44,53 @@ class Directory < ActiveRecord::Base
   scope :filtered, -> { where(hidden: false) }
   scope :of_parent, ->(parent) { where(parent_id: parent.id) }
 
-  # FIXME: different validation for user?
-  validates_length_of %i[name path title], in: 1..255
-  validates_format_of :name, with: /\A[A-Za-z0-9]{1,20}\z/, on: :create
-  validates_length_of :name, in: 1..255
-  validates_inclusion_of :hidden, in: [true, false]
-  validates_presence_of :title
-  validates_with PathValidator
-  # TODO: add validation for path
+  validates :name, presence: true, length: { in: 1..255 }, format: { with: /\A[A-Za-z0-9]{1,20}\z/, on: :create }
+  validate :name_unchanged_on_update, on: :update
+  validates :path, presence: true, length: { in: 1..255 }
+  validates :title, presence: true, length: { in: 1..255 }
+  validates :hidden, inclusion: { in: [true, false] }
 
   before_validation :init_variables
   after_create :make_path
   after_save :update_timestamp
-  before_destroy :remove_files, unless: proc { preserve_files }
-  after_destroy :remove_path
+  before_destroy :remove_files, unless: :preserve_files?
+  after_destroy :remove_path, unless: :skip_remove_path?
 
   def to_s
     name
   end
 
   def parent_root?
-    parent.id == Directory::ROOT
+    parent&.id == Directory::ROOT
   end
 
   def root?
     id == Directory::ROOT
   end
 
+  def preserve_files?
+    preserve_files == true
+  end
+
+  def move_to_trash?
+    move_to_trash == true
+  end
+
+  private
+
+  # Prevent renaming directories after creation (would break filesystem structure)
+  def name_unchanged_on_update
+    return unless name_changed?
+
+    errors.add(:name, 'cannot be changed after creation')
+  end
+
+  public
+
   def full_title
-    output = ''
-    Directory.directory_traverse(self).reverse_each do |dir|
-      output << if dir.title && dir.title.empty?
-                  dir.name
-                else
-                  '%s' % dir.title
-                end
-      output << ' » ' unless self == dir
-    end
-    output
+    Directory.directory_traverse(self).reverse.map do |dir|
+      dir.title.present? ? dir.title : dir.name
+    end.join(' » ')
   end
 
   def self.directory_traverse(directory, list = [])
@@ -110,160 +113,284 @@ class Directory < ActiveRecord::Base
     File.directory?(full_path)
   end
 
+  # Cache computed values before validation
+  # path: Cached from full_path for query performance
+  # title: Auto-generated from directory name if not provided
+  # hidden: Defaults to false
   def init_variables
-    # Force path to use parent which is the authoritative source
+    # Cache the full hierarchical path for this directory
     self.path = full_path if parent
-    self.title = File.basename(path).capitalize
+    self.title = File.basename(path).capitalize if path.present? && title.blank?
     self.hidden = false if hidden.nil?
   end
 
   def make_path
-    Dir.mkdir(full_path) unless File.exist?(full_path)
+    return if File.exist?(full_path)
+
+    Dir.mkdir(full_path)
+    Rails.logger.info("Created directory: #{full_path}")
+  rescue StandardError => e
+    Rails.logger.error("Failed to create directory #{full_path}: #{e.message}")
+    raise ActiveRecord::RecordInvalid, "Filesystem error: Cannot create directory - #{e.message}"
   end
 
   def update_timestamp
-    self.created_at = File.mtime(full_path) if File.exist?(full_path)
+    return unless File.exist?(full_path)
+
+    self.created_at = File.mtime(full_path)
+  rescue StandardError => e
+    Rails.logger.warn("Failed to update timestamp for #{full_path}: #{e.message}")
   end
 
   def remove_files
-    files.each(&:destroy)
+    move_directory_to_trash if move_to_trash?
+    files.destroy_all
     subdirs.each do |subdir|
-      subdir.preserve_files = preserve_files
+      subdir.preserve_files = preserve_files? || move_to_trash?
       subdir.destroy
     end
   end
 
   def remove_path
-    Dir.unlink(full_path) if File.exist?(full_path)
+    return unless File.exist?(full_path)
+    return unless Dir.empty?(full_path)
+
+    Dir.unlink(full_path)
+  rescue StandardError => e
+    Rails.logger.error("Failed to remove directory #{full_path}: #{e.message}")
+  end
+
+  def skip_remove_path?
+    preserve_files? || move_to_trash?
+  end
+
+  def move_directory_to_trash
+    return unless Dir.exist?(full_path)
+
+    ensure_trash_root
+    trash_path = next_trash_path
+    FileUtils.mv(full_path, trash_path)
+    Rails.logger.info("Moved directory to trash: #{full_path} -> #{trash_path}")
+  rescue StandardError => e
+    Rails.logger.error("Failed to move directory #{full_path} to trash: #{e.message}")
+    raise ActiveRecord::RecordInvalid, "Filesystem error: Cannot move to trash - #{e.message}"
+  end
+
+  def ensure_trash_root
+    FileUtils.mkdir_p(trash_root)
+  end
+
+  def trash_root
+    File.join(ENV['FILES_ROOT'], '.trash')
+  end
+
+  def next_trash_path
+    base = File.basename(full_path)
+    timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
+    candidate = File.join(trash_root, "#{base}_#{id}_#{timestamp}")
+    return candidate unless File.exist?(candidate)
+
+    unique_suffix = SecureRandom.hex(4)
+    File.join(trash_root, "#{base}_#{id}_#{timestamp}_#{unique_suffix}")
   end
 
   # TODO: make tests for this, moving etc.
   # TODO: mutate instead of return.
-  # TODO: move to its own class
   # TODO: also remove files
   # TODO: need log to rails log too
+  # Sync database with filesystem (disk-authoritative reconciliation)
+  # Returns a StringIO containing the operation log
   def recreate_transaction
-    strio = StringIO.new
-    logger = Logger.new(strio)
-    logger.info format('Starting recreate on Directory(%d): %s.', id, name)
-    logger.info format('DataFiles: %d Directories: %d', DataFile.all.count, Directory.all.count)
-    ActiveRecord::Base.transaction do
-      # We use destroy lists so technically there can be seperate roots
-      destroy_dirs = {}
-      update_attribute :path, ENV['FILES_ROOT'] if id == Directory::ROOT
-      logger.info format('Path: %s', path)
-      destroy_dirs = recreate(destroy_dirs, logger: logger)
-      destroy_dirs.each_value do |dir|
-        logger.info 'Removed dir: %s' % dir.full_path
-        dir.preserve_files = true
-        dir.destroy!
-      end
-    end
-    logger.info format('DataFiles: %d Directories: %d', DataFile.all.count, Directory.all.count)
-    logger.info 'Finish recreate'
-    strio
-    # TODO: check items that weren't checked.
+    DirectoryReconciliationService.new(self).call
   end
 
-  # QUESTION Symlinks?
+  # Recursively sync this directory's database state with filesystem
+  # Disk is authoritative - we scan actual directories and match to DB records
   def recreate(destroy_dirs, logger: Rails.logger)
-    # Convert all subdirs into a hash and mark them to be deleted
-    # FIXME: better oneliner
-    # logger.debug 'recreate: %s' % full_path
-    destroy_dirs.merge!(subdirs.all.map { |s| [s.id, s] }.to_h)
+    # Mark all existing subdirs for deletion (we'll unmark those found on disk)
+    destroy_dirs.merge!(subdirs.index_by(&:id))
 
-    # Go through all subdirectories (no recursion)
-    Dir.glob(File.join(full_path, '*')).each do |subitem_path|
-      subitem_name = File.basename(subitem_path)
-
-      if File.directory? subitem_path
-        # logger.debug 'Processing dir: %s' % subitem_path
-        # We find by name only, ignore path
-        # Find existing subdirs from current path. Keep those we find
-        if (subdir = find_existing(subitem_name, subitem_path))
-          if subdir.parent_id != id
-            old_path = subdir.full_path
-            subdir.parent = self
-            subdir.save!
-            logger.info format('Renamed dir: %s -> %s', old_path, subdir.full_path)
-          elsif !subdir.valid?
-            subdir.errors.full_messages.each do |err|
-              logger.error err
-            end
-            subdir.init_variables
-            logger.info format('Fixed attributes: %s', subdir.full_path)
-            subdir.save!
-          end
-          destroy_dirs.delete subdir.id
-        # In case its a new directory
-        else
-          # Attempt to find it in existing directories
-          subdir = subdirs.build(name: subitem_name)
-          # FIXME: find a better solution
-          subdir.save!(validate: false)
-          logger.info 'New dir: %s' % subdir.full_path
-        end
-        # Recreate the directory
-        destroy_dirs = subdir.recreate(destroy_dirs, logger: logger)
-      elsif File.file? subitem_path
-        # logger.debug 'Processing file: %s' % subitem_path
-        if (dbfile = DataFile.find_existing(subitem_path, subitem_name))
-          if dbfile.directory_id != id
-            dbfile.directory = self
-            dbfile.save!
-            logger.info 'Update file: %s' % dbfile.name
-          end
-        elsif (File.mtime(subitem_path) + 100).past?
-          dbfile = DataFile.new
-          # dbfile.name = subitem_name
-          dbfile.directory = self
-          dbfile.manual_upload(subitem_path)
-          dbfile.save!
-          logger.info 'Added file: %s' % dbfile.name
-        end
-        # TODO: handle files that are only in database
-      end
-    end
+    scan_disk_entries(destroy_dirs, logger)
     destroy_dirs
   end
 
-  def find_existing(subdir_name, subitem_path)
-    # Find by name
-    if (dir = subdirs.where(name: subdir_name)).exists?
-      return dir.first
-    # Problem is we can't find it if haven't got that far
-    else
-      Directory.where(name: subdir_name).all.each do |dir|
-        return dir unless dir.path_exists?
+  private
+
+  # Scan all items in this directory on disk and sync with database
+  def scan_disk_entries(destroy_dirs, logger)
+    Dir.glob(File.join(full_path, '*')).each do |item_path|
+      item_name = File.basename(item_path)
+
+      if File.directory?(item_path)
+        process_disk_directory(item_name, item_path, destroy_dirs, logger)
+      elsif File.file?(item_path)
+        process_disk_file(item_path, item_name, logger)
       end
-      # TODO: use filter_map here
-      # NOTE: we don't use the logic from date_file
-      file_count = Dir['%s/*' % subitem_path].count { |f| File.file?(f) }
-      Directory.joins(:files).group('data_files.directory_id')\
-               .having('count(data_files.id) = ? and count(data_files.id) > 0', file_count).each do |dir|
-        Dir.glob(File.join(dir.full_path, '*')).each do |filename|
-          return false if File.size(file) != dir.files.where(name: filename).first&.size
-        end
-        return dir
-      end
-      # TODO: Find by number of files + hash of files
+    end
+  rescue StandardError => e
+    logger.error("Error scanning #{full_path}: #{e.message}")
+  end
+
+  # Process a directory found on disk
+  def process_disk_directory(item_name, item_path, destroy_dirs, logger)
+    subdir = find_or_create_subdir(item_name, item_path, logger)
+    return unless subdir
+
+    # If parent changed, move the record
+    if subdir.parent_id != id
+      move_subdir_to_self(subdir, logger)
+    elsif !subdir.valid?
+      fix_subdir_attributes(subdir, logger)
     end
 
-    false
+    destroy_dirs.delete(subdir.id)
+    subdir.recreate(destroy_dirs, logger: logger)
+  end
+
+  # Find existing directory or create new one
+  def find_or_create_subdir(item_name, item_path, logger)
+    if (subdir = find_existing(item_name, item_path))
+      subdir
+    else
+      create_new_subdir(item_name, logger)
+    end
+  end
+
+  # Create a new directory record for discovered disk directory
+  def create_new_subdir(item_name, logger)
+    subdir = subdirs.build(name: item_name)
+    subdir.save!(validate: false) # Skip validation for disk-found dirs
+    logger.info("New dir: #{subdir.full_path}")
+    subdir
+  rescue StandardError => e
+    logger.error("Failed to create subdir #{item_name}: #{e.message}")
+    nil
+  end
+
+  # Move a directory record to this parent
+  def move_subdir_to_self(subdir, logger)
+    old_path = subdir.full_path
+    subdir.parent = self
+    subdir.save!
+    logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
+  rescue StandardError => e
+    logger.error("Failed to move subdir: #{e.message}")
+  end
+
+  # Fix invalid directory attributes
+  def fix_subdir_attributes(subdir, logger)
+    subdir.errors.full_messages.each { |err| logger.error(err) }
+    subdir.init_variables
+    subdir.save!
+    logger.info("Fixed attributes: #{subdir.full_path}")
+  rescue StandardError => e
+    logger.error("Failed to fix subdir attributes: #{e.message}")
+  end
+
+  # Process a file found on disk
+  def process_disk_file(item_path, item_name, logger)
+    if (dbfile = DataFile.find_existing(item_path, item_name))
+      update_file_directory(dbfile, logger)
+    elsif file_is_old_enough?(item_path)
+      create_new_file(item_path, logger)
+    end
+  end
+
+  # Update file's directory if it moved
+  def update_file_directory(dbfile, logger)
+    return if dbfile.directory_id == id
+
+    dbfile.update!(directory: self)
+    logger.info("Update file: #{dbfile.name}")
+  rescue StandardError => e
+    logger.error("Failed to update file #{dbfile.name}: #{e.message}")
+  end
+
+  # Only import files older than 100 seconds (avoid in-progress uploads)
+  def file_is_old_enough?(file_path)
+    (File.mtime(file_path) + 100).past?
+  end
+
+  # Create new file record from disk file
+  def create_new_file(item_path, logger)
+    dbfile = DataFile.new(directory: self)
+    dbfile.manual_upload(item_path)
+    dbfile.save!
+    logger.info("Added file: #{dbfile.name}")
+  rescue StandardError => e
+    logger.error("Failed to create file from #{item_path}: #{e.message}")
+  end
+
+  public
+
+  # Find existing directory record matching disk directory
+  # Uses multiple heuristics: name match, orphaned record, file count match
+  def find_existing(subdir_name, subitem_path)
+    # First: try direct name match under this parent
+    return subdirs.find_by(name: subdir_name) if subdirs.exists?(name: subdir_name)
+
+    # Second: find orphaned directory with same name (path doesn't exist anymore)
+    orphaned = find_orphaned_directory(subdir_name)
+    return orphaned if orphaned
+
+    # Third: match by file count (heuristic for moved directories)
+    find_by_file_count(subitem_path)
+  end
+
+  # Find directory with same name that no longer exists on disk
+  def find_orphaned_directory(subdir_name)
+    Directory.where(name: subdir_name).find { |dir| !dir.path_exists? }
+  end
+
+  # Attempt to find directory by matching file count (heuristic)
+  def find_by_file_count(subitem_path)
+    file_count = count_files_in_path(subitem_path)
+    return nil if file_count.zero?
+
+    candidate_dirs = Directory.joins(:files)
+                              .group('directories.id')
+                              .having('count(data_files.id) = ?', file_count)
+
+    candidate_dirs.find { |dir| file_sizes_match?(dir, subitem_path) }
+  rescue StandardError => e
+    Rails.logger.warn("Error in find_by_file_count: #{e.message}")
+    nil
+  end
+
+  # Count files in a directory path
+  def count_files_in_path(path)
+    Dir[File.join(path, '*')].count { |f| File.file?(f) }
+  end
+
+  # Check if all file sizes match between disk and database
+  def file_sizes_match?(dir, disk_path)
+    Dir.glob(File.join(disk_path, '*')).all? do |file_path|
+      next true unless File.file?(file_path)
+
+      filename = File.basename(file_path)
+      db_file = dir.files.find_by(name: filename)
+      db_file && File.size(file_path) == db_file.size
+    end
   end
 
   # TODO: check that you can download files
 
   def can_create?(cuser)
-    cuser&.admin?
+    return false unless cuser
+
+    cuser.admin?
   end
 
   def can_update?(cuser, params = {})
-    cuser&.admin? and Verification.contain params, %i[description hidden]
+    return false unless cuser
+
+    cuser.admin? && Verification.contain(params, %i[description hidden])
   end
 
   def can_destroy?(cuser)
-    cuser&.admin?
+    return false unless cuser
+
+    cuser.admin?
   end
 
   def self.params(params, _cuser)
