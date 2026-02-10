@@ -1,33 +1,4 @@
 <div class="wide box">
-  <div class="header">
-    <h1><%= @bracket.name %></h1>
-  </div>
-
-  <div class="bracket-info">
-    <table class="striped">
-      <tr>
-        <td class="label">Tournament:</td>
-        <td><%= link_to @bracket.contest.name, @bracket.contest %></td>
-      </tr>
-      <tr>
-        <td class="label">Bracket Type:</td>
-        <td><%= I18n.t("contest_types.#{@bracket.contest.contest_type}") %></td>
-      </tr>
-      <tr>
-        <td class="label">Bracket Slots:</td>
-        <td><%= @bracket.slots %></td>
-      </tr>
-      <tr>
-        <td class="label">Status:</td>
-        <td>
-          <% completed_matches = @bracket.contest.matches.where.not(score1: nil, score2: nil).count %>
-          <% total_matches = @bracket.contest.matches.count %>
-          <%= "#{completed_matches}/#{total_matches} matches completed" %>
-        </td>
-      </tr>
-    </table>
-  </div>
-
   <div class="bracket-container">
     <%= render partial: "bracket", locals: { bracket: @bracket, edit: false } %>
   </div>
@@ -39,63 +10,4 @@
     <%= link_to 'Contest', edit_contest_path(@bracket.contest), class: 'button' %>
   </div>
 </div>
-
-<style>
-  .bracket-info {
-    margin: 20px 0;
-  }
-
-  .bracket-info table {
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .bracket-info .label {
-    font-weight: bold;
-    width: 150px;
-  }
-
-  .bracket-container {
-    margin: 30px 0;
-    overflow-x: auto;
-  }
-
-  .brackets {
-    border-collapse: collapse;
-    margin: 20px 0;
-  }
-
-  .brackets td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-    height: 40px;
-  }
-
-  .brackets td.team {
-    background-color: #f5f5f5;
-    min-width: 180px;
-  }
-
-  .brackets td.connector {
-    border: none;
-    background-color: transparent;
-  }
-
-  .brackets td.empty {
-    background-color: #fafafa;
-  }
-
-  .brackets .flag {
-    padding: 2px 4px;
-  }
-
-  .brackets a {
-    text-decoration: none;
-    color: #0066cc;
-  }
-
-  .brackets a:hover {
-    text-decoration: underline;
-  }
-</style>
+<!-- Inline bracket CSS removed — styles are provided by theme stylesheets under app/assets/stylesheets/themes/ -->

@@ -15,7 +15,11 @@ class BracketsController < ApplicationController
     @bracket = Bracket.new Bracket.params(params, cuser)
     raise AccessError unless @bracket.can_create? cuser
 
-    flash[:notice] = t(:brackets_create) if @bracket.save
+    if @bracket.save
+      flash[:notice] = t(:brackets_create)
+    else
+      flash[:error] = @bracket.errors.full_messages.to_sentence
+    end
 
     redirect_to edit_contest_path(@bracket.contest)
   end
@@ -23,16 +27,19 @@ class BracketsController < ApplicationController
   def update
     raise AccessError unless @bracket.can_update? cuser
 
-    @bracket.update(Bracket.params(params, cuser))
-
     # Handle cell updates - permit nested structure with custom field
     cell_params = params.permit(cell: {}, cell_custom: {})
-    @bracket.update_cells(cell_params[:cell] || {})
-    @bracket.update_custom_text(cell_params[:cell_custom] || {})
 
-    flash[:notice] = t(:brackets_update)
+    if @bracket.update(Bracket.params(params, cuser))
+      @bracket.update_cells(cell_params[:cell] || {})
+      @bracket.update_custom_text(cell_params[:cell_custom] || {})
 
-    render :edit, layout: 'full'
+      flash[:notice] = t(:brackets_update)
+      redirect_to edit_bracket_path(@bracket)
+    else
+      flash.now[:error] = @bracket.errors.full_messages.to_sentence.presence || t(:error)
+      render :edit, layout: 'full', status: :unprocessable_entity
+    end
   end
 
   def destroy

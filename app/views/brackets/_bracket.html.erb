@@ -1,12 +1,33 @@
-<h3>
-  <%= bracket.name if !bracket.name&.empty? and !defined? edit %>
-</h3>
+<%# Show header when not in edit mode. Use explicit truthy check to avoid defined? pitfalls %>
+<% unless defined?(edit) && edit %>
+  <h3>
+    <%= namelink bracket %>
+    <%= link_to icon('pencil'), edit_bracket_path(bracket, tab: 'bracket') if bracket.can_update?(cuser) %>
+  </h3>
+<% end %>
+
+<% if controller_name == 'brackets' && action_name == 'show' %>
+  <table class="striped">
+    <tr>
+      <td class="label">Tournament:</td>
+      <td><%= link_to bracket.contest.name, bracket.contest %></td>
+    </tr>
+    <tr>
+      <td class="label">Status:</td>
+      <td>
+        <% completed_matches = bracket.contest.matches.where.not(score1: nil, score2: nil).count %>
+        <% total_matches = bracket.contest.matches.count %>
+        <%= "#{completed_matches}/#{total_matches} matches completed" %>
+      </td>
+    </tr>
+  </table>
+<% end %>
 
 <% slots = (bracket.slots || 0).to_i %>
 <% if slots <= 0 %>
   <p class="notice">Bracket not configured.</p>
 <% else %>
-  <% is_edit = defined?(edit) %>
+  <% is_edit = defined?(edit) && edit %>
   <% rows = slots*2-1 %>
   <% cols = [(slots - 1).bit_length + 1, 2].max %>
   <div class="bracket-wrapper">
