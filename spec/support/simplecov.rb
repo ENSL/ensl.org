@@ -1,4 +1,4 @@
-enable_simplecov = ENV['SIMPLECOV'] == '1' && !ARGV.any? { |a| a =~ /--only-failures|--next-failure/ }
+enable_simplecov = ENV['SIMPLECOV'] == '1'
 if enable_simplecov
   require 'simplecov'
 

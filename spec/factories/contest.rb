@@ -35,6 +35,32 @@ FactoryBot.define do
       end
     end
 
+    trait :with_scored_matches do
+      transient do
+        matches_count { 50 }
+      end
+
+      after(:create) do |contest, evaluator|
+        contesters = contest.contesters.to_a
+        maps = contest.maps.to_a
+
+        evaluator.matches_count.times do |i|
+          # Pick two different contesters
+          cont1, cont2 = contesters.sample(2)
+
+          create(:match,
+                 contest: contest,
+                 contester1: cont1,
+                 contester2: cont2,
+                 map1: maps.sample,
+                 map2: maps.sample,
+                 match_time: Time.current - (i * 2).hours,
+                 score1: rand(1..4),
+                 score2: rand(1..4))
+        end
+      end
+    end
+
     trait :bracket_ready do
       contest_type { Contest::TYPE_BRACKET }
 

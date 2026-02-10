@@ -8,6 +8,19 @@ FactoryBot.define do
     country 'EU'
     comment 'We are a team'
 
+    trait :with_leader do
+      association :founder, factory: :user
+
+      after(:create) do |team|
+        next unless team.founder
+
+        Teamer.find_or_create_by!(user: team.founder, team: team) do |teamer|
+          teamer.rank = Teamer::RANK_LEADER
+        end
+        team.founder.update_column(:team_id, team.id) unless team.founder.team_id == team.id
+      end
+    end
+
     trait :with_members do
       transient do
         members_count { 6 }
