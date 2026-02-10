@@ -352,10 +352,12 @@ class Match < ActiveRecord::Base
       if score_diff.zero? # Draw
         if diff.negative? # contester2 has higher rank
           # set contester1s rank one below contester2
-          contest.update_ranks(contester1, contester1.score, contester2.score - 1)
+          new_rank = [contester2.score - 1, 0].max
+          contest.update_ranks(contester1, contester1.score, new_rank)
         else
           # set contester2s rank one below contester1
-          contest.update_ranks(contester2, contester2.score, contester1.score - 1)
+          new_rank = [contester1.score - 1, 0].max
+          contest.update_ranks(contester2, contester2.score, new_rank)
         end
       elsif score_diff.negative? && diff.negative? # contester1 won and contester2 has higher rank
         contest.update_ranks(contester1, contester1.score, contester2.score)

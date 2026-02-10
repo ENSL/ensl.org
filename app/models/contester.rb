@@ -79,10 +79,34 @@ class Contester < ActiveRecord::Base
     contest.matches.where('contester1_id = ? OR contester2_id = ?', id, id)
   end
 
+  def stats_from_matches(matches_scope = nil)
+    matches = matches_scope || get_matches.realfinished
+    stats = { win: 0, loss: 0, draw: 0 }
+
+    matches.each do |match|
+      if match.score1 == match.score2
+        stats[:draw] += 1
+      elsif match.contester1_id == id
+        match.score1 > match.score2 ? stats[:win] += 1 : stats[:loss] += 1
+      else
+        match.score2 > match.score1 ? stats[:win] += 1 : stats[:loss] += 1
+      end
+    end
+
+    stats
+  end
+
   def init_variables
     self.active = true
     self.trend = Contester::TREND_FLAT
     self.extra = 0
+
+    # Initialize ladder contesters with sequential scores to avoid negative values during rank updates
+    return unless contest&.contest_type == Contest::TYPE_LADDER
+
+    # Get the current max score in this ladder, default to -1 so first contester gets 0
+    max_score = contest.contesters.maximum(:score) || -1
+    self.score = max_score + 1
   end
 
   def validate_member_participation

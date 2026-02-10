@@ -37,7 +37,6 @@
       <td><%= h contester.draw %></td>
       <% if actions and cuser%>
         <td class="actions">
-          <% if false %>
           <% current = cuser.active_contesters.of_contest(contest).first %>
           <% if current %>
             <% challenge = Challenge.new
@@ -46,7 +45,6 @@
             <% if challenge.can_create? cuser %>
               <%= link_to 'C', controller: 'challenges', id: contester, action: 'new' %>
             <% end %>
-          <% end %>
           <% end %>
           <% if cuser and cuser.admin? %>
             <%= link_to icon('pencil'), edit_contester_path(contester) %>

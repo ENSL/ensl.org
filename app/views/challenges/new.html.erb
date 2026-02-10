@@ -16,6 +16,14 @@
           <%= namelink @challenge.contester2.team %>
         </h3>
         <p>
+          <%= f.label :match_time, "Match time" %><br />
+          <%= f.datetime_select :match_time, datetime_separator: '', time_separator: '' %>
+        </p>
+        <p>
+          <%= f.label :map1_id, "Map" %><br />
+          <%= f.select :map1_id, @challenge.contester1.contest.maps.basic.collect { |m| [m.name, m.id] }, include_blank: true %>
+        </p>
+        <p>
           <%= f.label :details, "Information for the opponent" %><br />
           <%= f.text_area :details, :cols => 40, :rows => 7 %>
         </p>
