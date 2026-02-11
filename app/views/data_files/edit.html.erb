@@ -45,7 +45,7 @@
 
 <%= form_for @file, url: { action: "addFile", id: @file } do |f| %>
   <div class="fields">
-    <%= f.select :related_id, @file.directory.files.not(@file).collect {|file| [file, file.id]} %>
+    <%= f.select :related_id, @file.directory.files.except_file(@file).collect {|file| [file, file.id]} %>
   </div>
   <div class="controls">
     <%= f.submit "Add" %>

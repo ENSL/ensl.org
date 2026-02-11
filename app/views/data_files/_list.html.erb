@@ -7,7 +7,7 @@
   </tr>
 
   <% files.each do |file| %>
-    <tr>
+    <tr id="data_file_<%= file.id %>">
       <td><%= namelink file %></td>
       <td><%= h file.url %></td>
       <td><%= file.size_s %></td>

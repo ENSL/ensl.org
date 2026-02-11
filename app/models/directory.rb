@@ -94,7 +94,7 @@ class Directory < ActiveRecord::Base
   end
 
   def self.directory_traverse(directory, list = [])
-    return list if directory.root?
+    return list if directory.nil? || directory.root?
 
     list << directory
     directory_traverse(directory.parent, list)
@@ -105,6 +105,7 @@ class Directory < ActiveRecord::Base
     parent ? File.join(parent.full_path, name.downcase) : path
   end
 
+  # Returns the path relative to FILES_ROOT (used for CarrierWave storage)
   def relative_path
     parent ? File.join(parent.relative_path, name.downcase).sub(%r{^/}, '') : ''
   end

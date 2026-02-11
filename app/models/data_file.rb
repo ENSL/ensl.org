@@ -61,11 +61,11 @@ class DataFile < ActiveRecord::Base
   validates_length_of %i[description path], maximum: 255
 
   # Callback chain for file processing (order matters)
-  before_save :sync_file_metadata, if: -> { File.exist?(location) }
+  before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
   before_save :ensure_path_cached, if: :directory
   before_validation :auto_generate_description, if: -> { description.blank? }
-  before_save :auto_link_preview_file, if: -> { !related && location.include?('_preview.mp4') }
+  before_save :auto_link_preview_file, if: -> { !related && location.present? && location.include?('_preview.mp4') }
   after_save :update_movie_metadata, if: -> { movie && saved_change_to_md5? }
   after_create :create_movie, if: :should_create_movie?
   after_save :update_relations, if: :should_update_relations?
@@ -81,6 +81,7 @@ class DataFile < ActiveRecord::Base
     md5.upcase
   end
 
+  # Not used.
   def extra_url
     url.to_s.gsub(%r{^/files}, 'http://extra.ensl.org/static')
   end
@@ -89,14 +90,32 @@ class DataFile < ActiveRecord::Base
     "#{(size.to_f / MEGABYTE).round(2)} MB"
   end
 
-  # Returns the current filesystem path. Source of truth for file location.
-  # Note: disk is authoritative; this should always match what's on disk.
+  # Shortcut to get the current file path from CarrierWave (source of truth)
   def location
     name.current_path
   end
 
+  # Shortcut to get the URL for this file from CarrierWave
   def url
     name.url
+  end
+
+  # Get the top-level directory (root of the hierarchy) for this file
+  def first_directory
+    return nil unless directory
+
+    dir = directory
+    dir = dir.parent while dir.parent
+    dir
+  end
+
+  # Get the second-level directory (immediate child of root) for this file, if it exists
+  def second_directory
+    return nil unless directory
+
+    dir = directory
+    dir = dir.parent while dir.parent
+    dir == directory ? nil : directory
   end
 
   def manual_upload(manual_location)
@@ -109,7 +128,7 @@ class DataFile < ActiveRecord::Base
 
   # Recompute MD5, size, and timestamp from actual file on disk
   def sync_file_metadata
-    return unless File.exist?(location)
+    return if location.blank? || !File.exist?(location)
     return unless new_record? || file_changed_on_disk?
 
     self.md5 = Digest::MD5.hexdigest(File.read(location))
@@ -126,13 +145,14 @@ class DataFile < ActiveRecord::Base
   def move_file_between_directories
     return unless path && File.exist?(path)
     return unless directory&.full_path # Guard: directory must exist
-    return if path == location # Already in correct location
+    return if location.blank? || path == location # Already in correct location or no target
 
     FileUtils.mv(path, location)
     Rails.logger.info("Moved file from #{path} to #{location}")
   rescue StandardError => e
     Rails.logger.error("Failed to move file from #{path} to #{location}: #{e.message}")
-    raise ActiveRecord::RecordInvalid, "File system error: Cannot move file - #{e.message}"
+    errors.add(:base, "File system error: Cannot move file - #{e.message}")
+    raise ActiveRecord::RecordInvalid, self
   end
 
   # Cache the full path in the path attribute for query performance
@@ -231,6 +251,8 @@ class DataFile < ActiveRecord::Base
     nil
   end
 
+  # Permission checks
+  
   def can_create?(cuser)
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_MUTE)

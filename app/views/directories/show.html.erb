@@ -52,7 +52,7 @@
         <h3>Files</h3>
 
         <% dir.files.unrelated.each do |file| %>
-          <div class="file">
+          <div class="file" id="file_<%= file.id %>">
             <div class="actions">
               <% if file.can_update? cuser %>
                 <%= link_to icon('pencil'), edit_data_file_path(file) %>

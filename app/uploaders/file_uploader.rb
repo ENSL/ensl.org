@@ -1,16 +1,20 @@
-# encoding: utf-8
-
 class FileUploader < CarrierWave::Uploader::Base
+  # Configure storage root to use FILES_ROOT env var
+  # This allows files to be stored in public/files (dev) or external path (production)
+  def root
+    ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
+  end
+
   # Override the directory where uploaded files will be stored.
-  # This is a sensible default for uploaders that are meant to be mounted:
+  # Returns path relative to the root directory (FILES_ROOT)
   def store_dir
     if model and model.directory
-      # This is a recursive look up
-      model.directory.full_path
+      # Use relative path from FILES_ROOT
+      rel = model.directory.relative_path
+      rel.empty? ? '' : rel
     else
-      Directory.find(Directory::ROOT).full_path
+      ''
     end
-    # .gsub(/public\//, '')
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
