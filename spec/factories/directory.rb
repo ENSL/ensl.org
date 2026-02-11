@@ -4,16 +4,10 @@ FactoryBot.define do
     title { 'Test Directory' }
     description { 'A test directory' }
     hidden { false }
-    sequence(:path) { |n| "/tmp/test_dirs/dir#{n}" }
+    parent { nil }
 
-    # Create actual directories on disk
-    after(:build) do |directory|
-      FileUtils.mkdir_p(directory.path) unless File.exist?(directory.path)
-    end
-
-    after(:create) do |directory|
-      FileUtils.mkdir_p(directory.path) unless File.exist?(directory.path)
-    end
+    # Don't set path - let model compute it via ensure_path_cached
+    # Don't pre-create directories - let model's make_path callback handle it
 
     trait :hidden do
       hidden { true }
@@ -22,8 +16,8 @@ FactoryBot.define do
     trait :root do
       id { Directory::ROOT }
       name { 'root' }
-      path { '/tmp/test_dirs/root' }
       parent { nil }
+      # path will be set to ENV['FILES_ROOT'] by ensure_path_cached
     end
 
     trait :movies do

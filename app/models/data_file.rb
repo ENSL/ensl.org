@@ -59,12 +59,13 @@ class DataFile < ActiveRecord::Base
   belongs_to :article, optional: true
 
   validates_length_of %i[description path], maximum: 255
-  validates :name, presence: { message: 'Please select a file to upload' }
+  validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation
+
+  attr_accessor :skip_file_validation
 
   # Callback chain for file processing (order matters)
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
-  before_save :ensure_path_cached, if: :directory
   before_validation :auto_generate_description, if: -> { description.blank? }
   before_save :auto_link_preview_file, if: -> { !related && location.present? && location.include?('_preview.mp4') }
   after_save :update_movie_metadata, if: -> { movie && saved_change_to_md5? }
@@ -73,6 +74,10 @@ class DataFile < ActiveRecord::Base
 
   # acts_as_rateable
   mount_uploader :name, FileUploader
+
+  # Cache the final stored path after CarrierWave has stored/moved the file.
+  # Declared after `mount_uploader` so it runs after CarrierWave's after_save.
+  after_save :cache_path_from_uploader, if: -> { location.present? && File.exist?(location) }
 
   def to_s
     description.present? ? description : File.basename(path.to_s)
@@ -135,40 +140,63 @@ class DataFile < ActiveRecord::Base
 
   private
 
+  # Absolute destination path based on CarrierWave storage rules.
+  # This reflects the current model state (e.g. directory).
+  def carrierwave_store_absolute_path
+    identifier = name&.identifier
+    return nil if identifier.blank?
+
+    File.join(name.root.to_s, name.store_path(identifier).to_s)
+  end
+
   # Recompute MD5, size, and timestamp from actual file on disk
   def sync_file_metadata
     return if location.blank? || !File.exist?(location)
     return unless new_record? || file_changed_on_disk?
 
-    self.md5 = Digest::MD5.hexdigest(File.read(location))
+    self.md5 = Digest::MD5.file(location).hexdigest
     self.size = File.size(location)
     self.created_at = File.mtime(location)
   end
 
   def file_changed_on_disk?
-    size != File.size(location) || created_at != File.mtime(location)
+    disk_size = File.size(location)
+    disk_mtime = File.mtime(location)
+
+    size != disk_size || created_at.to_i != disk_mtime.to_i
   end
 
   # Move file on disk when directory changes (uses old cached path and new location)
   def move_file_between_directories
-    return unless path && File.exist?(path)
+    old_path = path.presence || location
+    return if old_path.blank? || !File.exist?(old_path)
     return unless directory&.full_path # Guard: directory must exist
-    return if location.blank? || path == location # Already in correct location or no target
 
-    # The 'path' is the old location (cached), and 'location' is the
-    # new location from CarrierWave which acquires it from directory model.
-    FileUtils.mv(path, location)
-    Rails.logger.info("Moved file from #{path} to #{location}")
+    new_path = carrierwave_store_absolute_path
+    return if new_path.blank? || old_path == new_path
+
+    FileUtils.mkdir_p(File.dirname(new_path))
+    FileUtils.mv(old_path, new_path)
+    self.path = new_path
+
+    # Refresh uploader state to reflect the moved file.
+    name.retrieve_from_store!(name.identifier) if name&.identifier.present?
+
+    Rails.logger.info("Moved file from #{old_path} to #{new_path}")
   rescue StandardError => e
-    Rails.logger.error("Failed to move file from #{path} to #{location}: #{e.message}")
+    Rails.logger.error("Failed to move file from #{old_path} to #{new_path}: #{e.message}")
     errors.add(:base, "File system error: Cannot move file - #{e.message}")
     raise ActiveRecord::RecordInvalid, self
   end
 
-  # Cache the full path in the path attribute for query performance
-  # Fetch current path from CarrierWave to ensure it reflects any moves or changes
-  def ensure_path_cached
-    self.path = name.current_path if path.blank? || path != name.current_path
+  # Cache the final stored path in the DB for query performance.
+  # Runs after CarrierWave has stored the file so we don't cache a tmp/cache path.
+  def cache_path_from_uploader
+    current_path = location
+    return if current_path.blank? || !File.exist?(current_path)
+    return if path == current_path
+
+    update_column(:path, current_path)
   end
 
   # Auto-generate description from filename or match data

@@ -49,12 +49,11 @@ class Directory < ActiveRecord::Base
 
   validates :name, presence: true, length: { in: 1..255 }, format: { with: /\A[A-Za-z0-9]{1,20}\z/, on: :create }
   validates :path, presence: true, length: { in: 1..255 }
-  validate :directory_does_not_exist, on: :create
   validate :name_unchanged_on_update, on: :update
   validates :title, presence: true, length: { in: 1..255 }
   validates :hidden, inclusion: { in: [true, false] }
 
-  before_validation :ensure_path_cached, on: :create
+  before_validation :ensure_path_cached
   before_validation :set_default_title, on: :create
   before_validation :set_default_hidden, on: :create
   after_create :make_path
@@ -92,13 +91,6 @@ class Directory < ActiveRecord::Base
     errors.add(:name, 'cannot be changed after creation')
   end
 
-  # Ensure no duplicate directory exists at the same path on creation
-  def directory_does_not_exist
-    return unless path.present? && File.exist?(full_path)
-
-    errors.add(:path, 'already exists')
-  end
-
   public
 
   def full_title
@@ -119,16 +111,23 @@ class Directory < ActiveRecord::Base
   # Get the full filesystem path for this directory (used for file storage)
   def full_path
     if parent
-      File.join(parent.full_path, name.downcase)
-    else
+      File.join(parent.full_path, name.to_s.downcase)
+    elsif root?
       # Root directory always uses ENV, not stored path
       ENV['FILES_ROOT']
+    elsif path.present?
+      path
+    else
+      File.join(ENV['FILES_ROOT'], name.to_s.downcase)
     end
   end
 
   # Returns the path relative to FILES_ROOT (used for CarrierWave storage)
   def relative_path
-    parent ? File.join(parent.relative_path, name.downcase).sub(%r{^/}, '') : ''
+    return '' if root?
+    return name.to_s.downcase if parent.nil?
+
+    File.join(parent.relative_path, name.to_s.downcase).sub(%r{^/}, '')
   end
 
   def path_exists?
@@ -139,15 +138,23 @@ class Directory < ActiveRecord::Base
   def ensure_path_cached
     if parent
       self.path = full_path
-    elsif path.blank?
+    elsif root?
       # Root directory path is managed via ENV['FILES_ROOT']
       self.path = ENV['FILES_ROOT']
+    elsif path.blank?
+      self.path = File.join(ENV['FILES_ROOT'], name.to_s.downcase)
     end
   end
 
   # Auto-generate title from directory name if not provided
+  # Only runs once during initial creation
   def set_default_title
-    return unless path.present? && title.blank? && new_record?
+    return if @title_default_applied # Already ran once
+
+    @title_default_applied = true
+
+    return if title.present?
+    return unless path.present? && new_record?
 
     self.title = File.basename(path).capitalize
   end
@@ -170,7 +177,7 @@ class Directory < ActiveRecord::Base
   def update_timestamp
     return unless File.exist?(full_path)
 
-    self.created_at = File.mtime(full_path)
+    update_column(:created_at, File.mtime(full_path))
   rescue StandardError => e
     Rails.logger.warn("Failed to update timestamp for #{full_path}: #{e.message}")
   end
@@ -182,7 +189,7 @@ class Directory < ActiveRecord::Base
     stat = File.stat(full_path)
     self.st_dev = stat.dev
     self.st_ino = stat.ino
-    save! if changed?
+    save!(validate: false) if changed?
   rescue StandardError => e
     Rails.logger.warn("Could not capture inode info for #{full_path}: #{e.message}")
   end
@@ -218,7 +225,8 @@ class Directory < ActiveRecord::Base
     Rails.logger.info("Moved directory to trash: #{full_path} -> #{trash_path}")
   rescue StandardError => e
     Rails.logger.error("Failed to move directory #{full_path} to trash: #{e.message}")
-    raise ActiveRecord::RecordInvalid, "Filesystem error: Cannot move to trash - #{e.message}"
+    errors.add(:base, "Filesystem error: Cannot move to trash - #{e.message}")
+    raise ActiveRecord::RecordInvalid.new(self)
   end
 
   def ensure_trash_root
@@ -325,8 +333,11 @@ class Directory < ActiveRecord::Base
 
   # Fix invalid directory attributes
   def fix_subdir_attributes(subdir, logger)
-    subdir.errors.full_messages.each { |err| logger.error(err) }
-    subdir.init_variables
+    subdir.errors.full_messages.each { |err| logger.warn(err) }
+    # Manually re-initialize attributes that may be missing
+    subdir.path = subdir.full_path if subdir.path.blank?
+    subdir.title = subdir.name.capitalize if subdir.title.blank?
+    subdir.hidden = false if subdir.hidden.nil?
     subdir.save!
     subdir.sync_inode_info # Ensure inode info is synced after fix
     logger.info("Fixed attributes: #{subdir.full_path}")

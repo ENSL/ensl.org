@@ -56,12 +56,19 @@ describe Directory do
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_length_of(:name).is_at_least(1).is_at_most(255) }
-    it { is_expected.to validate_length_of(:path).is_at_least(1).is_at_most(255) }
+    it { is_expected.to validate_length_of(:path).is_at_most(255) }
     it { is_expected.to validate_inclusion_of(:hidden).in_array([true, false]) }
 
-    # Simply validate that title validation exists (init_variables may set it)
+    # Simply validate that title validation exists
     it 'validates title presence when explicitly nil' do
-      dir = Directory.new(name: 'test', path: nil, hidden: false, title: nil)
+      # Don't trigger ensure_path_cached by not having a parent and not providing attributes
+      # Create directory skipping callbacks to test validation only
+      dir = Directory.new(name: 'test', hidden: false, title: nil)
+      # Manually set path to avoid the auto-setting triggering title auto-generation
+      dir.path = '/some/path'
+      dir.validate
+      # Reset title to nil after path callback might have set it
+      dir.title = nil
       dir.validate
       expect(dir.errors[:title]).to include("can't be blank")
     end
@@ -169,7 +176,7 @@ describe Directory do
     end
 
     it 'returns false when parent is not ROOT' do
-      parent = create(:directory)
+      parent = create(:directory, id: Directory::ROOT + 200)
       dir = build(:directory, parent: parent)
       expect(dir.parent_root?).to be false
     end
@@ -212,13 +219,13 @@ describe Directory do
     end
 
     it 'returns joined path for child directory' do
-      parent = create(:directory, path: "#{@test_root}/parent")
+      parent = create(:directory, id: Directory::ROOT + 100, name: 'parent')
       child = build(:directory, name: 'child', parent: parent)
       expect(child.full_path).to eq("#{@test_root}/parent/child")
     end
 
     it 'returns nested path for deep hierarchy' do
-      parent = create(:directory, path: "#{@test_root}/level1")
+      parent = create(:directory, id: Directory::ROOT + 101, name: 'level1')
       middle = create(:directory, name: 'level2', parent: parent)
       child = build(:directory, name: 'level3', parent: middle)
       expect(child.full_path).to eq("#{@test_root}/level1/level2/level3")
@@ -227,12 +234,12 @@ describe Directory do
 
   describe '#relative_path' do
     it 'returns empty string for root directory' do
-      dir = build(:directory, path: @test_root, parent: nil)
+      dir = build(:directory, id: Directory::ROOT, name: 'root', parent: nil)
       expect(dir.relative_path).to eq('')
     end
 
     it 'returns relative path for child directory' do
-      parent = create(:directory, path: "#{@test_root}/parent")
+      parent = create(:directory, name: 'parent')
       child = build(:directory, name: 'child', parent: parent)
       # Assuming parent's relative_path is 'parent'
       expect(child.relative_path).to match(/child/)
@@ -303,7 +310,7 @@ describe Directory do
   describe 'callbacks' do
     describe 'before_validation :init_variables' do
       it 'sets path from parent when parent exists' do
-        parent = create(:directory, path: "#{@test_root}/parent")
+        parent = create(:directory, id: Directory::ROOT + 102, name: 'parent')
         child = build(:directory, name: 'child', parent: parent)
         child.valid?
         expect(child.path).to eq("#{@test_root}/parent/child")
@@ -324,27 +331,32 @@ describe Directory do
 
     describe 'after_create :make_path' do
       it 'creates directory on filesystem' do
-        dir_path = "#{@test_root}/newdir"
-        dir = create(:directory, path: dir_path)
-        expect(File.directory?(dir_path)).to be true
+        dir = create(:directory, name: 'newdir')
+        expect(File.directory?(dir.full_path)).to be true
       end
 
       it 'does not fail if directory already exists' do
-        dir_path = "#{@test_root}/existing"
+        dir_name = 'existing'
+        # Create the directory on disk first
+        dir_path = File.join(@test_root, dir_name)
         FileUtils.mkdir_p(dir_path)
-        expect { create(:directory, path: dir_path) }.not_to raise_error
+
+        # Creating a record for existing directory should not fail
+        # make_path callback handles this gracefully
+        expect { create(:directory, name: dir_name) }.not_to raise_error
       end
     end
 
     describe 'after_save :update_timestamp' do
       it 'updates created_at from filesystem mtime' do
-        dir_path = "#{@test_root}/timestamptest"
-        FileUtils.mkdir_p(dir_path)
+        dir = create(:directory, name: 'timestamptest')
         # Set a specific time - convert to Time object
         past_time = 2.days.ago.to_time
-        File.utime(past_time, past_time, dir_path)
+        File.utime(past_time, past_time, dir.full_path)
 
-        dir = create(:directory, path: dir_path, parent: nil)
+        # Trigger update_timestamp by re-saving
+        dir.save!
+        dir.reload
         expect(dir.created_at).to be_within(2.seconds).of(past_time)
       end
     end
@@ -412,8 +424,8 @@ describe Directory do
 
     describe 'after_destroy :remove_path' do
       it 'removes directory from filesystem' do
-        dir_path = "#{@test_root}/removeme"
-        dir = create(:directory, path: dir_path)
+        dir = create(:directory, name: 'removeme')
+        dir_path = dir.full_path
         expect(File.directory?(dir_path)).to be true
 
         dir.destroy

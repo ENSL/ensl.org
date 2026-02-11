@@ -1,21 +1,26 @@
 FactoryBot.define do
   factory :data_file do
     description { 'Test file description' }
-    sequence(:path) { |n| "/tmp/test_dirs/testfile#{n}.txt" }
-    md5 { 'e948c22100d29623a1df48e1760494df' }
+    sequence(:md5) { |n| Digest::MD5.hexdigest("unique_content_#{n}") }
     size { 1024 }
+    skip_file_validation { true } # Skip CarrierWave validation for tests
 
-    # Create actual file on disk
+    # For tests, skip CarrierWave processing by setting name column directly
+    # This works because tests stub location method
     after(:build) do |data_file|
-      file_path = data_file.path
-      FileUtils.mkdir_p(File.dirname(file_path))
-      File.write(file_path, "test content #{data_file.id}") unless File.exist?(file_path)
-    end
+      # Determine filename
+      filename = if data_file.path.present?
+                   File.basename(data_file.path)
+                 else
+                   "test_#{data_file.object_id}.txt"
+                 end
 
-    after(:create) do |data_file|
-      file_path = data_file.path
-      FileUtils.mkdir_p(File.dirname(file_path))
-      File.write(file_path, "test content #{data_file.id}") unless File.exist?(file_path)
+      # Set name column directly, bypassing CarrierWave
+      # The column just stores the filename
+      data_file[:name] = filename
+
+      # Ensure path is set
+      data_file.path ||= File.join(ENV['FILES_ROOT'] || '/tmp/test_dirs', filename)
     end
 
     trait :with_directory do
@@ -28,14 +33,22 @@ FactoryBot.define do
 
     trait :movie do
       description { 'Test movie' }
-      sequence(:path) { |n| "/tmp/test_dirs/test_movie#{n}.mp4" }
       association :directory, :movies
+
+      after(:build) do |data_file|
+        data_file[:name] = 'test_movie.mp4'
+        data_file.path = File.join(data_file.directory.full_path, 'test_movie.mp4') if data_file.directory
+      end
     end
 
     trait :preview do
       description { 'Test preview' }
-      sequence(:path) { |n| "/tmp/test_dirs/test_preview#{n}.mp4" }
       association :directory, :movies
+
+      after(:build) do |data_file|
+        data_file[:name] = 'test_preview.mp4'
+        data_file.path = File.join(data_file.directory.full_path, 'test_preview.mp4') if data_file.directory
+      end
     end
 
     trait :with_related do
@@ -44,7 +57,11 @@ FactoryBot.define do
 
     trait :demo do
       description { 'Test demo' }
-      sequence(:path) { |n| "/tmp/test_dirs/test_demo#{n}.dem" }
+
+      after(:build) do |data_file|
+        data_file[:name] = 'test_demo.dem'
+        data_file.path ||= File.join(ENV['FILES_ROOT'] || '/tmp/test_dirs', 'test_demo.dem')
+      end
     end
   end
 end

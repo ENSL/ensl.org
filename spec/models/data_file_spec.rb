@@ -28,22 +28,30 @@ require 'rails_helper'
 describe DataFile do
   # Setup and cleanup test filesystem
   before(:all) do
-    FileUtils.mkdir_p('/tmp/test_dirs')
+    @test_root = '/tmp/test_dirs'
+    FileUtils.mkdir_p(@test_root)
   end
 
   after(:all) do
-    FileUtils.rm_rf('/tmp/test_dirs')
+    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
+  end
+
+  before do
+    # Set up test root environment
+    ENV['FILES_ROOT'] = @test_root
   end
 
   after do
     # Clean up any test files created during the test
-    FileUtils.rm_rf('/tmp/test_dirs') if Dir.exist?('/tmp/test_dirs')
-    FileUtils.mkdir_p('/tmp/test_dirs')
+    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
+    FileUtils.mkdir_p(@test_root)
   end
 
-  # Stub location for all DataFile instances to avoid CarrierWave issues
+  # Stub location for all DataFile instances
+  # This makes location return path for compatibility with tests that set path explicitly
   before do
     allow_any_instance_of(DataFile).to receive(:location) do |instance|
+      # Return the path attribute which factory sets correctly
       instance.path.to_s
     end
   end
@@ -279,17 +287,19 @@ describe DataFile do
   describe '.find_existing' do
     it 'finds by path when file exists' do
       file_path = '/tmp/test_dirs/findexist_123.txt'
+      FileUtils.mkdir_p(File.dirname(file_path))
       File.write(file_path, 'test content')
-      existing = create(:data_file, path: file_path)
+
+      # Create DataFile by uploading the existing file
+      existing = create(:data_file)
+      # Manually set the path to the test file location for find_existing to work
+      existing.update_column(:path, file_path)
+
       result = DataFile.find_existing(file_path, 'findexist_123.txt')
       expect(result).to eq(existing)
     end
 
     it 'finds by MD5 hash when path does not match' do
-      # The find_existing method only does MD5 lookup when file doesn't exist at given path
-      # So we can't test the MD5 lookup path in the current implementation
-      # because compute_file_hash requires the file to exist
-      # This test verifies the current behavior
       file_path = '/tmp/test_dirs/hashfind_456.txt'
       content = 'test content for hash'
       File.write(file_path, content)
@@ -297,13 +307,13 @@ describe DataFile do
 
       # Create a record with same MD5 but different path
       existing = build(:data_file, md5: hash, path: '/tmp/test_dirs/other_hashfind.txt')
-      File.write(existing.path, 'dummy') # Create the other file
+      # Write matching content so disk MD5 aligns with the record
+      File.write(existing.path, content)
       existing.save!(validate: false)
 
-      # Since file exists at hashfind_456.txt, find_existing checks path first
-      # Path doesn't match any record, so it returns nil (doesn't check MD5)
+      # Since no record exists at hashfind_456.txt, it falls back to MD5 lookup
       result = DataFile.find_existing(file_path, 'hashfind_456.txt')
-      expect(result).to be_nil
+      expect(result).to eq(existing)
     end
 
     it 'returns nil when file does not exist on disk' do
