@@ -16,7 +16,7 @@
 <div id="files" class="tabbed">
   <ul id="files-nav" class="tabs">
     <% @directories.each do |dir| %>
-      <li><a href="#dir_<%= dir.id %>"><%= h dir.name %></a></li>
+      <li><a href="#dir_<%= dir.id %>"><%= h dir.title %></a></li>
     <% end %>
   </ul>
 
@@ -42,7 +42,7 @@
             <div class="subdirectories">
               <ul class="disc">
                 <% dir.subdirs.ordered.each do |subdir| %>
-                  <li><%= link_to subdir.name, subdir %></li>
+                  <li><%= link_to subdir.title, subdir %></li>
                 <% end %>
               </ul>
             </div>

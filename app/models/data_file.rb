@@ -96,8 +96,16 @@ class DataFile < ActiveRecord::Base
   end
 
   # Shortcut to get the URL for this file from CarrierWave
+  # Prepends /files/ since nginx serves files directly from FILES_ROOT
+  # This is needed because CarrierWave's url may not include the /files/
+  # prefix because of custom root.
+  # Do not call the CarrierWave url method directly in views
   def url
-    name.url
+    carrywave_url = name.url
+    return nil unless carrywave_url.present?
+
+    # Ensure URL starts with /files/
+    carrywave_url.start_with?('/files/') ? carrywave_url : "/files#{carrywave_url}"
   end
 
   # Get the top-level directory (root of the hierarchy) for this file
@@ -136,7 +144,6 @@ class DataFile < ActiveRecord::Base
     self.created_at = File.mtime(location)
   end
 
-  # Check if the actual file has changed since last save
   def file_changed_on_disk?
     size != File.size(location) || created_at != File.mtime(location)
   end
@@ -230,10 +237,15 @@ class DataFile < ActiveRecord::Base
     user && !rated_by?(user)
   end
 
-  # Find existing file record by path or checksum (disk-authoritative lookup)
+  # Find existing file record by path, then checksum (disk-authoritative lookup)
   def self.find_existing(subitem_path, _subitem_name)
-    return DataFile.find_by(path: subitem_path) if File.exist?(subitem_path)
+    return nil unless File.exist?(subitem_path)
 
+    # Fall back to path-based lookup
+    file = DataFile.find_by(path: subitem_path)
+    return file if file
+
+    # Fall back to checksum lookup
     hash = compute_file_hash(subitem_path)
     return unless hash
 
@@ -252,7 +264,7 @@ class DataFile < ActiveRecord::Base
   end
 
   # Permission checks
-  
+
   def can_create?(cuser)
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_MUTE)

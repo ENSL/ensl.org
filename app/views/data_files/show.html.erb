@@ -30,7 +30,7 @@
             <% @file.related_files.each do |related| %>
             <tr>
                 <td>
-                    <%= link_to (h related.name.filename), safe_url_for(related.name.url) %>
+                    <%= link_to (h related.name.filename), safe_url_for(related.url) %>
                 </td>
                 <td>
                     <%= related.size_s %> MB
