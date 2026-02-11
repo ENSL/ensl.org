@@ -135,7 +135,7 @@ class Directory < ActiveRecord::Base
       # Root directory path is managed via ENV['FILES_ROOT']
       self.path = ENV['FILES_ROOT']
     end
-    self.title = File.basename(path).capitalize if path.present? && title.blank?
+    self.title = File.basename(path).capitalize if path.present? && title.blank? && new_record?
     self.hidden = false if hidden.nil?
   end
 

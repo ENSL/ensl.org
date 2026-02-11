@@ -1,34 +1,40 @@
 <div class="wide box">
-  <%= form_for @directory do |f| %>
-    <div id="error_explanation">
-      <ul>
-        <% @directory.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
+  <%= form_for @directory, html: { class: "square" } do |f| %>
+    <div id="<%= dom_id(@directory) %>_errors_wrapper">
+      <%= render 'shared/errors', messages: @directory.errors.full_messages, container_id: "#{dom_id(@directory)}_errors" %>
     </div>
+    
     <% if @directory.new_record? %>
       <%= f.hidden_field :parent_id %>
     <% end %>
 
-    <p>
-      <b>Parent:</b> <%= @directory.parent.full_path %>
-  </p>
+    <div class="fields horizontal">
+      <label><strong>Parent:</strong></label>
+      <div class="inputs">
+        <%= @directory.parent.full_path %>
+      </div>
+    </div>
 
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :title %><br />
-    <%= f.text_field :title %>
-  </p>
-  <p>
-    <%= f.label :hidden %><br />
-    <%= f.check_box :hidden %>
-  </p>
-  <p>
-    <%= f.submit %>
-  </p>
-<% end %>
+    <div class="fields horizontal">
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+
+    <div class="fields horizontal">
+      <%= f.label :title %>
+      <%= f.text_field :title %>
+    </div>
+
+    <div class="fields horizontal">
+      <%= f.label :hidden %>
+      <%= f.check_box :hidden %>
+      <%= f.label :hidden, class: 'checkbox' do %>
+        Hide directory from public listings
+      <% end %>
+    </div>
+
+    <div class="controls submit-field">
+      <%= f.submit %>
+    </div>
+  <% end %>
 </div>

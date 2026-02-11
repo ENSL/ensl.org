@@ -1,5 +1,6 @@
 class DirectoriesController < ApplicationController
-  before_action :get_directory, except: [:new, :create]
+  before_action :get_directory, except: %i[new create]
+  respond_to :html, :turbo_stream
 
   def show
     if @directory.hidden
@@ -22,6 +23,7 @@ class DirectoriesController < ApplicationController
 
   def recreate
     raise AccessError unless @cuser&.admin?
+
     @result = @directory.recreate_transaction
     @nobody = true
   end
@@ -34,22 +36,24 @@ class DirectoriesController < ApplicationController
       flash[:notice] = t(:directories_create)
       redirect_to(@directory)
     else
-      render :new
+      respond_with_validation_errors(@directory, template: :new)
     end
   end
 
   def update
     raise AccessError unless @directory.can_update? cuser
+
     if @directory.update(Directory.params(params, cuser))
       flash[:notice] = t(:directories_update)
       redirect_to @directory
     else
-      render :edit
+      respond_with_validation_errors(@directory, template: :edit)
     end
   end
 
   def destroy
     raise AccessError unless @directory.can_destroy? cuser
+
     @directory.destroy
     redirect_to directory_path(Directory.find(Directory::ROOT))
   end
