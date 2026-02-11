@@ -82,7 +82,7 @@ services:
     depends_on:
       - db
       - memcached
-      - selenium
+    #  - selenium
 
   # selenium:
   #   image: selenium/standalone-chrome-debug
