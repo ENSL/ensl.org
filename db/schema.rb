@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_022123) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_155440) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -206,9 +206,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_022123) do
     t.string "name"
     t.integer "parent_id"
     t.string "path"
+    t.bigint "st_dev", comment: "Filesystem device ID for inode tracking"
+    t.bigint "st_ino", comment: "Inode number for filesystem-independent directory identification"
     t.string "title"
     t.datetime "updated_at", precision: nil
     t.index ["parent_id"], name: "index_directories_on_parent_id"
+    t.index ["st_dev", "st_ino"], name: "index_directories_on_inode", unique: true
   end
 
   create_table "forumers", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
