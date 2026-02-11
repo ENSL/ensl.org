@@ -22,20 +22,12 @@ class DirectoryReconciliationService
     @logger.info("DataFiles: #{DataFile.count} Directories: #{Directory.count}")
 
     ActiveRecord::Base.transaction do
-      update_root_path_if_needed
       destroy_dirs = reconcile_recursively
       remove_orphaned_directories(destroy_dirs)
     end
 
     @logger.info("DataFiles: #{DataFile.count} Directories: #{Directory.count}")
     @logger.info('Finish recreate')
-  end
-
-  def update_root_path_if_needed
-    return unless @directory.id == Directory::ROOT
-
-    @directory.update_attribute(:path, ENV['FILES_ROOT'])
-    @logger.info("Path: #{@directory.path}")
   end
 
   def reconcile_recursively
@@ -47,6 +39,9 @@ class DirectoryReconciliationService
   def remove_orphaned_directories(destroy_dirs)
     destroy_dirs.each_value do |dir|
       @logger.info("Removed dir: #{dir.full_path}")
+      # Unlink children and files but keep their records around
+      dir.files.update_all(directory_id: nil)
+      dir.subdirs.update_all(parent_id: nil)
       dir.preserve_files = true
       dir.destroy!
     end

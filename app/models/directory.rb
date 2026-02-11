@@ -10,6 +10,8 @@
 #  name        :string(255)
 #  path        :string(255)
 #  title       :string(255)
+#  st_dev      :bigint           Filesystem device ID for inode tracking
+#  st_ino      :bigint           Inode number for filesystem-independent identification
 #  created_at  :datetime
 #  updated_at  :datetime
 #  parent_id   :integer
@@ -17,6 +19,7 @@
 # Indexes
 #
 #  index_directories_on_parent_id  (parent_id)
+#  index_directories_on_inode      (st_dev, st_ino) UNIQUE
 #
 require 'securerandom'
 require 'stringio'
@@ -52,6 +55,7 @@ class Directory < ActiveRecord::Base
 
   before_validation :init_variables
   after_create :make_path
+  after_create :sync_inode_info
   after_save :update_timestamp
   before_destroy :remove_files, unless: :preserve_files?
   after_destroy :remove_path, unless: :skip_remove_path?
@@ -102,7 +106,12 @@ class Directory < ActiveRecord::Base
 
   # Use this
   def full_path
-    parent ? File.join(parent.full_path, name.downcase) : path
+    if parent
+      File.join(parent.full_path, name.downcase)
+    else
+      # Root directory always uses ENV, not stored path
+      ENV['FILES_ROOT']
+    end
   end
 
   # Returns the path relative to FILES_ROOT (used for CarrierWave storage)
@@ -115,12 +124,17 @@ class Directory < ActiveRecord::Base
   end
 
   # Cache computed values before validation
-  # path: Cached from full_path for query performance
+  # path: Cached from full_path for query performance (not used for root)
   # title: Auto-generated from directory name if not provided
   # hidden: Defaults to false
   def init_variables
-    # Cache the full hierarchical path for this directory
-    self.path = full_path if parent
+    # Cache the full hierarchical path for non-root directories
+    if parent
+      self.path = full_path
+    elsif path.blank?
+      # Root directory path is managed via ENV['FILES_ROOT']
+      self.path = ENV['FILES_ROOT']
+    end
     self.title = File.basename(path).capitalize if path.present? && title.blank?
     self.hidden = false if hidden.nil?
   end
@@ -141,6 +155,18 @@ class Directory < ActiveRecord::Base
     self.created_at = File.mtime(full_path)
   rescue StandardError => e
     Rails.logger.warn("Failed to update timestamp for #{full_path}: #{e.message}")
+  end
+
+  # Capture filesystem inode information for location-independent directory identification
+  def sync_inode_info
+    return unless File.exist?(full_path)
+
+    stat = File.stat(full_path)
+    self.st_dev = stat.dev
+    self.st_ino = stat.ino
+    save! if changed?
+  rescue StandardError => e
+    Rails.logger.warn("Could not capture inode info for #{full_path}: #{e.message}")
   end
 
   def remove_files
@@ -273,6 +299,7 @@ class Directory < ActiveRecord::Base
     old_path = subdir.full_path
     subdir.parent = self
     subdir.save!
+    subdir.sync_inode_info # Ensure inode info is synced after move
     logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
   rescue StandardError => e
     logger.error("Failed to move subdir: #{e.message}")
@@ -283,6 +310,7 @@ class Directory < ActiveRecord::Base
     subdir.errors.full_messages.each { |err| logger.error(err) }
     subdir.init_variables
     subdir.save!
+    subdir.sync_inode_info # Ensure inode info is synced after fix
     logger.info("Fixed attributes: #{subdir.full_path}")
   rescue StandardError => e
     logger.error("Failed to fix subdir attributes: #{e.message}")
@@ -325,16 +353,23 @@ class Directory < ActiveRecord::Base
   public
 
   # Find existing directory record matching disk directory
-  # Uses multiple heuristics: name match, orphaned record, file count match
+  # Uses inode priority: st_dev + st_ino first, then name match, orphaned record, file count match
   def find_existing(subdir_name, subitem_path)
-    # First: try direct name match under this parent
+    # First: try to match by inode (fastest, filesystem-independent)
+    if File.directory?(subitem_path)
+      stat = File.stat(subitem_path)
+      inode_match = Directory.find_by_inode(stat.dev, stat.ino)
+      return inode_match if inode_match
+    end
+
+    # Second: try direct name match under this parent
     return subdirs.find_by(name: subdir_name) if subdirs.exists?(name: subdir_name)
 
-    # Second: find orphaned directory with same name (path doesn't exist anymore)
+    # Third: find orphaned directory with same name (path doesn't exist anymore)
     orphaned = find_orphaned_directory(subdir_name)
     return orphaned if orphaned
 
-    # Third: match by file count (heuristic for moved directories)
+    # Fourth: match by file count (heuristic for moved directories)
     find_by_file_count(subitem_path)
   end
 
@@ -374,6 +409,28 @@ class Directory < ActiveRecord::Base
     end
   end
 
+  # Find directory record by filesystem inode (st_dev + st_ino)
+  # Returns nil if st_dev or st_ino is missing
+  def self.find_by_inode(st_dev, st_ino)
+    return nil unless st_dev && st_ino
+
+    find_by(st_dev: st_dev, st_ino: st_ino)
+  end
+
+  # Find directory by inode and verify it still exists on filesystem
+  # Returns directory if found and filesystem path exists
+  # Returns nil if inode not found or filesystem path missing
+  def self.find_by_inode_and_verify(dir_path, st_dev, st_ino)
+    dir = find_by_inode(st_dev, st_ino)
+    return nil unless dir
+    return nil unless dir.path_exists?
+
+    dir
+  rescue StandardError => e
+    Rails.logger.error("Error verifying directory by inode: #{e.message}")
+    nil
+  end
+
   # TODO: check that you can download files
 
   def can_create?(cuser)
@@ -395,6 +452,6 @@ class Directory < ActiveRecord::Base
   end
 
   def self.params(params, _cuser)
-    params.require(:directory).permit(:description, :hidden, :name, :parent_id)
+    params.require(:directory).permit(:description, :hidden, :name, :title, :parent_id)
   end
 end
