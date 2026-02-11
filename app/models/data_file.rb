@@ -155,6 +155,8 @@ class DataFile < ActiveRecord::Base
     return unless directory&.full_path # Guard: directory must exist
     return if location.blank? || path == location # Already in correct location or no target
 
+    # The 'path' is the old location (cached), and 'location' is the
+    # new location from CarrierWave which acquires it from directory model.
     FileUtils.mv(path, location)
     Rails.logger.info("Moved file from #{path} to #{location}")
   rescue StandardError => e
@@ -164,11 +166,9 @@ class DataFile < ActiveRecord::Base
   end
 
   # Cache the full path in the path attribute for query performance
+  # Fetch current path from CarrierWave to ensure it reflects any moves or changes
   def ensure_path_cached
-    return unless directory
-
-    new_path = File.join(directory.full_path, File.basename(name.to_s))
-    self.path = new_path if path.nil? || directory_id_changed?
+    self.path = name.current_path if path.blank? || path != name.current_path
   end
 
   # Auto-generate description from filename or match data
@@ -239,6 +239,8 @@ class DataFile < ActiveRecord::Base
   def rateable?(user)
     user && !rated_by?(user)
   end
+
+  # Class methods
 
   # Find existing file record by path, then checksum (disk-authoritative lookup)
   def self.find_existing(subitem_path, _subitem_name)

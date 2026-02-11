@@ -48,12 +48,15 @@ class Directory < ActiveRecord::Base
   scope :of_parent, ->(parent) { where(parent_id: parent.id) }
 
   validates :name, presence: true, length: { in: 1..255 }, format: { with: /\A[A-Za-z0-9]{1,20}\z/, on: :create }
-  validate :name_unchanged_on_update, on: :update
   validates :path, presence: true, length: { in: 1..255 }
+  validate :directory_does_not_exist, on: :create
+  validate :name_unchanged_on_update, on: :update
   validates :title, presence: true, length: { in: 1..255 }
   validates :hidden, inclusion: { in: [true, false] }
 
-  before_validation :init_variables
+  before_validation :ensure_path_cached, on: :create
+  before_validation :set_default_title, on: :create
+  before_validation :set_default_hidden, on: :create
   after_create :make_path
   after_create :sync_inode_info
   after_save :update_timestamp
@@ -89,6 +92,13 @@ class Directory < ActiveRecord::Base
     errors.add(:name, 'cannot be changed after creation')
   end
 
+  # Ensure no duplicate directory exists at the same path on creation
+  def directory_does_not_exist
+    return unless path.present? && File.exist?(full_path)
+
+    errors.add(:path, 'already exists')
+  end
+
   public
 
   def full_title
@@ -97,6 +107,8 @@ class Directory < ActiveRecord::Base
     end.join(' » ')
   end
 
+  # Recursively traverse up the directory hierarchy to build
+  # a list of ancestors (including self)
   def self.directory_traverse(directory, list = [])
     return list if directory.nil? || directory.root?
 
@@ -104,7 +116,7 @@ class Directory < ActiveRecord::Base
     directory_traverse(directory.parent, list)
   end
 
-  # Use this
+  # Get the full filesystem path for this directory (used for file storage)
   def full_path
     if parent
       File.join(parent.full_path, name.downcase)
@@ -123,19 +135,25 @@ class Directory < ActiveRecord::Base
     File.directory?(full_path)
   end
 
-  # Cache computed values before validation
-  # path: Cached from full_path for query performance (not used for root)
-  # title: Auto-generated from directory name if not provided
-  # hidden: Defaults to false
-  def init_variables
-    # Cache the full hierarchical path for non-root directories
+  # Cache the full hierarchical path for non-root directories
+  def ensure_path_cached
     if parent
       self.path = full_path
     elsif path.blank?
       # Root directory path is managed via ENV['FILES_ROOT']
       self.path = ENV['FILES_ROOT']
     end
-    self.title = File.basename(path).capitalize if path.present? && title.blank? && new_record?
+  end
+
+  # Auto-generate title from directory name if not provided
+  def set_default_title
+    return unless path.present? && title.blank? && new_record?
+
+    self.title = File.basename(path).capitalize
+  end
+
+  # Default hidden to false
+  def set_default_hidden
     self.hidden = false if hidden.nil?
   end
 
