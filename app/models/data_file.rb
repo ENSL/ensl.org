@@ -59,6 +59,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :article, optional: true
 
   validates_length_of %i[description path], maximum: 255
+  validates :name, presence: { message: 'Please select a file to upload' }
 
   # Callback chain for file processing (order matters)
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
@@ -181,6 +182,8 @@ class DataFile < ActiveRecord::Base
 
   # Clean up filename to create a readable description
   def generate_description_from_filename
+    return 'Untitled' if location.blank?
+
     filename = File.basename(location)
     # Remove file extension and replace underscores/dashes with spaces
     cleaned = filename.gsub(/\.\w+$/, '').gsub(/[_-]/, ' ')

@@ -1,7 +1,9 @@
 <h1>Editing File</h1>
 
 <%= form_for(@file, html: { class: 'square' }) do |f| %>
-  <%= render 'shared/errors', messages: @file.errors.full_messages %>
+  <div id="<%= dom_id(@file) %>_errors_wrapper">
+    <%= render 'shared/errors', messages: @file.errors.full_messages, container_id: "#{dom_id(@file)}_errors" %>
+  </div>
 
   <%= cascade @file, ["name", "size_s", "md5_s"] %>
 
