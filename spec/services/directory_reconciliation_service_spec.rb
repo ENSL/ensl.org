@@ -232,6 +232,157 @@ describe DirectoryReconciliationService do
       expect(log_output).to match(/DataFiles: \d+/)
       expect(log_output).to match(/Directories: \d+/)
     end
+
+    it 'handles deep filesystem with multiple directory moves to various subdirs and validates all DB fields' do
+      # Create deterministic deep structure for testing moves
+      level1 = File.join(@test_root, 'level1')
+      level1other = File.join(@test_root, 'level1other')
+      level2 = File.join(level1, 'level2')
+      level2target = File.join(level1other, 'level2target')
+      level3 = File.join(level2, 'level3')
+      level4a = File.join(level3, 'level4a')
+      level4b = File.join(level3, 'level4b')
+
+      FileUtils.mkdir_p([level1, level1other, level2, level2target, level4a, level4b])
+
+      # Create DB records
+      db_l1 = root_directory.subdirs.create!(name: 'level1', path: level1, title: 'Level 1')
+      db_l1.sync_inode_info
+      db_l1_other = root_directory.subdirs.create!(name: 'level1other', path: level1other, title: 'Level 1 Other')
+      db_l1_other.sync_inode_info
+
+      db_l2 = db_l1.subdirs.create!(name: 'level2', path: level2, title: 'Level 2')
+      db_l2.sync_inode_info
+      db_l2_target = db_l1_other.subdirs.create!(name: 'level2target', path: level2target, title: 'Level 2 Target')
+      db_l2_target.sync_inode_info
+
+      db_l3 = db_l2.subdirs.create!(name: 'level3', path: level3, title: 'Level 3')
+      db_l3.sync_inode_info
+
+      db_l4a = db_l3.subdirs.create!(name: 'level4a', path: level4a, title: 'Level 4a')
+      db_l4a.sync_inode_info
+      db_l4b = db_l3.subdirs.create!(name: 'level4b', path: level4b, title: 'Level 4b')
+      db_l4b.sync_inode_info
+
+      initial_dir_count = Directory.count
+
+      # Move 1: Move level3 (with its children level4a/level4b) to level2target
+      new_level3_path = File.join(level2target, 'level3')
+      FileUtils.mv(level3, new_level3_path)
+
+      # Move 2: Move level2 (now empty) to root
+      new_level2_path = File.join(@test_root, 'movedlevel2')
+      FileUtils.mv(level2, new_level2_path)
+
+      # Run reconciliation
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      # Verify reconciliation completed
+      expect(result).to be_a(StringIO)
+      expect(result.string).to include('Finish recreate')
+
+      # CRITICAL: Directory count should stay the same (moved, not deleted/created)
+      expect(Directory.count).to eq(initial_dir_count),
+                                 "Expected #{initial_dir_count} directories, got #{Directory.count}"
+
+      # Verify level3 moved to level2_target
+      db_l3.reload
+      expect(db_l3.parent_id).to eq(db_l2_target.id)
+      expect(db_l3.full_path).to eq(new_level3_path)
+
+      # Verify level3's children (level4a, level4b) still exist with correct parent
+      db_l4a.reload
+      db_l4b.reload
+      expect(db_l4a.parent_id).to eq(db_l3.id)
+      expect(db_l4b.parent_id).to eq(db_l3.id)
+
+      # Verify level2 moved to root
+      db_l2.reload
+      expect(db_l2.parent_id).to eq(Directory::ROOT)
+      expect(db_l2.full_path).to eq(new_level2_path)
+    end
+
+    it 'handles directory moves with file modifications without creating duplicate file records' do
+      # Create initial 4-level filesystem
+      filesystem = create_test_filesystem(@test_root, depth: 4, files_per_dir: 3, name_pattern: 'filetest')
+      initial_db = sync_filesystem_to_db(filesystem, root_directory)
+
+      initial_file_count = DataFile.count
+      initial_dir_count = Directory.count
+
+      # Track specific files for validation
+      tracked_files = DataFile.limit(5).map { |f| { id: f.id, path: f.path, md5: f.md5, size: f.size } }
+
+      # Move a directory with files from level 3 to level 1
+      source_dirs = filesystem[:directories].select do |d|
+        d.count('/') == @test_root.count('/') + 3 && File.directory?(d)
+      end
+      source_dir = source_dirs.sample
+      moved_dir_old_path = nil
+      moved_dir_new_path = nil
+
+      if source_dir
+        target_dirs = filesystem[:directories].select do |d|
+          d.count('/') == @test_root.count('/') + 1 && File.directory?(d) && !source_dir.start_with?(d)
+        end
+        target_dir = target_dirs.sample
+
+        if target_dir
+          moved_dir_old_path = source_dir
+          moved_dir_new_path = File.join(target_dir, File.basename(source_dir))
+
+          unless File.exist?(moved_dir_new_path)
+            # Get files in this directory before move
+            files_in_dir = Dir.glob(File.join(source_dir, '*')).select { |f| File.file?(f) }
+
+            # Move the directory
+            FileUtils.mv(source_dir, moved_dir_new_path)
+
+            # Modify a couple of files in the moved directory
+            files_in_dir[0..1].each do |old_file_path|
+              new_file_path = old_file_path.sub(source_dir, moved_dir_new_path)
+              if File.exist?(new_file_path)
+                new_content = SecureRandom.random_bytes(rand(2000..8000))
+                File.open(new_file_path, 'wb') { |f| f.write(new_content) }
+              end
+            end
+          end
+        end
+      end
+
+      # Run reconciliation
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      # CRITICAL: No new file records should be created (same file, different location)
+      expect(DataFile.count).to eq(initial_file_count),
+                                "File count should not change: expected #{initial_file_count}, got #{DataFile.count}"
+
+      # CRITICAL: No directories lost
+      expect(Directory.count).to eq(initial_dir_count),
+                                 "Directory count should not change: expected #{initial_dir_count}, got #{Directory.count}"
+
+      # Verify tracked files still exist with same IDs (not duplicated)
+      tracked_files.each do |tracked|
+        file_record = DataFile.find_by(id: tracked[:id])
+        expect(file_record).not_to be_nil, "File with ID #{tracked[:id]} should still exist"
+      end
+
+      # Verify files in the moved directory have updated paths if directory was found and updated
+      if moved_dir_new_path && File.directory?(moved_dir_new_path)
+        files_in_new_location = Dir.glob(File.join(moved_dir_new_path, '*')).select { |f| File.file?(f) }
+
+        # Each file on disk should have exactly one DB record
+        files_in_new_location.each do |file_path|
+          matching_records = DataFile.where('path LIKE ?', "%#{File.basename(file_path)}")
+          expect(matching_records.count).to be >= 1, "File #{file_path} should have at least one DB record"
+          expect(matching_records.count).to be <= 1, "File #{file_path} should not have duplicate DB records"
+        end
+      end
+
+      expect(result.string).to include('Finish recreate')
+    end
   end
 
   describe 'integration with Directory model' do

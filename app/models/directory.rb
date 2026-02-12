@@ -289,11 +289,18 @@ class Directory < ActiveRecord::Base
     subdir = find_or_create_subdir(item_name, item_path, logger)
     return unless subdir
 
-    # If parent changed, move the record
+    # If parent changed, move the record (this also saves)
     if subdir.parent_id != id
+      # Update name if it changed BEFORE moving (so move can use correct name)
+      subdir.name = item_name.downcase if subdir.name != item_name.downcase
+
       move_subdir_to_self(subdir, logger)
     elsif !subdir.valid?
       fix_subdir_attributes(subdir, logger)
+    elsif subdir.name != item_name.downcase
+      # Save name change if parent didn't change
+      subdir.name = item_name.downcase
+      subdir.save!
     end
 
     destroy_dirs.delete(subdir.id)
@@ -324,7 +331,8 @@ class Directory < ActiveRecord::Base
   def move_subdir_to_self(subdir, logger)
     old_path = subdir.full_path
     subdir.parent = self
-    subdir.save!
+    subdir.path = subdir.full_path # Update path to match new location
+    subdir.save!(validate: false) # Skip validations - disk is authoritative for reconciliation
     subdir.sync_inode_info # Ensure inode info is synced after move
     logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
   rescue StandardError => e

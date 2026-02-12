@@ -100,6 +100,8 @@ module FilesystemTestHelper
         title: dir_name.titleize
       )
       db_dir.save!
+      # Ensure inode info is captured for move detection
+      db_dir.sync_inode_info
       directories_hash[item_path] = db_dir
 
       # Recursively sync subdirectories
