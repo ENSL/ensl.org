@@ -1,19 +1,6 @@
 <!doctype html>
 <html>
-  <head>
-    <title><%= full_title(yield(:title)) %></title>
-    <meta charset="utf-8">
-    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= favicon_link_tag 'shared/favicon.ico' %>
-    <%= theme_stylesheet_link_tag %>
-    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-    
-    <%= csrf_meta_tags %>
-    <%= action_cable_meta_tag %>
-      <%= javascript_include_tag 'application' %>
-      <%= javascript_importmap_tags %>
-  </head>
+  <%= render partial: "head" %>
   <body data-disable-flash-fade="<%= Rails.env.test? %>">
     <div id="container">
       <%= render partial: "messages" %>
