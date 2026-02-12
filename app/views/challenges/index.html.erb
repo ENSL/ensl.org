@@ -15,7 +15,7 @@
       <td><%= namelink challenge.contester2.team %></td>
       <td><%= link_to (shorttime challenge.match_time), challenge %></td>
       <td><%= challenge.statuses[challenge.status] %></td>
-      <td class="actions"><%= link_to icon('times'), challenge, confirm: 'Are you sure?', method: :delete %></td>
+      <td class="actions"><%= link_to fa_icon('times'), challenge, confirm: 'Are you sure?', method: :delete %></td>
     </tr>
   <% end %>
 </table>

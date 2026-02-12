@@ -16,7 +16,7 @@
     <div class="contents">
       <%= auto_link shoutmsg.text, html: { target: '_blank' } %>
       <% if local_assigns.key?(:cuser) && shoutmsg.can_destroy?(local_assigns[:cuser]) %>
-        <%= link_to icon('times'), shoutmsg, method: :delete, class: 'destroy' %>
+        <%= link_to fa_icon('times'), shoutmsg, method: :delete, class: 'destroy' %>
       <% end %>
     </div>
   </div>

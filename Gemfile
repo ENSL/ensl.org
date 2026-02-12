@@ -80,7 +80,6 @@ gem 'uglifier'
 
 # CSS
 gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues
-gem 'font-awesome-sass', '~> 4.1.0.0' # Fix icons before updating
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
 gem 'tailwindcss-rails'

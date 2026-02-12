@@ -55,11 +55,11 @@
           <div class="file" id="file_<%= file.id %>">
             <div class="actions">
               <% if file.can_update? cuser %>
-                <%= link_to icon('pencil'), edit_data_file_path(file) %>
+                <%= link_to fa_icon('pencil'), edit_data_file_path(file) %>
               <% end %>
 
               <% if file.can_destroy? cuser %>
-                <%= link_to icon('times'), file, confirm: 'Are you sure?', method: :delete %>
+                <%= link_to fa_icon('times'), file, confirm: 'Are you sure?', method: :delete %>
               <% end %>
             </div>
 
@@ -68,7 +68,7 @@
 
             <div class="comments">
               <%= link_to file do %>
-                <%= icon('comments') %> Comments (<%= file.comments.count %>)
+                <%= fa_icon('comments') %> Comments (<%= file.comments.count %>)
               <% end %>
             </div>
 

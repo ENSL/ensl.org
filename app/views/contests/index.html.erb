@@ -25,8 +25,8 @@
           <td><%= contest.statuses[contest.status] %></td>
           <% if cuser and cuser.admin? %>
             <td class="actions">
-              <%= link_to icon('pencil'), edit_contest_path(contest) %>
-              <%= link_to icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
+              <%= link_to fa_icon('pencil'), edit_contest_path(contest) %>
+              <%= link_to fa_icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
             </td>
           <% end %>
         </tr>
@@ -58,8 +58,8 @@
           <% end %>
           <% if cuser and cuser.admin? %>
             <td class="actions">
-              <%= link_to icon('pencil'), edit_contest_path(contest) %>
-              <%= link_to icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
+              <%= link_to fa_icon('pencil'), edit_contest_path(contest) %>
+              <%= link_to fa_icon('times'), contest, confirm: 'Are you sure?', method: :delete %>
             </td>
           <% end %>
         </tr>

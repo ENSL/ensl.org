@@ -21,6 +21,10 @@ Rails.application.config.assets.precompile += %w[actioncable.js]
 Rails.application.config.assets.precompile += %w[importmap_application.js]
 # Tailwind
 Rails.application.config.assets.precompile += %w[tailwind.css]
+# Font awesome
+Rails.application.config.assets.precompile += %w[@fortawesome--fontawesome-free.js]
+Rails.application.config.assets.precompile += %w[fontawesome-webfont.eot fontawesome-webfont.svg
+                                                 fontawesome-webfont.ttf fontawesome-webfont.woff fontawesome-webfont.woff2]
 # Precompile Stimulus controllers
 Rails.application.config.assets.precompile += %w[controllers/gather_sync_controller.js]
 Rails.application.config.assets.precompile += %w[controllers/index.js]

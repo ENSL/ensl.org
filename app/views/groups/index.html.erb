@@ -14,9 +14,9 @@
       <td><%= h group.created_at.strftime("%d %B %y") %></td>
       <td><%= link_to (h group.founder.username), group.founder %></td>
       <td class="actions">
-        <%= link_to icon('pencil'), edit_group_path(group) %>
+        <%= link_to fa_icon('pencil'), edit_group_path(group) %>
         <% if group.can_destroy? cuser %>
-          <%= link_to icon('times'), group, confirm: 'Are you sure?', method: :delete %>
+          <%= link_to fa_icon('times'), group, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>

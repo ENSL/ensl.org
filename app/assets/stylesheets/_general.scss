@@ -12,3 +12,43 @@
 }
 
 .invisible { display: none !important; }
+
+@mixin fa-solid($unicode) {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-style: normal;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: $unicode;
+}
+
+$fontawesome: "Font Awesome 6 Free" !default;
+
+// Solid icons in FA6 need weight 900
+$fa-solid-weight: 900 !default;
+
+// Map old variables you use to FA unicode
+$fa-var-chevron-down: "\f078";
+$fa-var-check: "\f00c";
+// add more as needed...
+// Backwards-compatible mappings for older variable names used across the app
+$fa-var-list-alt: "\f022";
+$fa-var-trophy: "\f091";
+$fa-var-file-text-o: "\f15c";
+$fa-var-comments-o: "\f086";
+$fa-var-users: "\f0c0";
+$fa-var-user: "\f007";
+$fa-var-gamepad: "\f11b";
+$fa-var-graduation-cap: "\f19d";
+$fa-var-chevron-up: "\f077";
+$fa-var-minus: "\f068";
+$fa-var-times: "\f00d";
+$fa-var-pencil: "\f040";
+$fa-var-envelope: "\f0e0";
+$fa-var-wrench: "\f0ad";
+$fa-var-star: "\f005";
+$fa-var-flag-checkered: "\f11e";
+$fa-var-undo: "\f0e2";
+$fa-var-rotate-left: "\f0e2";
+$fa-var-hourglass: "\f254";

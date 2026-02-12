@@ -27,10 +27,10 @@
             <td class="actions">
               <% if forum.can_update? cuser %>
                 <%= link_to action: "up", id: forum do %>
-                  <% icon 'arrow-up' %>
+                  <% fa_icon 'arrow-up' %>
                 <% end %>
                 <%= link_to action: "down", id: forum do %>
-                  <% icon 'arrow-down' %>
+                  <% fa_icon 'arrow-down' %>
                 <% end %>
               <% end %>
             </td>

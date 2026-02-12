@@ -19,8 +19,8 @@
       <td><%=h poll.user %></td>
       <% if cuser and cuser.admin? %>
         <td class="actions">
-          <%= link_to icon('pencil'), edit_poll_path(poll) %>
-          <a href="#" onclick="if(!confirm('Are you sure?')) return false;" data-submit-form="true" data-form-id="delete_poll_<%= poll.id %>"><%= icon('times') %></a>
+          <%= link_to fa_icon('pencil'), edit_poll_path(poll) %>
+          <a href="#" onclick="if(!confirm('Are you sure?')) return false;" data-submit-form="true" data-form-id="delete_poll_<%= poll.id %>"><%= fa_icon('times') %></a>
           <%= form_tag poll_path(poll), method: :post, id: "delete_poll_#{poll.id}", style: 'display:none;' do %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
             <%= hidden_field_tag :_method, 'delete' %>

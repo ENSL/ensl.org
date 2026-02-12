@@ -20,8 +20,8 @@
           <td><%= shorttime article.created_at %></td>
           <td><%= namelink article.user %></td>
           <td class="actions">
-            <%= link_to icon('pencil'), edit_article_path(article) %>
-            <%= link_to icon('times'), article, confirm: 'Are you sure?', method: :delete %>
+            <%= link_to fa_icon('pencil'), edit_article_path(article) %>
+            <%= link_to fa_icon('times'), article, confirm: 'Are you sure?', method: :delete %>
           </td>
         </tr>
       <% end %>

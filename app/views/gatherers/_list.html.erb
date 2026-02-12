@@ -20,7 +20,7 @@
           <%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %>
 
           <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
-            <%= icon 'chevron-right' %>
+            <%= fa_icon 'chevron-right' %>
           <% end %>
 
           <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
@@ -28,7 +28,7 @@
 
           <% if gatherer == captain %>
             <span class="captain">
-              <%= icon('star') %>
+              <%= fa_icon('star') %>
             </span>
           <% end %>
         <% end %>

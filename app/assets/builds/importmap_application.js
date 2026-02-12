@@ -2,3 +2,4 @@
 import "@hotwired/turbo-rails"
 import "@rails/actioncable"
 import "controllers"
+import "@fortawesome/fontawesome-free"

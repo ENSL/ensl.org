@@ -85,7 +85,7 @@ form {
       &:after {
         font-family: $fontawesome;
         pointer-events: none;
-        content: $fa-var-chevron-down;
+        content: "\f078";
         font-weight: normal;
         font-style: normal;
         position: absolute;
@@ -183,11 +183,8 @@ form {
       &:checked {
 
         & + label.checkbox:before {
-          content: $fa-var-check;
+          @include fa-solid($fa-var-check);
           pointer-events: none;
-          font-family: $fontawesome;
-          font-weight: normal;
-          font-style: normal;
           color: $light-blue;
         }
       }

@@ -19,17 +19,17 @@
   <% contesters.each do |contester| %>
     <tr>
       <% if contester.trend == Contester::TREND_UP %>
-        <td><%= icon 'chevron-up' %></td>
+        <td><%= fa_icon 'chevron-up' %></td>
       <% elsif contester.trend == Contester::TREND_DOWN %>
-        <td><%= icon 'chevron-down' %></td>
+        <td><%= fa_icon 'chevron-down' %></td>
       <% elsif contester.trend == Contester::TREND_FLAT %>
-        <td><%= icon 'minus' %></td>
+        <td><%= fa_icon 'minus' %></td>
       <% else %>
         <td></td>
       <% end %>
       <td><%= flag contester.team.country %></td>
       <td><%= link_to (h contester.team.name), contester %></td>
-      <td><%= icon 'trophy' if contester == contester.contest.winner %></td>
+      <td><%= fa_icon 'trophy' if contester == contester.contest.winner %></td>
       <td><%= h contester.total_score %></td>
       <td><%= h contester.win %></td>
       <td><%= h contester.loss %></td>
@@ -45,8 +45,8 @@
             <% end %>
           <% end %>
           <% if cuser and cuser.admin? %>
-            <%= link_to icon('pencil'), edit_contester_path(contester) %>
-            <%= link_to icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
+            <%= link_to fa_icon('pencil'), edit_contester_path(contester) %>
+            <%= link_to fa_icon('times'), contester, confirm: 'Are you sure?', method: :delete %>
           <% end %>
         </td>
       <% end %>

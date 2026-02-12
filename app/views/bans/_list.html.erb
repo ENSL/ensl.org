@@ -24,10 +24,10 @@
       <% if cuser and cuser.allowed_to_ban? %>
         <td class="actions">
           <% if ban.can_update? cuser %>
-            <%= link_to icon('pencil'), edit_ban_path(ban) %>
+            <%= link_to fa_icon('pencil'), edit_ban_path(ban) %>
           <% end %>
           <% if ban.can_destroy? cuser %>
-            <%= link_to icon('times'), ban, data: { turbo_method: :delete, confirm: 'Are you sure?' }, class: 'delete' %>
+            <%= link_to fa_icon('times'), ban, data: { turbo_method: :delete, confirm: 'Are you sure?' }, class: 'delete' %>
           <% end %>
         </td>
       <% end %>

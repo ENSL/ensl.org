@@ -12,8 +12,8 @@
       <td><%= namelink map %></td>
       <td><%= h map.download %></td>
       <td class="actions">
-        <%= link_to icon('pencil'), edit_map_path(map) %>
-        <%= link_to icon('times'), map, confirm: 'Are you sure?', method: :delete %>
+        <%= link_to fa_icon('pencil'), edit_map_path(map) %>
+        <%= link_to fa_icon('times'), map, confirm: 'Are you sure?', method: :delete %>
       </td>
     </tr>
   <% end %>

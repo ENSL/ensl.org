@@ -25,16 +25,16 @@
             <%= f.hidden_field :id, value: 0 %>
             <%= f.hidden_field :status, value: 0 %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_CONFIRMED) %>
-              <%= link_to icon('check'), "#", 'data-id': "#{MatchProposal::STATUS_CONFIRMED}", title: 'Confirm' %>
+              <%= link_to fa_icon('check'), "#", 'data-id': "#{MatchProposal::STATUS_CONFIRMED}", title: 'Confirm' %>
             <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REJECTED) %>
-              <%= link_to icon('times'), "#", 'data-id': "#{MatchProposal::STATUS_REJECTED}", title: 'Reject' %>
+              <%= link_to fa_icon('times'), "#", 'data-id': "#{MatchProposal::STATUS_REJECTED}", title: 'Reject' %>
             <% end %> 
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REVOKED) %>
-              <%= link_to icon('undo'), "#", 'data-id': "#{MatchProposal::STATUS_REVOKED}", title: 'Revoke' %>
+              <%= link_to fa_icon('undo'), "#", 'data-id': "#{MatchProposal::STATUS_REVOKED}", title: 'Revoke' %>
             <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_DELAYED) %>
-              <%= link_to icon('hourglass'), "#", 'data-id': "#{MatchProposal::STATUS_DELAYED}", title: 'Delay' %>
+              <%= link_to fa_icon('hourglass'), "#", 'data-id': "#{MatchProposal::STATUS_DELAYED}", title: 'Delay' %>
             <% end %>
           <% end %>
         <% end %>

@@ -2,7 +2,7 @@
 <% unless defined?(edit) && edit %>
   <h3>
     <%= namelink bracket %>
-    <%= link_to icon('pencil'), edit_bracket_path(bracket, tab: 'bracket') if bracket.can_update?(cuser) %>
+    <%= link_to fa_icon('pencil'), edit_bracket_path(bracket, tab: 'bracket') if bracket.can_update?(cuser) %>
   </h3>
 <% end %>
 

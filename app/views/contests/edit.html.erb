@@ -98,8 +98,8 @@
                     <td><%= namelink bracket %></td>
                     <td><%= bracket.slots %></td>
                     <td class="actions">
-                        <%= link_to icon('pencil'), edit_bracket_path(bracket) %>
-                        <%= link_to icon('times'), bracket, confirm: 'Are you sure?', method: :delete %>
+                        <%= link_to fa_icon('pencil'), edit_bracket_path(bracket) %>
+                        <%= link_to fa_icon('times'), bracket, confirm: 'Are you sure?', method: :delete %>
                     </td>
                 </tr>
                 <% end %>
@@ -138,8 +138,8 @@
                     <td><%= namelink map %></td>
                     <td><%= h map.download %></td>
                     <td class="actions">
-                        <%= link_to icon('pencil'), edit_map_path(map) %>
-                        <%= link_to icon('times'), del_map_contests_path(id: @contest.id, id2: map.id), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('pencil'), edit_map_path(map) %>
+                        <%= link_to fa_icon('times'), del_map_contests_path(id: @contest.id, id2: map.id), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>
@@ -182,11 +182,11 @@
                     <td><%= contester.statuses[contester.active] %></td>
                     <td class="actions">
                         <% if contester.active %>
-                        <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                        <%= link_to icon('times'), contester_path(contester), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('pencil'), edit_contester_path(contester) %>
+                        <%= link_to fa_icon('times'), contester_path(contester), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                         <% else %>
-                        <%= link_to icon('pencil'), edit_contester_path(contester) %>
-                        <%= link_to icon('rotate-left'), contester_path(contester), method: :patch, params: { contester: { active: 1 } }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('pencil'), edit_contester_path(contester) %>
+                        <%= link_to fa_icon('rotate-left'), contester_path(contester), method: :patch, params: { contester: { active: 1 } }, form: { style: 'display:inline;margin:0;' } %>
                         <% end %>
                     </td>
                 </tr>
@@ -225,8 +225,8 @@
                     <td><%= h week.map1 %></td>
                     <td><%= h week.map2 %></td>
                     <td class="actions">
-                        <%= link_to icon('pencil'), edit_week_path(week) %>
-                        <%= link_to icon('times'), week_path(week), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('pencil'), edit_week_path(week) %>
+                        <%= link_to fa_icon('times'), week_path(week), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>
@@ -260,9 +260,9 @@
                         <% end %>
                     </td>
                     <td class="actions">
-                        <%= link_to icon('flag-checkered'), controller: :matches, action: :ref, id: match %>
-                        <%= link_to icon('pencil'), edit_match_path(match) %>
-                        <%= link_to icon('times'), match_path(match), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('flag-checkered'), controller: :matches, action: :ref, id: match %>
+                        <%= link_to fa_icon('pencil'), edit_match_path(match) %>
+                        <%= link_to fa_icon('times'), match_path(match), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>

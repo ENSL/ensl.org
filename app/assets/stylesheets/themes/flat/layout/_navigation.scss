@@ -90,7 +90,9 @@ ul.navigation {
     &.icon {
 
       a:after {
-        @extend .fa;
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900; // solid
+        font-style: normal;
         content: '';
         display: block;
         position: absolute;
@@ -100,39 +102,14 @@ ul.navigation {
         font-size: 14px;
       }
 
-      a {
-        &.news:after {
-          content: $fa-var-list-alt;
-        }
-
-        &.contests:after {
-          content: $fa-var-trophy;
-        }
-
-        &.articles:after {
-          content: $fa-var-file-text-o;
-        }
-
-        &.forums:after {
-          content: $fa-var-comments-o;
-        }
-
-        &.teams:after {
-          content: $fa-var-users;
-        }
-
-        &.users:after {
-          content: $fa-var-user;
-        }
-
-        &.league:after {
-          content: $fa-var-gamepad;
-        }
-
-        &.tutorials:after {
-          content: $fa-var-graduation-cap;
-        }
-      }
+      a.news:after       { content: "\f022"; } // list-alt
+      a.contests:after   { content: "\f091"; } // trophy
+      a.articles:after   { content: "\f15c"; } // file (replaces file-text-o)
+      a.forums:after     { content: "\f086"; } // comments (replaces comments-o)
+      a.teams:after      { content: "\f0c0"; } // users
+      a.users:after      { content: "\f007"; } // user
+      a.league:after     { content: "\f11b"; } // gamepad
+      a.tutorials:after  { content: "\f19d"; } // graduation-cap
 
       i {
         color: white;

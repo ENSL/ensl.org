@@ -4,7 +4,7 @@
   <% @messages.each do |message| %>
     <div class="message">
       <h3 class="subject <%= message.recipient == @message.recipient ? "sender" : "recipient" %>">
-        <%= icon("chevron-right") if message == @message %>
+        <%= fa_icon("chevron-right") if message == @message %>
         <%= namelink message %>
       </h3>
       <div class="content">

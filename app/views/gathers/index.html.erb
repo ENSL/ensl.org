@@ -29,7 +29,7 @@
               <% if gatherer.team == 1 %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
                 <% if gather.captain1 == gatherer %>
-                  <%= icon 'star' %>
+                  <%= fa_icon 'star' %>
                 <% end %>
               <% end %>
             </li>
@@ -43,7 +43,7 @@
               <% if gatherer.team == 2 %>
                 <%= link_to gatherer.user.to_s, User.find_by_username(gatherer.user.to_s) %>
                 <% if gather.captain2 == gatherer %>
-                  <%= icon 'star' %>
+                  <%= fa_icon 'star' %>
                 <% end %>
               <% end %>
             </li>

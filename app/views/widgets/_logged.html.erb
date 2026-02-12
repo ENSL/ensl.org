@@ -6,29 +6,29 @@
       <% if cuser.admin? %>
         <li>
           <%= link_to '/about/adminpanel', class: 'admin' do %>
-            Admin (<%= Issue.with_status(0).count  %>) <%= icon 'wrench' %>
+            Admin (<%= Issue.with_status(0).count  %>) <%= fa_icon 'wrench' %>
           <% end %>
         </li>
       <% elsif cuser.moderator? %>
         <li>
           <%= link_to issues_path, class: 'admin' do %>
-            Issues (<%= Issue.where(category_id: Issue.allowed_categories(cuser)).with_status(0).count %>) <%= icon 'wrench' %>
+            Issues (<%= Issue.where(category_id: Issue.allowed_categories(cuser)).with_status(0).count %>) <%= fa_icon 'wrench' %>
           <% end %>
         </li>
       <% end %>
       <li>
         <%= link_to user_path(cuser) do %>
-          Account <%= icon 'user' %>
+          Account <%= fa_icon 'user' %>
         <% end %>
       </li>
       <li>
         <%= link_to agenda_user_path(cuser) do %>
-          Agenda <%= icon 'calendar' %>
+          Agenda <%= fa_icon 'calendar' %>
         <% end %>
       </li>
       <li>
         <%= link_to messages_path do %>
-          Messages <%= icon 'envelope' %>
+          Messages <%= fa_icon 'envelope' %>
         <% end %>
         <% if c = cuser.new_messages.count > 0 %>
           (<%= cuser.new_messages.count %>)
@@ -36,7 +36,7 @@
       </li>
       <li>
         <%= link_to '#', data: { submit_form: true, form_id: 'logout-form' } do %>
-          Logout <%= icon 'key' %>
+          Logout <%= fa_icon 'key' %>
         <% end %>
         <%= form_tag({ controller: 'users', action: 'logout' }, id: 'logout-form', style: 'display:none;', data: { turbo: false }) do %>
         <% end %>

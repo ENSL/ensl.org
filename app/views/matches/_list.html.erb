@@ -47,9 +47,9 @@
       <% if match.contest.contest_type == Contest::TYPE_LADDER and (max_columns > 4 if (defined? max_columns)) %>
         <td>
           <% if match.get_friendly(:points) > 0 %>
-            <%= icon 'chevron-up' %>
+            <%= fa_icon 'chevron-up' %>
           <% elsif match.get_friendly(:points) < 0 %>
-            <%= icon 'chevron-down' %>
+            <%= fa_icon 'chevron-down' %>
           <% end %>
           <%= match.get_friendly(:points) %>
         </td>

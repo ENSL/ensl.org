@@ -15,10 +15,10 @@
       <td><%= namelink issue.author %></td>
       <td class="actions">
         <% if issue.can_update? cuser %>
-          <%= link_to icon('pencil'), edit_issue_path(issue) %>
+          <%= link_to fa_icon('pencil'), edit_issue_path(issue) %>
         <% end %>
         <% if issue.can_destroy? cuser %>
-          <%= link_to icon('times'), issue, confirm: 'Are you sure?', method: :delete %>
+          <%= link_to fa_icon('times'), issue, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>

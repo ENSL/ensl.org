@@ -13,9 +13,9 @@
       <td><%= namelink article.user %></td>
       <td class="actions">
         <% if article.can_update? cuser %>
-          <%= link_to icon('pencil'), edit_article_path(article) %>
+          <%= link_to fa_icon('pencil'), edit_article_path(article) %>
           <% end; if article.can_destroy? cuser %>
-          <%= link_to icon('times'), article, confirm: 'Are you sure?', method: :delete %>
+          <%= link_to fa_icon('times'), article, confirm: 'Are you sure?', method: :delete %>
         <% end %>
       </td>
     </tr>
