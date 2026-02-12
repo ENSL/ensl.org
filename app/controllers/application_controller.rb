@@ -115,6 +115,10 @@ class ApplicationController < ActionController::Base
     render 'errors/403', status: :forbidden, layout: 'errors'
   end
 
+  rescue_from UserRegistrationReq do |_exception|
+    render text: I18n.t(:user_registration_required), status: :forbidden
+  end
+
   rescue_from ActiveRecord::RecordNotFound do |_exception|
     # Correct template reference: 'errors/404' (not 'errors/404.html')
     render 'errors/404', status: :not_found, layout: 'errors'
