@@ -104,3 +104,6 @@ CHECKLIST.md
 /app/assets/javascripts/vendor
 
 node_modules/
+
+/app/assets/builds/*
+!/app/assets/builds/.keep

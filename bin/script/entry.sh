@@ -45,7 +45,14 @@ if [[ "$RAILS_DEBUG" -eq 1 ]]; then
   exit 0
 fi
 
-bundle exec puma -C config/puma.rb
+# If in development, start with Tailwind runner
+if [[ "$RAILS_ENV" == "development" ]]; then
+  echo "Starting Tailwind runner in development mode..."
+  bin/dev
+else
+  bundle exec puma -C config/puma.rb
+fi
+
 
 # After puma dies, leave us a shell
 /bin/bash
