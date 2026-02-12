@@ -36,7 +36,7 @@ class Movie < ActiveRecord::Base
   LOCAL = '78.46.36.107:29100'
 
   # attr_protected :id, :updated_at, :created_at
-  attr_accessor :user_name, :name, :stream_ip, :stream_port
+  attr_accessor :user_name, :stream_ip, :stream_port
 
   scope :recent, -> { limit(5) }
   scope :ordered, lambda {
@@ -169,26 +169,41 @@ class Movie < ActiveRecord::Base
     sout
   end
 
-  def self.filter_or_all(order, filter)
-    order = case order
-            when 'date' then 'data_files.created_at DESC'
-            when 'author' then 'users.username ASC'
-            when 'ratings' then 'total_ratings DESC'
-            else 'total_ratings DESC'
-            end
+  # Supports stacked filters: rating (numeric), size ('short'|'long'), author
+  def self.filter_or_all(order_param, rating_param = nil, size_param = nil, author_param = nil)
+    order_sql = case order_param
+                when 'date' then 'data_files.created_at DESC'
+                when 'author' then 'users.username ASC'
+                when 'ratings' then 'total_ratings DESC'
+                else 'total_ratings DESC'
+                end
 
-    # FIXME: use new system
-    # movies = []
-    # if filter
-    #  Movie.index.order(order).each do |movie|
-    #    if movie.file and movie.file.average_rating_round >= filter.to_i
-    #      movies << movie
-    #    end
-    #  end
-    #  return movies
-    # else
-    with_ratings.order(order)
-    # end
+    movies = with_ratings.order(order_sql)
+
+    # apply author filter (author_param may be user id or username)
+    if author_param.present?
+      movies = if author_param.to_s =~ /^\d+$/
+                 movies.where('movies.user_id = ?', author_param.to_i)
+               else
+                 movies.joins('LEFT JOIN users ON users.id = movies.user_id').where('users.username = ?',
+                                                                                    author_param.to_s)
+               end
+    end
+
+    # apply size filter
+    if size_param.present?
+      case size_param.to_s
+      when 'short'
+        movies = movies.where('movies.length IS NOT NULL AND movies.length <= ?', 10 * 60)
+      when 'long'
+        movies = movies.where('movies.length IS NOT NULL AND movies.length > ?', 10 * 60)
+      end
+    end
+
+    # apply rating filter (numeric)
+    movies = movies.having('AVG(rates.score) >= ?', rating_param.to_i) if rating_param.present? && rating_param.to_i > 0
+
+    movies
   end
 
   # def update_status
@@ -202,7 +217,7 @@ class Movie < ActiveRecord::Base
   # end
 
   def can_create?(cuser)
-    cuser and cuser.admin? or cuser.groups.exists? id: Group::MOVIES
+    cuser&.admin? or cuser&.groups&.exists? id: Group::MOVIES
   end
 
   def can_update?(cuser)
@@ -216,5 +231,13 @@ class Movie < ActiveRecord::Base
   def self.params(params, cuser)
     params.require(:movie).permit(:content, :format, :length, :name, :picture, :status, :category_id, :file_id,
                                   :match_id, :preview_id, :user_id)
+  end
+
+  # Return array of [username, id] for users who submitted movies
+  def self.submitter_options
+    User.joins('INNER JOIN movies ON movies.user_id = users.id')
+        .distinct
+        .order('users.username ASC')
+        .pluck('users.username, users.id')
   end
 end

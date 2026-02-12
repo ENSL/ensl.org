@@ -1,51 +1,82 @@
 <div id="movies">
   <h1 class="title">Movie Archive</h1>
-  <p>We recommend <%= link_to "VLC Player", "http://www.videolan.org/vlc/" %> for movie playback.</p>
+  <p>
+    We recommend <%= link_to "VLC Player", "http://www.videolan.org/vlc/" %> for movie playback.
+    <% if cuser and DataFile.new(directory_id: Directory::MOVIES).can_create? cuser %>
+      You can add a NS1/NS2 movie <%= link_to "here", new_data_file_url(id: Directory::MOVIES) %>.
+    <% else %>
+      Ask admins if you'd like to upload NS1/NS2 movies. We'll provide access.
+    <% end %>
+  </p>
 
   <div class="filters">
     <%= form_tag movies_url, method: "get" do %>
       <div class="fields">
-        <%= select_tag :filter, options_for_select({"5 stars" => 5, "4 stars" => 4, "3 stars" => 3, "2 stars" => 2, "1 stars" => 1}) %>  
+        <%= select_tag :rating, options_for_select([['All', ''], ['5 stars', 5], ['4 stars', 4], ['3 stars', 3], ['2 stars', 2], ['1 star', 1]], params[:rating]), onchange: 'this.form.submit()' %>
       </div>
-      
+
       <div class="fields">
-        <%= select_tag :order, options_for_select({"Ratings" => :ratings, "Date" => :date, "Author" => :author}) %>  
+        <%= select_tag :order, options_for_select({"Ratings" => 'ratings', "Date" => 'date', "Author" => 'author'}, params[:order]), onchange: 'this.form.submit()' %>
       </div>
-      
-      <div class="controls">
-        <%= submit_tag "Filter" %>  
+
+      <div class="fields">
+        <%= select_tag :author, options_for_select([['All Authors', '']] + ( @movie_authors || [] ), params[:author]), onchange: 'this.form.submit()' %>
       </div>
     <% end %>
+
+        <% short_active = params[:size] == 'short' %>
+        <% long_active = params[:size] == 'long' %>
+        <%= link_to "Shorts",
+          movies_url(size: (short_active ? nil : 'short'), order: params[:order], rating: params[:rating], author: params[:author]),
+          class: "button mr-2 #{'opacity-50 bg-gray-200 text-gray-700' if short_active}" %>
+
+        <%= link_to "Long",
+          movies_url(size: (long_active ? nil : 'long'), order: params[:order], rating: params[:rating], author: params[:author]),
+          class: "button #{'opacity-50 bg-gray-200 text-gray-700' if long_active}" %>
   </div>
 
-  <div id="movie" class="tabbed">
-    <ul id="movie-nav" class="tabs">
-      <% Category.domain(Category::DOMAIN_MOVIES).ordered.each do |cat| %>
-        <li>
-          <a href="#<%= cat.id %>"><%= cat %></a>
-        </li>
-      <% end %>
-    </ul>
+  <div class="w-full">
+    <div id="movies-grid"
+        class="grid gap-5 w-max mx-auto [grid-template-columns:repeat(5,10rem)]">
 
-    <div class="tabbed-contents">
-      <% Category.domain(Category::DOMAIN_MOVIES).each do |cat| %>
-        <div class="tab" id="<%= cat.id %>">
-          <% @movies.each do |m| %>
-            <% next if m.category != cat %>
-            <%= render partial: "movie", object: m %>
-          <% end %>
-        </div>
+      <% @movies.each do |movie| %>
+
+        <%= link_to movie_path(movie),
+            class: "group relative w-40 h-32 overflow-hidden rounded bg-gray-100" do %>
+
+          <!-- Image / Icon Layer -->
+          <div class="absolute inset-0 transition-opacity duration-300 group-hover:opacity-0">
+
+            <% if movie.picture.present? %>
+              <%= image_tag movie.picture.url,
+                  class: "w-full h-full object-cover" %>
+            <% else %>
+              <div class="flex items-center justify-center w-full h-full">
+                <i class="fa-solid fa-film text-3xl text-gray-400"></i>
+              </div>
+            <% end %>
+
+          </div>
+
+          <!-- Hover Details Layer -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-2
+                      opacity-0 transition-opacity duration-300
+                      group-hover:opacity-100 bg-white/90">
+
+            <div class="font-semibold text-sm">
+              <%= movie.to_s %>
+            </div>
+
+            <div class="text-xs text-gray-600">
+              <%= movie&.user %>
+            </div>
+
+          </div>
+
+        <% end %>
+
       <% end %>
+
     </div>
   </div>
-
-  <script type="text/javascript">
-    new Yetii({
-      id: 'movie'
-    });
-  </script>
-
-  <% if cuser and DataFile.new(directory_id: Directory::MOVIES).can_create? cuser %>
-    <%= link_to "New Movie", { controller: "data_files", action: "new", id: Directory::MOVIES }, { class: 'button' } %>
-  <% end %>
 </div>

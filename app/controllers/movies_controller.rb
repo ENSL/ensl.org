@@ -2,7 +2,11 @@ class MoviesController < ApplicationController
   before_action :get_movie, except: %i[index new create]
 
   def index
-    @movies = Movie.filter_or_all(params[:filter], params[:order])
+    # Movie.filter_or_all expects (order, rating, size, author)
+    @movies = Movie.filter_or_all(params[:order], params[:rating], params[:size], params[:author])
+    # authors for dropdown (only users who submitted movies)
+    @movie_authors = Movie.submitter_options
+    render layout: 'full'
   end
 
   def show
@@ -19,7 +23,7 @@ class MoviesController < ApplicationController
 
   def new
     @movie = Movie.new
-    raise AccessError unless @movie.can_create? cuser
+    raise UserRegistrationReq unless @movie.can_create? cuser
   end
 
   def edit
