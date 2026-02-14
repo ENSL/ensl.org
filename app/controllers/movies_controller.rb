@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
-  before_action :get_movie, except: %i[index new create]
+  before_action :get_movie, except: %i[index new create admin]
+  respond_to :html, :turbo_stream
 
   def index
     # Movie.filter_or_all expects (order, rating, size, author)
@@ -21,44 +22,70 @@ class MoviesController < ApplicationController
     @movie.update_status
   end
 
+  def admin
+    raise AccessError unless cuser && cuser.admin?
+
+    @movies = Movie.includes(:user, :file, :preview).ordered.all
+  end
+
   def new
     @movie = Movie.new
     raise UserRegistrationReq unless @movie.can_create? cuser
+
+    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
   end
 
   def edit
     raise AccessError unless @movie.can_update? cuser
+
+    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
   end
 
   def create
     @movie = Movie.new(Movie.params(params, cuser))
+    @movie.user ||= cuser
     raise AccessError unless @movie.can_create? cuser
 
     if @movie.save
       flash[:notice] = t(:movies_create)
       redirect_to(@movie)
     else
-      render :new
+      @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
+      respond_with_validation_errors(@movie, template: :new)
     end
   end
 
   def update
     raise AccessError unless @movie.can_update? cuser
 
+    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
+
     if @movie.update(Movie.params(params, cuser))
       flash[:notice] = t(:movies_update)
       redirect_to(@movie)
     else
-      render :edit
+      respond_with_validation_errors(@movie, template: :edit)
     end
   end
 
   def preview
     raise AccessError unless @movie.can_update? cuser
 
-    x = params[:x].to_i <= 1280 ? params[:x].to_i : 800
-    y = params[:y].to_i <= 720 ? params[:y].to_i : 600
-    render text: t(:executed) + '<br />' + @movie.make_preview(x, y), layout: true
+    # x = params[:x].to_i <= 1280 ? params[:x].to_i : 800
+    # y = params[:y].to_i <= 720 ? params[:y].to_i : 600
+    begin
+      result = @movie.make_preview
+      flash[:notice] = (t(:executed) + ' ' + result.to_s).html_safe
+    rescue CommandFailed => e
+      flash[:alert] = e.message.to_s
+    end
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages') }
+      format.html { redirect_back(fallback_location: @movie) }
+    end
+  rescue VideoProcessing::CommandFailed => e
+    render inline: e.message.to_s, status: :internal_server_error, layout: 'application'
   end
 
   def snapshot

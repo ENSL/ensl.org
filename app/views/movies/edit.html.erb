@@ -1,4 +1,6 @@
-<h1>Editing Movie</h1>
+<h1>
+  Editing Movie
+</h1>
 
 <%= render partial: 'form' %>
 
@@ -10,11 +12,44 @@
     The program will run in the background and the preview file will automatically added to the movie.
   </p>
 
-  <%= form_tag({ action: "preview", id: @movie.id }, { class: 'square' }) do %>
+  <%= form_tag(preview_movie_path(@movie.id), { class: 'square' }) do %>
     <div class="fields horizontal">
-      <%= label_tag "Resolution" %>
+      <%= label_tag :web_friendly, 'Web Friendly' %>
       <div class="inputs">
-        <%= text_field_tag "x", "800", size: 2 %> x <%= text_field_tag "y", "600", size: 2 %>  
+        <div class="status">
+          <% if @movie.web_friendly %>
+            <span class="icon success"><%= fa_icon('check') %></span>
+            <span class="status-text">The original format plays nicely in browser</span>
+          <% else %>
+            <span class="icon muted"><%= fa_icon('times') %></span>
+            <span class="status-text muted">The video requires a preview version in web-friendly format</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="fields horizontal">
+      <%= label_tag :format, 'Format' %>
+      <div class="inputs">
+        <p class="note">
+          The dimensions and FPS are the same. It uses x264 codec, YUV420p colorspace, and targets
+          high quality (crf 18), not bitrate.
+        </p>
+      </div>
+    </div>
+
+    <div class="fields horizontal">
+      <%= label_tag :existing_preview, 'Existing Preview' %>
+      <div class="inputs">
+        <div class="status">
+          <% if @movie.preview %>
+            <span class="icon success"><%= fa_icon('check') %></span>
+            <span class="status-text">The original format plays nicely in browser</span>
+          <% else %>
+            <span class="icon muted"><%= fa_icon('times') %></span>
+            <span class="status-text muted">The video requires a preview version in web-friendly format</span>
+          <% end %>
+        </div>
       </div>
     </div>
 

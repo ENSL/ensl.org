@@ -22,8 +22,8 @@ RUN \
     apt-get -y install --no-install-recommends --upgrade \
       # General tools
       curl build-essential \
-      # For MySQL/MariaDB
-      libmariadb-dev libmariadb-dev-compat \
+    # For MySQL/MariaDB
+    libmariadb-dev libmariadb-dev-compat \
       # SSL libs
       libssl-dev  \
       # zlib, readline and libyaml
@@ -32,6 +32,8 @@ RUN \
       libxslt1-dev libxml2-dev \
       # For carrierwave/rmagick
       imagemagick libmagickwand-dev \
+      # Tools for media processing and metadata
+      ffmpeg vlc screen libimage-exiftool-perl \
       # For poltergeist
       # phantomjs \
       firefox-esr \

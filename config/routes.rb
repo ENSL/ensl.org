@@ -176,9 +176,12 @@ Rails.application.routes.draw do
   resources :weeks
   resources :movies do
     member do
-      get :preview
+      post :preview
       get :download
       get :snapshot
+    end
+    collection do
+      get :admin
     end
   end
 

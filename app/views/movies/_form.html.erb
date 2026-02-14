@@ -1,9 +1,8 @@
-<%= form_for @movie, html: { multipart: true, class: 'square' } do |f| %>
-  <%= render 'shared/errors', messages: @movie.errors.full_messages %>
+<div id="<%= error_wrapper_id_for(@movie) %>">
+  <%= render 'shared/errors', messages: @movie.errors.full_messages, container_id: error_container_id_for(@movie) %>
+</div>
 
-  <% if @movie.file %>
-    <%= link_to "View File", edit_data_file_path(@movie.file), class: 'button tiny' %>
-  <% end %>
+<%= form_for @movie, html: { multipart: true, class: 'square', id: dom_id(@movie, :form) } do |f| %>
 
   <div class="fields horizontal">
     <%= f.label :name %>
@@ -11,7 +10,7 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :category_id %>
-    <%= f.select :category_id, Category.ordered.collect { |c| ["#{c.domains[c.domain]} - #{c}", c.id] } %>
+    <%= f.select :category_id, @movie_categories %>
   </div>
   <div class="fields horizontal">
     <%= f.label :content %>
@@ -27,7 +26,7 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :user_name, "Author" %>
-    <%= f.text_field :user_name, { value: @movie.get_user } %>
+    <%= f.text_field :user_name, { value: @movie&.user } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :file %>
@@ -46,5 +45,8 @@
 
   <div class="controls">
     <%= f.submit 'Save' %>
+    <% if @movie.file %>
+      <%= link_to "View File", edit_data_file_path(@movie.file), class: 'button' %>
+    <% end %>
   </div>
 <% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: movies
@@ -26,35 +28,37 @@
 #  index_movies_on_user_id     (user_id)
 #
 
+require 'open3'
+
 class Movie < ActiveRecord::Base
   include Extra
 
   MOVIES = 'movies'
-  FFMPEG = '/usr/local/bin/ffmpeg'
+  FFMPEG = '/usr/bin/ffmpeg'
   SCREEN = '/usr/bin/screen'
   VLC = '/usr/bin/vlc'
   LOCAL = '78.46.36.107:29100'
 
-  # attr_protected :id, :updated_at, :created_at
   attr_accessor :user_name, :stream_ip, :stream_port
 
-  scope :recent, -> { limit(5) }
-  scope :ordered, lambda {
-    include('file')
-      .order('data_files.created_at DESC')
-  }
+  acts_as_readable on: :created_at
+
+  mount_uploader :picture, MovieUploader
+
+  scope :recent, -> { order(created_at: :desc).limit(5) }
+  scope :ordered, -> { includes(:file).order('data_files.created_at DESC') }
   scope :with_ratings, lambda {
     select('movies.*, users.username, AVG(rates.score) as total_ratings')
       .joins("LEFT JOIN data_files ON movies.file_id = data_files.id
-            LEFT JOIN users ON movies.user_id = users.id
-            LEFT JOIN ratings ON rateable_id = data_files.id AND rateable_type = 'DataFile'
-            LEFT JOIN rates ON ratings.rate_id = rates.id")
+             LEFT JOIN users ON movies.user_id = users.id
+             LEFT JOIN ratings ON rateable_id = data_files.id AND rateable_type = 'DataFile'
+             LEFT JOIN rates ON ratings.rate_id = rates.id")
       .group('movies.id')
   }
   scope :active_streams, -> { where('status > 0') }
 
   belongs_to :user, optional: true
-  belongs_to :file, class_name: 'DataFile', optional: true
+  belongs_to :file, class_name: 'DataFile', optional: true, dependent: :destroy
   belongs_to :preview, class_name: 'DataFile', optional: true
   belongs_to :match, optional: true
   belongs_to :category, optional: true
@@ -64,109 +68,145 @@ class Movie < ActiveRecord::Base
   has_many :watcher_users, through: :watchers, source: :user
   has_many :view_counts, as: :viewable, dependent: :destroy
 
-  validates_length_of %i[content format], maximum: 100, allow_blank: true
-  validates_inclusion_of :length, in: 0..50_000, allow_blank: true, allow_nil: true
-  validates_presence_of :file
+  before_validation :assign_user_from_user_name, on: :update
 
-  mount_uploader :picture, MovieUploader
+  validates :content, :format, length: { maximum: 200 }, allow_blank: true
+  validates :length, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 50_000 },
+                     allow_nil: true
+  validates :file, presence: true
 
-  # has_view_count
-  acts_as_readable on: :created_at
+  before_save :probe_metadata
+  before_save :probe_length
+  after_save :make_snapshot
+
+  # Can take too much time.
+  # after_save :make_preview, unless: :web_friendly
 
   def to_s
     file.to_s
   end
 
+  # TODO: Perhaps create DurationType < ActiveRecord::Type::Integer
   def length_s
-    (length / 60).to_s + ':' + (length % 60).to_s if length
-  end
+    return unless length
 
-  def get_user
-    user_id ? User.find(user_id) : ''
-  end
-
-  def get_length
-    require 'open3'
-    out, _err, status = Open3.capture3('exiftool', '-Duration', file.full_path.to_s)
-    if status.success?
-      # exiftool output may contain durations like "0:03:21" or "3:21"
-      if t = out.match(/([0-9]+):([0-9]{2})$/)
-        update_attribute :length, t[1].to_i * 60 + t[2].to_i
-      elsif t = out.match(/([0-9]+):([0-9]{2}):([0-9]{2})$/)
-        update_attribute :length, t[1].to_i * 3600 + t[2].to_i * 60 + t[3].to_i
-      end
-    end
-  rescue StandardError
-    nil
+    minutes = length / 60
+    seconds = length % 60
+    "#{minutes}:#{Kernel.format('%02d', seconds)}"
   end
 
   def all_files
-    file ? ([file] + file.related_files) : []
+    file ? ([file] + (file.related_files || [])) : []
   end
 
   def view_count
-    view_counts.length
+    view_counts.count
   end
 
   def record_view_count(ip_address, logged_in = false)
-    view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
+    view_counts.find_or_create_by(ip_address: ip_address) do |vc|
+      vc.logged_in = logged_in
+    end
     self
   end
 
-  def before_validation
-    self.user = if user_name and !user_name.empty?
-                  User.find_by_username(user_name)
-                else
-                  nil
-                end
-    # if file.nil? and match and stream_ip and stream_port
-    #	build_file
-    #	self.file.directory = Directory.find(Directory::MOVIES)
-    #	self.file.path = File.join(self.file.directory.path, match.demo_name + ".mp4")
-    #	self.file.description = match.contest.short_name + ": " + match.contester1.to_s + " vs " + match.contester2.to_s
-    #	FileUtils.touch(self.file.path)
-    #	self.file.save!
-    #	make_stream
-    # end
+  def assign_user_from_user_name
+    return unless user_name.present?
+
+    user = User.find_by(username: user_name)
+    self.user = user if user
   end
 
+  def snapshot_path(_index = 0)
+    File.join(Rails.root, 'public', 'local', 'snapshots', "#{id}.png")
+  end
+
+  def snapshot_url(_index = 0)
+    # Pathname.new(snapshot_path).relative_path_from(Rails.root.join('public')).to_s
+    File.join('/', 'local', 'snapshots', "#{id}.png")
+  end
+
+  def snapshot?
+    File.exist?(snapshot_path)
+  end
+
+  def preview_path
+    file.reload if new_record?
+
+    bname = "#{File.basename(file.location, File.extname(file.location))}_preview.mp4"
+    File.join(File.dirname(file.location), bname)
+  end
+
+  # This not the URL version of above. Its what is shown on page.
   def preview_url
-    if preview
-      preview.url
-    elsif movie.url.ends_with?('.mp4')
-      file.url
-    else
-      False
+    return preview.url if preview.present?
+    if File.exist?(preview_path)
+      return '/' + Pathname.new(preview_path).relative_path_from(Rails.root.join('public')).to_s
     end
+    return file.url if web_friendly
+
+    nil
   end
 
-  def make_preview(x, y)
-    result = file.full_path.to_s.gsub(/\.\w{3}$/, '') + '_preview.mp4'
-    params = ['-vcodec', 'libx264', '-vpre', 'hq', '-b', '1200k', '-bt', '1200k', '-acodec', 'libmp3lame', '-ab',
-              '128k', '-ac', '2']
-    # Use array form of system to avoid shell interpolation
-    system SCREEN, '-d', '-m', FFMPEG, '-y', '-i', file.full_path.to_s, *params, result
-    result
+  def probe_metadata
+    return unless file&.location
+
+    result = VideoProcessing.probe_web_compat(file.location)
+
+    unless result
+      errors.add :base, 'Not a movie file.'
+      return
+    end
+
+    self.metadata = result[:metadata].to_json
+    self.web_friendly = result[:web_friendly]
+    self.format = result[:oneliner]
+
+    Rails.logger.info("Video probe result#{result[:oneliner]}")
   end
 
-  def make_snapshot(secs)
-    image = File.join(Rails.root, 'public', 'images', MOVIES, id.to_s + '.png')
-    secs_i = secs.to_i
-    params = ['-ss', secs_i.to_s, '-vcodec', 'png', '-vframes', '1', '-an', '-f', 'rawvideo', '-s', '160x120']
-    Movie.update_all({ picture: "#{id}.png" }, { id: id })
-    system FFMPEG, '-y', '-i', file.full_path.to_s, *params, image
-    image
+  def probe_length
+    self.length = VideoProcessing.probe_duration_seconds!(file&.location).to_i
+  end
+
+  def make_preview(_x = nil, _y = nil)
+    return unless file&.location
+
+    VideoProcessing.transcode_for_web!(
+      input_path: file&.location,
+      output_path: preview_path
+    )
+  end
+
+  def make_snapshot
+    return unless file&.location
+
+    # Prepare file and its dir
+    FileUtils.mkdir_p(File.dirname(snapshot_path)) unless File.exist?(File.dirname(snapshot_path))
+    FileUtils.rm(snapshot_path) if File.exist?(snapshot_path)
+
+    VideoProcessing.random_snapshot!(
+      input_path: file&.location,
+      output_path: snapshot_path
+    )
   end
 
   def make_stream
-    ip = stream_ip.to_s.match(/[0-9]{1,3}(?:\.[0-9]{1,3}){3}/).to_s
-    port = stream_port.to_s.match(/[0-9]{1,5}/).to_s
-    # Build --sout argument safely (no shell interpolation)
+    ip = stream_ip.to_s[/\b(?:\d{1,3}\.){3}\d{1,3}\b/]
+    port = stream_port.to_s[/\d{1,5}/]
+    return unless ip.present? && port.present? && file&.full_path
+
     dst_file = file.full_path.to_s
-    sout = %(#duplicate{dst=std{access=file,mux=mp4,dst=#{dst_file}},dst=std{access=http,mux=ts,dst=#{LOCAL}}})
-    system SCREEN, '-d', '-m', VLC, "http://#{ip}:#{port}", '--sout', sout, 'vlc://quit'
-    update_attribute :status, $?.pid
+    sout = "#duplicate{dst=std{access=file,mux=mp4,dst=#{dst_file}},dst=std{access=http,mux=ts,dst=#{LOCAL}}}"
+    src = "http://#{ip}:#{port}"
+
+    cmd = [VLC, src, '--sout', sout, 'vlc://quit']
+    pid = Process.spawn(*cmd)
+    Process.detach(pid)
+    update_column(:status, pid)
     sout
+  rescue StandardError
+    nil
   end
 
   # Supports stacked filters: rating (numeric), size ('short'|'long'), author
@@ -180,17 +220,15 @@ class Movie < ActiveRecord::Base
 
     movies = with_ratings.order(order_sql)
 
-    # apply author filter (author_param may be user id or username)
     if author_param.present?
       movies = if author_param.to_s =~ /^\d+$/
-                 movies.where('movies.user_id = ?', author_param.to_i)
+                 movies.where(movies: { user_id: author_param.to_i })
                else
                  movies.joins('LEFT JOIN users ON users.id = movies.user_id').where('users.username = ?',
                                                                                     author_param.to_s)
                end
     end
 
-    # apply size filter
     if size_param.present?
       case size_param.to_s
       when 'short'
@@ -200,44 +238,32 @@ class Movie < ActiveRecord::Base
       end
     end
 
-    # apply rating filter (numeric)
-    movies = movies.having('AVG(rates.score) >= ?', rating_param.to_i) if rating_param.present? && rating_param.to_i > 0
+    if rating_param.present? && rating_param.to_i.positive?
+      movies = movies.having('AVG(rates.score) >= ?', rating_param.to_i)
+    end
 
     movies
   end
 
-  # def update_status
-  #	if status and status > 0
-  #		begin
-  #			Process.getpgid(status) != -1
-  #		rescue Errno::ESRCH
-  #			update_attribute :status, 0
-  #		end
-  #	end
-  # end
-
   def can_create?(cuser)
-    cuser&.admin? or cuser&.groups&.exists? id: Group::MOVIES
+    cuser&.admin? || cuser&.groups&.exists?(id: Group::MOVIES)
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin? or user == cuser
+    cuser&.admin? || user == cuser
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
-  end
-
-  def self.params(params, cuser)
-    params.require(:movie).permit(:content, :format, :length, :name, :picture, :status, :category_id, :file_id,
-                                  :match_id, :preview_id, :user_id)
+    cuser&.admin?
   end
 
   # Return array of [username, id] for users who submitted movies
   def self.submitter_options
-    User.joins('INNER JOIN movies ON movies.user_id = users.id')
-        .distinct
-        .order('users.username ASC')
-        .pluck('users.username, users.id')
+    User.joins(:movies).distinct.order(username: :asc).pluck(:username, :id)
+  end
+
+  def self.params(params, _cuser)
+    params.require(:movie).permit(:content, :format, :length, :name, :picture, :status, :category_id, :file_id,
+                                  :match_id, :preview_id, :user_name, :user_id)
   end
 end

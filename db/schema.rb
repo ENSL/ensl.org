@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_11_155440) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
   create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -466,17 +466,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_11_155440) do
     t.string "format"
     t.integer "length"
     t.integer "match_id"
+    t.text "metadata", size: :long, collation: "utf8mb4_bin"
     t.string "name"
     t.string "picture"
     t.integer "preview_id"
     t.integer "status"
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
+    t.boolean "web_friendly", default: false, null: false
     t.index ["file_id"], name: "index_movies_on_file_id"
     t.index ["match_id"], name: "index_movies_on_match_id"
     t.index ["preview_id"], name: "index_movies_on_preview_id"
     t.index ["status"], name: "index_movies_on_status"
     t.index ["user_id"], name: "index_movies_on_user_id"
+    t.check_constraint "json_valid(`metadata`)", name: "metadata"
   end
 
   create_table "options", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|

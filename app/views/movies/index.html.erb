@@ -50,6 +50,9 @@
             <% if movie.picture.present? %>
               <%= image_tag movie.picture.url,
                   class: "w-full h-full object-cover" %>
+            <% elsif movie.snapshot? %>
+              <%= image_tag movie.snapshot_url,
+                  :class => "w-full h-full object-cover" %>
             <% else %>
               <div class="flex items-center justify-center w-full h-full">
                 <i class="fa-solid fa-film text-3xl text-gray-400"></i>

@@ -68,7 +68,7 @@ class DataFile < ActiveRecord::Base
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
   before_validation :auto_generate_description, if: -> { description.blank? }
   before_save :auto_link_preview_file, if: -> { !related && location.present? && location.include?('_preview.mp4') }
-  after_save :update_movie_metadata, if: -> { movie && saved_change_to_md5? }
+  # after_save :update_movie_metadata, if: -> { !new_record? && movie && saved_change_to_md5? }
   after_create :create_movie, if: :should_create_movie?
   after_save :update_relations, if: :should_update_relations?
 
@@ -99,6 +99,10 @@ class DataFile < ActiveRecord::Base
   # Shortcut to get the current file path from CarrierWave (source of truth)
   def location
     name.current_path
+  end
+
+  def file_exists?
+    File.exist?(location)
   end
 
   # Shortcut to get the URL for this file from CarrierWave
@@ -237,7 +241,7 @@ class DataFile < ActiveRecord::Base
 
   # Update movie metadata if movie exists and file changed
   def update_movie_metadata
-    movie.get_length
+    movie.probe_metadata
   end
 
   public
@@ -254,7 +258,7 @@ class DataFile < ActiveRecord::Base
   def create_movie
     movie = Movie.new
     movie.file = self
-    movie.make_snapshot 5
+    movie.make_snapshot
     movie.save
   end
 

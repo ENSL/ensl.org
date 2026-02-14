@@ -17,6 +17,7 @@
         <% if Directory.first %>
         <li><%= link_to "Recreate Root", recreate_directory_path(Directory.find(Directory::ROOT)) %></li>
         <li><%= link_to "Files Admin", controller: "directories", action: "show", id: Directory.first %></li>
+        <li><%= link_to "Movie Admin", admin_movies_path()%></li>
         <% end %>
     </ul>
 

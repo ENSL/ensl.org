@@ -59,6 +59,10 @@ class Category < ActiveRecord::Base
     name
   end
 
+  def display_name
+    "#{domains[domain]} - #{self}"
+  end
+
   def domains
     { DOMAIN_NEWS => 'News',
       DOMAIN_ARTICLES => 'Articles',
@@ -87,5 +91,9 @@ class Category < ActiveRecord::Base
 
   def self.params(params, cuser)
     params.require(:category).permit(:name, :sort, :domain)
+  end
+
+  def self.options_for_select(relation = all)
+    relation.map { |c| [c.display_name, c.id] }
   end
 end

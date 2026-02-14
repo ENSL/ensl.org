@@ -7,10 +7,18 @@
 
     <% if @movie.preview_url %>
     <div class="player">
-        <video src="<%= @movie.preview.url %>" controls></video>
+        <video controls width="640" preload="metadata">
+            <source src="<%= @movie.preview_url %>" type="video/mp4">
+        Your browser does not support the video tag.
+        </video>
 
-        <p>This is a preview version and video quality may not be full. For best experince please download the movie and use eg. <a href="https://www.videolan.org/vlc/">VLC</a></p>
     </div>
+    <p>
+        This is a preview version and video quality may not be the best. For the
+        best experince please download the movie and use eg.
+        <a href="https://www.videolan.org/vlc/">VLC</a>
+    </p>
+
     <% else %>
     <p>There is no preview available. Please download the movie and use eg. <a href="https://www.videolan.org/vlc/">VLC</a></p>
     <% end %>
