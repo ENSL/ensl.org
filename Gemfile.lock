@@ -720,7 +720,6 @@ DEPENDENCIES
   mysql2
   neat (~> 1.6.0)
   net-http
-  nokogiri
   omniauth
   omniauth-rails_csrf_protection
   omniauth-steam
@@ -728,7 +727,6 @@ DEPENDENCIES
   playwright-ruby-client
   pry-byebug
   pry-rails
-  public_suffix
   puma
   puma_worker_killer
   rack-attack

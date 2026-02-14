@@ -30,16 +30,15 @@ gem 'rack-cors'
 # Logging
 gem 'lograge'
 
+#
 # Model plugins.
-# Active_flag is used for soft-deletion of records. It adds a boolean 'active' column
-# to models and provides scopes and methods to easily manage active/inactive records.
+
+# Active_flag is used for soft-deletion of records with boolean column.
 gem 'active_flag'
 # Scrypt for secure password storage
 gem 'scrypt'
 # Unread for marking stuff read or unread
 gem 'unread'
-# gem 'ratyrate'
-# gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 # External APIs.
 # Steam condenders for querying Steam API and last to help with StemaIDs
@@ -47,23 +46,37 @@ gem 'google-api-client'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'steam-id2'
 
+# gem 'ratyrate'
+# gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
+
 # Auth
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
+
+# Transform text to nice HTML
+gem 'bbcoder'
+gem 'commonmarker'
+
 # FIXME
 # gem 'rails_csrf_protection'
 
+#
 # View and model helper gems
+
+# Navigation
 gem 'active_link_to'
-gem 'bbcoder'
+
+# File attachments
 gem 'carrierwave'
-gem 'commonmarker'
+
 gem 'country_select'
-gem 'nokogiri'
-gem 'public_suffix'
+
+# Captcha
 gem 'recaptcha', require: 'recaptcha/rails'
 gem 'rmagick'
+
+# FIXME: Use something else here
 gem 'sanitize'
 gem 'time_difference'
 gem 'will_paginate'
@@ -99,9 +112,6 @@ gem 'signet', '0.11.0'
 
 # FIXME: Fix for warning: https://github.com/ruby/net-imap/issues/16
 gem 'net-http'
-
-# https://github.com/DatabaseCleaner/database_cleaner/issues/299
-# gem 'mongoid-tree'
 
 # Importmap for Rails. JS management without nodejs.
 gem 'importmap-rails', '~> 2.2'
