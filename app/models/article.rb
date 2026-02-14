@@ -117,7 +117,17 @@ class Article < ActiveRecord::Base
     if text_coding == CODING_BBCODE
       self.text_parsed = bbcode_to_html(text)
     elsif text_coding == CODING_MARKDOWN
-      self.text_parsed = BlueCloth.new(text).to_html
+      self.text_parsed = markdown_to_html(text)
+    end
+  end
+
+  def markdown_to_html(source)
+    text = source.to_s
+
+    if defined?(Commonmarker)
+      Commonmarker.to_html(text)
+    else
+      CommonMarker.render_html(text, :DEFAULT)
     end
   end
 

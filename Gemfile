@@ -17,11 +17,11 @@ gem 'dotenv-rails'
 # DB
 gem 'mysql2'
 
-# Web server
+# Web server.
+# Faraday provides NET-HTTP functions
 gem 'faraday'
 gem 'os'
 gem 'puma'
-# gem 'unicorn'
 
 # API
 gem 'rack-attack'
@@ -30,15 +30,19 @@ gem 'rack-cors'
 # Logging
 gem 'lograge'
 
-# Model plugins
+# Model plugins.
+# Active_flag is used for soft-deletion of records. It adds a boolean 'active' column
+# to models and provides scopes and methods to easily manage active/inactive records.
 gem 'active_flag'
+# Scrypt for secure password storage
 gem 'scrypt'
+# Unread for marking stuff read or unread
 gem 'unread'
-# gem 'impressionist
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
-# External APIs
+# External APIs.
+# Steam condenders for querying Steam API and last to help with StemaIDs
 gem 'google-api-client'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'steam-id2'
@@ -53,8 +57,8 @@ gem 'omniauth-steam'
 # View and model helper gems
 gem 'active_link_to'
 gem 'bbcoder'
-gem 'bluecloth'
 gem 'carrierwave'
+gem 'commonmarker'
 gem 'country_select'
 gem 'nokogiri'
 gem 'public_suffix'
