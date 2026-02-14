@@ -50,7 +50,8 @@ module Ensl
                          key: '_ENSL_session_key',
                          domain: (Rails.env.production? ? '.ensl.org' : nil),
                          secure: Rails.env.production?,
-                         same_site: :lax
+                         same_site: :lax,
+                         expire_after: 6.months
 
     config.action_dispatch.cookies_serializer = :hybrid
 
