@@ -61,8 +61,10 @@ module Ensl
     config.secret_token = ENV['APP_SECRET']
     config.secret_key_base = ENV['APP_SECRET']
 
-    # Use a different cache store
-    config.cache_store = :mem_cache_store, 'memcached:11211'
+    # Use Redis for application cache
+    config.cache_store = :redis_cache_store, {
+      url: ENV.fetch('REDIS_URL', 'redis://redis:6379/1')
+    }
 
     # Use smtp-Server
     config.action_mailer.delivery_method = :smtp

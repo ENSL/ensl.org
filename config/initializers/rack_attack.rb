@@ -2,7 +2,7 @@
 
 class Rack::Attack
   # Cache backend
-  cache.store = ActiveSupport::Cache::MemoryStore.new # Use dalli/memcached in production
+  cache.store = ActiveSupport::Cache::MemoryStore.new # Use Redis cache store in production
 
   # Whitelist requests from localhost
   safelist('allow-localhost') do |req|

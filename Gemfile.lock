@@ -160,8 +160,6 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    dalli (4.3.2)
-      logger
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)
@@ -697,9 +695,7 @@ DEPENDENCIES
   capybara-playwright-driver
   capybara-validate_html5
   carrierwave
-  connection_pool (~> 2.4)
   country_select
-  dalli
   dartsass-rails
   database_cleaner
   database_cleaner-active_record

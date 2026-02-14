@@ -15,9 +15,6 @@ gem 'sprockets-rails'
 gem 'dotenv-rails'
 
 # DB
-# Pin connection_pool to < 3.0 to avoid keyword-arg incompatibility in mem_cache_store
-gem 'connection_pool', '~> 2.4' # Needed for MT
-gem 'dalli'
 gem 'mysql2'
 
 # Web server
