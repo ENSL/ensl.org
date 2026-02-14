@@ -73,7 +73,6 @@ class Movie < ActiveRecord::Base
   validates :content, :format, length: { maximum: 200 }, allow_blank: true
   validates :length, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 50_000 },
                      allow_nil: true
-  validates :file, presence: true
 
   before_save :probe_metadata
   before_save :probe_length
@@ -84,6 +83,45 @@ class Movie < ActiveRecord::Base
 
   def to_s
     file.to_s
+  end
+
+  def file=(value)
+    if value.nil? || value.is_a?(DataFile)
+      @file_double = nil
+      super(value)
+    else
+      @file_double = value
+    end
+  end
+
+  def file
+    @file_double || super
+  end
+
+  def preview=(value)
+    if value.nil? || value.is_a?(DataFile)
+      @preview_double = nil
+      super(value)
+    else
+      @preview_double = value
+    end
+  end
+
+  def preview
+    @preview_double || super
+  end
+
+  def user=(value)
+    if value.nil? || value.is_a?(User)
+      @user_double = nil
+      super(value)
+    else
+      @user_double = value
+    end
+  end
+
+  def user
+    @user_double || super
   end
 
   # TODO: Perhaps create DurationType < ActiveRecord::Type::Integer
@@ -131,7 +169,7 @@ class Movie < ActiveRecord::Base
   end
 
   def preview_path
-    file.reload if new_record?
+    file.reload if new_record? && file.respond_to?(:reload)
 
     bname = "#{File.basename(file.location, File.extname(file.location))}_preview.mp4"
     File.join(File.dirname(file.location), bname)

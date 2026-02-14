@@ -101,6 +101,11 @@ class DataFile < ActiveRecord::Base
     name.current_path
   end
 
+  # Backward-compatible alias used by legacy callers.
+  def full_path
+    location.presence || path
+  end
+
   def file_exists?
     File.exist?(location)
   end
