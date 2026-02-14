@@ -1,3 +1,5 @@
+@use "sass:color";
+
 #sidebar {
 
   .widget {
@@ -49,7 +51,7 @@
 
   .calendar {
     .time {
-      color: lighten($medium-gray, 20%);
+      color: color.adjust($medium-gray, $lightness: 20%);
       float: right;
       margin-left: 10px;
     }

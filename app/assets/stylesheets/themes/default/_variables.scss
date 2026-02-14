@@ -2,6 +2,8 @@
   Theme Path
 */
 
+@use "sass:color";
+
 $theme-name: 'default';
 $theme-path: "themes/#{$theme-name}";
 
@@ -56,27 +58,27 @@ $base-border-radius: 3px;
 */
 
 $red: #de8650;
-$green: darken(#68cc90, 10);
+$green: color.adjust(#68cc90, $lightness: -10%);
 $blue: #0e4d78;
 $gold: #FFD700;
 
-$dark-blue: darken($blue, 15);
-$deep-blue: darken($dark-blue, 15);
+$dark-blue: color.adjust($blue, $lightness: -15%);
+$deep-blue: color.adjust($dark-blue, $lightness: -15%);
 $dark-gray: #21262A;
 
 $light-blue: #36b1ff;
-$light-gray: darken(#ECF1F5, 5);
+$light-gray: color.adjust(#ECF1F5, $lightness: -5%);
 $light-red: #e56c69;
 $light-yellow: #FFF6BF;
 $light-green: #1f7f5c;
 
-$medium-gray: lighten(#5a5a5a, 30%);
+$medium-gray: color.adjust(#5a5a5a, $lightness: 30%);
  
 $base-body-color: white;
 $base-font-color: $dark-gray;
 $base-accent-color: $blue;
 $base-link-color: $base-accent-color;
-$hover-link-color: lighten($base-accent-color, 15);
+$hover-link-color: color.adjust($base-accent-color, $lightness: 15%);
 $base-border-color: $light-gray;
 
 $error-color: $light-red;
@@ -87,7 +89,7 @@ $background-primary: $medium-gray;
 
 $navbar-primary: $blue;
 $navbar-secondary: $light-blue;
-$navbar-border: lighten($dark-gray, 10);
+$navbar-border: color.adjust($dark-gray, $lightness: 10%);
 $navbar-text: white;
 
 $flash-text: white;
@@ -101,7 +103,7 @@ $input-primary: white;
 $input-secondary: $blue;
 $input-text: #232323;
 $input-border-width: 2px;
-$input-border-colour: darken($light-gray, 10%);
+$input-border-colour: color.adjust($light-gray, $lightness: -10%);
 $input-padding: 9px;
 $input-border-radius: $base-border-radius;
 

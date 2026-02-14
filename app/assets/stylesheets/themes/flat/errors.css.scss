@@ -24,7 +24,7 @@ body {
 }
 
 html {
-  @include linear-gradient($dark-blue, $deep-blue);
+  background-image: unquote("linear-gradient(to bottom, #{$dark-blue}, #{$deep-blue})");
 }
 
 body {

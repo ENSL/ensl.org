@@ -2,6 +2,8 @@
   Tabs
 */
 
+@use "sass:color";
+
 .tabbed {
   $tabs-border-width: 1px;
   $tabs-border-colour: $light-blue;
@@ -21,7 +23,7 @@
       display: block;
 
       a {
-        @include linear-gradient($blue, $dark-blue);
+        background-image: unquote("linear-gradient(to bottom, #{$blue}, #{$dark-blue})");
         background-color: $blue;
         border: $tabs-border-width solid $tabs-border-colour;
         border-right: 0;
@@ -50,7 +52,7 @@
         z-index: 100;
 
         a {
-          @include linear-gradient($light-blue, $blue);
+          background-image: unquote("linear-gradient(to bottom, #{$light-blue}, #{$blue})");
           background-color: $light-blue;
         }
       }
@@ -61,7 +63,7 @@
     @include span-columns(12);  
     border: $tabs-border-width solid $tabs-border-colour;
     border-radius: 0 $base-border-radius $base-border-radius $base-border-radius;
-    background: lighten($light-gray, 10%);
+    background: color.adjust($light-gray, $lightness: 10%);
     box-shadow: $light-shadow;
     padding: 20px;
   }

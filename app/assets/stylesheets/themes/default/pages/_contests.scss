@@ -2,6 +2,8 @@
   Contester
 */
 
+@use "sass:color";
+
 div#matches {
   @include span-columns(12);
   margin: 20px 0;
@@ -142,7 +144,7 @@ table.brackets {
     border-right: 1px solid $light-blue;
     border-bottom: 1px solid $light-blue;
     border-left: 1px solid $light-blue;
-    @include linear-gradient($light-blue, $blue);
+    background-image: unquote("linear-gradient(to bottom, #{$light-blue}, #{$blue})");
     background-color: $light-blue;
     color: white;
     font-weight: bold;
@@ -157,7 +159,7 @@ table.brackets {
     }
 
     &.win1 {
-      @include linear-gradient(lighten(#1b5e20, 15), #1b5e20);
+      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#1b5e20, $lightness: 15%)}, #{#1b5e20})");
       background-color: #1b5e20;
       color: white;
 
@@ -168,7 +170,7 @@ table.brackets {
     }
 
     &.win2 {
-      @include linear-gradient(lighten(#b71c1c, 15), #b71c1c);
+      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#b71c1c, $lightness: 15%)}, #{#b71c1c})");
       background-color: #b71c1c;
       color: white;
 
@@ -179,7 +181,7 @@ table.brackets {
     }
 
     &.tie {
-      @include linear-gradient(lighten(#f57f17, 15), #f57f17);
+      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#f57f17, $lightness: 15%)}, #{#f57f17})");
       background-color: #f57f17;
       color: white;
 

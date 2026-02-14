@@ -21,6 +21,9 @@ Rails.application.config.assets.precompile += %w[actioncable.js]
 Rails.application.config.assets.precompile += %w[importmap_application.js]
 # Tailwind
 Rails.application.config.assets.precompile += %w[tailwind.css]
+# Dart Sass theme outputs
+Rails.application.config.assets.precompile += %w[themes/default/theme.css themes/default/errors.css]
+Rails.application.config.assets.precompile += %w[themes/flat/theme.css themes/flat/errors.css]
 # Font awesome
 Rails.application.config.assets.precompile += %w[@fortawesome--fontawesome-free.js]
 Rails.application.config.assets.precompile += %w[fontawesome-webfont.eot fontawesome-webfont.svg

@@ -2,6 +2,9 @@
   Navigation
 */
 
+@use "sass:color";
+@use "sass:math";
+
 $navigation-height: 50px;
 
 #menu {
@@ -78,7 +81,7 @@ ul.navigation {
         background-color: $navbar-secondary;
 
         .count {
-          background-color: lighten($light-blue, 20);
+          background-color: color.adjust($light-blue, $lightness: 20%);
         }
       }
 
@@ -119,7 +122,7 @@ ul.navigation {
         right: 0;
         font-size: 18px;
         line-height: 1em;
-        padding: $navigation-height/3;
+        padding: math.div($navigation-height, 3);
       }
     }
 

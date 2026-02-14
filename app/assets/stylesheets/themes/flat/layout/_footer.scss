@@ -1,8 +1,10 @@
+@use "sass:color";
+
 .footer {
   $footer-background: $dark-gray;
   $footer-color: white;
-  $footer-link-color: transparentize($footer-color, .6);
-  $footer-disclaimer-color: transparentize($footer-color, .6);
+  $footer-link-color: color.adjust($footer-color, $alpha: -0.6);
+  $footer-disclaimer-color: color.adjust($footer-color, $alpha: -0.6);
 
   background: $footer-background;
 
@@ -37,7 +39,7 @@
     color: $footer-link-color;
 
     &:hover {
-      color: transparentize($footer-color, 0);
+      color: color.adjust($footer-color, $alpha: 0);
     }
   }
 
@@ -49,7 +51,7 @@
   }  
 
   hr {
-    border: 1px solid transparentize($footer-disclaimer-color, .3);
+    border: 1px solid color.adjust($footer-disclaimer-color, $alpha: -0.3);
     margin: 0 auto $base-line-height;
     width: 12em;
   }

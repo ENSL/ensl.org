@@ -2,6 +2,8 @@
   Thread List
 */
 
+@use "sass:color";
+
 #comments-thread {
   @include span-columns(12);
   
@@ -20,7 +22,7 @@
   $comment-image-width: 4em;
   $comment-color: $base-font-color;
   $comment-background: $light-gray;
-  $comment-detail-color: transparentize($comment-color, .5);
+  $comment-detail-color: color.adjust($comment-color, $alpha: -0.5);
   $comment-image-vert-alignment: top;
 
   position: relative;

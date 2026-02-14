@@ -2,6 +2,9 @@
   Forms
 */
 
+@use "sass:color";
+@use "sass:math";
+
 $input-height: 35px;
 
 form {
@@ -63,7 +66,7 @@ form {
         display: block;
         width: auto;
         position: relative;
-        line-height: $select-height/2 + 4px;
+        line-height: math.div($select-height, 2) + 4px;
         vertical-align: middle;
         max-height: $select-height;
         margin-left: 0;
@@ -100,10 +103,10 @@ form {
       }
 
       &:hover {
-        border: $input-border-width solid lighten($input-secondary, 20%);
+        border: $input-border-width solid color.adjust($input-secondary, $lightness: 20%);
 
         &:after {
-          border-left: $input-border-width solid lighten($input-secondary, 20%);
+          border-left: $input-border-width solid color.adjust($input-secondary, $lightness: 20%);
           color: $base-font-color;
         }
       }
@@ -127,7 +130,7 @@ form {
       border: $input-border-colour solid $input-border-width;
 
       &:hover {
-        border: $input-border-width solid lighten($input-secondary, 20%);
+        border: $input-border-width solid color.adjust($input-secondary, $lightness: 20%);
       }
 
       &:focus {
@@ -172,7 +175,7 @@ form {
       &:hover {
 
         &:before {
-          border: $input-border-width solid lighten($input-secondary, 20%);
+          border: $input-border-width solid color.adjust($input-secondary, $lightness: 20%);
         }
       }
     }

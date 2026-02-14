@@ -162,6 +162,9 @@ GEM
     crass (1.0.6)
     dalli (4.3.2)
       logger
+    dartsass-rails (0.5.1)
+      railties (>= 6.0.0)
+      sass-embedded (~> 1.63)
     database_cleaner (2.1.0)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.2.2)
@@ -225,6 +228,27 @@ GEM
       multi_json (~> 1.10)
       retriable (~> 1.4)
       signet (~> 0.6)
+    google-protobuf (4.33.5)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-aarch64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-aarch64-linux-musl)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-x86_64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.5-x86_64-linux-musl)
+      bigdecimal
+      rake (>= 13)
     googleauth (0.9.0)
       faraday (~> 0.12)
       jwt (>= 1.4, < 3.0)
@@ -542,15 +566,25 @@ GEM
       nokogiri (>= 1.16.8)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
+    sass-embedded (1.97.3-aarch64-linux-gnu)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-aarch64-linux-musl)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-arm-linux-gnueabihf)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-arm-linux-musleabihf)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-arm64-darwin)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-x86_64-darwin)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-x86_64-linux-gnu)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.97.3-x86_64-linux-musl)
+      google-protobuf (~> 4.31)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sass-rails (5.0.8)
-      railties (>= 5.2.0)
-      sass (~> 3.1)
-      sprockets (>= 2.8, < 4.0)
-      sprockets-rails (>= 2.0, < 4.0)
-      tilt (>= 1.1, < 3)
     scrypt (3.1.0)
       ffi-compiler (>= 1.0, < 2.0)
       rake (~> 13)
@@ -569,10 +603,10 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
-    sprockets (3.7.5)
-      base64
+    sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
-      rack (> 1, < 3)
+      logger
+      rack (>= 2.2.4, < 4)
     sprockets-rails (3.5.2)
       actionpack (>= 6.1)
       activesupport (>= 6.1)
@@ -666,6 +700,7 @@ DEPENDENCIES
   connection_pool (~> 2.4)
   country_select
   dalli
+  dartsass-rails
   database_cleaner
   database_cleaner-active_record
   debug
@@ -717,11 +752,11 @@ DEPENDENCIES
   ruby-lsp-rails
   ruby-lsp-rspec
   sanitize
-  sass-rails (~> 5.0.3)
   scrypt
   shoulda-matchers
   signet (= 0.11.0)
   simplecov
+  sprockets-rails
   steam-condenser!
   steam-id2
   tailwindcss-rails

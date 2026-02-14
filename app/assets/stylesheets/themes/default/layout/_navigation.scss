@@ -2,6 +2,8 @@
   Navigation
 */
 
+@use "sass:color";
+
 $navigation-height: 50px;
 
 #menu {
@@ -9,7 +11,7 @@ $navigation-height: 50px;
   font-family: $base-font-family;
   height: $navigation-height;
   margin-top: -50px;
-  background: image-url("#{$theme-path}/layout/nav-background.png") top center repeat-x;
+  background: url("/assets/#{$theme-path}/layout/nav-background.png") top center repeat-x;
   height: 100px;
   position: relative;
   z-index: 25;
@@ -58,10 +60,10 @@ ul.navigation {
       border-radius: $base-border-radius;
       display: inline-block;
       margin-left: 20px;
-      background: darken(#5a5a5a, 15%);
+      background: color.adjust(#5a5a5a, $lightness: -15%);
       line-height: 20px;
       padding: 0 3px;
-      color: lighten(#5f5f5f, 20%);
+      color: color.adjust(#5f5f5f, $lightness: 20%);
     }
 
     a {
@@ -82,10 +84,10 @@ ul.navigation {
         border-radius: $base-border-radius;
         display: inline-block;
         margin-left: 20px;
-        background: darken(#5a5a5a, 15%);
+        background: color.adjust(#5a5a5a, $lightness: -15%);
         line-height: 20px;
         padding: 0 3px;
-        color: lighten(#5f5f5f, 20%);
+        color: color.adjust(#5f5f5f, $lightness: 20%);
       }
 
       &.active .count,
@@ -112,23 +114,23 @@ ul.navigation {
       }
       
       &:before {
-        @include linear-gradient(#54585b, #15181a);
+        background-image: unquote("linear-gradient(to bottom, #{#54585b}, #{#15181a})");
         left: 0;
       }
 
       &:after {
-        @include linear-gradient(#54585b, #15181a);
+        background-image: unquote("linear-gradient(to bottom, #{#54585b}, #{#15181a})");
         right: -1px;
       }
 
       &:hover,
       &.active {
-        @include background-image(radial-gradient(50% -10%, ellipse cover, transparentize(#2abdfb, 0.6), transparent 60%));
+        @include background-image(radial-gradient(50% -10%, ellipse cover, color.adjust(#2abdfb, $alpha: -0.6), transparent 60%));
         border-top: 1px solid #266d98;
 
         &:before,
         &:after {
-          @include linear-gradient(#266d98, #15181a);
+          background-image: unquote("linear-gradient(to bottom, #{#266d98}, #{#15181a})");
           z-index: 100;
         }
       }
@@ -138,7 +140,7 @@ ul.navigation {
       position: relative;
 
       ul {
-        background: image-url("#{$theme-path}/layout/drop-menu-background.png") top center repeat-y;
+        background: url("/assets/#{$theme-path}/layout/drop-menu-background.png") top center repeat-y;
         width: 176px;
         position: absolute;
         box-shadow: $content-shadow;
@@ -185,8 +187,8 @@ ul.navigation {
               border-radius: $base-border-radius;
               display: inline-block;
               padding: 0 6px;
-              background: darken(#5a5a5a, 15%);
-              color: lighten(#5f5f5f, 20%);
+              background: color.adjust(#5a5a5a, $lightness: -15%);
+              color: color.adjust(#5f5f5f, $lightness: 20%);
               line-height: 20px;
             }
             &:hover a {

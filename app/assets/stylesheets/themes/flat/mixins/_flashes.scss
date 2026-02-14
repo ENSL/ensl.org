@@ -2,6 +2,8 @@
   Flash Messages
 */
 
+@use "sass:color";
+
 @mixin flash($background: $flash-notice, $text: $flash-text) {
   $flash-height: 35px;
 
@@ -18,7 +20,7 @@
     font-style: normal;
     font-weight: normal;
     content: "\f05a";
-    background-color: darken($background, 10%);
+    background-color: color.adjust($background, $lightness: -10%);
     display: block;
     position: absolute;
     top: 0;

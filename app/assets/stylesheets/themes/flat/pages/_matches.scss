@@ -2,6 +2,8 @@
   Matches Listing
 */
 
+@use "sass:math";
+
 table#matches {
   width: 100%;
   display: table;
@@ -47,7 +49,7 @@ div#match {
     .vs {
       margin: 0 auto;
       display: block;
-      font: $title-height/2 $montserrat;
+      font: math.div($title-height, 2) $montserrat;
       border-radius: 50px;
       background: $blue;
       width: $title-height;
@@ -98,7 +100,7 @@ div#match {
 
       .score-1,
       .score-2 {
-        font: $title-height/2 $montserrat;
+        font: math.div($title-height, 2) $montserrat;
         color: white;
         width: 50%;
         position: absolute;
@@ -109,12 +111,12 @@ div#match {
       }
 
       .score-1 {
-        padding-left: $title-height/6;
+        padding-left: math.div($title-height, 6);
         left: 0;
       }
       
       .score-2 {
-        padding-right: $title-height/6;
+        padding-right: math.div($title-height, 6);
         right: 0;
       }
     }

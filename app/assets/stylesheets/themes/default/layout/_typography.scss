@@ -2,6 +2,9 @@
   Typography
 */
 
+@use "sass:color";
+@use "sass:math";
+
 @import url(https://fonts.googleapis.com/css?family=Russo+One);
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
@@ -93,26 +96,26 @@ abbr, acronym {
 
 address {
   display: block;
-  margin: 0 0 ($base-line-height / 2);
+  margin: 0 0 math.div($base-line-height, 2);
 }
 
 hgroup {
-  margin-bottom: $base-line-height / 2;
+  margin-bottom: math.div($base-line-height, 2);
 }
 
 del {
-  color: lighten($base-font-color, 15);
+  color: color.adjust($base-font-color, $lightness: 15%);
 }
 
 blockquote {
   border-left: 2px solid $base-border-color;
-  color: lighten($base-font-color, 15);
+  color: color.adjust($base-font-color, $lightness: 15%);
   margin: $base-line-height 0;
-  padding-left: $base-line-height / 2;
+  padding-left: math.div($base-line-height, 2);
 }
 
 cite {
-  color: lighten($base-font-color, 25);
+  color: color.adjust($base-font-color, $lightness: 25%);
   font-style: italic;
 
   &:before {

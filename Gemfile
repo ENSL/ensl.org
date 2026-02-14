@@ -9,6 +9,7 @@ ruby '3.2.5'
 # Rails core
 gem 'rails', '~> 8.1.1'
 gem 'rake'
+gem 'sprockets-rails'
 
 # Dotenv
 gem 'dotenv-rails'
@@ -80,8 +81,8 @@ gem 'uglifier'
 
 # CSS
 gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues
+gem 'dartsass-rails'
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
-gem 'sass-rails', '~> 5.0.3' # This it outdated by sassc
 gem 'tailwindcss-rails'
 
 # Redis is a common Action Cable adapter (useful in production)

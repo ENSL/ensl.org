@@ -77,7 +77,7 @@ div.errors-block {
   top: 0;
 
   .message {
-    background: image-url("#{$theme-path}/layout/flash-notice-background.png");
+    background: url("/assets/#{$theme-path}/layout/flash-notice-background.png");
     position: relative;
     width: 730px;
     height: 60px;
@@ -91,7 +91,7 @@ div.errors-block {
     z-index: 2;
 
     &:before {
-      background: image-url("#{$theme-path}/layout/flash-notice-icon.png");
+      background: url("/assets/#{$theme-path}/layout/flash-notice-icon.png");
       content: '';
       display: block;
       width: 30px;
@@ -104,10 +104,10 @@ div.errors-block {
     &.warning,
     &.error,
     &.alert {
-      background: image-url("#{$theme-path}/layout/flash-error-background.png");
+      background: url("/assets/#{$theme-path}/layout/flash-error-background.png");
 
       &:before {
-        background: image-url("#{$theme-path}/layout/flash-error-icon.png");
+        background: url("/assets/#{$theme-path}/layout/flash-error-icon.png");
       }
     }
   }

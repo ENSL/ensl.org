@@ -2,6 +2,8 @@
   Forums
 */
 
+@use "sass:color";
+
 #forums {
   position: relative;
 
@@ -47,7 +49,7 @@ div#categories {
     border: 0;
 
     thead th {
-      @include linear-gradient(#15181b, #0d1011);
+      background-image: unquote("linear-gradient(to bottom, #{#15181b}, #{#0d1011})");
       padding-top: 0.75em;
       padding-bottom: 0.75em;
       font-family: $header-font-family;
@@ -78,13 +80,13 @@ div#categories {
     width: 10%;
 
     background: {
-      image: image-url("#{$theme-path}/layout/forum-category.png");
+      image: url("/assets/#{$theme-path}/layout/forum-category.png");
       position: center center;
       repeat: no-repeat;
     }
 
     &.updated {
-      background-image: image-url("#{$theme-path}/layout/forum-category-highlight.png");
+      background-image: url("/assets/#{$theme-path}/layout/forum-category-highlight.png");
     }
   }
 
@@ -136,7 +138,7 @@ div#categories {
   }
 
   thead th {
-    @include linear-gradient(#15181b, #0d1011);
+    background-image: unquote("linear-gradient(to bottom, #{#15181b}, #{#0d1011})");
     padding-top: 0.75em;
     padding-bottom: 0.75em;
     font-family: $header-font-family;
@@ -269,7 +271,7 @@ div#categories {
         margin-top: 20px;
 
         fieldset {
-          border-color: darken($light-gray, 10);
+          border-color: color.adjust($light-gray, $lightness: -10%);
           border-radius: $base-border-radius;
         }
       }
