@@ -23,6 +23,10 @@ Rails.application.configure do
   config.assets.digest = false
   config.assets.cache_store = [:file_store, Rails.root.join('tmp/cache/assets/test')]
 
+  # Tailwind v4 emits modern CSS syntax (e.g. rgb(from ...)) that legacy sass-rails
+  # cannot parse when used as a CSS compressor.
+  config.assets.css_compressor = nil
+
   # Show full error reports.
   config.consider_all_requests_local = true
   config.cache_store = :null_store

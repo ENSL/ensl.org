@@ -16,6 +16,9 @@ Rails.application.configure do
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
+  # Tailwind v4 emits modern CSS syntax (e.g. rgb(from ...)) that legacy sass-rails
+  # cannot parse when used as a CSS compressor.
+  config.assets.css_compressor = nil
   # config.assets.js_compressor = Uglifier.new(harmony: true)
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
