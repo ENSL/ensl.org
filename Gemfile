@@ -7,16 +7,16 @@ source 'https://rubygems.org'
 ruby '3.4.8'
 
 # Rails core
-gem 'rails', '~> 8.1.1'
+gem 'rails', '~> 8.1.2'
 gem 'rake'
-gem 'sprockets-rails'
 
 # Dotenv
 gem 'dotenv-rails'
 
 # DB and caching
+# Redis is pinned to 4 version
 gem 'mysql2'
-gem 'redis', '~> 4.0'
+gem 'redis', '~> 4.8'
 
 # Web server.
 # Faraday provides NET-HTTP functions
@@ -33,6 +33,9 @@ gem 'rack-cors'
 # Logging. Add JSON logs with nice data.
 # Objective: catch errors, easily parsable
 gem 'lograge'
+
+# Hotwire Turbo (Turbo Streams) for real-time updates
+gem 'turbo-rails'
 
 #
 # Model plugins.
@@ -59,19 +62,22 @@ gem 'google-api-client'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'steam-id2'
 
-# gem 'ratyrate'
-# gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
-
 # Auth
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
 
-# FIXME
-# gem 'rails_csrf_protection'
+# gem 'ratyrate'
+# gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 
 #
 # View and view helper gems
+
+# FIXME
+# gem 'rails_csrf_protection'
+
+# Pagination
+gem 'will_paginate'
 
 # Navigation
 gem 'active_link_to'
@@ -84,11 +90,11 @@ gem 'country_select'
 # Captcha
 gem 'recaptcha', require: 'recaptcha/rails'
 
-# Pagination
-gem 'will_paginate'
-
 # Provides URL parsing to links for customer content.
 gem 'rails_autolink'
+
+#
+# Assets, JS and CSS
 
 # Javascript
 gem 'i18n-js'
@@ -104,17 +110,10 @@ gem 'tailwindcss-rails'
 # Provides il8n and respond functions
 gem 'responders'
 
-# FIXME: Dependency version fix
-gem 'signet', '0.11.0'
-
-# FIXME: Fix for warning: https://github.com/ruby/net-imap/issues/16
-gem 'net-http'
-
 # Importmap for Rails. JS management without nodejs.
+# Asset pipeline
 gem 'importmap-rails', '~> 2.2'
-
-# Hotwire Turbo (Turbo Streams) for real-time updates
-gem 'turbo-rails'
+gem 'sprockets-rails'
 
 group :production do
   # gem 'newrelic_rpm'
