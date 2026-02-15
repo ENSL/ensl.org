@@ -59,9 +59,13 @@ class DataFile < ActiveRecord::Base
   belongs_to :article, optional: true
 
   validates_length_of %i[description path], maximum: 255
-  validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation
+  validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation_or_update?
 
   attr_accessor :skip_file_validation
+
+  def skip_file_validation_or_update?
+    skip_file_validation || !new_record?
+  end
 
   # Callback chain for file processing (order matters)
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }

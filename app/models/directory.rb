@@ -23,6 +23,7 @@
 #
 require 'securerandom'
 require 'stringio'
+require 'fileutils'
 
 ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
 
@@ -167,11 +168,12 @@ class Directory < ActiveRecord::Base
   def make_path
     return if File.exist?(full_path)
 
-    Dir.mkdir(full_path)
+    FileUtils.mkdir_p(full_path)
     Rails.logger.info("Created directory: #{full_path}")
   rescue StandardError => e
     Rails.logger.error("Failed to create directory #{full_path}: #{e.message}")
-    raise ActiveRecord::RecordInvalid, "Filesystem error: Cannot create directory - #{e.message}"
+    errors.add(:base, "Filesystem error: Cannot create directory - #{e.message}")
+    raise ActiveRecord::RecordInvalid.new(self)
   end
 
   def update_timestamp

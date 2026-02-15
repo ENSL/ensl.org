@@ -65,7 +65,7 @@
       <%= link_to 'Edit', edit_post_path(post), class: 'button tiny' %>
     <% end %>
     <% if post.can_destroy? cuser %>
-      <%= link_to 'Delete', post, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'button tiny' %>
+      <%= link_to 'Delete', post, method: :delete, data: { confirm: 'Are you sure?', turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'button tiny' %>
     <% end %>
   </div>
 

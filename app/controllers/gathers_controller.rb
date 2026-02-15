@@ -92,6 +92,8 @@ class GathersController < ApplicationController
   def get_gather
     Gather.transaction do
       @gather = Gather.basic.where(id: params[:id]).lock(true).first
+      raise ActiveRecord::RecordNotFound, 'Gather not found' unless @gather
+
       @gather.refresh cuser
     end
 
