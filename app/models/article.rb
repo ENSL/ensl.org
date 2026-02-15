@@ -125,9 +125,11 @@ class Article < ActiveRecord::Base
     text = source.to_s
 
     if defined?(Commonmarker)
-      Commonmarker.to_html(text)
+      # Disable raw HTML to prevent XSS
+      Commonmarker.to_html(text, options: { render: { unsafe: false } })
     else
-      CommonMarker.render_html(text, :DEFAULT)
+      # For older CommonMarker versions, use safe mode
+      CommonMarker.render_html(text, :DEFAULT, [:SAFE])
     end
   end
 

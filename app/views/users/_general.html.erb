@@ -59,7 +59,7 @@
   <% if @user.profile.achievements and !@user.profile.achievements.empty? %>
     <h4>Achievements</h4>
     <div class="achievements">
-      <%= @user.profile.achievements_parsed.html_safe %>  
+      <%= sanitize(@user.profile.achievements_parsed) %>  
     </div>
   <% end %>
 

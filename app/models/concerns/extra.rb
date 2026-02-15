@@ -1,5 +1,6 @@
 module Extra
   extend ActiveSupport::Concern
+  include ActionView::Helpers::SanitizeHelper
 
   CODING_HTML = 0
   CODING_BBCODE = 1
@@ -8,9 +9,9 @@ module Extra
   included do
     def codings
       {
-        CODING_HTML => "Plain HTML",
-        CODING_BBCODE => "BBCode",
-        CODING_MARKDOWN => "Markdown"
+        CODING_HTML => 'Plain HTML',
+        CODING_BBCODE => 'BBCode',
+        CODING_MARKDOWN => 'Markdown'
       }
     end
 
@@ -18,63 +19,63 @@ module Extra
       (params.instance_of?(Array) ? params : params.keys).each do |key|
         return false unless filter.include? key.to_sym
       end
-      return true
+      true
     end
 
     def error_messages
-      self.errors.full_messages.uniq
+      errors.full_messages.uniq
     end
 
     def bbcode_to_html(text)
-      Sanitize.clean(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, "<br>").html_safe
+      # Strip any HTML tags before parsing BBCode to prevent HTML injection
+      # Then let views sanitize the BBCode-generated HTML
+      strip_tags(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, '<br>')
     end
 
-    def cleanup_string(str, len=20)
+    def cleanup_string(str, len = 20)
       str = str.gsub(/[^0-9A-Za-z\-_]/, '')
-      if str.length > len
-        str = str.to_s[0, len]
-      end
-      return str
+      str = str.to_s[0, len] if str.length > len
+      str
     end
 
-    def move_up(objects, column = "position")
+    def move_up(objects, column = 'position')
       n = 0
       # the objects need to be assigned before loop or the order is not right
       (objects = objects.order(column)).each_with_index do |item, i|
         if item.id == id and n > 0
           old_position = item[column]
-          item.update_attribute(column, objects[i-1][column])
-          objects[i-1].update_attribute(column, old_position)
+          item.update_attribute(column, objects[i - 1][column])
+          objects[i - 1].update_attribute(column, old_position)
         end
-        n = n + 1
+        n += 1
       end
     end
 
-    def move_down(objects, column = "position")
+    def move_down(objects, column = 'position')
       n = 0
       (objects = objects.order(column)).each_with_index do |item, i|
-        if item.id == id and n < (objects.length-1)
+        if item.id == id and n < (objects.length - 1)
           old_position = item[column]
-          item.update_attribute(column, objects[n+1][column])
-          objects[n+1].update_attribute(column, old_position)
+          item.update_attribute(column, objects[n + 1][column])
+          objects[n + 1].update_attribute(column, old_position)
         end
-        n = n + 1
+        n += 1
       end
     end
 
-    def can_show? cuser
+    def can_show?(cuser)
       true
     end
 
-    def can_create? cuser
+    def can_create?(cuser)
       true
     end
 
-    def can_update? cuser
+    def can_update?(cuser)
       true
     end
 
-    def can_destroy? cuser
+    def can_destroy?(cuser)
       true
     end
   end

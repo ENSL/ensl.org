@@ -110,4 +110,58 @@ RSpec.describe Comment, type: :model do
       expect { Comment.params(params, nil) }.to raise_error(ActionController::ParameterMissing)
     end
   end
+
+  describe 'XSS protection' do
+    it 'strips script tags from BBCode text' do
+      comment = Comment.new(
+        user: user,
+        commentable: post_record,
+        text: '[b]bold[/b]<script>alert("xss")</script>'
+      )
+
+      comment.save!
+
+      expect(comment.text_parsed).not_to include('<script>')
+      expect(comment.text_parsed).not_to include('alert')
+      expect(comment.text_parsed).to include('<strong>bold</strong>')
+    end
+
+    it 'strips iframe tags from text' do
+      comment = Comment.new(
+        user: user,
+        commentable: post_record,
+        text: '[i]text[/i]<iframe src="evil.com"></iframe>'
+      )
+
+      comment.save!
+
+      expect(comment.text_parsed).not_to include('<iframe')
+    end
+
+    it 'strips event handlers from text' do
+      comment = Comment.new(
+        user: user,
+        commentable: post_record,
+        text: '[b]text[/b]<img src=x onerror="alert(1)">'
+      )
+
+      comment.save!
+
+      expect(comment.text_parsed).not_to include('onerror')
+      expect(comment.text_parsed).not_to include('<img')
+    end
+
+    it 'strips style tags with javascript' do
+      comment = Comment.new(
+        user: user,
+        commentable: post_record,
+        text: '[b]text[/b]<style>body{background:url("javascript:alert(1)")}</style>'
+      )
+
+      comment.save!
+
+      expect(comment.text_parsed).not_to include('<style')
+      expect(comment.text_parsed).not_to include('javascript:')
+    end
+  end
 end

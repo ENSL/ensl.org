@@ -1,12 +1,12 @@
 module ArticlesHelper
   def preview_text(article, full)
-    if article.text_coding == Article::CODING_HTML
-      content = article.text.html_safe
-    else
-      content = article.text_parsed.html_safe
-    end 
+    content = if article.text_coding == Article::CODING_HTML
+                sanitize(article.text)
+              else
+                sanitize(article.text_parsed)
+              end
 
-    content = truncate(raw(strip_tags(content)), length: 200) if !full
+    content = truncate(raw(strip_tags(content)), length: 200) unless full
     content
   end
 end

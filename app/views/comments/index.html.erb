@@ -11,7 +11,7 @@
   </h3>
 
   <p>
-    <%= comment.text_parsed %>
+    <%= sanitize(comment.text_parsed) %>
   </p>
 </div>
 <% end %>

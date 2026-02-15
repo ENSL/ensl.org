@@ -560,9 +560,6 @@ GEM
     ruby_parser (3.22.0)
       racc (~> 1.5)
       sexp_processor (~> 4.16)
-    sanitize (7.0.0)
-      crass (~> 1.0.2)
-      nokogiri (>= 1.16.8)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-embedded (1.97.3-aarch64-linux-gnu)
@@ -740,7 +737,6 @@ DEPENDENCIES
   ruby-lsp
   ruby-lsp-rails
   ruby-lsp-rspec
-  sanitize
   scrypt
   shoulda-matchers
   signet (= 0.11.0)

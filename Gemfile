@@ -78,18 +78,17 @@ gem 'active_link_to'
 
 # Form helpers
 gem 'country_select'
+# , require: 'country_select_without_sort_alphabetical'
+# gem 'i18n_country_select'
 
 # Captcha
 gem 'recaptcha', require: 'recaptcha/rails'
 
-# FIXME: Use something else here
-gem 'sanitize'
-
 # Pagination
 gem 'will_paginate'
-# replaced time_difference with native calculations
-# , require: 'country_select_without_sort_alphabetical'
-# gem 'i18n_country_select'
+
+# Provides URL parsing to links for customer content.
+gem 'rails_autolink'
 
 # Javascript
 gem 'i18n-js'
@@ -102,8 +101,7 @@ gem 'dartsass-rails'
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'tailwindcss-rails'
 
-# FIXME: Legacy feature shims
-gem 'rails_autolink'
+# Provides il8n and respond functions
 gem 'responders'
 
 # FIXME: Dependency version fix
