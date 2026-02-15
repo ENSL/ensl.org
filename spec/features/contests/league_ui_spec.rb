@@ -43,7 +43,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     expect(page).to have_content('Editing Contest')
 
     # Navigate to contest edit page and add maps via UI
-    find("a[href='#maps']").click
+    click_link(href: '#maps', wait: 5)
 
     [map1, map2].each do |map|
       select map.name, from: 'map'
@@ -56,10 +56,11 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     expect(contest.maps.count).to be >= 2
 
     # Create a week for the league
-    find("a[href='#weeks']").click
+    click_link(href: '#weeks', wait: 5)
     click_link 'New Week'
-    fill_in I18n.t('activerecord.attributes.week.name'), with: 'Week 1'
-    click_button I18n.t('helpers.submit.week.create')
+    expect(page).to have_field('week_name', wait: 5)
+    fill_in 'week_name', with: 'Week 1'
+    click_button 'Save Week'
     expect(page).to have_content('Week 1', wait: 5)
 
     # STEP 3: Team leaders create their teams
@@ -86,7 +87,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     sign_out
     sign_in_as(admin)
     visit edit_contest_path(contest)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     expect(page).to have_css('#teams')
 
     teams.each do |team|
@@ -97,7 +98,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
       # Wait for page reload
       expect(page).to have_current_path(/contests/)
-      find("a[href='#teams']").click
+      click_link(href: '#teams', wait: 5)
       expect(page).to have_css('#teams table.teams', text: team.name, wait: 5)
     end
 
@@ -105,7 +106,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     expect(contest.contesters.count).to eq(4)
 
     # STEP 5: Admin creates round-robin matches
-    find("a[href='#matches']").click
+    click_link(href: '#matches', wait: 5)
 
     contesters = contest.contesters.to_a
     matches_to_score = []
@@ -187,7 +188,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
     # Verify standings show updated stats
     visit edit_contest_path(contest)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
 
     within('#teams table.teams') do
       teams.each do |team|

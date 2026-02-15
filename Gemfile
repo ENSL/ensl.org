@@ -141,6 +141,8 @@ group :development do
 end
 
 group :test do
+  gem 'ostruct'
+
   gem 'rspec-core'
   gem 'rspec-expectations'
   gem 'rspec-mocks'

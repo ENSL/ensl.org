@@ -8,7 +8,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
   before do
     sign_in_as(admin)
     visit edit_contest_path(contest)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     expect(page).to have_css('#teams')
   end
 
@@ -22,7 +22,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     end
 
     expect(page).to have_current_path(/contests/)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     # verify table headers and the added team's row values
     within('#teams table.teams') do
       expect(page).to have_css('thead') if page.has_css?('thead')
@@ -59,7 +59,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     click_button 'Save Contester'
 
     expect(page).to have_current_path(%r{/contests/[0-9]+/edit}) # accept edit path with/without fragment
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     expect(page).to have_css('#teams table.teams')
     # verify the contester row shows correct column values
     within('#teams table.teams') do
@@ -80,7 +80,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
   scenario 'Delete contester from contest teams', :aggregate_failures do
     contester = create(:contester, contest: contest, team: team)
     visit edit_contest_path(contest)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     expect(page).to have_css('#teams table.teams')
 
     # Delete from the teams table action link for the created team row
@@ -101,7 +101,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
 
     # ensure we have a fresh rendering of the contest edit page (avoid stale client DOM)
     visit edit_contest_path(contest)
-    find("a[href='#teams']").click
+    click_link(href: '#teams', wait: 5)
     within('#teams table.teams') do
       expect(page).not_to have_text(contester.team.name)
     end

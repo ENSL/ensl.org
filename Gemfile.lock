@@ -379,6 +379,7 @@ GEM
       multi_json
       omniauth-openid
     os (1.1.4)
+    ostruct (0.6.1)
     parallel (1.27.0)
     parser (3.3.10.1)
       ast (~> 2.4.1)
@@ -711,6 +712,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   omniauth-steam
   os
+  ostruct
   playwright-ruby-client
   pry-byebug
   pry-rails
@@ -754,7 +756,7 @@ DEPENDENCIES
   will_paginate
 
 RUBY VERSION
-  ruby 3.2.5p208
+  ruby 3.4.8
 
 BUNDLED WITH
   4.0.6

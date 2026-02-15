@@ -38,7 +38,8 @@ feature 'XSS Protection in Articles', js: true do
 
     # Try to inject script tag via Markdown
     expect(page).to have_selector('#article_text', visible: :all, wait: 5)
-    fill_tinymce 'article_text', '**Safe content** <script>alert("XSS")</script>'
+    page.execute_script("if (window.tinymce && tinymce.get('article_text')) { tinymce.get('article_text').remove(); }")
+    page.execute_script("document.getElementById('article_text').value = '**Safe content** <script>alert(\\\"XSS\\\")</script>'")
 
     click_button I18n.t('helpers.submit.post.create')
 
