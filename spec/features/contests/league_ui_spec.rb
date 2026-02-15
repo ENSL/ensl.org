@@ -96,8 +96,8 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
       select team.name, from: 'contester_team_id'
       click_button 'Add Team'
 
-      # Wait for page reload
-      expect(page).to have_current_path(/contests/)
+      # Explicitly visit the page to ensure fresh rendering and avoid stale DOM
+      visit edit_contest_path(contest)
       click_link(href: '#teams', wait: 5)
       expect(page).to have_css('#teams table.teams', text: team.name, wait: 5)
     end

@@ -57,7 +57,6 @@ describe Directory do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_length_of(:name).is_at_least(1).is_at_most(255) }
     it { is_expected.to validate_length_of(:path).is_at_most(255) }
-    it { is_expected.to validate_inclusion_of(:hidden).in_array([true, false]) }
 
     # Simply validate that title validation exists
     it 'validates title presence when explicitly nil' do

@@ -10,7 +10,7 @@ RSpec.describe MatchesController, type: :controller do
   describe 'POST create' do
     it 'returns 422 when validation fails' do
       post :create, params: { match: { contest_id: nil } }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -22,7 +22,7 @@ RSpec.describe MatchesController, type: :controller do
 
     it 'returns 422 when update validation fails' do
       patch :update, params: { id: match.id, match: { contester1_id: nil } }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end
