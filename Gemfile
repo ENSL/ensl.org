@@ -4,7 +4,7 @@
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
 source 'https://rubygems.org'
-ruby '3.2.5'
+ruby '3.4.8'
 
 # Rails core
 gem 'rails', '~> 8.1.1'
