@@ -1,0 +1,84 @@
+<% @matches.each do |week, matches| %>
+  <h2><%= week %></h2>
+  <table class="striped" id="matches">
+    <tr>
+      <th class="opponent">Teams</th>
+      <th class="date">Date</th>
+      <th class="maps">Maps</th>
+      <th>Score</th>
+      <th>Caster</th>
+      <th>Referee</th>
+      <th class="actions">Actions</th>
+    </tr>
+    <% matches.each do |match| %>
+      <tr>
+        <td>
+          <%= namelink match.contester1.team %>
+          vs
+          <%= namelink match.contester2.team %>
+        </td>
+        <td>
+          <%= shorttime match.match_time %>
+        </td>
+        <td>
+          <%= match.map1.to_s + " " + match.map2.to_s %>
+        </td>
+        <td>
+          <%= link_to match, class: "bold #{match.score_color}" do %>
+            <%= h match.score1 %>
+            - <%= h match.score2 %>
+          <% end %>
+        </td>
+        <td>
+          <% if match.caster %>
+            <%= form_for match do |f| %>
+              <%= f.hidden_field :caster_id, value: nil %>
+              <%= namelink match.caster %>
+              <% if match.can_update?(cuser, { caster_id: nil }) %>
+                <%= link_to '#', data: { submit_form: true } do %>
+                  <i class="fa fa-times"></i>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% elsif match.can_update?(cuser, { caster_id: cuser.id }) %>
+            <%= form_for match do |f| %>
+              <% if cuser.admin? %>
+                <%= f.collection_select :caster_id, User.casters, :id, :username, { include_blank: true }, { class: "autosubmit" } %>
+              <% else %>
+                <%= f.hidden_field :caster_id, value: cuser.id %>
+                <%= link_to "Take!", '#', data: { submit_form: true } %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </td>
+        <td>
+          <% if match.referee %>
+            <%= form_for match do |f| %>
+              <%= f.hidden_field :referee_id, value: nil %>
+              <%= namelink match.referee %>
+              <% if match.can_update?(cuser, { referee_id: nil }) %>
+                <%= link_to '#', data: { submit_form: true } do %>
+                  <i class="fa fa-times"></i>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% elsif match.can_update?(cuser, { referee_id: cuser.id }) %>
+            <%= form_for match do |f| %>
+              <% if cuser.admin? %>
+                <%= f.collection_select :referee_id, User.refadmins, :id, :username, { include_blank: true }, { class: "autosubmit" } %>
+              <% else %>
+                <%= f.hidden_field :referee_id, value: cuser.id %>
+                <%= link_to "Take!", '#', data: { submit_form: true } %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </td>
+        <td class="actions">
+          <% if cuser.ref? || cuser.admin? %>
+            <%= link_to "Admin", "/matches/ref/#{match.id}" %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

@@ -14,8 +14,9 @@ gem 'sprockets-rails'
 # Dotenv
 gem 'dotenv-rails'
 
-# DB
+# DB and caching
 gem 'mysql2'
+gem 'redis', '~> 4.0'
 
 # Web server.
 # Faraday provides NET-HTTP functions
@@ -23,11 +24,14 @@ gem 'faraday'
 gem 'os'
 gem 'puma'
 
-# API
+# Rack-attack to stop spamming
 gem 'rack-attack'
+
+# CORS for external API's, not really used.
 gem 'rack-cors'
 
-# Logging
+# Logging. Add JSON logs with nice data.
+# Objective: catch errors, easily parsable
 gem 'lograge'
 
 #
@@ -39,6 +43,15 @@ gem 'active_flag'
 gem 'scrypt'
 # Unread for marking stuff read or unread
 gem 'unread'
+# Transform text to nice HTML
+gem 'bbcoder'
+gem 'commonmarker'
+# File attachments
+gem 'carrierwave'
+# Image manipulation, avatars
+gem 'rmagick'
+# Union for AR
+gem 'active_record_union'
 
 # External APIs.
 # Steam condenders for querying Steam API and last to help with StemaIDs
@@ -54,44 +67,34 @@ gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
 
-# Transform text to nice HTML
-gem 'bbcoder'
-gem 'commonmarker'
-
 # FIXME
 # gem 'rails_csrf_protection'
 
 #
-# View and model helper gems
+# View and view helper gems
 
 # Navigation
 gem 'active_link_to'
 
-# File attachments
-gem 'carrierwave'
-
+# Form helpers
 gem 'country_select'
 
 # Captcha
 gem 'recaptcha', require: 'recaptcha/rails'
-gem 'rmagick'
 
 # FIXME: Use something else here
 gem 'sanitize'
-gem 'time_difference'
+
+# Pagination
 gem 'will_paginate'
+# replaced time_difference with native calculations
 # , require: 'country_select_without_sort_alphabetical'
 # gem 'i18n_country_select'
-gem 'dynamic_form'
-
-# Views
-gem 'haml'
 
 # Javascript
 gem 'i18n-js'
 gem 'jquery-rails'
 gem 'tinymce-rails'
-gem 'uglifier'
 
 # CSS
 gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues
@@ -99,11 +102,7 @@ gem 'dartsass-rails'
 gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'tailwindcss-rails'
 
-# Redis is a common Action Cable adapter (useful in production)
-gem 'redis', '~> 4.0'
-
 # FIXME: Legacy feature shims
-gem 'active_record_union'
 gem 'rails_autolink'
 gem 'responders'
 

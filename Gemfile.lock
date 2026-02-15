@@ -186,15 +186,11 @@ GEM
       dotenv (= 3.2.0)
       railties (>= 6.1)
     drb (2.2.3)
-    dynamic_form (1.3.1)
-      actionview (> 5.2.0)
-      activemodel (> 5.2.0)
     erb (6.0.1)
     erb2haml (0.1.5)
       html2haml
     erubi (1.13.1)
     erubis (2.7.0)
-    execjs (2.10.0)
     extlib (0.9.16)
     factory_bot (4.10.0)
       activesupport (>= 3.0.0)
@@ -631,8 +627,6 @@ GEM
     temple (0.10.4)
     thor (1.5.0)
     tilt (2.7.0)
-    time_difference (0.5.0)
-      activesupport
     timecop (0.9.10)
     timeout (0.6.0)
     tinymce-rails (8.3.2)
@@ -643,8 +637,6 @@ GEM
       railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uglifier (4.2.1)
-      execjs (>= 0.3.0, < 3)
     unaccent (0.4.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
@@ -706,12 +698,10 @@ DEPENDENCIES
   database_cleaner-active_record
   debug
   dotenv-rails
-  dynamic_form
   erb2haml
   factory_bot_rails (= 4.10.0)
   faraday
   google-api-client
-  haml
   i18n-js
   importmap-rails (~> 2.2)
   jquery-rails
@@ -759,11 +749,9 @@ DEPENDENCIES
   steam-condenser!
   steam-id2
   tailwindcss-rails
-  time_difference
   timecop
   tinymce-rails
   turbo-rails
-  uglifier
   unread
   web-console
   webmock

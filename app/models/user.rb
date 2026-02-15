@@ -297,7 +297,10 @@ class User < ActiveRecord::Base
   end
 
   def idle
-    format('%d m', TimeDifference.between(Time.now.utc, lastvisit).in_minutes.floor)
+    return '0 m' if lastvisit.nil?
+
+    minutes = ((Time.now.utc - lastvisit.to_time.utc) / 60).floor
+    format('%d m', minutes)
   end
 
   def current_layout

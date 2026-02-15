@@ -281,5 +281,21 @@ describe User do
       u.update_password
       expect(u.password).to eq(Digest::MD5.hexdigest('plainpw'))
     end
+
+    describe '#idle' do
+      it 'returns 0 m when lastvisit is nil' do
+        u = build(:user)
+        u.lastvisit = nil
+        expect(u.idle).to eq('0 m')
+      end
+
+      it 'returns minutes difference rounded down' do
+        u = create(:user)
+        fixed_now = Time.now.utc
+        allow(Time).to receive(:now).and_return(fixed_now)
+        u.update!(lastvisit: fixed_now - 125) # 2 minutes 5 seconds ago
+        expect(u.idle).to eq('2 m')
+      end
+    end
   end
 end
