@@ -11,7 +11,7 @@
 
   <% if cuser && cuser.teamers %>
     <%= form_for @teamer do |f| %>
-      <%= f.error_messages %>
+      <%= render 'shared/errors', messages: @teamer.errors.full_messages %>
       <%= f.hidden_field :user_id, :value => cuser.id %>
       <%= f.hidden_field :team_id, :value => @team.id %>
       <% if cuser.teamers.joining.count == 0  && @team.active %>

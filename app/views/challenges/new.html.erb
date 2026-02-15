@@ -4,7 +4,7 @@
 
 <div class="wide box">
   <%= form_for @challenge do |f| %>
-    <%= f.error_messages %>
+    <%= render 'shared/errors', messages: @challenge.errors.full_messages %>
     <%= f.hidden_field :contester1_id %>
     <%= f.hidden_field :contester2_id %>
 

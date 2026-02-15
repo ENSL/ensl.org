@@ -43,7 +43,7 @@
 
       <% if @user.teamers.joining.count == 0  %>
         <%= form_for @teamer do |f| %>
-          <%= f.error_messages %>
+          <%= render 'shared/errors', messages: @teamer.errors.full_messages %>
           <%= f.hidden_field :user_id %>
 
           <h4>Join an existing team</h4>

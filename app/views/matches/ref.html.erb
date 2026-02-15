@@ -17,7 +17,7 @@
     <h3>Lineups</h3>
 
     <%= form_for @match do |f| %>
-      <%= f.error_messages %>
+      <%= render 'shared/errors', messages: @match.errors.full_messages %>
 
       <div class="team-1">
         <% [@match.contester1].each do |contester| %>
@@ -39,7 +39,7 @@
 
   <div class="scoring">
     <%= form_for @match, html: { class: 'square' } do |f| %>
-      <%= f.error_messages %>
+      <%= render 'shared/errors', messages: @match.errors.full_messages %>
 
       <h3>Scoring</h3>
 
@@ -82,7 +82,7 @@
 
   <div class="report">
     <%= form_for @match do |f| %>
-      <%= f.error_messages %>
+      <%= render 'shared/errors', messages: @match.errors.full_messages %>
 
       <h3>Match Report</h3>
 

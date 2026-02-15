@@ -1,5 +1,5 @@
 <%= form_for(@issue, html: { class: 'square' }) do |f| %>
-  <%= f.error_messages %>
+  <%= render 'shared/errors', messages: @issue.errors.full_messages %>
   <div class="fields horizontal">
     <%= f.label :title %>
     <%= f.text_field :title %>
