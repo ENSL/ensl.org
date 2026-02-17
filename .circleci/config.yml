@@ -2,7 +2,7 @@ version: 2.1
 
 references:
   default_docker_ruby_executor: &default_docker_ruby_executor
-    image: cimg/ruby:3.4.8-node
+    image: cimg/ruby:3.4.8-browsers
     environment:
       BUNDLE_JOBS: '3'
       BUNDLE_RETRY: '3'
@@ -59,8 +59,8 @@ jobs:
           name: Bundle Install
           command: bundle check || bundle install
       - run:
-          name: Install Playwright Chromium
-          command: npx -y playwright@1.58.2 install chromium
+          name: Install Playwright Chromium and dependencies
+          command: npx -y playwright@1.58.2 install --with-deps chromium
       - save_cache:
           key: ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
           paths:
