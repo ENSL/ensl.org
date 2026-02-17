@@ -2,7 +2,7 @@ version: 2.1
 
 references:
   default_docker_ruby_executor: &default_docker_ruby_executor
-    image: cimg/ruby:3.4-node-browsers
+    image: cimg/ruby:3.4.8-node
     environment:
       BUNDLE_JOBS: '3'
       BUNDLE_RETRY: '3'
