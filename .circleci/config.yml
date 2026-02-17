@@ -14,6 +14,7 @@ references:
       MYSQL_DATABASE: 'ensl_test'
       MYSQL_USER: 'ensl'
       MYSQL_PASSWORD: 'ensl'
+      MYSQL_CONNECTION_POOL: '16'
   mariadb: &mariadb
     image: mariadb:10.7
     environment:

@@ -46,8 +46,18 @@ module Features
 
         return unless with_votes_scope('map-votes')
 
+        # If no vote links are available in this session, skip gracefully
+        return unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 2)
+
         votes.times do
-          safe_click { all('ul#map-votes a', minimum: 1, wait: 5).sample.click }
+          # Vote links can legitimately disappear once user reached vote limit
+          break unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 2)
+
+          safe_click do
+            first_choice = find('ul#map-votes a.vote-link', match: :first, wait: 5)
+            choices = all('ul#map-votes a.vote-link')
+            (choices.empty? ? first_choice : choices.sample).click
+          end
           sleep(0.2) # Wait for vote to be processed before next click
         end
 
