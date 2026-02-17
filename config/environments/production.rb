@@ -41,6 +41,9 @@ Rails.application.configure do
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Json.new
   config.lograge.keep_original_rails_log = false
+  lograge_logger = ActiveSupport::Logger.new(Rails.root.join('log', "#{Rails.env}.log"), 5, 10 * 1024 * 1024)
+  lograge_logger.formatter = proc { |_severity, _timestamp, _progname, msg| "#{msg}\n" }
+  config.lograge.logger = ActiveSupport::TaggedLogging.new(lograge_logger)
   config.lograge.custom_payload do |controller|
     request = controller.request
     {
