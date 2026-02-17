@@ -256,7 +256,7 @@ class DataFile < ActiveRecord::Base
   public
 
   def should_create_movie?
-    directory_id == Directory::MOVIES && !location.include?('_preview.mp4')
+    directory_id == Directory::MOVIES && !location.to_s.include?('_preview.mp4') && movie.nil?
   end
 
   def should_update_relations?
@@ -267,7 +267,6 @@ class DataFile < ActiveRecord::Base
   def create_movie
     movie = Movie.new
     movie.file = self
-    movie.make_snapshot
     movie.save
   end
 

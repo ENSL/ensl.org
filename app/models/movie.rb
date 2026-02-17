@@ -187,9 +187,10 @@ class Movie < ActiveRecord::Base
   end
 
   def probe_metadata
-    return unless file&.location
+    path = processable_source_path
+    return unless path
 
-    result = VideoProcessing.probe_web_compat(file.location)
+    result = VideoProcessing.probe_web_compat(path)
 
     unless result
       errors.add :base, 'Not a movie file.'
@@ -201,10 +202,17 @@ class Movie < ActiveRecord::Base
     self.format = result[:oneliner]
 
     Rails.logger.info("Video probe result#{result[:oneliner]}")
+  rescue VideoProcessing::Error => e
+    Rails.logger.warn("Skipping movie metadata probe for movie##{id || 'new'}: #{e.message}")
   end
 
   def probe_length
-    self.length = VideoProcessing.probe_duration_seconds!(file&.location).to_i
+    path = processable_source_path
+    return unless path
+
+    self.length = VideoProcessing.probe_duration_seconds!(path).to_i
+  rescue VideoProcessing::Error => e
+    Rails.logger.warn("Skipping movie length probe for movie##{id || 'new'}: #{e.message}")
   end
 
   def make_preview(_x = nil, _y = nil)
@@ -217,16 +225,28 @@ class Movie < ActiveRecord::Base
   end
 
   def make_snapshot
-    return unless file&.location
+    path = processable_source_path
+    return unless path
 
     # Prepare file and its dir
     FileUtils.mkdir_p(File.dirname(snapshot_path)) unless File.exist?(File.dirname(snapshot_path))
     FileUtils.rm(snapshot_path) if File.exist?(snapshot_path)
 
     VideoProcessing.random_snapshot!(
-      input_path: file&.location,
+      input_path: path,
       output_path: snapshot_path
     )
+  rescue VideoProcessing::Error => e
+    Rails.logger.warn("Skipping movie snapshot for movie##{id || 'new'}: #{e.message}")
+    nil
+  end
+
+  def processable_source_path
+    path = file&.location.to_s
+    return nil if path.blank?
+    return nil unless File.file?(path) && File.readable?(path)
+
+    path
   end
 
   def make_stream
@@ -268,12 +288,8 @@ class Movie < ActiveRecord::Base
     end
 
     if size_param.present?
-      case size_param.to_s
-      when 'short'
-        movies = movies.where('movies.length IS NOT NULL AND movies.length <= ?', 10 * 60)
-      when 'long'
-        movies = movies.where('movies.length IS NOT NULL AND movies.length > ?', 10 * 60)
-      end
+      # Filter by category name - size_param should match a category name
+      movies = movies.joins(:category).where(categories: { name: size_param.to_s })
     end
 
     if rating_param.present? && rating_param.to_i.positive?
@@ -292,7 +308,7 @@ class Movie < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser&.admin?
+    cuser&.admin? || user == cuser
   end
 
   # Return array of [username, id] for users who submitted movies

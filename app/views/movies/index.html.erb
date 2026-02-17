@@ -24,15 +24,12 @@
       </div>
     <% end %>
 
-        <% short_active = params[:size] == 'short' %>
-        <% long_active = params[:size] == 'long' %>
-        <%= link_to "Shorts",
-          movies_url(size: (short_active ? nil : 'short'), order: params[:order], rating: params[:rating], author: params[:author]),
-          class: "button mr-2 #{'opacity-50 bg-gray-200 text-gray-700' if short_active}" %>
-
-        <%= link_to "Long",
-          movies_url(size: (long_active ? nil : 'long'), order: params[:order], rating: params[:rating], author: params[:author]),
-          class: "button #{'opacity-50 bg-gray-200 text-gray-700' if long_active}" %>
+    <% @movie_size_categories.each do |category_name| %>
+      <% active = params[:size] == category_name %>
+      <%= link_to category_name,
+        movies_url(size: (active ? nil : category_name), order: params[:order], rating: params[:rating], author: params[:author]),
+        class: "button mr-2 #{'opacity-50 bg-gray-200 text-gray-700' if active}" %>
+    <% end %>
   </div>
 
   <div class="w-full">

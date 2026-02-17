@@ -7,6 +7,8 @@ class MoviesController < ApplicationController
     @movies = Movie.filter_or_all(params[:order], params[:rating], params[:size], params[:author])
     # authors for dropdown (only users who submitted movies)
     @movie_authors = Movie.submitter_options
+    # movie size categories for filter buttons
+    @movie_size_categories = Category.movie_size_categories
     render layout: 'full'
   end
 
@@ -30,7 +32,7 @@ class MoviesController < ApplicationController
 
   def new
     @movie = Movie.new
-    raise UserRegistrationReq unless @movie.can_create? cuser
+    raise Exceptions::UserRegistrationReq unless @movie.can_create? cuser
 
     @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
   end

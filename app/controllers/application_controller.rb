@@ -115,8 +115,8 @@ class ApplicationController < ActionController::Base
     render 'errors/403', status: :forbidden, layout: 'errors'
   end
 
-  rescue_from UserRegistrationReq do |_exception|
-    render text: I18n.t(:user_registration_required), status: :forbidden
+  rescue_from Exceptions::UserRegistrationReq do |_exception|
+    render plain: I18n.t(:user_registration_required), status: :forbidden
   end
 
   rescue_from ActiveRecord::RecordNotFound do |_exception|

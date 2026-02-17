@@ -55,6 +55,11 @@ class Category < ActiveRecord::Base
 
   acts_as_readable
 
+  # Get movie size filter categories (Shorts, Full Length, etc.)
+  def self.movie_size_categories
+    where(domain: DOMAIN_MOVIES).pluck(:name).compact.uniq
+  end
+
   def to_s
     name
   end
