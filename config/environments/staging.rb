@@ -5,8 +5,8 @@ Rails.application.configure do
   config.eager_load = true
 
   # Code is not reloaded between requests
-  config.cache_classes = false
-  config.action_controller.perform_caching = false
+  config.cache_classes = true
+  config.action_controller.perform_caching = true
 
   # Full error reports are disabled and caching is turned on
   config.consider_all_requests_local = false
@@ -28,10 +28,14 @@ Rails.application.configure do
   config.assets.digest = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+  # Keep this off, causes weird redirection bug
   config.force_ssl = false
 
+  # Trust SSL terminated at the proxy so request.base_url uses https
+  config.assume_ssl = false
+
   # See everything in the log (default is :info)
-  config.log_level = :info
+  config.log_level = (ENV['LOG_LEVEL'] || 'error').to_sym
 
   # Log one JSON event per request
   config.lograge.enabled = true
@@ -61,4 +65,7 @@ Rails.application.configure do
   # Specifies the header that your server uses for sending files
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
+
+  # Secret key
+  config.require_master_key = false
 end
