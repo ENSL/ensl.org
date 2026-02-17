@@ -54,6 +54,7 @@ services:
       - "${PUMA_PORT}:${PUMA_PORT}"
     depends_on:
       - smtp
+      - redis
     networks:
       default: {}
       catpack_docker:
