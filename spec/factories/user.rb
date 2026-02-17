@@ -38,6 +38,13 @@ FactoryBot.define do
       end
     end
 
+    trait :movie_maker do
+      after(:create) do |user|
+        group = Group.find_or_create_by(id: Group::MOVIES) { |g| g.name = 'Movie Makers' }
+        create :grouper, user: user, group: group
+      end
+    end
+
     trait :chris do
       steamid '0:1:58097444'
     end

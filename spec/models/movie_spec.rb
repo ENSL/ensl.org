@@ -79,6 +79,7 @@ RSpec.describe Movie, type: :model do
                                                                         oneliner: 'h264' })
       allow(VideoProcessing).to receive(:probe_duration_seconds!).and_return(123)
       allow(VideoProcessing).to receive(:random_snapshot!).and_return(true)
+      allow(movie).to receive(:processable_source_path).and_return(data_file.location)
 
       # Stub filesystem helpers
       allow(File).to receive(:exist?).and_call_original

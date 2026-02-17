@@ -1,0 +1,2 @@
+# Keep this directory in git, but ignore video files
+# Video files are downloaded automatically during test setup

@@ -1,0 +1,12 @@
+# Ignore downloaded and generated test videos
+*.mp4
+*.webm
+*.avi
+*.mov
+*.mkv
+*.wmv
+temp_*
+
+# Keep the README
+!README.md
+!.gitkeep

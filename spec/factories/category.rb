@@ -20,4 +20,8 @@ FactoryBot.define do
   trait :articles do
     domain { Category::DOMAIN_ARTICLES }
   end
+
+  trait :movies do
+    domain { Category::DOMAIN_MOVIES }
+  end
 end
