@@ -32,7 +32,20 @@ module Features
     end
 
     def log_snippet(log_content, pattern)
-      log_content[/.*#{pattern}.*?\n.{0,500}/m]
+      lines = log_content.lines
+      match_index = lines.index { |line| line.match?(pattern) }
+      return nil unless match_index
+
+      context_before = 2
+      context_after = 2
+      start_index = [match_index - context_before, 0].max
+      end_index = [match_index + context_after, lines.length - 1].min
+
+      lines[start_index..end_index]
+        .map
+        .with_index(start_index)
+        .map { |line, idx| "#{idx + 1}: #{line}" }
+        .join
     end
 
     # Also check page body as fallback
