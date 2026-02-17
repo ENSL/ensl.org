@@ -1,7 +1,7 @@
 test:
-  socket: /var/run/mysqld/mysqld.sock
-  host: localhost
-  database: circle_ruby_test
+  host: 127.0.0.1
+  database: ensl_test
   adapter: mysql2
   encoding: utf8
-  username: ubuntu
+  username: ensl
+  password: ensl

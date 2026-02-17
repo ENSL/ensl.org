@@ -1,17 +1,21 @@
-version: 2
+version: 2.1
 
 references:
   default_docker_ruby_executor: &default_docker_ruby_executor
-    image: circleci/ruby:2.6.5-buster-node-browsers
+    image: cimg/ruby:3.4-node-browsers
     environment:
       BUNDLE_JOBS: '3'
       BUNDLE_RETRY: '3'
       BUNDLE_PATH: vendor/bundle
+      BUNDLER_VERSION: '4.0.6'
       RACK_ENV: test
       RAILS_ENV: test
       MYSQL_HOST: '127.0.0.1'
+      MYSQL_DATABASE: 'ensl_test'
+      MYSQL_USER: 'ensl'
+      MYSQL_PASSWORD: 'ensl'
   mariadb: &mariadb
-    image: circleci/mariadb:10.1.44
+    image: mariadb:10.7
     environment:
       MYSQL_DATABASE: ensl_test
       MYSQL_USER: ensl
@@ -20,99 +24,65 @@ references:
       MYSQL_ROOT_HOST: "%"
 
 jobs:
-  build:
-    environment:
-      CC_TEST_REPORTER_ID: b3db5b7df9a0a1d0fd3503e72d7431ffbfa172492c2840d590ccb2fafd9172d3
-      RAILS_ENV: test
-      RACK_ENV: test
-    docker:
-      - *default_docker_ruby_executor
-    steps:
-      - checkout
-      - run:
-          name: Bundle Update
-          command: gem update --system && gem install bundler
-      # Which version of bundler?
-      - run:
-          name: Which bundler?
-          command: bundle -v
-      # bundle cache
-      - restore_cache:
-          keys:
-            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-demo-bundle-v2-
-      - run:
-          name: Bundle Install
-          command: bundle check || bundle install
-      # Store bundle cache
-      - save_cache:
-          key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
-#      - run:
-#          name: Setup dependencies
-#          command: |
-#            sudo composer self-update
-#            composer install -n --prefer-dist
-      # download test reporter as a static binary
-#      - run:
-#          name: Setup Code Climate test-reporter
-#          command: |
-#            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-#            chmod +x ./cc-test-reporter
-      # Only necessary if app uses webpacker or yarn in some other way
-      #- restore_cache:
-      #    keys:
-      #      - rails-demo-yarn-{{ checksum "yarn.lock" }}
-      #      - rails-demo-yarn-
-      #- run:
-      #    name: Yarn Install
-      #    command: yarn install --cache-folder ~/.cache/yarn
-      # Store yarn / webpacker cache
-      #- save_cache:
-      #    key: rails-demo-yarn-{{ checksum "yarn.lock" }}
-      #    paths:
-      #      - ~/.cache/yarn
   test:
     parallelism: 3
     docker:
       - *default_docker_ruby_executor
       - *mariadb
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "b7:35:a6:4e:9b:0d:6d:d4:78:1e:9a:97:2a:66:6b:be"
-      - checkout
       - run:
-          name: Bundle Update
-          command: gem update --system && gem install bundler 
+          name: Checkout via HTTPS
+          command: |
+            REPO_HTTPS="${CIRCLE_REPOSITORY_URL/git@github.com:/https://github.com/}"
+            if [ "$REPO_HTTPS" = "$CIRCLE_REPOSITORY_URL" ]; then
+              REPO_HTTPS="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git"
+            fi
+            git clone --filter=blob:none "$REPO_HTTPS" .
+            git checkout --force "$CIRCLE_SHA1"
+      - run:
+          name: Install system packages for native gems
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends \
+              libmariadb-dev \
+              libmariadb-dev-compat \
+              libmagickwand-dev \
+              imagemagick
+      - run:
+          name: Install Bundler
+          command: gem install bundler -v "$BUNDLER_VERSION"
       - restore_cache:
           keys:
-            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-demo-bundle-v2-
+            - ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
+            - ensl-bundle-v4-{{ arch }}-
       - run:
           name: Bundle Install
           command: bundle check || bundle install
-      #- restore_cache:
-      #    keys:
-      #      - rails-demo-yarn-{{ checksum "yarn.lock" }}
-      #      - rails-demo-yarn-
+      - run:
+          name: Install Playwright Chromium
+          command: npx -y playwright@1.58.2 install chromium
+      - save_cache:
+          key: ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
       - run:
           name: Wait for DB
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+          command: |
+            for i in $(seq 1 60); do
+              (echo > /dev/tcp/127.0.0.1/3306) >/dev/null 2>&1 && exit 0
+              sleep 2
+            done
+            echo "MariaDB did not become ready in time"
+            exit 1
       - run:
           name: Database setup
-          command: bundle exec rake db:test:prepare --trace
+          command: bundle exec bin/rails db:prepare
       # Run rspec in parallel
-      #            ./cc-test-reporter before-build
-      #            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
       - run:
           command: |
             mkdir /tmp/test-results
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-            bundle exec rspec $TESTFILES --profile 10 -r rspec_junit_formatter --format RspecJunitFormatter --out /tmp/test-results/rspec.xml --format progress
-      - store_test_results:
-          path: /tmp/test-results
+            bundle exec rspec $TESTFILES --profile 10 --format progress
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
@@ -121,7 +91,4 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - test
