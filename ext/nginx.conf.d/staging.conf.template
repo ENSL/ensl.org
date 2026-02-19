@@ -53,6 +53,7 @@ server {
     gzip_static on;
     expires 1m;
     add_header Cache-Control public;
+    try_files $uri @puma;
   }
 
   # FIXME: use env. var
