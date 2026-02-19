@@ -188,8 +188,7 @@ group :test do
   # Flaky tests
   # gem 'rspec-flaky'
 
-  # For circle ci + CC
-  # gem 'codeclimate-test-reporter', require: nil
+  # For CircleCI
   # gem 'rspec_junit_formatter'
 
   # Old drivers not used atm.

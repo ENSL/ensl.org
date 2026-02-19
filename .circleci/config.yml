@@ -83,7 +83,25 @@ jobs:
           command: |
             mkdir /tmp/test-results
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-            bundle exec rspec $TESTFILES --profile 10 --format progress
+            SIMPLECOV=1 bundle exec rspec $TESTFILES --profile 10 --format progress
+      - run:
+          name: Publish coverage to Qlty
+          command: |
+            if [ -z "$QLTY_COVERAGE_TOKEN" ]; then
+              echo "QLTY_COVERAGE_TOKEN is not set; skipping Qlty coverage upload"
+              exit 0
+            fi
+
+            if [ ! -f coverage/.resultset.json ]; then
+              echo "coverage/.resultset.json not found; skipping Qlty coverage upload"
+              exit 0
+            fi
+
+            curl -sSf https://qlty.sh | sh
+            qlty coverage publish \
+              --token "$QLTY_COVERAGE_TOKEN" \
+              --total-parts-count "$CIRCLE_NODE_TOTAL" \
+              coverage/.resultset.json
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results

@@ -1,6 +1,6 @@
 [![Circle CI](https://circleci.com/gh/ENSL/ensl.org.svg?style=svg)](https://circleci.com/gh/ENSL/ensl.org)
-[![Maintainability](https://api.codeclimate.com/v1/badges/742413a13ad93876d5a0/maintainability)](https://codeclimate.com/github/ENSL/ensl.org/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/742413a13ad93876d5a0/test_coverage)](https://codeclimate.com/github/ENSL/ensl.org/test_coverage)
+[![Maintainability](https://qlty.sh/gh/ENSL/projects/ensl.org/maintainability.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
+[![Code Coverage](https://qlty.sh/gh/ENSL/projects/ensl.org/coverage.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
 
 # ENSL Website
 

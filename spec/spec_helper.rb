@@ -3,8 +3,6 @@ ENV['RAILS_ENV'] ||= 'test'
 require 'dotenv'
 Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
 
-# require 'codeclimate-test-reporter'
-
 require File.expand_path('support/simplecov', __dir__)
 require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
