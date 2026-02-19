@@ -78,7 +78,7 @@ class MoviesController < ApplicationController
     begin
       result = @movie.make_preview
       flash[:notice] = (t(:executed) + ' ' + result.to_s).html_safe
-    rescue CommandFailed => e
+    rescue VideoProcessing::Error => e
       flash[:alert] = e.message.to_s
     end
 
@@ -86,15 +86,43 @@ class MoviesController < ApplicationController
       format.turbo_stream { render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages') }
       format.html { redirect_back(fallback_location: @movie) }
     end
-  rescue VideoProcessing::CommandFailed => e
-    render inline: e.message.to_s, status: :internal_server_error, layout: 'application'
   end
 
   def snapshot
     raise AccessError unless @movie.can_update? cuser
 
-    secs = params[:secs].to_i > 0 ? params[:secs].to_i : 5
-    render text: t(:executed) + '<br />' + @movie.make_snapshot(secs), layout: true
+    seconds = begin
+      raw = params[:secs].to_s.strip
+      raw.present? ? Float(raw) : nil
+    rescue ArgumentError, TypeError
+      nil
+    end
+    seconds = nil if seconds&.negative?
+
+    success = @movie.make_snapshot(seconds: seconds)
+    notice_message = 'Snapshot created.'
+    alert_message = 'Snapshot could not be created.'
+
+    respond_to do |format|
+      format.turbo_stream do
+        if success
+          flash.now[:notice] = notice_message
+        else
+          flash.now[:alert] = alert_message
+        end
+
+        render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages')
+      end
+      format.html do
+        if success
+          flash[:notice] = notice_message
+        else
+          flash[:alert] = alert_message
+        end
+
+        redirect_to edit_movie_path(@movie)
+      end
+    end
   end
 
   def download

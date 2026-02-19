@@ -104,8 +104,17 @@ RSpec.describe Movie, type: :model do
     it 'make_snapshot calls VideoProcessing.random_snapshot!' do
       movie.file = data_file
       expect(VideoProcessing).to receive(:random_snapshot!).with(input_path: data_file.location,
-                                                                 output_path: instance_of(String))
+                                                                 output_path: instance_of(String),
+                                                                 at_seconds: nil)
       movie.make_snapshot
+    end
+
+    it 'make_snapshot forwards requested seconds to VideoProcessing.random_snapshot!' do
+      movie.file = data_file
+      expect(VideoProcessing).to receive(:random_snapshot!).with(input_path: data_file.location,
+                                                                 output_path: instance_of(String),
+                                                                 at_seconds: 12.5)
+      movie.make_snapshot(seconds: 12.5)
     end
 
     context '#length_s' do

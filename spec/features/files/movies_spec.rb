@@ -213,6 +213,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       expect(uploaded.location).to be_present
       expect(File.exist?(uploaded.location)).to be true
       expect(uploaded.movie).to be_present
+      expect(page).to have_current_path(movie_path(uploaded.movie), ignore_query: true)
       expect(page).to have_content(description)
     end
 
@@ -238,6 +239,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       expect(uploaded.location).to be_present
       expect(File.exist?(uploaded.location)).to be true
       expect(uploaded.movie).to be_present
+      expect(page).to have_current_path(movie_path(uploaded.movie), ignore_query: true)
     end
 
     scenario 'admin can create movie through new movie form' do
@@ -448,6 +450,47 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       expect(page).to have_content(I18n.t(:executed))
       movie.reload
       expect(movie.preview_url).to be_present
+    end
+
+    scenario 'movie maker can take snapshot for their own movie' do
+      movie = create_movie_with_file(
+        name: 'Maker Snapshot Movie',
+        user: movie_maker,
+        category: movie_category,
+        fixture_name: 'sample_h264_aac.mp4'
+      )
+
+      FileUtils.rm_f(movie.snapshot_path)
+
+      sign_in_as(movie_maker)
+      visit edit_movie_path(movie)
+
+      fill_in 'secs', with: '5'
+      click_button 'Take Snapshot'
+
+      expect(page).to have_content('Snapshot created.')
+      expect(File.exist?(movie.reload.snapshot_path)).to be true
+    end
+
+    scenario 'movie maker sees error when snapshot cannot be created' do
+      movie = create_movie_with_file(
+        name: 'Maker Snapshot Missing Source',
+        user: movie_maker,
+        category: movie_category,
+        fixture_name: 'sample_h264_aac.mp4'
+      )
+
+      FileUtils.rm_f(movie.file.location)
+      FileUtils.rm_f(movie.snapshot_path)
+
+      sign_in_as(movie_maker)
+      visit edit_movie_path(movie)
+
+      fill_in 'secs', with: '5'
+      click_button 'Take Snapshot'
+
+      expect(page).to have_content('Snapshot could not be created.')
+      expect(File.exist?(movie.reload.snapshot_path)).to be false
     end
   end
 

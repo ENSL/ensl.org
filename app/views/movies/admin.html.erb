@@ -37,7 +37,7 @@
           <% if movie.preview_url.present? %>
             <%= link_to fa_icon('eye', class: "green"), movie.preview_url, target: '_blank', title: 'View preview' %>
           <% else %>
-            <%= link_to fa_icon('video', class: "red"), preview_movie_path(movie), title: 'Make preview' %>
+            <%= link_to fa_icon('video', class: "red"), preview_movie_path(movie), method: :post, title: 'Make preview', form: { style: 'display:inline;margin:0;' } %>
           <% end %>
         </td>
         <td class="actions">

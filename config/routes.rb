@@ -178,7 +178,7 @@ Rails.application.routes.draw do
     member do
       post :preview
       get :download
-      get :snapshot
+      post :snapshot
     end
     collection do
       get :admin

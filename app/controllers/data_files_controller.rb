@@ -35,10 +35,11 @@ class DataFilesController < ApplicationController
 
     if @file.save
       flash[:notice] = t(:files_create)
+      created_movie = @file.movie || Movie.find_by(file_id: @file.id)
       if @file.article
         redirect_to @file.article
-      elsif @file.movie
-        redirect_to @file.movie
+      elsif created_movie
+        redirect_to created_movie
       else
         redirect_to @file
       end

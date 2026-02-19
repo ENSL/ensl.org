@@ -37,12 +37,14 @@ class VideoProcessing
   #
   # Options:
   # - avoid_edges_seconds: avoid picking a frame too close to start/end
+  # - at_seconds: explicit snapshot timestamp (seconds) from start of video
   # - quality: JPEG quality (2 is higher quality in ffmpeg, 2..31)
   # - seed: deterministic selection if desired
   def self.random_snapshot!(
     input_path:,
     output_path:,
     avoid_edges_seconds: 1.0,
+    at_seconds: nil,
     quality: 2,
     seed: nil
   )
@@ -54,18 +56,24 @@ class VideoProcessing
 
     duration = probe_duration_seconds!(input_path) # Float
 
-    # Pick a timestamp safely inside the video.
-    t_min = [0.0, avoid_edges_seconds.to_f].max
-    t_max = [duration - avoid_edges_seconds.to_f, 0.0].max
+    max_seek = [duration - 0.001, 0.0].max
 
-    # If duration is tiny, just pick 0.
-    timestamp =
-      if t_max <= t_min + 0.001
-        0.0
-      else
-        rng = seed ? Random.new(seed.to_i) : Random.new
-        t_min + rng.rand * (t_max - t_min)
-      end
+    timestamp = if at_seconds.nil?
+                  # Pick a timestamp safely inside the video.
+                  t_min = [0.0, avoid_edges_seconds.to_f].max
+                  t_max = [duration - avoid_edges_seconds.to_f, 0.0].max
+
+                  # If duration is tiny, just pick 0.
+                  if t_max <= t_min + 0.001
+                    0.0
+                  else
+                    rng = seed ? Random.new(seed.to_i) : Random.new
+                    t_min + rng.rand * (t_max - t_min)
+                  end
+                else
+                  requested = at_seconds.to_f
+                  [[requested, 0.0].max, max_seek].min
+                end
 
     # Use -ss BEFORE -i for faster seek; -frames:v 1 grabs one frame.
     # -q:v controls JPEG quality when output is jpg.

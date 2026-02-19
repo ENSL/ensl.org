@@ -224,9 +224,9 @@ class Movie < ActiveRecord::Base
     )
   end
 
-  def make_snapshot
+  def make_snapshot(seconds: nil)
     path = processable_source_path
-    return unless path
+    return false unless path
 
     # Prepare file and its dir
     FileUtils.mkdir_p(File.dirname(snapshot_path)) unless File.exist?(File.dirname(snapshot_path))
@@ -234,11 +234,13 @@ class Movie < ActiveRecord::Base
 
     VideoProcessing.random_snapshot!(
       input_path: path,
-      output_path: snapshot_path
+      output_path: snapshot_path,
+      at_seconds: seconds
     )
+    File.exist?(snapshot_path)
   rescue VideoProcessing::Error => e
     Rails.logger.warn("Skipping movie snapshot for movie##{id || 'new'}: #{e.message}")
-    nil
+    false
   end
 
   def processable_source_path
