@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'open3'
+require 'shellwords'
 
 module Features
   module VideoSampleHelper
@@ -38,10 +39,55 @@ module Features
 
     # Maximum sample duration (in seconds) to extract from each video
     MAX_SAMPLE_DURATION = 15
+    CIRCLECI_DEFAULT_MAX_VIDEO_INPUT_BYTES = 4 * 1024 * 1024
+
+    def running_on_circleci?
+      ENV['CIRCLECI'].to_s == 'true'
+    end
+
+    def circleci_max_video_input_bytes
+      raw = ENV['CIRCLECI_MAX_VIDEO_INPUT_BYTES'].to_s.strip
+      return CIRCLECI_DEFAULT_MAX_VIDEO_INPUT_BYTES if raw.empty?
+
+      Integer(raw)
+    rescue ArgumentError, TypeError
+      CIRCLECI_DEFAULT_MAX_VIDEO_INPUT_BYTES
+    end
+
+    def ffmpeg_bin
+      ENV.fetch('FFMPEG_BIN', 'ffmpeg')
+    end
+
+    def ffprobe_bin
+      ENV.fetch('FFPROBE_BIN', 'ffprobe')
+    end
+
+    def command_available?(command)
+      system('sh', '-lc', "command -v #{Shellwords.escape(command)} >/dev/null 2>&1")
+    end
+
+    def skip_video_specs!(reason)
+      return skip(reason) if respond_to?(:skip)
+
+      raise reason
+    end
+
+    def ensure_video_tooling_for_circleci!
+      return unless running_on_circleci?
+
+      missing = []
+      missing << ffmpeg_bin unless command_available?(ffmpeg_bin)
+      missing << ffprobe_bin unless command_available?(ffprobe_bin)
+      return if missing.empty?
+
+      skip_video_specs!("Skipping video specs on CircleCI: missing #{missing.join(', ')}")
+    end
 
     # Ensure test videos are available, downloading if necessary
     # This method is safe to call multiple times
     def ensure_test_videos
+      ensure_video_tooling_for_circleci!
+
       FileUtils.mkdir_p(TEST_VIDEOS_DIR)
 
       GENERATED_VIDEO_SPECS.each do |spec|
@@ -50,6 +96,8 @@ module Features
 
         generate_video_fixture(spec, local_path)
       end
+
+      return if running_on_circleci?
 
       REMOTE_VIDEO_LIST.each do |filename|
         local_path = TEST_VIDEOS_DIR.join(filename)
@@ -112,7 +160,7 @@ module Features
     end
 
     def generate_video_fixture(spec, output_path)
-      ffmpeg = ENV.fetch('FFMPEG_BIN', 'ffmpeg')
+      ffmpeg = ffmpeg_bin
 
       cmd = [
         ffmpeg,
@@ -137,7 +185,7 @@ module Features
     def create_video_sample(input_path, output_path, duration_seconds)
       return unless File.exist?(input_path)
 
-      ffmpeg = ENV.fetch('FFMPEG_BIN', 'ffmpeg')
+      ffmpeg = ffmpeg_bin
 
       cmd = [
         ffmpeg,
@@ -169,7 +217,7 @@ module Features
     # Create a minimal test video file using ffmpeg
     # This is a fallback when downloads fail
     def create_minimal_test_video(output_path)
-      ffmpeg = ENV.fetch('FFMPEG_BIN', 'ffmpeg')
+      ffmpeg = ffmpeg_bin
 
       # Create a 5-second black video with silent audio
       cmd = [
@@ -201,7 +249,15 @@ module Features
 
     def available_video_specs
       ensure_test_videos
-      all_video_specs.select { |spec| File.exist?(TEST_VIDEOS_DIR.join(spec[:filename])) }
+
+      specs = all_video_specs.select { |spec| File.exist?(TEST_VIDEOS_DIR.join(spec[:filename])) }
+      return specs unless running_on_circleci?
+
+      max_bytes = circleci_max_video_input_bytes
+      capped_specs = specs.select { |spec| File.size(TEST_VIDEOS_DIR.join(spec[:filename])) <= max_bytes }
+      return capped_specs unless capped_specs.empty?
+
+      skip_video_specs!("Skipping video specs on CircleCI: no fixture within #{max_bytes} bytes")
     end
 
     # Get path to a test video file by index or filename
