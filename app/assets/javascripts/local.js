@@ -27,13 +27,6 @@ $(document).ready(function(){
 });
 
 function bindLocalHandlers() {
-  // Shoutbox mousewheel scrolling
-  $(document).off('mousewheel', 'div#shoutbox');
-  $(document).on('mousewheel', 'div#shoutbox', function(ev, delta) {
-    var scrollTop = $(this).scrollTop();
-    $(this).scrollTop(scrollTop-Math.round(delta));
-  });
-
   // Forums fast reply
   $(document).off('click', '.fastReply');
   $(document).on('click', '.fastReply', function(e) {
@@ -84,22 +77,6 @@ function bindLocalHandlers() {
     if (form) {
       form.submit();
     }
-  });
-
-  $(document).off('submit', 'form.new_shoutmsg');
-  $(document).on('submit', 'form.new_shoutmsg', function(){
-    $('input[type=submit]', this).attr('disabled', 'disabled');
-  });
-
-  $(document).off('ajax:complete', 'form.new_shoutmsg');
-  $(document).on("ajax:complete", 'form.new_shoutmsg', function(event, xhr, status){
-    var self = this;
-
-    $(this)[0].reset();
-
-    setTimeout(function() {
-      $('input[type=submit]', self).removeAttr('disabled');
-    }, 2000);
   });
 
   $user_tabs = $("#user-profile .tabs");
