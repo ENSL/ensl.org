@@ -9,6 +9,8 @@ x-app: &app
     target: ensl_${RAILS_ENV:-development}
   volumes:
     - .:/var/www
+    # Mount also files root somewhere, from $FILES_ROOT
+    - ${FILES_HOST_ROOT}:${FILES_ROOT}
   environment:
     RAILS_ENV: ${RAILS_ENV:-development}
   depends_on:
@@ -28,6 +30,12 @@ services:
     ports:
       - "${PUMA_PORT}:${PUMA_PORT}"
       - "35729:35729"
+
+  sidekiq:
+    <<: *app
+    profiles: ["development", "staging", "production"]
+    command: bundle exec sidekiq
+    restart: unless-stopped
 
   staging:
     <<: *app
