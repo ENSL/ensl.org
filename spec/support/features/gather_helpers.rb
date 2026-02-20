@@ -18,7 +18,7 @@ module Features
     # Visit gather page and join. Assumes the user is logged in within this session.
     def open_and_join(session_name, user_index)
       Capybara.using_session(session_name) do
-        visit gather_path(gather)
+        visit_gather_with_retry(gather)
 
         expect(page).to have_content('Join')
 
@@ -39,7 +39,7 @@ module Features
     # Vote randomly on maps (each user can cast `votes` clicks)
     def vote_random_maps(session_name, votes: 2)
       Capybara.using_session(session_name) do
-        visit gather_path(gather)
+        visit_gather_with_retry(gather)
         return unless wait_for_voting_state
 
         gather_map_votes = gather.map_votes.count
@@ -70,7 +70,7 @@ module Features
     # Vote randomly on servers (each user can cast `votes` clicks)
     def vote_random_servers(session_name, votes: 2)
       Capybara.using_session(session_name) do
-        visit gather_path(gather)
+        visit_gather_with_retry(gather)
         return unless wait_for_voting_state
 
         gather_server_votes = gather.server_votes.count
@@ -132,7 +132,7 @@ module Features
         set_session_cookie(session_key, cookie_value)
 
         # Visit the gather page with authenticated session
-        visit gather_path(gather_page)
+        visit_gather_with_retry(gather_page)
 
         if page.has_button?('Click to join gather!', wait: 5)
           safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
@@ -154,6 +154,24 @@ module Features
     # Alias for backward compatibility
     def sign_in_and_join(session_name, user, gather_arg = nil)
       sign_in_and_join_gather(session_name, user, gather_arg)
+    end
+
+    private
+
+    def visit_gather_with_retry(gather_page, retries: 1)
+      attempts = 0
+
+      begin
+        visit gather_path(gather_page)
+      rescue Playwright::Error => e
+        raise unless e.message.match?(/page crashed|target closed/i)
+        raise if attempts >= retries
+
+        attempts += 1
+        page.driver.reset! if page.driver.respond_to?(:reset!)
+        sleep(0.25)
+        retry
+      end
     end
   end
 end

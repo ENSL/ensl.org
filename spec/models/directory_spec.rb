@@ -433,10 +433,10 @@ describe Directory do
     end
   end
 
-  describe '#recreate_transaction' do
+  describe 'reconciliation via service' do
     it 'returns a StringIO with log output' do
       dir = create(:directory, path: @test_root, parent: nil)
-      result = dir.recreate_transaction
+      result = DirectoryReconciliationService.new(dir).call
       expect(result).to be_a(StringIO)
       expect(result.string).to include('Starting recreate')
     end
@@ -449,7 +449,7 @@ describe Directory do
       FileUtils.mkdir_p("#{@test_root}/newdir2")
 
       expect do
-        root.recreate_transaction
+        DirectoryReconciliationService.new(root).call
       end.to change { Directory.count }.by_at_least(1)
     end
 
@@ -470,7 +470,7 @@ describe Directory do
       # Don't create the directory on disk
 
       expect do
-        root.recreate_transaction
+        DirectoryReconciliationService.new(root).call
       end.to change { Directory.exists?(orphan.id) }.from(true).to(false)
     end
   end

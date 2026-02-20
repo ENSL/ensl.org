@@ -48,6 +48,7 @@ class DataFile < ActiveRecord::Base
   scope :movies, -> { order('created_at DESC').where(directory_id: Directory::MOVIES) }
   scope :except_file, ->(file) { where.not(id: file.id) }
   scope :unrelated, -> { where(related_id: nil) }
+  scope :orphaned, -> { where(directory_id: nil) }
 
   has_many :related_files, class_name: 'DataFile', foreign_key: :related_id
   has_many :comments, as: :commentable
