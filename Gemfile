@@ -17,10 +17,12 @@ gem 'dotenv-rails'
 # Redis is pinned to 4 version
 gem 'mysql2'
 gem 'redis', '~> 4.8'
+gem 'sidekiq'
 
 # Web server.
 # Faraday provides NET-HTTP functions
 gem 'faraday'
+gem 'net-ftp'
 gem 'os'
 gem 'puma'
 
