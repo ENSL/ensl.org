@@ -21,11 +21,17 @@ class DirectoriesController < ApplicationController
     raise AccessError unless @directory.can_update? cuser
   end
 
-  def recreate
+  def reconcile
     raise AccessError unless @cuser&.admin?
 
-    @result = @directory.recreate_transaction
-    @nobody = true
+    # Call reconciliation service
+    service = DirectoryReconciliationService.new(@directory)
+    @result = service.call.string
+
+    respond_to do |format|
+      format.html { render :reconcile, layout: 'full' }
+      format.turbo_stream { render :reconcile, formats: [:html] }
+    end
   end
 
   def create

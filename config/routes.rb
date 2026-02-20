@@ -157,7 +157,7 @@ Rails.application.routes.draw do
   resources :log_files
   resources :directories do
     member do
-      get :recreate
+      post :reconcile
     end
     collection do
       # default directory landing

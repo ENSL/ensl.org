@@ -148,9 +148,19 @@ describe DirectoryReconciliationService do
       expect(db_file.directory_id).not_to be_nil
     end
 
-    it 'handles rename-in-place by matching directory via inode and updating parent linkage' do
-      skip('Rename-in-place to a new basename is blocked by immutable Directory#name on update; keep as regression target')
+    it 'ignores special directories such as uploads and .trash during reconciliation' do
+      FileUtils.mkdir_p(File.join(@test_root, 'uploads', 'tmp'))
+      FileUtils.mkdir_p(File.join(@test_root, '.trash', 'old_stuff'))
 
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      expect(Directory.find_by(name: 'uploads')).to be_nil
+      expect(Directory.find_by(name: '.trash')).to be_nil
+      expect(result.string).to include('Skipping ignored path:')
+    end
+
+    it 'handles rename-in-place by matching directory via inode and updating parent linkage' do
       old_path = File.join(@test_root, 'renamesrc')
       new_path = File.join(@test_root, 'renamedst')
       FileUtils.mkdir_p(old_path)
@@ -264,6 +274,20 @@ describe DirectoryReconciliationService do
       expect(Directory.exists?(child.id)).to be true
       expect(DataFile.find_by(id: db_file.id)&.directory_id).to eq(orphan.id)
       expect(Directory.find_by(name: 'rollbackcreated')).to be_nil
+    end
+
+    it 'logs candidate and actual removed directory counts' do
+      orphan = Directory.new(name: 'orphantoremove', parent_id: root_directory.id, hidden: false)
+      orphan.path = File.join(@test_root, 'orphantoremove')
+      orphan.title = 'Orphan To Remove'
+      orphan.define_singleton_method(:make_path) {}
+      orphan.save!(validate: false)
+
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      expect(result.string).to include('Directories to remove: 1')
+      expect(result.string).to include('Directories removed: 1')
     end
 
     it 'handles complex filesystem changes in single transaction' do

@@ -24,11 +24,14 @@
 require 'securerandom'
 require 'stringio'
 require 'fileutils'
+require 'pathname'
 
 ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
 
 class Directory < ActiveRecord::Base
   include Extra
+
+  IGNORED_RECONCILIATION_ROOT_DIRS = %w[uploads .trash].freeze
 
   ROOT = 1
   DEMOS = 5
@@ -249,21 +252,11 @@ class Directory < ActiveRecord::Base
     File.join(trash_root, "#{base}_#{id}_#{timestamp}_#{unique_suffix}")
   end
 
-  # TODO: make tests for this, moving etc.
-  # TODO: mutate instead of return.
-  # TODO: also remove files
-  # TODO: need log to rails log too
-  # Sync database with filesystem (disk-authoritative reconciliation)
-  # Returns a StringIO containing the operation log
-  def recreate_transaction
-    DirectoryReconciliationService.new(self).call
-  end
-
   # Recursively sync this directory's database state with filesystem
   # Disk is authoritative - we scan actual directories and match to DB records
   def recreate(destroy_dirs, logger: Rails.logger)
     # Mark all existing subdirs for deletion (we'll unmark those found on disk)
-    destroy_dirs.merge!(subdirs.index_by(&:id))
+    destroy_dirs.merge!(subdirs.reject { |subdir| ignored_reconciliation_directory?(subdir) }.index_by(&:id))
 
     scan_disk_entries(destroy_dirs, logger)
     destroy_dirs
@@ -274,12 +267,21 @@ class Directory < ActiveRecord::Base
   # Scan all items in this directory on disk and sync with database
   def scan_disk_entries(destroy_dirs, logger)
     Dir.glob(File.join(full_path, '*')).each do |item_path|
+      if ignored_reconciliation_path?(item_path)
+        logger.info("Skipping ignored path: #{item_path}")
+        next
+      end
+
       item_name = File.basename(item_path)
 
-      if File.directory?(item_path)
-        process_disk_directory(item_name, item_path, destroy_dirs, logger)
-      elsif File.file?(item_path)
-        process_disk_file(item_path, item_name, logger)
+      begin
+        if File.directory?(item_path)
+          process_disk_directory(item_name, item_path, destroy_dirs, logger)
+        elsif File.file?(item_path)
+          process_disk_file(item_path, item_name, logger)
+        end
+      rescue StandardError => e
+        logger.error("Error processing #{item_path}: #{e.message}")
       end
     end
   rescue StandardError => e
@@ -300,9 +302,13 @@ class Directory < ActiveRecord::Base
     elsif !subdir.valid?
       fix_subdir_attributes(subdir, logger)
     elsif subdir.name != item_name.downcase
-      # Save name change if parent didn't change
+      # Reconciliation is disk-authoritative: persist in-place rename without strict validations
+      old_path = subdir.full_path
       subdir.name = item_name.downcase
-      subdir.save!
+      subdir.path = subdir.full_path
+      subdir.save!(validate: false)
+      subdir.sync_inode_info
+      logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
     end
 
     destroy_dirs.delete(subdir.id)
@@ -415,6 +421,24 @@ class Directory < ActiveRecord::Base
   # Find directory with same name that no longer exists on disk
   def find_orphaned_directory(subdir_name)
     Directory.where(name: subdir_name).find { |dir| !dir.path_exists? }
+  end
+
+  def ignored_reconciliation_directory?(subdir)
+    ignored_reconciliation_path?(subdir&.full_path)
+  end
+
+  def ignored_reconciliation_path?(absolute_path)
+    return false if absolute_path.blank?
+
+    root = Pathname.new(ENV['FILES_ROOT'].to_s)
+    path = Pathname.new(absolute_path.to_s)
+    relative_path = path.relative_path_from(root).to_s
+    return false if relative_path.blank? || relative_path == '.'
+
+    root_segment = relative_path.split(File::SEPARATOR).first
+    IGNORED_RECONCILIATION_ROOT_DIRS.include?(root_segment)
+  rescue ArgumentError
+    false
   end
 
   # Attempt to find directory by matching file count (heuristic)

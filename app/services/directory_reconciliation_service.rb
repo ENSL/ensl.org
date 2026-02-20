@@ -37,14 +37,20 @@ class DirectoryReconciliationService
   end
 
   def remove_orphaned_directories(destroy_dirs)
-    @logger.info("Directories to remove: #{destroy_dirs.size}")
-    destroy_dirs.each_value do |dir|
+    candidates = destroy_dirs.values
+    removed_count = 0
+
+    @logger.info("Directories to remove: #{candidates.size}")
+    candidates.each do |dir|
       @logger.info("Removed dir: #{dir.name} (ID: #{dir.id}, path: #{dir.path}, parent_id: #{dir.parent_id})")
       # Unlink children and files but keep their records around
       dir.files.update_all(directory_id: nil)
       dir.subdirs.update_all(parent_id: nil)
       dir.preserve_files = true
       dir.destroy!
+      removed_count += 1
     end
+
+    @logger.info("Directories removed: #{removed_count}")
   end
 end
