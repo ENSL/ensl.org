@@ -129,6 +129,143 @@ describe DirectoryReconciliationService do
       expect { service.call }.not_to raise_error
     end
 
+    it 'keeps DataFile database rows when files are deleted from disk' do
+      filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 3)
+      synced = sync_filesystem_to_db(filesystem, root_directory)
+
+      file_path = filesystem[:files].first
+      db_file = synced[:files][file_path]
+      expect(db_file).not_to be_nil
+
+      File.delete(file_path)
+      expect(File.exist?(file_path)).to be false
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.not_to raise_error
+
+      db_file.reload
+      expect(DataFile.exists?(db_file.id)).to be true
+      expect(db_file.directory_id).not_to be_nil
+    end
+
+    it 'handles rename-in-place by matching directory via inode and updating parent linkage' do
+      skip('Rename-in-place to a new basename is blocked by immutable Directory#name on update; keep as regression target')
+
+      old_path = File.join(@test_root, 'renamesrc')
+      new_path = File.join(@test_root, 'renamedst')
+      FileUtils.mkdir_p(old_path)
+
+      db_dir = root_directory.subdirs.create!(name: 'renamesrc', path: old_path, title: 'Rename Src')
+      db_dir.sync_inode_info
+      old_id = db_dir.id
+      old_dev = db_dir.st_dev
+      old_ino = db_dir.st_ino
+
+      FileUtils.mv(old_path, new_path)
+      expect(File.directory?(new_path)).to be true
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.not_to raise_error
+
+      inode_match = Directory.find_by_inode(old_dev, old_ino)
+      expect(inode_match).not_to be_nil
+      expect(inode_match.id).to eq(old_id)
+      expect(inode_match.parent_id).to eq(root_directory.id)
+      expect(inode_match.path_exists?).to be true
+      expect(Directory.where(parent_id: root_directory.id).where('LOWER(name) = ?', 'renamedst').count).to eq(1)
+    end
+
+    it 'keeps distinct records for same filename in different directories' do
+      dir_a_path = File.join(@test_root, 'samefilea')
+      dir_b_path = File.join(@test_root, 'samefileb')
+      FileUtils.mkdir_p([dir_a_path, dir_b_path])
+
+      dir_a = root_directory.subdirs.create!(name: 'samefilea', path: dir_a_path, title: 'Same File A')
+      dir_a.sync_inode_info
+      dir_b = root_directory.subdirs.create!(name: 'samefileb', path: dir_b_path, title: 'Same File B')
+      dir_b.sync_inode_info
+
+      filename = 'duplicate_name.dat'
+      file_a_path = File.join(dir_a_path, filename)
+      file_b_path = File.join(dir_b_path, filename)
+
+      File.open(file_a_path, 'wb') { |f| f.write('A' * 2048) }
+      File.open(file_b_path, 'wb') { |f| f.write('B' * 3072) }
+      past_time = 110.seconds.ago.to_time
+      File.utime(past_time, past_time, file_a_path)
+      File.utime(past_time, past_time, file_b_path)
+
+      ActiveRecord::Base.connection.execute(
+        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        "VALUES (#{dir_a.id}, '#{file_a_path}', '#{filename}', #{File.size(file_a_path)}, " \
+        "'#{Digest::MD5.hexdigest(File.read(file_a_path))}', '#{filename}', NOW(), NOW())"
+      )
+
+      ActiveRecord::Base.connection.execute(
+        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        "VALUES (#{dir_b.id}, '#{file_b_path}', '#{filename}', #{File.size(file_b_path)}, " \
+        "'#{Digest::MD5.hexdigest(File.read(file_b_path))}', '#{filename}', NOW(), NOW())"
+      )
+
+      record_a = DataFile.find_by(path: file_a_path)
+      record_b = DataFile.find_by(path: file_b_path)
+      expect(record_a).not_to be_nil
+      expect(record_b).not_to be_nil
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.not_to raise_error
+
+      expect(DataFile.find_by(id: record_a.id)&.directory_id).to eq(dir_a.id)
+      expect(DataFile.find_by(id: record_b.id)&.directory_id).to eq(dir_b.id)
+      expect(DataFile.where(name: filename).count).to eq(2)
+    end
+
+    it 'rolls back reconciliation transaction when orphan directory destroy fails' do
+      orphan_path = File.join(@test_root, 'orphantoremove')
+      orphan = Directory.new(name: 'orphantoremove', parent_id: root_directory.id, hidden: false)
+      orphan.path = orphan_path
+      orphan.title = 'Orphan To Remove'
+      orphan.define_singleton_method(:make_path) {}
+      orphan.save!(validate: false)
+
+      child_path = File.join(orphan_path, 'child')
+      child = Directory.new(name: 'child', parent_id: orphan.id, hidden: false)
+      child.path = child_path
+      child.title = 'Child'
+      child.define_singleton_method(:make_path) {}
+      child.save!(validate: false)
+
+      db_only_file_path = File.join(orphan_path, 'db_only_file.dat')
+      ActiveRecord::Base.connection.execute(
+        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        "VALUES (#{orphan.id}, '#{db_only_file_path}', 'db_only_file.dat', 123, " \
+        "'202cb962ac59075b964b07152d234b70', 'db_only_file.dat', NOW(), NOW())"
+      )
+      db_file = DataFile.find_by(path: db_only_file_path)
+      expect(db_file).not_to be_nil
+
+      # Ensure orphan exists only in DB so reconciliation will attempt removal
+      expect(File.directory?(orphan_path)).to be false
+
+      # Also create a new directory on disk to ensure creates are rolled back too
+      rollback_created_path = File.join(@test_root, 'rollback_created')
+      FileUtils.mkdir_p(rollback_created_path)
+
+      allow_any_instance_of(Directory).to receive(:destroy!) do |instance|
+        raise ActiveRecord::RecordNotDestroyed, 'forced destroy failure for rollback test' if instance.id == orphan.id
+
+        instance.destroy
+      end
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.to raise_error(ActiveRecord::RecordNotDestroyed)
+
+      expect(Directory.exists?(orphan.id)).to be true
+      expect(Directory.exists?(child.id)).to be true
+      expect(DataFile.find_by(id: db_file.id)&.directory_id).to eq(orphan.id)
+      expect(Directory.find_by(name: 'rollbackcreated')).to be_nil
+    end
+
     it 'handles complex filesystem changes in single transaction' do
       # Create initial structure with decent depth
       filesystem = create_test_filesystem(@test_root, depth: 2, files_per_dir: 2, name_pattern: 'complex')
