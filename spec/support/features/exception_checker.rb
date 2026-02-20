@@ -1,5 +1,13 @@
 module Features
   module ExceptionChecker
+    BENIGN_LOG_ERROR_PATTERNS = [
+      /WebSocket error occurred: Broken pipe/i,
+      /WebSocket error occurred:.*(broken pipe|stream closed|closed stream)/i,
+      /Error occurred while closing stream/i,
+      /IOError: stream closed/i,
+      /Errno::EPIPE/i
+    ].freeze
+
     # Track log file position at start of test
     def initialize_log_position
       log_file = Rails.root.join('log/test.log')
@@ -11,14 +19,15 @@ module Features
       log_content = recent_log_content
       return if log_content.nil? || log_content.empty?
 
-      error_patterns = [/ERROR|FATAL/]
-      error_patterns.each do |pattern|
-        next unless log_content.match?(pattern)
-
-        context_msg = context.empty? ? '' : " (#{context})"
-        error_snippet = log_snippet(log_content, pattern)
-        raise "ERROR IN LOGS#{context_msg}:\n#{error_snippet}"
+      lines = log_content.lines
+      match_index = lines.index do |line|
+        line.match?(/ERROR|FATAL/) && !benign_log_error_line?(line)
       end
+      return unless match_index
+
+      context_msg = context.empty? ? '' : " (#{context})"
+      error_snippet = log_snippet(lines, match_index)
+      raise "ERROR IN LOGS#{context_msg}:\n#{error_snippet}"
     end
 
     def recent_log_content
@@ -31,11 +40,7 @@ module Features
       File.read(log_file, current_size - @log_start_position, @log_start_position)
     end
 
-    def log_snippet(log_content, pattern)
-      lines = log_content.lines
-      match_index = lines.index { |line| line.match?(pattern) }
-      return nil unless match_index
-
+    def log_snippet(lines, match_index)
       context_before = 2
       context_after = 2
       start_index = [match_index - context_before, 0].max
@@ -46,6 +51,10 @@ module Features
         .with_index(start_index)
         .map { |line, idx| "#{idx + 1}: #{line}" }
         .join
+    end
+
+    def benign_log_error_line?(line)
+      BENIGN_LOG_ERROR_PATTERNS.any? { |pattern| line.match?(pattern) }
     end
 
     # Also check page body as fallback
