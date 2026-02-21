@@ -24,6 +24,21 @@ scope.find_each.with_index(1) do |movie, i|
     next
   end
 
+  begin
+    movie.probe_metadata
+    movie.probe_length
+    movie.update_columns(
+      metadata: movie.metadata,
+      web_friendly: movie.web_friendly,
+      format: movie.format,
+      length: movie.length,
+      updated_at: Time.current
+    )
+    stats[:probed] += 1
+  rescue StandardError
+    stats[:failed] += 1
+  end
+
   unless movie.snapshot?
     if movie.make_snapshot
       stats[:snapshots] += 1
@@ -32,7 +47,7 @@ scope.find_each.with_index(1) do |movie, i|
     end
   end
 
-  needs_preview = !movie.web_friendly && movie.preview.blank? && !File.exist?(movie.preview_path)
+  needs_preview = !movie.web_friendly && !movie.preview_exists?
   if needs_preview
     begin
       movie.make_preview
@@ -43,9 +58,9 @@ scope.find_each.with_index(1) do |movie, i|
   end
 
   if (i % tick).zero? || i == total
-    puts "[#{i}/#{total}] snap=#{stats[:snapshots]} prev=#{stats[:previews]} skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
+    puts "[#{i}/#{total}] probe=#{stats[:probed]} snap=#{stats[:snapshots]} prev=#{stats[:previews]} skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
   end
 end
 
 elapsed = (Time.now - started_at).round
-puts "Done in #{elapsed}s | snapshots=#{stats[:snapshots]} previews=#{stats[:previews]} skipped_missing_file=#{stats[:skipped_missing_file]} failed=#{stats[:failed]}"
+puts "Done in #{elapsed}s | probed=#{stats[:probed]} snapshots=#{stats[:snapshots]} previews=#{stats[:previews]} skipped_missing_file=#{stats[:skipped_missing_file]} failed=#{stats[:failed]}"
