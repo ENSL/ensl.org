@@ -10,6 +10,8 @@ cd $APP_PATH
 # Create dirs
 mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
 
+bundle install
+
 # Run migrations and run sleep loop on failure
 echo "Running database migrations..."
 bundle exec rake db:migrate || {
