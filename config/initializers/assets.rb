@@ -31,3 +31,5 @@ Rails.application.config.assets.precompile += %w[fontawesome-webfont.eot fontawe
 # Precompile Stimulus controllers
 Rails.application.config.assets.precompile += %w[controllers/gather_sync_controller.js]
 Rails.application.config.assets.precompile += %w[controllers/index.js]
+Rails.application.config.assets.precompile += %w[controllers/local.js]
+Rails.application.config.assets.precompile += %w[controllers/shoutbox.js]

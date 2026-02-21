@@ -5,8 +5,6 @@
 // = require jquery_ujs
 // = require jquery.jplayer.min
 // = require yetii
-// = require shoutbox
-// = require local
 
 /*
  This file is the Sprockets application manifest converted from CoffeeScript.
