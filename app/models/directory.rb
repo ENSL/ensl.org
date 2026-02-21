@@ -34,7 +34,8 @@ class Directory < ActiveRecord::Base
 
   MAX_FILE_COUNT_MATCH_CANDIDATES = 200
 
-  IGNORED_RECONCILIATION_ROOT_DIRS = %w[uploads .trash].freeze
+  IGNORED_RECONCILIATION_ROOT_DIRS = %w[uploads .trash preload logs tmp].freeze
+  BLOCKED_ROOT_LEVEL_DIRS = %w[preload logs tmp].freeze
 
   ROOT = 1
   DEMOS = 5
@@ -57,6 +58,7 @@ class Directory < ActiveRecord::Base
   validates :name, presence: true, length: { in: 1..255 }, format: { with: /\A[A-Za-z0-9]{1,20}\z/, on: :create }
   validates :path, presence: true, length: { in: 1..255 }
   validate :name_unchanged_on_update, on: :update
+  validate :name_not_blocked_at_root_level
   validates :title, presence: true, length: { in: 1..255 }
   validates :hidden, inclusion: { in: [true, false] }
 
@@ -96,6 +98,14 @@ class Directory < ActiveRecord::Base
     return unless name_changed?
 
     errors.add(:name, 'cannot be changed after creation')
+  end
+
+  def name_not_blocked_at_root_level
+    return unless parent_root?
+    return if name.blank?
+    return unless BLOCKED_ROOT_LEVEL_DIRS.include?(name.downcase)
+
+    errors.add(:name, 'is reserved at root level')
   end
 
   public

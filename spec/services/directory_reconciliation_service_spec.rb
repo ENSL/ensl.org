@@ -148,15 +148,21 @@ describe DirectoryReconciliationService do
       expect(db_file.directory_id).not_to be_nil
     end
 
-    it 'ignores special directories such as uploads and .trash during reconciliation' do
+    it 'ignores configured root-level directories during reconciliation' do
       FileUtils.mkdir_p(File.join(@test_root, 'uploads', 'tmp'))
       FileUtils.mkdir_p(File.join(@test_root, '.trash', 'old_stuff'))
+      FileUtils.mkdir_p(File.join(@test_root, 'preload', 'dropzone'))
+      FileUtils.mkdir_p(File.join(@test_root, 'logs', 'archive'))
+      FileUtils.mkdir_p(File.join(@test_root, 'tmp', 'buffer'))
 
       service = DirectoryReconciliationService.new(root_directory)
       result = service.call
 
       expect(Directory.find_by(name: 'uploads')).to be_nil
       expect(Directory.find_by(name: '.trash')).to be_nil
+      expect(Directory.find_by(name: 'preload')).to be_nil
+      expect(Directory.find_by(name: 'logs')).to be_nil
+      expect(Directory.find_by(name: 'tmp')).to be_nil
       expect(result.string).to include('Skipping ignored path:')
     end
 

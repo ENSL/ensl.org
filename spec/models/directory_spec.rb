@@ -87,6 +87,22 @@ describe Directory do
         dir = build(:directory, name: 'a' * 21)
         expect(dir).not_to be_valid
       end
+
+      it 'rejects blocked names at root level' do
+        root = create(:directory, :root, path: @test_root)
+        dir = build(:directory, name: 'tmp', parent: root)
+
+        expect(dir).not_to be_valid
+        expect(dir.errors[:name]).to include('is reserved at root level')
+      end
+
+      it 'allows blocked names outside root level' do
+        root = create(:directory, :root, path: @test_root)
+        level_one = create(:directory, name: 'levelone', parent: root)
+        dir = build(:directory, name: 'tmp', parent: level_one)
+
+        expect(dir).to be_valid
+      end
     end
 
     # Path is now auto-cached from full_path in before_validation callback
