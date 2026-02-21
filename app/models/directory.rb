@@ -25,6 +25,7 @@ require 'securerandom'
 require 'stringio'
 require 'fileutils'
 require 'pathname'
+require 'digest/md5'
 
 ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
 
@@ -364,18 +365,25 @@ class Directory < ActiveRecord::Base
   # Process a file found on disk
   def process_disk_file(item_path, item_name, logger)
     if (dbfile = DataFile.find_existing(item_path, item_name))
-      update_file_directory(dbfile, logger)
+      update_file_directory(dbfile, item_path, logger)
     elsif file_is_old_enough?(item_path)
       create_new_file(item_path, logger)
     end
   end
 
   # Update file's directory if it moved
-  def update_file_directory(dbfile, logger)
-    return if dbfile.directory_id == id
+  def update_file_directory(dbfile, item_path, logger)
+    changes = {}
+    changes[:directory_id] = id if dbfile.directory_id != id
+    changes[:path] = item_path if dbfile.path != item_path
+    return if changes.empty?
 
-    dbfile.update!(directory: self)
-    logger.info("Update file: #{dbfile.name}")
+    changes[:updated_at] = Time.current if dbfile.has_attribute?(:updated_at)
+
+    # Reconciliation is disk-authoritative: update DB pointers only.
+    # We intentionally bypass DataFile callbacks here to avoid filesystem moves.
+    dbfile.update_columns(changes)
+    logger.info("Reconciled file: #{dbfile.name} (ID: #{dbfile.id})")
   rescue StandardError => e
     logger.error("Failed to update file #{dbfile.name}: #{e.message}")
   end
@@ -387,10 +395,25 @@ class Directory < ActiveRecord::Base
 
   # Create new file record from disk file
   def create_new_file(item_path, logger)
-    dbfile = DataFile.new(directory: self)
-    dbfile.manual_upload(item_path)
-    dbfile.save!
-    logger.info("Added file: #{dbfile.name}")
+    stat = File.stat(item_path)
+    filename = File.basename(item_path)
+
+    DataFile.insert_all!([
+                           {
+                             directory_id: id,
+                             name: filename,
+                             path: item_path,
+                             size: stat.size,
+                             md5: Digest::MD5.file(item_path).hexdigest,
+                             description: filename,
+                             created_at: stat.mtime,
+                             updated_at: Time.current
+                           }
+                         ])
+
+    dbfile = DataFile.find_by(path: item_path)
+
+    logger.info("Added file: #{dbfile&.name || filename}")
   rescue StandardError => e
     logger.error("Failed to create file from #{item_path}: #{e.message}")
   end

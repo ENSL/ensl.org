@@ -544,6 +544,75 @@ describe DirectoryReconciliationService do
 
       expect(result.string).to include('Finish recreate')
     end
+
+    it 're-links moved file records without performing filesystem operations' do
+      source_dir_path = File.join(@test_root, 'source')
+      target_dir_path = File.join(@test_root, 'target')
+      FileUtils.mkdir_p([source_dir_path, target_dir_path])
+
+      source_dir = root_directory.subdirs.create!(name: 'source', path: source_dir_path, title: 'Source')
+      source_dir.sync_inode_info
+      target_dir = root_directory.subdirs.create!(name: 'target', path: target_dir_path, title: 'Target')
+      target_dir.sync_inode_info
+
+      filename = 'db_only_relink.bin'
+      old_path = File.join(source_dir_path, filename)
+      new_path = File.join(target_dir_path, filename)
+      File.binwrite(old_path, SecureRandom.random_bytes(512))
+
+      db_file = DataFile.create!(
+        directory_id: source_dir.id,
+        name: filename,
+        path: old_path,
+        size: File.size(old_path),
+        md5: Digest::MD5.file(old_path).hexdigest,
+        description: filename,
+        skip_file_validation: true
+      )
+
+      FileUtils.mv(old_path, new_path)
+      expect(File.exist?(new_path)).to be true
+
+      expect(FileUtils).not_to receive(:mv)
+      expect(Dir).not_to receive(:unlink)
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.not_to raise_error
+
+      db_file.reload
+      expect(db_file.directory_id).to eq(target_dir.id)
+      expect(db_file.path).to eq(new_path)
+      expect(File.exist?(new_path)).to be true
+    end
+
+    it 'creates DB record for disk file without moving or rewriting the file' do
+      disk_dir_path = File.join(@test_root, 'incoming')
+      FileUtils.mkdir_p(disk_dir_path)
+
+      disk_dir = root_directory.subdirs.create!(name: 'incoming', path: disk_dir_path, title: 'Incoming')
+      disk_dir.sync_inode_info
+
+      filename = 'fresh_from_disk.dat'
+      disk_path = File.join(disk_dir_path, filename)
+      original_content = SecureRandom.random_bytes(1024)
+      File.binwrite(disk_path, original_content)
+      aged_time = 120.seconds.ago.to_time
+      File.utime(aged_time, aged_time, disk_path)
+      original_mtime = File.mtime(disk_path)
+
+      expect(FileUtils).not_to receive(:mv)
+      expect(Dir).not_to receive(:unlink)
+
+      service = DirectoryReconciliationService.new(root_directory)
+      expect { service.call }.not_to raise_error
+
+      db_file = DataFile.find_by(path: disk_path)
+      expect(db_file).not_to be_nil
+      expect(db_file.directory_id).to eq(disk_dir.id)
+      expect(db_file.md5).to eq(Digest::MD5.file(disk_path).hexdigest)
+      expect(File.binread(disk_path)).to eq(original_content)
+      expect(File.mtime(disk_path).to_i).to eq(original_mtime.to_i)
+    end
   end
 
   describe 'integration with Directory model' do
