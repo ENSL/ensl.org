@@ -63,6 +63,7 @@ services:
       - smtp
       - redis
     volumes:
+      - .:/var/www
       - ${FILES_HOST_ROOT}:${FILES_ROOT}
     networks:
       default: {}
