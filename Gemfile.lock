@@ -337,6 +337,7 @@ GEM
     mini_mime (1.1.5)
     minitest (6.0.1)
       prism (~> 1.5)
+    msgpack (1.8.0)
     multi_json (1.19.1)
     multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
@@ -738,6 +739,7 @@ DEPENDENCIES
   jquery-rails
   lograge
   mime-types
+  msgpack (>= 1.7.0)
   mysql2
   neat (~> 1.6.0)
   net-ftp

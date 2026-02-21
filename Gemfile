@@ -7,6 +7,7 @@ source 'https://rubygems.org'
 ruby '3.4.8'
 
 # Rails core
+gem 'msgpack', '>= 1.7.0'
 gem 'rails', '~> 8.1.2'
 gem 'rake'
 
