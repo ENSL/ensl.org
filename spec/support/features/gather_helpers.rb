@@ -36,72 +36,134 @@ module Features
       end
     end
 
-    # Vote randomly on maps (each user can cast `votes` clicks)
-    def vote_random_maps(session_name, votes: 2)
+    # Vote randomly on captains (gatherers) while voting is still open.
+    def vote_random_captains(session_name, votes: 2, deadline: nil)
+      return unless voting_time_left?(deadline)
+
       Capybara.using_session(session_name) do
+        return unless voting_time_left?(deadline)
+
         visit_gather_with_retry(gather)
-        return unless wait_for_voting_state
+        return unless wait_for_voting_state(deadline: deadline)
+        return unless voting_time_left?(deadline)
+
+        gatherer_votes = gather.gatherer_votes.count
+
+        return unless with_votes_scope('gatherers')
+        return unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
+
+        votes.times do
+          break unless voting_time_left?(deadline, minimum_left: 0.3)
+          break unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
+
+          safe_click do
+            first_choice = find('table#gatherers a.vote-link', match: :first, wait: 2)
+            choices = all('table#gatherers a.vote-link')
+            (choices.empty? ? first_choice : choices.sample).click
+          end
+
+          sleep(0.15)
+        end
+
+        gather.reload
+        expect(gather.gatherer_votes.count).to be >= gatherer_votes
+      end
+    end
+
+    # Vote randomly on maps (each user can cast `votes` clicks)
+    def vote_random_maps(session_name, votes: 2, deadline: nil)
+      return unless voting_time_left?(deadline)
+
+      Capybara.using_session(session_name) do
+        return unless voting_time_left?(deadline)
+
+        visit_gather_with_retry(gather)
+        return unless wait_for_voting_state(deadline: deadline)
+        return unless voting_time_left?(deadline)
 
         gather_map_votes = gather.map_votes.count
 
         return unless with_votes_scope('map-votes')
 
         # If no vote links are available in this session, skip gracefully
-        return unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 2)
+        return unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 1)
 
         votes.times do
+          break unless voting_time_left?(deadline, minimum_left: 0.3)
+
           # Vote links can legitimately disappear once user reached vote limit
-          break unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 2)
+          break unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 1)
 
           safe_click do
-            first_choice = find('ul#map-votes a.vote-link', match: :first, wait: 5)
+            first_choice = find('ul#map-votes a.vote-link', match: :first, wait: 2)
             choices = all('ul#map-votes a.vote-link')
             (choices.empty? ? first_choice : choices.sample).click
           end
-          sleep(0.2) # Wait for vote to be processed before next click
+          sleep(0.15)
         end
 
-        sleep(1)
         gather.reload
         expect(gather.map_votes.count).to be >= gather_map_votes
       end
     end
 
     # Vote randomly on servers (each user can cast `votes` clicks)
-    def vote_random_servers(session_name, votes: 2)
+    def vote_random_servers(session_name, votes: 2, deadline: nil)
+      return unless voting_time_left?(deadline)
+
       Capybara.using_session(session_name) do
+        return unless voting_time_left?(deadline)
+
         visit_gather_with_retry(gather)
-        return unless wait_for_voting_state
+        return unless wait_for_voting_state(deadline: deadline)
+        return unless voting_time_left?(deadline)
 
         gather_server_votes = gather.server_votes.count
 
         return unless with_votes_scope('server-votes')
 
         # If no vote links are available in this session, skip gracefully
-        return unless page.has_selector?('ul#server-votes a', minimum: 1, wait: 2)
+        return unless page.has_selector?('ul#server-votes a', minimum: 1, wait: 1)
 
         votes.times do
+          break unless voting_time_left?(deadline, minimum_left: 0.3)
+          break unless page.has_selector?('ul#server-votes a', minimum: 1, wait: 1)
+
           safe_click do
-            first_choice = find('ul#server-votes a', match: :first, wait: 5)
+            first_choice = find('ul#server-votes a', match: :first, wait: 2)
             choices = all('ul#server-votes a')
             (choices.empty? ? first_choice : choices.sample).click
           end
-          sleep(0.2) # Wait for vote to be processed before next click
+          sleep(0.15)
         end
 
-        sleep(1)
         gather.reload
         expect(gather.server_votes.count).to be >= gather_server_votes
       end
     end
 
-    def wait_for_voting_state
+    def voting_deadline(buffer_seconds: 4)
+      Process.clock_gettime(Process::CLOCK_MONOTONIC) + [gather.voting_timeout.to_f - buffer_seconds, 1.0].max
+    end
+
+    def wait_for_voting_state(deadline: nil)
       # Wait for gather to transition to voting state (happens when 12th player joins)
       max_wait = 30
       start_time = Time.current
-      sleep(0.5) until gather.reload.status == Gather::STATE_VOTING || (Time.current - start_time) > max_wait
+
+      until gather.reload.status == Gather::STATE_VOTING || (Time.current - start_time) > max_wait
+        return false unless voting_time_left?(deadline, minimum_left: 0.2)
+
+        sleep(0.5)
+      end
 
       gather.status == Gather::STATE_VOTING
+    end
+
+    def voting_time_left?(deadline, minimum_left: 0.8)
+      return true if deadline.nil?
+
+      (deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)) > minimum_left
     end
 
     def with_votes_scope(list_id)

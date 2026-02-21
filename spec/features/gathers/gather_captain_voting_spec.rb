@@ -25,19 +25,18 @@ RSpec.feature 'Gather voting phase - find nil:id error when voting', type: :feat
       visit gather_path(gather)
       assert_no_log_errors('on initial page load')
 
-      # Vote for captains (gatherers)
       safe_expect_text('Vote Captains')
-      2.times do
-        safe_click { all('table#gatherers a.vote-link', minimum: 1, wait: 10).sample.click }
-        assert_no_log_errors('after voting for captain')
-        sleep 0.5
-      end
+
+      vote_deadline = voting_deadline(buffer_seconds: 3)
+
+      vote_random_captains('user_0', votes: 2, deadline: vote_deadline)
+      assert_no_log_errors('after voting for captain')
 
       # Vote for maps and servers using shared helpers
-      vote_random_maps('user_0', votes: 2)
+      vote_random_maps('user_0', votes: 2, deadline: vote_deadline)
       assert_no_log_errors('after voting for maps')
 
-      vote_random_servers('user_0', votes: 2)
+      vote_random_servers('user_0', votes: 2, deadline: vote_deadline)
       assert_no_log_errors('after voting for servers')
 
       puts 'All votes cast without exceptions!'

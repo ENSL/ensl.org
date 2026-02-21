@@ -29,15 +29,20 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     puts
     puts("All users joined the gather and voting has started. Timeout is: #{gather.voting_timeout} seconds.")
 
-    # All users cast two random map votes
+    vote_deadline = voting_deadline(buffer_seconds: 4)
+
+    # Users vote while time remains; stop early before timeout to avoid racing state transition.
     users.each_with_index do |_, i|
-      vote_random_maps("user_#{i}", votes: 2)
-      vote_random_servers("user_#{i}", votes: 2)
+      break unless voting_time_left?(vote_deadline, minimum_left: 1.0)
+
+      vote_random_captains("user_#{i}", votes: 2, deadline: vote_deadline)
+      vote_random_maps("user_#{i}", votes: 2, deadline: vote_deadline)
+      vote_random_servers("user_#{i}", votes: 2, deadline: vote_deadline)
       print('.')
     end
 
     puts
-    puts('All users have cast their votes on maps and servers.')
+    puts('Voting attempts completed (stopped early if close to timeout).')
 
     # Wait for voting phase to finish. Wait up to 125s for the voting UI to disappear.
     Capybara.using_session('user_0') do
