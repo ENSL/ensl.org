@@ -42,12 +42,12 @@
       <%= label_tag :existing_preview, 'Existing Preview' %>
       <div class="inputs">
         <div class="status">
-          <% if @movie.preview %>
+          <% if @movie.preview_exists? %>
             <span class="icon success"><%= fa_icon('check') %></span>
-            <span class="status-text">The original format plays nicely in browser</span>
+            <span class="status-text"><%= link_to 'Preview exists', @movie.preview_url, target: '_blank' %></span>
           <% else %>
             <span class="icon muted"><%= fa_icon('times') %></span>
-            <span class="status-text muted">The video requires a preview version in web-friendly format</span>
+            <span class="status-text muted">Preview doesn&apos;t exist</span>
           <% end %>
         </div>
       </div>

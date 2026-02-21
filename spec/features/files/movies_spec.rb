@@ -544,9 +544,11 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       expect(page).to have_content('Web Friendly Movie')
       expect(page).to have_css('video')
-      # Verify it's showing the preview
+      # Preview exists, but player prefers original when it is web-friendly
       expect(movie.preview).to be_present
       expect(movie.preview_url).to be_present
+      expect(movie.original_url).to be_present
+      expect(page).to have_css("video source[src='#{movie.original_url}']", visible: false)
     end
 
     scenario 'movie with rails-made preview (not web_friendly initially) shows preview after generation' do

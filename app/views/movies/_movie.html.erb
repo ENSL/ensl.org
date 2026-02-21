@@ -12,7 +12,12 @@
 
       <% (params[:action] == "show" ? movie.all_files : [movie.file]).each do |file| %>
       <% unless file.nil? %>
-          <b>File: </b> <%= link_to File.basename(file.name.to_s), file.url %>
+          <b>File: </b>
+          <% if file.file_exists? %>
+            <%= link_to File.basename(file.name.to_s), file.url %>
+          <% else %>
+            <span class="muted"><%= File.basename(file.name.to_s) %> (missing)</span>
+          <% end %>
           <ul>
             <li>
               <strong>MD5:</strong> <%= file.md5_s %>

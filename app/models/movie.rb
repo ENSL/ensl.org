@@ -169,21 +169,40 @@ class Movie < ActiveRecord::Base
   end
 
   def preview_path
+    return nil unless file&.location
+
     file.reload if new_record? && file.respond_to?(:reload)
 
     bname = "#{File.basename(file.location, File.extname(file.location))}_preview.mp4"
     File.join(File.dirname(file.location), bname)
   end
 
+  def original_url
+    return nil unless file&.file_exists?
+    return nil unless web_friendly
+
+    file.url
+  end
+
+  def preview_exists?
+    return true if preview&.file_exists?
+
+    preview_path.present? && File.exist?(preview_path)
+  end
+
   # This not the URL version of above. Its what is shown on page.
   def preview_url
-    return preview.url if preview.present?
-    if File.exist?(preview_path)
+    return preview.url if preview&.file_exists?
+
+    if preview_path.present? && File.exist?(preview_path)
       return '/' + Pathname.new(preview_path).relative_path_from(Rails.root.join('public')).to_s
     end
-    return file.url if web_friendly
 
     nil
+  end
+
+  def playback_url
+    original_url || preview_url
   end
 
   def probe_metadata

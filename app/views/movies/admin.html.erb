@@ -17,27 +17,27 @@
       <tr>
         <td><%= link_to movie.to_s, movie %></td>
         <td><%= movie.user ? namelink(movie.user) : '-' %></td>
-        <td><%= shorttime movie.created_at %></td>
+        <td><%= shortdate movie.created_at %></td>
         <td><%= movie.length_s %></td>
         <td>
-          <% if movie&.file.file_exists? %>
+          <% if movie.file&.file_exists? %>
             <span style="color:#1f7f5c"><%= fa_icon('check') %></span>
           <% else %>
             <span style="color:#9aa0a6"><%= fa_icon('times') %></span>
           <% end %>
         </td>
         <td>
-          <% if movie.preview_url.present? || movie.web_friendly %>
+          <% if movie.web_friendly %>
             <span style="color:#1f7f5c"><%= fa_icon('check') %></span>
           <% else %>
             <span style="color:#9aa0a6"><%= fa_icon('times') %></span>
           <% end %>
         </td>
         <td>
-          <% if movie.preview_url.present? %>
+          <% if movie.preview_exists? %>
             <%= link_to fa_icon('eye', class: "green"), movie.preview_url, target: '_blank', title: 'View preview' %>
           <% else %>
-            <%= link_to fa_icon('video', class: "red"), preview_movie_path(movie), method: :post, title: 'Make preview', form: { style: 'display:inline;margin:0;' } %>
+            <%= link_to "Make Preview", preview_movie_path(movie), method: :post, title: 'Make preview', form: { style: 'display:inline;margin:0;' } %>
           <% end %>
         </td>
         <td class="actions">

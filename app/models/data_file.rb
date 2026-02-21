@@ -112,7 +112,10 @@ class DataFile < ActiveRecord::Base
   end
 
   def file_exists?
-    File.exist?(location)
+    current_path = full_path
+    return false if current_path.blank?
+
+    File.exist?(current_path)
   end
 
   # Shortcut to get the URL for this file from CarrierWave

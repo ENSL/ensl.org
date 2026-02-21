@@ -5,10 +5,10 @@
 
     <%= render partial: "movie", object: @movie %>
 
-    <% if @movie.preview_url %>
+    <% if @movie.playback_url %>
     <div class="player">
         <video controls width="640" preload="metadata">
-            <source src="<%= @movie.preview_url %>" type="video/mp4">
+            <source src="<%= @movie.playback_url %>" type="video/mp4">
         Your browser does not support the video tag.
         </video>
 

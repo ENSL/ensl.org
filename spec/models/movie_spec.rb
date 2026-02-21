@@ -6,10 +6,11 @@ RSpec.describe Movie, type: :model do
   let(:user) { instance_double('User', id: 1, username: 'alice') }
   let(:data_file) do
     instance_double('DataFile', id: 2, location: '/tmp/video.mp4', full_path: '/var/media/video.mp4',
-                                url: '/uploads/video.mp4')
+                                url: '/uploads/video.mp4', file_exists?: true)
   end
   let(:preview_file) do
-    instance_double('DataFile', id: 3, location: '/tmp/video_preview.mp4', url: '/uploads/video_preview.mp4')
+    instance_double('DataFile', id: 3, location: '/tmp/video_preview.mp4', url: '/uploads/video_preview.mp4',
+                                file_exists?: true)
   end
 
   before do
@@ -173,10 +174,36 @@ RSpec.describe Movie, type: :model do
         expect(movie.preview_path).to end_with('_preview.mp4')
       end
 
-      it 'returns preview.url if preview present' do
+      it 'returns preview.url if preview file exists' do
         allow(preview_file).to receive(:url).and_return('/uploads/prev.mp4')
         movie.preview = preview_file
         expect(movie.preview_url).to eq('/uploads/prev.mp4')
+      end
+
+      it 'returns nil when preview record exists but preview file is missing' do
+        allow(preview_file).to receive(:file_exists?).and_return(false)
+        movie.preview = preview_file
+        allow(movie).to receive(:preview_path).and_return(nil)
+
+        expect(movie.preview_url).to be_nil
+      end
+    end
+
+    context '#playback_url' do
+      it 'prefers original file URL when original is web-friendly' do
+        movie.file = data_file
+        movie.preview = preview_file
+        movie.web_friendly = true
+
+        expect(movie.playback_url).to eq('/uploads/video.mp4')
+      end
+
+      it 'falls back to preview URL when original is not web-friendly' do
+        movie.file = data_file
+        movie.preview = preview_file
+        movie.web_friendly = false
+
+        expect(movie.playback_url).to eq('/uploads/video_preview.mp4')
       end
     end
 
