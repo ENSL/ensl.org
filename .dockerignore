@@ -1,5 +1,5 @@
 Dockerfile
-docker-compose.yml
+compose.yml
 *.md
 .idea
 dkim
