@@ -149,8 +149,13 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       open_movies_index
 
       select 'AlphaUser', from: 'author'
+      expect(page).to have_select('author', selected: 'AlphaUser')
+
       click_link shorts_category.name
+      expect(page).to have_link(shorts_category.name, class: /opacity-50/)
+
       select '3 stars', from: 'rating'
+      expect(page).to have_select('rating', selected: '3 stars')
 
       expect(page).to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
       expect(page).not_to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)

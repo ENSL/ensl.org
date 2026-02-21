@@ -105,16 +105,21 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
 
     first_shout = SecureRandom.hex(6)
-    fill_in "shout_Gather_#{gather.id}_text", with: first_shout
-    click_button 'Shout!'
+    within("#new_shout_Gather_#{gather.id}") do
+      fill_in "shout_Gather_#{gather.id}_text", with: first_shout
+      click_button 'Shout!'
+    end
 
     within("#shout_Gather_#{gather.id}") do
       expect(page).to have_content(first_shout, wait: 5)
     end
+    expect(page).to have_field("shout_Gather_#{gather.id}_text", with: '', wait: 5)
 
     second_shout = SecureRandom.hex(6)
-    fill_in "shout_Gather_#{gather.id}_text", with: second_shout
-    click_button 'Shout!'
+    within("#new_shout_Gather_#{gather.id}") do
+      fill_in "shout_Gather_#{gather.id}_text", with: second_shout
+      click_button 'Shout!'
+    end
 
     within("#shout_Gather_#{gather.id}") do
       expect(page).to have_content(second_shout, wait: 5)

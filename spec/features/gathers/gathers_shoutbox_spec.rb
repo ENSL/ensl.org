@@ -15,8 +15,10 @@ feature 'Gathers', js: true do
       visit gather_path(gather)
       expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
       shout = rand(100_000).to_s
-      fill_in "shout_Gather_#{gather.id}_text", with: shout
-      click_button 'Shout!'
+      within("#new_shout_Gather_#{gather.id}") do
+        fill_in "shout_Gather_#{gather.id}_text", with: shout
+        click_button 'Shout!'
+      end
       expect(page).to have_content(shout, wait: 5)
       expect(Shoutmsg.where(text: shout).count).to eq(1)
       expect(page).to have_field("shout_Gather_#{gather.id}_text", with: '')
@@ -31,14 +33,18 @@ feature 'Gathers', js: true do
       expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
       expect(page).to_not have_content('Maximum shout length exceeded')
       before_count = Shoutmsg.count
-      fill_in "shout_Gather_#{gather.id}_text", with: invalid_shout
-      click_button 'Shout!'
+      within("#new_shout_Gather_#{gather.id}") do
+        fill_in "shout_Gather_#{gather.id}_text", with: invalid_shout
+        click_button 'Shout!'
+      end
       # invalid shouts should not create records and the input should remain populated
       expect(page).to have_field("shout_Gather_#{gather.id}_text", with: invalid_shout)
       expect(Shoutmsg.count).to eq(before_count)
       expect(page).to have_no_content(invalid_shout, wait: 2)
-      fill_in "shout_Gather_#{gather.id}_text", with: valid_shout
-      click_button 'Shout!'
+      within("#new_shout_Gather_#{gather.id}") do
+        fill_in "shout_Gather_#{gather.id}_text", with: valid_shout
+        click_button 'Shout!'
+      end
       expect(page).to have_content(valid_shout, wait: 5)
       expect(Shoutmsg.where(text: valid_shout).count).to eq(1)
     end
