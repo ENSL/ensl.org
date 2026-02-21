@@ -5,10 +5,24 @@
 class DirectoryReconciliationService
   PROGRESS_LOG_EVERY = 500
 
+  class TeeIO
+    def initialize(*targets)
+      @targets = targets.compact
+    end
+
+    def write(message)
+      @targets.each { |target| target.write(message) }
+    end
+
+    def close
+      @targets.each { |target| target.close unless target.equal?($stdout) }
+    end
+  end
+
   def initialize(directory)
     @directory = directory
     @strio = StringIO.new
-    @logger = Logger.new(@strio)
+    @logger = Logger.new(log_output)
     @stats = default_stats
   end
 
@@ -19,6 +33,16 @@ class DirectoryReconciliationService
   end
 
   private
+
+  def log_output
+    return @strio unless console_session?
+
+    TeeIO.new(@strio, $stdout)
+  end
+
+  def console_session?
+    defined?(Rails::Console)
+  end
 
   def reconcile_with_transaction
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
