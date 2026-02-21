@@ -3,13 +3,13 @@
     <span><%=h @map.name %></span>
   </h1>
 
-  <% if @map.picture.length > 0 %>
+  <% if @map.picture.present? %>
     <div class="preview">
       <%= image_tag @map.picture.url %>
     </div>
   <% end %>
 
-  <% if @map.download.length > 0 %>
+  <% if @map.download.present? %>
     <strong>Download</strong><br>
     <p><%= link_to (h @map.download), (h @map.download) %></p>
   <% end %>

@@ -222,9 +222,30 @@ module Features
 
     def visit_gather_with_retry(gather_page, retries: 1)
       attempts = 0
+      target_path = gather_path(gather_page)
 
       begin
-        visit gather_path(gather_page)
+        if page.driver.is_a?(Capybara::Playwright::Driver)
+          playwright_page = current_playwright_page
+
+          if playwright_page
+            playwright_page.goto(
+              absolute_url_for(playwright_page, target_path),
+              waitUntil: 'domcontentloaded',
+              timeout: 12_000
+            )
+          else
+            visit target_path
+          end
+        else
+          visit target_path
+        end
+      rescue Playwright::TimeoutError
+        raise if attempts >= retries
+
+        attempts += 1
+        sleep(0.25)
+        retry
       rescue Playwright::Error => e
         raise unless e.message.match?(/page crashed|target closed/i)
         raise if attempts >= retries
@@ -234,6 +255,25 @@ module Features
         sleep(0.25)
         retry
       end
+    end
+
+    def current_playwright_page
+      page.driver.current_url # Ensure driver internals are initialized
+      browser_wrapper = page.driver.instance_variable_get(:@browser)
+      browser_wrapper&.instance_variable_get(:@playwright_page)
+    rescue StandardError
+      nil
+    end
+
+    def absolute_url_for(playwright_page, path)
+      require 'uri'
+
+      current_url = playwright_page.url
+      current_uri = URI.parse(current_url)
+      base = "#{current_uri.scheme}://#{current_uri.host}:#{current_uri.port}"
+      URI.join(base, path).to_s
+    rescue StandardError
+      path
     end
   end
 end

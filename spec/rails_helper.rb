@@ -1,10 +1,16 @@
 # Load spec_helper
 require 'spec_helper'
 require 'fileutils'
+require 'tmpdir'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
+
+# CI can inject FILES_ROOT values that are not writable by the test process.
+# Force a test-local writable root for all specs unless a spec overrides it.
+ENV['FILES_ROOT'] = File.join(Dir.tmpdir, 'ensl_test_files')
+FileUtils.mkdir_p(ENV.fetch('FILES_ROOT'))
 
 require 'rspec/rails'
 require 'capybara/rspec'
@@ -16,6 +22,9 @@ Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f 
 
 RSpec.configure do |config|
   config.before(:suite) do
+    FileUtils.rm_rf(ENV.fetch('FILES_ROOT'))
+    FileUtils.mkdir_p(ENV.fetch('FILES_ROOT'))
+
     log_file = Rails.root.join('log', 'test.log')
     FileUtils.mkdir_p(log_file.dirname)
     File.write(log_file, '')
