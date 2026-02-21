@@ -59,6 +59,22 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     expect(captain1).not_to be_nil
     expect(captain2).not_to be_nil
 
+    # End-of-voting transition should create exactly one follow-up gather.
+    expect(Gather.where(category_id: gather.category_id).count).to eq(2)
+
+    # Additional clients loading after transition must not create extra empty gathers.
+    Capybara.using_session('user_1') do
+      visit gather_path(gather)
+      safe_expect_text('Captains are picking the teams', wait: 5)
+    end
+
+    Capybara.using_session('user_2') do
+      visit gather_path(gather)
+      safe_expect_text('Captains are picking the teams', wait: 5)
+    end
+
+    expect(Gather.where(category_id: gather.category_id).count).to eq(2)
+
     # Verify that captains are the two most-voted users
     expect(gather.captain1.id).to eq(gather.gatherers.most_voted[1].id)
     expect(gather.captain2.id).to eq(gather.gatherers.most_voted[0].id)

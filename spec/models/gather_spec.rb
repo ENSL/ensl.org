@@ -26,6 +26,21 @@ RSpec.describe Gather, type: :model do
     end
   end
 
+  describe 'check_status' do
+    it 'creates only one follow-up gather for concurrent stale transitions' do
+      gather = create(:gather)
+      create_list(:gatherer, 12, gather: gather)
+
+      stale_copy_1 = Gather.find(gather.id)
+      stale_copy_2 = Gather.find(gather.id)
+
+      expect do
+        stale_copy_1.update!(status: Gather::STATE_PICKING)
+        stale_copy_2.update!(status: Gather::STATE_PICKING)
+      end.to change { Gather.where(category_id: gather.category_id).count }.by(1)
+    end
+  end
+
   describe 'refresh' do
     it 'changes turn based on team counts' do
       gather = create(:gather)

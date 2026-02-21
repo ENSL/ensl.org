@@ -139,7 +139,10 @@ class Gather < ActiveRecord::Base
     changed = respond_to?(:will_save_change_to_status?) ? will_save_change_to_status? : status_changed?
     return unless changed and status == STATE_PICKING and !captain1
 
-    g = Gather.create!(category: category)
+    category&.with_lock do
+      Gather.create!(category: category) unless Gather.where(category_id: category_id).where('id > ?', id).exists?
+    end
+
     self.captain1 = gatherers.most_voted[1]
     self.captain2 = gatherers.most_voted[0]
     if gather_maps.count > 1
