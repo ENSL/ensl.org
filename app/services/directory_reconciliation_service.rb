@@ -67,19 +67,21 @@ class DirectoryReconciliationService
   def with_reconciliation_lock
     FileUtils.mkdir_p(File.dirname(LOCKFILE_PATH))
 
-    File.open(LOCKFILE_PATH, File::RDWR | File::CREAT, 0o644) do |lock_file|
-      unless lock_file.flock(File::LOCK_EX | File::LOCK_NB)
-        @logger.info('Skipping reconciliation: another reconciliation is already running')
-        return
-      end
+    lock_file = File.open(LOCKFILE_PATH, File::RDWR | File::CREAT, 0o644)
 
-      begin
-        yield
-      ensure
-        lock_file.flock(File::LOCK_UN)
-      end
+    unless lock_file.flock(File::LOCK_EX | File::LOCK_NB)
+      @logger.info('Skipping reconciliation: another reconciliation is already running')
+      lock_file.close
+      return
     end
-  rescue StandardError => e
+
+    begin
+      yield
+    ensure
+      lock_file.flock(File::LOCK_UN)
+      lock_file.close
+    end
+  rescue Errno::EACCES, Errno::ENOENT, Errno::ENOTDIR, IOError, SystemCallError => e
     @logger.error("Failed to acquire reconciliation lock: #{e.message}")
   end
 
