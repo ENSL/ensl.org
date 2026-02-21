@@ -5,7 +5,7 @@ class DirectoriesController < ApplicationController
   def show
     if @directory.hidden
       @files = @directory.files
-      render partial: 'data_files/list', layout: true
+      render partial: 'data_files/list'
     else
       @directories = Directory.ordered.filtered.where(parent_id: Directory::ROOT)
     end

@@ -1,6 +1,7 @@
 class CustomUrlsController < ApplicationController
   def administrate
     raise AccessError unless cuser && cuser.admin?
+
     @custom_urls = CustomUrl.all
     @custom_url = CustomUrl.new
   end
@@ -23,25 +24,33 @@ class CustomUrlsController < ApplicationController
   def show
     custom_url = CustomUrl.find_by_name(params[:name])
     raise ActiveRecord::RecordNotFound unless custom_url
+
     @article = custom_url.article
+    raise ActiveRecord::RecordNotFound unless @article
     raise AccessError unless @article.can_show? cuser
+
     @article.mark_as_read! for: cuser if cuser
     render 'articles/show'
   end
 
   def update
     raise AccessError unless request.xhr?
+
     response = {}
     if cuser && cuser.admin?
-      url = CustomUrl.find(params[:id]) rescue nil
+      url = begin
+        CustomUrl.find(params[:id])
+      rescue StandardError
+        nil
+      end
 
       if url
         url.article_id = params[:custom_url][:article_id]
-        url.name= params[:custom_url][:name]
+        url.name = params[:custom_url][:name]
         if url.save
           response[:status] = 200
           response[:message] = 'Successfully updated!'
-          resobj = {name: url.name, title: url.article.title}
+          resobj = { name: url.name, title: url.article.title }
           response[:obj] = resobj
         else
           response[:status] = 400
@@ -66,6 +75,7 @@ class CustomUrlsController < ApplicationController
 
   def destroy
     raise AccessError unless request.xhr?
+
     response = {}
     if cuser && cuser.admin?
       url = CustomUrl.destroy(params[:id])

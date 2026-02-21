@@ -120,8 +120,10 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActiveRecord::RecordNotFound do |_exception|
-    # Correct template reference: 'errors/404' (not 'errors/404.html')
-    render 'errors/404', status: :not_found, layout: 'errors'
+    respond_to do |format|
+      format.html { render 'errors/404', status: :not_found, layout: 'errors' }
+      format.any { head :not_found }
+    end
   end
 
   rescue_from ActionController::InvalidAuthenticityToken do |_exception|

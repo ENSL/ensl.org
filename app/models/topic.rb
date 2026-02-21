@@ -110,7 +110,7 @@ class Topic < ActiveRecord::Base
   end
 
   def can_show?(cuser)
-    forum.can_show? cuser
+    forum&.can_show?(cuser)
   end
 
   def can_create?(cuser)

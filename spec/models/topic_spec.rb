@@ -86,6 +86,14 @@ describe Topic do
 
       expect(restricted_topic.can_show?(user)).to be_truthy
     end
+
+    it 'returns nil when forum is missing instead of raising' do
+      topic = create(:topic, user: user, forum: forum)
+      topic.update_column(:forum_id, nil)
+
+      expect { topic.can_show?(nil) }.not_to raise_error
+      expect(topic.can_show?(nil)).to be_nil
+    end
   end
 
   describe '#can_create?' do
