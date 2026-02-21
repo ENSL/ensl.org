@@ -394,6 +394,31 @@ describe DirectoryReconciliationService do
       expect(log_output).to match(/Directories: \d+/)
     end
 
+    it 'logs reconciliation summary with db action counters and elapsed time' do
+      filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)
+      sync_filesystem_to_db(filesystem, root_directory)
+
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      expect(result.string).to include('Reconciliation summary:')
+      expect(result.string).to include('db(dirs:new=')
+      expect(result.string).to include('files:new=')
+      expect(result.string).to match(/Elapsed: \d+\.\d+s/)
+    end
+
+    it 'emits periodic progress logs while scanning when interval is reached' do
+      stub_const('DirectoryReconciliationService::PROGRESS_LOG_EVERY', 1)
+
+      filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 1)
+      sync_filesystem_to_db(filesystem, root_directory)
+
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      expect(result.string).to include('Progress scanned=')
+    end
+
     it 'handles deep filesystem with multiple directory moves to various subdirs and validates all DB fields' do
       # Create deterministic deep structure for testing moves
       level1 = File.join(@test_root, 'level1')

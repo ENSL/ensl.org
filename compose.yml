@@ -10,7 +10,6 @@ x-app: &app
   volumes:
     - .:/var/www
     # Mount also files root somewhere, from $FILES_ROOT
-    - ${FILES_HOST_ROOT}:${FILES_ROOT}
   environment:
     RAILS_ENV: ${RAILS_ENV:-development}
   depends_on:
@@ -63,6 +62,8 @@ services:
     depends_on:
       - smtp
       - redis
+    volumes:
+      - ${FILES_HOST_ROOT}:${FILES_ROOT}
     networks:
       default: {}
       catpack_docker:

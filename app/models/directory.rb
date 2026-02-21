@@ -32,6 +32,8 @@ ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
 class Directory < ActiveRecord::Base
   include Extra
 
+  MAX_FILE_COUNT_MATCH_CANDIDATES = 200
+
   IGNORED_RECONCILIATION_ROOT_DIRS = %w[uploads .trash].freeze
 
   ROOT = 1
@@ -255,18 +257,19 @@ class Directory < ActiveRecord::Base
 
   # Recursively sync this directory's database state with filesystem
   # Disk is authoritative - we scan actual directories and match to DB records
-  def recreate(destroy_dirs, logger: Rails.logger)
+  def recreate(destroy_dirs, logger: Rails.logger, stats: nil, progress_every: nil, progress_callback: nil)
     # Mark all existing subdirs for deletion (we'll unmark those found on disk)
     destroy_dirs.merge!(subdirs.reject { |subdir| ignored_reconciliation_directory?(subdir) }.index_by(&:id))
 
-    scan_disk_entries(destroy_dirs, logger)
+    scan_disk_entries(destroy_dirs, logger, stats: stats, progress_every: progress_every,
+                                            progress_callback: progress_callback)
     destroy_dirs
   end
 
   private
 
   # Scan all items in this directory on disk and sync with database
-  def scan_disk_entries(destroy_dirs, logger)
+  def scan_disk_entries(destroy_dirs, logger, stats: nil, progress_every: nil, progress_callback: nil)
     Dir.glob(File.join(full_path, '*')).each do |item_path|
       if ignored_reconciliation_path?(item_path)
         logger.info("Skipping ignored path: #{item_path}")
@@ -274,13 +277,19 @@ class Directory < ActiveRecord::Base
       end
 
       item_name = File.basename(item_path)
+      increment_stat(stats, :entries_scanned)
 
       begin
         if File.directory?(item_path)
-          process_disk_directory(item_name, item_path, destroy_dirs, logger)
+          increment_stat(stats, :directories_scanned)
+          process_disk_directory(item_name, item_path, destroy_dirs, logger,
+                                 stats: stats, progress_every: progress_every, progress_callback: progress_callback)
         elsif File.file?(item_path)
-          process_disk_file(item_path, item_name, logger)
+          increment_stat(stats, :files_scanned)
+          process_disk_file(item_path, item_name, logger, stats: stats)
         end
+
+        maybe_report_progress(stats, progress_every, progress_callback)
       rescue StandardError => e
         logger.error("Error processing #{item_path}: #{e.message}")
       end
@@ -290,8 +299,9 @@ class Directory < ActiveRecord::Base
   end
 
   # Process a directory found on disk
-  def process_disk_directory(item_name, item_path, destroy_dirs, logger)
-    subdir = find_or_create_subdir(item_name, item_path, logger)
+  def process_disk_directory(item_name, item_path, destroy_dirs, logger, stats: nil, progress_every: nil,
+                             progress_callback: nil)
+    subdir = find_or_create_subdir(item_name, item_path, logger, stats: stats)
     return unless subdir
 
     # If parent changed, move the record (this also saves)
@@ -299,9 +309,9 @@ class Directory < ActiveRecord::Base
       # Update name if it changed BEFORE moving (so move can use correct name)
       subdir.name = item_name.downcase if subdir.name != item_name.downcase
 
-      move_subdir_to_self(subdir, logger)
+      move_subdir_to_self(subdir, logger, stats: stats)
     elsif !subdir.valid?
-      fix_subdir_attributes(subdir, logger)
+      fix_subdir_attributes(subdir, logger, stats: stats)
     elsif subdir.name != item_name.downcase
       # Reconciliation is disk-authoritative: persist in-place rename without strict validations
       old_path = subdir.full_path
@@ -309,26 +319,29 @@ class Directory < ActiveRecord::Base
       subdir.path = subdir.full_path
       subdir.save!(validate: false)
       subdir.sync_inode_info
+      increment_stat(stats, :directories_renamed)
       logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
     end
 
     destroy_dirs.delete(subdir.id)
-    subdir.recreate(destroy_dirs, logger: logger)
+    subdir.recreate(destroy_dirs, logger: logger, stats: stats, progress_every: progress_every,
+                                  progress_callback: progress_callback)
   end
 
   # Find existing directory or create new one
-  def find_or_create_subdir(item_name, item_path, logger)
+  def find_or_create_subdir(item_name, item_path, logger, stats: nil)
     if (subdir = find_existing(item_name, item_path))
       subdir
     else
-      create_new_subdir(item_name, logger)
+      create_new_subdir(item_name, logger, stats: stats)
     end
   end
 
   # Create a new directory record for discovered disk directory
-  def create_new_subdir(item_name, logger)
+  def create_new_subdir(item_name, logger, stats: nil)
     subdir = subdirs.build(name: item_name)
     subdir.save!(validate: false) # Skip validation for disk-found dirs
+    increment_stat(stats, :directories_created)
     logger.info("New dir: #{subdir.full_path}")
     subdir
   rescue StandardError => e
@@ -337,19 +350,20 @@ class Directory < ActiveRecord::Base
   end
 
   # Move a directory record to this parent
-  def move_subdir_to_self(subdir, logger)
+  def move_subdir_to_self(subdir, logger, stats: nil)
     old_path = subdir.full_path
     subdir.parent = self
     subdir.path = subdir.full_path # Update path to match new location
     subdir.save!(validate: false) # Skip validations - disk is authoritative for reconciliation
     subdir.sync_inode_info # Ensure inode info is synced after move
+    increment_stat(stats, :directories_relinked)
     logger.info("Renamed dir: #{old_path} -> #{subdir.full_path}")
   rescue StandardError => e
     logger.error("Failed to move subdir: #{e.message}")
   end
 
   # Fix invalid directory attributes
-  def fix_subdir_attributes(subdir, logger)
+  def fix_subdir_attributes(subdir, logger, stats: nil)
     subdir.errors.full_messages.each { |err| logger.warn(err) }
     # Manually re-initialize attributes that may be missing
     subdir.path = subdir.full_path if subdir.path.blank?
@@ -357,22 +371,29 @@ class Directory < ActiveRecord::Base
     subdir.hidden = false if subdir.hidden.nil?
     subdir.save!
     subdir.sync_inode_info # Ensure inode info is synced after fix
+    increment_stat(stats, :directories_fixed)
     logger.info("Fixed attributes: #{subdir.full_path}")
   rescue StandardError => e
     logger.error("Failed to fix subdir attributes: #{e.message}")
   end
 
   # Process a file found on disk
-  def process_disk_file(item_path, item_name, logger)
-    if (dbfile = DataFile.find_existing(item_path, item_name))
-      update_file_directory(dbfile, item_path, logger)
+  def process_disk_file(item_path, item_name, logger, stats: nil)
+    if (dbfile = DataFile.find_by(path: item_path))
+      update_file_directory(dbfile, item_path, logger, stats: stats)
+      return
+    end
+
+    file_hash = DataFile.compute_file_hash(item_path)
+    if file_hash && (dbfile = DataFile.find_by(md5: file_hash))
+      update_file_directory(dbfile, item_path, logger, stats: stats)
     elsif file_is_old_enough?(item_path)
-      create_new_file(item_path, logger)
+      create_new_file(item_path, logger, md5: file_hash, stats: stats)
     end
   end
 
   # Update file's directory if it moved
-  def update_file_directory(dbfile, item_path, logger)
+  def update_file_directory(dbfile, item_path, logger, stats: nil)
     changes = {}
     changes[:directory_id] = id if dbfile.directory_id != id
     changes[:path] = item_path if dbfile.path != item_path
@@ -383,6 +404,7 @@ class Directory < ActiveRecord::Base
     # Reconciliation is disk-authoritative: update DB pointers only.
     # We intentionally bypass DataFile callbacks here to avoid filesystem moves.
     dbfile.update_columns(changes)
+    increment_stat(stats, :files_relinked)
     logger.info("Reconciled file: #{dbfile.name} (ID: #{dbfile.id})")
   rescue StandardError => e
     logger.error("Failed to update file #{dbfile.name}: #{e.message}")
@@ -394,7 +416,7 @@ class Directory < ActiveRecord::Base
   end
 
   # Create new file record from disk file
-  def create_new_file(item_path, logger)
+  def create_new_file(item_path, logger, md5: nil, stats: nil)
     stat = File.stat(item_path)
     filename = File.basename(item_path)
 
@@ -404,7 +426,7 @@ class Directory < ActiveRecord::Base
                              name: filename,
                              path: item_path,
                              size: stat.size,
-                             md5: Digest::MD5.file(item_path).hexdigest,
+                             md5: md5 || Digest::MD5.file(item_path).hexdigest,
                              description: filename,
                              created_at: stat.mtime,
                              updated_at: Time.current
@@ -412,10 +434,24 @@ class Directory < ActiveRecord::Base
                          ])
 
     dbfile = DataFile.find_by(path: item_path)
+    increment_stat(stats, :files_created)
 
     logger.info("Added file: #{dbfile&.name || filename}")
   rescue StandardError => e
     logger.error("Failed to create file from #{item_path}: #{e.message}")
+  end
+
+  def increment_stat(stats, key)
+    return unless stats
+
+    stats[key] = stats.fetch(key, 0) + 1
+  end
+
+  def maybe_report_progress(stats, progress_every, progress_callback)
+    return unless stats && progress_every && progress_callback
+    return unless (stats[:entries_scanned] % progress_every).zero?
+
+    progress_callback.call(stats)
   end
 
   public
@@ -431,7 +467,8 @@ class Directory < ActiveRecord::Base
     end
 
     # Second: try direct name match under this parent
-    return subdirs.find_by(name: subdir_name) if subdirs.exists?(name: subdir_name)
+    direct_match = subdirs.find_by(name: subdir_name)
+    return direct_match if direct_match
 
     # Third: find orphaned directory with same name (path doesn't exist anymore)
     orphaned = find_orphaned_directory(subdir_name)
@@ -472,6 +509,14 @@ class Directory < ActiveRecord::Base
     candidate_dirs = Directory.joins(:files)
                               .group('directories.id')
                               .having('count(data_files.id) = ?', file_count)
+                              .limit(MAX_FILE_COUNT_MATCH_CANDIDATES + 1)
+
+    if candidate_dirs.size > MAX_FILE_COUNT_MATCH_CANDIDATES
+      Rails.logger.warn(
+        "Skipping file-count heuristic for #{subitem_path}: too many candidates (#{candidate_dirs.size})"
+      )
+      return nil
+    end
 
     candidate_dirs.find { |dir| file_sizes_match?(dir, subitem_path) }
   rescue StandardError => e

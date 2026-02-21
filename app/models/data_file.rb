@@ -303,7 +303,7 @@ class DataFile < ActiveRecord::Base
 
   # Safely compute MD5 hash of a file
   def self.compute_file_hash(file_path)
-    Digest::MD5.hexdigest(File.read(file_path))
+    Digest::MD5.file(file_path).hexdigest
   rescue StandardError => e
     Rails.logger.warn("Could not compute hash for #{file_path}: #{e.message}")
     nil

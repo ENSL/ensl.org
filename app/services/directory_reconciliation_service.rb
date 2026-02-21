@@ -3,10 +3,13 @@
 # Service to reconcile directory database records with filesystem state
 # Disk is authoritative - scans actual directories and syncs database records
 class DirectoryReconciliationService
+  PROGRESS_LOG_EVERY = 500
+
   def initialize(directory)
     @directory = directory
     @strio = StringIO.new
     @logger = Logger.new(@strio)
+    @stats = default_stats
   end
 
   # Returns a StringIO containing the operation log
@@ -18,21 +21,33 @@ class DirectoryReconciliationService
   private
 
   def reconcile_with_transaction
+    started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
     @logger.info("Starting recreate on Directory(#{@directory.id}): #{@directory.name}.")
     @logger.info("DataFiles: #{DataFile.count} Directories: #{Directory.count}")
+    @logger.info("Progress logging interval: every #{PROGRESS_LOG_EVERY} scanned entries")
 
     ActiveRecord::Base.transaction do
       destroy_dirs = reconcile_recursively
       remove_orphaned_directories(destroy_dirs)
     end
 
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
     @logger.info("DataFiles: #{DataFile.count} Directories: #{Directory.count}")
+    @logger.info(summary_line)
+    @logger.info(format('Elapsed: %.2fs', elapsed))
     @logger.info('Finish recreate')
   end
 
   def reconcile_recursively
     destroy_dirs = {}
-    @directory.recreate(destroy_dirs, logger: @logger)
+    @directory.recreate(
+      destroy_dirs,
+      logger: @logger,
+      stats: @stats,
+      progress_every: PROGRESS_LOG_EVERY,
+      progress_callback: method(:log_progress)
+    )
     destroy_dirs
   end
 
@@ -49,8 +64,39 @@ class DirectoryReconciliationService
       dir.preserve_files = true
       dir.destroy!
       removed_count += 1
+      @stats[:directories_removed] += 1
     end
 
     @logger.info("Directories removed: #{removed_count}")
+  end
+
+  def log_progress(stats)
+    @logger.info(
+      "Progress scanned=#{stats[:entries_scanned]} dirs=#{stats[:directories_scanned]} files=#{stats[:files_scanned]} " \
+      "db_dirs(new=#{stats[:directories_created]}, moved=#{stats[:directories_relinked]}, fixed=#{stats[:directories_fixed]}, renamed=#{stats[:directories_renamed]}) " \
+      "db_files(new=#{stats[:files_created]}, relinked=#{stats[:files_relinked]})"
+    )
+  end
+
+  def summary_line
+    'Reconciliation summary: ' \
+      "scanned(entries=#{@stats[:entries_scanned]}, dirs=#{@stats[:directories_scanned]}, files=#{@stats[:files_scanned]}) " \
+      "db(dirs:new=#{@stats[:directories_created]}, moved=#{@stats[:directories_relinked]}, fixed=#{@stats[:directories_fixed]}, renamed=#{@stats[:directories_renamed]}, removed=#{@stats[:directories_removed]}; " \
+      "files:new=#{@stats[:files_created]}, relinked=#{@stats[:files_relinked]})"
+  end
+
+  def default_stats
+    {
+      entries_scanned: 0,
+      directories_scanned: 0,
+      files_scanned: 0,
+      directories_created: 0,
+      directories_relinked: 0,
+      directories_fixed: 0,
+      directories_renamed: 0,
+      directories_removed: 0,
+      files_created: 0,
+      files_relinked: 0
+    }
   end
 end
