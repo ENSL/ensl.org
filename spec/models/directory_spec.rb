@@ -430,7 +430,7 @@ describe Directory do
         dir.move_to_trash = true
         dir.destroy
 
-        trash_root = File.join(ENV['FILES_ROOT'], '.trash')
+        trash_root = dir.send(:trash_root_for, dir.full_path)
         matches = Dir.glob(File.join(trash_root, "#{File.basename(dir.full_path)}_*"))
         expect(File.exist?(dir.full_path)).to be false
         expect(matches).not_to be_empty

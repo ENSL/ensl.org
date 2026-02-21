@@ -276,8 +276,9 @@ class Directory < ActiveRecord::Base
   def move_directory_to_trash
     return unless Dir.exist?(full_path)
 
-    ensure_trash_root
-    trash_path = next_trash_path
+    trash_root_path = trash_root_for(full_path)
+    ensure_trash_root(trash_root_path)
+    trash_path = next_trash_path(trash_root_path)
     FileUtils.mv(full_path, trash_path)
     Rails.logger.info("Moved directory to trash: #{full_path} -> #{trash_path}")
   rescue StandardError => e
@@ -286,22 +287,33 @@ class Directory < ActiveRecord::Base
     raise ActiveRecord::RecordInvalid.new(self)
   end
 
-  def ensure_trash_root
-    FileUtils.mkdir_p(trash_root)
+  def ensure_trash_root(root_path = trash_root)
+    FileUtils.mkdir_p(root_path)
   end
 
   def trash_root
     File.join(ENV['FILES_ROOT'], '.trash')
   end
 
-  def next_trash_path
+  def trash_root_for(source_path)
+    default_trash_root = trash_root
+    source_abs = File.expand_path(source_path)
+    default_abs = File.expand_path(default_trash_root)
+    source_prefix = "#{source_abs}#{File::SEPARATOR}"
+
+    return default_trash_root unless default_abs == source_abs || default_abs.start_with?(source_prefix)
+
+    File.join(File.dirname(source_abs), '.trash')
+  end
+
+  def next_trash_path(root_path = trash_root)
     base = File.basename(full_path)
     timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
-    candidate = File.join(trash_root, "#{base}_#{id}_#{timestamp}")
+    candidate = File.join(root_path, "#{base}_#{id}_#{timestamp}")
     return candidate unless File.exist?(candidate)
 
     unique_suffix = SecureRandom.hex(4)
-    File.join(trash_root, "#{base}_#{id}_#{timestamp}_#{unique_suffix}")
+    File.join(root_path, "#{base}_#{id}_#{timestamp}_#{unique_suffix}")
   end
 
   # Recursively sync this directory's database state with filesystem
