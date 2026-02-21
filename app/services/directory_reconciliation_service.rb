@@ -4,6 +4,7 @@
 # Disk is authoritative - scans actual directories and syncs database records
 class DirectoryReconciliationService
   PROGRESS_LOG_EVERY = 500
+  LOCKFILE_PATH = Rails.root.join('tmp', 'directory_reconciliation.lock')
 
   class TeeIO
     def initialize(*targets)
@@ -28,7 +29,7 @@ class DirectoryReconciliationService
 
   # Returns a StringIO containing the operation log
   def call
-    reconcile_with_transaction
+    with_reconciliation_lock { reconcile_with_transaction }
     @strio
   end
 
@@ -61,6 +62,25 @@ class DirectoryReconciliationService
     @logger.info(summary_line)
     @logger.info(format('Elapsed: %.2fs', elapsed))
     @logger.info('Finish recreate')
+  end
+
+  def with_reconciliation_lock
+    FileUtils.mkdir_p(File.dirname(LOCKFILE_PATH))
+
+    File.open(LOCKFILE_PATH, File::RDWR | File::CREAT, 0o644) do |lock_file|
+      unless lock_file.flock(File::LOCK_EX | File::LOCK_NB)
+        @logger.info('Skipping reconciliation: another reconciliation is already running')
+        return
+      end
+
+      begin
+        yield
+      ensure
+        lock_file.flock(File::LOCK_UN)
+      end
+    end
+  rescue StandardError => e
+    @logger.error("Failed to acquire reconciliation lock: #{e.message}")
   end
 
   def reconcile_recursively

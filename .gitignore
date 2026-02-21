@@ -32,6 +32,9 @@ db/initdb.d/*
 # **/*secrets*.yml
 # !**/*secrets*sample*.yml
 
+# Sync creds
+config/data_file_sync_servers.json
+
 # ignore dkim keys
 dkim
 ext/dkim

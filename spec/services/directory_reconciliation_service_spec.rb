@@ -66,6 +66,17 @@ describe DirectoryReconciliationService do
       end
     end
 
+    it 'does not emit title fix-up warnings for newly discovered directories' do
+      FileUtils.mkdir_p(File.join(@test_root, 'audio'))
+
+      service = DirectoryReconciliationService.new(root_directory)
+      result = service.call
+
+      expect(result.string).to include('New dir:')
+      expect(result.string).not_to include("Title can't be blank")
+      expect(result.string).not_to include('Fixed attributes:')
+    end
+
     it 'discovers new files on disk and creates DB records' do
       # Create initial structure
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)

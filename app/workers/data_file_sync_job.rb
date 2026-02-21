@@ -1,40 +1,26 @@
 # frozen_string_literal: true
 
-require 'cgi'
 require 'fileutils'
 require 'json'
 require 'net/ftp'
-require 'open-uri'
 
 class DataFileSyncJob
   include Sidekiq::Job
 
   sidekiq_options queue: :default, retry: 5
 
-  DEFAULT_REPO = 'ENSL/NS'
-  GITHUB_API_BASE = 'https://api.github.com'
-  USER_AGENT = 'ensl-sidekiq-data-file-sync'
-  DEMO_FTP = {
-    host: ENV['DEMO_FTP_HOST'],
-    username: ENV['DEMO_FTP_USERNAME'],
-    password: ENV['DEMO_FTP_PASSWORD'],
-    directory: ENV.fetch('DEMO_FTP_DIRECTORY', '/'),
-    enabled: false
-  }.freeze
+  CONFIG_PATH = Rails.root.join('config', 'data_file_sync_servers.json')
 
-  def perform(options = {})
-    options = normalize_options(options)
-    client_root = File.join(files_root, 'client')
-    demo_root = File.join(files_root, 'demos', 'sputnik')
-    FileUtils.mkdir_p(client_root)
-    FileUtils.mkdir_p(demo_root)
+  def perform(_options = {})
+    server_configs = load_server_configs
 
-    sync_github_release_assets(client_root, options[:repo])
+    if server_configs.blank?
+      Rails.logger.info('[DataFileSyncJob] No server config entries found; skipping download sync')
+      return
+    end
 
-    if options[:enable_demo_downloader]
-      sync_ftp_demos(demo_root, options[:demo_ftp])
-    else
-      Rails.logger.info('[DataFileSyncJob] Demo downloader is disabled; skipping demo sync')
+    server_configs.each do |server_config|
+      sync_server(server_config)
     end
   ensure
     run_directory_reconciliation
@@ -42,129 +28,109 @@ class DataFileSyncJob
 
   private
 
-  def normalize_options(options)
-    opts = options.is_a?(Hash) ? options : {}
+  def load_server_configs
+    unless File.exist?(CONFIG_PATH)
+      Rails.logger.error("[DataFileSyncJob] Missing config file: #{CONFIG_PATH}")
+      return []
+    end
+
+    body = JSON.parse(File.read(CONFIG_PATH.to_s))
+    Array(body['servers']).filter_map { |server| normalize_server_config(server) }
+  rescue JSON::ParserError => e
+    Rails.logger.error("[DataFileSyncJob] Invalid JSON config: #{e.message}")
+    []
+  end
+
+  def normalize_server_config(raw_server)
+    server = raw_server.is_a?(Hash) ? raw_server : {}
+
+    nickname = safe_name(server['nickname'])
+    host = resolve_value(server['host'])
+    username = resolve_value(server['username'])
+    password = resolve_value(server['password'])
+
+    if nickname.blank? || host.blank? || username.blank? || password.blank?
+      Rails.logger.error('[DataFileSyncJob] Invalid server config entry (nickname/host/username/password required); skipping')
+      return nil
+    end
 
     {
-      repo: opts['repo'].presence || opts[:repo].presence || DEFAULT_REPO,
-      demo_ftp: DEMO_FTP.merge(opts['demo_ftp'] || opts[:demo_ftp] || {}),
-      enable_demo_downloader: ActiveModel::Type::Boolean.new.cast(opts['enable_demo_downloader'] || opts[:enable_demo_downloader] || DEMO_FTP[:enabled])
+      nickname: nickname,
+      host: host,
+      username: username,
+      password: password,
+      passive: ActiveModel::Type::Boolean.new.cast(server.fetch('passive', true)),
+      dirs: Array(server['dirs']).filter_map { |dir| normalize_dir_config(dir) }
     }
   end
 
-  def files_root
-    ENV['FILES_ROOT'].presence || File.join(Rails.root, 'public', 'files')
+  def normalize_dir_config(raw_dir)
+    return raw_dir.to_s if raw_dir.is_a?(String) && raw_dir.present?
+
+    remote = raw_dir.is_a?(Hash) ? raw_dir['remote'].to_s : ''
+    remote.presence
   end
 
-  def sync_github_release_assets(destination_root, repo)
-    tags = fetch_tags(repo)
-    release_assets = fetch_release_assets(repo)
-
-    tags.each do |tag|
-      release_assets.fetch(tag, []).uniq.each do |asset_url|
-        download_asset(destination_root, asset_url, prefix: tag)
-      end
-    end
-  end
-
-  def sync_ftp_demos(destination_root, ftp_config)
-    if ftp_config[:host].blank? || ftp_config[:username].blank? || ftp_config[:password].blank?
-      Rails.logger.error('[DataFileSyncJob] Demo FTP config missing host/username/password; skipping demo sync')
+  def sync_server(server_config)
+    if server_config[:dirs].blank?
+      Rails.logger.info("[DataFileSyncJob] No dirs configured for #{server_config[:nickname]}; skipping server")
       return
     end
 
-    Net::FTP.open(ftp_config[:host], ftp_config[:username], ftp_config[:password]) do |ftp|
-      ftp.passive = true
-      ftp.chdir(ftp_config[:directory])
-      ftp.nlst.grep(/\.(dem|gz)\z/i).each do |filename|
-        download_ftp_asset(destination_root, ftp, filename)
+    Net::FTP.open(server_config[:host], server_config[:username], server_config[:password]) do |ftp|
+      ftp.passive = server_config[:passive]
+
+      server_config[:dirs].each do |remote_dir|
+        sync_remote_dir(ftp, server_config, remote_dir)
       end
     end
   rescue StandardError => e
-    Rails.logger.error("[DataFileSyncJob] FTP demo sync failed: #{e.message}")
+    Rails.logger.error("[DataFileSyncJob] Failed to sync server #{server_config[:nickname]}: #{e.message}")
   end
 
-  def fetch_tags(repo)
-    github_paginated_get("/repos/#{repo}/tags?per_page=100").filter_map { |tag| tag['name'].presence }
-  end
+  def sync_remote_dir(ftp, server_config, remote_dir)
+    with_ftp_directory(ftp, remote_dir) do
+      ftp.nlst.each do |filename|
+        next if ['.', '..'].include?(filename)
 
-  def fetch_release_assets(repo)
-    assets_by_tag = Hash.new { |hash, key| hash[key] = [] }
-
-    github_paginated_get("/repos/#{repo}/releases?per_page=100").each do |release|
-      tag = release['tag_name'].to_s
-      next if tag.blank?
-
-      Array(release['assets']).each do |asset|
-        url = asset['browser_download_url'].to_s
-        assets_by_tag[tag] << url if url.present?
+        download_ftp_asset(server_config[:nickname], ftp, filename)
       end
     end
-
-    assets_by_tag.transform_values(&:uniq)
-  end
-
-  def github_paginated_get(path)
-    results = []
-    next_url = path
-
-    while next_url.present?
-      response = github_connection.get(next_url) do |request|
-        request.headers['Accept'] = 'application/vnd.github+json'
-        request.headers['User-Agent'] = USER_AGENT
-      end
-
-      raise "GitHub request failed (#{response.status}) for #{next_url}" unless response.success?
-
-      body = JSON.parse(response.body)
-      body = [body] unless body.is_a?(Array)
-      results.concat(body)
-
-      next_url = next_link_from(response.headers['link'])
-    end
-
-    results
-  end
-
-  def next_link_from(link_header)
-    return nil if link_header.blank?
-
-    next_part = link_header.split(',').map(&:strip).find { |segment| segment.include?('rel="next"') }
-    return nil unless next_part
-
-    next_part[/<([^>]+)>/, 1]
-  end
-
-  def github_connection
-    @github_connection ||= Faraday.new(url: GITHUB_API_BASE) do |connection|
-      connection.options.open_timeout = 20
-      connection.options.timeout = 120
-      connection.adapter(Faraday.default_adapter)
-    end
-  end
-
-  def download_asset(destination_root, asset_url, prefix: nil)
-    filename = filename_for(asset_url, prefix)
-    destination_path = File.join(destination_root, filename)
-
-    if File.exist?(destination_path)
-      Rails.logger.info("[DataFileSyncJob] Skipping existing file #{destination_path}")
-      return
-    end
-
-    URI.open(asset_url, 'User-Agent' => USER_AGENT, open_timeout: 20, read_timeout: 120) do |stream|
-      File.open(destination_path, 'wb') do |file|
-        IO.copy_stream(stream, file)
-      end
-    end
-
-    Rails.logger.info("[DataFileSyncJob] Downloaded #{asset_url} -> #{destination_path}")
   rescue StandardError => e
-    Rails.logger.error("[DataFileSyncJob] Failed to download #{asset_url}: #{e.message}")
+    Rails.logger.error("[DataFileSyncJob] Failed syncing #{server_config[:nickname]}:#{remote_dir} (#{e.message})")
   end
 
-  def download_ftp_asset(destination_root, ftp, filename)
+  def with_ftp_directory(ftp, remote_dir)
+    original_dir = ftp.pwd
+    ftp.chdir(remote_dir)
+    yield
+  ensure
+    begin
+      ftp.chdir(original_dir)
+    rescue StandardError
+      nil
+    end
+  end
+
+  def resolve_value(value)
+    return nil if value.nil?
+
+    text = value.to_s
+    return ENV[text.delete_prefix('env:')] if text.start_with?('env:')
+
+    text
+  end
+
+  def download_ftp_asset(nickname, ftp, filename)
+    kind = Directory.sync_kind_for_filename(filename)
+    return if kind.blank?
+
+    destination_root = Directory.sync_download_root(kind: kind, nickname: nickname)
+    return if destination_root.blank?
+
+    FileUtils.mkdir_p(destination_root)
     destination_path = File.join(destination_root, File.basename(filename))
+
     remote_size = begin
       ftp.size(filename)
     rescue StandardError
@@ -182,7 +148,7 @@ class DataFileSyncJob
     end
 
     ftp.getbinaryfile(filename, destination_path)
-    File.utime(Time.now, remote_mtime, destination_path) if remote_mtime
+    File.utime(Time.current, remote_mtime, destination_path) if remote_mtime
     Rails.logger.info("[DataFileSyncJob] Downloaded FTP asset #{filename} -> #{destination_path}")
   rescue StandardError => e
     Rails.logger.error("[DataFileSyncJob] Failed to download FTP asset #{filename}: #{e.message}")
@@ -200,18 +166,6 @@ class DataFileSyncJob
     false
   end
 
-  def filename_for(asset_url, prefix)
-    basename = File.basename(URI.parse(asset_url).path.to_s)
-    basename = CGI.unescape(basename)
-    basename = 'asset' if basename.blank?
-
-    return basename if prefix.blank?
-
-    "#{safe_name(prefix)}__#{basename}"
-  rescue URI::InvalidURIError
-    prefix.blank? ? 'asset' : "#{safe_name(prefix)}__asset"
-  end
-
   def run_directory_reconciliation
     root_directory = Directory.find_by(id: Directory::ROOT)
     unless root_directory
@@ -226,6 +180,6 @@ class DataFileSyncJob
   end
 
   def safe_name(value)
-    value.to_s.gsub(%r{[\\/]}, '_')
+    value.to_s.gsub(/[^A-Za-z0-9._-]/, '_').downcase
   end
 end

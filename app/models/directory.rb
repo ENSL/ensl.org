@@ -33,6 +33,14 @@ class Directory < ActiveRecord::Base
   include Extra
 
   MAX_FILE_COUNT_MATCH_CANDIDATES = 200
+  SYNC_KIND_DEMOS = 'demos'
+  SYNC_KIND_LOGS = 'logs'
+  SYNC_SUFFIX_KIND_MAP = {
+    '.dem.gz' => SYNC_KIND_DEMOS,
+    '.log.gz' => SYNC_KIND_LOGS,
+    '.dem' => SYNC_KIND_DEMOS,
+    '.log' => SYNC_KIND_LOGS
+  }.freeze
 
   IGNORED_RECONCILIATION_ROOT_DIRS = %w[uploads .trash preload logs tmp].freeze
   BLOCKED_ROOT_LEVEL_DIRS = %w[preload logs tmp].freeze
@@ -123,6 +131,37 @@ class Directory < ActiveRecord::Base
 
     list << directory
     directory_traverse(directory.parent, list)
+  end
+
+  def self.sync_download_root(kind:, nickname:)
+    base_root = sync_download_base_root(kind)
+    segment = sanitize_sync_segment(nickname)
+    return nil if base_root.blank? || segment.blank?
+
+    File.join(base_root, segment)
+  end
+
+  def self.sync_kind_for_filename(filename)
+    name = filename.to_s.downcase
+    suffix = SYNC_SUFFIX_KIND_MAP.keys.sort_by(&:length).reverse.find { |ext| name.end_with?(ext) }
+    suffix ? SYNC_SUFFIX_KIND_MAP[suffix] : nil
+  end
+
+  def self.sync_download_base_root(kind)
+    normalized_kind = sanitize_sync_segment(kind)
+
+    case normalized_kind
+    when SYNC_KIND_DEMOS
+      find_by(id: DEMOS)&.full_path || File.join(ENV['FILES_ROOT'], SYNC_KIND_DEMOS)
+    when SYNC_KIND_LOGS
+      logs_directory = where(parent_id: ROOT).find_by('LOWER(name) = ?', SYNC_KIND_LOGS)
+      logs_directory&.full_path || File.join(ENV['FILES_ROOT'], SYNC_KIND_LOGS)
+    end
+  end
+
+  def self.sanitize_sync_segment(value)
+    sanitized = value.to_s.strip.downcase.gsub(/[^a-z0-9._-]/, '_')
+    sanitized.presence
   end
 
   # Get the full filesystem path for this directory (used for file storage)
@@ -349,7 +388,11 @@ class Directory < ActiveRecord::Base
 
   # Create a new directory record for discovered disk directory
   def create_new_subdir(item_name, logger, stats: nil)
-    subdir = subdirs.build(name: item_name)
+    subdir = subdirs.build(
+      name: item_name,
+      title: item_name.to_s.capitalize,
+      hidden: false
+    )
     subdir.save!(validate: false) # Skip validation for disk-found dirs
     increment_stat(stats, :directories_created)
     logger.info("New dir: #{subdir.full_path}")

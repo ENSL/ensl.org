@@ -1,0 +1,14 @@
+{
+  "servers": [
+    {
+      "nickname": "sputnik",
+      "host": "env:DEMO_FTP_HOST",
+      "username": "env:DEMO_FTP_USERNAME",
+      "password": "env:DEMO_FTP_PASSWORD",
+      "passive": true,
+      "dirs": [
+        "/"
+      ]
+    }
+  ]
+}
