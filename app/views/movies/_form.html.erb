@@ -28,10 +28,14 @@
     <%= f.label :user_name, "Author" %>
     <%= f.text_field :user_name, { value: @movie&.user } %>
   </div>
+  <% file_options = DataFile.movies.collect { |d| ["#{d.name}", d.id] } %>
+  <% if @movie.file && !file_options.any? { |(_, id)| id == @movie.file_id } %>
+    <% file_options.unshift([@movie.file.name.to_s, @movie.file_id]) %>
+  <% end %>
   <div class="fields horizontal">
     <%= f.label :file %>
     <div class="inputs">
-      <%= f.select :file_id, DataFile.movies.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>  
+      <%= f.select :file_id, file_options, { include_blank: true }, { selected: @movie.file_id } %>
     </div>
   </div>
   <div class="fields horizontal">

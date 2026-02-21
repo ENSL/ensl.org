@@ -45,4 +45,45 @@ RSpec.describe MoviesController, type: :controller do
       expect(flash[:notice]).to include('/tmp/test_preview.mp4')
     end
   end
+
+  describe 'PATCH #update' do
+    it 'does not clear existing file when file_id is submitted blank' do
+      login_admin
+      original_file_id = movie.file_id
+
+      patch :update, params: {
+        id: movie.id,
+        movie: {
+          content: 'updated content',
+          file_id: ''
+        }
+      }
+
+      expect(response).to redirect_to(movie_path(movie))
+      expect(movie.reload.file_id).to eq(original_file_id)
+      expect(movie.content).to eq('updated content')
+    end
+  end
+
+  describe 'GET #show' do
+    it 'renders successfully when movie has no file' do
+      login_admin
+      movie.update!(file: nil)
+
+      get :show, params: { id: movie.id }
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders successfully when movie has no file' do
+      login_admin
+      movie.update!(file: nil)
+
+      get :edit, params: { id: movie.id }
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end

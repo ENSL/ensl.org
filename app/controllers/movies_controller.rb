@@ -61,8 +61,10 @@ class MoviesController < ApplicationController
     raise AccessError unless @movie.can_update? cuser
 
     @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
+    movie_params = Movie.params(params, cuser)
+    movie_params = movie_params.except(:file_id) if movie_params[:file_id].blank?
 
-    if @movie.update(Movie.params(params, cuser))
+    if @movie.update(movie_params)
       flash[:notice] = t(:movies_update)
       redirect_to(@movie)
     else

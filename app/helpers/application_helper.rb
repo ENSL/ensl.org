@@ -160,6 +160,8 @@ module ApplicationHelper
   end
 
   def add_comments(object)
+    return ''.html_safe unless object
+
     @comment = Comment.new(commentable: object)
     @comments = object.comments.ordered.with_userteam
 
