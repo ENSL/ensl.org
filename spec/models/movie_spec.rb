@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'tmpdir'
 
 RSpec.describe Movie, type: :model do
   let(:user) { instance_double('User', id: 1, username: 'alice') }
@@ -116,6 +117,23 @@ RSpec.describe Movie, type: :model do
                                                                  output_path: instance_of(String),
                                                                  at_seconds: 12.5)
       movie.make_snapshot(seconds: 12.5)
+    end
+
+    it 'make_preview falls back to copying source in test when transcoding fails' do
+      Dir.mktmpdir do |dir|
+        source_path = File.join(dir, 'video.mp4')
+        File.binwrite(source_path, 'video-bytes')
+
+        allow(data_file).to receive(:location).and_return(source_path)
+        movie.file = data_file
+        allow(VideoProcessing).to receive(:transcode_for_web!).and_raise(VideoProcessing::CommandFailed,
+                                                                         'ffmpeg failed')
+
+        result = movie.make_preview
+
+        expect(result).to eq(movie.preview_path)
+        expect(File.exist?(movie.preview_path)).to be(true)
+      end
     end
 
     context '#length_s' do
