@@ -53,6 +53,7 @@
   messages_create: "Viesti on luotu."
   movies_create: "Video on luotu."
   movies_update: "Video on päivitetty."
+  executed: "Suoritettu: "
   execute: "Suoritettu: "
   pcws_create: "Harjoitusottelu on säästetty."
   matches_nofound: "Ottelua ei löydetty."

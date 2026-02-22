@@ -62,6 +62,7 @@ en:
   message_create: "Message was successfully sent."
   movies_create: "Movie was successfully created."
   movies_update: "Movie was successfully updated."
+  executed: "Executed: "
   execute: "Executed: "
   pcws_create: "Pcw was successfully saved."
   matches_nofound: "Match cannot be found."
