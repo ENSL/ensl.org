@@ -13,7 +13,7 @@
       <td><%= shoutmsg.created_at.strftime("%Y/%m/%d") %></td>
       <td><%= shoutmsg.created_at.strftime("%H:%M") %></td>
       <td><%= namelink shoutmsg.user %></td>
-      <td><%= shoutmsg.text %></td>
+      <td><%= emojify_aliases(shoutmsg.text) %></td>
     </tr>
   <% end %>
 </table>

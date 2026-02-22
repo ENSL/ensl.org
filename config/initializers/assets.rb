@@ -33,3 +33,5 @@ Rails.application.config.assets.precompile += %w[controllers/gather_sync_control
 Rails.application.config.assets.precompile += %w[controllers/index.js]
 Rails.application.config.assets.precompile += %w[controllers/local.js]
 Rails.application.config.assets.precompile += %w[controllers/shoutbox.js]
+Rails.application.config.assets.precompile += %w[controllers/twemoji_controller.js]
+Rails.application.config.assets.precompile += %w[controllers/emoji_autocomplete_controller.js]

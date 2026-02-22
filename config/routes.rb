@@ -208,6 +208,7 @@ Rails.application.routes.draw do
   # Utility
   get 'refresh', to: 'application#refresh'
   get 'search',  to: 'application#search'
+  get 'emoji/shortcodes', to: 'application#emoji_shortcodes'
 
   # Plugin
   get 'plugin/user', to: 'plugin#user'

@@ -122,7 +122,7 @@ class Article < ActiveRecord::Base
   end
 
   def markdown_to_html(source)
-    text = source.to_s
+    text = EmojiParser.parse(source.to_s) { |emoji| emoji.raw }
 
     if defined?(Commonmarker)
       # Disable raw HTML to prevent XSS

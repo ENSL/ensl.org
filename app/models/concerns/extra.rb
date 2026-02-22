@@ -29,7 +29,9 @@ module Extra
     def bbcode_to_html(text)
       # Strip any HTML tags before parsing BBCode to prevent HTML injection
       # Then let views sanitize the BBCode-generated HTML
-      strip_tags(text.to_s).bbcode_to_html.gsub(/\n|\r\n/, '<br>')
+      plain_text = strip_tags(text.to_s)
+      emojified = EmojiParser.parse(plain_text) { |emoji| emoji.raw }
+      emojified.bbcode_to_html.gsub(/\n|\r\n/, '<br>')
     end
 
     def cleanup_string(str, len = 20)

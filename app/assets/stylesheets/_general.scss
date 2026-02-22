@@ -56,3 +56,40 @@ $fa-var-hourglass: "\f254";
 // Used for icons
 .green { color:#1f7f5c }
 .red { color:#de440c }
+
+img.emoji {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0 0.05em;
+  vertical-align: -0.1em;
+}
+
+.tribute-container {
+  position: absolute;
+  z-index: 9999;
+  background: $base-body-color;
+  border: 1px solid $base-border-color;
+  border-radius: $base-border-radius;
+  box-shadow: $light-shadow;
+
+  ul {
+    margin: 0;
+    padding: 4px 0;
+    max-height: 220px;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  li {
+    margin: 0;
+    padding: 6px 10px;
+    color: $base-font-color;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  li.highlight {
+    background: $light-gray;
+  }
+}

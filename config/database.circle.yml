@@ -2,6 +2,7 @@ test:
   host: 127.0.0.1
   database: ensl_test
   adapter: mysql2
-  encoding: utf8
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
   username: ensl
   password: ensl

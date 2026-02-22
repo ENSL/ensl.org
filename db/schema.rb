@@ -10,26 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
-  create_table "article_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+ActiveRecord::Schema[8.1].define(version: 2026_02_22_090000) do
+  create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
-    t.text "text", size: :medium
+    t.text "text", size: :long
     t.integer "text_coding", default: 0, null: false
-    t.text "text_parsed", size: :medium
+    t.text "text_parsed", size: :long
     t.string "title"
     t.datetime "updated_at", precision: nil
     t.integer "version"
     t.index ["article_id"], name: "index_article_versions_on_article_id"
   end
 
-  create_table "articles", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "articles", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "category_id"
     t.datetime "created_at", precision: nil
     t.integer "status", null: false
-    t.text "text", size: :medium
+    t.text "text", size: :long
     t.integer "text_coding", default: 0, null: false
-    t.text "text_parsed", size: :medium
+    t.text "text_parsed", size: :long
     t.string "title"
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
@@ -113,12 +113,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["user_id"], name: "index_challenges_on_user_id"
   end
 
-  create_table "comments", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "comments", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "commentable_id"
     t.string "commentable_type"
     t.datetime "created_at", precision: nil
-    t.text "text"
-    t.text "text_parsed"
+    t.text "text", size: :medium
+    t.text "text_parsed", size: :medium
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
@@ -314,15 +314,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.integer "user_id", null: false
   end
 
-  create_table "issues", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "issues", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "assigned_id"
     t.integer "author_id"
     t.integer "category_id"
     t.datetime "created_at", precision: nil
-    t.text "solution"
+    t.text "solution", size: :medium
     t.integer "status"
-    t.text "text"
-    t.text "text_parsed"
+    t.text "text", size: :medium
+    t.text "text_parsed", size: :medium
     t.string "title"
     t.datetime "updated_at", precision: nil
     t.index ["assigned_id"], name: "index_issues_on_assigned_id"
@@ -444,14 +444,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["week_id"], name: "index_matches_on_week_id"
   end
 
-  create_table "messages", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "messages", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "recipient_id"
     t.string "recipient_type"
     t.integer "sender_id"
     t.string "sender_type"
-    t.text "text"
-    t.text "text_parsed"
+    t.text "text", size: :medium
+    t.text "text_parsed", size: :medium
     t.string "title"
     t.datetime "updated_at", precision: nil
     t.index ["recipient_id", "recipient_type"], name: "index_messages_on_recipient_id_and_recipient_type"
@@ -512,10 +512,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["user_id"], name: "index_polls_on_user_id"
   end
 
-  create_table "posts", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
+  create_table "posts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
-    t.text "text"
-    t.text "text_parsed"
+    t.text "text", size: :medium
+    t.text "text_parsed", size: :medium
     t.integer "topic_id"
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
@@ -535,8 +535,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["user_id"], name: "index_predictions_on_user_id"
   end
 
-  create_table "profiles", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
-    t.text "achievements"
+  create_table "profiles", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.text "achievements", size: :medium
     t.string "achievements_parsed", limit: 400
     t.string "avatar"
     t.string "beverage"
@@ -576,7 +576,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.string "scripts"
     t.string "sensitivity"
     t.string "signature"
-    t.text "signature_parsed"
+    t.text "signature_parsed", size: :medium
     t.string "singleplayer"
     t.string "soundcard"
     t.string "speakers"
@@ -723,7 +723,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["user_id"], name: "index_shoutmsgs_on_user_id"
   end
 
-  create_table "shoutmsgs", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "shoutmsgs", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "shoutable_id"
     t.string "shoutable_type"
@@ -773,7 +773,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_220039) do
     t.index ["founder_id"], name: "index_teams_on_founder_id"
   end
 
-  create_table "topics", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
+  create_table "topics", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "forum_id"
     t.integer "state", default: 0, null: false

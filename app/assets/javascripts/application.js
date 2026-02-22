@@ -5,6 +5,7 @@
 // = require jquery_ujs
 // = require jquery.jplayer.min
 // = require yetii
+// = require twemoji
 
 /*
  This file is the Sprockets application manifest converted from CoffeeScript.

@@ -52,6 +52,7 @@ gem 'unread'
 # Transform text to nice HTML
 gem 'bbcoder'
 gem 'commonmarker'
+gem 'gemoji-parser'
 # File attachments
 gem 'carrierwave'
 # Image manipulation, avatars
@@ -103,6 +104,7 @@ gem 'rails_autolink'
 gem 'i18n-js'
 gem 'jquery-rails'
 gem 'tinymce-rails'
+gem 'twemoji-rails'
 
 # CSS
 gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues

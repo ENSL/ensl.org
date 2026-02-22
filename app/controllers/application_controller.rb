@@ -17,6 +17,20 @@ class ApplicationController < ActionController::Base
 
   respond_to :html, :js
 
+  def emoji_shortcodes
+    entries = Emoji.all.flat_map do |emoji|
+      emoji.aliases.map do |emoji_alias|
+        {
+          key: emoji_alias,
+          value: ":#{emoji_alias}:",
+          emoji: emoji.raw
+        }
+      end
+    end
+
+    render json: entries
+  end
+
   def cuser
     return @cuser if defined?(@cuser) && @cuser
 

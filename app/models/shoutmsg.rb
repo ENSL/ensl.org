@@ -35,6 +35,7 @@ class Shoutmsg < ActiveRecord::Base
   scope :ordered, -> { order('id') }
 
   after_create_commit :broadcast_shoutmsg
+  before_validation :normalize_emoji_aliases
 
   def domain
     self[:shoutable_type] ? "shout_#{shoutable_type}_#{shoutable_id}" : 'shoutbox'
@@ -49,6 +50,10 @@ class Shoutmsg < ActiveRecord::Base
   end
 
   private
+
+  def normalize_emoji_aliases
+    self.text = EmojiParser.parse(text.to_s) { |emoji| emoji.raw }
+  end
 
   def broadcast_shoutmsg
     # Reload from DB to ensure associations (user) are present when rendering in the job

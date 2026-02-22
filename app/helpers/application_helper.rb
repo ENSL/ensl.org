@@ -151,6 +151,10 @@ module ApplicationHelper
     raw link_to text, url
   end
 
+  def emojify_aliases(text)
+    EmojiParser.parse(text.to_s) { |emoji| emoji.raw }
+  end
+
   def flag(country)
     if country and country.to_s.size > 0
       image_tag 'shared/blank.gif', class: "flag flag-#{country.downcase}"
