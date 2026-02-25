@@ -14,6 +14,7 @@ all:
 	@echo "  * pull  - pull $(IMAGE)"
 	@echo "  * push  - push $(IMAGE)"
 	@echo "  * test  - build and test $(IMAGE)"
+	@echo "  * deploy_check - run production pre-deploy MySQL integrity checks"
 	@echo "  * prep_prod - checkout master and build production+sidekiq images for production profile"
 	@echo "  * deploy_prod - start missing prod deps without restart, then recreate production app/worker containers"
 	@echo "  * restart_prod_all - recreate full production stack without rebuilding images"
@@ -50,6 +51,9 @@ deploy_prod:
 	    --remove-orphans \
 	    production sidekiq\
 	'
+
+deploy_check:
+	bash ./script/deploy_check.sh .env .env.production .env.local
 
 restart_prod_all:
 	bash -lc '\
