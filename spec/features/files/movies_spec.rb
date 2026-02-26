@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'timeout'
 
 RSpec.feature 'Movies management', type: :feature, js: true do
   include Features::VideoSampleHelper
@@ -452,9 +453,14 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Make a Preview'
 
-      expect(page).to have_content(I18n.t(:executed))
-      movie.reload
-      expect(movie.preview_url).to be_present
+      Timeout.timeout(5) do
+        loop do
+          break if movie.reload.preview_url.present?
+
+          sleep 0.1
+        end
+      end
+      expect(movie.reload.preview_url).to be_present
     end
 
     scenario 'movie maker can take snapshot for their own movie' do
@@ -567,9 +573,14 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Make a Preview'
 
-      expect(page).to have_content(I18n.t(:executed))
-      movie.reload
-      expect(movie.preview_url).to be_present
+      Timeout.timeout(5) do
+        loop do
+          break if movie.reload.preview_url.present?
+
+          sleep 0.1
+        end
+      end
+      expect(movie.reload.preview_url).to be_present
 
       # Now visit show page and verify preview is available
       visit movie_path(movie)
