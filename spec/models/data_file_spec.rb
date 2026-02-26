@@ -264,16 +264,9 @@ describe DataFile do
 
   describe '#should_update_relations?' do
     it 'returns true when related_id changed and has related_files' do
-      file = create(:data_file)
-      # Create another file that points to 'file'
-      other = create(:data_file)
-      other.update_column(:related_id, file.id)
-
-      # Reload to ensure related_files association is current
-      file.reload
-
-      # Update related_id and save to trigger the after_save callback
-      file.update!(related_id: 999)
+      file = build(:data_file)
+      allow(file).to receive(:saved_change_to_related_id?).and_return(true)
+      allow(file).to receive_message_chain(:related_files, :any?).and_return(true)
 
       expect(file.should_update_relations?).to be true
     end
@@ -281,6 +274,33 @@ describe DataFile do
     it 'returns false when related_id not changed' do
       file = create(:data_file)
       expect(file.should_update_relations?).to be false
+    end
+  end
+
+  describe '#update_relations' do
+    it 'reparents direct related files to the new related file' do
+      directory = create(:directory)
+      new_parent = create(:data_file, directory: directory)
+      moving_file = create(:data_file, directory: directory)
+      child1 = create(:data_file, directory: directory, related: moving_file)
+      child2 = create(:data_file, directory: directory, related: moving_file)
+
+      moving_file.update!(related: new_parent)
+
+      expect(child1.reload.related).to eq(new_parent)
+      expect(child2.reload.related).to eq(new_parent)
+      expect(moving_file.reload.related).to eq(new_parent)
+    end
+
+    it 'does not create self references when new parent was already a child' do
+      directory = create(:directory)
+      parent = create(:data_file, directory: directory)
+      child = create(:data_file, directory: directory, related: parent)
+
+      parent.update!(related: child)
+
+      expect(child.reload.related).to be_nil
+      expect(parent.reload.related).to be_nil
     end
   end
 

@@ -67,6 +67,12 @@
             <p><strong>Size:</strong> <%= file.size_s %>MB</p>
 
             <div class="comments">
+              <% if file.related_files.count > 0 %>
+                <%= link_to file do %>
+                  <%= fa_icon('fa-solid fa-file-half-dashed') %> Related files (<%= file.related_files.count %>)
+                <% end %>
+              <% end %>
+
               <%= link_to file do %>
                 <%= fa_icon('comments') %> Comments (<%= file.comments.count %>)
               <% end %>

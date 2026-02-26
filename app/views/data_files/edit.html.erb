@@ -33,21 +33,21 @@
   <% @file.related_files.each do |related| %>
     <tr>
       <td>
-        <%= h related.name.filename %>
+        <%= namelink related %>
       </td>
       <td>
         <%= related.size_s %> MB
       </td>
       <td>
-        <%= link_to "Remove", controller: "data_files", action: "delFile", id: @file, "related_id" => related %>
+        <%= link_to "Remove", delFile_data_file_path(@file, related_id: related.id), method: :delete %>
       </td>
     </tr>
   <% end %>
 </table>
 
-<%= form_for @file, url: { action: "addFile", id: @file } do |f| %>
+<%= form_for @file, url: { action: "addFile", id: @file }, method: :post do |f| %>
   <div class="fields">
-    <%= f.select :related_id, @file.directory.files.except_file(@file).collect {|file| [file, file.id]} %>
+    <%= f.select :related_id, @related_file_options %>
   </div>
   <div class="controls">
     <%= f.submit "Add" %>

@@ -92,11 +92,6 @@ class DataFile < ActiveRecord::Base
     md5.upcase
   end
 
-  # Not used.
-  def extra_url
-    url.to_s.gsub(%r{^/files}, 'http://extra.ensl.org/static')
-  end
-
   def size_s
     "#{(size.to_f / MEGABYTE).round(2)} MB"
   end
@@ -275,8 +270,9 @@ class DataFile < ActiveRecord::Base
   end
 
   def update_relations
-    related_files.each do |rf|
-      rf.update(related: related)
+    related_files.find_each do |rf|
+      new_related = rf.id == related_id ? nil : related
+      rf.update(related: new_related)
     end
   end
 

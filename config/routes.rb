@@ -165,10 +165,12 @@ Rails.application.routes.draw do
     end
   end
   resources :data_files do
+    member do
+      post :addFile
+      delete :delFile
+    end
     collection do
       get :admin
-      get :addFile
-      get :delFile
       get :trash
     end
   end

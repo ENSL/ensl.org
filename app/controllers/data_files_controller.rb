@@ -26,6 +26,8 @@ class DataFilesController < ApplicationController
 
   def edit
     raise AccessError unless @file.can_update? cuser
+
+    @related_file_options = related_file_options
   end
 
   def create
@@ -62,16 +64,19 @@ class DataFilesController < ApplicationController
   def addFile
     raise AccessError unless @file.can_update? cuser
 
-    @related = @file.directory.files.not(@file).find params[:data_file][:related_id]
-    @related.related = @file
-    @related.save
+    @related = @file.directory.files.except_file(@file).find(params[:data_file][:related_id])
+    @related.update!(related: @file)
     redirect_to edit_data_file_url(@file)
+  rescue ActiveRecord::RecordInvalid
+    @related_file_options = related_file_options
+    @file.errors.add(:base, 'Could not add related file')
+    render :edit, status: :unprocessable_entity
   end
 
   def delFile
     raise AccessError unless @file.can_update? cuser
 
-    @related = @file.related_files.first params[:related_id]
+    @related = @file.related_files.find params[:related_id]
     @related.related = nil
     @related.save
     redirect_to edit_data_file_url(@file)
@@ -108,5 +113,12 @@ class DataFilesController < ApplicationController
 
   def get_file
     @file = DataFile.find params[:id]
+  end
+
+  def related_file_options
+    @file.directory.files.except_file(@file).includes(:related_files).map do |file|
+      suffix = file.related_files.any? ? " (+#{file.related_files.size} related files)" : ''
+      ["#{file}#{suffix}", file.id]
+    end
   end
 end
