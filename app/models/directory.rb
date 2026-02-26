@@ -68,6 +68,7 @@ class Directory < ActiveRecord::Base
   validate :name_unchanged_on_update, on: :update
   validate :name_not_blocked_at_root_level
   validates :title, presence: true, length: { in: 1..255 }
+  validates :description, length: { maximum: 255 }
   validates :hidden, inclusion: { in: [true, false] }
 
   before_validation :ensure_path_cached

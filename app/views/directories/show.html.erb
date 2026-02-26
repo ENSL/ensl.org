@@ -49,6 +49,10 @@
           <% end %>
         </div>
 
+        <% if dir.description.present? %>
+          <p><%= dir.description %></p>
+        <% end %>
+
         <h3>Files</h3>
 
         <% dir.files.unrelated.each do |file| %>
