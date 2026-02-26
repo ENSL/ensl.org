@@ -35,6 +35,9 @@ services:
     profiles: ["development", "staging", "production"]
     command: bundle exec sidekiq
     restart: unless-stopped
+    volumes:
+      - .:/var/www
+      - ${FILES_HOST_ROOT}:${FILES_ROOT}
 
   staging:
     <<: *app
