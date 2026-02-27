@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_26_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_27_111000) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -668,6 +668,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_100000) do
     t.string "ping"
     t.integer "players"
     t.integer "server_id"
+    t.string "status", default: "offline", null: false
     t.datetime "updated_at", precision: nil
     t.integer "version"
     t.index ["server_id"], name: "index_server_versions_on_server_id"
@@ -683,7 +684,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_100000) do
     t.integer "domain", default: 0, null: false
     t.datetime "idle", precision: nil
     t.string "ip"
-    t.string "irc"
     t.string "map"
     t.integer "max_players"
     t.string "name"
@@ -696,6 +696,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_100000) do
     t.string "recordable_type"
     t.string "recording"
     t.string "reservation"
+    t.string "status", default: "offline", null: false
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.integer "version"

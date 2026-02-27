@@ -19,6 +19,7 @@ gem 'dotenv-rails'
 gem 'mysql2'
 gem 'redis', '~> 4.8'
 gem 'sidekiq'
+gem 'sidekiq-cron'
 
 # Web server.
 # Faraday provides NET-HTTP functions
@@ -59,6 +60,8 @@ gem 'carrierwave'
 gem 'rmagick'
 # Union for AR
 gem 'active_record_union'
+# Auditing/version tracking
+gem 'paper_trail'
 
 # External APIs.
 # Steam condenders for querying Steam API and last to help with StemaIDs

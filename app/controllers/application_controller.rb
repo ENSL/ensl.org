@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
 
   before_action :update_user
   before_action :set_controller_and_action_names
+  before_action :set_paper_trail_whodunnit
 
   # Omniauth has its own CSRF handling for the callback endpoint.
   protect_from_forgery with: :exception
@@ -218,5 +219,9 @@ class ApplicationController < ActionController::Base
   def set_controller_and_action_names
     @current_controller = controller_name
     @current_action     = action_name
+  end
+
+  def user_for_paper_trail
+    cuser&.id
   end
 end

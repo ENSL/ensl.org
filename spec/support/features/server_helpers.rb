@@ -7,7 +7,6 @@ module Features
       password = 'secret'
       name = 'MyNsServer'
       description = 'My NS Server'
-      irc = '#some_channel'
 
       visit new_server_path
       fill_in 'Dns', with: dns
@@ -16,14 +15,12 @@ module Features
       fill_in 'Password', with: password
       fill_in 'Name', with: name
       fill_in 'Description', with: description
-      fill_in 'Irc', with: irc
       page.execute_script("document.getElementById('server_official').checked = true;")
       click_button 'Save'
 
       expect(page).to have_content(dns)
       expect(page).to have_content("#{ip}:#{port}")
       expect(page).to have_content(password)
-      expect(page).to have_content(irc)
       expect(page).to have_content(description)
 
       click_link 'Edit Server'
@@ -34,14 +31,12 @@ module Features
       fill_in 'Password', with: "#{password}2"
       fill_in 'Name', with: "#{name}2"
       fill_in 'Description', with: "#{description}2"
-      fill_in 'Irc', with: "#{irc}2"
       page.execute_script("document.getElementById('server_official').checked = true;")
       click_button 'Save'
 
       expect(page).to have_content('192.168.1.2:8001')
       expect(page).to have_content("#{dns}2")
       expect(page).to have_content("#{password}2")
-      expect(page).to have_content("#{irc}2")
       expect(page).to have_content("#{description}2")
     end
   end

@@ -1,0 +1,53 @@
+<table class="striped expandable roomy servers-table">
+  <thead>
+    <tr>
+      <th>Server</th>
+      <th class="players-col">Players</th>
+      <th class="actions actions-col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if servers.any? %>
+      <% servers.each do |server| %>
+        <% detail_id = "server-detail-#{server.id}" %>
+        <tr class="expand-row" data-expand-target="<%= detail_id %>" aria-expanded="false">
+          <td>
+            <div class="server-main">
+              <span class="expand-toggle" data-expand-icon><%= fa_icon('chevron-right') %></span>
+              <%= fa_icon('server', class: server.online? ? 'text-green-600' : 'text-red-600') %>
+              <strong><%= h server.name %></strong>
+              <% if cuser&.admin? %>
+                <span class="admin-edit" data-no-toggle>
+                  <%= link_to fa_icon('pencil'), edit_server_path(server), title: 'Edit server' %>
+                </span>
+              <% end %>
+            </div>
+            <div class="cell-subtle"><%= h(server.dns.presence || server.addr) %> • <%= server_status_label(server) %></div>
+          </td>
+          <td class="players-col"><%= server.players || 0 %><%= server.max_players.present? ? "/#{server.max_players}" : '' %></td>
+          <td class="actions" data-no-toggle>
+            <%= link_to 'Connect', "steam://run/4920//connect #{server.ip} #{server.password}", class: 'button tiny server-connect' %>
+          </td>
+        </tr>
+        <tr id="<%= detail_id %>" class="expand-detail">
+          <td colspan="3">
+            <div class="server-detail-meta">
+              <strong>IP:</strong> <%= h server.addr %>
+              &nbsp; | &nbsp;
+              <strong>Map:</strong> <%= h(server.map.presence || '-') %>
+              &nbsp; | &nbsp;
+              <strong>Password:</strong> <%= h(server.password.presence || '-') %>
+            </div>
+            <% if server.description.present? %>
+              <div class="server-description"><%= h(server.description) %></div>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="3">No servers available.</td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

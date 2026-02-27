@@ -1,5 +1,8 @@
 <h1 class="fancy">
-  <span><%= h @server.name %></span>
+  <span>
+    <%= fa_icon('circle', class: @server.online? ? 'text-green-600' : 'text-red-600') %>
+    <%= h @server.name %>
+  </span>
 </h1>
 
 <% if map = Map.find_by_name(@server.map) and map.picture.length > 0 %>
@@ -13,12 +16,9 @@
   <%= link_to @server.addr, "steam://connect/#{@server.addr}" %>
 </p>
 
-<%= cascade @server, ["dns", "password", "irc", ["Owner", :user], "description"] %>
+<%= cascade @server, ["dns", "password", ["Owner", :user], "description"] %>
 
 <% if @server.can_update? cuser %>
   <%= link_to 'Edit Server', edit_server_path(@server), class: 'button' %>
   <%= link_to 'Delete Server', @server, confirm: 'Are you sure?', method: :delete, class: 'button'  %>
-  <% if @server.domain == Server::DOMAIN_HLTV %>
-    <%= link_to 'Default Record', action: "default", id: @server, class: 'button' %>
-  <% end %>
 <% end %>

@@ -54,3 +54,53 @@ table.striped > thead {
     text-align: right;
   }
 }
+
+/*
+  Expandable Tables (generic)
+*/
+
+table.expandable {
+  .expand-row {
+    cursor: pointer;
+  }
+
+  .expand-toggle {
+    color: $medium-gray;
+    display: inline-block;
+    margin-right: 0.35rem;
+    transition: transform 0.15s ease;
+    width: 1rem;
+  }
+
+  .cell-subtle {
+    color: $medium-gray;
+    font-size: 0.9em;
+    margin-left: 1.55rem;
+  }
+
+  .admin-edit {
+    margin-left: 0.35rem;
+  }
+
+  tr[aria-expanded='true'] .expand-toggle {
+    transform: rotate(90deg);
+  }
+
+  tr.expand-detail {
+    display: none;
+  }
+
+  tr.expand-detail.is-open {
+    display: table-row;
+  }
+}
+
+table.roomy > tbody,
+table.roomy > thead {
+  > tr {
+    td:first-child,
+    th:first-child {
+      padding-left: $base-line-height;
+    }
+  }
+}

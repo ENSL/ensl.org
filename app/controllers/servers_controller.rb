@@ -2,9 +2,9 @@ class ServersController < ApplicationController
   before_action :get_server, except: %i[index refresh new create]
 
   def index
-    @servers = Server.hlds.active.ordered.includes(:user).all
-    @ns2 = Server.ns2.active.ordered.includes(:user).all
-    @officials = Server.ns2.active.ordered.where ['name LIKE ?', '%NSL%']
+    @servers = Server.hlds.active.ordered.includes(:user, :versions).all
+    @ns2 = Server.ns2.active.ordered.includes(:user, :versions).all
+    @officials = Server.ns2.active.ordered.where(['name LIKE ?', '%NSL%']).includes(:versions)
   end
 
   def show
@@ -43,13 +43,6 @@ class ServersController < ApplicationController
     end
   end
 
-  def default
-    raise AccessError unless @server.can_update? cuser
-
-    @server.default_record
-    render text: 'Ok'
-  end
-
   def destroy
     raise AccessError unless @server.can_destroy? cuser
 
@@ -63,5 +56,9 @@ class ServersController < ApplicationController
 
   def get_server
     @server = Server.find params[:id]
+    return if @server.active?
+    return if @server.can_update?(cuser)
+
+    raise ActiveRecord::RecordNotFound
   end
 end

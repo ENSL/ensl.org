@@ -31,10 +31,6 @@
     <%= f.text_field :description %>
   </div>
   <div class="fields horizontal">
-    <%= f.label :irc %>
-    <%= f.text_field :irc %>
-  </div>
-  <div class="fields horizontal">
     <%= f.label :domain %>
     <%= f.select :domain, @server.domains.invert %>
   </div>
@@ -43,6 +39,13 @@
     <%= f.check_box :official %>
     <%= f.label :official, class: 'checkbox' %>
   </div>
+  <% if @server.persisted? %>
+    <div class="fields horizontal">
+      <%= f.label :disabled, 'Disable server?' %>
+      <%= f.check_box :disabled %>
+      <%= f.label :disabled, class: 'checkbox' %>
+    </div>
+  <% end %>
 
   <div class="controls">
     <%= f.submit 'Save' %>

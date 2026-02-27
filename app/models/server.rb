@@ -9,7 +9,6 @@
 #  domain          :integer          default(0), not null
 #  idle            :datetime
 #  ip              :string(255)
-#  irc             :string(255)
 #  map             :string(255)
 #  max_players     :integer
 #  name            :string(255)
@@ -21,6 +20,7 @@
 #  recordable_type :string(255)
 #  recording       :string(255)
 #  reservation     :string(255)
+#  status          :string(255)      default("offline"), not null
 #  version         :integer
 #  created_at      :datetime
 #  updated_at      :datetime
@@ -45,18 +45,22 @@ class Server < ActiveRecord::Base
   DOMAIN_HLTV = 1
   DOMAIN_NS2 = 2
 
+  STATUS_OFFLINE = 'offline'
+  STATUS_ONLINE = 'online'
+
   attr_accessor :pwd
 
   # attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
   validates_length_of %i[name dns], in: 1..30
-  validates_length_of %i[password irc], maximum: 30, allow_blank: true
+  validates_length_of :password, maximum: 30, allow_blank: true
   validates_length_of :description, maximum: 255, allow_blank: true
   validates_format_of :ip, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
   validates_format_of :port, with: /\A[0-9]{1,5}\z/
   validates_format_of :reservation, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/,
                                     allow_nil: true
   validates_format_of :pwd, with: /\A[A-Za-z0-9_-]*\z/, allow_nil: true
+  validates_inclusion_of :status, in: [STATUS_OFFLINE, STATUS_ONLINE]
 
   scope :ordered, -> { order('name') }
   scope :hlds, -> { where('domain = ?', DOMAIN_HLDS) }
@@ -86,24 +90,7 @@ class Server < ActiveRecord::Base
 
   before_create :set_category
 
-  acts_as_versioned
-  non_versioned_columns << 'name'
-  non_versioned_columns << 'description'
-  non_versioned_columns << 'dns'
-  non_versioned_columns << 'ip'
-  non_versioned_columns << 'port'
-  non_versioned_columns << 'password'
-  non_versioned_columns << 'irc'
-  non_versioned_columns << 'user_id'
-  non_versioned_columns << 'official'
-  non_versioned_columns << 'domain'
-  non_versioned_columns << 'reservation'
-  non_versioned_columns << 'recording'
-  non_versioned_columns << 'idle'
-  non_versioned_columns << 'default_id'
-  non_versioned_columns << 'active'
-  non_versioned_columns << 'recordable_type'
-  non_versioned_columns << 'recordable_id'
+  has_paper_trail on: [:update], only: %i[map max_players status]
 
   def domains
     { DOMAIN_HLTV => 'HLTV', DOMAIN_HLDS => 'NS Server', DOMAIN_NS2 => 'NS2 Server' }
@@ -111,6 +98,18 @@ class Server < ActiveRecord::Base
 
   def to_s
     name
+  end
+
+  def online?
+    status == STATUS_ONLINE
+  end
+
+  def disabled
+    !active
+  end
+
+  def disabled=(value)
+    self.active = !ActiveModel::Type::Boolean.new.cast(value)
   end
 
   def addr
@@ -156,6 +155,6 @@ class Server < ActiveRecord::Base
     # FIXME: check this, add user_id
     # TEST
     params.require(:server).except(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version,
-                                    :updated_at).permit!
+                                   :updated_at, :status).permit!
   end
 end

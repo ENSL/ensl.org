@@ -1,30 +1,11 @@
 <h1 class="title">Listing Servers</h1>
 
-<div id="servers" class="tabbed">
-  <ul id="servers-nav" class="tabs">
-    <li><a href="#officials">ENSL NS2 Servers</a></li>
-    <li><a href="#ns2">NS2 Servers</a></li>
-    <li><a href="#ns1">NS1 Servers</a></li>
-  </ul>
+<div class="servers-index" data-controller="server-table">
+  <h3>NS2 Servers</h3>
+  <%= render partial: 'servers_table', locals: { servers: @ns2 } %>
 
-  <div class="tabbed-contents">
-    <div class="tab" id="officials">
-      <%= render partial: "server", collection: @officials %>
-    </div>
-    <div class="tab" id="ns2">
-      <%= render partial: "server", collection: @ns2 %>
-    </div>
-
-    <div class="tab" id="ns1">
-      <%= render partial: "server", collection: @servers %>
-    </div>
-  </div>
+  <h3>NS1 Servers</h3>
+  <%= render partial: 'servers_table', locals: { servers: @servers } %>
 </div>
-
-<script type="text/javascript">
-  var tabber1 = new Yetii({
-    id: 'servers'
-  });
-</script>
 
 <%= link_to 'New server', new_server_path, class: 'button' %>

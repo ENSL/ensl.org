@@ -1,5 +1,8 @@
 <div class="server">
-  <h3><%= namelink server %></h3>
+  <h3>
+    <%= fa_icon('server', class: server.online? ? 'text-green-600' : 'text-red-600') %>
+    <%= namelink server %>
+  </h3>
 
   <p>
     <strong>IP:</strong>
