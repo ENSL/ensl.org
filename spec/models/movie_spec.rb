@@ -275,4 +275,16 @@ RSpec.describe Movie, type: :model do
       expect(movie.to_s).to eq('file-string')
     end
   end
+
+  describe 'destroy behavior with shared data files' do
+    it 'does not destroy a shared data file when one movie is removed' do
+      shared_file = create(:data_file, :movie)
+      first_movie = create(:movie, file: shared_file)
+      second_movie = create(:movie, file: shared_file)
+
+      expect { first_movie.destroy }.not_to change(DataFile, :count)
+      expect(DataFile.exists?(shared_file.id)).to be(true)
+      expect(second_movie.reload.file_id).to eq(shared_file.id)
+    end
+  end
 end

@@ -59,7 +59,7 @@ class Movie < ActiveRecord::Base
   scope :active_streams, -> { where('status > 0') }
 
   belongs_to :user, optional: true
-  belongs_to :file, class_name: 'DataFile', optional: true, dependent: :destroy
+  belongs_to :file, class_name: 'DataFile', optional: true
   belongs_to :preview, class_name: 'DataFile', optional: true
   belongs_to :match, optional: true
   belongs_to :category, optional: true
