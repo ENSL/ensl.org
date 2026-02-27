@@ -72,6 +72,18 @@
     @include span-columns(12);
     margin-bottom: 20px;
 
+    #user-movies-grid {
+      .movie-card:hover {
+        .movie-card-image-layer {
+          opacity: 0;
+        }
+
+        .movie-card-hover-layer {
+          opacity: 1;
+        }
+      }
+    }
+
     h2,
     h3,
     h4 {

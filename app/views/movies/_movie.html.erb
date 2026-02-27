@@ -8,7 +8,13 @@
 
     <td>
       <h3 class="title"><%= namelink movie %></h3>
-      <%= cascade movie, ["content", "format", ["Author", :user], "length_s", ["Views", "view_count"], ["Date", "file.created_at"]] %>
+      <% if movie.user %>
+        <dl>
+          <dt>Author</dt>
+          <dd><%= link_to movie.user.username, movies_url(author: movie.user_id) %></dd>
+        </dl>
+      <% end %>
+      <%= cascade movie, ["content", "format", "length_s", ["Views", "view_count"], ["Date", "file.created_at"]] %>
 
       <% (params[:action] == "show" ? movie.all_files : [movie.file]).each do |file| %>
       <% unless file.nil? %>

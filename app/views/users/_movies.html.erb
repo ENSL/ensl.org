@@ -1,5 +1,37 @@
 <h2>Movies</h2>
 
 <div class="userData">
-  <%= render partial: "movies/movie_user", collection: @user.movies %>
+  <div class="w-full">
+    <div id="user-movies-grid"
+      class="grid gap-5 w-max mx-auto [grid-template-columns:repeat(3,10rem)]">
+
+      <% @user.movies.each do |movie| %>
+        <%= link_to movie_path(movie),
+          class: "movie-card relative w-40 h-32 overflow-hidden rounded bg-gray-100" do %>
+
+          <div class="movie-card-image-layer absolute inset-0 transition-opacity duration-300">
+            <% if movie.picture.present? %>
+              <%= image_tag movie.picture.url,
+                class: "w-full h-full object-cover" %>
+            <% elsif movie.snapshot? %>
+              <%= image_tag movie.snapshot_url,
+                class: "w-full h-full object-cover" %>
+            <% else %>
+              <div class="flex items-center justify-center w-full h-full">
+                <i class="fa-solid fa-film text-3xl text-gray-400"></i>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="movie-card-hover-layer absolute inset-0 flex flex-col items-center justify-center text-center p-2
+            opacity-0 transition-opacity duration-300 bg-white/90">
+            <div class="font-semibold text-sm">
+              <%= movie.to_s %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+    </div>
+  </div>
 </div>
