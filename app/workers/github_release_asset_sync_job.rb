@@ -91,6 +91,11 @@ class GithubReleaseAssetSyncJob
     filename = filename_for(asset_url, prefix)
     destination_path = File.join(destination_root, filename)
 
+    if data_file_exists?(filename)
+      Rails.logger.info("[GithubReleaseAssetSyncJob] Skipping existing DB file #{filename}")
+      return
+    end
+
     if File.exist?(destination_path)
       Rails.logger.info("[GithubReleaseAssetSyncJob] Skipping existing file #{destination_path}")
       return
@@ -116,6 +121,12 @@ class GithubReleaseAssetSyncJob
 
   def safe_name(value)
     value.to_s.gsub(/[^A-Za-z0-9._-]/, '_').downcase
+  end
+
+  def data_file_exists?(filename)
+    return false if filename.blank?
+
+    DataFile.exists?(name: filename)
   end
 
   def run_directory_reconciliation
