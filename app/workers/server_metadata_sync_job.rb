@@ -6,8 +6,10 @@ class ServerMetadataSyncJob
   sidekiq_options queue: :default, retry: 3
 
   def perform(_options = {})
-    scope = Server.hlds.active
+    scope = Server.active.where(domain: [Server::DOMAIN_HLDS, Server::DOMAIN_NS2])
     total = scope.count
+    hlds_total = scope.where(domain: Server::DOMAIN_HLDS).count
+    ns2_total = scope.where(domain: Server::DOMAIN_NS2).count
     responded = 0
     updated = 0
     offline = 0
@@ -26,7 +28,7 @@ class ServerMetadataSyncJob
     end
 
     Rails.logger.info(
-      "[ServerMetadataSyncJob] total=#{total} responded=#{responded} updated=#{updated} offline=#{offline}"
+      "[ServerMetadataSyncJob] total=#{total} hlds=#{hlds_total} ns2=#{ns2_total} responded=#{responded} updated=#{updated} offline=#{offline}"
     )
   end
 
@@ -71,7 +73,7 @@ class ServerMetadataSyncJob
   def fetch_server_snapshot(server)
     errors = []
 
-    [SteamCondenser::Servers::GoldSrcServer, SteamCondenser::Servers::SourceServer].each do |server_class|
+    query_classes_for(server).each do |server_class|
       query_server = server_class.new(server.ip, server.port.to_i)
       query_server.update_ping
 
@@ -84,6 +86,17 @@ class ServerMetadataSyncJob
     end
 
     raise StandardError, errors.join(' | ')
+  end
+
+  def query_classes_for(server)
+    case server.domain
+    when Server::DOMAIN_HLDS
+      [SteamCondenser::Servers::GoldSrcServer, SteamCondenser::Servers::SourceServer]
+    when Server::DOMAIN_NS2
+      [SteamCondenser::Servers::SourceServer]
+    else
+      [SteamCondenser::Servers::SourceServer]
+    end
   end
 
   def mark_offline(server, error)
