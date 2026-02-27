@@ -2,6 +2,7 @@
   <div class="data">
     <div class="contents">
       <h4>Vote Captains</h4>
+      <%= render partial: 'gathers/progress' %>
 
       <table id="gatherers">
         <% @gather.gatherers.most_voted.each do |gatherer| %>

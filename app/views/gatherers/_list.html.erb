@@ -1,10 +1,6 @@
 <% captain = team == 1 ? @gather.captain1 : @gather.captain2 %>
 <% pick = false %>
 
-<h4>
-  <%= if team.nil? then "Lobby" else team == 1 ? "Marines" : "Aliens" end %>
-</h4>
-
 <%= form_tag pick_gather_path(@gather), data: { turbo_stream: true } do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
