@@ -136,6 +136,50 @@ RSpec.describe Movie, type: :model do
       end
     end
 
+    it 'make_preview creates a preview data file and links it as related to the source file' do
+      Dir.mktmpdir do |dir|
+        source_path = File.join(dir, 'clip.mp4')
+        File.binwrite(source_path, 'source-bytes')
+
+        directory = Directory.create!(name: 'movietest', title: 'Movie Test', hidden: false, path: dir)
+        DataFile.insert_all!([
+                               {
+                                 directory_id: directory.id,
+                                 name: 'clip.mp4',
+                                 path: source_path,
+                                 size: File.size(source_path),
+                                 md5: Digest::MD5.file(source_path).hexdigest,
+                                 description: 'clip.mp4',
+                                 created_at: File.mtime(source_path),
+                                 updated_at: Time.current
+                               }
+                             ])
+
+        source_file = DataFile.find_by(path: source_path)
+        Movie.insert_all!([{ file_id: source_file.id, created_at: Time.current, updated_at: Time.current }])
+        persisted_movie = Movie.find_by(file_id: source_file.id)
+
+        allow(source_file).to receive(:location).and_return(source_path)
+        allow(source_file).to receive(:full_path).and_return(source_path)
+        allow(persisted_movie).to receive(:file).and_return(source_file)
+        allow(persisted_movie).to receive(:preview_path).and_return(File.join(dir, 'clip_preview.mp4'))
+
+        allow(VideoProcessing).to receive(:transcode_for_web!) do |input_path:, output_path:|
+          expect(input_path).to eq(source_path)
+          File.binwrite(output_path, 'preview-bytes')
+        end
+
+        result = persisted_movie.make_preview
+
+        preview_file = DataFile.find_by(path: persisted_movie.preview_path)
+        expect(result).to eq(persisted_movie.preview_path)
+        expect(preview_file).not_to be_nil
+        expect(preview_file.related_id).to eq(source_file.id)
+        expect(preview_file.directory_id).to eq(directory.id)
+        expect(persisted_movie.reload.preview_id).to eq(preview_file.id)
+      end
+    end
+
     context '#length_s' do
       it 'formats seconds into M:SS' do
         movie.length = 65

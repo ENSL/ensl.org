@@ -73,10 +73,10 @@ class DataFile < ActiveRecord::Base
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
   before_validation :auto_generate_title, if: -> { title.blank? }
-  before_save :auto_link_preview_file, if: -> { !related && location.present? && location.include?('_preview.mp4') }
   # after_save :update_movie_metadata, if: -> { !new_record? && movie && saved_change_to_md5? }
   after_create :create_movie, if: :should_create_movie?
   after_save :update_relations, if: :should_update_relations?
+  after_commit :sync_preview_links, on: %i[create update]
 
   # acts_as_rateable
   mount_uploader :name, FileUploader
@@ -232,21 +232,67 @@ class DataFile < ActiveRecord::Base
     cleaned.split(/\s+/).map(&:capitalize).join(' ')
   end
 
-  # Link preview videos to their full versions
-  def auto_link_preview_file
-    basename = location.gsub(/_preview\.mp4$/, '')
-    find_and_link_related_file(basename)
+  def sync_preview_links
+    return unless in_movies_tree?
+
+    if preview_filename?
+      source = find_source_for_preview
+      link_preview_to_source!(source) if source
+    else
+      preview = find_preview_for_source
+      link_preview_to_source!(self, preview) if preview
+    end
+  rescue StandardError => e
+    Rails.logger.warn("Skipping preview auto-link for DataFile##{id}: #{e.message}")
   end
 
-  # Find the full-version file matching this preview
-  def find_and_link_related_file(basename)
-    DataFile.where('path LIKE ?', "#{basename}%").each do |candidate|
-      if candidate.location.match?(/#{Regexp.escape(basename)}\.\w+$/)
-        self.related = candidate
-        return
-      end
-    end
+  def in_movies_tree?
+    first_directory&.id == Directory::MOVIES || directory_id == Directory::MOVIES
   end
+
+  def preview_filename?
+    name.to_s.downcase.end_with?('_preview.mp4')
+  end
+
+  def source_basename
+    preview_filename? ? name.to_s.sub(/_preview\.mp4\z/i, '') : File.basename(name.to_s, File.extname(name.to_s))
+  end
+
+  def find_source_for_preview
+    base = source_basename
+    return nil if base.blank?
+
+    DataFile.where(directory_id: directory_id)
+            .where('LOWER(name) = ?', "#{base.downcase}.mp4")
+            .where.not(id: id)
+            .first
+  end
+
+  def find_preview_for_source
+    base = source_basename
+    return nil if base.blank?
+
+    DataFile.where(directory_id: directory_id)
+            .where('LOWER(name) = ?', "#{base.downcase}_preview.mp4")
+            .where.not(id: id)
+            .first
+  end
+
+  def link_preview_to_source!(source, preview = self)
+    return unless source && preview
+
+    preview_changes = {}
+    preview_changes[:related_id] = source.id if preview.related_id != source.id
+    preview_changes[:updated_at] = Time.current if preview.has_attribute?(:updated_at)
+    preview.update_columns(preview_changes) if preview_changes.present?
+
+    source_movie = source.movie
+    return unless source_movie && source_movie.preview_id != preview.id
+
+    source_movie.update_columns(preview_id: preview.id, updated_at: Time.current)
+  end
+  private :sync_preview_links, :in_movies_tree?, :preview_filename?, :source_basename,
+          :find_source_for_preview, :find_preview_for_source, :link_preview_to_source!
 
   # Update movie metadata if movie exists and file changed
   def update_movie_metadata
@@ -279,6 +325,10 @@ class DataFile < ActiveRecord::Base
 
   def rateable?(user)
     user && !rated_by?(user)
+  end
+
+  def refresh_preview_links!
+    sync_preview_links
   end
 
   # Class methods

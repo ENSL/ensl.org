@@ -463,13 +463,17 @@ class Directory < ActiveRecord::Base
     changes = {}
     changes[:directory_id] = id if dbfile.directory_id != id
     changes[:path] = item_path if dbfile.path != item_path
-    return if changes.empty?
+    if changes.empty?
+      dbfile.refresh_preview_links!
+      return
+    end
 
     changes[:updated_at] = Time.current if dbfile.has_attribute?(:updated_at)
 
     # Reconciliation is disk-authoritative: update DB pointers only.
     # We intentionally bypass DataFile callbacks here to avoid filesystem moves.
     dbfile.update_columns(changes)
+    dbfile.refresh_preview_links!
     increment_stat(stats, :files_relinked)
     logger.info("Reconciled file: #{dbfile.name} (ID: #{dbfile.id})")
   rescue StandardError => e
@@ -500,6 +504,7 @@ class Directory < ActiveRecord::Base
                          ])
 
     dbfile = DataFile.find_by(path: item_path)
+    dbfile&.refresh_preview_links!
     increment_stat(stats, :files_created)
 
     logger.info("Added file: #{dbfile&.name || filename}")

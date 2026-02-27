@@ -29,6 +29,7 @@
 #
 
 require 'open3'
+require 'digest/md5'
 
 class Movie < ActiveRecord::Base
   include Extra
@@ -241,10 +242,14 @@ class Movie < ActiveRecord::Base
       input_path: file&.location,
       output_path: preview_path
     )
+    ensure_preview_data_file!
+    preview_path
   rescue VideoProcessing::Error
     raise unless Rails.env.test?
 
-    make_preview_fallback_for_test
+    result = make_preview_fallback_for_test
+    ensure_preview_data_file! if result.present?
+    result
   end
 
   def make_snapshot(seconds: nil)
@@ -287,6 +292,44 @@ class Movie < ActiveRecord::Base
     nil
   end
   private :make_preview_fallback_for_test
+
+  def ensure_preview_data_file!
+    source_file = file
+    return unless source_file.is_a?(DataFile)
+
+    source_directory_id = source_file.directory_id
+    target_path = preview_path
+    return if source_directory_id.blank? || target_path.blank? || !File.exist?(target_path)
+
+    stat = File.stat(target_path)
+    filename = File.basename(target_path)
+    payload = {
+      directory_id: source_directory_id,
+      name: filename,
+      path: target_path,
+      size: stat.size,
+      md5: Digest::MD5.file(target_path).hexdigest,
+      description: filename,
+      related_id: source_file.id,
+      updated_at: Time.current
+    }
+
+    preview_file = DataFile.find_by(path: target_path)
+
+    if preview_file
+      preview_file.update_columns(payload)
+    else
+      payload[:created_at] = stat.mtime
+      DataFile.insert_all!([payload])
+      preview_file = DataFile.find_by(path: target_path)
+    end
+
+    return unless preview_file && preview_id != preview_file.id
+
+    update_columns(preview_id: preview_file.id,
+                   updated_at: Time.current)
+  end
+  private :ensure_preview_data_file!
 
   def make_stream
     ip = stream_ip.to_s[/\b(?:\d{1,3}\.){3}\d{1,3}\b/]

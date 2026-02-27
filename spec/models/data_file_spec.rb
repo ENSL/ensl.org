@@ -451,5 +451,12 @@ describe DataFile do
         expect(callbacks).not_to be_empty
       end
     end
+
+    describe 'after_commit :sync_preview_links' do
+      it 'is configured as an after_commit callback' do
+        callbacks = DataFile._commit_callbacks.select { |cb| cb.filter == :sync_preview_links }
+        expect(callbacks).not_to be_empty
+      end
+    end
   end
 end
