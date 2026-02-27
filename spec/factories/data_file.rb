@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :data_file do
-    description { 'Test file description' }
+    title { 'Test file title' }
+    description { '' }
     sequence(:md5) { |n| Digest::MD5.hexdigest("unique_content_#{n}") }
     size { 1024 }
     skip_file_validation { true } # Skip CarrierWave validation for tests
@@ -32,7 +33,7 @@ FactoryBot.define do
     end
 
     trait :movie do
-      description { 'Test movie' }
+      title { 'Test movie' }
       association :directory, :movies
 
       after(:build) do |data_file|
@@ -42,7 +43,7 @@ FactoryBot.define do
     end
 
     trait :preview do
-      description { 'Test preview' }
+      title { 'Test preview' }
       association :directory, :movies
 
       after(:build) do |data_file|
@@ -56,7 +57,7 @@ FactoryBot.define do
     end
 
     trait :demo do
-      description { 'Test demo' }
+      title { 'Test demo' }
 
       after(:build) do |data_file|
         data_file[:name] = 'test_demo.dem'

@@ -223,13 +223,13 @@ describe DirectoryReconciliationService do
       File.utime(past_time, past_time, file_b_path)
 
       ActiveRecord::Base.connection.execute(
-        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        'INSERT INTO data_files (directory_id, path, name, size, md5, title, created_at, updated_at) ' +
         "VALUES (#{dir_a.id}, '#{file_a_path}', '#{filename}', #{File.size(file_a_path)}, " \
         "'#{Digest::MD5.hexdigest(File.read(file_a_path))}', '#{filename}', NOW(), NOW())"
       )
 
       ActiveRecord::Base.connection.execute(
-        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        'INSERT INTO data_files (directory_id, path, name, size, md5, title, created_at, updated_at) ' +
         "VALUES (#{dir_b.id}, '#{file_b_path}', '#{filename}', #{File.size(file_b_path)}, " \
         "'#{Digest::MD5.hexdigest(File.read(file_b_path))}', '#{filename}', NOW(), NOW())"
       )
@@ -264,7 +264,7 @@ describe DirectoryReconciliationService do
 
       db_only_file_path = File.join(orphan_path, 'db_only_file.dat')
       ActiveRecord::Base.connection.execute(
-        'INSERT INTO data_files (directory_id, path, name, size, md5, description, created_at, updated_at) ' +
+        'INSERT INTO data_files (directory_id, path, name, size, md5, title, created_at, updated_at) ' +
         "VALUES (#{orphan.id}, '#{db_only_file_path}', 'db_only_file.dat', 123, " \
         "'202cb962ac59075b964b07152d234b70', 'db_only_file.dat', NOW(), NOW())"
       )
@@ -608,7 +608,7 @@ describe DirectoryReconciliationService do
         path: old_path,
         size: File.size(old_path),
         md5: Digest::MD5.file(old_path).hexdigest,
-        description: filename,
+        title: filename,
         skip_file_validation: true
       )
 

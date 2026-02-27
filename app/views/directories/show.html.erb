@@ -68,9 +68,11 @@
             </div>
 
             <h4><%= namelink file %></h4>
-            <p><strong>Size:</strong> <%= file.size_s %>MB</p>
+            <p><%= h file.description %></p>
 
             <div class="comments">
+              <%= fa_icon('fa-solid fa-ruler-vertical') %> <%= file.size_s %>
+
               <% if file.related_files.count > 0 %>
                 <%= link_to file do %>
                   <%= fa_icon('fa-solid fa-file-half-dashed') %> Related files (<%= file.related_files.count %>)
@@ -82,7 +84,9 @@
               <% end %>
             </div>
 
-            <%= link_to 'Download', file.url, class: 'button tiny' %>
+            <%= link_to file.url, class: 'button tiny' do %>
+              <%= fa_icon('download', style: :solid) + " Download" %>
+            <% end %>
           </div>
         <% end %>
 

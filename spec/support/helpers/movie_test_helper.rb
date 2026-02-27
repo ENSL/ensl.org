@@ -13,10 +13,10 @@ module MovieTestHelper
     end
   end
 
-  def make_movie_file(description: 'Movie File', fixture_name: 'sample_h264_aac.mp4')
+  def make_movie_file(title: 'Movie File', fixture_name: 'sample_h264_aac.mp4')
     movies_dir = setup_movies_directory
     src = test_video_path(fixture_name)
-    build(:data_file, directory: movies_dir, description: description, skip_file_validation: true).tap do |file|
+    build(:data_file, directory: movies_dir, title: title, skip_file_validation: true).tap do |file|
       File.open(src, 'rb') { |uploaded| file.name = uploaded }
       file.save!
       file.reload
@@ -25,12 +25,12 @@ module MovieTestHelper
 
   def create_movie_with_file(attributes = {})
     fixture_name = attributes.delete(:fixture_name) || 'sample_h264_aac.mp4'
-    file_description = attributes.delete(:file_description) || attributes[:name] || 'Movie File'
+    file_title = attributes.delete(:file_title) || attributes.delete(:file_description) || attributes[:name] || 'Movie File'
 
     # Extract rating_score if present (transient attribute for :with_rating trait)
     rating_score = attributes.delete(:rating_score)
 
-    file = make_movie_file(description: file_description, fixture_name: fixture_name)
+    file = make_movie_file(title: file_title, fixture_name: fixture_name)
     attributes[:file] = file
 
     # If rating_score was specified, pass it through the trait mechanism

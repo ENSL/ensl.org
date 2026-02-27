@@ -30,7 +30,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
         name: 'Short High',
         user: author_alpha,
         category: shorts_category,
-        file_description: 'Short High',
+        file_title: 'Short High',
         rating_score: 5
       ).tap { |m| create(:rating, rateable: m.file, rate: create(:rate, score: 5)) }
     end
@@ -40,7 +40,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
         name: 'Long Medium',
         user: author_beta,
         category: full_length_category,
-        file_description: 'Long Medium',
+        file_title: 'Long Medium',
         fixture_name: 'sample_mpeg4_mp3.avi',
         rating_score: 3
       ).tap { |m| create(:rating, rateable: m.file, rate: create(:rate, score: 3)) }
@@ -51,7 +51,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
         name: 'Short Low',
         user: author_alpha,
         category: shorts_category,
-        file_description: 'Short Low',
+        file_title: 'Short Low',
         fixture_name: 'sample_h264_aac.mkv',
         rating_score: 2
       ).tap { |m| create(:rating, rateable: m.file, rate: create(:rate, score: 2)) }
@@ -62,7 +62,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
         name: 'Long No Rating',
         user: author_beta,
         category: full_length_category,
-        file_description: 'Long No Rating',
+        file_title: 'Long No Rating',
         fixture_name: 'sample_vp9_opus.webm'
       )
     end
@@ -178,12 +178,12 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
   describe 'viewing movies' do
     scenario 'user can navigate from index to movie show page and watch preview player' do
-      preview_file = make_movie_file(description: 'Preview Showcase', fixture_name: 'sample_h264_aac.mkv')
+      preview_file = make_movie_file(title: 'Preview Showcase', fixture_name: 'sample_h264_aac.mkv')
       movie = create_movie_with_file(
         name: 'Showcase Movie',
         user: admin,
         category: movie_category,
-        file_description: 'Showcase Movie'
+        file_title: 'Showcase Movie'
       )
       movie.update(preview: preview_file)
 
@@ -207,14 +207,14 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       click_link 'here'
 
       attach_file 'data_file_name', src.to_s
-      fill_in 'data_file_description', with: description
+      fill_in 'data_file_title', with: description
       find("#data_file_directory_id option[value='#{Directory::MOVIES}']").select_option
 
       click_button 'Create File'
 
       expect(page).to have_content(I18n.t(:files_create))
 
-      uploaded = DataFile.find_by(description: description)
+      uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
       expect(uploaded.location).to be_present
       expect(File.exist?(uploaded.location)).to be true
@@ -233,14 +233,14 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       click_link 'here'
 
       attach_file 'data_file_name', src.to_s
-      fill_in 'data_file_description', with: description
+      fill_in 'data_file_title', with: description
       find("#data_file_directory_id option[value='#{Directory::MOVIES}']").select_option
 
       click_button 'Create File'
 
       expect(page).to have_content(I18n.t(:files_create))
 
-      uploaded = DataFile.find_by(description: description)
+      uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
       expect(uploaded.location).to be_present
       expect(File.exist?(uploaded.location)).to be true
@@ -249,7 +249,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
     end
 
     scenario 'admin can create movie through new movie form' do
-      file = make_movie_file(description: 'Create Source', fixture_name: 'sample_h264_aac.mp4')
+      file = make_movie_file(title: 'Create Source', fixture_name: 'sample_h264_aac.mp4')
 
       sign_in_as(admin)
       visit new_movie_path
@@ -275,7 +275,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
     end
 
     scenario 'movie maker can create movie through ui' do
-      file = make_movie_file(description: 'Maker Source', fixture_name: 'sample_vp9_opus.webm')
+      file = make_movie_file(title: 'Maker Source', fixture_name: 'sample_vp9_opus.webm')
 
       sign_in_as(movie_maker)
       visit new_movie_path
@@ -534,9 +534,9 @@ RSpec.feature 'Movies management', type: :feature, js: true do
   describe 'preview variants' do
     scenario 'movie with web_friendly uploaded preview shows preview player' do
       # Create main file
-      file = make_movie_file(description: 'Web Friendly Movie', fixture_name: 'sample_h264_aac.mp4')
+      file = make_movie_file(title: 'Web Friendly Movie', fixture_name: 'sample_h264_aac.mp4')
       # Create preview file separately since it uses different fixture
-      preview = make_movie_file(description: 'Web Friendly Preview', fixture_name: 'sample_h264_aac.mkv')
+      preview = make_movie_file(title: 'Web Friendly Preview', fixture_name: 'sample_h264_aac.mkv')
       movie = create(:movie,
                      name: 'Web Friendly Movie',
                      user: admin,

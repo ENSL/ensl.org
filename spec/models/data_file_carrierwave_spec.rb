@@ -32,7 +32,7 @@ RSpec.describe DataFile do
 
     tmp = upload_tempfile(filename: 'hello.txt', content: 'hello world')
 
-    file = DataFile.new(directory: dir, description: 'x')
+    file = DataFile.new(directory: dir, title: 'x')
     file.name = tmp
     file.skip_file_validation = false
     file.save!
@@ -56,7 +56,7 @@ RSpec.describe DataFile do
 
     tmp = upload_tempfile(filename: 'move_me.txt', content: 'abc')
 
-    file = DataFile.new(directory: from_dir, description: 'x')
+    file = DataFile.new(directory: from_dir, title: 'x')
     file.name = tmp
     file.skip_file_validation = false
     file.save!

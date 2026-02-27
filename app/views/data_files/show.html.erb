@@ -16,6 +16,9 @@
     <%= link_to "Download", safe_url_for(@file.url), class: 'button' %>
     <%= link_to "Back to directory", directory_url(@file.directory), class: 'button' %>
 
+    <h4>Description</h4>
+    <%= simple_format(h(@file.description.to_s)) %>
+
     <% if @file.related_files.count > 0 %>
     <div class="files-list">
         <h4>Related Files</h4>

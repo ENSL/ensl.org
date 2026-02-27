@@ -5,19 +5,22 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   let!(:user) { create(:user) }
 
   describe 'File viewing' do
-    it 'displays file description and metadata' do
-      file = create(:data_file, :with_directory, description: 'ImportantDoc')
+    it 'displays file title, description, and metadata' do
+      file = create(:data_file, :with_directory, title: 'ImportantDoc',
+                                                 description: "Long file description\nwith two lines")
 
       visit data_file_path(file)
 
       expect(page).to have_content('ImportantDoc')
+      expect(page).to have_content('Long file description')
+      expect(page).to have_content('with two lines')
       expect(page).to have_content(file.md5_s)
     end
 
     it 'shows related files when present' do
       dir = create(:directory)
-      file1 = create(:data_file, directory: dir, description: 'Part1')
-      file2 = create(:data_file, directory: dir, description: 'Part2', related: file1)
+      file1 = create(:data_file, directory: dir, title: 'Part1')
+      file2 = create(:data_file, directory: dir, title: 'Part2', related: file1)
 
       visit data_file_path(file2)
 
@@ -26,27 +29,41 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   end
 
   describe 'File editing' do
-    it 'allows admin to edit file description' do
-      file = create(:data_file, :with_directory, description: 'OldDesc')
+    it 'allows admin to edit file title and description' do
+      file = create(:data_file, :with_directory, title: 'OldTitle', description: 'Old description')
 
       sign_in_via_session(admin)
       visit edit_data_file_path(file)
 
-      expect(page).to have_field('data_file_description', with: 'OldDesc')
+      expect(page).to have_field('data_file_title', with: 'OldTitle')
+      expect(page).to have_field('data_file_description', with: 'Old description')
 
-      fill_in 'data_file_description', with: 'NewDesc'
+      fill_in 'data_file_title', with: 'NewTitle'
+      fill_in 'data_file_description', with: 'New long description for this file'
       click_button 'Update'
 
       expect(page).to have_content(I18n.t(:files_update))
 
       file.reload
-      expect(file.description).to eq('NewDesc')
+      expect(file.title).to eq('NewTitle')
+      expect(file.description).to eq('New long description for this file')
+    end
+
+    it 'shows description in directory listing' do
+      root = create(:directory, :root)
+      dir = create(:directory, parent: root, title: 'Listing Dir')
+      file = create(:data_file, directory: dir, title: 'ListedFile', description: 'Listed description')
+
+      visit directory_path(root)
+
+      expect(page).to have_content(file.title)
+      expect(page).to have_content('Listed description')
     end
   end
 
   describe 'File deletion' do
     it 'does not allow non-admin to delete files' do
-      file = create(:data_file, :with_directory, description: 'ProtectedFile')
+      file = create(:data_file, :with_directory, title: 'ProtectedFile')
 
       sign_in_via_session(user)
       visit data_file_path(file)
@@ -57,7 +74,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
   describe 'File access control' do
     it 'shows file information for authenticated users' do
-      file = create(:data_file, :with_directory, description: 'ViewableFile')
+      file = create(:data_file, :with_directory, title: 'ViewableFile')
 
       sign_in_via_session(user)
       visit data_file_path(file)
@@ -66,7 +83,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
     end
 
     it 'allows unauthenticated users to view files' do
-      file = create(:data_file, :with_directory, description: 'PublicFile')
+      file = create(:data_file, :with_directory, title: 'PublicFile')
 
       visit data_file_path(file)
 
@@ -77,7 +94,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   describe 'File associations' do
     it 'can associate file with a match as demo' do
       dir = create(:directory)
-      demo_file = create(:data_file, directory: dir, description: 'MatchDemo')
+      demo_file = create(:data_file, directory: dir, title: 'MatchDemo')
 
       contest = create(:contest)
       match = create(:match, contest: contest, demo: demo_file)
@@ -106,7 +123,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
     end
 
     it 'displays file creation timestamp' do
-      file = create(:data_file, :with_directory, description: 'TimeFile')
+      file = create(:data_file, :with_directory, title: 'TimeFile')
 
       visit data_file_path(file)
 
@@ -117,8 +134,8 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   describe 'File model scopes' do
     it 'orders files by creation date (newest first)' do
       dir = create(:directory)
-      old_file = create(:data_file, directory: dir, description: 'OldFile', created_at: 10.days.ago)
-      new_file = create(:data_file, directory: dir, description: 'NewFile', created_at: 1.day.ago)
+      old_file = create(:data_file, directory: dir, title: 'OldFile', created_at: 10.days.ago)
+      new_file = create(:data_file, directory: dir, title: 'NewFile', created_at: 1.day.ago)
 
       ordered = DataFile.ordered
 
@@ -128,8 +145,8 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
     it 'filters files to exclude specific file' do
       dir = create(:directory)
-      file1 = create(:data_file, directory: dir, description: 'File1')
-      file2 = create(:data_file, directory: dir, description: 'File2')
+      file1 = create(:data_file, directory: dir, title: 'File1')
+      file2 = create(:data_file, directory: dir, title: 'File2')
 
       except = DataFile.except_file(file1)
 
@@ -159,10 +176,10 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   end
 
   describe 'File string representation' do
-    it 'shows description as string' do
-      file = create(:data_file, :with_directory, description: 'MyDescription')
+    it 'shows title as string' do
+      file = create(:data_file, :with_directory, title: 'MyTitle')
 
-      expect(file.to_s).to eq('MyDescription')
+      expect(file.to_s).to eq('MyTitle')
     end
   end
 
@@ -182,8 +199,8 @@ RSpec.feature 'Data files management', type: :feature, js: true do
   describe 'Related files' do
     it 'links files together' do
       dir = create(:directory)
-      main_file = create(:data_file, directory: dir, description: 'Main')
-      related_file = create(:data_file, directory: dir, description: 'Related', related: main_file)
+      main_file = create(:data_file, directory: dir, title: 'Main')
+      related_file = create(:data_file, directory: dir, title: 'Related', related: main_file)
 
       expect(related_file.related).to eq(main_file)
       expect(main_file.related_files).to include(related_file)
@@ -191,8 +208,8 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
     it 'can unlink related files' do
       dir = create(:directory)
-      main_file = create(:data_file, directory: dir, description: 'Main')
-      related_file = create(:data_file, directory: dir, description: 'Related', related: main_file)
+      main_file = create(:data_file, directory: dir, title: 'Main')
+      related_file = create(:data_file, directory: dir, title: 'Related', related: main_file)
 
       related_file.update(related: nil)
 

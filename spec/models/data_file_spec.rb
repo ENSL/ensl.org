@@ -5,11 +5,12 @@
 # Table name: data_files
 #
 #  id           :integer          not null, primary key
-#  description  :string(255)
+#  description  :text(65535)      not null
 #  md5          :string(255)
 #  name         :string(255)
 #  path         :string(255)
 #  size         :integer          not null
+#  title        :string(255)
 #  created_at   :datetime
 #  updated_at   :datetime
 #  article_id   :integer
@@ -72,7 +73,7 @@ describe DataFile do
   describe 'validations' do
     subject { build(:data_file) }
 
-    it { is_expected.to validate_length_of(:description).is_at_most(255) }
+    it { is_expected.to validate_length_of(:title).is_at_most(255) }
     it { is_expected.to validate_length_of(:path).is_at_most(255) }
   end
 
@@ -134,27 +135,41 @@ describe DataFile do
   end
 
   describe '#to_s' do
-    it 'returns description when present and not empty' do
-      file = create(:data_file, description: 'My File')
+    it 'returns title when present and not empty' do
+      file = create(:data_file, title: 'My File')
       expect(file.to_s).to eq('My File')
     end
 
-    it 'returns file basename when description is nil' do
-      file = build(:data_file, path: '/tmp/test_dirs/test_file.txt', description: nil)
-      # Before save, description is nil, so should return basename
+    it 'returns file basename when title is nil' do
+      file = build(:data_file, path: '/tmp/test_dirs/test_file.txt', title: nil)
+      # Before save, title is nil, so should return basename
       expect(file.to_s).to eq('test_file.txt')
-      # After save, process_file callback fills in description
+      # After save, callback fills in title
       file.save
       expect(file.to_s).to eq('Test File') # Auto-generated from filename
     end
 
-    it 'returns file basename when description is empty string' do
-      file = build(:data_file, path: '/tmp/test_dirs/test2_file.txt', description: '')
-      # Before save, empty description should return basename
+    it 'returns file basename when title is empty string' do
+      file = build(:data_file, path: '/tmp/test_dirs/test2_file.txt', title: '')
+      # Before save, empty title should return basename
       expect(file.to_s).to eq('test2_file.txt')
-      # After save, process_file callback fills in description
+      # After save, callback fills in title
       file.save
       expect(file.to_s).to eq('Test2 File') # Auto-generated from filename
+    end
+  end
+
+  describe 'description field' do
+    it 'defaults description to empty string' do
+      file = create(:data_file)
+      expect(file.description).to eq('')
+    end
+
+    it 'stores long free-form description text' do
+      long_text = "Line one\n" + ('Long text ' * 80)
+      file = create(:data_file, description: long_text)
+
+      expect(file.reload.description).to eq(long_text)
     end
   end
 
@@ -219,12 +234,12 @@ describe DataFile do
     end
   end
 
-  describe '#generate_description_from_filename' do
+  describe '#generate_title_from_filename' do
     it 'removes file extension' do
       file_path = '/tmp/test_dirs/myfile_ext_test.txt'
       File.write(file_path, 'test')
       file = create(:data_file, path: file_path)
-      result = file.send(:generate_description_from_filename)
+      result = file.send(:generate_title_from_filename)
       expect(result).not_to include('.txt')
     end
 
@@ -232,7 +247,7 @@ describe DataFile do
       file_path = '/tmp/test_dirs/test_file-name_gen.txt'
       File.write(file_path, 'test')
       file = create(:data_file, path: file_path)
-      result = file.send(:generate_description_from_filename)
+      result = file.send(:generate_title_from_filename)
       expect(result).to eq('Test File Name Gen')
     end
 
@@ -240,7 +255,7 @@ describe DataFile do
       file_path = '/tmp/test_dirs/my_test_file_cap.txt'
       File.write(file_path, 'test')
       file = create(:data_file, path: file_path)
-      result = file.send(:generate_description_from_filename)
+      result = file.send(:generate_title_from_filename)
       expect(result).to eq('My Test File Cap')
     end
   end
@@ -398,7 +413,8 @@ describe DataFile do
     it 'permits expected attributes' do
       params = ActionController::Parameters.new(
         data_file: {
-          description: 'Test',
+          title: 'Test',
+          description: 'Long description',
           name: 'file.txt',
           article_id: 1,
           related_id: 2,
@@ -409,7 +425,7 @@ describe DataFile do
 
       result = DataFile.params(params, nil)
       expect(result.permitted?).to be true
-      expect(result.keys).to match_array(%w[description name article_id related_id directory_id])
+      expect(result.keys).to match_array(%w[title description name article_id related_id directory_id])
     end
   end
 

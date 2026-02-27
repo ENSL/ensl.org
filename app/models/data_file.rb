@@ -5,11 +5,12 @@
 # Table name: data_files
 #
 #  id           :integer          not null, primary key
-#  description  :string(255)
+#  description  :text(65535)      not null
 #  md5          :string(255)
 #  name         :string(255)
 #  path         :string(255)
 #  size         :integer          not null
+#  title        :string(255)
 #  created_at   :datetime
 #  updated_at   :datetime
 #  article_id   :integer
@@ -59,7 +60,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :related, class_name: 'DataFile', optional: true
   belongs_to :article, optional: true
 
-  validates_length_of %i[description path], maximum: 255
+  validates_length_of %i[title path], maximum: 255
   validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation_or_update?
 
   attr_accessor :skip_file_validation
@@ -71,7 +72,7 @@ class DataFile < ActiveRecord::Base
   # Callback chain for file processing (order matters)
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
-  before_validation :auto_generate_description, if: -> { description.blank? }
+  before_validation :auto_generate_title, if: -> { title.blank? }
   before_save :auto_link_preview_file, if: -> { !related && location.present? && location.include?('_preview.mp4') }
   # after_save :update_movie_metadata, if: -> { !new_record? && movie && saved_change_to_md5? }
   after_create :create_movie, if: :should_create_movie?
@@ -85,7 +86,7 @@ class DataFile < ActiveRecord::Base
   after_save :cache_path_from_uploader, if: -> { location.present? && File.exist?(location) }
 
   def to_s
-    description.present? ? description : File.basename(path.to_s)
+    title.present? ? title : File.basename(path.to_s)
   end
 
   def md5_s
@@ -211,17 +212,17 @@ class DataFile < ActiveRecord::Base
     update_column(:path, current_path)
   end
 
-  # Auto-generate description from filename or match data
-  def auto_generate_description
-    self.description = if match
-                         "#{match.contester1} vs #{match.contester2}"
-                       else
-                         generate_description_from_filename
-                       end
+  # Auto-generate title from filename or match data
+  def auto_generate_title
+    self.title = if match
+                   "#{match.contester1} vs #{match.contester2}"
+                 else
+                   generate_title_from_filename
+                 end
   end
 
-  # Clean up filename to create a readable description
-  def generate_description_from_filename
+  # Clean up filename to create a readable title
+  def generate_title_from_filename
     return 'Untitled' if location.blank?
 
     filename = File.basename(location)
@@ -330,6 +331,6 @@ class DataFile < ActiveRecord::Base
   end
 
   def self.params(params, _cuser)
-    params.require(:data_file).permit(:description, :name, :article_id, :related_id, :directory_id)
+    params.require(:data_file).permit(:title, :description, :name, :article_id, :related_id, :directory_id)
   end
 end

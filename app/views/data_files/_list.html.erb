@@ -1,6 +1,7 @@
 <table class="striped files-list">
   <tr>
     <th>Name</th>
+    <th>Description</th>
     <th>Path</th>
     <th>Size</th>
     <th>Actions</th>
@@ -9,6 +10,7 @@
   <% files.each do |file| %>
     <tr id="data_file_<%= file.id %>">
       <td><%= namelink file %></td>
+      <td><%= h file.description %></td>
       <td><%= h file.url %></td>
       <td><%= file.size_s %></td>
       <td>
