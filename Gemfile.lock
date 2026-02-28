@@ -321,6 +321,7 @@ GEM
       base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
+    local_time (3.0.3)
     logger (1.7.0)
     lograge (0.14.0)
       actionpack (>= 4)
@@ -757,6 +758,7 @@ DEPENDENCIES
   i18n-js
   importmap-rails (~> 2.2)
   jquery-rails
+  local_time (~> 3.0)
   lograge
   mime-types
   msgpack (>= 1.7.0)

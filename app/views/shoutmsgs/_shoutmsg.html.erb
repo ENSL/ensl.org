@@ -9,7 +9,7 @@
       <% end %>
     </span>
     <span class="time">
-      <%= shoutmsg_time_label(shoutmsg.created_at || Time.current) %>
+      <%= local_time(shoutmsg.created_at || Time.current, format: '%H:%M') %>
     </span>  
   </div>
   <div class="message">

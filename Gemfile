@@ -106,6 +106,7 @@ gem 'rails_autolink'
 # Javascript
 gem 'i18n-js'
 gem 'jquery-rails'
+gem 'local_time', '~> 3.0'
 gem 'tinymce-rails'
 gem 'twemoji-rails'
 
