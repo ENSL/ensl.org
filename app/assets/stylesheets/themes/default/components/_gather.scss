@@ -53,13 +53,19 @@
     margin: 20px 0;
 
     .shout_input {
-      width: 400px;
-      margin-right: 20px;
+      width: 100%;
+      margin-right: 0;
     }
 
-    .fields,
+    .fields {
+      float: none;
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
     .controls {
-      float: left;
+      float: none;
       display: block;
     }
   }
@@ -78,6 +84,29 @@
   .timestamp {
     float: right;
     margin: 0 5px 5px;
+  }
+}
+
+form.new-shout[id^="new_shout_Gather_"] {
+  @include span-columns(12);
+  margin: 20px 0;
+
+  .shout_input {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .fields {
+    float: none;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .controls {
+    float: none;
+    display: block;
+    margin-top: 6px;
   }
 }
 

@@ -228,4 +228,22 @@ module ApplicationHelper
       'https://gathers.staging.ensl.org'
     end
   end
+
+  def shoutmsg_time_label(time)
+    return '' unless time
+
+    local_time = time.in_time_zone(timezone_offset)
+    today = Time.use_zone(timezone_offset) { Time.zone.today }
+    date = local_time.to_date
+
+    if date == today
+      local_time.strftime('%H:%M')
+    elsif date == today - 1.day
+      "yesterday #{local_time.strftime('%H:%M')}"
+    elsif date >= today - 6.days
+      "#{I18n.l(local_time, format: '%A').downcase} #{local_time.strftime('%H:%M')}"
+    else
+      I18n.l(local_time, format: '%d %b %Y %H:%M')
+    end
+  end
 end
