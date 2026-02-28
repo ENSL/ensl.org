@@ -1,14 +1,17 @@
 def ensure_test_assets_precompiled!
   return if ENV['SKIP_ASSET_PRECOMPILE'].present?
 
-  assets_dir = Rails.root.join('public', 'assets')
-  manifest = Dir[assets_dir.join('.sprockets-manifest*.json')].first ||
-             Dir[assets_dir.join('manifest*.json')].first
-
-  return if manifest && File.exist?(manifest)
+  # Propshaft writes public/assets/.manifest.json after assets:precompile
+  manifest = Rails.root.join('public', 'assets', '.manifest.json')
+  return if File.exist?(manifest)
 
   puts 'Precompiling assets for test environment...'
-  success = system({ 'RAILS_ENV' => 'test' }, 'bin/rails', 'assets:precompile')
+  # dartsass:build and tailwindcss:build must run before assets:precompile
+  # because Propshaft does not compile — it only fingerprints existing files.
+  success = system(
+    { 'RAILS_ENV' => 'test' },
+    'bin/rails', 'dartsass:build', 'tailwindcss:build', 'assets:precompile'
+  )
   abort('Assets precompile failed in test environment.') unless success
 end
 

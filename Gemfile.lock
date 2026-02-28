@@ -424,6 +424,10 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    propshaft (1.3.1)
+      actionpack (>= 7.0.0)
+      activesupport (>= 7.0.0)
+      rack
     pry (0.16.0)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -651,14 +655,6 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
-    sprockets (4.2.2)
-      concurrent-ruby (~> 1.0)
-      logger
-      rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.2)
-      actionpack (>= 6.1)
-      activesupport (>= 6.1)
-      sprockets (>= 3.0.0)
     ssrf_filter (1.3.0)
     steam-id2 (0.4.5)
       steam-condenser (~> 1.3)
@@ -774,6 +770,7 @@ DEPENDENCIES
   ostruct
   paper_trail
   playwright-ruby-client
+  propshaft
   pry-byebug
   pry-rails
   puma
@@ -804,7 +801,6 @@ DEPENDENCIES
   sidekiq
   sidekiq-cron
   simplecov
-  sprockets-rails
   steam-condenser!
   steam-id2
   tailwindcss-rails

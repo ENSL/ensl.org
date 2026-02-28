@@ -29,10 +29,6 @@ module Ensl
     # Load Rails 5
     config.load_defaults 5.0
 
-    # Additional assets
-    config.assets.precompile += ['themes/*/theme.css', 'themes/*/errors.css']
-    config.assets.initialize_on_precompile = false
-
     # Custom directories with classes and modules you want to be autoloadable.
     # Only register the services root (no recursive dirs as roots)
     services_root = Rails.root.join('app', 'services').to_s
@@ -85,12 +81,6 @@ module Ensl
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
-
-    # Enable the asset pipeline
-    config.assets.enabled = true
-
-    # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
 
     # il8n fix
     config.i18n.fallbacks = true

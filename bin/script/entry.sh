@@ -29,7 +29,10 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   #   mv "$ASSETS_PATH" "${APP_PATH}/public/assets"
   # fi
   bundle exec rake assets:clean
-  bundle exec rake assets:precompile
+  bundle exec rails dartsass:build
+  bundle exec rails tailwindcss:build
+  bundle exec rails assets:precompile
+  bundle exec rails assets:precompile
   # chown -R web:web $APP_PATH
 fi
 

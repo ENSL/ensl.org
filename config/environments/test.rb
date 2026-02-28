@@ -18,15 +18,6 @@ Rails.application.configure do
   # Configure public file server for tests with cache-control for performance.
   config.public_file_server.headers = { 'cache-control' => 'public, max-age=3600' }
 
-  # Allow on-the-fly asset compilation in tests to avoid sprockets precompile errors
-  config.assets.compile = true
-  config.assets.digest = false
-  config.assets.cache_store = [:file_store, Rails.root.join('tmp/cache/assets/test')]
-
-  # Tailwind v4 emits modern CSS syntax (e.g. rgb(from ...)) that legacy sass-rails
-  # cannot parse when used as a CSS compressor.
-  config.assets.css_compressor = nil
-
   # Show full error reports.
   config.consider_all_requests_local = true
   config.cache_store = :null_store

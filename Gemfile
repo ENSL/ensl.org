@@ -121,7 +121,7 @@ gem 'responders'
 # Importmap for Rails. JS management without nodejs.
 # Asset pipeline
 gem 'importmap-rails', '~> 2.2'
-gem 'sprockets-rails'
+gem 'propshaft'
 
 group :production do
   # gem 'newrelic_rpm'

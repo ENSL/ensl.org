@@ -7,7 +7,7 @@ $container-padding: 2em;
 html {
   background: {
     color: $blue;
-    image: url("/assets/#{$theme-path}/layout/background.jpg");
+    image: url("layout/background.jpg");
     position: top center;
     repeat: no-repeat;  
   }
@@ -30,7 +30,7 @@ body#tinymce {
   min-width: 1020px;
   background: {
     color: $blue;
-    image: url("/assets/#{$theme-path}/layout/background.jpg");
+    image: url("layout/background.jpg");
     position: top center;
     repeat: no-repeat;  
   }
@@ -49,11 +49,11 @@ body#tinymce {
   box-shadow: $content-shadow;
   margin-top: -35px;
   padding: 10px $container-padding $container-padding $container-padding;
-  background: url("/assets/#{$theme-path}/layout/body-background.png") top center repeat-y;
+  background: url("layout/body-background.png") top center repeat-y;
 
   &.full {
     padding-top: 40px;
-    background-image: url("/assets/#{$theme-path}/layout/body-background-full.png");
+    background-image: url("layout/body-background-full.png");
   }
 
   &.no-body {

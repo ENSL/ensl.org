@@ -7,7 +7,10 @@
     <%= theme_stylesheet_link_tag %>
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
-    <%= javascript_include_tag 'application' %>
+    <%= javascript_include_tag 'jquery', defer: false %>
+    <%= javascript_include_tag 'jquery_ujs', defer: false %>
+    <%= javascript_include_tag 'yetii', defer: false %>
+    <%= javascript_include_tag 'twemoji', defer: false %>
     <%= javascript_importmap_tags %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% unless Rails.env.test? %>

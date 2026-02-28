@@ -11,22 +11,6 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on
   config.consider_all_requests_local = false
 
-  # Disable Rails's static asset server (Apache or nginx will already do this)
-  config.serve_static_assets = true
-
-  # Compress JavaScripts and CSS
-  config.assets.compress = true
-  # Tailwind v4 emits modern CSS syntax (e.g. rgb(from ...)) that legacy sass-rails
-  # cannot parse when used as a CSS compressor.
-  config.assets.css_compressor = nil
-  # config.assets.js_compressor = Uglifier.new(harmony: true)
-
-  # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = true
-
-  # Generate digests for assets URLs
-  config.assets.digest = true
-
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # Keep this off, causes weird redirection bug
   config.force_ssl = false

@@ -1,11 +1,11 @@
-import { application } from "./application"
-import GatherSyncController from "./gather_sync_controller"
-import EmojiAutocompleteController from "./emoji_autocomplete_controller"
-import TwemojiController from "./twemoji_controller"
-import ServerTableController from "./server_table_controller"
-import GatherMusicController from "./gather_music_controller"
-import "./local"
-import "./shoutbox"
+import { application } from "controllers/application"
+import GatherSyncController from "controllers/gather_sync_controller"
+import EmojiAutocompleteController from "controllers/emoji_autocomplete_controller"
+import TwemojiController from "controllers/twemoji_controller"
+import ServerTableController from "controllers/server_table_controller"
+import GatherMusicController from "controllers/gather_music_controller"
+import "controllers/local"
+import "controllers/shoutbox"
 
 application.register("gather-sync", GatherSyncController)
 application.register("emoji-autocomplete", EmojiAutocompleteController)
