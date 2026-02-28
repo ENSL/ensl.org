@@ -147,7 +147,20 @@ class ApplicationController < ActionController::Base
       "ip=#{request.ip} referer=#{request.referer.to_s.inspect} " \
       "ua=#{request.user_agent.to_s.inspect} params=#{request.filtered_parameters.inspect}"
     )
-    render 'errors/422', status: :unprocessable_entity, layout: 'errors'
+
+    error_message = I18n.t(:csrf_retry, default: 'Your page expired while updating. Please try again.')
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:error] = error_message
+        render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages'),
+               status: :unprocessable_entity
+      end
+      format.html do
+        flash[:error] = error_message
+        redirect_back fallback_location: root_path
+      end
+      format.any { head :unprocessable_entity }
+    end
   end
 
   rescue_from ActionController::InvalidCrossOriginRequest do |_exception|

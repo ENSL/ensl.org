@@ -26,6 +26,24 @@ function HideUserPopup() {
   userInfoTimeout = setTimeout(HideUserPopupRunner, 1000)
 }
 
+function refreshFormAuthenticityToken(form) {
+  if (!form) return
+
+  const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute("content")
+  const csrfParam = document.querySelector("meta[name='csrf-param']")?.getAttribute("content") || "authenticity_token"
+  if (!csrfToken) return
+
+  let tokenInput = form.querySelector(`input[name='${csrfParam}']`)
+  if (!tokenInput) {
+    tokenInput = document.createElement("input")
+    tokenInput.type = "hidden"
+    tokenInput.name = csrfParam
+    form.appendChild(tokenInput)
+  }
+
+  tokenInput.value = csrfToken
+}
+
 function bindLocalHandlers() {
   $(document).off("click", ".fastReply")
   $(document).on("click", ".fastReply", function(e) {
@@ -65,7 +83,10 @@ function bindLocalHandlers() {
       try { form.action = url } catch (_err) { }
     }
 
-    if (form) form.submit()
+    if (form) {
+      refreshFormAuthenticityToken(form)
+      form.submit()
+    }
   })
 
   const userTabs = $("#user-profile .tabs")

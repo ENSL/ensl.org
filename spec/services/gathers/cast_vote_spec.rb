@@ -90,6 +90,30 @@ describe Gathers::CastVote do
       result = described_class.call(actor: voter, params: vote_params)
       expect(result.error).to be_present
     end
+
+    it 'retries transient deadlock and succeeds' do
+      call_count = 0
+      allow_any_instance_of(Vote).to receive(:save!).and_wrap_original do |original, *args|
+        call_count += 1
+        raise ActiveRecord::Deadlocked if call_count == 1
+
+        original.call(*args)
+      end
+
+      result = described_class.call(actor: voter, params: vote_params)
+
+      expect(result.success?).to be(true)
+      expect(call_count).to be >= 2
+    end
+
+    it 'returns graceful busy error when lock contention persists' do
+      allow_any_instance_of(Vote).to receive(:save!).and_raise(ActiveRecord::LockWaitTimeout)
+
+      result = described_class.call(actor: voter, params: vote_params)
+
+      expect(result.success?).to be(false)
+      expect(result.error.to_s).to match(/gather is busy|try again/i)
+    end
   end
 
   describe '#initialize' do

@@ -30,6 +30,6 @@
 
 <%= render partial: "gathers/status" %>
 
-<% if @gatherer and @gatherer.user_id = 176 %>
+<% if @gatherer && @gatherer.user_id == 176 %>
   <div id="gatherStarted"></div>
 <% end %>

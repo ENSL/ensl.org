@@ -2,7 +2,7 @@
 <% pick = false %>
 <% gatherers = @gather.gatherers.for_pick_list(team) %>
 
-<%= form_tag pick_gather_path(@gather), data: { turbo_stream: true } do %>
+<%= form_tag pick_gather_path(@gather), authenticity_token: false, data: { turbo_stream: true } do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% gatherers.each_with_index do |gatherer, index| %>
       <% team_pick_position = team.nil? ? nil : (index + 1) %>

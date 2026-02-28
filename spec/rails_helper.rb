@@ -34,6 +34,22 @@ RSpec.configure do |config|
     Rails.cache.clear
   end
 
+  config.around(:each, type: :feature) do |example|
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    example.run
+  ensure
+    ActionController::Base.allow_forgery_protection = original
+  end
+
+  config.around(:each, type: :system) do |example|
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    example.run
+  ensure
+    ActionController::Base.allow_forgery_protection = original
+  end
+
   config.filter_rails_from_backtrace!
 
   config.include Controllers::JsonHelpers, type: :controller
