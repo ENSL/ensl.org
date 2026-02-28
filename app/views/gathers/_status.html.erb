@@ -17,17 +17,17 @@
         <p>Gather running, <%= Gather::FULL - @gather.gatherers.length %> more needed.</p>
         <p>
           You can download custom maps via the
-          <%= link_to "Steam Workshop", "http://steamcommunity.com/workshop/browse?searchtext=&childpublishedfileid=0&section=items&appid=4920&browsesort=trend&requiredtags%5B%5D=level" %>.
+          <%= link_to "Steam Workshop", "http://steamcommunity.com/workshop/browse?searchtext=&childpublishedfileid=0&section=items&appid=4920&browsesort=trend&requiredtags%5B%5D=level", data: { turbo_frame: '_top' } %>.
         </p>
 
         <p>
           <% if gather_current_user.gatherers.count < 5 %>
-            <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES) %>, installed NS and Discord.
+            <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES), data: { turbo_frame: '_top' } %>, installed NS and Discord.
           <% end  %>
         </p>
         <p>
           <%= f.submit 'Click to join gather!', class: 'button' %>
-          <%= link_to gathers_path(), class: 'button' do %>
+          <%= link_to gathers_path(), class: 'button', data: { turbo_frame: '_top' } do %>
             Gather archive
           <% end %>
         </p>
@@ -35,7 +35,7 @@
 
     <% else %>
       <p>Log in to join the gather.</p>
-      <%= link_to gathers_path(), class: 'button tiny' do %>
+      <%= link_to gathers_path(), class: 'button tiny', data: { turbo_frame: '_top' } do %>
         Gather archive
       <% end %>
     <% end %>
@@ -86,7 +86,9 @@
     <p>Gather finished, join the Server and voice communication.</p>
 
     <p>
-      <strong>Maps</strong>: <%= namelink @gather.map1.map if @gather.map1 %>, <%= (namelink @gather.map2.map) if @gather.map2 %> <br>
+      <strong>Maps</strong>:
+      <%= link_to @gather.map1.map.to_s, @gather.map1.map, data: { turbo_frame: '_top' } if @gather.map1 %>,
+      <%= link_to @gather.map2.map.to_s, @gather.map2.map, data: { turbo_frame: '_top' } if @gather.map2 %> <br>
       <strong>Server</strong>:
       <% if @gather.server %>
         <%= @gather.server %>
@@ -97,9 +99,9 @@
 
     <p>
     <% if @gather.server and @gather.server.ip and @gather.server.password %>
-      <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny' %>
+      <%= link_to "Click to join Server", "steam://run/4920//connect #{@gather.server.ip} #{@gather.server.password}", class: 'join button tiny', data: { turbo_frame: '_top' } %>
     <% end %>
-    <%= link_to gathers_path(), class: 'button tiny' do %>
+    <%= link_to gathers_path(), class: 'button tiny', data: { turbo_frame: '_top' } do %>
       Gather archive
     <% end %>
     </p>

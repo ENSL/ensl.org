@@ -27,7 +27,7 @@ module GathersHelper
     user = gather_current_user
     return false unless @gather && user
     return false unless @gather.users.exists?(user.id)
-    return false if @gather.status == Gather::STATE_FINISHED
+    return false unless @gather.status == Gather::STATE_VOTING
 
     !@gather.gatherer_votes.where(user_id: user.id).exists? &&
       !@gather.map_votes.where(user_id: user.id).exists? &&

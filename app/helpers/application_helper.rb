@@ -37,11 +37,14 @@ module ApplicationHelper
             end
     str = model.to_s
 
+    options = { class: model.class.to_s.downcase }
+    options[:data] = { turbo_frame: '_top' } if model.is_a?(User)
+
     # Reduce length of too long model names
     if length and str.length > length
-      link_to(str.to_s[0, length] + '...', model, class: model.class.to_s.downcase)
+      link_to(str.to_s[0, length] + '...', model, options)
     else
-      link_to(str, model, class: model.class.to_s.downcase)
+      link_to(str, model, options)
     end
   end
 

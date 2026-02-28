@@ -48,8 +48,8 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     expect(controls_order.first).to eq('gather-music')
   end
 
-  scenario 'attempts to autoplay gather music once gather has started' do
-    gather.update!(status: Gather::STATE_PICKING)
+  scenario 'attempts to autoplay gather music when voting starts' do
+    gather.update!(status: Gather::STATE_VOTING)
     gather.gatherers.create!(user: user)
 
     sign_in_via_session(user)

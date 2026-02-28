@@ -15,7 +15,7 @@
           <% if team_pick_position %>
             <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
           <% end %>
-          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
+          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag, turbo_frame: '_top' } : { turbo_frame: '_top' }) %>
 
         <% else %>
           <%= flag(gatherer.user&.country) %>
@@ -27,7 +27,7 @@
           <% if @gather.status != Gather::STATE_FINISHED && gatherer == captain and gatherer.team == gatherer.gather.turn %>
             <%= fa_icon 'chevron-right' %>
           <% end %>
-          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
+          <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag, turbo_frame: '_top' } : { turbo_frame: '_top' }) %>
 
           <% if gatherer == captain %>
             <span class="captain">
