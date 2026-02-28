@@ -49,6 +49,19 @@ feature 'Gathers', js: true do
       expect(Shoutmsg.where(text: valid_shout).count).to eq(1)
     end
 
+    scenario 'emoji autocomplete popup appears in gather shout input' do
+      visit gather_path(gather)
+      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+
+      input = find_field("shout_Gather_#{gather.id}_text")
+      input.send_keys(':smi')
+
+      expect(page).to have_css('.tribute-container li', text: ':smile:', wait: 5)
+      find('.tribute-container li', text: ':smile:').click
+
+      expect(find_field("shout_Gather_#{gather.id}_text").value).to include(':smile:')
+    end
+
     scenario 'creating shout while banned' do
       Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.now + 10.days, user_name: user.username
       visit root_path

@@ -38,6 +38,8 @@ export default class extends Controller {
     document.addEventListener("turbo:render", this.handleTurboRender)
     document.addEventListener("turbo:frame-load", this.handleTurboFrameLoad)
     document.addEventListener("turbo:before-stream-render", this.handleTurboBeforeStreamRender)
+
+    this.observeDomChanges()
   }
 
   disconnect() {
@@ -55,6 +57,11 @@ export default class extends Controller {
 
     if (this.handleTurboBeforeStreamRender) {
       document.removeEventListener("turbo:before-stream-render", this.handleTurboBeforeStreamRender)
+    }
+
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect()
+      this.mutationObserver = null
     }
 
     if (!this.tribute) {
@@ -118,5 +125,35 @@ export default class extends Controller {
 
       return originalSelectItemAtIndex(index, originalEvent)
     }
+  }
+
+  observeDomChanges() {
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect()
+    }
+
+    this.mutationObserver = new MutationObserver((mutations) => {
+      const hasRelevantNode = mutations.some((mutation) => {
+        if (mutation.type !== "childList") {
+          return false
+        }
+
+        return Array.from(mutation.addedNodes).some((node) => {
+          if (!(node instanceof Element)) {
+            return false
+          }
+
+          return node.matches("textarea, input.shout_input") || node.querySelector("textarea, input.shout_input")
+        })
+      })
+
+      if (!hasRelevantNode) {
+        return
+      }
+
+      this.attachToInputs()
+    })
+
+    this.mutationObserver.observe(document.body, { childList: true, subtree: true })
   }
 }

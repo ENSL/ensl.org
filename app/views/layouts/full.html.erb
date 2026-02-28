@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <%= render partial: "head" %>
-  <body data-disable-flash-fade="<%= Rails.env.test? %>">
+  <body data-disable-flash-fade="<%= Rails.env.test? %>" data-controller="twemoji emoji-autocomplete">
     <div id="container">
       <%= render partial: "header" %>
       <%= render partial: "navigation" %>
