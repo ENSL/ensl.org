@@ -1,6 +1,5 @@
 class GathersController < ApplicationController
   before_action :get_gather, except: %i[latest index create version]
-  skip_before_action :update_user, only: :version
 
   respond_to :html, :js
 
