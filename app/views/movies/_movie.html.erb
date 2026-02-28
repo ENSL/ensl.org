@@ -40,7 +40,11 @@
           <%= link_to 'Edit', edit_movie_path(movie), class: 'button tiny' %>
           <%= link_to 'Make a Preview', preview_movie_path(movie), method: :post, class: 'button tiny' %>
           <% if movie.can_destroy? cuser %>
-            <%= link_to 'Destroy', movie, confirm: 'Are you sure?', method: :delete, class: 'button tiny' %>
+            <%= button_to 'Destroy', movie_path(movie),
+                          method: :delete,
+                          form: { class: 'inline' },
+                          class: 'button tiny',
+                          data: { turbo_confirm: 'Are you sure?' } %>
           <% end %>
         </div>
       <% end %>

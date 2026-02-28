@@ -354,8 +354,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(admin)
       visit movie_path(movie)
 
-      expect(page).to have_link('Destroy')
-      page.driver.submit :delete, movie_path(movie), {}
+      expect(page).to have_button('Destroy')
+      click_button 'Destroy'
       visit movies_path
 
       expect(Movie.find_by(id: movie.id)).to be_nil
@@ -399,8 +399,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(movie_maker)
       visit movie_path(movie)
 
-      expect(page).to have_link('Destroy')
-      page.driver.submit :delete, movie_path(movie), {}
+      expect(page).to have_button('Destroy')
+      click_button 'Destroy'
       visit movies_path
 
       expect(Movie.find_by(id: movie.id)).to be_nil
