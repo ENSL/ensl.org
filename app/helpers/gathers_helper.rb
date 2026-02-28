@@ -22,4 +22,15 @@ module GathersHelper
       render partial: 'gathers/picking', layout: false
     end
   end
+
+  def gather_music_should_play?
+    user = gather_current_user
+    return false unless @gather && user
+    return false unless @gather.users.exists?(user.id)
+    return false if @gather.status == Gather::STATE_FINISHED
+
+    !@gather.gatherer_votes.where(user_id: user.id).exists? &&
+      !@gather.map_votes.where(user_id: user.id).exists? &&
+      !@gather.server_votes.where(user_id: user.id).exists?
+  end
 end

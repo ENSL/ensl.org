@@ -3,7 +3,6 @@
 // `data-confirm` used across many views. Enable it so feature tests behave
 // like the browser and link_to(..., method: :delete) works reliably.
 // = require jquery_ujs
-// = require jquery.jplayer.min
 // = require yetii
 // = require twemoji
 

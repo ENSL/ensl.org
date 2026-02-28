@@ -104,10 +104,13 @@
     <% end %>
     </p>
   <% end %>
-
-
-  <%= link_to "Mute", '#', id: "mute", class: 'button' %>
-  <% if gather_current_user and (gather_current_user.admin? or gather_current_user.gather_moderator?) %>
-    <%= link_to "Admin Page", edit_gather_path(@gather), class: 'admin button', data: { turbo: false } %>
-  <% end %>
+  <div class="gather-controls"
+       data-controller="gather-music"
+       data-gather-music-should-play-value="<%= gather_music_should_play? %>">
+    <%= audio_tag '/sounds/gather-1.mp3', id: 'gather-music', class: 'gather-audio', loop: true, preload: 'metadata', data: { gather_music_target: 'audio' } %>
+    <%= button_tag 'Mute', type: 'button', id: 'mute', class: 'button', data: { gather_music_target: 'muteButton', action: 'gather-music#toggleMute' } %>
+    <% if gather_current_user and (gather_current_user.admin? or gather_current_user.gather_moderator?) %>
+      <%= link_to "Admin Page", edit_gather_path(@gather), class: 'admin button', data: { turbo: false } %>
+    <% end %>
+  </div>
 </div>
