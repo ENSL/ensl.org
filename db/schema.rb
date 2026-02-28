@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_27_111000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_27_120000) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -254,11 +254,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_111000) do
   create_table "gatherers", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "gather_id"
+    t.integer "pick_order"
     t.integer "status", default: 0, null: false
     t.integer "team"
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.integer "votes", default: 0, null: false
+    t.index ["gather_id", "pick_order"], name: "index_gatherers_on_gather_id_and_pick_order"
     t.index ["gather_id"], name: "index_gatherers_on_gather_id"
     t.index ["updated_at", "gather_id"], name: "index_gatherers_on_updated_at_and_gather_id"
     t.index ["user_id"], name: "index_gatherers_on_user_id"
@@ -273,6 +275,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_111000) do
     t.datetime "lastpick2", precision: nil
     t.integer "map1_id"
     t.integer "map2_id"
+    t.string "pick_strategy", default: "1-2-2-2-2-1", null: false
     t.integer "server_id"
     t.integer "status"
     t.integer "turn"

@@ -161,6 +161,22 @@
 
   .players {
 
+    .pick-order-badge {
+      display: inline-block;
+      min-width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+      margin-right: 8px;
+      font-size: 11px;
+      font-weight: bold;
+      color: $dark-gray;
+      background: $light-gray;
+      border: 1px solid $medium-gray;
+      vertical-align: middle;
+    }
+
     .captain {
       color: $gold;
       margin: 0 10px;

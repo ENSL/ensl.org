@@ -35,8 +35,19 @@ class Gather < ActiveRecord::Base
   FULL = 12
   SERVERS = [3, 5, 23, 21, 22]
   VOTING_TIMEOUT_SECONDS = 60
+  PICK_STRATEGY_DEFAULT = '1-2-2-2-2-1'
+  PICK_STRATEGIES = [
+    PICK_STRATEGY_DEFAULT,
+    '1-1-1-1',
+    'team_pick',
+    'random',
+    'gather_rank',
+    'ml_rank'
+  ].freeze
 
   attr_accessor :admin
+
+  attr_readonly :pick_strategy
 
   scope :ordered, -> { order('id DESC') }
   scope :basic, -> { includes(:captain1, :captain2, :map1, :map2, :server) }
@@ -63,6 +74,9 @@ class Gather < ActiveRecord::Base
   has_many :servers, through: :gather_servers
   has_many :shoutmsgs, as: 'shoutable'
   has_many :real_votes, class_name: 'Vote', as: :votable, dependent: :destroy
+
+  validates :pick_strategy, inclusion: { in: PICK_STRATEGIES }
+  validate :pick_strategy_immutable, on: :update
 
   before_create :init_variables
   after_create :add_maps_and_server
@@ -173,16 +187,20 @@ class Gather < ActiveRecord::Base
 
     # Lock gather to avoid concurrent updates to gatherers
     with_lock do
+      captain1&.update!(team: 1, pick_order: 1, skip_callbacks: true)
+      captain2&.update!(team: 2, pick_order: 2, skip_callbacks: true)
+
       gatherers.each do |gatherer|
-        if gatherer.id == captain1_id
-          gatherer.update!(team: 1, skip_callbacks: true)
-        elsif gatherer.id == captain2_id
-          gatherer.update!(team: 2, skip_callbacks: true)
-        else
-          gatherer.update!(team: nil, skip_callbacks: true)
-        end
+        next if gatherer.id == captain1_id || gatherer.id == captain2_id
+
+        gatherer.update!(team: nil, pick_order: nil, skip_callbacks: true)
       end
     end
+  end
+
+  def pick_strategy_immutable
+    changed = respond_to?(:will_save_change_to_pick_strategy?) ? will_save_change_to_pick_strategy? : pick_strategy_changed?
+    errors.add(:pick_strategy, 'cannot be changed') if changed
   end
 
   def refresh(cuser)

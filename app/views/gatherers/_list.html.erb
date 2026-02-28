@@ -1,25 +1,32 @@
 <% captain = team == 1 ? @gather.captain1 : @gather.captain2 %>
 <% pick = false %>
+<% gatherers = @gather.gatherers.for_pick_list(team) %>
 
 <%= form_tag pick_gather_path(@gather), data: { turbo_stream: true } do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
-    <% @gather.gatherers.ordered.team(team).each do |gatherer| %>
+    <% gatherers.each_with_index do |gatherer, index| %>
+      <% team_pick_position = team.nil? ? nil : (index + 1) %>
       <li>
           <% if @gatherer and gatherer.can_update? gather_current_user, { team: @gatherer.team } %>
           <% pick = true %>
           <%= radio_button_tag :player, gatherer.id %>
           <%= flag gatherer.user.country %>
           <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <% if team_pick_position %>
+            <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
+          <% end %>
           <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
 
         <% else %>
-          <%= flag(gatherer.user.country) if gatherer.user && gatherer.user.country %>
-
-          <% if gatherer == captain and gatherer.team == gatherer.gather.turn %>
-            <%= fa_icon 'chevron-right' %>
-          <% end %>
+          <%= flag(gatherer.user&.country) %>
 
           <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <% if team_pick_position %>
+            <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
+          <% end %>
+          <% if @gather.status != Gather::STATE_FINISHED && gatherer == captain and gatherer.team == gatherer.gather.turn %>
+            <%= fa_icon 'chevron-right' %>
+          <% end %>
           <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: (captain_flag ? { captain: captain_flag } : {}) %>
 
           <% if gatherer == captain %>

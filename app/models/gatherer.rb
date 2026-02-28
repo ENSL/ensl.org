@@ -66,6 +66,21 @@ class Gatherer < ActiveRecord::Base
     joins('LEFT JOIN gathers ON captain1_id = gatherers.id OR captain2_id = gatherers.id')
       .order('captain1_id, captain2_id, gatherers.id')
   }
+  scope :for_pick_list, lambda { |team|
+    if team.nil?
+      ordered.team(team)
+    else
+      pick_order_nulls_last = Arel::Nodes::Case.new
+                                               .when(arel_table[:pick_order].eq(nil)).then(1)
+                                               .else(0)
+
+      team(team)
+        .order(pick_order_nulls_last.asc)
+        .order(arel_table[:pick_order].asc)
+        .order(arel_table[:updated_at].asc)
+        .order(arel_table[:id].asc)
+    end
+  }
   scope :idle, lambda {
     joins('LEFT JOIN users ON users.id = gatherers.user_id')
       .where('lastvisit < ?', 30.minutes.ago.utc)
@@ -77,11 +92,13 @@ class Gatherer < ActiveRecord::Base
 
   validates_uniqueness_of :user_id, scope: :gather_id
   validates_inclusion_of :team, in: 1..2, allow_nil: true
+  validates_numericality_of :pick_order, only_integer: true, greater_than: 0, allow_nil: true
   validates :confirm, acceptance: true, unless: proc { |gatherer| gatherer.user.gatherers.count >= 5 }
   validate :validate_username
 
   after_create :start_gather, if: proc { |gatherer| gatherer.gather.gatherers.count == Gather::FULL }
   after_create :notify_gatherers, if: proc { |gatherer| gatherer.gather.gatherers.count == Gather::NOTIFY }
+  before_save :assign_pick_order_on_pick
   after_update :change_turn, unless: proc { |gatherer| gatherer.skip_callbacks == true }
   after_destroy :cleanup_votes
 
@@ -138,6 +155,25 @@ class Gatherer < ActiveRecord::Base
       end
 
       gather.update!(status: Gather::STATE_FINISHED) if gather.gatherers.lobby.count == 0
+    end
+  end
+
+  def assign_pick_order_on_pick
+    return unless should_assign_pick_order?
+    return unless gather
+
+    gather.with_lock do
+      self.pick_order = gather.gatherers.where.not(id: id).maximum(:pick_order).to_i + 1
+    end
+  end
+
+  def should_assign_pick_order?
+    return false if pick_order.present? || team.nil?
+
+    if respond_to?(:will_save_change_to_team?)
+      will_save_change_to_team? && team_change_to_be_saved&.first.nil?
+    else
+      team_changed? && team_was.nil?
     end
   end
 

@@ -7,6 +7,21 @@ RSpec.describe Gather, type: :model do
       g.send(:init_variables)
       expect(g.status).to eq(Gather::STATE_RUNNING)
     end
+
+    it 'defaults pick_strategy to default strategy' do
+      gather = create(:gather)
+      expect(gather.pick_strategy).to eq(Gather::PICK_STRATEGY_DEFAULT)
+    end
+  end
+
+  describe 'pick_strategy' do
+    it 'is immutable after create' do
+      gather = create(:gather)
+
+      gather.pick_strategy = 'random'
+      expect(gather).to be_invalid
+      expect(gather.errors[:pick_strategy]).to include('cannot be changed')
+    end
   end
 
   describe 'check_captains' do
@@ -22,7 +37,10 @@ RSpec.describe Gather, type: :model do
       expect(gather.status).to eq(Gather::STATE_PICKING)
       expect(ga.reload.team).to eq(1)
       expect(gb.reload.team).to eq(2)
+      expect(ga.reload.pick_order).to eq(1)
+      expect(gb.reload.pick_order).to eq(2)
       expect(gx.reload.team).to be_nil
+      expect(gx.reload.pick_order).to be_nil
     end
   end
 
