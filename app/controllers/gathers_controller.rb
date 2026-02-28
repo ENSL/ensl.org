@@ -77,7 +77,9 @@ class GathersController < ApplicationController
 
   def version
     Rails.logger.silence do
-      gather = Gather.basic.find(params[:id])
+      # Only the fields required by refresh + the version response are needed here.
+      # Avoid Gather.basic (5 association JOINs) on every poll from 12 sessions.
+      gather = Gather.find(params[:id])
       previous_status = gather.status
       gather.refresh(nil)
       Gathers::Broadcaster.call(gather) if gather.status != previous_status
@@ -89,12 +91,13 @@ class GathersController < ApplicationController
   private
 
   def get_gather
-    Gather.transaction do
-      @gather = Gather.basic.where(id: params[:id]).lock(true).first
-      raise ActiveRecord::RecordNotFound, 'Gather not found' unless @gather
+    # No pessimistic lock here — lock(true) serialised every concurrent page-load
+    # across all 12 browser sessions. refresh() acquires with_lock internally
+    # only when it actually needs to write, so the outer lock is redundant.
+    @gather = Gather.basic.find(params[:id])
+    raise ActiveRecord::RecordNotFound, 'Gather not found' unless @gather
 
-      @gather.refresh cuser
-    end
+    @gather.refresh cuser
 
     @gatherer = @gather.gatherers.of_user(cuser).first if cuser
     update_gatherers
@@ -102,19 +105,8 @@ class GathersController < ApplicationController
 
   def update_gatherers
     # Update user that has left and came back
-    if @gatherer and @gatherer.status == Gatherer::STATE_LEAVING
-      @gatherer.update_attribute(:status, Gatherer::STATE_ACTIVE)
-    end
+    return unless @gatherer && @gatherer.status == Gatherer::STATE_LEAVING
 
-    # Remove any users that left over 30 seconds ago
-    removed_users = false
-    # @gather.gatherers.each do |gatherer|
-    #   if gatherer.status == Gatherer::STATE_LEAVING and gatherer.updated_at < Time.now - 30
-    #     removed_users = true
-    #     gatherer.destroy
-    #   end
-    # end
-
-    @gather.reload if removed_users
+    @gatherer.update_attribute(:status, Gatherer::STATE_ACTIVE)
   end
 end

@@ -42,7 +42,9 @@ Capybara.register_driver :playwright_chrome_headless do |app|
   )
 end
 
-Capybara.server = :puma, { Silent: true }
+# Need enough threads to serve 12 concurrent browser sessions (version polls + page loads)
+# simultaneously without starving each other or the connection pool.
+Capybara.server = :puma, { Silent: true, threads: '1:20' }
 Capybara.default_driver = :rack_test
 Capybara.javascript_driver = :playwright_chrome_headless
 Capybara.default_max_wait_time = 10

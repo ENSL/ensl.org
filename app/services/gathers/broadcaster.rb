@@ -14,6 +14,13 @@ module Gathers
     def call
       @gather.reload
       @gather.bump_version!
+      # In test, skip all ActionCable HTML renders. Every join/vote/pick would
+      # otherwise render N+1 full partials (O(n²) across 12 joins). The version
+      # bump alone is sufficient: gather_sync_controller.js detects the mismatch
+      # and reloads the frame via its poll interval, giving each session fresh,
+      # user-specific content through a normal GET /gathers/:id.
+      return if Rails.env.test?
+
       broadcast_for_guest
       broadcast_for_users
     end

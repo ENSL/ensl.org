@@ -218,24 +218,40 @@ class Gather < ActiveRecord::Base
         end
       end
     elsif status == STATE_PICKING
-      # Lock gather while evaluating and applying turn/status updates
-      with_lock do
-        # If both teams full, mark finished immediately
-        if gatherers.team(1).count == 6 and gatherers.team(2).count == 6
-          update!(status: STATE_FINISHED)
-        elsif turn == 1 and gatherers.team(1).count == 2 and gatherers.team(2).count == 1
-          update!(turn: 2)
-        elsif turn == 2 and gatherers.team(2).count == 3 and gatherers.team(1).count == 2
-          update!(turn: 1)
-        elsif turn == 1 and gatherers.team(1).count == 4 and gatherers.team(2).count == 3
-          update!(turn: 2)
-        elsif turn == 2 and gatherers.team(2).count == 5 and gatherers.team(1).count == 4
-          update!(turn: 1)
-        elsif turn == 1 and gatherers.team(1).count == 6 and gatherers.team(2).count == 5
-          gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
-          update!(turn: 2)
-        elsif gatherers.team(1).count == 6 and gatherers.team(2).count == 6
-          update!(status: STATE_FINISHED)
+      # Read counts outside the lock first. The version endpoint is polled by
+      # every browser session concurrently; unconditionally taking with_lock
+      # serialised all 12 callers even when nothing needed to change. Only
+      # acquire the write lock when a transition actually appears necessary.
+      t1 = gatherers.team(1).count
+      t2 = gatherers.team(2).count
+      cur_turn = turn
+
+      needs_check = (t1 == 6 && t2 == 6) ||
+                    (cur_turn == 1 && t1 == 2 && t2 == 1) ||
+                    (cur_turn == 2 && t2 == 3 && t1 == 2) ||
+                    (cur_turn == 1 && t1 == 4 && t2 == 3) ||
+                    (cur_turn == 2 && t2 == 5 && t1 == 4) ||
+                    (cur_turn == 1 && t1 == 6 && t2 == 5)
+
+      if needs_check
+        with_lock do
+          # Re-read inside the lock (with_lock reloads the record)
+          if gatherers.team(1).count == 6 and gatherers.team(2).count == 6
+            update!(status: STATE_FINISHED)
+          elsif turn == 1 and gatherers.team(1).count == 2 and gatherers.team(2).count == 1
+            update!(turn: 2)
+          elsif turn == 2 and gatherers.team(2).count == 3 and gatherers.team(1).count == 2
+            update!(turn: 1)
+          elsif turn == 1 and gatherers.team(1).count == 4 and gatherers.team(2).count == 3
+            update!(turn: 2)
+          elsif turn == 2 and gatherers.team(2).count == 5 and gatherers.team(1).count == 4
+            update!(turn: 1)
+          elsif turn == 1 and gatherers.team(1).count == 6 and gatherers.team(2).count == 5
+            gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
+            update!(turn: 2)
+          elsif gatherers.team(1).count == 6 and gatherers.team(2).count == 6
+            update!(status: STATE_FINISHED)
+          end
         end
       end
     end

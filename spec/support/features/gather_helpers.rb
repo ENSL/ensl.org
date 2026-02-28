@@ -43,7 +43,9 @@ module Features
       Capybara.using_session(session_name) do
         return unless voting_time_left?(deadline)
 
-        visit_gather_with_retry(gather)
+        # No page re-visit: after joining, every session already has the gather
+        # page open. gather_sync_controller.js polls for version changes and
+        # reloads the frame automatically when the gather transitions to VOTING.
         return unless wait_for_voting_state(deadline: deadline)
         return unless voting_time_left?(deadline)
 
@@ -88,7 +90,6 @@ module Features
       Capybara.using_session(session_name) do
         return unless voting_time_left?(deadline)
 
-        visit_gather_with_retry(gather)
         return unless wait_for_voting_state(deadline: deadline)
         return unless voting_time_left?(deadline)
 
@@ -125,7 +126,6 @@ module Features
       Capybara.using_session(session_name) do
         return unless voting_time_left?(deadline)
 
-        visit_gather_with_retry(gather)
         return unless wait_for_voting_state(deadline: deadline)
         return unless voting_time_left?(deadline)
 
@@ -182,12 +182,17 @@ module Features
 
       frame_selector = "turbo-frame#gather_#{gather.id}_frame"
 
-      if page.has_selector?(frame_selector, wait: 10)
+      # After removing page re-visits from vote helpers we must allow enough
+      # time for gather_sync_controller.js to poll (/version every 5 s in test)
+      # and reload the frame before we check for vote links.
+      wait_for_content = 10
+
+      if page.has_selector?(frame_selector, wait: wait_for_content)
         within(frame_selector) do
-          return false unless page.has_selector?("ul##{list_id}", wait: 3)
+          return false unless page.has_selector?("ul##{list_id}", wait: wait_for_content)
         end
       else
-        return false unless page.has_selector?("ul##{list_id}", wait: 3)
+        return false unless page.has_selector?("ul##{list_id}", wait: wait_for_content)
       end
 
       true
@@ -231,60 +236,12 @@ module Features
 
     private
 
-    def visit_gather_with_retry(gather_page, retries: 1)
-      attempts = 0
-      target_path = gather_path(gather_page)
-
-      begin
-        if page.driver.is_a?(Capybara::Playwright::Driver)
-          playwright_page = current_playwright_page
-
-          if playwright_page
-            playwright_page.goto(
-              absolute_url_for(playwright_page, target_path),
-              waitUntil: 'domcontentloaded',
-              timeout: 12_000
-            )
-          else
-            visit target_path
-          end
-        else
-          visit target_path
-        end
-      rescue Playwright::TimeoutError
-        raise if attempts >= retries
-
-        attempts += 1
-        sleep(0.25)
-        retry
-      rescue Playwright::Error => e
-        raise unless e.message.match?(/page crashed|target closed/i)
-        raise if attempts >= retries
-
-        attempts += 1
-        page.driver.reset! if page.driver.respond_to?(:reset!)
-        sleep(0.25)
-        retry
-      end
-    end
-
-    def current_playwright_page
-      page.driver.current_url # Ensure driver internals are initialized
-      browser_wrapper = page.driver.instance_variable_get(:@browser)
-      browser_wrapper&.instance_variable_get(:@playwright_page)
-    rescue StandardError
-      nil
-    end
-
-    def absolute_url_for(playwright_page, path)
-      require 'uri'
-
-      current_url = playwright_page.url
-      current_uri = URI.parse(current_url)
-      base = "#{current_uri.scheme}://#{current_uri.host}:#{current_uri.port}"
-      URI.join(base, path).to_s
-    rescue StandardError
-      path
+    # Simple navigation – rely on Capybara's built-in visit rather than
+    # bypassing it with raw Playwright goto. Capybara handles driver
+    # differences and its default wait-until is appropriate for the test
+    # Puma server we configure.
+    def visit_gather_with_retry(gather_page)
+      visit gather_path(gather_page)
     end
   end
 end
