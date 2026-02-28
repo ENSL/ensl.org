@@ -157,6 +157,13 @@
     ul {
       margin-bottom: 10px;
     }
+
+    ul#map-votes {
+      max-height: 15.00rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+    }
   }
 
   .players {
