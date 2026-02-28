@@ -19,7 +19,8 @@ class Vote < ActiveRecord::Base
 
   # attr_protected :id, :updated_at, :created_at, :user_id
 
-  validates_uniqueness_of :user_id, scope: %i[votable_id votable_type]
+  validates :user_id,
+            uniqueness: { scope: %i[votable_id votable_type], message: 'You have already voted for this choice' }
   validates_presence_of :user_id, :votable_id, :votable_type
 
   belongs_to :user, optional: true
@@ -51,7 +52,8 @@ class Vote < ActiveRecord::Base
       case votable_type
       when 'Gatherer'
         return false if votable.gather.status != Gather::STATE_VOTING
-        return false if votable.gather.gatherer_votes.where(user_id: cuser.id).count > 1
+        return false if votable.gather.gatherer_votes.where(user_id: cuser.id, votable_id: votable.id).exists?
+        return false if votable.gather.gatherer_votes.where(user_id: cuser.id).count >= 2
       when 'GatherMap'
         return false if votable.gather.status == Gather::STATE_FINISHED
         # Do not let user vote for same map twice

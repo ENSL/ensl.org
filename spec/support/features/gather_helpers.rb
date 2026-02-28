@@ -48,6 +48,7 @@ module Features
         return unless voting_time_left?(deadline)
 
         gatherer_votes = gather.gatherer_votes.count
+        attempted_captain_vote_urls = []
 
         return unless with_votes_scope('gatherers')
         return unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
@@ -56,10 +57,20 @@ module Features
           break unless voting_time_left?(deadline, minimum_left: 0.3)
           break unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
 
+          available_choices = all('table#gatherers a.vote-link').reject do |choice|
+            attempted_captain_vote_urls.include?(choice[:href])
+          end
+          break if available_choices.empty?
+
           safe_click do
-            first_choice = find('table#gatherers a.vote-link', match: :first, wait: 2)
-            choices = all('table#gatherers a.vote-link')
-            (choices.empty? ? first_choice : choices.sample).click
+            choices = all('table#gatherers a.vote-link').reject do |choice|
+              attempted_captain_vote_urls.include?(choice[:href])
+            end
+            raise Capybara::ElementNotFound if choices.empty?
+
+            choice = choices.sample
+            attempted_captain_vote_urls << choice[:href]
+            choice.click
           end
 
           sleep(0.15)

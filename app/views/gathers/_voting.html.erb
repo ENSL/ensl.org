@@ -13,7 +13,7 @@
               <% if @gatherer and gatherer.real_votes.build(user: gather_current_user).can_create? gather_current_user %>
                 <%= link_to gatherer.user, votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), turbo: false } %>
               <% else %>
-                <%= namelink gatherer.user %>
+                <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: { turbo_frame: '_top' } %>
               <% end %>
             </td>
           </tr>
