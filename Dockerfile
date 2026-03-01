@@ -1,6 +1,5 @@
-FROM ruby:3.4.8 AS ensl_development
+FROM ruby:3.4.8 AS ensl_base
 
-ENV RAILS_ENV=development
 ENV APP_PATH=/var/www
 ENV WEB_UID=1000
 ENV WEB_GID=1000
@@ -22,26 +21,19 @@ RUN \
     apt-get -y install --no-install-recommends --upgrade \
       # General tools
       curl build-essential \
-    # For MySQL/MariaDB
-    libmariadb-dev libmariadb-dev-compat \
+      # For MySQL/MariaDB
+      libmariadb-dev libmariadb-dev-compat \
       # SSL libs
-      libssl-dev  \
+      libssl-dev \
       # zlib, readline and libyaml
-      zlib1g-dev libreadline-dev libyaml-dev  \
-      # For nogokiri
+      zlib1g-dev libreadline-dev libyaml-dev \
+      # For nokogiri
       libxslt1-dev libxml2-dev \
       # For carrierwave/rmagick
       imagemagick libmagickwand-dev \
       # Tools for media processing and metadata
-      ffmpeg vlc screen libimage-exiftool-perl \
-      # For poltergeist
-      # phantomjs \
-      firefox-esr \
-      # For testing
-      time \
-      # For apparition
-      chromium chromium-driver && \
-    # Fix URI startup issue && \
+      ffmpeg vlc screen libimage-exiftool-perl && \
+    # Fix URI startup issue
     gem update --system && \
     # Install bundler and bundle path
     gem install bundler -v $BUNDLER_VERSION && \
@@ -66,9 +58,6 @@ RUN \
     # Clean up
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
-# Install Playwright dependencies for Chromium
-RUN npx playwright install-deps chromium
-
 # Cache bundle installs
 USER web
 WORKDIR /var/www
@@ -81,6 +70,26 @@ RUN bundle config set github.https true && \
     bundle config set with 'test' && \
     bundle install --jobs 8
 
+#
+# Development (includes test dependencies)
+#
+
+FROM ensl_base AS ensl_development
+
+ENV RAILS_ENV=development
+
+# Test-only system packages
+USER root
+RUN apt-get update && apt-get -y install --no-install-recommends \
+      # For timing test runs
+      time
+
+# Install Playwright's own Chromium and its system dependencies
+# (apt chromium is not used — Playwright manages its own browser binaries)
+RUN npx playwright install-deps chromium
+
+USER web
+
 # Install Playwright browsers via Node CLI (independent of Ruby gem)
 RUN npx playwright install chromium
 
@@ -88,7 +97,7 @@ RUN npx playwright install chromium
 # Production
 #
 
-FROM ensl_development AS ensl_production
+FROM ensl_base AS ensl_production
 
 ENV RAILS_ENV=production
 
