@@ -23,9 +23,9 @@ services:
   development:
     <<: *app
     profiles: ["development"]
-#    environment:
-#      DISABLE_PUMA: 0
-#      RAILS_DEBUG: 0
+    environment:
+      - DISABLE_PUMA
+      - RAILS_DEBUG
     ports:
       - "${PUMA_PORT}:${PUMA_PORT}"
       - "35729:35729"

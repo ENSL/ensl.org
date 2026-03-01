@@ -1,0 +1,18 @@
+{
+  "name": "Ruby RSpec Dev Container",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  // Optional but usually correct if your container user is 'web'
+  "remoteUser": "web",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Shopify.ruby-lsp"
+      ]
+    }
+  }
+}
