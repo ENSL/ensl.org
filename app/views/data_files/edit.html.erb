@@ -44,17 +44,21 @@
         <%= related.size_s %> MB
       </td>
       <td>
-        <%= link_to "Remove", delFile_data_file_path(@file, related_id: related.id), method: :delete %>
+        <%= link_to fa_icon('times'), data_file_path(related, data_file: { related_id: nil }, return_to: edit_data_file_path(@file)), method: :patch,
+          title: 'Remove related file' %>
       </td>
     </tr>
   <% end %>
 </table>
 
-<%= form_for @file, url: { action: "addFile", id: @file }, method: :post do |f| %>
+<%= form_tag data_file_path(@file), method: :patch,
+  onsubmit: "var id=document.getElementById('add_related_candidate_id').value; if(!id){return false;} this.action='#{data_files_path}/'+id;" do %>
   <div class="fields">
-    <%= f.select :related_id, @related_file_options %>
+    <%= select_tag :add_related_candidate_id, options_for_select(@add_related_options), include_blank: true %>
+    <%= hidden_field_tag 'data_file[related_id]', @file.id %>
+    <%= hidden_field_tag :return_to, edit_data_file_path(@file) %>
   </div>
   <div class="controls">
-    <%= f.submit "Add" %>
+    <%= submit_tag 'Add' %>
   </div>
 <% end %>

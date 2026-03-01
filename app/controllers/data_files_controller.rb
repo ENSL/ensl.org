@@ -1,5 +1,6 @@
 class DataFilesController < ApplicationController
-  before_action :get_file, only: %i[show edit update destroy rate addFile delFile]
+  before_action :get_file, only: %i[show edit update destroy rate]
+  before_action :prepare_edit_form_data, only: %i[edit update]
   respond_to :html, :turbo_stream
 
   def show
@@ -26,8 +27,6 @@ class DataFilesController < ApplicationController
 
   def edit
     raise AccessError unless @file.can_update? cuser
-
-    @related_file_options = related_file_options
   end
 
   def create
@@ -55,31 +54,15 @@ class DataFilesController < ApplicationController
 
     if @file.update(DataFile.params(params, cuser))
       flash[:notice] = t(:files_update)
-      redirect_to(@file)
+      return_to = params[:return_to].to_s
+      if return_to.start_with?('/')
+        redirect_to(return_to)
+      else
+        redirect_to(@file)
+      end
     else
       respond_with_validation_errors(@file, template: :edit)
     end
-  end
-
-  def addFile
-    raise AccessError unless @file.can_update? cuser
-
-    @related = @file.directory.files.except_file(@file).find(params[:data_file][:related_id])
-    @related.update!(related: @file)
-    redirect_to edit_data_file_url(@file)
-  rescue ActiveRecord::RecordInvalid
-    @related_file_options = related_file_options
-    @file.errors.add(:base, 'Could not add related file')
-    render :edit, status: :unprocessable_entity
-  end
-
-  def delFile
-    raise AccessError unless @file.can_update? cuser
-
-    @related = @file.related_files.find params[:related_id]
-    @related.related = nil
-    @related.save
-    redirect_to edit_data_file_url(@file)
   end
 
   def destroy
@@ -115,8 +98,9 @@ class DataFilesController < ApplicationController
     @file = DataFile.find params[:id]
   end
 
-  def related_file_options
-    @file.directory.files.except_file(@file).includes(:related_files).map do |file|
+  def prepare_edit_form_data
+    @available_related_files = DataFile.for_related_selection(@file)
+    @add_related_options = @available_related_files.map do |file|
       suffix = file.related_files.any? ? " (+#{file.related_files.size} related files)" : ''
       ["#{file}#{suffix}", file.id]
     end

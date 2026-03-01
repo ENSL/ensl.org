@@ -108,6 +108,21 @@ describe DataFile do
       end
     end
 
+    describe '.for_related_selection' do
+      it 'returns files in same directory excluding the given file' do
+        directory = create(:directory)
+        target = create(:data_file, directory: directory)
+        same_dir = create(:data_file, directory: directory)
+        other_dir = create(:data_file, directory: create(:directory))
+
+        result = DataFile.for_related_selection(target)
+
+        expect(result).to include(same_dir)
+        expect(result).not_to include(target)
+        expect(result).not_to include(other_dir)
+      end
+    end
+
     describe '.unrelated' do
       it 'returns files without related_id' do
         unrelated = create(:data_file, related_id: nil)
@@ -426,6 +441,28 @@ describe DataFile do
       result = DataFile.params(params, nil)
       expect(result.permitted?).to be true
       expect(result.keys).to match_array(%w[title description name article_id related_id directory_id])
+    end
+  end
+
+  describe 'direct related updates' do
+    it 'adds a related file via related_id update' do
+      directory = create(:directory)
+      parent = create(:data_file, directory: directory)
+      candidate = create(:data_file, directory: directory, related: nil)
+
+      candidate.update!(related_id: parent.id)
+
+      expect(candidate.reload.related).to eq(parent)
+    end
+
+    it 'removes a related file via related_id nil update' do
+      directory = create(:directory)
+      parent = create(:data_file, directory: directory)
+      related = create(:data_file, directory: directory, related: parent)
+
+      related.update!(related_id: nil)
+
+      expect(related.reload.related).to be_nil
     end
   end
 

@@ -216,6 +216,39 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       related_file.reload
       expect(related_file.related).to be_nil
     end
+
+    it 'adds related file from edit page using update' do
+      dir = create(:directory)
+      main_file = create(:data_file, directory: dir, title: 'Main')
+      candidate = create(:data_file, directory: dir, title: 'Candidate')
+
+      sign_in_via_session(admin)
+      visit edit_data_file_path(main_file)
+
+      select 'Candidate', from: 'add_related_candidate_id'
+      click_button 'Add'
+
+      expect(page).to have_content(I18n.t(:files_update))
+      expect(candidate.reload.related).to eq(main_file)
+    end
+
+    it 'removes related file from edit page using update' do
+      dir = create(:directory)
+      main_file = create(:data_file, directory: dir, title: 'Main')
+      related_file = create(:data_file, directory: dir, title: 'Related', related: main_file)
+
+      sign_in_via_session(admin)
+      visit edit_data_file_path(main_file)
+
+      within(all('table.striped').first) do
+        within('tr', text: 'Related') do
+          find('a[title="Remove related file"]').click
+        end
+      end
+
+      expect(page).to have_content(I18n.t(:files_update))
+      expect(related_file.reload.related).to be_nil
+    end
   end
 
   describe 'Admin access' do

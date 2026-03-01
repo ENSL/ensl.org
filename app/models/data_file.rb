@@ -48,6 +48,9 @@ class DataFile < ActiveRecord::Base
   scope :ordered, -> { order('created_at DESC') }
   scope :movies, -> { order('created_at DESC').where(directory_id: Directory::MOVIES) }
   scope :except_file, ->(file) { where.not(id: file.id) }
+  scope :for_related_selection, lambda { |file|
+    file&.directory_id ? where(directory_id: file.directory_id).except_file(file).includes(:related_files) : none
+  }
   scope :unrelated, -> { where(related_id: nil) }
   scope :orphaned, -> { where(directory_id: nil) }
 
