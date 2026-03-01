@@ -2,6 +2,10 @@ module Gathers
   class Broadcaster
     include ActionView::RecordIdentifier
 
+    # Set to true in feature specs to skip per-user HTML renders.
+    # Version bump still occurs so gather_sync_controller.js reloads via polling.
+    cattr_accessor :skip_broadcasts, default: false
+
     def self.call(gather, skip_user_ids: [])
       new(gather, skip_user_ids: skip_user_ids).call
     end
@@ -14,12 +18,7 @@ module Gathers
     def call
       @gather.reload
       @gather.bump_version!
-      # In test, skip all ActionCable HTML renders. Every join/vote/pick would
-      # otherwise render N+1 full partials (O(n²) across 12 joins). The version
-      # bump alone is sufficient: gather_sync_controller.js detects the mismatch
-      # and reloads the frame via its poll interval, giving each session fresh,
-      # user-specific content through a normal GET /gathers/:id.
-      return if Rails.env.test?
+      return if self.class.skip_broadcasts
 
       broadcast_for_guest
       broadcast_for_users

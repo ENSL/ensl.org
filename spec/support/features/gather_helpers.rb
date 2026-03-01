@@ -25,14 +25,10 @@ module Features
         safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
         safe_click { click_button 'Click to join gather!' }
 
-        if page.has_selector?('.message.notice', text: 'You have joined the Gather.', wait: 1)
-          safe_expect_text('You have joined the Gather.')
-        else
-          # Fallback for cases where the join flash does not render consistently
-          # check via db
-          gather.reload
-          expect(gather.gatherers.of_user(users[user_index]).count).to eq(1)
-        end
+        # Wait for 'Leave Gather' — only appears once the join response is applied
+        page.has_button?('Leave Gather', wait: Capybara.default_max_wait_time)
+        gather.reload
+        expect(gather.gatherers.of_user(users[user_index]).count).to eq(1)
       end
     end
 
@@ -216,12 +212,14 @@ module Features
           safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
           safe_click { click_button 'Click to join gather!' }
 
-          if page.has_selector?('.message.notice', text: 'You have joined the Gather.', wait: 1)
-            safe_expect_text('You have joined the Gather.')
-          else
-            gather_page.reload
-            expect(gather_page.gatherers.of_user(user).count).to eq(1)
-          end
+          # Wait for the turbo-stream response to be applied. Turbo disables the
+          # submit button immediately on click (to prevent double-submit), which
+          # fools has_no_button? into returning true before the server responds.
+          # 'Leave Gather' only appears after a successful join AND the frame is
+          # replaced — reliable proof the INSERT is committed and DOM is updated.
+          page.has_button?('Leave Gather', wait: Capybara.default_max_wait_time)
+          gather_page.reload
+          expect(gather_page.gatherers.of_user(user).count).to eq(1)
         else
           gather_page.reload
           expect(gather_page.gatherers.of_user(user).count).to eq(1)
