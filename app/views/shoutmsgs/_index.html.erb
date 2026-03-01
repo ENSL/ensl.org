@@ -3,7 +3,7 @@
 <%= turbo_stream_from shoutmsg_new.domain %>
 
 <div id="<%= shoutmsg_new.domain %>" class="shoutbox-messages">
-  <%= render partial: "shoutmsgs/shoutmsg", collection: object.shoutmsgs.recent.reverse, locals: { popup: 'this' } %>
+  <%= render partial: "shoutmsgs/shoutmsg", collection: object.shoutmsgs.includes(:user).order('id ASC'), locals: { popup: 'this' } %>
 </div>
 
 <%= render partial: "shoutmsgs/new", locals: { shoutmsg: shoutmsg_new, popup: "this" } %>
