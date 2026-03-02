@@ -35,11 +35,15 @@
 # The filesystem is authoritative - metadata (MD5, size) is synced from actual files on disk.
 
 require 'digest/md5'
+require 'fileutils'
+require 'securerandom'
 
 class DataFile < ActiveRecord::Base
   include Extra
 
   MEGABYTE = 1_048_576
+  SYNC_DUPLICATE_OVERWRITE_AGE = 1.week
+  SYNC_MAX_DUPLICATE_SUFFIX_ATTEMPTS = 10_000
 
   scope :recent, -> { order('created_at DESC').limit(8) }
   scope :demos, lambda {
@@ -335,6 +339,96 @@ class DataFile < ActiveRecord::Base
   end
 
   # Class methods
+
+  # Build download decision and destination for a remote sync file.
+  # Returns nil for unsupported files or unresolved destination roots.
+  # Otherwise returns a hash with:
+  # - :download [Boolean]
+  # - :destination_path [String]
+  # - :reason [Symbol]
+  def self.sync_download_plan(nickname:, filename:, remote_size: nil, remote_mtime: nil, now: Time.current)
+    kind = Directory.sync_kind_for_filename(filename)
+    return nil if kind.blank?
+
+    year = sync_destination_year(kind, remote_mtime, now: now)
+    destination_root = Directory.sync_download_root(kind: kind, nickname: nickname, year: year)
+    return nil if destination_root.blank?
+
+    FileUtils.mkdir_p(destination_root)
+    destination_path = File.join(destination_root, File.basename(filename))
+
+    unless sync_download_required?(destination_path, remote_size, remote_mtime)
+      return { download: false, destination_path: destination_path, reason: :up_to_date }
+    end
+
+    {
+      download: true,
+      destination_path: sync_resolve_destination_path(destination_path, remote_mtime, now: now),
+      reason: :download
+    }
+  end
+
+  def self.sync_download_required?(destination_path, remote_size, remote_mtime)
+    return true unless File.exist?(destination_path)
+
+    local_size = File.size(destination_path)
+    local_mtime = File.mtime(destination_path)
+
+    return true if remote_size && local_size != remote_size
+    return true if remote_mtime && local_mtime < remote_mtime
+
+    false
+  rescue StandardError => e
+    Rails.logger.warn("Could not evaluate sync download requirement for #{destination_path}: #{e.message}")
+    true
+  end
+
+  def self.sync_destination_year(kind, remote_mtime, now: Time.current)
+    return nil unless kind.to_s == Directory::SYNC_KIND_LOGS
+
+    (remote_mtime || now).year
+  end
+
+  def self.sync_resolve_destination_path(destination_path, remote_mtime, now: Time.current)
+    return destination_path unless File.exist?(destination_path)
+    return destination_path if sync_fresh_for_overwrite?(destination_path, now: now)
+
+    sync_duplicate_destination_path(destination_path, remote_mtime, now: now)
+  end
+
+  def self.sync_fresh_for_overwrite?(destination_path, now: Time.current)
+    File.mtime(destination_path) >= (now - SYNC_DUPLICATE_OVERWRITE_AGE)
+  rescue StandardError
+    false
+  end
+
+  def self.sync_duplicate_destination_path(destination_path, remote_mtime, now: Time.current)
+    directory = File.dirname(destination_path)
+    basename = File.basename(destination_path)
+    stem, extension = sync_split_filename_for_duplicate_suffix(basename)
+    year = (remote_mtime || now).year
+
+    1.upto(SYNC_MAX_DUPLICATE_SUFFIX_ATTEMPTS) do |index|
+      candidate = File.join(directory, "#{stem}_#{year}_#{index}#{extension}")
+      return candidate unless File.exist?(candidate)
+    end
+
+    fallback = File.join(directory, "#{stem}_#{year}_#{SecureRandom.hex(6)}#{extension}")
+    return fallback unless File.exist?(fallback)
+
+    raise "Unable to find duplicate destination path for #{destination_path}"
+  end
+
+  def self.sync_split_filename_for_duplicate_suffix(filename)
+    if (match = filename.match(/\A(.+?)(\.[^.]+\.gz)\z/i))
+      [match[1], match[2]]
+    else
+      [File.basename(filename, File.extname(filename)), File.extname(filename)]
+    end
+  end
+  private_class_method :sync_download_required?, :sync_destination_year, :sync_resolve_destination_path,
+                       :sync_fresh_for_overwrite?, :sync_duplicate_destination_path,
+                       :sync_split_filename_for_duplicate_suffix
 
   # Find existing file record by path, then checksum (disk-authoritative lookup)
   def self.find_existing(subitem_path, _subitem_name)

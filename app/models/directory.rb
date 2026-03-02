@@ -134,12 +134,25 @@ class Directory < ActiveRecord::Base
     directory_traverse(directory.parent, list)
   end
 
-  def self.sync_download_root(kind:, nickname:)
+  def self.sync_download_root(kind:, nickname:, year: nil)
     base_root = sync_download_base_root(kind)
     segment = sanitize_sync_segment(nickname)
     return nil if base_root.blank? || segment.blank?
 
-    File.join(base_root, segment)
+    segments = [base_root, segment]
+    if sanitize_sync_segment(kind) == SYNC_KIND_LOGS
+      year_segment = sanitize_sync_year_segment(year)
+      segments << year_segment if year_segment.present?
+    end
+
+    File.join(*segments)
+  end
+
+  def self.sanitize_sync_year_segment(value)
+    text = value.to_s.strip
+    return nil unless text.match?(/\A\d{4}\z/)
+
+    text
   end
 
   def self.sync_kind_for_filename(filename)

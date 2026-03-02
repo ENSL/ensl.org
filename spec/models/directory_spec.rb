@@ -622,4 +622,22 @@ describe Directory do
       expect(result.keys).to match_array(%w[description hidden name parent_id])
     end
   end
+
+  describe '.sync_download_root' do
+    it 'adds year segment for logs downloads' do
+      allow(described_class).to receive(:sync_download_base_root).with('logs').and_return('/tmp/files/logs')
+
+      path = described_class.sync_download_root(kind: 'logs', nickname: 'Server 1', year: 2026)
+
+      expect(path).to eq('/tmp/files/logs/server_1/2026')
+    end
+
+    it 'does not add year segment for non-log downloads' do
+      allow(described_class).to receive(:sync_download_base_root).with('demos').and_return('/tmp/files/demos')
+
+      path = described_class.sync_download_root(kind: 'demos', nickname: 'Server 1', year: 2026)
+
+      expect(path).to eq('/tmp/files/demos/server_1')
+    end
+  end
 end

@@ -387,6 +387,126 @@ describe DataFile do
     end
   end
 
+  describe '.sync_download_plan' do
+    around do |example|
+      Dir.mktmpdir('data_file_sync_plan_spec') do |tmp_dir|
+        @sync_tmp = tmp_dir
+        example.run
+      end
+    end
+
+    it 'returns base destination when existing file is fresh for overwrite' do
+      remote_mtime = Time.utc(2025, 8, 12, 12, 0, 0)
+      destination_root = File.join(@sync_tmp, 'logs', 'alpha', '2025')
+      destination_path = File.join(destination_root, 'server.log')
+      FileUtils.mkdir_p(destination_root)
+      File.binwrite(destination_path, 'old-content')
+
+      now = Time.utc(2025, 8, 13, 12, 0, 0)
+      fresh_time = now - 2.days
+      File.utime(fresh_time, fresh_time, destination_path)
+
+      expect(Directory).to receive(:sync_download_root)
+        .with(kind: Directory::SYNC_KIND_LOGS, nickname: 'alpha', year: 2025)
+        .and_return(destination_root)
+
+      plan = described_class.sync_download_plan(
+        nickname: 'alpha',
+        filename: 'server.log',
+        remote_size: 1024,
+        remote_mtime: remote_mtime,
+        now: now
+      )
+
+      expect(plan[:download]).to be true
+      expect(plan[:destination_path]).to eq(destination_path)
+      expect(plan[:reason]).to eq(:download)
+    end
+
+    it 'returns _year_n duplicate destination when existing file is older than one week' do
+      remote_mtime = Time.utc(2026, 1, 3, 0, 0, 0)
+      destination_root = File.join(@sync_tmp, 'logs', 'beta', '2026')
+      destination_path = File.join(destination_root, 'monthly.log')
+      FileUtils.mkdir_p(destination_root)
+      File.binwrite(destination_path, 'existing')
+
+      now = Time.utc(2026, 1, 20, 0, 0, 0)
+      old_time = now - 20.days
+      File.utime(old_time, old_time, destination_path)
+
+      expect(Directory).to receive(:sync_download_root)
+        .with(kind: Directory::SYNC_KIND_LOGS, nickname: 'beta', year: 2026)
+        .and_return(destination_root)
+
+      plan = described_class.sync_download_plan(
+        nickname: 'beta',
+        filename: 'monthly.log',
+        remote_size: 2048,
+        remote_mtime: remote_mtime,
+        now: now
+      )
+
+      expect(plan[:download]).to be true
+      expect(plan[:destination_path]).to eq(File.join(destination_root, 'monthly_2026_1.log'))
+      expect(plan[:reason]).to eq(:download)
+    end
+
+    it 'increments duplicate suffix and keeps .log.gz extension placement' do
+      remote_mtime = Time.utc(2026, 6, 1, 0, 0, 0)
+      destination_root = File.join(@sync_tmp, 'logs', 'gamma', '2026')
+      destination_path = File.join(destination_root, 'archive.log.gz')
+      first_duplicate = File.join(destination_root, 'archive_2026_1.log.gz')
+      FileUtils.mkdir_p(destination_root)
+      File.binwrite(destination_path, 'existing')
+      File.binwrite(first_duplicate, 'existing-duplicate')
+
+      now = Time.utc(2026, 6, 20, 0, 0, 0)
+      old_time = now - 15.days
+      File.utime(old_time, old_time, destination_path)
+
+      expect(Directory).to receive(:sync_download_root)
+        .with(kind: Directory::SYNC_KIND_LOGS, nickname: 'gamma', year: 2026)
+        .and_return(destination_root)
+
+      plan = described_class.sync_download_plan(
+        nickname: 'gamma',
+        filename: 'archive.log.gz',
+        remote_size: 4096,
+        remote_mtime: remote_mtime,
+        now: now
+      )
+
+      expect(plan[:download]).to be true
+      expect(plan[:destination_path]).to eq(File.join(destination_root, 'archive_2026_2.log.gz'))
+    end
+
+    it 'returns up-to-date plan when local file matches remote metadata' do
+      remote_mtime = Time.utc(2026, 3, 1, 10, 0, 0)
+      destination_root = File.join(@sync_tmp, 'logs', 'delta', '2026')
+      destination_path = File.join(destination_root, 'same.log')
+      content = 'same-content'
+      FileUtils.mkdir_p(destination_root)
+      File.binwrite(destination_path, content)
+      File.utime(remote_mtime, remote_mtime, destination_path)
+
+      expect(Directory).to receive(:sync_download_root)
+        .with(kind: Directory::SYNC_KIND_LOGS, nickname: 'delta', year: 2026)
+        .and_return(destination_root)
+
+      plan = described_class.sync_download_plan(
+        nickname: 'delta',
+        filename: 'same.log',
+        remote_size: content.bytesize,
+        remote_mtime: remote_mtime,
+        now: Time.utc(2026, 3, 1, 12, 0, 0)
+      )
+
+      expect(plan[:download]).to be false
+      expect(plan[:destination_path]).to eq(destination_path)
+      expect(plan[:reason]).to eq(:up_to_date)
+    end
+  end
+
   describe 'permission methods' do
     let(:file) { create(:data_file) }
 
