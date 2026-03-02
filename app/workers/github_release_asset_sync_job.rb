@@ -26,7 +26,8 @@ class GithubReleaseAssetSyncJob
       end
     end
 
-    run_directory_reconciliation
+    root_directory = Directory.find_by(id: Directory::ROOT)
+    DirectoryReconciliationService.new(root_directory).call if root_directory
   end
 
   private
@@ -91,7 +92,7 @@ class GithubReleaseAssetSyncJob
     filename = filename_for(asset_url, prefix)
     destination_path = File.join(destination_root, filename)
 
-    if data_file_exists?(filename)
+    if filename.present? && DataFile.exists?(name: filename)
       Rails.logger.info("[GithubReleaseAssetSyncJob] Skipping existing DB file #{filename}")
       return
     end
@@ -121,24 +122,5 @@ class GithubReleaseAssetSyncJob
 
   def safe_name(value)
     value.to_s.gsub(/[^A-Za-z0-9._-]/, '_').downcase
-  end
-
-  def data_file_exists?(filename)
-    return false if filename.blank?
-
-    DataFile.exists?(name: filename)
-  end
-
-  def run_directory_reconciliation
-    root_directory = Directory.find_by(id: Directory::ROOT)
-    unless root_directory
-      Rails.logger.error('[GithubReleaseAssetSyncJob] Failed to run DirectoryReconciliationService: root directory not found')
-      return
-    end
-
-    operation_log = DirectoryReconciliationService.new(root_directory).call
-    Rails.logger.info("[GithubReleaseAssetSyncJob] Directory reconciliation completed\n#{operation_log.string}")
-  rescue StandardError => e
-    Rails.logger.error("[GithubReleaseAssetSyncJob] Directory reconciliation failed: #{e.message}")
   end
 end
