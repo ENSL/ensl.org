@@ -115,7 +115,11 @@ class DataFileSyncJob
           temp_path = "#{download_path}.part-#{Process.pid}-#{SecureRandom.hex(4)}"
           ftp.getbinaryfile(filename, temp_path)
           FileUtils.mv(temp_path, download_path, force: true)
-          File.utime(Time.current, remote_mtime, download_path) if remote_mtime
+          if remote_mtime
+            access_time = Time.current.to_time
+            modified_time = remote_mtime.respond_to?(:to_time) ? remote_mtime.to_time : remote_mtime
+            File.utime(access_time, modified_time, download_path)
+          end
           Rails.logger.info("[DataFileSyncJob] Downloaded FTP asset #{filename} -> #{download_path}")
         ensure
           FileUtils.rm_f(temp_path) if defined?(temp_path)

@@ -65,4 +65,25 @@ describe DataFileSyncJob do
 
     job.send(:sync_server, server_config)
   end
+
+  it 'coerces TimeWithZone values before File.utime' do
+    remote_mtime = Time.zone.parse('2026-03-01 12:34:56 UTC')
+    destination_path = File.join(@tmp_dir, 'logs', 'alpha', '2026', 'monthly.log')
+
+    allow(Net::FTP).to receive(:open).and_yield(ftp)
+    allow(ftp).to receive(:passive=)
+    allow(ftp).to receive(:pwd).and_return('/')
+    allow(ftp).to receive(:chdir)
+    allow(ftp).to receive(:nlst).and_return(['monthly.log'])
+    allow(ftp).to receive(:size).with('monthly.log').and_return(2048)
+    allow(ftp).to receive(:mtime).with('monthly.log').and_return(remote_mtime)
+
+    allow(DataFile).to receive(:sync_download_plan)
+      .and_return({ download: true, destination_path: destination_path, reason: :download })
+
+    allow(ftp).to receive(:getbinaryfile) { |_remote, local| File.binwrite(local, 'new-month') }
+    expect(File).to receive(:utime).with(kind_of(Time), kind_of(Time), destination_path).and_call_original
+
+    job.send(:sync_server, server_config)
+  end
 end
