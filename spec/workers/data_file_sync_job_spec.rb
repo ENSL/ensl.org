@@ -62,6 +62,7 @@ describe DataFileSyncJob do
       .and_return({ download: false, destination_path: destination_path, reason: :up_to_date })
 
     expect(ftp).not_to receive(:getbinaryfile)
+    expect(Rails.logger).not_to receive(:error).with(%r{Failed syncing alpha:/logs})
 
     job.send(:sync_server, server_config)
   end

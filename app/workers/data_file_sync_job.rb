@@ -84,6 +84,7 @@ class DataFileSyncJob
         ftp.chdir(remote_dir)
 
         ftp.nlst.each do |filename|
+          temp_path = nil
           next if ['.', '..'].include?(filename)
 
           remote_size = begin
@@ -122,7 +123,7 @@ class DataFileSyncJob
           end
           Rails.logger.info("[DataFileSyncJob] Downloaded FTP asset #{filename} -> #{download_path}")
         ensure
-          FileUtils.rm_f(temp_path) if defined?(temp_path)
+          FileUtils.rm_f(temp_path) if temp_path
         end
       rescue StandardError => e
         Rails.logger.error("[DataFileSyncJob] Failed syncing #{server_config[:nickname]}:#{remote_dir} (#{e.message})")
