@@ -1,91 +1,80 @@
 class CustomUrlsController < ApplicationController
-  def administrate
-    raise AccessError unless cuser && cuser.admin?
+  respond_to :html, :json
+  responders :flash
 
-    @custom_urls = CustomUrl.all
-    @custom_url = CustomUrl.new
-  end
+  before_action :require_admin!, except: :show
+  before_action :set_custom_url, only: %i[update destroy]
+  before_action :load_administrate_page, only: %i[administrate create]
+
+  def administrate; end
 
   def create
-    administrate
-
-    @custom_url.name = params[:custom_url][:name]
-    @custom_url.article_id = params[:custom_url][:article_id].to_i
+    @custom_url.assign_attributes(custom_url_params)
 
     if @custom_url.save
-      flash[:notice] = "Created URL with name #{@custom_url.name}"
-      redirect_to custom_urls_url
+      respond_with @custom_url, location: custom_urls_url
     else
-      flash[:error] = 'Error creating URL!'
-      render :administrate
+      render :administrate, status: :unprocessable_entity
     end
   end
 
   def show
-    custom_url = CustomUrl.find_by_name(params[:name])
-    raise ActiveRecord::RecordNotFound unless custom_url
-
-    @article = custom_url.article
-    raise ActiveRecord::RecordNotFound unless @article
-    raise AccessError unless @article.can_show? cuser
+    custom_url = CustomUrl.find_by!(name: params[:name])
+    @article = custom_url.visible_article_for!(cuser)
 
     @article.mark_as_read! for: cuser if cuser
     render 'articles/show'
   end
 
   def update
-    raise AccessError unless request.xhr?
-
-    response = {}
-    if cuser && cuser.admin?
-      url = begin
-        CustomUrl.find(params[:id])
-      rescue StandardError
-        nil
-      end
-
-      if url
-        url.article_id = params[:custom_url][:article_id]
-        url.name = params[:custom_url][:name]
-        if url.save
-          response[:status] = 200
-          response[:message] = 'Successfully updated!'
-          resobj = { name: url.name, title: url.article.title }
-          response[:obj] = resobj
-        else
-          response[:status] = 400
-          message = 'Update failed! Errors:'
-          url.errors.full_messages.each do |error|
-            message += "\n * " + error
-          end
-
-          response[:message] = message
-        end
-      else
-        response[:status] = 404
-        response[:message] = 'Error! No Custom URL with this id exists.'
-      end
+    if @custom_url.update(custom_url_params)
+      render json: {
+        status: 200,
+        message: t(:custom_urls_update),
+        obj: { name: @custom_url.name, title: @custom_url.article.title }
+      }, status: :ok
     else
-      response[:status] = 403
-      response[:message] = 'You are not allowed to do this!'
+      render json: {
+        status: 422,
+        message: "#{t(:custom_urls_update_failed)}\n * #{@custom_url.errors.full_messages.join("\n * ")}",
+        errors: @custom_url.errors.full_messages
+      }, status: :unprocessable_entity
     end
-
-    render json: response, status: response[:status]
   end
 
   def destroy
-    raise AccessError unless request.xhr?
+    @custom_url.destroy
 
-    response = {}
-    if cuser && cuser.admin?
-      url = CustomUrl.destroy(params[:id])
-      response[:status] = 200
-      response[:message] = "Successfully deleted url with name: #{url.name}!"
-    else
-      response[:status] = 403
-      response[:message] = 'You are not allowed to do this!'
+    respond_to do |format|
+      format.json do
+        render json: {
+          status: 200,
+          message: t(:custom_urls_destroy, name: @custom_url.name)
+        }, status: :ok
+      end
+      format.html do
+        redirect_to custom_urls_url, notice: t(:custom_urls_destroy, name: @custom_url.name)
+      end
     end
+  end
 
-    render json: response, status: response[:status]
+  private
+
+  def require_admin!
+    raise AccessError unless cuser&.admin?
+  end
+
+  def set_custom_url
+    @custom_url = CustomUrl.find(params[:id])
+  end
+
+  def custom_url_params
+    params.require(:custom_url).permit(:name, :article_id)
+  end
+
+  def load_administrate_page
+    @custom_urls = CustomUrl.includes(:article).order(:name)
+    @custom_url ||= CustomUrl.new
+    @articles_for_select = Article.order(:title).pluck(:title, :id)
   end
 end

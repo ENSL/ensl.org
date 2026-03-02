@@ -85,4 +85,7 @@
   incorrect_information: "Väärät käyttäjätiedot."
   weeks_create: "Viikko on luotu."
   weeks_update: "Viikko on päivitetty."
+  custom_urls_update: "Päivitys onnistui!"
+  custom_urls_update_failed: "Päivitys epäonnistui! Virheet:"
+  custom_urls_destroy: "URL poistettu onnistuneesti: %{name}!"
   votes_success: "Äänestys hyväksytty."

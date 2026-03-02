@@ -16,18 +16,21 @@
 
 # FIXME: move this to a gem
 class CustomUrl < ActiveRecord::Base
-  belongs_to :article, :optional => true
+  belongs_to :article, optional: true
   # FIXME: attr_accessible :name
 
   validates :name,
-            length: {in: 2..10},
+            length: { in: 2..10 },
             uniqueness: true,
-            format: /\A[a-z]+([\-])?[a-z]+\Z/
+            format: /\A[a-z]+(-)?[a-z]+\Z/
 
   validates :article_id,
             presence: true
 
-  def self.params(params, cuser)
-    params.require(:custom_url).permit(:name, :article_id)
+  def visible_article_for!(user)
+    raise ActiveRecord::RecordNotFound unless article
+    raise AccessError unless article.can_show?(user)
+
+    article
   end
 end

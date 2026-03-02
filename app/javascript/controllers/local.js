@@ -245,3 +245,4 @@ window.submitEdit = submitEdit
 
 document.addEventListener("DOMContentLoaded", bindLocalHandlers)
 document.addEventListener("turbo:load", bindLocalHandlers)
+document.addEventListener("turbo:render", bindLocalHandlers)
