@@ -4,6 +4,10 @@ feature 'Gathers', js: true do
   let!(:user) { create :user }
   let!(:gather) { create :gather, :running }
 
+  def gather_selector
+    "#shout_Gather_#{gather.id}"
+  end
+
   feature 'Shoutbox' do
     background do
       sign_in_as user
@@ -66,6 +70,32 @@ feature 'Gathers', js: true do
       Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.now + 10.days, user_name: user.username
       visit root_path
       expect(find('#sidebar')).to have_content 'You have been muted.'
+    end
+
+    scenario 'gather shoutbox is scrollable, keeps full buffer, appends at bottom, and autoscrolls to latest' do
+      prefix = "gather-buffer-#{SecureRandom.hex(4)}"
+      12.times { |n| create(:shoutmsg, shoutable: gather, user: user, text: "#{prefix}-#{n}") }
+
+      visit gather_path(gather)
+      expect(page).to have_selector("#{gather_selector} .shoutmsg", minimum: 1)
+
+      overflow_y = page.evaluate_script("window.getComputedStyle(document.querySelector('#{gather_selector}')).overflowY")
+      max_height = page.evaluate_script("window.getComputedStyle(document.querySelector('#{gather_selector}')).maxHeight")
+      expect(overflow_y).to eq('auto')
+      expect(max_height).to eq('240px')
+
+      texts = all("#{gather_selector} .shoutmsg .contents", minimum: 12).map(&:text).join(' ')
+      expect(texts).to include("#{prefix}-0")
+      expect(texts).to include("#{prefix}-11")
+
+      first_text = all("#{gather_selector} .shoutmsg .contents", minimum: 12).first.text
+      last_text = all("#{gather_selector} .shoutmsg .contents", minimum: 12).last.text
+      expect(first_text).to include("#{prefix}-0")
+      expect(last_text).to include("#{prefix}-11")
+
+      scroll_top = page.evaluate_script("document.querySelector('#{gather_selector}').scrollTop")
+      max_scroll = page.evaluate_script("(function(){ const el = document.querySelector('#{gather_selector}'); return el.scrollHeight - el.clientHeight; })()")
+      expect(scroll_top).to be >= [max_scroll - 10, 0].max
     end
   end
 end

@@ -4,6 +4,10 @@ feature 'Shoutbox (Turbo Streams)', js: true do
   let!(:user) { create :user }
   let!(:other_user) { create :user }
 
+  def shout_texts_in(selector)
+    all("#{selector} .shoutmsg .contents", minimum: 0).map(&:text)
+  end
+
   background do
     sign_in_via_session(user)
     visit root_path
@@ -126,5 +130,43 @@ feature 'Shoutbox (Turbo Streams)', js: true do
       expect(page).to have_content(first_shout)
       expect(page).to have_text(/#{Regexp.escape(first_shout)}.*#{Regexp.escape(second_shout)}/m)
     end
+  end
+
+  scenario 'main shoutbox is scrollable, limited to newest 8, and prepends newest shouts at top' do
+    prefix = "main-buffer-#{SecureRandom.hex(4)}"
+    12.times { |n| create(:shoutmsg, text: "#{prefix}-#{n}") }
+
+    visit root_path
+    expect(page).to have_selector('#shoutbox .shoutmsg', minimum: 1)
+
+    overflow_y = page.evaluate_script("window.getComputedStyle(document.querySelector('#shoutbox')).overflowY")
+    max_height = page.evaluate_script("window.getComputedStyle(document.querySelector('#shoutbox')).maxHeight")
+    expect(overflow_y).to eq('auto')
+    expect(max_height).to eq('240px')
+
+    texts = shout_texts_in('#shoutbox').join(' ')
+    expect(texts).to include("#{prefix}-11")
+    expect(texts).to include("#{prefix}-4")
+    expect(texts).not_to include("#{prefix}-3")
+    expect(texts).not_to include("#{prefix}-0")
+
+    first_text = all('#shoutbox .shoutmsg .contents', minimum: 1).first.text
+    expect(first_text).to include("#{prefix}-11")
+  end
+
+  scenario 'main shoutbox mousewheel changes scroll position' do
+    20.times { |n| create(:shoutmsg, text: "wheel-main-#{n}-#{SecureRandom.hex(2)}") }
+
+    visit root_path
+    expect(page).to have_selector('#shoutbox .shoutmsg', minimum: 1)
+
+    page.execute_script("document.querySelector('#shoutbox').scrollTop = 100;")
+    before = page.evaluate_script("document.querySelector('#shoutbox').scrollTop")
+
+    page.execute_script("$(document.querySelector('#shoutbox')).trigger('mousewheel', [120]);")
+    sleep 0.1
+    after = page.evaluate_script("document.querySelector('#shoutbox').scrollTop")
+
+    expect(after).not_to eq(before)
   end
 end
