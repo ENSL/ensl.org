@@ -21,6 +21,8 @@ RUN \
     apt-get -y install --no-install-recommends --upgrade \
       # General tools
       curl build-essential \
+      # For Rust bindgen-based native gems (e.g. commonmarker)
+      clang libclang-dev \
       # For MySQL/MariaDB
       libmariadb-dev libmariadb-dev-compat \
       # SSL libs
