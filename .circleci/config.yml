@@ -64,7 +64,10 @@ jobs:
           command: bundle check || bundle install
       - run:
           name: Install Playwright Chromium and dependencies
-          command: npx -y playwright@1.58.2 install --with-deps chromium
+          command: |
+            PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION')
+            echo "Installing Playwright browser for Ruby client version: $PLAYWRIGHT_VERSION"
+            npx -y "playwright@$PLAYWRIGHT_VERSION" install --with-deps chromium
       - save_cache:
           key: ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
           paths:
