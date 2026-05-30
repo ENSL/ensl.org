@@ -55,7 +55,7 @@ class DataFilesController < ApplicationController
     if @file.update(DataFile.params(params, cuser))
       flash[:notice] = t(:files_update)
       return_to = params[:return_to].to_s
-      if return_to.start_with?('/')
+      if return_to.start_with?('/') && !return_to.start_with?('//')
         redirect_to(return_to)
       else
         redirect_to(@file)
