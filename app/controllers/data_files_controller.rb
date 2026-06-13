@@ -82,14 +82,14 @@ class DataFilesController < ApplicationController
   def trash
     raise AccessError unless cuser and cuser.admin?
 
-    @result = ''
+    deleted_files = []
     DataFile.all.each do |file|
       unless File.exist?(file.path)
         file.destroy
-        @result << file.to_s + '<br />'
+        deleted_files << ERB::Util.html_escape(file.to_s)
       end
     end
-    render text: @result, layout: true
+    render html: helpers.safe_join(deleted_files, helpers.tag.br), layout: true
   end
 
   private

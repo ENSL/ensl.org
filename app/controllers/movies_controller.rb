@@ -17,7 +17,7 @@ class MoviesController < ApplicationController
     @movie.record_view_count(request.remote_ip, cuser.nil?)
     return unless @movie.file && @movie.file.related
 
-    safe_redirect_to(@movie.file.related.to_s)
+    redirect_to data_file_path(@movie.file.related)
   end
 
   def refresh
@@ -128,11 +128,15 @@ class MoviesController < ApplicationController
   end
 
   def download
-    raise AccessError unless cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     @movie.stream_ip = params[:ip]
     @movie.stream_port = params[:port]
-    render text: t(:executed) + '<br />' + @movie.make_stream, layout: true
+    render html: helpers.safe_join([
+                                     ERB::Util.html_escape(t(:executed)),
+                                     helpers.tag.br,
+                                     ERB::Util.html_escape(@movie.make_stream.to_s)
+                                   ]), layout: true
   end
 
   def destroy
