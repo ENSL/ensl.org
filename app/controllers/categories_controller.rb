@@ -5,7 +5,7 @@ class CategoriesController < ApplicationController
     return unless [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
 
     @articles = Article.with_comments.ordered.limited.nodrafts.category params[:id]
-    Category.find(params[:id]).mark_as_read! for: cuser if cuser
+    @category.mark_as_read! for: cuser if cuser
     render partial: 'articles/article', collection: @articles.to_a
   end
 
@@ -28,7 +28,7 @@ class CategoriesController < ApplicationController
 
     if @category.save
       # FIXME: move to model
-      @category.update_attribute :sort, @category.id
+      @category.update_column :sort, @category.id
       flash[:notice] = t(:articles_category)
       redirect_to :categories
     else

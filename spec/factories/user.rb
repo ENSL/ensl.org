@@ -12,28 +12,50 @@ FactoryBot.define do
 
     trait :admin do
       after(:create) do |user|
-        group = create(:group, :admin)
+        group = Group.find_or_create_by(id: Group::ADMINS) do |record|
+          record.name = 'Admins'
+          record.founder = user
+        end
         create :grouper, user: user, group: group
       end
     end
 
     trait :caster do
       after(:create) do |user|
-        group = create(:group, :caster)
+        group = Group.find_or_create_by(id: Group::CASTERS) do |record|
+          record.name = 'Shoutcasters'
+          record.founder = user
+        end
+        create :grouper, user: user, group: group
+      end
+    end
+
+    trait :gather_moderator do
+      after(:create) do |user|
+        group = Group.find_or_create_by(id: Group::GATHER_MODERATORS) do |record|
+          record.name = 'Gather Moderator'
+          record.founder = user
+        end
         create :grouper, user: user, group: group
       end
     end
 
     trait :ref do
       after(:create) do |user|
-        group = create(:group, :ref)
+        group = Group.find_or_create_by(id: Group::REFEREES) do |record|
+          record.name = 'Referees'
+          record.founder = user
+        end
         create :grouper, user: user, group: group
       end
     end
 
     trait :referee do
       after(:create) do |user|
-        group = create(:group, :ref)
+        group = Group.find_or_create_by(id: Group::REFEREES) do |record|
+          record.name = 'Referees'
+          record.founder = user
+        end
         create :grouper, user: user, group: group
       end
     end

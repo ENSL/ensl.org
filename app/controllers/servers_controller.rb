@@ -56,8 +56,7 @@ class ServersController < ApplicationController
 
   def get_server
     @server = Server.find params[:id]
-    return if @server.active?
-    return if @server.can_update?(cuser)
+    return if @server.active? || @server.can_update?(cuser)
 
     raise ActiveRecord::RecordNotFound
   end

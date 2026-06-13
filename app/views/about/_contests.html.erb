@@ -1,5 +1,9 @@
 <p>These statistics need to be taken lightly as people are allowed to join and quit teams at will, change nationality, etc... Especially the further in the past the contests, the more errors we get especially for teams which have played through multiple contests. Still, they provide an interesting imprecise overview.</p>
 
+<% if contests.blank? %>
+  <p>No contest statistics available.</p>
+<% else %>
+
 <h4>
   Overall statistics:
 </h4>
@@ -15,8 +19,7 @@
     <%= contests.all.inject(0) {|total_number, contest| total_number + contest.matches.realfinished.count}%>
   </li>
   <li>Number of teams involved:
-    <% contesters = contests.collect{|contest| contest.contesters}.flatten! %>
-    <% contesters.uniq!{|c| c.team}%>
+    <% contesters = contests.flat_map(&:contesters).uniq { |contester| contester.team } %>
     <%= contesters.count %>
   </li>
   <li>Number of players involved:
@@ -87,3 +90,4 @@
     <li><%= link_to (h contest.name), contest %></li>
   <% end %>
 </ul>
+<% end %>

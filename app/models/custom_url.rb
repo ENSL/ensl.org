@@ -29,7 +29,7 @@ class CustomUrl < ActiveRecord::Base
 
   def visible_article_for!(user)
     raise ActiveRecord::RecordNotFound unless article
-    raise AccessError unless article.can_show?(user)
+    raise Exceptions::AccessError unless article.can_show?(user)
 
     article
   end

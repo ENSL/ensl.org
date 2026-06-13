@@ -6,7 +6,7 @@ class LocksController < ApplicationController
     if @lock.save
       flash[:notice] = t(:topics_locked)
     else
-      flash[:error] = @lock.errors.full_messages.to_s
+      flash[:error] = @lock.errors.full_messages.to_sentence
     end
 
     redirect_to_back

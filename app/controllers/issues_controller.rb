@@ -1,28 +1,20 @@
 class IssuesController < ApplicationController
-  before_action :get_issue, only: [:show, :edit, :update, :destroy]
+  before_action :require_index_access!, only: :index
+  before_action :get_issue, only: %i[show edit update destroy]
 
   def index
-    raise AccessError unless cuser and (cuser.admin? or cuser.moderator?)
-
-    sort = case params['sort']
-           when "title"  then "title"
-           when "status" then "status"
-           when "assigned" then "assigned_id"
-           when "category" then "category_id"
-           else "created_at DESC"
-           end
-
-    allowed = Issue::allowed_categories cuser
+    allowed = Issue.allowed_categories cuser
     qstring = 'category_id IN (?)'
     qstring += ' OR category_id IS NULL' if cuser.admin?
 
-    @open = Issue.where(qstring, allowed).with_status(Issue::STATUS_OPEN).order(sort)
-    @solved = Issue.where(qstring, allowed).with_status(Issue::STATUS_SOLVED).order(sort)
-    @rejected = Issue.where(qstring, allowed).with_status(Issue::STATUS_REJECTED).order(sort)
+    @open = Issue.where(qstring, allowed).with_status(Issue::STATUS_OPEN).order(issue_sort)
+    @solved = Issue.where(qstring, allowed).with_status(Issue::STATUS_SOLVED).order(issue_sort)
+    @rejected = Issue.where(qstring, allowed).with_status(Issue::STATUS_REJECTED).order(issue_sort)
   end
 
   def show
     raise AccessError unless @issue.can_show? cuser
+
     @issue.mark_as_read! for: cuser
   end
 
@@ -41,11 +33,9 @@ class IssuesController < ApplicationController
     raise AccessError unless @issue.can_create? cuser
 
     # verify reCAPTCHA for anonymous users
-    if cuser.nil?
-      unless verify_recaptcha(model: @issue)
-        render :new
-        return
-      end
+    if cuser.nil? && !verify_recaptcha(model: @issue)
+      render :new
+      return
     end
 
     if @issue.save
@@ -62,6 +52,7 @@ class IssuesController < ApplicationController
 
   def update
     raise AccessError unless @issue.can_update?(cuser, params[:issue])
+
     if @issue.update(Issue.params(params, cuser))
       flash[:notice] = t(:issues_update)
       redirect_to(@issue)
@@ -72,13 +63,28 @@ class IssuesController < ApplicationController
 
   def destroy
     raise AccessError unless @issue.can_destroy? cuser
+
     @issue.destroy
     redirect_to(issues_url)
   end
 
   private
 
+  def require_index_access!
+    raise AccessError unless cuser&.admin? || cuser&.moderator?
+  end
+
   def get_issue
     @issue = Issue.find params[:id]
+  end
+
+  def issue_sort
+    case params[:sort]
+    when 'title' then 'title'
+    when 'status' then 'status'
+    when 'assigned' then 'assigned_id'
+    when 'category' then 'category_id'
+    else 'created_at DESC'
+    end
   end
 end

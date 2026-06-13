@@ -115,9 +115,10 @@ class User < ActiveRecord::Base
 
   scope :active, -> { where(banned: false) }
   scope :with_age, lambda {
-    where("DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(birthdate)), '%Y')+0 AS aged, COUNT(*) as num, username")
+    select('TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) AS aged, COUNT(*) AS num')
+      .where.not(birthdate: nil)
       .group('aged')
-      .having('num > 8 AND aged > 0')
+      .having('COUNT(*) > 8 AND aged > 0')
   }
   scope :country_stats, lambda {
     select('country, COUNT(*) as num')
