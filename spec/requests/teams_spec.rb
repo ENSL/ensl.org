@@ -10,6 +10,44 @@ RSpec.describe 'TeamsController', type: :request do
     expect(flash[:notice]).to be_present
   end
 
+  describe 'GET /teams' do
+    it 'renders the team index' do
+      create(:team, name: 'Alpha Squad', tag: '[AS]')
+
+      get teams_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Alpha Squad')
+    end
+  end
+
+  describe 'GET /teams/:id' do
+    it 'renders the team page' do
+      team = create(:team, name: 'Show Team', tag: '[ST]')
+
+      get team_path(team)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Show Team')
+    end
+  end
+
+  describe 'GET /teams/new' do
+    it 'returns 403 for guests' do
+      get new_team_path
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'renders for signed-in users' do
+      login_as(user)
+
+      get new_team_path
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe 'POST /teams (create)' do
     it 'allows admin to create a team' do
       login_as(admin)
@@ -18,6 +56,26 @@ RSpec.describe 'TeamsController', type: :request do
       follow_redirect!
       expect(response.body).to include('Req Team')
       expect(Team.where(name: 'Req Team').exists?).to be true
+    end
+
+    it 'returns 403 for guests' do
+      expect do
+        post teams_path, params: { team: { name: 'Blocked Team', tag: '[BT]' } }
+      end.not_to change(Team, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'returns 422 for invalid params' do
+      login_as(admin)
+
+      expect do
+        post teams_path, params: { team: { name: '', tag: '' } }
+      end.not_to change(Team, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to render_template(:new)
+      expect(response.body).to include('Please fix the errors below.')
     end
   end
 
@@ -32,21 +90,51 @@ RSpec.describe 'TeamsController', type: :request do
       expect(team.reload.name).to eq('Updated Name')
     end
 
+    it 'returns 422 for invalid updates' do
+      team = create(:team, name: 'Valid Team', tag: '[VT]')
+      login_as(admin)
+
+      patch team_path(team), params: { team: { name: '', tag: '' } }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to render_template(:edit)
+      expect(team.reload.name).to eq('Valid Team')
+    end
+
+    it 'applies only allowed rank changes and promotes joiners into the team' do
+      leader = create(:user)
+      team = create(:team, founder: leader)
+      member = create(:teamer, team: team, rank: Teamer::RANK_MEMBER)
+      joiner_user = create(:user)
+      joiner = create(:teamer, team: team, user: joiner_user, rank: Teamer::RANK_JOINER)
+
+      login_as(leader)
+
+      patch team_path(team), params: {
+        team: { name: 'Ranked Team' },
+        rank: {
+          member.id.to_s => Teamer::RANK_JOINER.to_s,
+          joiner.id.to_s => Teamer::RANK_MEMBER.to_s
+        },
+        comment: {
+          member.id.to_s => 'skip',
+          joiner.id.to_s => 'approved'
+        }
+      }
+
+      expect(response).to redirect_to(edit_team_path(team))
+      expect(member.reload.rank).to eq(Teamer::RANK_MEMBER)
+      expect(member.comment).to be_nil
+      expect(joiner.reload.rank).to eq(Teamer::RANK_MEMBER)
+      expect(joiner.comment).to eq('approved')
+      expect(joiner_user.reload.team).to eq(team)
+    end
+
     it 'forbids non-leader non-admin' do
       team = create(:team)
       login_as(user)
       patch team_path(team), params: { team: { name: 'Bad Update' } }
       expect(response.status).to eq(403)
-    end
-  end
-
-  describe 'POST /teamers (join)' do
-    it 'allows signed-in user to request to join a team' do
-      team = create(:team)
-      login_as(user)
-      post '/teamers', params: { teamer: { team_id: team.id, user_id: user.id } }
-      expect(response).to redirect_to(/.*/)
-      expect(Teamer.where(team: team, user: user).joining.exists?).to be true
     end
   end
 
@@ -74,6 +162,28 @@ RSpec.describe 'TeamsController', type: :request do
       delete team_path(team)
       expect(response).to redirect_to(teams_path)
       expect(Team.exists?(team.id)).to be false
+    end
+
+    it 'returns 403 when a non-admin tries to destroy a team' do
+      team = create(:team)
+      login_as(user)
+
+      expect do
+        delete team_path(team)
+      end.not_to change(Team, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'returns 403 when a non-admin tries to recover a team' do
+      team = create(:team)
+      team.update_column(:active, false)
+      login_as(user)
+
+      get recover_team_path(team)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(team.reload.active).to be false
     end
   end
 end

@@ -45,10 +45,11 @@ class TeamsController < ApplicationController
         @team.teamers.each do |member|
           # Contains new rank as given by submitted parameters
           new_rank = params[:rank]["#{member.id}"]
+          next if new_rank.nil?
           # Can only set own rank to equal or lower than current rank
           next unless cuser.admin? or (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
           # Don't allow setting members back to rank joining
-          next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
+          next if new_rank.to_i == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
 
           # Update team when rank changes from joiner to member or higher
           if member.rank == Teamer::RANK_JOINER && new_rank.to_i >= Teamer::RANK_MEMBER

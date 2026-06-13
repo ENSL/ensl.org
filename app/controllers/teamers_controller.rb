@@ -1,11 +1,14 @@
 class TeamersController < ApplicationController
   def index
+    head :not_acceptable
   end
 
   def create
-    @old_application = cuser.teamers.joining.count == 0 ? nil : cuser.teamers.joining.first
-    @teamer = Teamer.new(Teamer.params(params, cuser))
-    raise AccessError unless @teamer.can_create?(cuser, Teamer.params(params, cuser))
+    teamer_params = Teamer.params(params, cuser)
+    @teamer = Teamer.new(teamer_params)
+    raise AccessError unless @teamer.can_create?(cuser, teamer_params)
+
+    @old_application = cuser.teamers.joining.first
 
     @teamer.user = cuser unless cuser.admin?
 
