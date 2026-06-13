@@ -7,9 +7,7 @@ class GroupersController < ApplicationController
       flash[:notice] = t(:groups_user_add)
       redirect_to edit_group_url(@grouper.group, anchor: 'members')
     else
-      @group = @grouper.group
-      @new_grouper = @grouper
-      @group_tab = 'members'
+      prepare_group_edit(@grouper, new_grouper: @grouper)
       respond_with_validation_errors(@grouper, template: 'groups/edit')
     end
   end
@@ -22,9 +20,7 @@ class GroupersController < ApplicationController
       flash[:notice] = t(:groups_user_update)
       redirect_to edit_group_url(@grouper.group, anchor: 'members')
     else
-      @group = @grouper.group
-      @new_grouper = Grouper.new(group: @group)
-      @group_tab = 'members'
+      prepare_group_edit(@grouper)
       respond_with_validation_errors(@grouper, template: 'groups/edit')
     end
   end
@@ -36,5 +32,13 @@ class GroupersController < ApplicationController
     @grouper.destroy
     flash[:notice] = t(:groups_user_remove)
     redirect_to edit_group_url(@grouper.group, anchor: 'members')
+  end
+
+  private
+
+  def prepare_group_edit(grouper, new_grouper: Grouper.new(group: grouper.group))
+    @group = grouper.group
+    @new_grouper = new_grouper
+    @group_tab = 'members'
   end
 end

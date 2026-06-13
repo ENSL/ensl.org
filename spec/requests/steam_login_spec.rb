@@ -36,6 +36,17 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
   end
 
   context 'when Steam login fails' do
+    it 'rejects XHR JavaScript callback requests before processing auth' do
+      OmniAuth.config.mock_auth[:steam] = auth_hash
+
+      post '/auth/steam/callback', headers: {
+        'ACCEPT' => 'text/javascript',
+        'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
+      }
+
+      expect(response).to have_http_status(:not_acceptable)
+    end
+
     it 'handles missing auth_hash gracefully' do
       # Simulate OmniAuth failure by not setting mock_auth
       OmniAuth.config.mock_auth[:steam] = nil
@@ -49,6 +60,16 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
     it 'handles User.find_or_build returning nil' do
       OmniAuth.config.mock_auth[:steam] = auth_hash
       allow(User).to receive(:find_or_build).and_return(nil)
+
+      post '/auth/steam/callback'
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:error]).to be_present
+    end
+
+    it 'handles User.find_or_build returning a non-ActiveRecord object' do
+      OmniAuth.config.mock_auth[:steam] = auth_hash
+      allow(User).to receive(:find_or_build).and_return(double('not-a-record'))
 
       post '/auth/steam/callback'
 

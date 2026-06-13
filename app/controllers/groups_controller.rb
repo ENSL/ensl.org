@@ -14,9 +14,9 @@ class GroupsController < ApplicationController
   end
 
   def edit
-    @group.users.all
-    @new_grouper = Grouper.new(group: @group)
     raise AccessError unless @group.can_update? cuser
+
+    prepare_edit_dependencies
   end
 
   def create
@@ -39,7 +39,7 @@ class GroupsController < ApplicationController
       flash[:notice] = t(:groups_update)
       redirect_to @group
     else
-      @new_grouper = Grouper.new(group: @group)
+      prepare_edit_dependencies
       respond_with_validation_errors(@group, template: :edit)
     end
   end
@@ -51,24 +51,12 @@ class GroupsController < ApplicationController
     redirect_to groups_url
   end
 
-  def addUser
-    @user = User.where(username: params[:username])
-    raise AccessError unless @group.can_update? cuser
-    raise Error, t(:duplicate_user) if @group.users.include? @user
-
-    @group.users << @user if @user
-    redirect_to edit_group_url(@group, groupTab: 'groupTabMembers')
-  end
-
-  def delUser
-    @user = User.find params[:id2]
-    raise AccessError unless @group.can_update? cuser
-
-    @group.users.delete @user
-    redirect_to edit_group_url(@group, groupTab: 'groupTabMembers')
-  end
-
   private
+
+  def prepare_edit_dependencies
+    @group.users.load
+    @new_grouper = Grouper.new(group: @group)
+  end
 
   def get_group
     @group = Group.find params[:id]
