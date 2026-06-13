@@ -300,6 +300,7 @@ class Challenge < ActiveRecord::Base
 
   def can_create?(cuser)
     return false unless cuser
+    return false unless contester1 && contester2
     return false if cuser.banned?(Ban::TYPE_LEAGUE)
 
     validate_teams

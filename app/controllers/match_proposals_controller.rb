@@ -44,7 +44,7 @@ class MatchProposalsController < ApplicationController
     raise AccessError unless request.xhr? # Only respond to ajax requests
 
     rjson = {}
-    proposal = MatchProposal.find(params[:id])
+    proposal = @match.match_proposals.find_by(id: params[:id])
     unless proposal
       rjson[:error] = {
         code: 404,

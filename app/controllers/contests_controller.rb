@@ -30,6 +30,7 @@ class ContestsController < ApplicationController
 
     @friendly = params[:friendly] ? @contest.contesters.find(params[:friendly]) : @contest.contesters.first
     @rounds = [@contest.modulus_even, @contest.modulus_3to1, @contest.modulus_4to0]
+    @modulus_base = @contest.modulus_base || 30
     @rounds.each_index do |key|
       @rounds[key] = params['rounds']["#{key}"].to_f if params['rounds'] and params['rounds']["#{key}"]
     end
@@ -61,7 +62,7 @@ class ContestsController < ApplicationController
       flash[:notice] = t(:contests_create)
       redirect_to @contest
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -74,7 +75,7 @@ class ContestsController < ApplicationController
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     elsif update_type == 'map'
       map = Map.find_by(id: params[:map])
@@ -92,9 +93,9 @@ class ContestsController < ApplicationController
       contester.contest = @contest
       contester.active = true
       if contester.valid?
-        contester.save(false)
+        contester.save!
       else
-        @contest.errors.add_to_base contester.errors.full_messages.to_s
+        @contest.errors.add(:base, contester.errors.full_messages.to_sentence)
       end
       render :edit
     end

@@ -57,7 +57,7 @@ class ChallengesController < ApplicationController
 
     @challenge.destroy
     # return_to FIX ME from challenge side
-    render text: t(:challenges_cleared)
+    render plain: t(:challenges_cleared)
   end
 
   # Custom method
@@ -67,7 +67,7 @@ class ChallengesController < ApplicationController
       c.destroy
     end
 
-    render text: t(:challenges_cleared)
+    render plain: t(:challenges_cleared)
   end
 
   private

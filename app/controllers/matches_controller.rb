@@ -77,7 +77,7 @@ class MatchesController < ApplicationController
       end
     else
       flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
-      if request.referer.present? && URI(request.referer).path == match_ref_path(@match)
+      if request.referer.present? && URI(request.referer).path == ref_match_path(@match)
         ref
         render :ref, status: :unprocessable_entity
       else
