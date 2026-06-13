@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_27_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_13_091500) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -827,7 +827,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_120000) do
     t.string "event", null: false
     t.integer "item_id", null: false
     t.string "item_type", null: false
-    t.text "object"
+    t.text "object", size: :long
     t.string "whodunnit"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end

@@ -27,7 +27,7 @@ class Comment < ActiveRecord::Base
   scope :with_userteam, -> { includes({ user: :team }) }
   scope :recent, ->(n) { order('id DESC').limit(n) }
   scope :recent5, -> { order('id DESC').limit(5).group('commentable_id, commentable_type') }
-  scope :filtered, -> {  where.not({ 'commentable_type' => 'Issue' }) }
+  scope :filtered, -> { where.not(commentable_type: 'Issue') }
   scope :ordered, -> { order('id ASC') }
 
   belongs_to :user, optional: true
@@ -60,7 +60,7 @@ class Comment < ActiveRecord::Base
   end
 
   def can_update?(cuser)
-    cuser and user == cuser or cuser.admin?
+    cuser && (user == cuser || cuser.admin?)
   end
 
   def can_destroy?(cuser)

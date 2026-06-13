@@ -1,9 +1,9 @@
 class CommentsController < ApplicationController
-  before_action :get_comment, only: [:raw, :quote, :edit, :update, :destroy]
+  before_action :get_comment, only: %i[raw quote edit update destroy]
   respond_to :html, :js
 
   def index
-    @comments = Comment.recent.filtered
+    @comments = Comment.recent(50).filtered
   end
 
   def show
@@ -26,14 +26,15 @@ class CommentsController < ApplicationController
         format.js { render }
       else
         flash[:error] = t(:comments_invalid) + @comment.errors.full_messages.to_s
-        format.html { redirect_to(:back)}
+        format.html { redirect_back fallback_location: root_path }
       end
     end
   end
 
   def update
     raise AccessError unless @comment.can_update? cuser
-    if @comment.update(Comment.params(parmas, cuser))
+
+    if @comment.update(Comment.params(params, cuser))
       flash[:notice] = t(:comments_update)
       return_to
     else
@@ -43,11 +44,16 @@ class CommentsController < ApplicationController
 
   def destroy
     raise AccessError unless @comment.can_destroy? cuser
+
     @comment.destroy
     redirect_to_back
   end
 
   def quote
+    respond_to do |format|
+      format.html { render :quote, formats: :js }
+      format.js
+    end
   end
 
   private
