@@ -1,34 +1,25 @@
 class TopicsController < ApplicationController
-  before_action :get_topic, only: [:show, :reply, :edit, :update, :destroy]
+  before_action :get_topic, only: %i[show edit update destroy]
   layout 'forums'
 
   def index
-    render partial: true, locals: {page: params[:p].to_i}
+    render partial: true, locals: { page: params[:p].to_i }
   end
 
   def show
     raise AccessError unless @topic.can_show? cuser
-    @posts = @topic.posts.basic.paginate(:page => params[:page],
-                                         :per_page => Topic::POSTS_PAGE)
+
+    @posts = @topic.posts.basic.paginate(page: params[:page],
+                                         per_page: Topic::POSTS_PAGE)
 
     return_here
-    @topic.record_view_count(request.remote_ip, cuser.nil?)
+    @topic.record_view_count(request.remote_ip, cuser.present?)
     @topic.mark_as_read! for: cuser if cuser
     @topic.forum.mark_as_read! for: cuser if cuser
     @newpost = Post.new
     @newpost.topic = @topic
     @newpost.user = cuser
-    @lock = (@topic.lock ? @topic.lock : Lock.new(:lockable => @topic))
-  end
-
-  def reply
-    @post = @topic.posts.build
-    raise AccessError unless @post.can_create? cuser
-    if request.xhr?
-      render 'quickreply', layout: false
-    else
-      render
-    end
+    @lock = @topic.lock || Lock.new(lockable: @topic)
   end
 
   def new
@@ -56,6 +47,7 @@ class TopicsController < ApplicationController
 
   def update
     raise AccessError unless @topic.can_update? cuser
+
     if @topic.update(Topic.params(params, cuser))
       flash[:notice] = t(:topics_update)
       redirect_to(@topic)
@@ -66,6 +58,7 @@ class TopicsController < ApplicationController
 
   def destroy
     raise AccessError unless @topic.can_destroy? cuser
+
     @topic.destroy
     redirect_to(topics_url)
   end

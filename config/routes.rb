@@ -104,9 +104,12 @@ Rails.application.routes.draw do
   resources :topics
   resources :matches
 
-  get 'forums/up'
-  get 'forums/down'
-  resources :forums
+  resources :forums do
+    member do
+      patch :up
+      patch :down
+    end
+  end
 
   # Users: resourceful + extra member/collection actions
   resources :users do

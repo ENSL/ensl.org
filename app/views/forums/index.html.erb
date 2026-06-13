@@ -26,10 +26,10 @@
             </td>
             <td class="actions">
               <% if forum.can_update? cuser %>
-                <%= link_to action: "up", id: forum do %>
+                <%= link_to up_forum_path(forum), method: :patch do %>
                   <% fa_icon 'arrow-up' %>
                 <% end %>
-                <%= link_to action: "down", id: forum do %>
+                <%= link_to down_forum_path(forum), method: :patch do %>
                   <% fa_icon 'arrow-down' %>
                 <% end %>
               <% end %>

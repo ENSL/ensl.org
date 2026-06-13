@@ -1,5 +1,5 @@
 class ForumsController < ApplicationController
-  before_action :get_forum, only: [:show, :edit, :update, :up, :down, :destroy]
+  before_action :get_forum, only: %i[show edit update up down destroy]
   layout 'forums'
 
   def index
@@ -11,13 +11,13 @@ class ForumsController < ApplicationController
     raise AccessError unless @forum.can_show? cuser
 
     @topics = Topic.where(forum_id: @forum.id)
-      .joins(posts: :user)          # INNER JOIN (same as before)
-      .includes(:lock)
-      .select('topics.*, MAX(posts.created_at) AS last_post_at')
-      .group('topics.id')
-      .order(state: :desc)
-      .order(Arel.sql('last_post_at DESC'))
-      .paginate(page: params[:page], per_page: 30)
+                   .joins(posts: :user) # INNER JOIN (same as before)
+                   .includes(:lock)
+                   .select('topics.*, MAX(posts.created_at) AS last_post_at')
+                   .group('topics.id')
+                   .order(state: :desc)
+                   .order(Arel.sql('last_post_at DESC'))
+                   .paginate(page: params[:page], per_page: 30)
 
     @forum.mark_as_read! for: cuser if cuser
     @nobody = true
@@ -46,6 +46,7 @@ class ForumsController < ApplicationController
 
   def update
     raise AccessError unless @forum.can_update? cuser
+
     if @forum.update(Forum.params(params, cuser))
       flash[:notice] = t(:forums_update)
       redirect_to(@forum)
@@ -56,18 +57,21 @@ class ForumsController < ApplicationController
 
   def up
     raise AccessError unless @forum.can_update? cuser
-    @forum.move_up(category_id: @forum.category.id)
+
+    @forum.move_up(@forum.category.forums)
     redirect_to_back
   end
 
   def down
     raise AccessError unless @forum.can_update? cuser
-    @forum.move_down(category_id: @forum.category.id)
+
+    @forum.move_down(@forum.category.forums)
     redirect_to_back
   end
 
   def destroy
     raise AccessError unless @forum.can_destroy? cuser
+
     @forum.destroy
     redirect_to(forums_url)
   end
