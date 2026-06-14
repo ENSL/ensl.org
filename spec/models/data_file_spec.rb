@@ -214,6 +214,47 @@ describe DataFile do
     end
   end
 
+  describe '#full_path' do
+    it 'prefers the uploader location when present' do
+      file = build(:data_file, path: '/tmp/test_dirs/cached.txt')
+      allow(file).to receive(:location).and_return('/tmp/test_dirs/current.txt')
+
+      expect(file.full_path).to eq('/tmp/test_dirs/current.txt')
+    end
+
+    it 'falls back to cached path when uploader location is blank' do
+      file = build(:data_file, path: '/tmp/test_dirs/cached.txt')
+      allow(file).to receive(:location).and_return(nil)
+
+      expect(file.full_path).to eq('/tmp/test_dirs/cached.txt')
+    end
+  end
+
+  describe '#file_exists?' do
+    it 'returns false when no path is available' do
+      file = build(:data_file, path: nil)
+      allow(file).to receive(:location).and_return(nil)
+
+      expect(file.file_exists?).to be(false)
+    end
+  end
+
+  describe '#url' do
+    it 'returns nil when uploader has no URL' do
+      file = build(:data_file)
+      allow(file.name).to receive(:url).and_return(nil)
+
+      expect(file.url).to be_nil
+    end
+
+    it 'prefixes uploader URLs that are missing /files' do
+      file = build(:data_file)
+      allow(file.name).to receive(:url).and_return('/uploads/example.mp4')
+
+      expect(file.url).to eq('/files/uploads/example.mp4')
+    end
+  end
+
   describe '#sync_file_metadata' do
     it 'updates MD5 hash from disk file' do
       file_path = '/tmp/test_dirs/sync_md5_test_2.txt'
@@ -279,6 +320,13 @@ describe DataFile do
     it 'returns true when in movies directory and not preview' do
       file = build(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/movie.mp4')
       expect(file.should_create_movie?).to be true
+    end
+
+    it 'returns false when a movie already exists' do
+      file = build(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/movie.mp4')
+      allow(file).to receive(:movie).and_return(instance_double('Movie'))
+
+      expect(file.should_create_movie?).to be false
     end
 
     it 'returns false when file is a preview' do
@@ -505,6 +553,46 @@ describe DataFile do
       expect(plan[:destination_path]).to eq(destination_path)
       expect(plan[:reason]).to eq(:up_to_date)
     end
+
+    it 'returns nil for unsupported file suffixes' do
+      expect(described_class.sync_download_plan(nickname: 'alpha', filename: 'notes.txt')).to be_nil
+    end
+
+    it 'returns nil when the destination root cannot be resolved' do
+      expect(Directory).to receive(:sync_download_root)
+        .with(kind: Directory::SYNC_KIND_DEMOS, nickname: 'alpha', year: nil)
+        .and_return(nil)
+
+      plan = described_class.sync_download_plan(
+        nickname: 'alpha',
+        filename: 'match.dem',
+        remote_size: 123,
+        remote_mtime: Time.utc(2026, 3, 1, 0, 0, 0)
+      )
+
+      expect(plan).to be_nil
+    end
+  end
+
+  describe '#refresh_preview_links!' do
+    it 'links a source movie to its preview file in the movies directory' do
+      source = create(:data_file,
+                      directory_id: Directory::MOVIES,
+                      path: '/tmp/test_dirs/source_clip.mp4',
+                      title: 'Source Clip')
+      preview = create(:data_file,
+                       directory_id: Directory::MOVIES,
+                       path: '/tmp/test_dirs/source_clip_preview.mp4',
+                       title: 'Preview Clip')
+
+      Movie.insert_all!([{ file_id: source.id, created_at: Time.current, updated_at: Time.current }])
+      source_movie = Movie.find_by(file_id: source.id)
+
+      source.reload.refresh_preview_links!
+
+      expect(preview.reload.related_id).to eq(source.id)
+      expect(source_movie.reload.preview_id).to eq(preview.id)
+    end
   end
 
   describe 'permission methods' do
@@ -515,9 +603,22 @@ describe DataFile do
         expect(file.can_create?(nil)).to be false
       end
 
+      it 'returns false for banned users' do
+        banned_user = double('user', admin?: false, banned?: true)
+
+        expect(file.can_create?(banned_user)).to be false
+      end
+
       it 'returns true for admin user' do
         admin = double('user', admin?: true, banned?: false)
         expect(file.can_create?(admin)).to be true
+      end
+
+      it 'allows movie-group users to upload into the movies directory' do
+        movies_file = build(:data_file, directory_id: Directory::MOVIES)
+        member = double('user', admin?: false, banned?: false, has_access?: true)
+
+        expect(movies_file.can_create?(member)).to be true
       end
     end
 

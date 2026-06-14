@@ -97,10 +97,30 @@ RSpec.describe Movie, type: :model do
       expect(movie.format).to eq('h264')
     end
 
+    it 'adds an error when probe_metadata cannot identify a movie file' do
+      allow(VideoProcessing).to receive(:probe_web_compat).and_return(nil)
+
+      movie.probe_metadata
+
+      expect(movie.errors[:base]).to include('Not a movie file.')
+    end
+
+    it 'swallows video processing probe errors for metadata' do
+      allow(VideoProcessing).to receive(:probe_web_compat).and_raise(VideoProcessing::Error, 'boom')
+
+      expect { movie.probe_metadata }.not_to raise_error
+    end
+
     it 'sets length from probe_length' do
       movie.file = data_file
       movie.probe_length
       expect(movie.length).to eq(123)
+    end
+
+    it 'swallows video processing probe errors for length' do
+      allow(VideoProcessing).to receive(:probe_duration_seconds!).and_raise(VideoProcessing::Error, 'boom')
+
+      expect { movie.probe_length }.not_to raise_error
     end
 
     it 'make_snapshot calls VideoProcessing.random_snapshot!' do
@@ -109,6 +129,18 @@ RSpec.describe Movie, type: :model do
                                                                  output_path: instance_of(String),
                                                                  at_seconds: nil)
       movie.make_snapshot
+    end
+
+    it 'returns false when make_snapshot has no readable source path' do
+      allow(movie).to receive(:processable_source_path).and_return(nil)
+
+      expect(movie.make_snapshot).to be(false)
+    end
+
+    it 'returns false when snapshot generation fails' do
+      allow(VideoProcessing).to receive(:random_snapshot!).and_raise(VideoProcessing::Error, 'boom')
+
+      expect(movie.make_snapshot).to be(false)
     end
 
     it 'make_snapshot forwards requested seconds to VideoProcessing.random_snapshot!' do
@@ -236,10 +268,30 @@ RSpec.describe Movie, type: :model do
         expect(movie.preview_path).to end_with('_preview.mp4')
       end
 
+      it 'returns nil preview_path when file has no location' do
+        allow(data_file).to receive(:location).and_return(nil)
+        movie.file = data_file
+
+        expect(movie.preview_path).to be_nil
+      end
+
       it 'returns preview.url if preview file exists' do
         allow(preview_file).to receive(:url).and_return('/uploads/prev.mp4')
         movie.preview = preview_file
         expect(movie.preview_url).to eq('/uploads/prev.mp4')
+      end
+
+      it 'builds preview_url from preview_path when preview file exists on disk' do
+        preview_path = Rails.root.join('public', 'local', 'movie_preview_url_spec.mp4')
+        FileUtils.mkdir_p(File.dirname(preview_path))
+        File.binwrite(preview_path, 'preview')
+
+        movie.preview = nil
+        allow(movie).to receive(:preview_path).and_return(preview_path.to_s)
+
+        expect(movie.preview_url).to eq('/local/movie_preview_url_spec.mp4')
+      ensure
+        FileUtils.rm_f(preview_path)
       end
 
       it 'returns nil when preview record exists but preview file is missing' do
@@ -266,6 +318,96 @@ RSpec.describe Movie, type: :model do
         movie.web_friendly = false
 
         expect(movie.playback_url).to eq('/uploads/video_preview.mp4')
+      end
+    end
+
+    context '#preview_exists?' do
+      it 'returns true when preview data file exists' do
+        movie.preview = preview_file
+
+        expect(movie.preview_exists?).to be(true)
+      end
+
+      it 'returns false when neither preview record nor preview path exists' do
+        movie.preview = nil
+        allow(movie).to receive(:preview_path).and_return(nil)
+
+        expect(movie.preview_exists?).to be(false)
+      end
+    end
+
+    context '#original_url' do
+      it 'returns nil when original file is not web friendly' do
+        movie.file = data_file
+        movie.web_friendly = false
+
+        expect(movie.original_url).to be_nil
+      end
+
+      it 'returns nil when file is missing on disk' do
+        allow(data_file).to receive(:file_exists?).and_return(false)
+        movie.file = data_file
+        movie.web_friendly = true
+
+        expect(movie.original_url).to be_nil
+      end
+    end
+
+    context '#processable_source_path' do
+      it 'returns nil when file location is blank' do
+        allow(movie).to receive(:processable_source_path).and_call_original
+        allow(data_file).to receive(:location).and_return(nil)
+        movie.file = data_file
+
+        expect(movie.processable_source_path).to be_nil
+      end
+
+      it 'returns nil when file is not readable' do
+        allow(movie).to receive(:processable_source_path).and_call_original
+        allow(data_file).to receive(:location).and_return('/tmp/unreadable.mp4')
+        movie.file = data_file
+        allow(File).to receive(:file?).with('/tmp/unreadable.mp4').and_return(true)
+        allow(File).to receive(:readable?).with('/tmp/unreadable.mp4').and_return(false)
+
+        expect(movie.processable_source_path).to be_nil
+      end
+    end
+
+    context '#make_stream' do
+      it 'spawns vlc and stores the detached process id for valid stream settings' do
+        movie.file = data_file
+        movie.stream_ip = '10.0.0.15'
+        movie.stream_port = '8080'
+
+        expect(Process).to receive(:spawn).with(
+          Movie::VLC,
+          'http://10.0.0.15:8080',
+          '--sout',
+          a_string_including('dst=/var/media/video.mp4'),
+          'vlc://quit'
+        ).and_return(4321)
+        expect(Process).to receive(:detach).with(4321)
+        expect(movie).to receive(:update_column).with(:status, 4321)
+
+        expect(movie.send(:make_stream)).to include('access=http')
+      end
+
+      it 'returns nil when stream settings are incomplete' do
+        movie.file = data_file
+        movie.stream_ip = 'not-an-ip'
+        movie.stream_port = nil
+
+        expect(Process).not_to receive(:spawn)
+        expect(movie.send(:make_stream)).to be_nil
+      end
+
+      it 'returns nil when spawning vlc fails' do
+        movie.file = data_file
+        movie.stream_ip = '10.0.0.15'
+        movie.stream_port = '8080'
+        allow(Process).to receive(:spawn).and_raise(StandardError, 'spawn failed')
+
+        expect(movie.send(:make_stream)).to be_nil
       end
     end
 

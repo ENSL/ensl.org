@@ -228,6 +228,19 @@ describe Directory do
     end
   end
 
+  describe '#move_to_trash?' do
+    it 'returns true when move_to_trash is set to true' do
+      dir = build(:directory)
+      dir.move_to_trash = true
+
+      expect(dir.move_to_trash?).to be true
+    end
+
+    it 'returns false when move_to_trash is not set' do
+      expect(build(:directory).move_to_trash?).to be false
+    end
+  end
+
   describe '#full_path' do
     it 'returns path for root directory' do
       dir = build(:directory, path: @test_root, parent: nil)
@@ -638,6 +651,70 @@ describe Directory do
       path = described_class.sync_download_root(kind: 'demos', nickname: 'Server 1', year: 2026)
 
       expect(path).to eq('/tmp/files/demos/server_1')
+    end
+
+    it 'returns nil when nickname sanitizes to blank' do
+      allow(described_class).to receive(:sync_download_base_root).with('demos').and_return('/tmp/files/demos')
+
+      expect(described_class.sync_download_root(kind: 'demos', nickname: '   ')).to be_nil
+    end
+  end
+
+  describe '.sanitize_sync_year_segment' do
+    it 'returns a four-digit year as a string' do
+      expect(described_class.sanitize_sync_year_segment(2026)).to eq('2026')
+    end
+
+    it 'returns nil for invalid year values' do
+      expect(described_class.sanitize_sync_year_segment('26')).to be_nil
+    end
+  end
+
+  describe '.sync_kind_for_filename' do
+    it 'detects demo and log files case-insensitively' do
+      expect(described_class.sync_kind_for_filename('MATCH.DEM.GZ')).to eq(Directory::SYNC_KIND_DEMOS)
+      expect(described_class.sync_kind_for_filename('server.LOG')).to eq(Directory::SYNC_KIND_LOGS)
+    end
+
+    it 'returns nil for unsupported filenames' do
+      expect(described_class.sync_kind_for_filename('notes.txt')).to be_nil
+    end
+  end
+
+  describe '.sync_download_base_root' do
+    it 'falls back to FILES_ROOT paths when directories are missing' do
+      expect(described_class.sync_download_base_root('demos')).to eq(File.join(@test_root, 'demos'))
+      expect(described_class.sync_download_base_root('logs')).to eq(File.join(@test_root, 'logs'))
+    end
+  end
+
+  describe '#ignored_reconciliation_path?' do
+    let(:directory) { create(:directory, :root, path: @test_root) }
+
+    it 'returns true for ignored top-level folders' do
+      expect(directory.ignored_reconciliation_path?(File.join(@test_root, 'uploads', 'file.txt'))).to be(true)
+    end
+
+    it 'returns false for blank and unrelated paths' do
+      expect(directory.ignored_reconciliation_path?(nil)).to be(false)
+      expect(directory.ignored_reconciliation_path?('/tmp/elsewhere/file.txt')).to be(false)
+    end
+  end
+
+  describe '.find_by_inode_and_verify' do
+    it 'returns the directory when inode matches and the path still exists' do
+      dir = create(:directory, name: 'inodekeep')
+      dir.sync_inode_info
+
+      expect(described_class.find_by_inode_and_verify(dir.full_path, dir.st_dev, dir.st_ino)).to eq(dir)
+    end
+
+    it 'returns nil when the inode matches but the filesystem path is gone' do
+      dir = create(:directory, name: 'inodegone')
+      dir.sync_inode_info
+      FileUtils.rm_rf(dir.full_path)
+
+      expect(described_class.find_by_inode_and_verify(dir.full_path, dir.st_dev, dir.st_ino)).to be_nil
     end
   end
 end

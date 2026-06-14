@@ -457,7 +457,7 @@ class Directory < ActiveRecord::Base
   end
 
   # Process a file found on disk
-  def process_disk_file(item_path, item_name, logger, stats: nil)
+  def process_disk_file(item_path, _item_name, logger, stats: nil)
     if (dbfile = DataFile.find_by(path: item_path))
       update_file_directory(dbfile, item_path, logger, stats: stats)
       return
@@ -635,7 +635,7 @@ class Directory < ActiveRecord::Base
   # Find directory by inode and verify it still exists on filesystem
   # Returns directory if found and filesystem path exists
   # Returns nil if inode not found or filesystem path missing
-  def self.find_by_inode_and_verify(dir_path, st_dev, st_ino)
+  def self.find_by_inode_and_verify(_dir_path, st_dev, st_ino)
     dir = find_by_inode(st_dev, st_ino)
     return nil unless dir
     return nil unless dir.path_exists?
