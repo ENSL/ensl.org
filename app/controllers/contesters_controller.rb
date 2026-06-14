@@ -19,9 +19,10 @@ class ContestersController < ApplicationController
   end
 
   def create
-    @contester = Contester.new(Contester.params(params, cuser))
+    contester_params = Contester.params(params, cuser)
+    @contester = Contester.new(contester_params)
     @contester.user = cuser
-    raise AccessError unless @contester.can_create? cuser
+    raise AccessError unless @contester.can_create?(cuser, contester_params)
 
     if @contester.contest.contest_type == Contest::TYPE_LADDER
       @contester.score = @contester.contest.contesters.active.count + 1

@@ -635,10 +635,12 @@ class Directory < ActiveRecord::Base
   # Find directory by inode and verify it still exists on filesystem
   # Returns directory if found and filesystem path exists
   # Returns nil if inode not found or filesystem path missing
-  def self.find_by_inode_and_verify(_dir_path, st_dev, st_ino)
+  def self.find_by_inode_and_verify(dir_path, st_dev, st_ino)
     dir = find_by_inode(st_dev, st_ino)
     return nil unless dir
-    return nil unless dir.path_exists?
+
+    verified_path = dir_path.presence || dir.full_path
+    return nil unless File.directory?(verified_path)
 
     dir
   rescue StandardError => e
