@@ -169,9 +169,9 @@ class Contest < ActiveRecord::Base
   end
 
   def can_join?(cuser)
-    cuser and !cuser&.banned?(Ban::TYPE_LEAGUE) and \
-      cuser&.lead_teams&.not_in_contest(self)&.exists? and \
-      Contest.joinable.where(id: id).exists?
+    !!(cuser && !cuser.banned?(Ban::TYPE_LEAGUE) &&
+      cuser.lead_teams&.not_in_contest(self)&.exists? &&
+      Contest.joinable.where(id: id).exists?)
   end
 
   def can_create?(cuser)

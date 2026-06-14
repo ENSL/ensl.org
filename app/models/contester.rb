@@ -150,11 +150,11 @@ class Contester < ActiveRecord::Base
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    !!(cuser && cuser.admin?)
   end
 
   def can_destroy?(cuser)
-    cuser and team.is_leader? cuser or cuser.admin?
+    !!(cuser && (team.is_leader?(cuser) || cuser.admin?))
   end
 
   def self.params(params, cuser)

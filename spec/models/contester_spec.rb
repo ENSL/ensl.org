@@ -25,6 +25,29 @@ RSpec.describe Contester, type: :model do
       expect(contester.statuses[true]).to eq 'Active'
       expect(contester.statuses[false]).to eq 'Inactive'
     end
+
+    it 'returns the correct lineup relation for open and closed contests' do
+      open_relation = double('open_lineup')
+      closed_relation = double('closed_lineup')
+      allow(contester.team).to receive_message_chain(:teamers, :active).and_return(open_relation)
+      allow(contester.team).to receive_message_chain(:teamers, :distinct).and_return(closed_relation)
+
+      allow(contester.contest).to receive(:status).and_return(Contest::STATUS_OPEN)
+      expect(contester.lineup).to eq(open_relation)
+
+      allow(contester.contest).to receive(:status).and_return(Contest::STATUS_CLOSED)
+      expect(contester.lineup).to eq(closed_relation)
+    end
+
+    it 'computes stats from finished matches for either side of the pairing' do
+      match_as_contester1 = instance_double(Match, score1: 4, score2: 2, contester1_id: contester.id)
+      draw_match = instance_double(Match, score1: 1, score2: 1, contester1_id: contester.id)
+      match_as_contester2 = instance_double(Match, score1: 1, score2: 3, contester1_id: contester.id + 100)
+
+      stats = contester.stats_from_matches([match_as_contester1, draw_match, match_as_contester2])
+
+      expect(stats).to eq(win: 2, loss: 0, draw: 1)
+    end
   end
 
   describe 'validation helpers' do
@@ -42,6 +65,15 @@ RSpec.describe Contester, type: :model do
       contester.contest = future
       contester.validate_contest
       expect(contester.errors[:base]).to include 'Cannot join contest! Signups are closed!'
+    end
+
+    it 'requires at least six active players' do
+      contester = build(:contester)
+      allow(contester.team).to receive_message_chain(:teamers, :active, :unique_by_team, :count).and_return(5)
+
+      contester.validate_playernumber
+
+      expect(contester.errors[:team]).not_to be_empty
     end
   end
 
@@ -91,6 +123,19 @@ RSpec.describe Contester, type: :model do
       allow(team).to receive(:is_leader?).with(other).and_return(false)
       expect(contester.can_destroy?(other)).to be false
     end
+
+    it 'returns false from can_destroy? when no user is provided' do
+      expect(contester.can_destroy?(nil)).to be false
+    end
+
+    it 'returns true from can_update? only for admins' do
+      admin = instance_double(User, admin?: true)
+      member = instance_double(User, admin?: false)
+
+      expect(contester.can_update?(admin)).to be true
+      expect(contester.can_update?(member)).to be false
+      expect(contester.can_update?(nil)).to be false
+    end
   end
 
   describe 'relations and destructive helpers' do
@@ -107,6 +152,24 @@ RSpec.describe Contester, type: :model do
       contester = build(:contester)
       expect(contester).to receive(:update_attribute).with(:active, false)
       contester.destroy
+    end
+
+    it 'initializes ladder scores sequentially and preserves explicit scores' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      create(:contester, contest: ladder, score: 3)
+      create(:contester, contest: ladder, score: 5)
+
+      next_contester = create(:contester, contest: ladder, score: nil)
+      preset_contester = create(:contester, contest: ladder, score: 42)
+
+      expect(next_contester.score).to eq(6)
+      expect(preset_contester.score).to eq(42)
+    end
+
+    it 'permits expected params' do
+      params = ActionController::Parameters.new(contester: { team_id: 1, contest_id: 2, ignored: 'x' })
+
+      expect(Contester.params(params, nil).to_h).to eq('team_id' => 1, 'contest_id' => 2)
     end
   end
 end
