@@ -113,13 +113,19 @@ describe Topic do
       topic = build(:topic, user: user, forum: forum)
       expect(topic.can_create?(user)).to be true
     end
+
+    it 'returns false for users who are not yet verified' do
+      topic = build(:topic, user: user, forum: forum)
+      allow(user).to receive(:verified?).and_return(false)
+
+      expect(topic.can_create?(user)).to be false
+      expect(topic.errors[:bans]).not_to be_empty
+    end
   end
 
   describe '#can_update? and #can_destroy?' do
     it 'allows admin' do
-      admin = create(:user)
-      admin_group = create(:group, :admin)
-      create(:grouper, user: admin, group: admin_group)
+      admin = create(:user, :admin)
       topic = create(:topic, user: admin, forum: forum)
 
       expect(topic.can_update?(admin)).to be true

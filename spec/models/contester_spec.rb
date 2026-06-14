@@ -48,6 +48,15 @@ RSpec.describe Contester, type: :model do
 
       expect(stats).to eq(win: 2, loss: 0, draw: 1)
     end
+
+    it 'counts losses when the contester loses as either side of the match' do
+      loss_as_contester1 = instance_double(Match, score1: 1, score2: 3, contester1_id: contester.id)
+      loss_as_contester2 = instance_double(Match, score1: 4, score2: 2, contester1_id: contester.id + 100)
+
+      stats = contester.stats_from_matches([loss_as_contester1, loss_as_contester2])
+
+      expect(stats).to eq(win: 0, loss: 2, draw: 0)
+    end
   end
 
   describe 'validation helpers' do
@@ -74,6 +83,15 @@ RSpec.describe Contester, type: :model do
       contester.validate_playernumber
 
       expect(contester.errors[:team]).not_to be_empty
+    end
+
+    it 'allows teams with at least six active players' do
+      contester = build(:contester)
+      allow(contester.team).to receive_message_chain(:teamers, :active, :unique_by_team, :count).and_return(6)
+
+      contester.validate_playernumber
+
+      expect(contester.errors[:team]).to be_empty
     end
   end
 
@@ -105,6 +123,16 @@ RSpec.describe Contester, type: :model do
       allow(team).to receive(:is_leader?).with(user).and_return(true)
       allow(Verification).to receive(:contain).and_return(true)
       expect(contester.can_create?(user, team_id: 1, contest_id: 2)).to be true
+    end
+
+    it 'returns false for a leader when params are not allowed' do
+      user = double('User')
+      allow(user).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
+      allow(user).to receive(:admin?).and_return(false)
+      allow(team).to receive(:is_leader?).with(user).and_return(true)
+      allow(Verification).to receive(:contain).and_return(false)
+
+      expect(contester.can_create?(user, invalid: true)).to be false
     end
 
     it 'can_destroy? true for admin or leader, false otherwise' do

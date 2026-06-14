@@ -32,6 +32,12 @@ RSpec.describe Comment, type: :model do
   end
 
   describe 'callbacks' do
+    it 'leaves text_parsed unchanged when text is nil' do
+      c = Comment.new(user: user, commentable: post_record, text: nil)
+
+      expect { c.parse_text }.not_to change(c, :text_parsed)
+    end
+
     it 'parses text into text_parsed before save' do
       c = Comment.new(user: user, commentable: post_record, text: '[b]bold[/b]')
       allow(c).to receive(:bbcode_to_html).with(c.text).and_return('<p>bold</p>')

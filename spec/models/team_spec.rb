@@ -83,6 +83,80 @@ RSpec.describe Team, type: :model do
       expect(Team.search(nil)).to match_array(Team.all.to_a)
     end
   end
+
+  describe '.not_in_contest' do
+    it 'filters out teams already entered in the contest when given a contest object' do
+      contest = create(:contest)
+      included_team = create(:team)
+      excluded_team = create(:team)
+      create(:contester, contest: contest, team: excluded_team)
+
+      teams = Team.not_in_contest(contest)
+
+      expect(teams).to include(included_team)
+      expect(teams).not_to include(excluded_team)
+    end
+
+    it 'accepts a raw contest id' do
+      contest = create(:contest)
+      excluded_team = create(:team)
+      create(:contester, contest: contest, team: excluded_team)
+
+      expect(Team.not_in_contest(contest.id)).not_to include(excluded_team)
+    end
+  end
+
+  describe '#init_variables' do
+    it 'preserves teamers_count when already set' do
+      team = Team.new(teamers_count: 4)
+
+      team.init_variables
+
+      expect(team.teamers_count).to eq(4)
+    end
+  end
+
+  describe '#add_leader' do
+    it 'returns without creating a leader when founder is missing' do
+      team = create(:team, founder: nil)
+
+      expect(Teamer.where(team_id: team.id)).to be_empty
+    end
+  end
+
+  describe '.params' do
+    it 'returns an empty hash when params are nil' do
+      expect(Team.params(nil, nil)).to eq({})
+    end
+
+    it 'returns an empty hash when the team payload is missing' do
+      params = ActionController::Parameters.new(other: { name: 'Ignored' })
+
+      expect(Team.params(params, nil)).to eq({})
+    end
+
+    it 'permits team params and strips protected attributes' do
+      params = ActionController::Parameters.new(
+        team: {
+          id: 3,
+          active: false,
+          founder_id: 7,
+          name: 'Allowed',
+          tag: 'TAG',
+          comment: 'Hello',
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      )
+
+      permitted = Team.params(params, nil)
+
+      expect(permitted.to_h).to include('name' => 'Allowed', 'tag' => 'TAG', 'comment' => 'Hello')
+      expect(permitted.to_h).not_to have_key('id')
+      expect(permitted.to_h).not_to have_key('active')
+      expect(permitted.to_h).not_to have_key('founder_id')
+    end
+  end
 end
 require 'rails_helper'
 

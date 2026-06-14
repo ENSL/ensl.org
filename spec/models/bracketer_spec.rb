@@ -125,6 +125,9 @@ RSpec.describe Bracketer, type: :model do
     it 'returns nil when the next round cell is disabled or empty' do
       allow(bracketer).to receive(:disabled).and_return(false)
       allow(bracketer).to receive(:effective_contester_id).and_return(10)
+      allow(bracketer).to receive(:next_round_cell).and_return(nil)
+      expect(bracketer.result_class).to be_nil
+
       allow(bracketer).to receive(:next_round_cell).and_return(instance_double(Bracketer, disabled: true, team_id: nil,
                                                                                           match_id: nil))
       expect(bracketer.result_class).to be_nil
@@ -175,6 +178,10 @@ RSpec.describe Bracketer, type: :model do
       allow(Match).to receive(:find_by).with(id: 101).and_return(unresolved_match)
       expect(bracketer.result_class).to be_nil
 
+      allow(Match).to receive(:find_by).with(id: 101).and_return(nil)
+      expect(bracketer.result_class).to be_nil
+
+      allow(Match).to receive(:find_by).with(id: 101).and_return(unresolved_match)
       allow(unresolved_match).to receive(:score1).and_return(1)
       allow(unresolved_match).to receive(:score2).and_return(0)
       expect(bracketer.result_class).to be_nil
@@ -196,6 +203,8 @@ RSpec.describe Bracketer, type: :model do
 
       match.update!(score1: 2, score2: 2)
       expect(build(:bracketer, match_id: match.id).send(:effective_contester_id)).to be_nil
+
+      expect(build(:bracketer, match_id: -1).send(:effective_contester_id)).to be_nil
     end
 
     it 'finds the next round cell from the bracket tree position' do
