@@ -94,6 +94,15 @@ describe Gathers::CaptainPick do
       expect(result.success?).to be(false)
       expect(result.error).to be_a(StandardError)
     end
+
+    it 'returns a busy error after exhausting lock retries' do
+      allow(gather).to receive(:with_lock).and_raise(ActiveRecord::LockWaitTimeout)
+
+      result = described_class.call(actor: captain.user, gather: gather, player_id: player.id)
+
+      expect(result.success?).to be(false)
+      expect(result.error.to_s).to match(/gather is busy|try again/i)
+    end
   end
 
   describe '#initialize' do

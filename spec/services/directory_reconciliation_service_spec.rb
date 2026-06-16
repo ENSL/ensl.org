@@ -32,6 +32,19 @@ describe DirectoryReconciliationService do
     end
   end
 
+  describe DirectoryReconciliationService::TeeIO do
+    it 'closes non-stdout targets and leaves stdout open' do
+      other_target = instance_double(StringIO)
+      allow(other_target).to receive(:close)
+      allow($stdout).to receive(:close)
+
+      described_class.new($stdout, other_target).close
+
+      expect(other_target).to have_received(:close)
+      expect($stdout).not_to have_received(:close)
+    end
+  end
+
   describe '#call' do
     it 'returns a StringIO with operation log' do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)
@@ -711,6 +724,30 @@ describe DirectoryReconciliationService do
       expect(preview_file.reload.related_id).to eq(source_file.id)
       expect(movie.reload.preview_id).to eq(preview_file.id)
       expect(result.string).to include('Finish recreate')
+    end
+
+    it 'logs and skips work when another reconciliation already holds the lock' do
+      service = DirectoryReconciliationService.new(root_directory)
+      lock_file = instance_double(File)
+
+      allow(FileUtils).to receive(:mkdir_p)
+      allow(File).to receive(:open).and_return(lock_file)
+      allow(lock_file).to receive(:flock).with(File::LOCK_EX | File::LOCK_NB).and_return(false)
+      allow(lock_file).to receive(:close)
+
+      result = service.call
+
+      expect(result.string).to include('Skipping reconciliation: another reconciliation is already running')
+      expect(lock_file).to have_received(:close)
+    end
+  end
+
+  describe 'private helpers' do
+    it 'uses TeeIO when running in a console session' do
+      service = DirectoryReconciliationService.new(root_directory)
+      allow(service).to receive(:console_session?).and_return(true)
+
+      expect(service.send(:log_output)).to be_a(DirectoryReconciliationService::TeeIO)
     end
   end
 
