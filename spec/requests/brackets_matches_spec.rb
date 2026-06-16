@@ -96,6 +96,89 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
     let(:contester2) { create(:contester, contest: contest) }
     let(:match_record) { create(:match, contest: contest, contester1: contester1, contester2: contester2) }
 
+    it 'renders the show page for guests' do
+      get "/matches/#{match_record.id}"
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'renders the show page for signed in users' do
+      create(:prediction, match: match_record, user: user, score1: 3, score2: 2)
+      login_as(user)
+
+      get "/matches/#{match_record.id}"
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'renders the new form for admins' do
+      login_as(admin)
+
+      get '/matches/new', params: { id: contest.id }
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 for regular users on new' do
+      login_as(user)
+
+      get '/matches/new', params: { id: contest.id }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'renders the edit form for admins' do
+      login_as(admin)
+
+      get "/matches/#{match_record.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+    end
+
+    it 'returns 403 for regular users on edit' do
+      login_as(user)
+
+      get "/matches/#{match_record.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'renders the referee page for admins' do
+      login_as(admin)
+
+      get "/matches/#{match_record.id}/ref"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:ref)
+    end
+
+    it 'returns 403 for regular users on the referee page' do
+      login_as(user)
+
+      get "/matches/#{match_record.id}/ref"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'creates a valid match for admins' do
+      login_as(admin)
+
+      expect do
+        post '/matches', params: {
+          match: {
+            contest_id: contest.id,
+            contester1_id: contester1.id,
+            contester2_id: contester2.id,
+            match_time: 1.day.from_now
+          }
+        }
+      end.to change(Match, :count).by(1)
+
+      expect(response).to redirect_to(edit_contest_path(contest, contest: 'matches'))
+    end
+
     it 'returns 422 when match creation is invalid' do
       login_as(admin)
 
@@ -132,6 +215,35 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(match_record.reload.report).to eq('Updated normally')
     end
 
+    it 'updates through the xml response branch' do
+      login_as(admin)
+
+      patch "/matches/#{match_record.id}.xml", params: {
+        match: { report: 'Updated via xml' }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(match_record.reload.report).to eq('Updated via xml')
+    end
+
+    it 'normalizes matcher attributes before update' do
+      replacement_user = create(:user)
+      login_as(admin)
+
+      patch "/matches/#{match_record.id}", params: {
+        match: {
+          report: 'Updated with lineup attrs',
+          matchers_attributes: {
+            '0' => { 'user_id' => '', '_destroy' => 'keep' },
+            '1' => { 'user_id' => replacement_user.username, '_destroy' => 'keep' }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(match_path(match_record))
+      expect(match_record.reload.report).to eq('Updated with lineup attrs')
+    end
+
     it 'renders the referee form when an invalid update comes from the ref page' do
       login_as(admin)
 
@@ -143,6 +255,17 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(response.body).to include('Referee Admin')
     end
 
+    it 'renders the edit form when an invalid update does not come from the ref page' do
+      login_as(admin)
+
+      patch "/matches/#{match_record.id}", params: {
+        match: { report: 'x' * 64_001 }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response).to render_template(:edit)
+    end
+
     it 'destroys a match as admin' do
       login_as(admin)
 
@@ -150,6 +273,15 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
 
       expect(response).to redirect_to(edit_contest_path(contest, anchor: 'matches'))
       expect(Match.exists?(match_record.id)).to be(false)
+    end
+
+    it 'returns 403 when a non-admin tries to destroy a match' do
+      login_as(user)
+
+      delete "/matches/#{match_record.id}"
+
+      expect(response).to have_http_status(:forbidden)
+      expect(Match.exists?(match_record.id)).to be(true)
     end
   end
 end

@@ -11,6 +11,7 @@ RSpec.describe 'IssuesController', type: :request do
     it 'allows admins to see all allowed categories' do
       gather_issue = create(:issue, title: 'Gather issue', category: gather_category, status: Issue::STATUS_OPEN)
       website_issue = create(:issue, title: 'Website issue', category: website_category, status: Issue::STATUS_SOLVED)
+      uncategorized_issue = create(:issue, title: 'No category issue', category: nil, status: Issue::STATUS_REJECTED)
       login_as(admin)
 
       get '/issues', params: { sort: 'title' }
@@ -18,6 +19,7 @@ RSpec.describe 'IssuesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(gather_issue.title)
       expect(response.body).to include(website_issue.title)
+      expect(response.body).to include(uncategorized_issue.title)
     end
 
     it 'limits moderators to their allowed categories' do
@@ -38,6 +40,19 @@ RSpec.describe 'IssuesController', type: :request do
       get '/issues'
 
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'supports alternate sort branches for admins' do
+      assigned = create(:user)
+      issue = create(:issue, title: 'Sortable issue', category: gather_category, assigned: assigned, status: Issue::STATUS_OPEN)
+      login_as(admin)
+
+      %w[status assigned category unexpected].each do |sort|
+        get '/issues', params: { sort: sort }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(issue.title)
+      end
     end
   end
 

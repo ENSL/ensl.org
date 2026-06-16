@@ -8,6 +8,62 @@ RSpec.describe 'UsersController', type: :request do
     post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
+  describe 'GET /users' do
+    it 'renders the index page with users' do
+      indexed_user = create(:user, username: 'VisibleUser')
+
+      get '/users'
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:index)
+      expect(response.body).to include(indexed_user.username)
+    end
+
+    it 'filters by admin ip search' do
+      matching = create(:user, username: 'IpMatch', lastip: '10.20.30.40')
+      create(:user, username: 'IpMiss', lastip: '10.20.30.41')
+      login_as(admin)
+
+      get '/users', params: { search: 'ip:10.20.30.40' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(matching.username)
+      expect(response.body).not_to include('IpMiss')
+    end
+
+    it 'uses the lately filter when requested' do
+      recent_user = create(:user, username: 'RecentUser', lastvisit: 1.day.ago)
+      stale_user = create(:user, username: 'StaleUser', lastvisit: 6.months.ago)
+
+      get '/users', params: { filter: 'lately' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(recent_user.username)
+      expect(response.body).not_to include(stale_user.username)
+    end
+  end
+
+  describe 'GET /users/:id' do
+    it 'returns javascript successfully for a known page tab' do
+      get "/users/#{user.id}",
+          params: { page: 'movies' },
+          headers: { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'ACCEPT' => 'text/javascript' }
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns javascript successfully for an unknown page tab' do
+      get "/users/#{user.id}",
+          params: { page: 'not-a-real-page' },
+          headers: { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'ACCEPT' => 'text/javascript' }
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'GET /users/:id/popup' do
+  end
+
   describe 'GET /users/new' do
     it 'redirects a logged-in non-admin to their edit page' do
       login_as(user)

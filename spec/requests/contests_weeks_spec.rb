@@ -10,6 +10,146 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
     expect(flash[:notice]).to be_present
   end
 
+  describe 'GET /contests' do
+    it 'renders current and inactive contests' do
+      active_contest = create(:contest, name: 'Active Contest')
+      inactive_contest = create(:contest, name: 'Inactive Contest', status: Contest::STATUS_CLOSED)
+
+      get '/contests'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(active_contest.name)
+      expect(response.body).to include(inactive_contest.name)
+    end
+  end
+
+  describe 'GET /contests/current' do
+    it 'renders current contests' do
+      current_contest = create(:contest, name: 'Current Contest')
+
+      get '/contests/current'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(current_contest.name)
+    end
+  end
+
+  describe 'GET /contests/historical/:id' do
+    it 'uses the NS1 branch' do
+      ns1_contest = create(:contest, name: 'Season S1: Legacy Cup')
+      contester1 = create(:contester, contest: ns1_contest)
+      contester2 = create(:contester, contest: ns1_contest)
+      create(:match, :scored, contest: ns1_contest, contester1: contester1, contester2: contester2)
+
+      get '/contests/historical/NS1'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(ns1_contest.name)
+    end
+
+    it 'uses the default branch for other ids' do
+      modern_contest = create(:contest, id: 200, name: 'Modern Contest')
+      contester1 = create(:contester, contest: modern_contest)
+      contester2 = create(:contester, contest: modern_contest)
+      create(:match, :scored, contest: modern_contest, contester1: contester1, contester2: contester2)
+
+      get '/contests/historical/NS2'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(modern_contest.name)
+    end
+  end
+
+  describe 'GET /contests/:id' do
+    it 'renders the show page' do
+      contest = create(:contest)
+
+      get "/contests/#{contest.id}"
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'GET /contests/new' do
+    it 'allows admins' do
+      login_as(admin)
+
+      get '/contests/new'
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns 403 for non-admins' do
+      login_as(user)
+
+      get '/contests/new'
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'GET /contests/:id/edit' do
+    it 'allows admins' do
+      contest = create(:contest)
+      login_as(admin)
+
+      get "/contests/#{contest.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns 403 for non-admins' do
+      contest = create(:contest)
+      login_as(user)
+
+      get "/contests/#{contest.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'POST /contests' do
+    it 'creates a contest for admins' do
+      login_as(admin)
+
+      expect do
+        post '/contests', params: {
+          contest: {
+            name: 'Created Contest',
+            start: Date.today,
+            end: 1.week.from_now.to_date,
+            contest_type: Contest::TYPE_LADDER,
+            status: Contest::STATUS_OPEN,
+            default_time: '12:00:00'
+          }
+        }
+      end.to change(Contest, :count).by(1)
+
+      expect(response).to redirect_to(contest_path(Contest.order(:id).last))
+    end
+
+    it 'returns 422 for invalid contests' do
+      login_as(admin)
+
+      expect do
+        post '/contests', params: { contest: { name: '' } }
+      end.not_to change(Contest, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 for non-admins' do
+      login_as(user)
+
+      expect do
+        post '/contests', params: { contest: { name: 'Blocked Contest' } }
+      end.not_to change(Contest, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe 'GET /contests/scores' do
     it 'returns 403 for a non-ladder contest' do
       contest = create(:contest, :bracket)
@@ -56,6 +196,19 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
   end
 
   describe 'PATCH /contests/:id' do
+    it 'updates contest attributes through the contest branch' do
+      contest = create(:contest, name: 'Original Contest')
+      login_as(admin)
+
+      patch "/contests/#{contest.id}", params: {
+        type: 'contest',
+        contest: { name: 'Updated Contest' }
+      }
+
+      expect(response).to redirect_to(contest_path(contest))
+      expect(contest.reload.name).to eq('Updated Contest')
+    end
+
     it 'returns 422 when a contest update is invalid' do
       contest = create(:contest)
       login_as(admin)
@@ -109,6 +262,19 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       expect(response).to have_http_status(:ok)
       expect(contest.reload.contesters.find_by(team: team)).to be_present
     end
+
+    it 'returns 403 for non-admins' do
+      contest = create(:contest)
+      login_as(user)
+
+      patch "/contests/#{contest.id}", params: {
+        type: 'contest',
+        contest: { name: 'Blocked Contest' }
+      }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(contest.reload.name).not_to eq('Blocked Contest')
+    end
   end
 
   describe 'DELETE /contests/del_map' do
@@ -131,6 +297,46 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
 
       expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
       expect(flash[:error]).to be_present
+    end
+  end
+
+  describe 'GET /contests/:id/confirmedmatches' do
+    it 'shows confirmed match proposals for a contest' do
+      contest = create(:contest)
+      contester1 = create(:contester, contest: contest)
+      contester2 = create(:contester, contest: contest)
+      match = create(:match, contest: contest, contester1: contester1, contester2: contester2)
+      confirmed = create(:match_proposal, :confirmed, match: match, team: contester1.team)
+      create(:match_proposal, :pending, match: match, team: contester2.team)
+
+      get "/contests/#{contest.id}/confirmedmatches"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(confirmed.team.name)
+    end
+  end
+
+  describe 'DELETE /contests/:id' do
+    it 'destroys contests for admins' do
+      contest = create(:contest)
+      login_as(admin)
+
+      expect do
+        delete "/contests/#{contest.id}"
+      end.to change(Contest, :count).by(-1)
+
+      expect(response).to redirect_to(contests_path)
+    end
+
+    it 'returns 403 for non-admins' do
+      contest = create(:contest)
+      login_as(user)
+
+      expect do
+        delete "/contests/#{contest.id}"
+      end.not_to change(Contest, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

@@ -180,7 +180,7 @@ class Article < ActiveRecord::Base
 
   def self.article_params(params, cuser)
     p = %i[title category_id text text_coding]
-    p << :status if cuser.admin?
+    p << :status if cuser&.admin?
     params.require(:article).permit(*p)
   end
 end

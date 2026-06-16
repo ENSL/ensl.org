@@ -95,6 +95,7 @@ RSpec.configure do |c|
     next unless example.exception.nil?
 
     next unless respond_to?(:assert_no_log_errors)
+    next if example.metadata[:skip_log_error_check]
 
     if example.metadata[:expect_log_error]
       begin
