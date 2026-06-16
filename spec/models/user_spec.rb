@@ -32,6 +32,122 @@ require 'rails_helper'
 describe User do
   let!(:user) { create :user }
 
+  describe '.normalize_steamid' do
+    it 'returns nil for nil and blank values' do
+      expect(described_class.normalize_steamid(nil)).to be_nil
+      expect(described_class.normalize_steamid('   ')).to be_nil
+    end
+
+    it 'accepts legacy values without the STEAM prefix' do
+      expect(described_class.normalize_steamid('0:1:125')).to eq('0:1:125')
+    end
+
+    it 'returns nil for invalid values' do
+      expect(described_class.normalize_steamid('not-a-steamid')).to be_nil
+    end
+  end
+
+  describe 'simple formatting helpers' do
+    it 'splits a full name into first and last names' do
+      subject = build(:user)
+      subject.fullname = 'Jane Doe'
+
+      subject.set_name
+
+      expect(subject.firstname).to eq('Jane')
+      expect(subject.lastname).to eq('Doe')
+    end
+
+    it 'stores a single-part fullname as the first name only' do
+      subject = build(:user)
+      subject.fullname = 'Madonna'
+      subject.lastname = nil
+
+      subject.set_name
+
+      expect(subject.firstname).to eq('Madonna')
+      expect(subject.lastname).to be_nil
+    end
+
+    it 'returns human-readable password hash labels and nil for unknown values' do
+      expect(build(:user, password_hash: User::PASSWORD_MD5).password_hash_s).to eq('MD5')
+      expect(build(:user, password_hash: User::PASSWORD_SCRYPT).password_hash_s).to eq('Scrypt')
+      expect(build(:user, password_hash: User::PASSWORD_MD5_SCRYPT).password_hash_s).to eq('Scrypt+MD5')
+      expect(build(:user, password_hash: 99).password_hash_s).to be_nil
+    end
+
+    it 'formats email addresses for display' do
+      expect(build(:user, email: 'player@example.com').email_s).to eq('player (at) example.com')
+    end
+
+    it 'returns Unknown for unmapped countries' do
+      expect(build(:user, country: 'ZZ').country_s).to eq('Unknown')
+    end
+
+    it 'builds real names from the available name parts' do
+      expect(build(:user, firstname: 'Jane', lastname: 'Doe').realname).to eq('Jane Doe')
+      expect(build(:user, firstname: 'Jane', lastname: nil).realname).to eq('Jane')
+      expect(build(:user, firstname: nil, lastname: 'Doe').realname).to eq('Doe')
+      expect(build(:user, firstname: nil, lastname: nil).realname).to eq('')
+    end
+
+    it 'includes the town when building the origin string' do
+      subject = create(:user, country: 'NO')
+      subject.profile.update!(town: 'Oslo')
+
+      expect(subject.from).to include('Oslo')
+    end
+
+    it 'falls back to country only when the town is blank' do
+      subject = create(:user, country: 'NO')
+      subject.profile.update!(town: '')
+
+      expect(subject.from).to eq(subject.country_s)
+    end
+
+    it 'returns 0 m when lastvisit is nil and minutes otherwise' do
+      expect(build(:user, lastvisit: nil).idle).to eq('0 m')
+
+      recent = build(:user, lastvisit: 5.minutes.ago)
+      expect(recent.idle).to match(/\A\d+ m\z/)
+    end
+
+    it 'returns the current active teamer when a team is present' do
+      subject = create(:user)
+      team = create(:team)
+      teamer = create(:teamer, user: subject, team: team, rank: Teamer::RANK_MEMBER)
+      subject.update_column(:team_id, team.id)
+      subject.reload
+
+      expect(subject.current_teamer).to eq(teamer)
+    end
+
+    it 'returns nil for current_teamer when no current team is set' do
+      expect(build(:user, team: nil).current_teamer).to be_nil
+    end
+
+    it 'clears @ensl.org email addresses during preformat but leaves other addresses alone' do
+      internal = build(:user, email: 'staff@ensl.org')
+      external = build(:user, email: 'staff@example.com')
+
+      internal.preformat
+      external.preformat
+
+      expect(internal.email).to eq('')
+      expect(external.email).to eq('staff@example.com')
+    end
+
+    it 'appends a numeric suffix when fixing duplicate usernames' do
+      create(:user, username: 'taken2')
+      subject = build(:user, username: 'taken')
+      subject.errors.add(:username, 'has already been taken')
+
+      subject.fix_attributes
+
+      expect(subject.username).to eq('taken3')
+    end
+  end
+
   describe '#banned?' do
     it 'returns false if user is not banned' do
       expect(user.banned?).to be_falsey

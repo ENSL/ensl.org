@@ -230,6 +230,32 @@ describe DataFile do
     end
   end
 
+  describe 'directory helpers' do
+    it 'returns nil for first_directory and second_directory when no directory is attached' do
+      file = build(:data_file, directory: nil)
+
+      expect(file.first_directory).to be_nil
+      expect(file.second_directory).to be_nil
+    end
+
+    it 'returns the root and second directory for nested directories' do
+      root = create(:directory, :root, path: @test_root)
+      child = create(:directory, name: 'childdir', parent: root)
+      grandchild = create(:directory, name: 'granddir', parent: child)
+      file = build(:data_file, directory: grandchild)
+
+      expect(file.first_directory).to eq(root)
+      expect(file.second_directory).to eq(grandchild)
+    end
+
+    it 'returns nil for second_directory when the file is already in the root directory' do
+      root = create(:directory, :root, path: @test_root)
+      file = build(:data_file, directory: root)
+
+      expect(file.second_directory).to be_nil
+    end
+  end
+
   describe '#file_exists?' do
     it 'returns false when no path is available' do
       file = build(:data_file, path: nil)
@@ -620,6 +646,24 @@ describe DataFile do
 
         expect(movies_file.can_create?(member)).to be true
       end
+
+      it 'allows users when the related article allows creation' do
+        permitted_article = build(:article)
+        allow(permitted_article).to receive(:can_create?).and_return(true)
+        member = double('user', admin?: false, banned?: false, has_access?: false)
+        file = build(:data_file, article: permitted_article, directory_id: nil)
+
+        expect(file.can_create?(member)).to be true
+      end
+
+      it 'rejects users when neither article nor movie access allows creation' do
+        denied_article = build(:article)
+        allow(denied_article).to receive(:can_create?).and_return(false)
+        member = double('user', admin?: false, banned?: false, has_access?: false)
+        file = build(:data_file, article: denied_article, directory_id: nil)
+
+        expect(file.can_create?(member)).to be false
+      end
     end
 
     describe '#can_update?' do
@@ -631,6 +675,24 @@ describe DataFile do
         admin = double('user', admin?: true)
         expect(file.can_update?(admin)).to be true
       end
+
+      it 'delegates updates to article permissions for non-admin users' do
+        editor = double('user', admin?: false)
+        article = build(:article)
+        allow(article).to receive(:can_create?).and_return(true)
+        file = build(:data_file, article: article)
+
+        expect(file.can_update?(editor)).to be true
+      end
+
+      it 'rejects updates when the related article does not allow them' do
+        editor = double('user', admin?: false)
+        article = build(:article)
+        allow(article).to receive(:can_create?).and_return(false)
+        file = build(:data_file, article: article)
+
+        expect(file.can_update?(editor)).to be false
+      end
     end
 
     describe '#can_destroy?' do
@@ -641,6 +703,24 @@ describe DataFile do
       it 'returns true for admin user' do
         admin = double('user', admin?: true)
         expect(file.can_destroy?(admin)).to be true
+      end
+
+      it 'delegates destroy permission to the related article' do
+        editor = double('user', admin?: false)
+        article = build(:article)
+        allow(article).to receive(:can_create?).and_return(true)
+        file = build(:data_file, article: article)
+
+        expect(file.can_destroy?(editor)).to be true
+      end
+
+      it 'rejects destroy when the related article does not allow it' do
+        editor = double('user', admin?: false)
+        article = build(:article)
+        allow(article).to receive(:can_create?).and_return(false)
+        file = build(:data_file, article: article)
+
+        expect(file.can_destroy?(editor)).to be false
       end
     end
   end

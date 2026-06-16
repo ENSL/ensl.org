@@ -561,6 +561,76 @@ describe Directory do
     end
   end
 
+  describe 'private reconciliation helpers' do
+    it 'fixes blank subdir attributes and records the repair' do
+      root = create(:directory, :root, path: @test_root)
+      subdir = build(:directory, name: 'repairme', parent: root)
+      subdir.path = nil
+      subdir.title = nil
+      subdir.hidden = nil
+      allow(subdir.errors).to receive(:full_messages).and_return(['Path is missing'])
+      allow(subdir).to receive(:sync_inode_info)
+      logger = instance_double(Logger, warn: nil, info: nil)
+      stats = Hash.new(0)
+
+      root.send(:fix_subdir_attributes, subdir, logger, stats: stats)
+
+      expect(subdir.path).to eq(subdir.full_path)
+      expect(subdir.title).to eq('Repairme')
+      expect(subdir.hidden).to be(false)
+      expect(subdir).to have_received(:sync_inode_info).at_least(:once)
+      expect(stats[:directories_fixed]).to eq(1)
+      expect(logger).to have_received(:warn).at_least(:once)
+      expect(logger).to have_received(:info).with("Fixed attributes: #{subdir.full_path}")
+    end
+
+    it 'returns nil from file-count matching when there are too many candidates' do
+      root = create(:directory, :root, path: @test_root)
+      relation = double('candidate_relation')
+      allow(root).to receive(:count_files_in_path).and_return(1)
+      allow(Directory).to receive(:joins).with(:files).and_return(relation)
+      allow(relation).to receive(:group).with('directories.id').and_return(relation)
+      allow(relation).to receive(:having).with('count(data_files.id) = ?', 1).and_return(relation)
+      allow(relation).to receive(:limit).with(Directory::MAX_FILE_COUNT_MATCH_CANDIDATES + 1)
+                                        .and_return(Array.new(Directory::MAX_FILE_COUNT_MATCH_CANDIDATES + 1) {
+                                                      build(:directory)
+                                                    })
+      allow(Rails.logger).to receive(:warn)
+
+      expect(root.send(:find_by_file_count, @test_root)).to be_nil
+    end
+
+    it 'finds a candidate directory when file counts and sizes match' do
+      disk_path = File.join(@test_root, 'size_match')
+      FileUtils.mkdir_p(disk_path)
+      File.write(File.join(disk_path, 'clip.dem'), '12345')
+
+      root = create(:directory, :root, path: @test_root)
+      candidate = create(:directory, name: 'candidate', parent: root)
+      relation = double('candidate_relation')
+      allow(root).to receive(:count_files_in_path).with(disk_path).and_return(1)
+      allow(Directory).to receive(:joins).with(:files).and_return(relation)
+      allow(relation).to receive(:group).with('directories.id').and_return(relation)
+      allow(relation).to receive(:having).with('count(data_files.id) = ?', 1).and_return(relation)
+      allow(relation).to receive(:limit).with(Directory::MAX_FILE_COUNT_MATCH_CANDIDATES + 1).and_return([candidate])
+      allow(root).to receive(:file_sizes_match?).with(candidate, disk_path).and_return(true)
+
+      expect(root.send(:find_by_file_count, disk_path)).to eq(candidate)
+    end
+
+    it 'rejects candidate directories when file sizes do not match' do
+      disk_path = File.join(@test_root, 'size_mismatch')
+      FileUtils.mkdir_p(disk_path)
+      File.write(File.join(disk_path, 'clip.dem'), '12345')
+
+      root = create(:directory, :root, path: @test_root)
+      candidate = create(:directory, name: 'mismatch', parent: root)
+      create(:data_file, directory: candidate, name: 'clip.dem', size: 6, path: File.join(disk_path, 'clip.dem'))
+
+      expect(root.send(:file_sizes_match?, candidate, disk_path)).to be(false)
+    end
+  end
+
   describe 'permission methods' do
     let(:directory) { build(:directory) }
 
