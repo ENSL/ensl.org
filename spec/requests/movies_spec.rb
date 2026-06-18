@@ -4,7 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'MoviesController', type: :request do
   let!(:admin) { create(:user, :admin) }
+  let!(:user) { create(:user) }
   let!(:movie) { create(:movie, user: admin) }
+
+  describe 'GET /movies' do
+    it 'renders the archive listing' do
+      get '/movies'
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:index)
+    end
+  end
 
   def login_as(account)
     post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
@@ -188,6 +198,14 @@ RSpec.describe 'MoviesController', type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it 'returns 403 for unauthorized users' do
+      login_as(user)
+
+      get "/movies/#{movie.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'POST /movies/:id/snapshot' do
@@ -222,6 +240,24 @@ RSpec.describe 'MoviesController', type: :request do
       expect(response.media_type).to eq('text/vnd.turbo-stream.html')
       expect(response.body).to include('Snapshot created.')
     end
+
+    it 'renders a turbo-stream alert when snapshot creation fails' do
+      allow_any_instance_of(Movie).to receive(:make_snapshot).with(seconds: nil).and_return(false)
+
+      post "/movies/#{movie.id}/snapshot", headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('Snapshot could not be created.')
+    end
+
+    it 'returns 403 for unauthorized users' do
+      login_as(user)
+
+      post "/movies/#{movie.id}/snapshot"
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'GET /movies/:id/download' do
@@ -252,6 +288,16 @@ RSpec.describe 'MoviesController', type: :request do
       end.to change(Movie, :count).by(-1)
 
       expect(response).to redirect_to(movies_url)
+    end
+
+    it 'returns 403 for unauthorized users' do
+      login_as(user)
+
+      expect do
+        delete "/movies/#{movie.id}"
+      end.not_to change(Movie, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

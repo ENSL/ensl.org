@@ -26,6 +26,31 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
+    it 'renders the edit page for admins' do
+      login_as(admin)
+
+      get "/brackets/#{bracket.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'creates a bracket for admins' do
+      login_as(admin)
+
+      expect do
+        post '/brackets', params: {
+          bracket: {
+            contest_id: contest.id,
+            name: 'Created bracket',
+            slots: 4
+          }
+        }
+      end.to change(Bracket, :count).by(1)
+
+      expect(response).to redirect_to(edit_contest_path(contest))
+      expect(flash[:notice]).to be_present
+    end
+
     it 'redirects back to the contest with an error when creation is invalid' do
       login_as(admin)
 
@@ -80,6 +105,18 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(bracket.bracketers.pos(3, 0).first.custom_text).to eq('Winner TBD')
     end
 
+    it 'returns 403 when a guest tries to update' do
+      patch "/brackets/#{bracket.id}", params: {
+        bracket: {
+          contest_id: contest.id,
+          name: 'Blocked',
+          slots: bracket.slots
+        }
+      }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it 'destroys a bracket as admin' do
       login_as(admin)
 
@@ -87,6 +124,13 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
 
       expect(response).to redirect_to(edit_contest_path(contest))
       expect(Bracket.exists?(bracket.id)).to be(false)
+    end
+
+    it 'returns 403 when a guest tries to destroy a bracket' do
+      delete "/brackets/#{bracket.id}"
+
+      expect(response).to have_http_status(:forbidden)
+      expect(Bracket.exists?(bracket.id)).to be(true)
     end
   end
 

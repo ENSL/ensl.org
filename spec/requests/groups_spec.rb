@@ -8,6 +8,28 @@ RSpec.describe 'GroupsController', type: :request do
     post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
+  describe 'GET /groups' do
+    it 'renders the groups index' do
+      group = create(:group, name: 'Visible Group')
+
+      get '/groups'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(group.name)
+    end
+  end
+
+  describe 'GET /groups/:id' do
+    it 'renders the group page' do
+      group = create(:group, name: 'Shown Group')
+
+      get "/groups/#{group.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(group.name)
+    end
+  end
+
   describe 'GET /groups/new' do
     it 'allows admins' do
       login_as(admin)
@@ -53,6 +75,15 @@ RSpec.describe 'GroupsController', type: :request do
 
   describe 'PATCH /groups/:id' do
     let(:group) { create(:group, name: 'Original') }
+
+    it 'renders the edit form for admins' do
+      login_as(admin)
+
+      get "/groups/#{group.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+    end
 
     it 'updates a group for admins' do
       login_as(admin)

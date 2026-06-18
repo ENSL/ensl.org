@@ -79,6 +79,15 @@ RSpec.describe 'DirectoriesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:edit)
     end
+
+    it 'returns 403 for non-admin users' do
+      directory = create(:directory, parent: ensure_root_directory)
+      login_as(user)
+
+      get "/directories/#{directory.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'POST /directories' do
@@ -114,6 +123,22 @@ RSpec.describe 'DirectoriesController', type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 for non-admin users' do
+      login_as(user)
+
+      expect do
+        post '/directories', params: {
+          directory: {
+            name: 'blocked',
+            title: 'Blocked',
+            parent_id: ensure_root_directory.id
+          }
+        }
+      end.not_to change(Directory, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -197,6 +222,17 @@ RSpec.describe 'DirectoriesController', type: :request do
       end.to change(Directory, :count).by(-1)
 
       expect(response).to redirect_to(directory_path(Directory::ROOT))
+    end
+
+    it 'returns 403 for non-admin users' do
+      directory = create(:directory, parent: ensure_root_directory)
+      login_as(user)
+
+      expect do
+        delete "/directories/#{directory.id}"
+      end.not_to change(Directory, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

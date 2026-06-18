@@ -41,6 +41,17 @@ RSpec.describe 'UsersController', type: :request do
       expect(response.body).to include(recent_user.username)
       expect(response.body).not_to include(stale_user.username)
     end
+
+    it 'does not allow guests to use the admin ip filter branch' do
+      create(:user, username: 'PublicIpMatch', lastip: '10.10.10.10')
+      create(:user, username: 'PublicIpMiss', lastip: '10.10.10.11')
+
+      get '/users', params: { search: 'ip:10.10.10.10' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('PublicIpMatch')
+      expect(response.body).not_to include('PublicIpMiss')
+    end
   end
 
   describe 'GET /users/:id' do
@@ -59,9 +70,6 @@ RSpec.describe 'UsersController', type: :request do
 
       expect(response).to have_http_status(:ok)
     end
-  end
-
-  describe 'GET /users/:id/popup' do
   end
 
   describe 'GET /users/new' do
@@ -87,6 +95,15 @@ RSpec.describe 'UsersController', type: :request do
   describe 'GET /users/:id/agenda' do
     it 'allows the user to view their own agenda' do
       login_as(user)
+
+      get "/users/#{user.id}/agenda"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:agenda)
+    end
+
+    it 'allows admins to view another users agenda' do
+      login_as(admin)
 
       get "/users/#{user.id}/agenda"
 

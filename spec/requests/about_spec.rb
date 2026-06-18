@@ -34,6 +34,12 @@ RSpec.describe 'AboutController', type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'returns 403 for guests' do
+      get '/about/adminpanel'
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'GET /about/statistics' do

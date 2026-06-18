@@ -73,6 +73,16 @@ RSpec.describe 'CategoriesController', type: :request do
       expect(response).to have_http_status(422)
       expect(response).to render_template(:new)
     end
+
+    it 'returns 403 for non-admins' do
+      login_as(user)
+
+      expect do
+        post '/categories', params: { category: { name: 'Blocked category', domain: Category::DOMAIN_NEWS, sort: 0 } }
+      end.not_to change(Category, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'PATCH /categories/:id' do
@@ -95,6 +105,16 @@ RSpec.describe 'CategoriesController', type: :request do
 
       expect(response).to have_http_status(422)
       expect(response).to render_template(:edit)
+      expect(category.reload.name).to eq('Original category')
+    end
+
+    it 'returns 403 for non-admins' do
+      login_as(user)
+
+      patch "/categories/#{category.id}",
+            params: { category: { name: 'Blocked', domain: category.domain, sort: category.sort } }
+
+      expect(response).to have_http_status(:forbidden)
       expect(category.reload.name).to eq('Original category')
     end
   end
@@ -133,6 +153,15 @@ RSpec.describe 'CategoriesController', type: :request do
       expect(response).to redirect_to(categories_path)
       expect(first_category.reload.sort).to eq(2)
       expect(second_category.reload.sort).to eq(1)
+    end
+
+    it 'returns 403 for non-admins' do
+      category = create(:category)
+      login_as(user)
+
+      patch "/categories/#{category.id}/down"
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

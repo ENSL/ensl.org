@@ -44,6 +44,15 @@ RSpec.describe 'MatchProposalsController', type: :request do
       expect(response).to redirect_to(match_proposals_path(match))
       expect(flash[:error]).to include('Cannot create a new proposal')
     end
+
+    it 'renders the form when no confirmed proposal exists and the user can create one' do
+      login_as(team1_leader)
+
+      get "/matches/#{match.id}/proposals/new"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+    end
   end
 
   describe 'POST /matches/:match_id/proposals' do
@@ -62,6 +71,21 @@ RSpec.describe 'MatchProposalsController', type: :request do
       expect(response).to redirect_to(match_proposals_path(match))
       expect(MatchProposal.last.status).to eq(MatchProposal::STATUS_PENDING)
       expect(MatchProposal.last.team).to eq(team1_leader.team)
+    end
+
+    it 're-renders new when the proposal is invalid' do
+      login_as(team1_leader)
+
+      expect do
+        post "/matches/#{match.id}/proposals", params: {
+          match_proposal: {
+            proposed_time: nil
+          }
+        }
+      end.not_to change(MatchProposal, :count)
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
     end
   end
 
@@ -132,6 +156,30 @@ RSpec.describe 'MatchProposalsController', type: :request do
 
       expect(response).to have_http_status(:accepted)
       expect(response.parsed_body['status']).to eq('Pending')
+    end
+
+    it 'returns accepted for a rejected transition' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1_leader.team)
+      login_as(team2_leader)
+
+      patch "/matches/#{match.id}/proposals/#{proposal.id}",
+            params: { match_proposal: { status: MatchProposal::STATUS_REJECTED } },
+            headers: xhr_headers
+
+      expect(response).to have_http_status(:accepted)
+      expect(response.parsed_body['status']).to eq('Rejected')
+    end
+
+    it 'returns accepted for a revoked transition' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1_leader.team)
+      login_as(team1_leader)
+
+      patch "/matches/#{match.id}/proposals/#{proposal.id}",
+            params: { match_proposal: { status: MatchProposal::STATUS_REVOKED } },
+            headers: xhr_headers
+
+      expect(response).to have_http_status(:accepted)
+      expect(response.parsed_body['status']).to eq('Revoked')
     end
   end
 end

@@ -40,13 +40,15 @@ RSpec.describe 'DataFilesController', type: :request do
   describe 'GET /data_files/admin' do
     it 'renders broken and unrelated movie files for admins' do
       regular_directory = create(:directory, parent: ensure_root_directory)
-      broken_file = create(:data_file, directory: regular_directory, title: 'Broken file', path: File.join(regular_directory.full_path, 'broken.txt'))
+      broken_file = create(:data_file, directory: regular_directory, title: 'Broken file',
+                                       path: File.join(regular_directory.full_path, 'broken.txt'))
 
       unrelated_path = File.join(ensure_movies_directory.full_path, 'unrelated.mp4')
       FileUtils.mkdir_p(File.dirname(unrelated_path))
       File.write(unrelated_path, 'movie')
       allow_any_instance_of(DataFile).to receive(:should_create_movie?).and_return(false)
-      unrelated_movie_file = create(:data_file, directory: ensure_movies_directory, title: 'Unrelated movie file', path: unrelated_path)
+      unrelated_movie_file = create(:data_file, directory: ensure_movies_directory, title: 'Unrelated movie file',
+                                                path: unrelated_path)
 
       login_as(admin)
 
@@ -104,6 +106,16 @@ RSpec.describe 'DataFilesController', type: :request do
       expect(response.body).to include('Candidate file (+1 related files)')
       expect(response.body).to include('Plain file')
     end
+
+    it 'returns 403 for non-admin users' do
+      directory = create(:directory, parent: ensure_root_directory)
+      file = create(:data_file, directory: directory)
+      login_as(user)
+
+      get "/data_files/#{file.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'POST /data_files' do
@@ -116,7 +128,8 @@ RSpec.describe 'DataFilesController', type: :request do
     end
 
     it 'redirects to the related article when one is attached' do
-      post '/data_files', params: { data_file: { directory_id: directory.id, article_id: article.id, title: 'Article file' } }
+      post '/data_files',
+           params: { data_file: { directory_id: directory.id, article_id: article.id, title: 'Article file' } }
 
       expect(response).to redirect_to(article_path(article))
       expect(flash[:notice]).to eq(I18n.t(:files_create))
@@ -142,6 +155,16 @@ RSpec.describe 'DataFilesController', type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 for non-admin users' do
+      login_as(user)
+
+      expect do
+        post '/data_files', params: { data_file: { directory_id: directory.id, title: 'Blocked file' } }
+      end.not_to change(DataFile, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -179,6 +202,16 @@ RSpec.describe 'DataFilesController', type: :request do
       expect(response).to render_template(:edit)
       expect(file.reload.title).to eq('Original title')
     end
+
+    it 'returns 403 for non-admin users' do
+      outsider = create(:user)
+      login_as(outsider)
+
+      patch "/data_files/#{file.id}", params: { data_file: { title: 'Blocked title' } }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(file.reload.title).to eq('Original title')
+    end
   end
 
   describe 'DELETE /data_files/:id' do
@@ -198,7 +231,8 @@ RSpec.describe 'DataFilesController', type: :request do
   describe 'GET /data_files/trash' do
     it 'destroys only files missing from disk' do
       directory = create(:directory, parent: ensure_root_directory)
-      missing = create(:data_file, directory: directory, title: 'Missing file', path: File.join(directory.full_path, 'missing.txt'))
+      missing = create(:data_file, directory: directory, title: 'Missing file',
+                                   path: File.join(directory.full_path, 'missing.txt'))
       existing_path = File.join(directory.full_path, 'existing.txt')
       FileUtils.mkdir_p(File.dirname(existing_path))
       File.write(existing_path, 'ok')
@@ -213,6 +247,14 @@ RSpec.describe 'DataFilesController', type: :request do
       expect(response.body).to include('Missing file')
       expect { missing.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(existing.reload).to be_present
+    end
+
+    it 'returns 403 for non-admin users' do
+      login_as(user)
+
+      get '/data_files/trash'
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end
