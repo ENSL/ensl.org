@@ -42,6 +42,12 @@ RSpec.describe 'IssuesController', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
+    it 'returns 403 for guests' do
+      get '/issues'
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it 'supports alternate sort branches for admins' do
       assigned = create(:user)
       issue = create(:issue, title: 'Sortable issue', category: gather_category, assigned: assigned, status: Issue::STATUS_OPEN)
@@ -53,6 +59,15 @@ RSpec.describe 'IssuesController', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include(issue.title)
       end
+    end
+  end
+
+  describe 'GET /issues/new' do
+    it 'renders the form for guests' do
+      get '/issues/new'
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
     end
   end
 
@@ -72,6 +87,27 @@ RSpec.describe 'IssuesController', type: :request do
       login_as(user)
 
       get "/issues/#{issue.id}"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'GET /issues/:id/edit' do
+    it 'allows moderators to edit issues in allowed categories' do
+      issue = create(:issue, category: gather_category)
+      login_as(moderator)
+
+      get "/issues/#{issue.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+    end
+
+    it 'returns 403 for regular users' do
+      issue = create(:issue, category: gather_category)
+      login_as(user)
+
+      get "/issues/#{issue.id}/edit"
 
       expect(response).to have_http_status(:forbidden)
     end

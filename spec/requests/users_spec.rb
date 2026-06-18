@@ -31,6 +31,16 @@ RSpec.describe 'UsersController', type: :request do
       expect(response.body).not_to include('IpMiss')
     end
 
+    it 'falls back to the normal search branch for non-ip admin searches' do
+      searchable = create(:user, username: 'SearchVisible')
+      login_as(admin)
+
+      get '/users', params: { search: searchable.username }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(searchable.username)
+    end
+
     it 'uses the lately filter when requested' do
       recent_user = create(:user, username: 'RecentUser', lastvisit: 1.day.ago)
       stale_user = create(:user, username: 'StaleUser', lastvisit: 6.months.ago)
@@ -92,6 +102,26 @@ RSpec.describe 'UsersController', type: :request do
     end
   end
 
+  describe 'GET /users/:id/edit' do
+    it 'allows users to edit their own profile' do
+      login_as(user)
+
+      get "/users/#{user.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+    end
+
+    it 'returns 403 when another non-admin requests the edit form' do
+      other_user = create(:user)
+      login_as(other_user)
+
+      get "/users/#{user.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe 'GET /users/:id/agenda' do
     it 'allows the user to view their own agenda' do
       login_as(user)
@@ -115,6 +145,12 @@ RSpec.describe 'UsersController', type: :request do
       other_user = create(:user)
       login_as(other_user)
 
+      get "/users/#{user.id}/agenda"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'returns 403 for guests' do
       get "/users/#{user.id}/agenda"
 
       expect(response).to have_http_status(:forbidden)
@@ -222,6 +258,43 @@ RSpec.describe 'UsersController', type: :request do
       expect(session[:user]).to be_nil
       expect(response).to redirect_to('/')
       expect(flash[:error]).to be_present
+    end
+  end
+
+  describe 'POST /users/logout' do
+    it 'clears the current session' do
+      login_as(user)
+
+      post '/users/logout'
+
+      expect(session[:user]).to be_nil
+      expect(response).to redirect_to('/')
+      expect(flash[:notice]).to be_present
+    end
+  end
+
+  describe 'DELETE /users/:id' do
+    it 'allows admins to destroy users' do
+      user
+      login_as(admin)
+
+      expect do
+        delete "/users/#{user.id}"
+      end.to change(User, :count).by(-1)
+
+      expect(response).to redirect_to(users_path)
+    end
+
+    it 'returns 403 for non-admins' do
+      other_user = create(:user)
+      user
+      login_as(other_user)
+
+      expect do
+        delete "/users/#{user.id}"
+      end.not_to change(User, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

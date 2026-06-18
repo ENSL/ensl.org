@@ -261,6 +261,26 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
       expect(response).to render_template(:new)
     end
 
+    it 'returns 403 when a non-participant tries to create a challenge' do
+      contester1
+      contester2
+      login_as(outsider)
+
+      expect do
+        post '/challenges', params: {
+          challenge: {
+            contester1_id: contester1.id,
+            contester2_id: contester2.id,
+            match_time: 2.days.from_now,
+            mandatory: false,
+            details: 'Blocked challenge'
+          }
+        }
+      end.not_to change(Challenge, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it 'accepts a pending challenge and creates a match' do
       challenge = Challenge.create!(
         contester1: contester1,
@@ -402,6 +422,23 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(I18n.t(:challenges_cleared))
       expect(Challenge.exists?(challenge.id)).to be(false)
+    end
+
+    it 'returns 403 when a non-participant tries to destroy a pending challenge' do
+      challenge = Challenge.create!(
+        contester1: contester1,
+        contester2: contester2,
+        user: team1_leader,
+        match_time: 2.days.from_now,
+        mandatory: false,
+        details: 'Pending challenge'
+      )
+      login_as(outsider)
+
+      delete "/challenges/#{challenge.id}"
+
+      expect(response).to have_http_status(:forbidden)
+      expect(Challenge.exists?(challenge.id)).to be(true)
     end
   end
 end

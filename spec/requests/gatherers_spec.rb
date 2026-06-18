@@ -37,10 +37,36 @@ RSpec.describe 'GatherersController', type: :request do
       expect(flash[:error]).to include('Join failed')
     end
 
+    it 'falls back to the service error and redirects to root when no gather is available' do
+      login_as(user)
+      result = instance_double('Gathers::Join::Result', success?: false, gatherer: nil, gather: nil,
+                                                        error: 'Join failed')
+      allow(Gathers::Join).to receive(:call).and_return(result)
+
+      post '/gatherers', params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } }
+
+      expect(response).to redirect_to('/')
+      expect(flash[:error]).to include('Join failed')
+    end
+
     it 'renders a turbo-stream response on success' do
       login_as(user)
       gatherer = create(:gatherer, gather: gather, user: user)
       result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: gather, error: nil)
+      allow(Gathers::Join).to receive(:call).and_return(result)
+
+      post '/gatherers',
+           params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } },
+           headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+    end
+
+    it 'uses the gather from the returned gatherer in turbo-stream responses' do
+      login_as(user)
+      gatherer = create(:gatherer, gather: gather, user: user)
+      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: nil, error: nil)
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -65,6 +91,21 @@ RSpec.describe 'GatherersController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+    end
+
+    it 'finds the current users gatherer from the gather when turbo-stream result has none' do
+      login_as(user)
+      existing_gatherer = create(:gatherer, gather: gather, user: user)
+      result = instance_double('Gathers::Join::Result', success?: false, gatherer: nil, gather: gather,
+                                                        error: 'Join failed')
+      allow(Gathers::Join).to receive(:call).and_return(result)
+
+      post '/gatherers',
+           params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } },
+           headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(existing_gatherer.id.to_s)
     end
   end
 

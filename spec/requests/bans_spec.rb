@@ -35,6 +35,38 @@ RSpec.describe 'BansController', type: :request do
     end
   end
 
+  describe 'GET /bans/:id' do
+    it 'renders the ban details' do
+      ban = create(:ban, creator: moderator, reason: 'Shown ban')
+
+      get "/bans/#{ban.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Shown ban')
+    end
+  end
+
+  describe 'GET /bans/:id/edit' do
+    it 'allows the creator to edit the ban' do
+      ban = create(:ban, creator: moderator)
+      login_as(moderator)
+
+      get "/bans/#{ban.id}/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+    end
+
+    it 'returns 403 for unrelated users' do
+      ban = create(:ban, creator: moderator)
+      login_as(user)
+
+      get "/bans/#{ban.id}/edit"
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe 'POST /bans' do
     let(:target_user) { create(:user) }
 
@@ -72,6 +104,23 @@ RSpec.describe 'BansController', type: :request do
 
       expect(response).to have_http_status(422)
       expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 for users without ban access' do
+      login_as(user)
+
+      expect do
+        post '/bans', params: {
+          ban: {
+            ban_type: Ban::TYPE_SITE,
+            expiry: 2.days.from_now.utc,
+            reason: 'Blocked ban',
+            user_name: target_user.username
+          }
+        }
+      end.not_to change(Ban, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

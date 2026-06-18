@@ -91,6 +91,20 @@ RSpec.describe 'Shoutmsgs', type: :request do
         expect(response.body).to include('target="notification"')
       end
 
+      it 'falls back to the generic invalid message when no validation text is available' do
+        login_as(user)
+        allow_any_instance_of(Shoutmsg).to receive(:save).and_return(false)
+        allow_any_instance_of(Shoutmsg).to receive(:errors).and_return(double(full_messages: []))
+
+        post '/shoutmsgs',
+             params: { shoutmsg: { text: 'hello-main' } },
+             headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('target="notification"')
+        expect(response.body).to include(I18n.t(:invalid_message))
+      end
+
       it 'forbids unauthenticated users from creating shouts' do
         expect do
           post '/shoutmsgs', params: { shoutmsg: { text: 'nope' } }

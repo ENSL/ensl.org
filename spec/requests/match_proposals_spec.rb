@@ -32,6 +32,14 @@ RSpec.describe 'MatchProposalsController', type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it 'returns 200 for a participating team leader' do
+      login_as(team1_leader)
+
+      get "/matches/#{match.id}/proposals"
+
+      expect(response).to have_http_status(:ok)
+    end
   end
 
   describe 'GET /matches/:match_id/proposals/new' do
@@ -52,6 +60,14 @@ RSpec.describe 'MatchProposalsController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 when the user cannot create a proposal' do
+      login_as(outsider)
+
+      get "/matches/#{match.id}/proposals/new"
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -86,6 +102,20 @@ RSpec.describe 'MatchProposalsController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:new)
+    end
+
+    it 'returns 403 when a non-participating user tries to create a proposal' do
+      login_as(outsider)
+
+      expect do
+        post "/matches/#{match.id}/proposals", params: {
+          match_proposal: {
+            proposed_time: 2.days.from_now
+          }
+        }
+      end.not_to change(MatchProposal, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -180,6 +210,55 @@ RSpec.describe 'MatchProposalsController', type: :request do
 
       expect(response).to have_http_status(:accepted)
       expect(response.parsed_body['status']).to eq('Revoked')
+    end
+
+    it 'returns accepted for an admin delaying a confirmed near-future proposal' do
+      admin_with_team = create(:user_with_team, :admin)
+      proposal = create(:match_proposal,
+                        :confirmed,
+                        match: match,
+                        team: team1_leader.team,
+                        proposed_time: 10.minutes.from_now)
+      login_as(admin_with_team)
+
+      expect do
+        patch "/matches/#{match.id}/proposals/#{proposal.id}",
+              params: { match_proposal: { status: MatchProposal::STATUS_DELAYED } },
+              headers: xhr_headers
+      end.to change(Message, :count).by(1)
+
+      expect(response).to have_http_status(:accepted)
+      expect(response.parsed_body['status']).to eq('Delayed')
+      expect(proposal.reload.status).to eq(MatchProposal::STATUS_DELAYED)
+    end
+
+    it 'returns accepted without sending a message when message text is blank' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1_leader.team)
+      login_as(team2_leader)
+      allow_any_instance_of(MatchProposalsController).to receive(:message_text).and_return(false)
+
+      expect do
+        patch "/matches/#{match.id}/proposals/#{proposal.id}",
+              params: { match_proposal: { status: MatchProposal::STATUS_CONFIRMED } },
+              headers: xhr_headers
+      end.not_to change(Message, :count)
+
+      expect(response).to have_http_status(:accepted)
+      expect(response.parsed_body['status']).to eq('Confirmed')
+    end
+
+    it 'returns 500 when the proposal save fails' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1_leader.team)
+      login_as(team2_leader)
+      allow_any_instance_of(MatchProposal).to receive(:save).and_return(false)
+
+      patch "/matches/#{match.id}/proposals/#{proposal.id}",
+            params: { match_proposal: { status: MatchProposal::STATUS_CONFIRMED } },
+            headers: xhr_headers
+
+      expect(response).to have_http_status(:internal_server_error)
+      expect(response.parsed_body.dig('error', 'code')).to eq(500)
+      expect(proposal.reload.status).to eq(MatchProposal::STATUS_PENDING)
     end
   end
 end

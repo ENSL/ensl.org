@@ -29,6 +29,30 @@ RSpec.describe 'CategoriesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(article.title)
     end
+
+    it 'marks article categories as read for logged in users' do
+      category = create(:category, domain: Category::DOMAIN_ARTICLES)
+      article = create(:article,
+                       user: create(:user, :admin),
+                       category: category,
+                       title: 'Read-tracked article',
+                       status: Article::STATUS_PUBLISHED)
+      login_as(user)
+      expect_any_instance_of(Category).to receive(:mark_as_read!).with(for: user)
+
+      get "/categories/#{category.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(article.title)
+    end
+
+    it 'returns no content for non-article categories', :expect_log_error do
+      category = create(:category, domain: Category::DOMAIN_FORUMS)
+
+      get "/categories/#{category.id}"
+
+      expect(response).to have_http_status(:not_acceptable)
+    end
   end
 
   describe 'GET /categories/new' do
