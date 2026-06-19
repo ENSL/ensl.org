@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class WeeksController < ApplicationController
-  before_action :get_week, except: %i[new create]
+  before_action :load_week, except: %i[new create]
 
   def new
     @week = Week.new
@@ -48,7 +48,7 @@ class WeeksController < ApplicationController
 
   private
 
-  def get_week
+  def load_week
     @week = Week.find(params[:id])
   end
 end

@@ -81,8 +81,8 @@ class DirectoryReconciliationService
       lock_file.flock(File::LOCK_UN)
       lock_file.close
     end
-  rescue Errno::EACCES, Errno::ENOENT, Errno::ENOTDIR, IOError, SystemCallError => e
-    @logger.error("Failed to acquire reconciliation lock: #{e.message}")
+  rescue Errno::EACCES, Errno::ENOENT, Errno::ENOTDIR, IOError, SystemCallError
+    @logger.error("Failed to acquire reconciliation lock: #{$!.message}")
   end
 
   def reconcile_recursively

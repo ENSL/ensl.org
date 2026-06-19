@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BansController < ApplicationController
-  before_action :get_ban, only: %i[show edit update destroy]
+  before_action :load_ban, only: %i[show edit update destroy]
 
   def index
     @bans = Ban.ordered
@@ -52,7 +52,7 @@ class BansController < ApplicationController
 
   private
 
-  def get_ban
+  def load_ban
     @ban = Ban.find(params[:id])
   end
 end

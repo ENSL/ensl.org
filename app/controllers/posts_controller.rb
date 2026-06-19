@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PostsController < ApplicationController
-  before_action :get_post, except: %i[new create]
+  before_action :load_post, except: %i[new create]
   respond_to :html, :js
   layout 'forums'
 
@@ -79,7 +79,7 @@ class PostsController < ApplicationController
 
   private
 
-  def get_post
+  def load_post
     @post = Post.find(params[:id])
   end
 end

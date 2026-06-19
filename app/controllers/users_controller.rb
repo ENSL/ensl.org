@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
-  before_action :get_user, only: %i[show history popup agenda edit update destroy]
+  before_action :load_user, only: %i[show history popup agenda edit update destroy]
   respond_to :html, :js
 
   # OmniAuth callback is a cross-origin GET from the provider; skip CSRF checks here.
@@ -199,7 +199,7 @@ class UsersController < ApplicationController
     head :not_acceptable
   end
 
-  def get_user
+  def load_user
     @user = User.find(params[:id])
   end
 

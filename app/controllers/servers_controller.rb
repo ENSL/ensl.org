@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ServersController < ApplicationController
-  before_action :get_server, except: %i[index refresh new create]
+  before_action :load_server, except: %i[index refresh new create]
 
   def index
     @servers = Server.hlds.active.ordered.includes(:user, :versions).all
@@ -55,7 +55,7 @@ class ServersController < ApplicationController
 
   private
 
-  def get_server
+  def load_server
     @server = Server.find params[:id]
     return if @server.active? || @server.can_update?(cuser)
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MoviesController < ApplicationController
-  before_action :get_movie, except: %i[index new create admin]
+  before_action :load_movie, except: %i[index new create admin]
   respond_to :html, :turbo_stream
 
   def index
@@ -16,7 +16,7 @@ class MoviesController < ApplicationController
 
   def show
     @movie.mark_as_read! for: cuser if cuser
-    @movie.record_view_count(request.remote_ip, cuser.nil?)
+    @movie.record_view_count(request.remote_ip, logged_in: cuser.nil?)
     return unless @movie.file&.related
 
     redirect_to data_file_path(@movie.file.related)
@@ -150,7 +150,7 @@ class MoviesController < ApplicationController
 
   private
 
-  def get_movie
+  def load_movie
     @movie = Movie.find(params[:id])
   end
 end

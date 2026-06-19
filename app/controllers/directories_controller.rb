@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DirectoriesController < ApplicationController
-  before_action :get_directory, except: %i[new create]
+  before_action :load_directory, except: %i[new create]
   respond_to :html, :turbo_stream
 
   def show
@@ -68,7 +68,7 @@ class DirectoriesController < ApplicationController
 
   private
 
-  def get_directory
+  def load_directory
     @directory = Directory.find params[:id]
   end
 end

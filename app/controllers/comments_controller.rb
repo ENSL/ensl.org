@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CommentsController < ApplicationController
-  before_action :get_comment, only: %i[raw quote edit update destroy]
+  before_action :load_comment, only: %i[raw quote edit update destroy]
   respond_to :html, :js
 
   def index
@@ -60,7 +60,7 @@ class CommentsController < ApplicationController
 
   private
 
-  def get_comment
+  def load_comment
     @comment = Comment.find params[:id]
   end
 end

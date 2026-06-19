@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ContestersController < ApplicationController
-  before_action :get_contester, only: %i[show edit update recover destroy recalc]
+  before_action :load_contester, only: %i[show edit update recover destroy recalc]
 
   def show
     @matches = Match.future.unfinished.ordered.of_contester @contester
@@ -78,7 +78,7 @@ class ContestersController < ApplicationController
 
   private
 
-  def get_contester
+  def load_contester
     @contester = Contester.find params[:id]
   end
 end

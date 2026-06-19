@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  before_action :get_article, only: %i[show edit update cleanup destroy]
+  before_action :load_article, only: %i[show edit update cleanup destroy]
 
   def index
     @categories = Category.ordered.nospecial.domain Category::DOMAIN_ARTICLES
@@ -27,7 +27,7 @@ class ArticlesController < ApplicationController
     raise AccessError unless @article.can_show? cuser
 
     @article.mark_as_read! for: cuser if cuser
-    @article.record_view_count(request.remote_ip, cuser.nil?)
+    @article.record_view_count(request.remote_ip, logged_in: cuser.nil?)
   end
 
   def new
@@ -85,7 +85,7 @@ class ArticlesController < ApplicationController
 
   private
 
-  def get_article
+  def load_article
     @article = Article.find params[:id]
   end
 end

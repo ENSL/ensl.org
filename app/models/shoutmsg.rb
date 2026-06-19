@@ -91,4 +91,6 @@ class Shoutmsg < ActiveRecord::Base
   def self.params(params, _cuser)
     params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
   end
+
+  private_class_method :flood?, :params
 end

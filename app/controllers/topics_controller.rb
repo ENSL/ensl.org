@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TopicsController < ApplicationController
-  before_action :get_topic, only: %i[show edit update destroy]
+  before_action :load_topic, only: %i[show edit update destroy]
   layout 'forums'
 
   def index
@@ -15,7 +15,7 @@ class TopicsController < ApplicationController
                                          per_page: Topic::POSTS_PAGE)
 
     return_here
-    @topic.record_view_count(request.remote_ip, cuser.present?)
+    @topic.record_view_count(request.remote_ip, logged_in: cuser.present?)
     @topic.mark_as_read! for: cuser if cuser
     @topic.forum.mark_as_read! for: cuser if cuser
     @newpost = Post.new
@@ -67,7 +67,7 @@ class TopicsController < ApplicationController
 
   private
 
-  def get_topic
+  def load_topic
     @topic = Topic.find(params[:id])
   end
 end

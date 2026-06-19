@@ -138,7 +138,7 @@ class Team < ActiveRecord::Base
     update_attribute :active, true
   end
 
-  def is_leader?(user)
+  def leader?(user)
     teamers.leaders.exists?(user_id: user.id)
   end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MatchesController < ApplicationController
-  before_action :get_match, except: %i[index new create admin]
+  before_action :load_match, except: %i[index new create admin]
 
   def index
     @matches = Match.active
@@ -113,7 +113,7 @@ class MatchesController < ApplicationController
 
   private
 
-  def get_match
+  def load_match
     @match = Match.find params[:id]
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MapsController < ApplicationController
-  before_action :get_map, only: %i[show edit update destroy]
+  before_action :load_map, only: %i[show edit update destroy]
 
   def index
     @maps = Map.basic
@@ -50,7 +50,7 @@ class MapsController < ApplicationController
 
   private
 
-  def get_map
+  def load_map
     @map = Map.find params[:id]
   end
 end

@@ -10,9 +10,9 @@ class Notifications < ActionMailer::Base
          subject: 'ENSL account password'
   end
 
-  def pm(user, pm)
+  def pm(user, private_message)
     @user = user
-    @pm = pm
+    @pm = private_message
     mail to: user.email,
          subject: 'New ENSL private message'
   end

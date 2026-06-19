@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PollsController < ApplicationController
-  before_action :get_poll, except: %i[index new create]
+  before_action :load_poll, except: %i[index new create]
 
   def index
     @polls = Poll.all
@@ -56,7 +56,7 @@ class PollsController < ApplicationController
 
   private
 
-  def get_poll
+  def load_poll
     @poll = Poll.find params[:id]
   end
 end

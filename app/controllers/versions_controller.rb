@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class VersionsController < ApplicationController
-  before_action :get_article
+  before_action :load_article
   before_action :ensure_versions_available
 
   def index
@@ -30,7 +30,7 @@ class VersionsController < ApplicationController
 
   private
 
-  def get_article
+  def load_article
     @article = Article.find(params[:article_id])
   end
 

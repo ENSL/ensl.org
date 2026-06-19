@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GathersController < ApplicationController
-  before_action :get_gather, except: %i[latest index create version]
+  before_action :load_gather, except: %i[latest index create version]
 
   respond_to :html, :js
 
@@ -92,7 +92,7 @@ class GathersController < ApplicationController
 
   private
 
-  def get_gather
+  def load_gather
     # No pessimistic lock here — lock(true) serialised every concurrent page-load
     # across all 12 browser sessions. refresh() acquires with_lock internally
     # only when it actually needs to write, so the outer lock is redundant.

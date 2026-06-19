@@ -122,7 +122,7 @@ class Server < ActiveRecord::Base
     self.category_id = (domain == DOMAIN_NS2 ? 45 : 44)
   end
 
-  def is_free(time)
+  def free?(time)
     challenges.around(time).pending.count.zero? and matches.around(time).count.zero?
   end
 

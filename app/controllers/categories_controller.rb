@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CategoriesController < ApplicationController
-  before_action :get_category, except: %i[index new create]
+  before_action :load_category, except: %i[index new create]
 
   def show
     return unless [Category::DOMAIN_ARTICLES, Category::DOMAIN_NEWS].include? @category.domain
@@ -72,7 +72,7 @@ class CategoriesController < ApplicationController
 
   private
 
-  def get_category
+  def load_category
     @category = Category.find params[:id]
   end
 end

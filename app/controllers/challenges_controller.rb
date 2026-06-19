@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ChallengesController < ApplicationController
-  before_action :get_challenge, only: %i[show edit update destroy]
+  before_action :load_challenge, only: %i[show edit update destroy]
 
   def index
     @challenges = Challenge.all
@@ -72,7 +72,7 @@ class ChallengesController < ApplicationController
 
   private
 
-  def get_challenge
+  def load_challenge
     @challenge = Challenge.find params[:id]
   end
 end

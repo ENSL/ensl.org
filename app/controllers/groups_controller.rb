@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GroupsController < ApplicationController
-  before_action :get_group, except: %i[index new create]
+  before_action :load_group, except: %i[index new create]
 
   def index
     @groups = Group.all
@@ -59,7 +59,7 @@ class GroupsController < ApplicationController
     @new_grouper = Grouper.new(group: @group)
   end
 
-  def get_group
+  def load_group
     @group = Group.find params[:id]
   end
 end

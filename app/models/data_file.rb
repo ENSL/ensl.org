@@ -462,7 +462,7 @@ class DataFile < ActiveRecord::Base
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_MUTE)
 
-    cuser.admin? || article&.can_create?(cuser) || (directory_id == Directory::MOVIES && cuser.has_access?(Group::MOVIES))
+    cuser.admin? || article&.can_create?(cuser) || (directory_id == Directory::MOVIES && cuser.access?(Group::MOVIES))
   end
 
   def can_update?(cuser)

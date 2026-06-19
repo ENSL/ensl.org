@@ -4,6 +4,7 @@ module Api
   module V1
     class UsersCollection < Collection
       def initialize(relation = User.all)
+        super()
         @relation = relation
       end
 

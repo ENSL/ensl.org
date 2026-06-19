@@ -252,8 +252,6 @@ class Gather < ActiveRecord::Base
           elsif (turn == 1) && (gatherers.team(1).count == 6) && (gatherers.team(2).count == 5)
             gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
             update!(turn: 2)
-          elsif (gatherers.team(1).count == 6) && (gatherers.team(2).count == 6)
-            update!(status: STATE_FINISHED)
           end
         end
       end

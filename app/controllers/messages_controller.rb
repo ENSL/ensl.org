@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MessagesController < ApplicationController
-  before_action :get_message, only: %i[show edit update destroy]
+  before_action :load_message, only: %i[show edit update destroy]
 
   def index
     raise AccessError unless cuser
@@ -46,7 +46,7 @@ class MessagesController < ApplicationController
 
   private
 
-  def get_message
+  def load_message
     @message = Message.find(params[:id])
   end
 end

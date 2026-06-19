@@ -174,7 +174,7 @@ class Match < ActiveRecord::Base
     matchers.where(merc: true, contester_id: contester.id)
   end
 
-  def get_hltv
+  def ensure_hltv
     self.hltv = hltv || Server.hltvs.active.unreserved_hltv_around(match_time).first
   end
 
@@ -225,7 +225,7 @@ class Match < ActiveRecord::Base
   end
 
   def set_hltv
-    get_hltv if match_time && match_time > Time.now.utc
+    ensure_hltv if match_time && match_time > Time.now.utc
   end
 
   def send_notifications
@@ -381,10 +381,10 @@ class Match < ActiveRecord::Base
   def hltv_record(addr, pwd)
     if (match_time - MATCH_LENGTH * 10) > Time.now.utc ||
        (match_time + MATCH_LENGTH * 10) < Time.now.utc
-      raise Error, I18n.t(:hltv_request_20)
+      raise Error, I18n.t('hltv_request_20')
     end
     raise Error, I18n.t(:hltv_already) + hltv.addr if hltv&.recording
-    raise Error, I18n.t(:hltv_notavailable) unless get_hltv
+    raise Error, I18n.t(:hltv_notavailable) unless ensure_hltv
 
     save!
     hltv.reservation = addr

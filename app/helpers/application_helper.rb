@@ -189,14 +189,14 @@ module ApplicationHelper
     link_to title, { sort: column, direction: direction }, { class: css_class }
   end
 
-  def link_to_remove_fields(name, f)
-    f.hidden_field(:_destroy) + link_to(name, '#', onclick: 'remove_fields(this); return false;')
+  def link_to_remove_fields(name, form_builder)
+    form_builder.hidden_field(:_destroy) + link_to(name, '#', onclick: 'remove_fields(this); return false;')
   end
 
   # FIXME: this won't work.
-  def link_to_add_fields(name, f, association)
-    new_object = f.object.class.reflect_on_association(association).klass.new
-    fields = f.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
+  def link_to_add_fields(name, form_builder, association)
+    new_object = form_builder.object.class.reflect_on_association(association).klass.new
+    fields = form_builder.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
       render(association.to_s.singularize, f: builder)
     end
     link_to(name, '#', onclick: "add_fields(this, '#{association}', '#{escape_javascript(fields)}'); return false;")

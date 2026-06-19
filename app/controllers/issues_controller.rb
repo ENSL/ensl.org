@@ -2,7 +2,7 @@
 
 class IssuesController < ApplicationController
   before_action :require_index_access!, only: :index
-  before_action :get_issue, only: %i[show edit update destroy]
+  before_action :load_issue, only: %i[show edit update destroy]
 
   def index
     allowed = Issue.allowed_categories cuser
@@ -76,7 +76,7 @@ class IssuesController < ApplicationController
     raise AccessError unless cuser&.admin? || cuser&.moderator?
   end
 
-  def get_issue
+  def load_issue
     @issue = Issue.find params[:id]
   end
 

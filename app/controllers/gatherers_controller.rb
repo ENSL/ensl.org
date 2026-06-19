@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GatherersController < ApplicationController
-  before_action :get_gatherer, except: [:create]
+  before_action :load_gatherer, except: [:create]
 
   def create
     result = Gathers::Join.call(actor: cuser, params: Gatherer.params(params, cuser))
@@ -82,7 +82,7 @@ class GatherersController < ApplicationController
 
   private
 
-  def get_gatherer
+  def load_gatherer
     @gatherer = Gatherer.find params[:id]
   end
 end

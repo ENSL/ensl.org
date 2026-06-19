@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BracketsController < ApplicationController
-  before_action :get_bracket, only: %i[show edit update destroy]
+  before_action :load_bracket, only: %i[show edit update destroy]
 
   def show
     render layout: 'full'
@@ -53,7 +53,7 @@ class BracketsController < ApplicationController
 
   private
 
-  def get_bracket
+  def load_bracket
     @bracket = Bracket.find(params[:id])
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MatchProposalsController < ApplicationController
-  before_action :get_match
+  before_action :load_match
 
   def index
     raise AccessError unless cuser&.admin? || @match.user_in_match?(cuser)
@@ -88,7 +88,7 @@ class MatchProposalsController < ApplicationController
 
   private
 
-  def get_match
+  def load_match
     @match = Match.find params[:match_id]
   end
 

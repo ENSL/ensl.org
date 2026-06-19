@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ContestsController < ApplicationController
-  before_action :get_contest, only: %i[show edit update destroy del_map scores recalc confirmed_matches]
+  before_action :load_contest, only: %i[show edit update destroy del_map scores recalc confirmed_matches]
 
   def index
     # @contests = Contest.all
@@ -130,7 +130,7 @@ class ContestsController < ApplicationController
 
   private
 
-  def get_contest
+  def load_contest
     @contest = Contest.find params[:id]
   end
 

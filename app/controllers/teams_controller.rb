@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TeamsController < ApplicationController
-  before_action :get_team, only: %i[show edit update destroy recover]
+  before_action :load_team, only: %i[show edit update destroy recover]
 
   def index
     @teams = Team.search(params[:search]).paginate(per_page: 80, page: params[:page]).ordered
@@ -84,7 +84,7 @@ class TeamsController < ApplicationController
 
   private
 
-  def get_team
+  def load_team
     @team = Team.find params[:id]
   end
 end

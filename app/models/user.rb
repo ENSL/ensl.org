@@ -129,7 +129,7 @@ class User < ActiveRecord::Base
       .having('num > 15')
       .order('num DESC')
   }
-  scope :posts_stats, lambda { |_ |
+  scope :posts_stats, lambda { |_ignored|
     select('users.id, username, COUNT(posts.id) as num')
       .joins('LEFT JOIN posts ON posts.user_id = users.id')
       .group('users.id')
@@ -326,32 +326,32 @@ class User < ActiveRecord::Base
   end
 
   def admin?
-    has_group_cached(Group::ADMINS)
+    group_cached?(Group::ADMINS)
   end
 
   def ref?
-    has_group_cached(Group::REFEREES)
+    group_cached?(Group::REFEREES)
   end
 
   def staff?
-    has_group_cached(Group::STAFF)
+    group_cached?(Group::STAFF)
   end
 
   def caster?
-    has_group_cached(Group::CASTERS)
+    group_cached?(Group::CASTERS)
   end
 
   # might seem redundant but allows for later extensions like forum moderators
   def moderator?
-    has_group_cached(Group::GATHER_MODERATORS)
+    group_cached?(Group::GATHER_MODERATORS)
   end
 
   def gather_moderator?
-    has_group_cached(Group::GATHER_MODERATORS)
+    group_cached?(Group::GATHER_MODERATORS)
   end
 
   def contributor?
-    has_group_cached(Group::CONTRIBUTORS)
+    group_cached?(Group::CONTRIBUTORS)
   end
 
   def allowed_to_ban?
@@ -362,15 +362,15 @@ class User < ActiveRecord::Base
     true
   end
 
-  def has_access?(groups)
-    admin? or has_group_cached(groups)
+  def access?(groups)
+    admin? or group_cached?(groups)
   end
 
   private
 
   # Cache membership checks for the lifetime of this model instance to
   # avoid repeated DB queries when role checks are called frequently from views.
-  def has_group_cached(group_id)
+  def group_cached?(group_id)
     @group_membership_cache ||= {}
     return @group_membership_cache[group_id] unless @group_membership_cache[group_id].nil?
 

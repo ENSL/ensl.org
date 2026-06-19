@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DataFilesController < ApplicationController
-  before_action :get_file, only: %i[show edit update destroy rate]
+  before_action :load_file, only: %i[show edit update destroy rate]
   before_action :prepare_edit_form_data, only: %i[edit update]
   respond_to :html, :turbo_stream
 
@@ -95,7 +95,7 @@ class DataFilesController < ApplicationController
 
   private
 
-  def get_file
+  def load_file
     @file = DataFile.find params[:id]
   end
 

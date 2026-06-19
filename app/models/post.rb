@@ -35,9 +35,9 @@ class Post < ActiveRecord::Base
   belongs_to :user, optional: true
   belongs_to :topic, optional: true
 
-  def number(pages, i)
-    if i != -1
-      pages.per_page * (pages.current_page - 1) + i + 1
+  def number(pages, index)
+    if index != -1
+      pages.per_page * (pages.current_page - 1) + index + 1
     else
       topic.posts.count + 1
     end
