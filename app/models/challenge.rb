@@ -34,7 +34,6 @@
 # A challenge is created by a team leader to challenge another team to a match.
 # It contains the proposed match time, map, server, and response of the challenged team.
 # If accepted, a match is created with the same parameters as the challenge.
-# rubocop:disable Metrics/ClassLength
 class Challenge < ActiveRecord::Base
   include Extra
 
@@ -118,7 +117,6 @@ class Challenge < ActiveRecord::Base
     self.contester1 = user.active_contesters.of_contest(contester2.contest).first
   end
 
-  # rubocop:disable Metrics/AbcSize
   def set_defaults
     self.status = STATUS_PENDING
     # Ensure contest default_time responds to hour/minute; caller tests should set a Time
@@ -129,7 +127,6 @@ class Challenge < ActiveRecord::Base
       minute: contester1.contest.default_time.strftime('%M').to_i
     )
   end
-  # rubocop:enable Metrics/AbcSize
 
   def send_challenge_notification
     contester2.team.teamers.active.leaders.each do |teamer|
@@ -139,7 +136,6 @@ class Challenge < ActiveRecord::Base
 
   private
 
-  # rubocop:disable Metrics/AbcSize
   def validate_teams
     errors.add(:base, I18n.t(:challenges_yourself)) if contester1.team == contester2.team
     errors.add(:base, I18n.t(:challenges_opponent_contest)) if contester1.contest != contester2.contest
@@ -148,9 +144,7 @@ class Challenge < ActiveRecord::Base
 
     errors.add(:base, I18n.t(:challenges_inactive))
   end
-  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Metrics/AbcSize
   def validate_contest
     if contester1.contest.end.past? || (contester1.contest.status == Contest::STATUS_CLOSED)
       errors.add(:base, I18n.t(:contests_closed))
@@ -159,9 +153,7 @@ class Challenge < ActiveRecord::Base
 
     errors.add(:base, I18n.t(:contests_notladder))
   end
-  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
   def validate_mandatory
     return unless mandatory
 
@@ -186,9 +178,7 @@ class Challenge < ActiveRecord::Base
 
     errors.add(:base, I18n.t(:challenges_opponent_defaulttime))
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
 
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def validate_match_time
     if (match_time - margin).past?
       if margin > 86_400
@@ -210,9 +200,7 @@ class Challenge < ActiveRecord::Base
 
     errors.add(:base, I18n.t(:contests_end))
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
-  # rubocop:disable Metrics/AbcSize
   def validate_server
     return unless server # Server is optional, only validate if provided
 
@@ -227,7 +215,6 @@ class Challenge < ActiveRecord::Base
 
     errors.add(:base, I18n.t(:servers_notfree_defaulttime))
   end
-  # rubocop:enable Metrics/AbcSize
 
   def validate_map1
     return unless map1 # Map1 is optional, only validate if provided
@@ -323,4 +310,3 @@ class Challenge < ActiveRecord::Base
     )
   end
 end
-# rubocop:enable Metrics/ClassLength
