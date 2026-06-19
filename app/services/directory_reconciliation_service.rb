@@ -2,6 +2,7 @@
 
 # Service to reconcile directory database records with filesystem state
 # Disk is authoritative - scans actual directories and syncs database records
+require 'English'
 class DirectoryReconciliationService
   PROGRESS_LOG_EVERY = 500
   LOCKFILE_PATH = Rails.root.join('tmp', 'directory_reconciliation.lock')
@@ -82,7 +83,7 @@ class DirectoryReconciliationService
       lock_file.close
     end
   rescue Errno::EACCES, Errno::ENOENT, Errno::ENOTDIR, IOError, SystemCallError
-    @logger.error("Failed to acquire reconciliation lock: #{$!.message}")
+    @logger.error("Failed to acquire reconciliation lock: #{$ERROR_INFO.message}")
   end
 
   def reconcile_recursively
