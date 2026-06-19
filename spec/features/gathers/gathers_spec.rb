@@ -86,6 +86,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     # Let whichever captain has the current turn pick from the lobby.
     remaining_picks = 9
     session_for_user_id = users.each_with_index.to_h { |u, i| [u.id, "user_#{i}"] }
+    captain_sessions = [session_for_user_id[captain1.id], session_for_user_id[captain2.id]].compact
 
     remaining_picks.times do
       picked = false
@@ -98,9 +99,21 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
         session_name = session_for_user_id[current_captain.id]
         current_turn = gather.turn
         lobby_count = gather.gatherers.lobby.count
+        candidate_sessions = ([session_name] + captain_sessions).uniq
 
-        Capybara.using_session(session_name) do
-          if safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
+        candidate_sessions.each do |candidate_session|
+          Capybara.using_session(candidate_session) do
+            nudge_gather_sync
+
+            turn_ready = safe_has_selector?(
+              '#gather-stats',
+              text: /It is your turn, please pick a player from the lobby!/i,
+              wait: 4
+            )
+
+            next unless turn_ready
+            next unless safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
+
             safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
             safe_click { find('input[value="Pick"]').click }
 
@@ -112,6 +125,8 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
               print('.')
             end
           end
+
+          break if picked
         end
 
         sleep(1) unless picked

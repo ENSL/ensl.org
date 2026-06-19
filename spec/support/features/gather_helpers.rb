@@ -104,11 +104,10 @@ module Features
           # Vote links can legitimately disappear once user reached vote limit
           break unless safe_has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 3)
 
-          safe_click do
-            first_choice = find('ul#map-votes a.vote-link', match: :first, wait: 2)
-            choices = all('ul#map-votes a.vote-link')
-            (choices.empty? ? first_choice : choices.sample).click
-          end
+          map_choices = all('ul#map-votes a.vote-link')
+          break if map_choices.empty?
+
+          safe_click { map_choices.sample.click }
           sleep(0.15)
         end
 
@@ -138,11 +137,10 @@ module Features
           break unless voting_time_left?(deadline, minimum_left: 0.3)
           break unless safe_has_selector?('ul#server-votes a', minimum: 1, wait: 3)
 
-          safe_click do
-            first_choice = find('ul#server-votes a', match: :first, wait: 2)
-            choices = all('ul#server-votes a')
-            (choices.empty? ? first_choice : choices.sample).click
-          end
+          server_choices = all('ul#server-votes a')
+          break if server_choices.empty?
+
+          safe_click { server_choices.sample.click }
           sleep(0.15)
         end
 
@@ -177,6 +175,8 @@ module Features
 
     def with_votes_scope(list_id)
       return false unless gather.reload.status == Gather::STATE_VOTING
+
+      nudge_gather_sync
 
       frame_selector = "turbo-frame#gather_#{gather.id}_frame"
 
@@ -239,6 +239,17 @@ module Features
     # Puma server we configure.
     def visit_gather_with_retry(gather_page)
       visit gather_path(gather_page)
+    end
+
+    def nudge_gather_sync
+      # Force the existing gather-sync controller to run an immediate
+      # version check without a full page navigation.
+      execute_script(<<~JS)
+        window.dispatchEvent(new Event('online'));
+        document.dispatchEvent(new Event('visibilitychange'));
+      JS
+    rescue StandardError
+      nil
     end
   end
 end
