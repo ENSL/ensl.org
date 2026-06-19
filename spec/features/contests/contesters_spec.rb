@@ -9,8 +9,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
 
   before do
     sign_in_as(admin)
-    visit edit_contest_path(contest)
-    click_link(href: '#teams', wait: 5)
+    visit edit_contest_path(contest, anchor: 'teams')
     expect(page).to have_css('#teams')
   end
 
@@ -24,7 +23,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     end
 
     expect(page).to have_current_path(/contests/)
-    click_link(href: '#teams', wait: 5)
+    visit edit_contest_path(contest, anchor: 'teams')
     # verify table headers and the added team's row values
     within('#teams table.teams') do
       expect(page).to have_css('thead') if page.has_css?('thead')
@@ -61,7 +60,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     click_button 'Save Contester'
 
     expect(page).to have_current_path(%r{/contests/[0-9]+/edit}) # accept edit path with/without fragment
-    click_link(href: '#teams', wait: 5)
+    visit edit_contest_path(contest, anchor: 'teams')
     expect(page).to have_css('#teams table.teams')
     # verify the contester row shows correct column values
     within('#teams table.teams') do
@@ -80,10 +79,19 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
   end
 
   scenario 'Delete contester from contest teams', :aggregate_failures do
-    contester = create(:contester, contest: contest, team: team)
-    visit edit_contest_path(contest)
-    click_link(href: '#teams', wait: 5)
+    visit edit_contest_path(contest, anchor: 'teams')
     expect(page).to have_css('#teams table.teams')
+
+    within('#teams') do
+      form = find('form')
+      select_el = form.find('select')
+      select_el.find('option', text: team.name).select_option
+      form.find('input[type=submit]').click
+    end
+
+    expect(page).to have_current_path(%r{/contests/[0-9]+/edit(?:#teams)?})
+    expect(page).to have_css('#teams table.teams', text: team.name, wait: 5)
+    contester = contest.reload.contesters.find_by!(team: team)
 
     # Delete from the teams table action link for the created team row
     within('#teams') do
@@ -102,8 +110,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     expect(Contester.active.exists?(contester.id)).to be(false)
 
     # ensure we have a fresh rendering of the contest edit page (avoid stale client DOM)
-    visit edit_contest_path(contest)
-    click_link(href: '#teams', wait: 5)
+    visit edit_contest_path(contest, anchor: 'teams')
     within('#teams table.teams') do
       expect(page).not_to have_text(contester.team.name)
     end

@@ -100,7 +100,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
         lobby_count = gather.gatherers.lobby.count
 
         Capybara.using_session(session_name) do
-          if page.has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
+          if safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
             safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
             safe_click { find('input[value="Pick"]').click }
 

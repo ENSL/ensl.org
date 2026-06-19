@@ -53,6 +53,26 @@ module Features
         retry
       end
     end
+
+    def safe_has_selector?(selector, wait: Capybara.default_max_wait_time, **options)
+      attempts = 0
+      begin
+        page.has_selector?(selector, wait: wait, **options)
+      rescue Capybara::Playwright::Node::NotActionableError, Capybara::Playwright::Node::StaleReferenceError,
+             Playwright::Error
+        attempts += 1
+        return false if attempts > 3
+
+        sleep(0.1)
+        retry
+      rescue Capybara::ElementNotFound
+        attempts += 1
+        return false if attempts > 3
+
+        sleep(0.1)
+        retry
+      end
+    end
   end
 end
 

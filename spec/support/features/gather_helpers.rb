@@ -51,11 +51,11 @@ module Features
         attempted_captain_vote_urls = []
 
         return unless with_votes_scope('gatherers')
-        return unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
+        return unless safe_has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 3)
 
         votes.times do
           break unless voting_time_left?(deadline, minimum_left: 0.3)
-          break unless page.has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 1)
+          break unless safe_has_selector?('table#gatherers a.vote-link', minimum: 1, wait: 3)
 
           available_choices = all('table#gatherers a.vote-link').reject do |choice|
             attempted_captain_vote_urls.include?(choice[:href])
@@ -96,13 +96,13 @@ module Features
         return unless with_votes_scope('map-votes')
 
         # If no vote links are available in this session, skip gracefully
-        return unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 1)
+        return unless safe_has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 3)
 
         votes.times do
           break unless voting_time_left?(deadline, minimum_left: 0.3)
 
           # Vote links can legitimately disappear once user reached vote limit
-          break unless page.has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 1)
+          break unless safe_has_selector?('ul#map-votes a.vote-link', minimum: 1, wait: 3)
 
           safe_click do
             first_choice = find('ul#map-votes a.vote-link', match: :first, wait: 2)
@@ -132,11 +132,11 @@ module Features
         return unless with_votes_scope('server-votes')
 
         # If no vote links are available in this session, skip gracefully
-        return unless page.has_selector?('ul#server-votes a', minimum: 1, wait: 1)
+        return unless safe_has_selector?('ul#server-votes a', minimum: 1, wait: 3)
 
         votes.times do
           break unless voting_time_left?(deadline, minimum_left: 0.3)
-          break unless page.has_selector?('ul#server-votes a', minimum: 1, wait: 1)
+          break unless safe_has_selector?('ul#server-votes a', minimum: 1, wait: 3)
 
           safe_click do
             first_choice = find('ul#server-votes a', match: :first, wait: 2)
@@ -185,12 +185,12 @@ module Features
       # and reload the frame before we check for vote links.
       wait_for_content = 10
 
-      if page.has_selector?(frame_selector, wait: wait_for_content)
+      if safe_has_selector?(frame_selector, wait: wait_for_content)
         within(frame_selector) do
-          return false unless page.has_selector?("ul##{list_id}", wait: wait_for_content)
+          return false unless safe_has_selector?("ul##{list_id}", wait: wait_for_content)
         end
       else
-        return false unless page.has_selector?("ul##{list_id}", wait: wait_for_content)
+        return false unless safe_has_selector?("ul##{list_id}", wait: wait_for_content)
       end
 
       true
