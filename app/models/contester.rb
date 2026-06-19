@@ -81,6 +81,10 @@ class Contester < ActiveRecord::Base
     contest.matches.where('contester1_id = ? OR contester2_id = ?', id, id)
   end
 
+  def get_matches
+    contest_matches
+  end
+
   def stats_from_matches(matches_scope = nil)
     matches = matches_scope || contest_matches.realfinished
     stats = { win: 0, loss: 0, draw: 0 }
@@ -146,7 +150,7 @@ class Contester < ActiveRecord::Base
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_LEAGUE)
     return true if cuser.admin?
-    return true if team.leader?(cuser) && Verification.contain(params, %i[team_id contest_id])
+    return true if team.is_leader?(cuser) && Verification.contain(params, %i[team_id contest_id])
 
     false
   end
@@ -156,7 +160,7 @@ class Contester < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    !!(cuser && (team.leader?(cuser) || cuser.admin?))
+    !!(cuser && (team.is_leader?(cuser) || cuser.admin?))
   end
 
   def self.params(params, _cuser)

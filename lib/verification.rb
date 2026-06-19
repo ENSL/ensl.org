@@ -7,7 +7,7 @@ module Verification
     chars = %w[A B C D E F]
     nums = []
     last_pos = md5[31].to_i
-    result = ''
+    result = +''
 
     (0..9).each do |i|
       pos = md5[i].to_i
@@ -49,7 +49,7 @@ module Verification
 
   def self.random_string(len)
     chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
-    str = ''
+    str = +''
     1.upto(len) do
       str << chars[rand(chars.size - 1)]
     end

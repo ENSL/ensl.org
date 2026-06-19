@@ -47,7 +47,7 @@ describe Topic do
       top_200 = post_max_ids.sort_by { |_topic_id, max_id| -max_id }.first(200)
 
       expected_ids = []
-      top_200.each_key do |topic_id|
+      top_200.each do |topic_id, _max_id|
         topic = Topic.find_by(id: topic_id)
         next unless topic
         next if Forumer.exists?(forum_id: topic.forum_id)

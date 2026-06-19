@@ -2,7 +2,7 @@
 
 module ApplicationHelper
   def full_title(page_title)
-    base_title = 'NSL'
+    base_title = +'NSL'
     base_title << " #{Rails.env.upcase}" unless Rails.env.production?
 
     if page_title.empty?
@@ -51,7 +51,7 @@ module ApplicationHelper
   end
 
   def directory_links(directory)
-    output = ''
+    output = +''
     Directory.directory_traverse(directory).reverse_each do |dir|
       output << "#{namelink(dir)}\n"
       output << " &raquo; \n" unless dir == directory
@@ -98,8 +98,8 @@ module ApplicationHelper
 
     out = list.map do |element|
       name = key = element
-      item = ''
-      result = ''
+      item = +''
+      result = +''
 
       if element.instance_of?(Array)
         name = element[0]

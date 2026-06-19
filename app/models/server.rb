@@ -126,6 +126,10 @@ class Server < ActiveRecord::Base
     challenges.around(time).pending.count.zero? and matches.around(time).count.zero?
   end
 
+  def is_free(time)
+    free?(time)
+  end
+
   def can_create?(cuser)
     cuser
   end

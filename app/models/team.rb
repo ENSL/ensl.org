@@ -142,6 +142,8 @@ class Team < ActiveRecord::Base
     teamers.leaders.exists?(user_id: user.id)
   end
 
+  alias is_leader? leader?
+
   def can_create?(cuser)
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
   end

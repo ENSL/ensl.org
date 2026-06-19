@@ -221,9 +221,9 @@ class Challenge < ActiveRecord::Base
       return
     end
 
-    errors.add(:base, I18n.t(:servers_notfree_specifictime)) unless server.free?(match_time)
+    errors.add(:base, I18n.t(:servers_notfree_specifictime)) unless server.is_free(match_time)
 
-    return if server.free?(default_time)
+    return if server.is_free(default_time)
 
     errors.add(:base, I18n.t(:servers_notfree_defaulttime))
   end

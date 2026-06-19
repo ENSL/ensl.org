@@ -154,7 +154,8 @@ class Article < ActiveRecord::Base
     view_counts.length
   end
 
-  def record_view_count(ip_address, logged_in: false)
+  def record_view_count(ip_address, logged_in = false, **options)
+    logged_in = options[:logged_in] if options.key?(:logged_in)
     view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
     self
   end

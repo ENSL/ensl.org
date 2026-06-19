@@ -142,7 +142,8 @@ class Movie < ActiveRecord::Base
     view_counts.count
   end
 
-  def record_view_count(ip_address, logged_in: false)
+  def record_view_count(ip_address, logged_in = false, **options)
+    logged_in = options[:logged_in] if options.key?(:logged_in)
     view_counts.find_or_create_by(ip_address: ip_address) do |vc|
       vc.logged_in = logged_in
     end
