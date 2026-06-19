@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 ENV['RAILS_ENV'] ||= 'test'
 
 require 'dotenv'
-Dotenv.load('.env.' + ENV['RAILS_ENV'] + '.local', '.env.local', '.env.' + ENV['RAILS_ENV'], '.env')
+Dotenv.load(".env.#{ENV['RAILS_ENV']}.local", '.env.local', ".env.#{ENV['RAILS_ENV']}", '.env')
 
 require File.expand_path('support/simplecov', __dir__)
 require File.expand_path('../config/environment', __dir__)

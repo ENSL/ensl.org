@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MatchProposalsController < ApplicationController
   before_action :get_match
 

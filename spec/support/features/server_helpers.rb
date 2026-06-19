@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module ServerHelpers
     def test_server_creation_and_editing

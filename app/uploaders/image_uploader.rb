@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::RMagick
 

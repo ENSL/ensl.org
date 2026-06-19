@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Controllers
   module SessionHelpers
     def login_admin

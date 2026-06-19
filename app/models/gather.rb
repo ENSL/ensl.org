@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: gathers
@@ -33,7 +35,7 @@ class Gather < ActiveRecord::Base
   STATE_FINISHED = 2
   NOTIFY = 6
   FULL = 12
-  SERVERS = [3, 5, 23, 21, 22]
+  SERVERS = [3, 5, 23, 21, 22].freeze
   VOTING_TIMEOUT_SECONDS = 60
   PICK_STRATEGY_DEFAULT = '1-2-2-2-2-1'
   PICK_STRATEGIES = [
@@ -151,7 +153,7 @@ class Gather < ActiveRecord::Base
 
   def check_status
     changed = respond_to?(:will_save_change_to_status?) ? will_save_change_to_status? : status_changed?
-    return unless changed and status == STATE_PICKING and !captain1
+    return unless changed && (status == STATE_PICKING) && !captain1
 
     category&.with_lock do
       Gather.create!(category: category) unless Gather.where(category_id: category_id).where('id > ?', id).exists?
@@ -162,10 +164,10 @@ class Gather < ActiveRecord::Base
     if gather_maps.count > 1
       self.map1 = gather_maps.ordered[0]
       self.map2 = gather_maps.ordered[1]
-    elsif gather_maps.count > 0
+    elsif gather_maps.count.positive?
       self.map1 = gather_maps.ordered[0]
     end
-    return unless gather_servers.count > 0
+    return unless gather_servers.count.positive?
 
     self.server = gather_servers.ordered[0].server
   end
@@ -204,9 +206,10 @@ class Gather < ActiveRecord::Base
   end
 
   def refresh(_cuser)
-    if status == STATE_RUNNING
+    case status
+    when STATE_RUNNING
       # DISABLED: gatherers.idle.destroy_all
-    elsif status == STATE_VOTING
+    when STATE_VOTING
       # Check if voting timeout has passed based on when voting actually started
       # Use with_lock to prevent concurrent transitions from causing optimistic locking conflicts
       if voting_start_time && Time.current > voting_start_time + voting_timeout.seconds
@@ -217,7 +220,7 @@ class Gather < ActiveRecord::Base
           end
         end
       end
-    elsif status == STATE_PICKING
+    when STATE_PICKING
       # Read counts outside the lock first. The version endpoint is polled by
       # every browser session concurrently; unconditionally taking with_lock
       # serialised all 12 callers even when nothing needed to change. Only
@@ -236,20 +239,20 @@ class Gather < ActiveRecord::Base
       if needs_check
         with_lock do
           # Re-read inside the lock (with_lock reloads the record)
-          if gatherers.team(1).count == 6 and gatherers.team(2).count == 6
+          if (gatherers.team(1).count == 6) && (gatherers.team(2).count == 6)
             update!(status: STATE_FINISHED)
-          elsif turn == 1 and gatherers.team(1).count == 2 and gatherers.team(2).count == 1
+          elsif (turn == 1) && (gatherers.team(1).count == 2) && (gatherers.team(2).count == 1)
             update!(turn: 2)
-          elsif turn == 2 and gatherers.team(2).count == 3 and gatherers.team(1).count == 2
+          elsif (turn == 2) && (gatherers.team(2).count == 3) && (gatherers.team(1).count == 2)
             update!(turn: 1)
-          elsif turn == 1 and gatherers.team(1).count == 4 and gatherers.team(2).count == 3
+          elsif (turn == 1) && (gatherers.team(1).count == 4) && (gatherers.team(2).count == 3)
             update!(turn: 2)
-          elsif turn == 2 and gatherers.team(2).count == 5 and gatherers.team(1).count == 4
+          elsif (turn == 2) && (gatherers.team(2).count == 5) && (gatherers.team(1).count == 4)
             update!(turn: 1)
-          elsif turn == 1 and gatherers.team(1).count == 6 and gatherers.team(2).count == 5
+          elsif (turn == 1) && (gatherers.team(1).count == 6) && (gatherers.team(2).count == 5)
             gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
             update!(turn: 2)
-          elsif gatherers.team(1).count == 6 and gatherers.team(2).count == 6
+          elsif (gatherers.team(1).count == 6) && (gatherers.team(2).count == 6)
             update!(status: STATE_FINISHED)
           end
         end
@@ -258,7 +261,7 @@ class Gather < ActiveRecord::Base
   end
 
   def can_create?(cuser)
-    true if cuser.admin? or cuser.gather_moderator?
+    true if cuser.admin? || cuser.gather_moderator?
   end
 
   def voting_timeout
@@ -276,7 +279,7 @@ class Gather < ActiveRecord::Base
 
   def voting_time_remaining
     return 0 unless status == STATE_VOTING
-    return 0 unless start_time = voting_start_time
+    return 0 unless (start_time = voting_start_time)
 
     elapsed = Time.current - start_time
     remaining = voting_timeout - elapsed.to_i
@@ -284,11 +287,11 @@ class Gather < ActiveRecord::Base
   end
 
   def can_update?(cuser)
-    true if cuser.admin? or cuser.gather_moderator?
+    true if cuser.admin? || cuser.gather_moderator?
   end
 
   def self.last(name = 'NS2')
-    return unless game = find_game(name)
+    return unless (game = find_game(name))
 
     game.gathers.ordered.first
   end

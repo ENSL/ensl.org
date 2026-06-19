@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module GatherHelpers
     # Sign in a user in a separate Capybara session.
@@ -218,12 +220,9 @@ module Features
           # 'Leave Gather' only appears after a successful join AND the frame is
           # replaced — reliable proof the INSERT is committed and DOM is updated.
           page.has_button?('Leave Gather', wait: Capybara.default_max_wait_time)
-          gather_page.reload
-          expect(gather_page.gatherers.of_user(user).count).to eq(1)
-        else
-          gather_page.reload
-          expect(gather_page.gatherers.of_user(user).count).to eq(1)
         end
+        gather_page.reload
+        expect(gather_page.gatherers.of_user(user).count).to eq(1)
       end
     end
 

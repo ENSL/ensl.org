@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AvatarUploader < ImageUploader
   # Create different versions of your uploaded files:
   process resize_to_limit: [120, 120]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Notifications < ActionMailer::Base
   default from: 'staff@ensl.org'
 
@@ -47,13 +49,13 @@ class Notifications < ActionMailer::Base
     @user = user
     @news = news
     mail to: user.email,
-         subject: 'News on ENSL: ' + news.title
+         subject: "News on ENSL: #{news.title}"
   end
 
   def article(user, article)
     @user = user
     @article = article
     mail to: user.email,
-         subject: 'News on ENSL: ' + article.title
+         subject: "News on ENSL: #{article.title}"
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: gatherers
@@ -132,19 +134,19 @@ class Gatherer < ActiveRecord::Base
     end
 
     Profile.where(notify_gather: 1).includes(:user).each do |p|
-      Notifications.gather p.user, gather if p.user && p.user.profile && p.user.profile.notify_pms
+      Notifications.gather p.user, gather if p.user&.profile&.notify_pms
     end
   end
 
   def change_turn
-    return unless (respond_to?(:saved_change_to_team?) ? saved_change_to_team? : team_changed?) and !team.nil?
+    return unless (respond_to?(:saved_change_to_team?) ? saved_change_to_team? : team_changed?) && !team.nil?
 
     # Perform all related state updates under a DB lock to avoid races
     gather.with_lock do
       new_turn = (team == 1 ? 2 : 1)
-      if team == 2 and [2, 4].include?(gather.gatherers.team(2).count.to_i)
+      if (team == 2) && [2, 4].include?(gather.gatherers.team(2).count.to_i)
         new_turn = 2
-      elsif team == 1 and [3, 5].include?(gather.gatherers.team(1).count.to_i)
+      elsif (team == 1) && [3, 5].include?(gather.gatherers.team(1).count.to_i)
         new_turn = 1
       end
       gather.update!(turn: new_turn)
@@ -154,7 +156,7 @@ class Gatherer < ActiveRecord::Base
         g.update!(team: (team == 1 ? 2 : 1))
       end
 
-      gather.update!(status: Gather::STATE_FINISHED) if gather.gatherers.lobby.count == 0
+      gather.update!(status: Gather::STATE_FINISHED) if gather.gatherers.lobby.count.zero?
     end
   end
 
@@ -209,18 +211,18 @@ class Gatherer < ActiveRecord::Base
     return false unless cuser
 
     if params.keys.include? 'username'
-      return true if cuser.admin? or cuser.gather_moderator?
+      return true if cuser.admin? || cuser.gather_moderator?
 
       return false
 
     end
     return false unless team.nil? \
-      and ((gather.captain1&.user == cuser and gather.turn == 1) or (gather.captain2&.user == cuser and gather.turn == 2))
-    return false if gather.turn == 1 and gather.gatherers.team(1).count == 2 and gather.gatherers.team(2).count < 3
-    return false if gather.turn == 2 and gather.gatherers.team(1).count < 4 and gather.gatherers.team(2).count == 3
-    return false if gather.turn == 1 and gather.gatherers.team(1).count == 4 and gather.gatherers.team(2).count < 5
-    return false if gather.turn == 2 and gather.gatherers.team(1).count < 6 and gather.gatherers.team(2).count == 5
-    return false if gather.turn == 1 and gather.gatherers.team(1).count == 6
+      && (((gather.captain1&.user == cuser) && (gather.turn == 1)) || ((gather.captain2&.user == cuser) && (gather.turn == 2)))
+    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 2) && (gather.gatherers.team(2).count < 3)
+    return false if (gather.turn == 2) && (gather.gatherers.team(1).count < 4) && (gather.gatherers.team(2).count == 3)
+    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 4) && (gather.gatherers.team(2).count < 5)
+    return false if (gather.turn == 2) && (gather.gatherers.team(1).count < 6) && (gather.gatherers.team(2).count == 5)
+    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 6)
 
     true
   end

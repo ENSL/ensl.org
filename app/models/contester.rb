@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: contesters
@@ -144,7 +146,7 @@ class Contester < ActiveRecord::Base
     return false unless cuser
     return false if cuser.banned?(Ban::TYPE_LEAGUE)
     return true if cuser.admin?
-    return true if team.is_leader? cuser and Verification.contain params, %i[team_id contest_id]
+    return true if team.is_leader?(cuser) && Verification.contain(params, %i[team_id contest_id])
 
     false
   end

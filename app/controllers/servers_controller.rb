@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ServersController < ApplicationController
   before_action :get_server, except: %i[index refresh new create]
 

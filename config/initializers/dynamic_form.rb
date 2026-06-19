@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Compatibility shim for dynamic_form 1.3.1 / ActiveModel::Errors.full_messages
 compat = Module.new do
   def full_messages

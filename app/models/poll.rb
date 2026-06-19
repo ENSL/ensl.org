@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: polls
@@ -34,19 +36,19 @@ class Poll < ActiveRecord::Base
   validate :must_have_at_least_two_options
 
   def voted?(user)
-    real_votes.where(user_id: user.id).count > 0
+    real_votes.where(user_id: user.id).count.positive?
   end
 
   def can_create?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.params(params, _cuser)

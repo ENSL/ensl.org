@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MoveReadingsToReadMarks < ActiveRecord::Migration[4.2][6.0]
   def change
     execute "INSERT IGNORE INTO read_marks (readable_type, readable_id, reader_type, reader_id, timestamp)

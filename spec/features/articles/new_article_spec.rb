@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-feature 'User creates new article', js: :true do
+feature 'User creates new article', js: true do
   let!(:category) { create(:category, domain: Category::DOMAIN_NEWS) }
   let(:article) { attributes_for(:article) }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamsController < ApplicationController
   before_action :get_team, only: %i[show edit update destroy recover]
 
@@ -44,10 +46,10 @@ class TeamsController < ApplicationController
       if params[:rank]
         @team.teamers.each do |member|
           # Contains new rank as given by submitted parameters
-          new_rank = params[:rank]["#{member.id}"]
+          new_rank = params[:rank][member.id.to_s]
           next if new_rank.nil?
           # Can only set own rank to equal or lower than current rank
-          next unless cuser.admin? or (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
+          next unless cuser.admin? || (new_rank.to_i <= cuser.teamers.active.of_team(@team).first.rank)
           # Don't allow setting members back to rank joining
           next if new_rank.to_i == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
 
@@ -56,7 +58,7 @@ class TeamsController < ApplicationController
             member.user.update_attribute :team, @team
           end
           member.update_attribute :rank, new_rank
-          member.update_attribute :comment, params[:comment]["#{member.id}"]
+          member.update_attribute :comment, params[:comment][member.id.to_s]
         end
       end
       flash[:notice] = t(:teams_update)

@@ -242,7 +242,7 @@ class Directory < ActiveRecord::Base
   rescue StandardError => e
     Rails.logger.error("Failed to create directory #{full_path}: #{e.message}")
     errors.add(:base, "Filesystem error: Cannot create directory - #{e.message}")
-    raise ActiveRecord::RecordInvalid.new(self)
+    raise ActiveRecord::RecordInvalid, self
   end
 
   def update_timestamp
@@ -298,7 +298,7 @@ class Directory < ActiveRecord::Base
   rescue StandardError => e
     Rails.logger.error("Failed to move directory #{full_path} to trash: #{e.message}")
     errors.add(:base, "Filesystem error: Cannot move to trash - #{e.message}")
-    raise ActiveRecord::RecordInvalid.new(self)
+    raise ActiveRecord::RecordInvalid, self
   end
 
   def ensure_trash_root(root_path = trash_root)

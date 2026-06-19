@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPasswordHashToUsers < ActiveRecord::Migration[4.2][6.0]
   def change
     change_table :users do |u|

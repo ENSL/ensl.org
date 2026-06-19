@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ContestersController < ApplicationController
   before_action :get_contester, only: %i[show edit update recover destroy recalc]
 
@@ -5,7 +7,7 @@ class ContestersController < ApplicationController
     @matches = Match.future.unfinished.ordered.of_contester @contester
     @results = Match.finished.ordered.of_contester @contester
 
-    raise AccessError unless @contester and @contester.contest and @contester.team
+    raise AccessError unless @contester&.contest && @contester.team
 
     @members = if @contester.contest.status == Contest::STATUS_CLOSED
                  @contester.team.teamers.distinct.ordered
@@ -43,8 +45,8 @@ class ContestersController < ApplicationController
     if @contester.contest.contest_type == Contest::TYPE_LADDER
       old_rank = @contester.score
       new_rank = params[:contester][:score].to_i
-      raise Error, t(:rank_invalid) unless new_rank > 0 and
-                                           new_rank <= @contester.contest.contesters.active.count
+      raise Error, t(:rank_invalid) unless new_rank.positive? &&
+                                           (new_rank <= @contester.contest.contesters.active.count)
 
       @contester.contest.update_ranks(@contester, old_rank, new_rank) if old_rank != new_rank
     end

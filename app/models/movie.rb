@@ -196,7 +196,7 @@ class Movie < ActiveRecord::Base
     return preview.url if preview&.file_exists?
 
     if preview_path.present? && File.exist?(preview_path)
-      return '/' + Pathname.new(preview_path).relative_path_from(Rails.root.join('public')).to_s
+      return "/#{Pathname.new(preview_path).relative_path_from(Rails.root.join('public'))}"
     end
 
     nil

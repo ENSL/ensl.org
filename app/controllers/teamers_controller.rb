@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamersController < ApplicationController
   def index
     head :not_acceptable
@@ -14,7 +16,7 @@ class TeamersController < ApplicationController
 
     if @teamer.save
       flash[:notice] = t(:applying_team) + @teamer.team.to_s
-      @old_application && @old_application.destroy
+      @old_application&.destroy
     else
       flash[:error] = @teamer.errors.full_messages.to_s
     end

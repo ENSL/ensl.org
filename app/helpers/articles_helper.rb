@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ArticlesHelper
   def preview_text(article, full)
     content = if article.text_coding == Article::CODING_HTML

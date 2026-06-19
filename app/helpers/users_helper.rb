@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UsersHelper
   def sort_link(_text, param)
     key = param

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class CastVote
     include Exceptions
@@ -22,7 +24,7 @@ module Gathers
           vote = Vote.new(@params)
           vote.user = @actor
 
-          gather = vote.votable&.respond_to?(:gather) ? vote.votable.gather : nil
+          gather = vote.votable.respond_to?(:gather) ? vote.votable.gather : nil
 
           if gather
             gather.with_lock do

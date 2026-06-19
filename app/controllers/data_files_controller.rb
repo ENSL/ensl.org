@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DataFilesController < ApplicationController
   before_action :get_file, only: %i[show edit update destroy rate]
   before_action :prepare_edit_form_data, only: %i[edit update]
@@ -6,7 +8,7 @@ class DataFilesController < ApplicationController
   def show; end
 
   def admin
-    raise AccessError unless cuser and cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     @files = []
     DataFile.all.each do |f|
@@ -14,7 +16,7 @@ class DataFilesController < ApplicationController
     end
     @movies = []
     DataFile.movies.each do |f|
-      @movies << f unless f.movie or f.preview or (f.related and f.related.movie)
+      @movies << f unless f.movie || f.preview || f.related&.movie
     end
   end
 
@@ -74,12 +76,12 @@ class DataFilesController < ApplicationController
   def rate
     raise AccessError unless cuser
 
-    @file.rate_it(params[:id2], cuser.id) if params[:id2].to_i > 0 and params[:id2].to_i <= 5
+    @file.rate_it(params[:id2], cuser.id) if params[:id2].to_i.positive? && (params[:id2].to_i <= 5)
     head :ok
   end
 
   def trash
-    raise AccessError unless cuser and cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     deleted_files = []
     DataFile.all.each do |file|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/support/omniauth.rb
 # Configure OmniAuth to use test mode and provide a default Steam mock.
 require 'omniauth'

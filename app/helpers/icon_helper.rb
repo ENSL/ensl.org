@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IconHelper
   def fa_icon(name, style: :solid, text: nil, class: nil)
     style_class =

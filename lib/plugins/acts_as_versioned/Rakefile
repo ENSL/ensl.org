@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems'
 
 Gem.manage_gems
@@ -10,7 +12,7 @@ require 'rake/contrib/rubyforgepublisher'
 
 PKG_NAME           = 'acts_as_versioned'
 PKG_VERSION        = '0.3.1'
-PKG_FILE_NAME      = "#{PKG_NAME}-#{PKG_VERSION}"
+PKG_FILE_NAME      = "#{PKG_NAME}-#{PKG_VERSION}".freeze
 PROD_HOST          = 'technoweenie@bidwell.textdrive.com'
 RUBY_FORGE_PROJECT = 'ar-versioned'
 RUBY_FORGE_USER    = 'technoweenie'
@@ -102,7 +104,7 @@ task rubyforge_upload: :package do
     require 'open-uri'
 
     project_uri = "http://rubyforge.org/projects/#{RUBY_FORGE_PROJECT}/"
-    project_data = open(project_uri) { |data| data.read }
+    project_data = open(project_uri, &:read)
     group_id = project_data[/[?&]group_id=(\d+)/, 1]
     raise "Couldn't get group id" unless group_id
 
@@ -111,7 +113,7 @@ task rubyforge_upload: :package do
       password = ENV['RUBY_FORGE_PASSWORD']
     else
       print "#{RUBY_FORGE_USER}@rubyforge.org's password: "
-      password = STDIN.gets.chomp
+      password = $stdin.gets.chomp
     end
 
     login_response = Net::HTTP.start('rubyforge.org', 80) do |http|
@@ -129,7 +131,7 @@ task rubyforge_upload: :package do
     headers = { 'Cookie' => cookie }
 
     release_uri = "http://rubyforge.org/frs/admin/?group_id=#{group_id}"
-    release_data = open(release_uri, headers) { |data| data.read }
+    release_data = open(release_uri, headers, &:read)
     package_id = release_data[/[?&]package_id=(\d+)/, 1]
     raise "Couldn't get package id" unless package_id
 
@@ -139,7 +141,7 @@ task rubyforge_upload: :package do
     files.each do |filename|
       basename  = File.basename(filename)
       file_ext  = File.extname(filename)
-      file_data = File.open(filename, 'rb') { |file| file.read }
+      file_data = File.open(filename, 'rb', &:read)
 
       debug_puts "Releasing #{basename}..."
 
@@ -185,7 +187,7 @@ task rubyforge_upload: :package do
         end.join('&')
 
         data = [
-          '--' + boundary,
+          "--#{boundary}",
           "Content-Disposition: form-data; name=\"userfile\"; filename=\"#{basename}\"",
           'Content-Type: application/octet-stream',
           'Content-Transfer-Encoding: binary',

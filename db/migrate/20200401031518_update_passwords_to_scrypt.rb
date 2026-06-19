@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ENV['SCRYPT_MAX_TIME'] ||= '1'
 class UpdatePasswordsToScrypt < ActiveRecord::Migration[4.2][6.0]
   require 'scrypt'

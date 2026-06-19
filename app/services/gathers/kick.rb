@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class Kick
     def self.call(actor:, gatherer:)

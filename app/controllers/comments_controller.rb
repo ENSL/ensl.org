@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommentsController < ApplicationController
   before_action :get_comment, only: %i[raw quote edit update destroy]
   respond_to :html, :js

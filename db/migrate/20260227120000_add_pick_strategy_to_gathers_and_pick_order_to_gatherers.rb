@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AddPickStrategyToGathersAndPickOrderToGatherers < ActiveRecord::Migration[8.1]
-  PICK_STRATEGY_DEFAULT = '1-2-2-2-2-1'.freeze
+  PICK_STRATEGY_DEFAULT = '1-2-2-2-2-1'
   COMPLETED_GATHER_SIZE = 12
 
   class MigrationGather < ActiveRecord::Base

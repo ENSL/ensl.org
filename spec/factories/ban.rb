@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :ban, class: Ban do
     ban_type { Ban::TYPE_SITE }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   # Mount Action Cable for Turbo Streams / Action Cable subscriptions
   mount ActionCable.server => '/cable'

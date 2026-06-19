@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddCreatorToBans < ActiveRecord::Migration[4.2]
   def change
     add_column :bans, :creator_id, :integer

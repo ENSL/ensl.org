@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -56,9 +58,9 @@ class User < ActiveRecord::Base
 
   # TODO: move this to a file
   PASSWORD_MESSAGE = \
-    "Hello %s, \n" + \
-    "Your new password is: %s \n \n \n" + \
-    "(Make sure you copy all characters and no whitespace when using copy-paste)\n" + \
+    "Hello %s, \n" \
+    "Your new password is: %s \n \n \n" \
+    "(Make sure you copy all characters and no whitespace when using copy-paste)\n" \
     "(Security information: your password is stored with hash %s)\n"
 
   # attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
@@ -269,7 +271,7 @@ class User < ActiveRecord::Base
   end
 
   def realname
-    if firstname and lastname
+    if firstname && lastname
       "#{firstname} #{lastname}"
     elsif firstname
       firstname
@@ -281,10 +283,10 @@ class User < ActiveRecord::Base
   end
 
   def from
-    if profile.town && profile.town.length > 0
+    if profile.town&.length&.positive?
       "#{profile.town}, #{country_s}"
     else
-      "#{country_s}"
+      country_s.to_s
     end
   end
 
@@ -320,7 +322,7 @@ class User < ActiveRecord::Base
   end
 
   def banned?(type = Ban::TYPE_SITE)
-    bans.effective.where(ban_type: type).count > 0
+    bans.effective.where(ban_type: type).count.positive?
   end
 
   def admin?
@@ -416,7 +418,7 @@ class User < ActiveRecord::Base
 
   # FIXME: if team has been removed
   def validate_team
-    return unless team and !active_teams.exists?({ id: team.id })
+    return unless team && !active_teams.exists?({ id: team.id })
 
     # Attempts to fix team, gracefully
     self.team = nil
@@ -427,7 +429,7 @@ class User < ActiveRecord::Base
   def init_variables
     self.public_email = false
     self.time_zone = 'Amsterdam'
-    generate_password if !raw_password and new_record?
+    generate_password if !raw_password && new_record?
     build_profile unless profile&.present?
     # Email is required; do not auto-fill when blank.
   end
@@ -449,16 +451,16 @@ class User < ActiveRecord::Base
   # Maybe it should return to not waste save?
   def update_password
     # Standard logic for saving password
-    if raw_password and raw_password.length > 0
+    if raw_password&.length&.positive?
       # Allow old hash too
-      if password_hash == User::PASSWORD_MD5 and password_force
+      if (password_hash == User::PASSWORD_MD5) && password_force
         self.password = Digest::MD5.hexdigest(raw_password)
       else
         self.password_hash = User::PASSWORD_SCRYPT
         self.password = SCrypt::Password.create(raw_password)
       end
     # Update MD5 to MD5+Scrypt
-    elsif password_hash == User::PASSWORD_MD5 and !password_force
+    elsif (password_hash == User::PASSWORD_MD5) && !password_force
       # Scrypt(Md5(passsword))
       self.password_hash = User::PASSWORD_MD5_SCRYPT
       self.password = SCrypt::Password.create(password)
@@ -467,7 +469,7 @@ class User < ActiveRecord::Base
 
   # This serves multiple functions
   def send_new_password
-    generate_password unless raw_password&.length.to_i > 0
+    generate_password unless raw_password&.length.to_i.positive?
     save!
 
     # TODO: consider moving these two to callbacks
@@ -486,7 +488,7 @@ class User < ActiveRecord::Base
   end
 
   def can_play?
-    (gathers.where('gathers.status > ?', Gather::STATE_RUNNING).count > 0) or created_at < 2.years.ago
+    gathers.where('gathers.status > ?', Gather::STATE_RUNNING).count.positive? or created_at < 2.years.ago
   end
 
   def can_create?(_cuser)
@@ -500,7 +502,7 @@ class User < ActiveRecord::Base
     loop do
       new_username = format('%s%d', username, i)
       i += 1
-      if User.where(username: new_username).count == 0 or i > 50
+      if User.where(username: new_username).count.zero? || (i > 50)
         self.username = new_username
         break
       end
@@ -514,11 +516,11 @@ class User < ActiveRecord::Base
   end
 
   def can_change_name?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.authenticate(login)
@@ -541,7 +543,6 @@ class User < ActiveRecord::Base
       return user if pass == login[:password]
 
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=scrypt")
-      return nil
     when User::PASSWORD_MD5_SCRYPT
       pass = SCrypt::Password.new(user.password)
       # Match to Scrypt(Md5(password))
@@ -552,7 +553,6 @@ class User < ActiveRecord::Base
         return user
       end
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5_scrypt")
-      return nil
     # when User::PASSWORD_MD5
     else
       if user.password == Digest::MD5.hexdigest(login[:password])
@@ -562,8 +562,8 @@ class User < ActiveRecord::Base
         return user
       end
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5")
-      return nil
     end
+    return nil
     # TODO: controller needs to handle this
     # rescue Exception => ex
     #  user.errors.add(:password, "%s (%s)" % [I18n.t(:password_corrupt), ex.class.to_s])
@@ -576,8 +576,8 @@ class User < ActiveRecord::Base
   end
 
   def self.historic(steamid)
-    if u = User.find_by_sql(['SELECT * FROM user_versions WHERE steamid = ? ORDER BY updated_at',
-                             steamid]) and u.length > 0
+    if (u = User.find_by_sql(['SELECT * FROM user_versions WHERE steamid = ? ORDER BY updated_at',
+                              steamid])) && u.length.positive?
       User.find u[0]['user_id']
     end
   end

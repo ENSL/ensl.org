@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BracketsController < ApplicationController
   before_action :get_bracket, only: %i[show edit update destroy]
 

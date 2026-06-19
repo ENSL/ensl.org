@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Add EU for legacy support
 ISO3166::Data.register(
   alpha2: 'EU',

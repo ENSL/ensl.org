@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: servers
@@ -113,7 +115,7 @@ class Server < ActiveRecord::Base
   end
 
   def addr
-    ip + ':' + port.to_s
+    "#{ip}:#{port}"
   end
 
   def set_category
@@ -121,7 +123,7 @@ class Server < ActiveRecord::Base
   end
 
   def is_free(time)
-    challenges.around(time).pending.count == 0 and matches.around(time).count == 0
+    challenges.around(time).pending.count.zero? and matches.around(time).count.zero?
   end
 
   def can_create?(cuser)
@@ -129,11 +131,11 @@ class Server < ActiveRecord::Base
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin? or user == cuser
+    cuser&.admin? or user == cuser
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.move(addr, newaddr, newpwd)

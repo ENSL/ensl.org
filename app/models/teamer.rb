@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: teamers
@@ -102,7 +104,7 @@ class Teamer < ActiveRecord::Base
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logger'
 require_relative 'boot'
 require 'securerandom'
@@ -10,11 +12,15 @@ Bundler.require(*Rails.groups)
 # FIXME
 ActionController::Parameters.permit_all_parameters = true
 
-class ActionDispatch::Session::MyCustomStore < ActionDispatch::Session::CookieStore
-  private
+module ActionDispatch
+  module Session
+    class MyCustomStore < ActionDispatch::Session::CookieStore
+      private
 
-  def cookie_jar(request)
-    request.cookie_jar.signed
+      def cookie_jar(request)
+        request.cookie_jar.signed
+      end
+    end
   end
 end
 
@@ -70,7 +76,7 @@ module Ensl
     }
 
     # Use a different logger for distributed setups
-    config.logger = Logger.new(Rails.root.join('log', Rails.env + '.log'), 5, 10 * 1024 * 1024)
+    config.logger = Logger.new(Rails.root.join('log', "#{Rails.env}.log"), 5, 10 * 1024 * 1024)
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.

@@ -174,7 +174,7 @@ describe ServerMetadataSyncJob do
       error = StandardError.new('timeout')
 
       expect(server).to receive(:update!).with(hash_including(status: Server::STATUS_OFFLINE, ping: nil))
-      expect(Rails.logger).to receive(:debug).with(include("#{server.id}", 'offline: StandardError: timeout'))
+      expect(Rails.logger).to receive(:debug).with(include(server.id.to_s, 'offline: StandardError: timeout'))
 
       job.send(:mark_offline, server, error)
     end

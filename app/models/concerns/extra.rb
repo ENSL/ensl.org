@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Extra
   extend ActiveSupport::Concern
   include ActionView::Helpers::SanitizeHelper
@@ -30,7 +32,7 @@ module Extra
       # Strip any HTML tags before parsing BBCode to prevent HTML injection
       # Then let views sanitize the BBCode-generated HTML
       plain_text = strip_tags(text.to_s)
-      emojified = EmojiParser.parse(plain_text) { |emoji| emoji.raw }
+      emojified = EmojiParser.parse(plain_text, &:raw)
       emojified.bbcode_to_html.gsub(/\n|\r\n/, '<br>')
     end
 
@@ -44,7 +46,7 @@ module Extra
       n = 0
       # the objects need to be assigned before loop or the order is not right
       (objects = objects.order(column)).each_with_index do |item, i|
-        if item.id == id and n > 0
+        if (item.id == id) && n.positive?
           old_position = item[column]
           item.update_attribute(column, objects[i - 1][column])
           objects[i - 1].update_attribute(column, old_position)
@@ -56,7 +58,7 @@ module Extra
     def move_down(objects, column = 'position')
       n = 0
       (objects = objects.order(column)).each_with_index do |item, _i|
-        if item.id == id and n < (objects.length - 1)
+        if (item.id == id) && (n < (objects.length - 1))
           old_position = item[column]
           item.update_attribute(column, objects[n + 1][column])
           objects[n + 1].update_attribute(column, old_position)

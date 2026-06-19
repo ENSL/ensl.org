@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def ensure_test_assets_precompiled!
   return if ENV['SKIP_ASSET_PRECOMPILE'].present?
 

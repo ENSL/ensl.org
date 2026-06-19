@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GroupsController < ApplicationController
   before_action :get_group, except: %i[index new create]
 

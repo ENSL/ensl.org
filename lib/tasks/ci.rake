@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :ci do
   task :deploy do
     require 'rubygems'
@@ -5,12 +7,12 @@ namespace :ci do
     require 'capistrano/setup'
     require 'capistrano/deploy'
 
-    raise 'Failed to deploy: Rake task called outside of CI environment' unless ci_branch = ENV['TRAVIS_BRANCH']
+    raise 'Failed to deploy: Rake task called outside of CI environment' unless (ci_branch = ENV['TRAVIS_BRANCH'])
 
     BRANCH_MAP = {
       # 'master' => 'production'
       'develop' => 'staging'
-    }
+    }.freeze
 
     if BRANCH_MAP.include?(ci_branch)
       Capistrano::Application.invoke(BRANCH_MAP[ci_branch])

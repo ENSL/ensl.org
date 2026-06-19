@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   before_action :get_user, only: %i[show history popup agenda edit update destroy]
   respond_to :html, :js
@@ -6,11 +8,11 @@ class UsersController < ApplicationController
   skip_forgery_protection only: :callback
   prepend_before_action :reject_js_callback, only: :callback
 
-  PAGES = %w[general favorites computer articles movies teams matches predictions comments]
+  PAGES = %w[general favorites computer articles movies teams matches predictions comments].freeze
 
   def index
     search = params[:search]
-    @users = if search && search.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser&.admin?
+    @users = if search&.match(/^ip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/) && cuser&.admin?
                User.where(lastip: ::Regexp.last_match(1)).paginate(per_page: 40, page: params[:page])
              elsif params[:filter] == 'lately'
                User.search(params[:search]).lately.paginate(per_page: 40, page: params[:page])
@@ -35,7 +37,7 @@ class UsersController < ApplicationController
   end
 
   def agenda
-    raise AccessError unless @user == cuser or cuser&.admin?
+    raise AccessError unless (@user == cuser) || cuser&.admin?
 
     @teamer = Teamer.new
     @teamer.user = @user
@@ -82,7 +84,7 @@ class UsersController < ApplicationController
 
     raise AccessError unless @user.can_create? cuser
 
-    if @user.valid? and @user.save
+    if @user.valid? && @user.save
       redirect_to action: :show, id: @user.id
       save_session @user
     else
@@ -125,7 +127,7 @@ class UsersController < ApplicationController
     end
 
     @user = User.find_or_build(auth_hash, request.ip)
-    unless @user and @user.is_a?(ActiveRecord::Base)
+    unless @user.is_a?(ActiveRecord::Base)
       flash[:error] = t(:users_callback_fail)
       redirect_to_home
       return
@@ -208,8 +210,8 @@ class UsersController < ApplicationController
       flash[:notice] = format('%s', t(:login_successful))
       # FIXME: this doesn't work because model is saved before
       flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if user.password_hash_changed?
-      if !session[:verified_steamid].blank? and \
-         user.steamid != session[:verified_steamid] and \
+      if !session[:verified_steamid].blank? && \
+         (user.steamid != session[:verified_steamid]) && \
          user.update_attribute(:steamid, session[:verified_steamid])
         session[:return_to] = edit_user_path(user)
         flash[:notice] << format(t(:users_steamid_update), user.steamid)

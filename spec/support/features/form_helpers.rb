@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module FormHelpers
     def fill_form(model, hash)

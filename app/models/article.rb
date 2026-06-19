@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: articles
@@ -74,7 +76,7 @@ class Article < ActiveRecord::Base
   validates_presence_of :user, :category
   validate :validate_status
 
-  before_validation :init_variables, if: proc { |model| model.new_record? }
+  before_validation :init_variables, if: proc(&:new_record?)
   before_save :format_text
   after_save :send_notifications
 
@@ -110,7 +112,7 @@ class Article < ActiveRecord::Base
 
   def init_variables
     self.status = STATUS_DRAFT unless user&.admin?
-    self.text_coding = CODING_BBCODE if !user&.admin? and text_coding == CODING_HTML
+    self.text_coding = CODING_BBCODE if !user&.admin? && (text_coding == CODING_HTML)
   end
 
   def format_text
@@ -122,7 +124,7 @@ class Article < ActiveRecord::Base
   end
 
   def markdown_to_html(source)
-    text = EmojiParser.parse(source.to_s) { |emoji| emoji.raw }
+    text = EmojiParser.parse(source.to_s, &:raw)
 
     if defined?(Commonmarker)
       # Disable raw HTML to prevent XSS
@@ -134,7 +136,7 @@ class Article < ActiveRecord::Base
   end
 
   def send_notifications
-    return unless (new_record? or status_changed?) and status == STATUS_PUBLISHED
+    return unless (new_record? || status_changed?) && (status == STATUS_PUBLISHED)
 
     case category.domain
     when Category::DOMAIN_NEWS
@@ -175,7 +177,7 @@ class Article < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.article_params(params, cuser)

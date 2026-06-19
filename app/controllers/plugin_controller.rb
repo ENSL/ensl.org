@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PluginController < ApplicationController
   # FIXME: think this again. Use API.
   # Most logic should be in here no in AMXX
@@ -7,13 +9,13 @@ class PluginController < ApplicationController
     buffer = []
     out = []
 
-    if ban = Ban.server_ban(params[:id]).count > 0
+    if (ban = Ban.server_ban(params[:id]).count.positive?)
       out << '#USER#'
       out << 'BANNED'
       out << ban.expiry.utc.to_i
       out << ban.reason
       out << "\r\r\r\r\r\r\r"
-    elsif user = User.where(steamid: params[:id]).first
+    elsif (user = User.where(steamid: params[:id]).first)
       icon = 0
       rank = 'User'
       if user.groups.exists? id: Group::DONORS

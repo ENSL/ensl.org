@@ -78,7 +78,7 @@ module FilesystemTestHelper
 
       # Insert directly using SQL to avoid CarrierWave and callback issues
       ActiveRecord::Base.connection.execute(
-        'INSERT INTO data_files (directory_id, path, name, size, md5, title, created_at, updated_at) ' +
+        'INSERT INTO data_files (directory_id, path, name, size, md5, title, created_at, updated_at) ' \
         "VALUES (#{containing_dir.id}, '#{file_path}', '#{filename}', #{size}, '#{md5}', '#{filename}', NOW(), NOW())"
       )
       # Re-query to get the created record

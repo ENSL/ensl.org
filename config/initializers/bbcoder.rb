@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 BBCoder.configure do
   tag :i, as: :em
   tag :b, as: :strong

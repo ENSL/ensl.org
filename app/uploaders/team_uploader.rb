@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamUploader < ImageUploader
   # Create different versions of your uploaded files:
   process resize_to_limit: [500, 200]

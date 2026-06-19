@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 set :branch, 'develop'
 set :deploy_to, '/var/www/virtual/ensl.org/staging/rails'
 

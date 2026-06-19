@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/support/factory_girl.rb
 require 'factory_bot'
 

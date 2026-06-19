@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArticlesController < ApplicationController
   before_action :get_article, only: %i[show edit update cleanup destroy]
 
@@ -15,7 +17,7 @@ class ArticlesController < ApplicationController
   end
 
   def admin
-    raise AccessError unless cuser and cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     # FIXME: something better?
     @articles = { 'Drafts' => Article.drafts.ordered, 'Special' => Article.category(Category::SPECIAL).ordered }

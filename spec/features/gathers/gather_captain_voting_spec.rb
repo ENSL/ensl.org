@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.feature 'Gather voting phase - find nil:id error when voting', type: :feature, js: true do

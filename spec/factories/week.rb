@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :week do
     sequence(:name) { |n| "Week ##{n}" }

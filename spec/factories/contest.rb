@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :contest do
     sequence(:name) { |n| "Contest ##{n}" }

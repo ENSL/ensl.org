@@ -181,7 +181,7 @@ describe DataFile do
     end
 
     it 'stores long free-form description text' do
-      long_text = "Line one\n" + ('Long text ' * 80)
+      long_text = "Line one\n#{'Long text ' * 80}"
       file = create(:data_file, description: long_text)
 
       expect(file.reload.description).to eq(long_text)

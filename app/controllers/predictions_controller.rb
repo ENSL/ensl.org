@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PredictionsController < ApplicationController
   def create
     @prediction = Prediction.new(Prediction.params(params, cuser))

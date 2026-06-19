@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MoviesController < ApplicationController
   before_action :get_movie, except: %i[index new create admin]
   respond_to :html, :turbo_stream
@@ -15,7 +17,7 @@ class MoviesController < ApplicationController
   def show
     @movie.mark_as_read! for: cuser if cuser
     @movie.record_view_count(request.remote_ip, cuser.nil?)
-    return unless @movie.file && @movie.file.related
+    return unless @movie.file&.related
 
     redirect_to data_file_path(@movie.file.related)
   end
@@ -25,7 +27,7 @@ class MoviesController < ApplicationController
   end
 
   def admin
-    raise AccessError unless cuser && cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     @movies = Movie.includes(:user, :file, :preview).ordered.all
   end
@@ -79,7 +81,7 @@ class MoviesController < ApplicationController
     # y = params[:y].to_i <= 720 ? params[:y].to_i : 600
     begin
       result = @movie.make_preview
-      flash[:notice] = (t(:executed) + ' ' + result.to_s).html_safe
+      flash[:notice] = "#{t(:executed)} #{result}".html_safe
     rescue VideoProcessing::Error => e
       flash[:alert] = e.message.to_s
     end

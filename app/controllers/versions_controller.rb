@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VersionsController < ApplicationController
   before_action :get_article
   before_action :ensure_versions_available
@@ -8,7 +10,7 @@ class VersionsController < ApplicationController
   end
 
   def show
-    raise AccessError unless cuser and cuser.admin?
+    raise AccessError unless cuser&.admin?
 
     @version = @article.versions.find params[:id]
     @nobody = true

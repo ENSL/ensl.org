@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateArticleVersionsIfMissing < ActiveRecord::Migration[8.1]
   def up
     return if table_exists?(:article_versions)

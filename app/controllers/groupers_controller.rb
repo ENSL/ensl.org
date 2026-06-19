@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GroupersController < ApplicationController
   def create
     @grouper = Grouper.new(Grouper.params(params, cuser))

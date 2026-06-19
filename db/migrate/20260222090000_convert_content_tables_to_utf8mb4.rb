@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ConvertContentTablesToUtf8mb4 < ActiveRecord::Migration[8.1]
   CONTENT_TABLES = %w[
     shoutmsgs

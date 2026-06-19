@@ -30,7 +30,7 @@ class Post < ActiveRecord::Base
   validates_length_of :text, in: 1..10_000
 
   before_save :parse_text
-  after_destroy :remove_topics, if: proc { |post| post.topic.posts.count == 0 }
+  after_destroy :remove_topics, if: proc { |post| post.topic.posts.count.zero? }
 
   belongs_to :user, optional: true
   belongs_to :topic, optional: true

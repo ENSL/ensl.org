@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 Dir.glob(File.join(Rails.root, 'lib/plugins/*')).sort.each do |directory|
   next unless File.directory?(directory)
 
   lib = File.join(directory, 'lib')
 
   if File.directory?(lib)
-    $:.unshift lib
+    $LOAD_PATH.unshift lib
     ActiveSupport::Dependencies.autoload_paths += [lib]
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module SafeClick
     # A helper method to safely click on elements.

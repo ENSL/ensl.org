@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PollsHelper
   def add_option_link(name, _form)
     # FIXME: not used atm.

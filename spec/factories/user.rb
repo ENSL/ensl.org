@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :user do
     sequence(:username) { |_n| "Player#{SecureRandom.hex(8)}" }

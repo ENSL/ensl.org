@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndexToForumers < ActiveRecord::Migration[4.2]
   def change
     add_index :forumers, :forum_id

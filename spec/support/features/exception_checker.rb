@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module ExceptionChecker
     BENIGN_LOG_ERROR_PATTERNS = [

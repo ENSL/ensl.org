@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ci_enabled = ENV.key?('CI') && !%w[0 false].include?(ENV['CI'].to_s.downcase)
 enable_simplecov = ENV['SIMPLECOV'] == '1' || ci_enabled
 

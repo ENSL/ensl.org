@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Configure OmniAuth failure handling - log errors and redirect gracefully
 OmniAuth.config.on_failure = proc do |env|
   request = Rack::Request.new(env)

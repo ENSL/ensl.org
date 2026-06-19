@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2005 Rick Olson
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -66,7 +68,7 @@ module ActiveRecord # :nodoc:
     #
     # See ActiveRecord::Acts::Versioned::ClassMethods#acts_as_versioned for configuration options
     module Versioned
-      CALLBACKS = %i[set_new_version save_version_on_create save_version? clear_altered_attributes]
+      CALLBACKS = %i[set_new_version save_version_on_create save_version? clear_altered_attributes].freeze
       def self.included(base) # :nodoc:
         base.extend ClassMethods
       end
@@ -315,10 +317,10 @@ module ActiveRecord # :nodoc:
         # Clears old revisions if a limit is set with the :limit option in <tt>acts_as_versioned</tt>.
         # Override this method to set your own criteria for clearing old versions.
         def clear_old_versions
-          return if self.class.max_version_limit == 0
+          return if self.class.max_version_limit.zero?
 
           excess_baggage = send(self.class.version_column).to_i - self.class.max_version_limit
-          return unless excess_baggage > 0
+          return unless excess_baggage.positive?
 
           sql = "DELETE FROM #{self.class.versioned_table_name} WHERE version <= #{excess_baggage} AND #{self.class.versioned_foreign_key} = #{id}"
           self.class.versioned_class.connection.execute sql
@@ -331,9 +333,9 @@ module ActiveRecord # :nodoc:
         # Reverts a model to a given version.  Takes either a version number or an instance of the versioned model
         def revert_to(version)
           if version.is_a?(self.class.versioned_class)
-            return false unless version.send(self.class.versioned_foreign_key) == id and !version.new_record?
+            return false unless (version.send(self.class.versioned_foreign_key) == id) && !version.new_record?
           else
-            return false unless version = versions.find_by_version(version)
+            return false unless (version = versions.find_by_version(version))
           end
           clone_versioned_model(version, self)
           send("#{self.class.version_column}=", version.version)
@@ -364,16 +366,16 @@ module ActiveRecord # :nodoc:
 
         # Returns an array of attribute keys that are versioned.  See non_versioned_columns
         def versioned_attributes
-          attributes.keys.select { |k| !self.class.non_versioned_columns.include?(k) }
+          attributes.keys.reject { |k| self.class.non_versioned_columns.include?(k) }
         end
 
         # If called with no parameters, gets whether the current model has changed and needs to be versioned.
         # If called with a single parameter, gets whether the parameter has changed.
         def changed?(attr_name = nil)
           if attr_name.nil?
-            !self.class.track_altered_attributes || (altered_attributes && altered_attributes.length > 0)
+            !self.class.track_altered_attributes || altered_attributes&.length&.positive?
           else
-            altered_attributes && altered_attributes.include?(attr_name.to_s)
+            altered_attributes&.include?(attr_name.to_s)
           end
         end
 
@@ -473,7 +475,7 @@ module ActiveRecord # :nodoc:
             conditions = ["#{versioned_foreign_key} = ? AND version = ?", id, version]
             options = { conditions: conditions, limit: 1 }
 
-            unless result = find_versions(id, options).first
+            unless (result = find_versions(id, options).first)
               raise RecordNotFound, "Couldn't find #{name} with ID=#{id} and VERSION=#{version}"
             end
 
@@ -490,7 +492,7 @@ module ActiveRecord # :nodoc:
 
           # Returns an array of columns that are versioned.  See non_versioned_columns
           def versioned_columns
-            columns.select { |c| !non_versioned_columns.include?(c.name) }
+            columns.reject { |c| non_versioned_columns.include?(c.name) }
           end
 
           # Returns an instance of the dynamic versioned model
@@ -520,7 +522,7 @@ module ActiveRecord # :nodoc:
                                     precision: col.precision
             end
 
-            if type_col = columns_hash[inheritance_column]
+            if (type_col = columns_hash[inheritance_column])
               connection.add_column versioned_table_name, versioned_inheritance_column, type_col.type,
                                     limit: type_col.limit,
                                     default: type_col.default,

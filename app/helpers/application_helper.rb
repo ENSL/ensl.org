@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   def full_title(page_title)
     base_title = 'NSL'
-    base_title << ' ' + Rails.env.upcase unless Rails.env.production?
+    base_title << " #{Rails.env.upcase}" unless Rails.env.production?
 
     if page_title.empty?
       base_title
@@ -11,7 +13,7 @@ module ApplicationHelper
   end
 
   def active_theme
-    if cuser && cuser.profile
+    if cuser&.profile
       cuser.current_layout
     else
       'default'
@@ -41,8 +43,8 @@ module ApplicationHelper
     options[:data] = { turbo_frame: '_top' } if model.is_a?(User)
 
     # Reduce length of too long model names
-    if length and str.length > length
-      link_to(str.to_s[0, length] + '...', model, options)
+    if length && (str.length > length)
+      link_to("#{str.to_s[0, length]}...", model, options)
     else
       link_to(str, model, options)
     end
@@ -51,14 +53,14 @@ module ApplicationHelper
   def directory_links(directory)
     output = ''
     Directory.directory_traverse(directory).reverse_each do |dir|
-      output << namelink(dir) + "\n"
+      output << "#{namelink(dir)}\n"
       output << " &raquo; \n" unless dir == directory
     end
     output.html_safe
   end
 
   def shorten(str, length)
-    str = str.to_s[0, length] + '...' if length and str and str.to_s.length > length
+    str = "#{str.to_s[0, length]}..." if length && str && (str.to_s.length > length)
     str
   end
 
@@ -104,7 +106,7 @@ module ApplicationHelper
         key = element[1]
       end
 
-      if m = key.to_s.match(/^(.*)_b$/)
+      if (m = key.to_s.match(/^(.*)_b$/))
         name = m[1]
         key = m[1]
       end
@@ -122,9 +124,9 @@ module ApplicationHelper
         next
       end
 
-      next if str == '' or str.nil?
+      next if (str == '') || str.nil?
 
-      result << if model[key].instance_of?(Time) or model[key].instance_of?(ActiveSupport::TimeWithZone)
+      result << if model[key].instance_of?(Time) || model[key].instance_of?(ActiveSupport::TimeWithZone)
                   # result << shorttime(str)
                   model[key].to_formatted_s(:long_ordinal)
                 elsif element.instance_of?(Symbol)
@@ -136,7 +138,7 @@ module ApplicationHelper
                 end
 
       item << content_tag(:dt) do
-        "#{name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')}".html_safe
+        name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ').to_s.html_safe
       end
       item << content_tag(:dd) do
         result.html_safe
@@ -155,11 +157,11 @@ module ApplicationHelper
   end
 
   def emojify_aliases(text)
-    EmojiParser.parse(text.to_s) { |emoji| emoji.raw }
+    EmojiParser.parse(text.to_s, &:raw)
   end
 
   def flag(country)
-    if country and country.to_s.size > 0
+    if country && country.to_s.size.positive?
       image_tag 'shared/blank.gif', class: "flag flag-#{country.downcase}"
     else
       image_tag 'shared/blank.gif', class: 'flag flag-placeholder'
@@ -167,7 +169,7 @@ module ApplicationHelper
   end
 
   def add_comments(object)
-    return ''.html_safe unless object&.respond_to?(:comments)
+    return ''.html_safe unless object.respond_to?(:comments)
 
     @comment = Comment.new(commentable: object)
     @comments = object.comments.ordered.with_userteam

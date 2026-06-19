@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumsController < ApplicationController
   before_action :get_forum, only: %i[show edit update up down destroy]
   layout 'forums'

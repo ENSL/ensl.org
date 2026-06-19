@@ -18,7 +18,7 @@ begin
                      name: "Random Bracket Contest #{Time.now.to_i}")
 
     # Print summary
-    puts "\n" + ('=' * 60)
+    puts "\n#{'=' * 60}"
     puts 'CONTEST SETUP COMPLETE'
     puts('=' * 60)
     puts "Contest: #{contest.name} (ID: #{contest.id})"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LocksController < ApplicationController
   def create
     @lock = Lock.new(Lock.params(params, cuser))

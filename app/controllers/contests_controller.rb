@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ContestsController < ApplicationController
   before_action :get_contest, only: %i[show edit update destroy del_map scores recalc confirmed_matches]
 
@@ -32,7 +34,7 @@ class ContestsController < ApplicationController
     @rounds = [@contest.modulus_even, @contest.modulus_3to1, @contest.modulus_4to0]
     @modulus_base = @contest.modulus_base || 30
     @rounds.each_index do |key|
-      @rounds[key] = params['rounds']["#{key}"].to_f if params['rounds'] and params['rounds']["#{key}"]
+      @rounds[key] = params['rounds'][key.to_s].to_f if params['rounds'] && params['rounds'][key.to_s]
     end
     @weight = params[:weight] ? params[:weight].to_f : @contest.weight
   end
@@ -70,14 +72,15 @@ class ContestsController < ApplicationController
   def update
     raise AccessError unless @contest.can_update? cuser
 
-    if update_type == 'contest'
+    case update_type
+    when 'contest'
       if @contest.update(Contest.params(params, cuser))
         flash[:notice] = t(:contests_update)
         redirect_to @contest
       else
         render :edit, status: :unprocessable_entity
       end
-    elsif update_type == 'map'
+    when 'map'
       map = Map.find_by(id: params[:map])
       if map.nil?
         flash.now[:error] = t(:error)
@@ -87,7 +90,7 @@ class ContestsController < ApplicationController
         flash[:notice] = t(:maps_update)
         redirect_to edit_contest_path(@contest, contest: 'maps')
       end
-    elsif update_type == 'team'
+    when 'team'
       contester = Contester.new
       contester.team = Team.find params[:team]
       contester.contest = @contest

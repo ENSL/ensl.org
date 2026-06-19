@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Collect browser console logs after system (JS) specs and fail on errors.
 RSpec.configure do |config|
   # Set up console listener for Playwright before each test

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Team, type: :model do
@@ -158,7 +160,6 @@ RSpec.describe Team, type: :model do
     end
   end
 end
-require 'rails_helper'
 
 RSpec.describe Team, type: :model do
   describe 'init and leader assignment' do
@@ -204,7 +205,6 @@ RSpec.describe Team, type: :model do
     end
   end
 end
-require 'rails_helper'
 
 RSpec.describe Team, type: :model do
   describe 'basic methods' do

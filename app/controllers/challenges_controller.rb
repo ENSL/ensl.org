@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChallengesController < ApplicationController
   before_action :get_challenge, only: %i[show edit update destroy]
 
@@ -24,7 +26,7 @@ class ChallengesController < ApplicationController
     @challenge.user = cuser
     raise AccessError unless @challenge.can_create? cuser
 
-    if @challenge.valid? and @challenge.save
+    if @challenge.valid? && @challenge.save
       flash[:notice] = t(:challenges_create)
       redirect_to @challenge
     else
@@ -63,9 +65,7 @@ class ChallengesController < ApplicationController
   # Custom method
 
   def refresh
-    Challenge.past.pending.each do |c|
-      c.destroy
-    end
+    Challenge.past.pending.each(&:destroy)
 
     render plain: t(:challenges_cleared)
   end

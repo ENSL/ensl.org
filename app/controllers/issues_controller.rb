@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IssuesController < ApplicationController
   before_action :require_index_access!, only: :index
   before_action :get_issue, only: %i[show edit update destroy]

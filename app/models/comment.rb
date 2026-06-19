@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: comments
@@ -56,7 +58,7 @@ class Comment < ActiveRecord::Base
     # errors.add_to_base I18n.t(:comments_locked) if !commentable.lock.nil? and commentable.lock
     errors.add :base, I18n.t(:bans_mute) if cuser.banned? Ban::TYPE_MUTE
     errors.add :base, I18n.t(:registered_for_week) unless cuser.verified?
-    errors.count == 0
+    errors.count.zero?
   end
 
   def can_update?(cuser)
@@ -64,7 +66,7 @@ class Comment < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.params(params, _cuser)

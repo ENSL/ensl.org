@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BansController < ApplicationController
   before_action :get_ban, only: %i[show edit update destroy]
 

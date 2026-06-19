@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UnreadMigration < ActiveRecord::Migration[6.0]
   def self.up
     return if table_exists?(:read_marks)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class CaptainPick
     MAX_LOCK_RETRIES = 2

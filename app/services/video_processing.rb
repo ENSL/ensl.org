@@ -194,7 +194,7 @@ class VideoProcessing
                      h = (duration_s / 3600).floor
                      m = ((duration_s % 3600) / 60).floor
                      s = (duration_s % 60)
-                     if h > 0
+                     if h.positive?
                        format('%d:%02d:%05.2f', h, m, s)
                      else
                        format('%d:%05.2f', m, s)

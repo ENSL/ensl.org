@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Configure ruby-openid to use system CA bundle explicitly (for production containers)
 begin
   ca_file = ENV['SSL_CERT_FILE'].presence || '/etc/ssl/certs/ca-certificates.crt'

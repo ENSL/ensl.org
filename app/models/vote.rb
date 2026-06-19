@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: votes
@@ -57,7 +59,7 @@ class Vote < ActiveRecord::Base
       when 'GatherMap'
         return false if votable.gather.status == Gather::STATE_FINISHED
         # Do not let user vote for same map twice
-        return false if votable.gather.map_votes.where(user_id: cuser.id, votable_id: votable.id).count > 0
+        return false if votable.gather.map_votes.where(user_id: cuser.id, votable_id: votable.id).count.positive?
         # Limit total map votes per user per gather to 2
         return false if votable.gather.map_votes.where(user_id: cuser.id).count >= 2
       when 'GatherServer'
@@ -82,7 +84,7 @@ class Vote < ActiveRecord::Base
 
   def validate_gather_vote_limits
     return unless %w[GatherMap GatherServer].include?(votable_type)
-    return unless votable && votable.respond_to?(:gather) && user
+    return unless votable.respond_to?(:gather) && user
 
     if votable.gather.nil?
       errors.add(:base, 'Invalid gather')

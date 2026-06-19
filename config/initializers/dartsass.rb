@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Keep legacy SCSS themes compiling with Dart Sass while migrating away from
 # Bourbon/Neat over time.
 Rails.application.config.dartsass.builds = {

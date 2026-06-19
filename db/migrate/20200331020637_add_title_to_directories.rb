@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddTitleToDirectories < ActiveRecord::Migration[4.2][6.0]
   def change
     change_table :directories do |m|

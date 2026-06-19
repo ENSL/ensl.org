@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: shoutmsgs
@@ -46,13 +48,13 @@ class Shoutmsg < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   private
 
   def normalize_emoji_aliases
-    self.text = EmojiParser.parse(text.to_s) { |emoji| emoji.raw }
+    self.text = EmojiParser.parse(text.to_s, &:raw)
   end
 
   def broadcast_shoutmsg

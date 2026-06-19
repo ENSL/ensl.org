@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSchema < ActiveRecord::Migration[4.2]
   def up
     create_table 'admin_requests', force: true do |t|

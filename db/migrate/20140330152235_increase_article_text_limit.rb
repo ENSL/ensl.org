@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IncreaseArticleTextLimit < ActiveRecord::Migration[4.2]
   def up
     change_column :articles, :text, :text, limit: 16_777_215

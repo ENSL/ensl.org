@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MatchesController < ApplicationController
   before_action :get_match, except: %i[index new create admin]
 
@@ -51,14 +53,12 @@ class MatchesController < ApplicationController
     raise AccessError unless @match.can_update? cuser, params[:match]
 
     # FIXME: better implementation
-    if params[:match][:matchers_attributes]
-      params[:match][:matchers_attributes].each do |key, matcher|
-        matcher['_destroy'] = !(matcher['_destroy'] == 'keep')
-        if matcher['user_id'] == ''
-          params[:match][:matchers_attributes].delete key
-        elsif matcher['user_id'].to_i == 0
-          matcher['user_id'] = User.find_by_username(matcher['user_id']).id
-        end
+    params[:match][:matchers_attributes]&.each do |key, matcher|
+      matcher['_destroy'] = matcher['_destroy'] != 'keep'
+      if matcher['user_id'] == ''
+        params[:match][:matchers_attributes].delete key
+      elsif matcher['user_id'].to_i.zero?
+        matcher['user_id'] = User.find_by_username(matcher['user_id']).id
       end
     end
 

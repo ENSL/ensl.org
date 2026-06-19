@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WeeksController < ApplicationController
   before_action :get_week, except: %i[new create]
 

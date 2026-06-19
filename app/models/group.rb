@@ -89,7 +89,7 @@ class Group < ActiveRecord::Base
     # Returns combined array of staff members (admins, casters, referees, and extras)
     def staff
       all_staff = admins + casters + referees + extras
-      all_staff.group_by { |grouper| grouper.user_id }.values.map(&:first)
+      all_staff.group_by(&:user_id).values.map(&:first)
     end
 
     # Returns extra staff (predictors and staff group members)
@@ -98,7 +98,7 @@ class Group < ActiveRecord::Base
       staff_group = find_by(id: STAFF)
       staff_users = staff_group ? staff_group.groupers.valid_users : []
       all_extras = predictors_users + staff_users
-      all_extras.group_by { |grouper| grouper.user_id }.values.map(&:first)
+      all_extras.group_by(&:user_id).values.map(&:first)
     end
 
     # Returns protected group IDs that cannot be destroyed

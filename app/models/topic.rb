@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: topics
@@ -116,17 +118,17 @@ class Topic < ActiveRecord::Base
   def can_create?(cuser)
     return false unless cuser
 
-    errors.add :bans, I18n.t(:bans_mute) if cuser.banned?(Ban::TYPE_MUTE) and forum != Forum::BANS
+    errors.add :bans, I18n.t(:bans_mute) if cuser.banned?(Ban::TYPE_MUTE) && (forum != Forum::BANS)
     errors.add :bans, I18n.t(:registered_for_week) unless cuser.verified?
-    Forum.available_to(cuser, Forumer::ACCESS_TOPIC).where(id: forum_id) and errors.size == 0
+    Forum.available_to(cuser, Forumer::ACCESS_TOPIC).where(id: forum_id) and errors.empty?
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def last_page

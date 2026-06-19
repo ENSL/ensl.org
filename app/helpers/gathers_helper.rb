@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GathersHelper
   def gather_current_user
     @gatherer&.user || cuser

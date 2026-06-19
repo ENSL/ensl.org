@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class Broadcaster
     include ActionView::RecordIdentifier

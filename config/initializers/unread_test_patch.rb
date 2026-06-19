@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Test-only patch to make unread gem join read_marks without timestamp
 # This prevents transient or global read_marks from marking freshly created
 # records as read during feature tests where timing and transactions can interfere
@@ -45,7 +47,7 @@ if Rails.env.test?
         def unread_by(reader)
           result = join_read_marks(reader)
 
-          if global_time_stamp = reader.read_mark_global(self).try(:timestamp)
+          if (global_time_stamp = reader.read_mark_global(self).try(:timestamp))
             result.where("#{ReadMark.quoted_table_name}.id IS NULL
                           AND #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])} >= ?", global_time_stamp)
           else

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 # FIXME: this is very stupid, use PKI
 module Verification
   def self.verify(input)
-    md5 = Digest::MD5.hexdigest('9WvcZ9hX' + input + 'KF7L4luQ').upcase.split(//)
+    md5 = Digest::MD5.hexdigest("9WvcZ9hX#{input}KF7L4luQ").upcase.split(//)
     chars = %w[A B C D E F]
     nums = []
     last_pos = md5[31].to_i
@@ -10,11 +12,11 @@ module Verification
     (0..9).each do |i|
       pos = md5[i].to_i
 
-      if pos == 0
+      if pos.zero?
         pos = last_pos**(i % 4)
-      elsif (pos % 4) == 0
+      elsif (pos % 4).zero?
         pos = pos * last_pos + i
-      elsif (pos % 3) == 0
+      elsif (pos % 3).zero?
         pos **= (i % 4)
       elsif pos.even?
         pos = pos * i + pos
@@ -25,7 +27,7 @@ module Verification
       cur_num = cur_char.to_i
 
       if nums.include? cur_num
-        cur_char = if cur_num == 0
+        cur_char = if cur_num.zero?
                      chars[pos % 6]
                    else
                      (pos % 10).to_s

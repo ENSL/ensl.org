@@ -395,11 +395,11 @@ describe Directory do
         dir = create(:directory)
         # Use raw SQL to insert data files without triggering callbacks
         file1_id = ActiveRecord::Base.connection.insert(
-          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' +
+          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' \
           "VALUES (#{dir.id}, '/tmp/file1.txt', 'abc123', 100, NOW(), NOW())"
         )
         file2_id = ActiveRecord::Base.connection.insert(
-          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' +
+          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' \
           "VALUES (#{dir.id}, '/tmp/file2.txt', 'def456', 200, NOW(), NOW())"
         )
 
@@ -422,7 +422,7 @@ describe Directory do
         dir = create(:directory)
         # Use direct SQL to avoid any callbacks
         ActiveRecord::Base.connection.execute(
-          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' +
+          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' \
           "VALUES (#{dir.id}, '/tmp/file.txt', 'abc123', 100, NOW(), NOW())"
         )
         file_id = ActiveRecord::Base.connection.select_value('SELECT LAST_INSERT_ID()')

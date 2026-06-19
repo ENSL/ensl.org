@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumersController < ApplicationController
   def create
     @forumer = Forumer.new(Forumer.params(params, cuser))

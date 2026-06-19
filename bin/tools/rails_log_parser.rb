@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 File.join(File.dirname(__FILE__), '/../lib/')
 
 module RailsLog
@@ -7,7 +9,7 @@ module RailsLog
 
       summary = Hash.new { |h, k| h[k] = [] }
       info = {}
-      while line = input.gets
+      while (line = input.gets)
         if waiting_for_time
           if line[0..11] == 'Completed in'
             if line =~ /^Completed\s*in\s*([^\s]+)\s*\(View:\s*(\d+),\s*DB:\s*(\d+)\)\s*\|\s*(\d+)\s*\w+\s*\[([^\]]+)\]/i
@@ -29,10 +31,10 @@ module RailsLog
       end
 
       stats = []
-      summary.keys.each do |k|
+      summary.each_key do |k|
         values = summary[k]
         sum, max, min, avg, median = 0
-        if values.length > 0
+        if values.length.positive?
           values.sort!
           sum = values.inject(0) { |sum, i| sum + i }
           max = values[-1]
@@ -74,14 +76,14 @@ module RailsLog
       end
     end
 
-    file = ARGV.size > 0 ? ARGV[-1] : nil
+    file = ARGV.size.positive? ? ARGV[-1] : nil
     stats = nil
     if !file.nil? && File.exist?(file)
       File.open(file, 'r') do |f|
         stats = Processor.process f
       end
     else
-      stats = Processor.process STDIN
+      stats = Processor.process $stdin
     end
 
     stats_array = []
@@ -90,7 +92,7 @@ module RailsLog
       # puts "#{s.uri} - count:#{s.count} - sum:#{s.sum} - max:#{s.max} - min:#{s.min} - avg:#{s.avg} - median:#{s.median}"
       stats_array << [s.uri, s.count, s.sum, s.max, s.min, s.avg, s.median]
     end
-    stats_array = stats_array[0..result_limit - 1] if result_limit > 0
+    stats_array = stats_array[0..result_limit - 1] if result_limit.positive?
     stats_array.tabalize(['Uri', 'Calls', 'Total Time', 'Max', 'Min', 'Avg', 'Median'],
                          %i[left right right right right right right])
   end
@@ -126,10 +128,10 @@ module RailsLog
 end
 
 class Array
-  def tabalize(headings, justifications = nil, out = STDOUT)
-    raise ArgumentError.new('only works on an array of arrays') if size > 0 && ![0].is_a?(Array)
-    if size > 0 && (headings.size != [0].size) && !justifications.nil? && (headings.size != justifications.size)
-      raise ArgumentError.new('headings, justifications and array elements must all have the same number of elements')
+  def tabalize(headings, justifications = nil, out = $stdout)
+    raise ArgumentError, 'only works on an array of arrays' if size.positive? && ![0].is_a?(Array)
+    if size.positive? && (headings.size != [0].size) && !justifications.nil? && (headings.size != justifications.size)
+      raise ArgumentError, 'headings, justifications and array elements must all have the same number of elements'
     end
 
     sizes = Array.new(headings.size, 0)
@@ -146,7 +148,7 @@ class Array
 
     out.write '| '
     sizes.each_with_index do |s, i|
-      out.write ' | ' if i > 0
+      out.write ' | ' if i.positive?
       out.write headings[i].ljust(s, ' ')
     end
     out.write " |\n"
@@ -156,7 +158,7 @@ class Array
     each do |row|
       out.write '| '
       sizes.each_with_index do |s, i|
-        out.write ' | ' if i > 0
+        out.write ' | ' if i.positive?
         out.write row[i].to_s.send("#{justifications[i].to_s[0..0]}just", s, ' ')
       end
       out.write " |\n"
@@ -170,7 +172,7 @@ class Array
   def print_tablalize_lines(out, sizes)
     out.write '+-'
     sizes.each_with_index do |s, i|
-      out.write '-+-' if i > 0
+      out.write '-+-' if i.positive?
       out.write ''.ljust(s, '-')
     end
     out.write "-+\n"

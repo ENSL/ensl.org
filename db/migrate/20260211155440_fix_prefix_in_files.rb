@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FixPrefixInFiles < ActiveRecord::Migration[8.1]
   def change
     # Some, or all files have public/files prefix, it needs to be removed

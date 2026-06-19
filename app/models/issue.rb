@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: issues
@@ -52,7 +54,7 @@ class Issue < ActiveRecord::Base
   validates_length_of :text, in: 1..65_000
   validate :validate_status
 
-  before_validation :init_variables, if: proc { |issue| issue.new_record? }
+  before_validation :init_variables, if: proc(&:new_record?)
   before_save :parse_text
   # FIXME
   # after_save :remove_readings
@@ -72,11 +74,12 @@ class Issue < ActiveRecord::Base
   end
 
   def color
-    if status == STATUS_SOLVED
+    case status
+    when STATUS_SOLVED
       'green'
-    elsif status == STATUS_OPEN
+    when STATUS_OPEN
       'yellow'
-    elsif status == STATUS_REJECTED
+    when STATUS_REJECTED
       'red'
     end
   end
@@ -120,7 +123,7 @@ class Issue < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   # STATIC METHODS

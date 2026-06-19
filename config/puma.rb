@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Load dev vars. These are loaded in application but puma needs them too.
 require 'dotenv'
 require 'os'
@@ -37,14 +39,14 @@ pidfile "#{app_dir}/tmp/pids/puma.pid"
 state_path "#{app_dir}/tmp/puma.state"
 
 # FIXME: sometimes the app becomes super slow if workers are used, investigate
-workers Integer(ENV['PUMA_WORKERS']) if ENV.has_key?('PUMA_WORKERS') && ENV['PUMA_WORKERS'].to_i > 0
+workers Integer(ENV['PUMA_WORKERS']) if ENV.key?('PUMA_WORKERS') && ENV['PUMA_WORKERS'].to_i.positive?
 worker_timeout Integer(ENV['PUMA_TIMEOUT'] || 30)
 threads Integer(ENV['PUMA_MIN_THREADS'] || 1), Integer(ENV['PUMA_MAX_THREADS'] || 16)
 
 # Allow restart via file
 plugin :tmp_restart
 
-if ENV['PUMA_WORKERS'] && ENV['PUMA_WORKERS'].to_i > 0
+if ENV['PUMA_WORKERS']&.to_i&.positive?
   before_worker_boot do
     require 'active_record'
     ActiveSupport.on_load(:active_record) do

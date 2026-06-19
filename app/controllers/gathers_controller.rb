@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GathersController < ApplicationController
   before_action :get_gather, except: %i[latest index create version]
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShoutmsgsController < ApplicationController
   respond_to :html, :js, :turbo_stream
 

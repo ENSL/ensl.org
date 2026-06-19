@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: teams
@@ -113,7 +115,7 @@ class Team < ActiveRecord::Base
   end
 
   def destroy
-    has_matches = matches.count > 0
+    has_matches = matches.count.positive?
 
     transaction do
       User.where(team_id: id).update_all(team_id: nil)
@@ -149,7 +151,7 @@ class Team < ActiveRecord::Base
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.params(params, _cuser)

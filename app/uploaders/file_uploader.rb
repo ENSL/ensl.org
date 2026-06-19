@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FileUploader < CarrierWave::Uploader::Base
   # Configure storage root to use FILES_ROOT env var
   # This allows files to be stored in public/files (dev) or external path (production)
@@ -8,7 +10,7 @@ class FileUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # Returns path relative to the root directory (FILES_ROOT)
   def store_dir
-    if model and model.directory
+    if model&.directory
       # Use relative path from FILES_ROOT
       rel = model.directory.relative_path
       rel.empty? ? '' : rel

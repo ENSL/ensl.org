@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GatherersController < ApplicationController
   before_action :get_gatherer, except: [:create]
 
@@ -53,7 +55,7 @@ class GatherersController < ApplicationController
       'active' => Gatherer::STATE_ACTIVE
     }
 
-    if states.has_key?(params[:status])
+    if states.key?(params[:status])
       @gatherer.update_attribute(:status, states[params[:status]])
       Gathers::Broadcaster.call(@gatherer.gather)
     end

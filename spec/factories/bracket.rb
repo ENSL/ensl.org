@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BracketFactoryHelpers
   CUSTOM_TEXT_SAMPLES = [
     'Winner of Upper Bracket',

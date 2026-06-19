@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'google/apis/calendar_v3'
   CALENDAR = Google::Apis::CalendarV3
@@ -14,13 +16,13 @@ begin
     end
 
     def upcoming
-      @events && @events.select do |event|
-        !(nsltv_regex =~ event.summary)
+      @events&.reject do |event|
+        nsltv_regex =~ event.summary
       end
     end
 
     def upcoming_nsltv
-      @events && @events.select do |event|
+      @events&.select do |event|
         nsltv_regex =~ event.summary
       end
     end
@@ -37,7 +39,7 @@ begin
           list = result
         end
       end
-      @events = list ? list.items.sort_by { |event| event.start.date_time } : nil
+      @events = list&.items&.sort_by { |event| event.start.date_time }
     end
 
     def nsltv_regex

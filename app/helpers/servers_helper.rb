@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ServersHelper
   def server_status_label(server)
     return 'Status: online' if server.online?

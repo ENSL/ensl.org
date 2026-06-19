@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: categories
@@ -83,15 +85,15 @@ class Category < ActiveRecord::Base
   end
 
   def can_create?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_update?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def can_destroy?(cuser)
-    cuser and cuser.admin?
+    cuser&.admin?
   end
 
   def self.params(params, _cuser)

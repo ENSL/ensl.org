@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/support/webmock.rb
 # Prevent tests from making external HTTP requests by default.
 begin

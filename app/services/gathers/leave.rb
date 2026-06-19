@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class Leave
     def self.call(actor:, gatherer:)

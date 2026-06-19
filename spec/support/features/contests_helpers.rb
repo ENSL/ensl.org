@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Features
   module ContestsHelpers
     def select_match_datetime(value)

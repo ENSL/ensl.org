@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Base User
 User.create!(username: 'admin', email: 'admin@ensl.org', raw_password: 'developer', steamid: '0:1:23456789')
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCustomUrls < ActiveRecord::Migration[4.2]
   def change
     create_table :custom_urls do |t|

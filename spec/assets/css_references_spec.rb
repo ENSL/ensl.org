@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 # Validates that every url() reference inside compiled CSS files (app/assets/builds/)

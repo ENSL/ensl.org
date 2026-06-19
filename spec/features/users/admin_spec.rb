@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-feature 'Admin logs in', js: :true do
+feature 'Admin logs in', js: true do
   let(:user) { attributes_for(:user) }
 
   before do

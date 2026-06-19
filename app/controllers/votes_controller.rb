@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VotesController < ApplicationController
   GATHER_VOTABLE_TYPES = %w[Gatherer GatherMap GatherServer].freeze
 

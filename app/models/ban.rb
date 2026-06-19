@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: bans
@@ -72,7 +74,7 @@ class Ban < ActiveRecord::Base
   end
 
   def validate_ventban
-    return unless ban_type == TYPE_VENT and !ip.match(/\A([0-9]{1,3}\.){3}[0-9]{1,3}\z/)
+    return unless (ban_type == TYPE_VENT) && !ip.match(/\A([0-9]{1,3}\.){3}[0-9]{1,3}\z/)
 
     errors.add :ip, I18n.t(:ventrilos_ip_ban)
   end

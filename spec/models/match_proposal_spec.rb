@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe MatchProposal, type: :model do
@@ -398,7 +400,7 @@ RSpec.describe MatchProposal, type: :model do
         }
       )
       permitted = MatchProposal.params(params, user1)
-      expect(permitted.has_key?(:unauthorized_param)).to be false
+      expect(permitted.key?(:unauthorized_param)).to be false
     end
   end
 end

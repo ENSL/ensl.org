@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-feature 'Google Calendar widget', js: :true do
+feature 'Google Calendar widget', js: true do
   let(:timezone_name) { Time.zone.name }
   let(:events_data_file) { Rails.root.join('spec/fixtures/google_calendar.json') }
   let(:events_list_data) { JSON.parse(File.read(events_data_file)) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PollsController < ApplicationController
   before_action :get_poll, except: %i[index new create]
 

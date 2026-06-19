@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gathers
   class Join
     def self.call(actor:, params:)

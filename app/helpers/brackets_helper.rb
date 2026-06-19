@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BracketsHelper
   # Returns the full CSS class string for a bracket cell's <td>
   def bracket_cell_class(bracket, bracketer, row, col, cols, is_edit_mode)

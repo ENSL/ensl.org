@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Load spec_helper
 require 'spec_helper'
 require 'fileutils'

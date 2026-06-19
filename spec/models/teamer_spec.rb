@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Teamer, type: :model do
@@ -55,7 +57,6 @@ RSpec.describe Teamer, type: :model do
     end
   end
 end
-require 'rails_helper'
 
 RSpec.describe Teamer, type: :model do
   describe 'basic helpers' do

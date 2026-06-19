@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CustomUrlsController < ApplicationController
   respond_to :html, :json
   responders :flash
