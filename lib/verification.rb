@@ -1,11 +1,11 @@
 # FIXME: this is very stupid, use PKI
 module Verification
   def self.verify(input)
-    md5 = Digest::MD5.hexdigest("9WvcZ9hX" + input + "KF7L4luQ").upcase.split(//)
+    md5 = Digest::MD5.hexdigest('9WvcZ9hX' + input + 'KF7L4luQ').upcase.split(//)
     chars = %w[A B C D E F]
     nums = []
     last_pos = md5[31].to_i
-    result = ""
+    result = ''
 
     (0..9).each do |i|
       pos = md5[i].to_i
@@ -20,16 +20,16 @@ module Verification
         pos = pos * i + pos
       end
 
-      pos = (pos > 31) ? (pos % 32) : pos
+      pos = pos > 31 ? (pos % 32) : pos
       cur_char = md5[31 - pos]
       cur_num = cur_char.to_i
 
       if nums.include? cur_num
-        if cur_num == 0
-          cur_char = chars[pos % 6]
-        else
-          cur_char = (pos % 10).to_s
-        end
+        cur_char = if cur_num == 0
+                     chars[pos % 6]
+                   else
+                     (pos % 10).to_s
+                   end
         cur_num = cur_char.to_i
       end
 
@@ -42,12 +42,12 @@ module Verification
   end
 
   def self.uncrap(str)
-    str.to_s.gsub(/[^A-Za-z0-9_\-]/, "")
+    str.to_s.gsub(/[^A-Za-z0-9_-]/, '')
   end
 
   def self.random_string(len)
-    chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
-    str = ""
+    chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
+    str = ''
     1.upto(len) do
       str << chars[rand(chars.size - 1)]
     end

@@ -4,12 +4,12 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def show
-    if params[:format].nil? || params[:format] == "id"
+    if params[:format].nil? || params[:format] == 'id'
       @user = User.find(params[:id])
-    elsif params[:format] == "steamid"
+    elsif params[:format] == 'steamid'
       steamid_i = params[:id].to_i
-      @user = User.where(steamid: format("0:%d:%d", steamid_i % 2, steamid_i >> 1)).first
-    elsif params[:format] == "steamidstr"
+      @user = User.where(steamid: format('0:%d:%d', steamid_i % 2, steamid_i >> 1)).first
+    elsif params[:format] == 'steamidstr'
       @user = User.where(steamid: params[:id]).first
     end
 
@@ -18,9 +18,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       return
     end
 
-    if @user.steamid.present?
-      @steam = steam_profile @user
-    end
+    @steam = steam_profile @user if @user.steamid.present?
 
     render json: {
       id: @user.id,
@@ -33,11 +31,15 @@ class Api::V1::UsersController < Api::V1::BaseController
       caster: @user.caster?,
       moderator: @user.gather_moderator?,
       contributor: @user.contributor?,
-      steam: @user.steamid.nil? ? nil : {
-        id: @user.steamid,
-        url: @steam.nil? ? nil : @steam.base_url,
-        nickname: @steam.nil? ? nil : @steam.nickname
-      },
+      steam: if @user.steamid.nil?
+               nil
+             else
+               {
+                 id: @user.steamid,
+                 url: @steam.nil? ? nil : @steam.base_url,
+                 nickname: @steam.nil? ? nil : @steam.nickname
+               }
+             end,
       bans: {
         gather: @user.banned?(Ban::TYPE_GATHER).present?,
         mute: @user.banned?(Ban::TYPE_MUTE).present?,
@@ -52,7 +54,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   private
 
   def not_found
-    render json: {error: "User not found"}, status: :not_found
+    render json: { error: 'User not found' }, status: :not_found
   end
 
   def steam_profile(user)

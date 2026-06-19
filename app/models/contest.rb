@@ -186,7 +186,7 @@ class Contest < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:contest).permit(:name, :start, :end, :status, :default_time,
                                     :contest_type, :winner_id, :demos_id, :short_name,
                                     :weight, :modulus_base, :modulus_even,

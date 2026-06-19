@@ -49,7 +49,7 @@ class Poll < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:poll).permit(:end_date, :question, options_attributes: %i[id option _destroy poll_id])
   end
 

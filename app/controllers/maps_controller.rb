@@ -1,12 +1,11 @@
 class MapsController < ApplicationController
-  before_action :get_map, only: [:show, :edit, :update, :destroy]
+  before_action :get_map, only: %i[show edit update destroy]
 
   def index
     @maps = Map.basic
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @map = Map.new
@@ -31,6 +30,7 @@ class MapsController < ApplicationController
 
   def update
     raise AccessError unless @map.can_update? cuser
+
     if @map.update(Map.params(params, cuser))
       flash[:notice] = t(:maps_update)
       redirect_to @map
@@ -41,6 +41,7 @@ class MapsController < ApplicationController
 
   def destroy
     raise AccessError unless @map.can_destroy? cuser
+
     @map.destroy
     redirect_to(maps_url)
   end

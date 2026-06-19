@@ -104,7 +104,7 @@ class Profile < ActiveRecord::Base
     self.signature_parsed = bbcode_to_html(signature) if signature
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     # FIXME: check this, add user_id
     # TEST
     params.require(:profile).except!(:id, :updated_at).permit!

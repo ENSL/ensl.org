@@ -109,7 +109,7 @@ class Teamer < ActiveRecord::Base
     cuser and (user == cuser or team.is_leader? cuser or cuser.admin?)
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:teamer).permit(:comment, :rank, :team_id, :user_id)
   end
 end

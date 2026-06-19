@@ -5,7 +5,7 @@ require 'capybara/validate_html5'
 
 # Override Selenium driver to prevent LoadError when selenium-webdriver is not installed
 # This prevents Capybara from trying to load Selenium during driver initialization
-Capybara.register_driver :selenium do |app|
+Capybara.register_driver :selenium do |_app|
   raise 'selenium-webdriver is not installed. Use Playwright drivers instead.'
 end
 

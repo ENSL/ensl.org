@@ -76,7 +76,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     # expect a recover link to be present for soft-deleted teams
     visit teams_path
     within('table') do
-      row = find('tr', text: team.name)
+      find('tr', text: team.name)
     end
 
     # perform recovery directly to avoid driver/ujs timing issues
@@ -164,7 +164,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
 
     visit edit_team_path(team)
     within('#members', visible: :all) do
-      row = find('tr', text: member.user.username)
+      find('tr', text: member.user.username)
       expect(page).to have_text(member.user.username)
     end
 

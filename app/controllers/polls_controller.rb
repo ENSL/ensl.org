@@ -1,12 +1,11 @@
 class PollsController < ApplicationController
-  before_action :get_poll, except: [:index, :new, :create]
+  before_action :get_poll, except: %i[index new create]
 
   def index
     @polls = Poll.all
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @poll = Poll.new
@@ -44,6 +43,7 @@ class PollsController < ApplicationController
 
   def destroy
     raise AccessError unless @poll.can_destroy? cuser
+
     @poll.destroy
     redirect_to polls_url
   end

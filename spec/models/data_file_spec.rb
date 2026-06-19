@@ -88,9 +88,9 @@ describe DataFile do
     describe '.ordered' do
       it 'returns files ordered by created_at DESC' do
         DataFile.delete_all # Clear all existing files
-        old_file = create(:data_file, created_at: 2.days.ago)
+        create(:data_file, created_at: 2.days.ago)
         sleep(0.01) # Ensure different timestamps
-        new_file = create(:data_file, created_at: 1.day.ago)
+        create(:data_file, created_at: 1.day.ago)
 
         result = DataFile.ordered
         expect(result.first.created_at).to be >= result.last.created_at

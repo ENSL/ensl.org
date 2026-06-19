@@ -3,8 +3,7 @@ class DataFilesController < ApplicationController
   before_action :prepare_edit_form_data, only: %i[edit update]
   respond_to :html, :turbo_stream
 
-  def show
-  end
+  def show; end
 
   def admin
     raise AccessError unless cuser and cuser.admin?

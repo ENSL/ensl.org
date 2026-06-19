@@ -67,7 +67,7 @@ class Comment < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:comment).permit(:text, :user_id, :commentable_type, :commentable_id)
   end
 end

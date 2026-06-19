@@ -29,7 +29,7 @@ RSpec.describe Week, type: :model do
 
   describe 'scopes and permissions' do
     it 'ordered scope sorts by start_date ascending' do
-      a = create(:week, start_date: Date.today + 2)
+      create(:week, start_date: Date.today + 2)
       b = create(:week, start_date: Date.today - 2)
       expect(Week.ordered.first).to eq b
     end

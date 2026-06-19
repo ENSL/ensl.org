@@ -12,7 +12,7 @@ BBCoder.configure do
 
   tag :ul
   tag :ol
-  tag :li, parents: [:ol, :ul]
+  tag :li, parents: %i[ol ul]
 
   tag :size do
     %(<span style="font-size: #{meta}px;">#{content}</span>)

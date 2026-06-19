@@ -5,14 +5,12 @@ RSpec.configure do |config|
     next unless example.exception
 
     # Only attempt to save failure artifacts if a driver is available
-    unless Capybara.current_driver && Capybara.current_driver != Capybara.default_driver
-      next
-    end
+    next unless Capybara.current_driver && Capybara.current_driver != Capybara.default_driver
 
     failures_dir = Rails.root.join('tmp', 'rspec_failures')
     FileUtils.mkdir_p(failures_dir)
 
-    name = example.full_description.gsub(/[^\w\-]+/, '_')[0, 200]
+    name = example.full_description.gsub(/[^\w-]+/, '_')[0, 200]
     timestamp = Time.now.utc.strftime('%Y%m%d-%H%M%S')
     base = failures_dir.join("#{timestamp}-#{name}")
 
@@ -77,4 +75,3 @@ RSpec.configure do |config|
   #   end
   # end
 end
-

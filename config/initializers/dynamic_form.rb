@@ -6,7 +6,7 @@ compat = Module.new do
     msgs = []
     to_hash.each do |attribute, messages|
       Array(messages).each do |message|
-        if attribute == :base || attribute.to_s == "base"
+        if attribute == :base || attribute.to_s == 'base'
           msgs << message
         else
           name = attribute.respond_to?(:attribute) ? attribute.attribute.to_s : attribute.to_s
@@ -22,7 +22,7 @@ apply_patch = proc do
   if defined?(ActiveModel::Errors)
     begin
       ActiveModel::Errors.prepend(compat)
-    rescue => _
+    rescue StandardError => _e
       # intentionally silent
     end
   end

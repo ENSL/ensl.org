@@ -5,8 +5,7 @@ class GroupsController < ApplicationController
     @groups = Group.all
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @group = Group.new

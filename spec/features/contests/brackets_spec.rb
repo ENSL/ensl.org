@@ -6,7 +6,7 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
   scenario 'Normal bracket renders all teams and matches correctly' do
     # Factory creates bracket with all teams and scored matches
     bracket = create(:bracket, :normal, name: 'Main Tournament', slots: 8)
-    contest = bracket.contest
+    bracket.contest
 
     sign_in_via_session(user)
     visit bracket_path(bracket)

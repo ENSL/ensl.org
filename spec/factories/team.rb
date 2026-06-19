@@ -28,7 +28,7 @@ FactoryBot.define do
 
       after(:create) do |team, evaluator|
         # Create unique users for this team
-        evaluator.members_count.times do |i|
+        evaluator.members_count.times do |_i|
           user = create(:user)
           create(:teamer, user: user, team: team, rank: Teamer::RANK_MEMBER)
         end

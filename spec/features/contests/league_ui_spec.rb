@@ -149,7 +149,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     # STEP 6: Admin records match scores via referee interface
     rng = Random.new(20_260_121)
 
-    matches_to_score.each_with_index do |match, idx|
+    matches_to_score.each_with_index do |match, _idx|
       visit ref_match_path(match)
 
       score1 = rng.rand(0..5)

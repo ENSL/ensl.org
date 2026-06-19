@@ -9,15 +9,15 @@ class Api::V1::TeamsController < Api::V1::BaseController
       id: @team.id,
       name: @team.name,
       logo: @team.logo,
-      members: @team.teamers.active.map do |m| 
-        { 
+      members: @team.teamers.active.map do |m|
+        {
           id: m.user.id,
           username: m.user.username,
           steamid: m.user.steamid
-        } 
+        }
       end
     }
   rescue ActiveRecord::RecordNotFound
-    raise ActionController::RoutingError.new("User Not Found")
+    raise ActionController::RoutingError.new('User Not Found')
   end
 end

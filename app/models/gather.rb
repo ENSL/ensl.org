@@ -203,7 +203,7 @@ class Gather < ActiveRecord::Base
     errors.add(:pick_strategy, 'cannot be changed') if changed
   end
 
-  def refresh(cuser)
+  def refresh(_cuser)
     if status == STATE_RUNNING
       # DISABLED: gatherers.idle.destroy_all
     elsif status == STATE_VOTING
@@ -293,7 +293,7 @@ class Gather < ActiveRecord::Base
     game.gathers.ordered.first
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
   end
 end

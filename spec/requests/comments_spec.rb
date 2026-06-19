@@ -37,7 +37,7 @@ RSpec.describe 'CommentsController', type: :request do
   # ---------------------------------------------------------------------------
   describe 'GET /comments/:id (show)' do
     it 'renders the list partial filtered by commentable' do
-      comment = create(:comment, commentable: article)
+      create(:comment, commentable: article)
       get "/comments/#{article.class.name}", params: { id2: article.id }
       expect(response).to have_http_status(:ok)
     end
@@ -86,13 +86,13 @@ RSpec.describe 'CommentsController', type: :request do
     context 'JS format (the normal in-page create flow)' do
       it 'creates a comment and renders the JS response for an authenticated user' do
         login_as(user)
-        expect {
+        expect do
           post '/comments', params: valid_params,
-               headers: { 'ACCEPT' => 'text/javascript' }
-        }.to change(Comment, :count).by(1)
+                            headers: { 'ACCEPT' => 'text/javascript' }
+        end.to change(Comment, :count).by(1)
 
         expect(response).to have_http_status(:ok)
-        expect(response.media_type).to match(%r{javascript})
+        expect(response.media_type).to match(/javascript/)
         expect(flash[:notice]).to be_present
       end
 
@@ -100,10 +100,10 @@ RSpec.describe 'CommentsController', type: :request do
         login_as(user)
         Ban.create!(ban_type: Ban::TYPE_MUTE, expiry: Time.now.utc + 10.days, user_name: user.username)
 
-        expect {
+        expect do
           post '/comments', params: valid_params,
-               headers: { 'ACCEPT' => 'text/javascript' }
-        }.not_to change(Comment, :count)
+                            headers: { 'ACCEPT' => 'text/javascript' }
+        end.not_to change(Comment, :count)
 
         expect(response).to have_http_status(:forbidden)
       end
@@ -111,9 +111,9 @@ RSpec.describe 'CommentsController', type: :request do
 
     context 'HTML format' do
       it 'returns 403 when a guest (not logged in) tries to create a comment' do
-        expect {
+        expect do
           post '/comments', params: valid_params
-        }.not_to change(Comment, :count)
+        end.not_to change(Comment, :count)
 
         expect(response).to have_http_status(:forbidden)
       end
@@ -121,10 +121,10 @@ RSpec.describe 'CommentsController', type: :request do
       it 'redirects back with a flash error when text is blank' do
         login_as(user)
 
-        expect {
+        expect do
           post '/comments',
                params: { comment: { text: '', commentable_type: 'Article', commentable_id: article.id } }
-        }.not_to change(Comment, :count)
+        end.not_to change(Comment, :count)
 
         expect(response).to be_redirect
         expect(flash[:error]).to be_present
@@ -133,10 +133,10 @@ RSpec.describe 'CommentsController', type: :request do
       it 'redirects back with a flash error when text exceeds max length' do
         login_as(user)
 
-        expect {
+        expect do
           post '/comments',
                params: { comment: { text: 'x' * 10_001, commentable_type: 'Article', commentable_id: article.id } }
-        }.not_to change(Comment, :count)
+        end.not_to change(Comment, :count)
 
         expect(response).to be_redirect
         expect(flash[:error]).to be_present
@@ -194,24 +194,24 @@ RSpec.describe 'CommentsController', type: :request do
 
     it 'allows an admin to destroy a comment and redirects' do
       login_as(admin)
-      expect {
+      expect do
         delete "/comments/#{comment.id}"
-      }.to change(Comment, :count).by(-1)
+      end.to change(Comment, :count).by(-1)
       expect(response).to be_redirect
     end
 
     it 'returns 403 and does not destroy when a non-admin tries to delete' do
       login_as(user)
-      expect {
+      expect do
         delete "/comments/#{comment.id}"
-      }.not_to change(Comment, :count)
+      end.not_to change(Comment, :count)
       expect(response).to have_http_status(:forbidden)
     end
 
     it 'returns 403 for a guest' do
-      expect {
+      expect do
         delete "/comments/#{comment.id}"
-      }.not_to change(Comment, :count)
+      end.not_to change(Comment, :count)
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -224,7 +224,7 @@ RSpec.describe 'CommentsController', type: :request do
 
     it 'renders the quote template for a logged-in user' do
       login_as(user)
-      get "/comments/quote", params: { id: comment.id }
+      get '/comments/quote', params: { id: comment.id }
       expect(response).to have_http_status(:ok)
     end
   end

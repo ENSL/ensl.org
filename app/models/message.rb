@@ -90,7 +90,7 @@ class Message < ActiveRecord::Base
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     # FIXME: check this
     params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id,
                                     :sender_raw)

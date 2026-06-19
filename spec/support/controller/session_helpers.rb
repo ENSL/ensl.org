@@ -6,7 +6,7 @@ module Controllers
     end
 
     def login(username)
-      user = User.where(:username => username.to_s).first
+      user = User.where(username: username.to_s).first
       request.session[:user] = user.id
     end
 

@@ -55,7 +55,7 @@ module Extra
 
     def move_down(objects, column = 'position')
       n = 0
-      (objects = objects.order(column)).each_with_index do |item, i|
+      (objects = objects.order(column)).each_with_index do |item, _i|
         if item.id == id and n < (objects.length - 1)
           old_position = item[column]
           item.update_attribute(column, objects[n + 1][column])
@@ -65,19 +65,19 @@ module Extra
       end
     end
 
-    def can_show?(cuser)
+    def can_show?(_cuser)
       true
     end
 
-    def can_create?(cuser)
+    def can_create?(_cuser)
       true
     end
 
-    def can_update?(cuser)
+    def can_update?(_cuser)
       true
     end
 
-    def can_destroy?(cuser)
+    def can_destroy?(_cuser)
       true
     end
   end

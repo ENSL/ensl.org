@@ -127,7 +127,7 @@ class User < ActiveRecord::Base
       .having('num > 15')
       .order('num DESC')
   }
-  scope :posts_stats, lambda { | |
+  scope :posts_stats, lambda { |_ |
     select('users.id, username, COUNT(posts.id) as num')
       .joins('LEFT JOIN posts ON posts.user_id = users.id')
       .group('users.id')
@@ -252,7 +252,6 @@ class User < ActiveRecord::Base
       'Scrypt'
     when User::PASSWORD_MD5_SCRYPT
       'Scrypt+MD5'
-    else
     end
   end
 
@@ -490,7 +489,7 @@ class User < ActiveRecord::Base
     (gathers.where('gathers.status > ?', Gather::STATE_RUNNING).count > 0) or created_at < 2.years.ago
   end
 
-  def can_create?(cuser)
+  def can_create?(_cuser)
     true
   end
 
@@ -580,8 +579,6 @@ class User < ActiveRecord::Base
     if u = User.find_by_sql(['SELECT * FROM user_versions WHERE steamid = ? ORDER BY updated_at',
                              steamid]) and u.length > 0
       User.find u[0]['user_id']
-    else
-      nil
     end
   end
 

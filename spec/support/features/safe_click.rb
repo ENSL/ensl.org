@@ -15,7 +15,7 @@ module Features
           find(selector, **find_opts).click
         end
       rescue Capybara::Playwright::Node::NotActionableError, Capybara::Playwright::Node::StaleReferenceError,
-             Playwright::Error => e
+             Playwright::Error
         # Playwright-specific errors for stale or non-actionable elements
         attempts += 1
         raise if attempts > 8

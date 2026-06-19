@@ -16,7 +16,7 @@ RSpec.describe Bracket, type: :model do
     end
 
     it 'destroys associated bracketers when deleted' do
-      bracketer = create(:bracketer, bracket:)
+      create(:bracketer, bracket:)
       bracket_id = bracket.id
       bracket.destroy
       expect(Bracketer.where(bracket_id:)).to be_empty
@@ -151,14 +151,14 @@ RSpec.describe Bracket, type: :model do
 
     context 'when bracketer is linked to a match' do
       it 'returns match reference string' do
-        bracketer = create(:bracketer, bracket:, row: 1, column: 1, match_id: 42, team_id: nil)
+        create(:bracketer, bracket:, row: 1, column: 1, match_id: 42, team_id: nil)
         expect(bracket.default(1, 1)).to eq('match_42')
       end
     end
 
     context 'when bracketer is linked to a contester' do
       it 'returns contester reference string' do
-        bracketer = create(:bracketer, bracket:, row: 1, column: 1, team_id: 99, match_id: nil)
+        create(:bracketer, bracket:, row: 1, column: 1, team_id: 99, match_id: nil)
         expect(bracket.default(1, 1)).to eq('contester_99')
       end
     end

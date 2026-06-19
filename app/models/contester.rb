@@ -157,7 +157,7 @@ class Contester < ActiveRecord::Base
     !!(cuser && (team.is_leader?(cuser) || cuser.admin?))
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:contester).permit(:team_id, :score, :win, :loss, :draw, :contest_id, :active, :extra, :user)
   end
 end

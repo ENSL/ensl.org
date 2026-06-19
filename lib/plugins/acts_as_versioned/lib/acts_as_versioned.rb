@@ -171,7 +171,7 @@ module ActiveRecord # :nodoc:
           # don't allow multiple calls
           return if included_modules.include?(ActiveRecord::Acts::Versioned::ActMethods)
 
-          send :include, ActiveRecord::Acts::Versioned::ActMethods
+          include ActiveRecord::Acts::Versioned::ActMethods
 
           cattr_accessor :versioned_class_name, :versioned_foreign_key, :versioned_table_name, :versioned_inheritance_column,
                          :version_column, :max_version_limit, :track_altered_attributes, :version_condition, :version_sequence_name, :non_versioned_columns,

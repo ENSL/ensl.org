@@ -45,7 +45,7 @@ class Forumer < ActiveRecord::Base
     { ACCESS_READ => 'Read', ACCESS_REPLY => 'Reply', ACCESS_TOPIC => 'Post a Topic' }
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:forumer).permit(:access, :forum_id, :group_id)
   end
 end

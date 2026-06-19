@@ -44,7 +44,7 @@ module FilesystemTestHelper
     return if remaining_depth <= 0
 
     # Create 2-4 subdirectories at each level with simple alphanumeric names
-    rand(2..4).times do |i|
+    rand(2..4).times do |_i|
       @dir_counter += 1
       dir_name = "#{name_pattern}dir#{@dir_counter}".downcase[0..19] # Ensure max 20 chars
       dir_path = File.join(parent_path, dir_name)

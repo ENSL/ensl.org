@@ -150,9 +150,9 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
                             map1: map1, map2: map2, match_time: 3.hours.from_now)
 
     # Create predictions
-    pred1 = create(:prediction, match: match1, user: user1, score1: 2, score2: 1)
-    pred2 = create(:prediction, match: match2, user: user1, score1: 3, score2: 0)
-    pred3 = create(:prediction, match: match3, user: user1, score1: 1, score2: 1)
+    create(:prediction, match: match1, user: user1, score1: 2, score2: 1)
+    create(:prediction, match: match2, user: user1, score1: 3, score2: 0)
+    create(:prediction, match: match3, user: user1, score1: 1, score2: 1)
 
     sign_in_as(user1)
     visit user_path(user1)

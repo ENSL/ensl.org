@@ -37,9 +37,9 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
   scenario 'admin views all groups on index page' do
     sign_in_via_session(admin)
 
-    group1 = FactoryBot.create(:group, name: 'Developers')
-    group2 = FactoryBot.create(:group, name: 'Moderators')
-    group3 = FactoryBot.create(:group, name: 'Content Reviewers')
+    FactoryBot.create(:group, name: 'Developers')
+    FactoryBot.create(:group, name: 'Moderators')
+    FactoryBot.create(:group, name: 'Content Reviewers')
 
     visit '/groups'
 

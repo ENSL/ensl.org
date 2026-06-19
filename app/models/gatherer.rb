@@ -195,7 +195,7 @@ class Gatherer < ActiveRecord::Base
     (gather.captain1 == self and gather.turn == 1) or (gather.captain2 == self and gather.turn == 2)
   end
 
-  def can_create?(cuser, params = {})
+  def can_create?(cuser, _params = {})
     # and check_params(params, [:user_id, :gather_id])
     cuser \
       and user == cuser \
@@ -229,7 +229,7 @@ class Gatherer < ActiveRecord::Base
     cuser and ((user == cuser or cuser.admin? or cuser.gather_moderator?) and gather.status == Gather::STATE_RUNNING)
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes, :confirm)
   end
 end

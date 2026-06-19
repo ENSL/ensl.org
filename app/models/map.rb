@@ -15,18 +15,18 @@
 class Map < ActiveRecord::Base
   include Extra
 
-  #attr_protected :id, :updated_at, :created_at, :deleted
+  # attr_protected :id, :updated_at, :created_at, :deleted
 
   has_and_belongs_to_many :contests
-  has_many :matches, -> (map){ unscope(:where).where("map1_id = :id OR map2_id = :id", id: map.id) }
+  has_many :matches, ->(map) { unscope(:where).where('map1_id = :id OR map2_id = :id', id: map.id) }
 
-  scope :basic, -> { where(deleted: false).order("name") }
-  scope :with_name, -> (name) { where(name: name) }
+  scope :basic, -> { where(deleted: false).order('name') }
+  scope :with_name, ->(name) { where(name: name) }
   scope :classic, -> { where("name LIKE 'ns_%'") }
   scope :of_category, ->(category) { where(category_id: category.id) }
 
-  validates_length_of :name, :maximum => 20
-  validates_length_of :download, :maximum => 100
+  validates_length_of :name, maximum: 20
+  validates_length_of :download, maximum: 100
 
   mount_uploader :picture, MapUploader
 
@@ -38,19 +38,19 @@ class Map < ActiveRecord::Base
     update_attribute :deleted, true
   end
 
-  def can_create? cuser
+  def can_create?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_update? cuser
+  def can_update?(cuser)
     cuser and cuser.admin?
   end
 
-  def can_destroy? cuser
+  def can_destroy?(cuser)
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:map).permit(:name, :download, :picture, :category_id)
   end
 end

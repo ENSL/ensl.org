@@ -92,7 +92,7 @@ RSpec.describe Gatherer, type: :model do
       gather = create(:gather)
       # create initial team members
       t1 = gather.gatherers.create!(user: create(:user), team: 1)
-      t2 = gather.gatherers.create!(user: create(:user), team: 2)
+      gather.gatherers.create!(user: create(:user), team: 2)
       lobby = gather.gatherers.create!(user: create(:user), team: nil)
 
       # change t1's team to trigger change_turn

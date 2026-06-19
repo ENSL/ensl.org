@@ -1,4 +1,4 @@
-#lock '3.1.0'
+# lock '3.1.0'
 
 set :application, 'ensl'
 set :deploy_via, :remote_cache
@@ -11,23 +11,23 @@ set :keep_releases, 10
 set :rbenv_type, :user
 set :rbenv_ruby, '2.2.2'
 set :bundle_flags, '--quiet'
-set :dotenv_role, [:app, :web]
+set :dotenv_role, %i[app web]
 
 set :puma_config, -> { File.join(current_path, 'config', 'puma.rb') }
 set :puma_pid, -> { File.join(shared_path, 'tmp', 'pids', 'puma.pid') }
 
-set :writable_dirs, %w{public tmp}
-set :linked_files, %w{.env}
-set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle
-                     public/system public/local public/uploads public/files}
+set :writable_dirs, %w[public tmp]
+set :linked_files, %w[.env]
+set :linked_dirs, %w[bin log tmp/pids tmp/cache tmp/sockets vendor/bundle
+                     public/system public/local public/uploads public/files]
 
-set :normalize_asset_timestamps, %{public/images
+set :normalize_asset_timestamps, %(public/images
                                    public/javascripts
-                                   public/stylesheets}
+                                   public/stylesheets)
 
 namespace :deploy do
   namespace :check do
-    desc "Check write permissions"
+    desc 'Check write permissions'
     task :permissions do
       on roles(:all) do |host|
         fetch(:writable_dirs).each do |dir|
@@ -51,7 +51,7 @@ namespace :deploy do
 end
 
 namespace :puma do
-  desc "Start puma"
+  desc 'Start puma'
   task :start do
     on roles(:app) do
       within current_path do
@@ -60,7 +60,7 @@ namespace :puma do
     end
   end
 
-  desc "Restart puma"
+  desc 'Restart puma'
   task :restart do
     on roles(:app) do
       within current_path do
@@ -73,7 +73,7 @@ namespace :puma do
     end
   end
 
-  desc "Stop puma"
+  desc 'Stop puma'
   task :stop do
     on roles(:app) do
       within current_path do

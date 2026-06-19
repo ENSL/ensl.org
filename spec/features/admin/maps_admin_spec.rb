@@ -28,9 +28,9 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
   scenario 'admin views all maps on index page' do
     sign_in_via_session(admin)
 
-    map1 = create(:map, name: 'ns_eclipse')
-    map2 = create(:map, name: 'ns_veil')
-    map3 = create(:map, name: 'ns_summit')
+    create(:map, name: 'ns_eclipse')
+    create(:map, name: 'ns_veil')
+    create(:map, name: 'ns_summit')
 
     visit '/maps'
 
@@ -76,8 +76,8 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
   scenario 'deleted maps do not appear in index listing' do
     sign_in_via_session(admin)
 
-    active_map = create(:map, name: 'ns_active', deleted: false)
-    deleted_map = create(:map, name: 'ns_deleted', deleted: true)
+    create(:map, name: 'ns_active', deleted: false)
+    create(:map, name: 'ns_deleted', deleted: true)
 
     visit '/maps'
 

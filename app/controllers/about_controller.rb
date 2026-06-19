@@ -1,14 +1,11 @@
 class AboutController < ApplicationController
   before_action :require_admin!, only: :adminpanel
 
-  def staff
-  end
+  def staff; end
 
-  def adminpanel
-  end
+  def adminpanel; end
 
-  def statistics
-  end
+  def statistics; end
 
   private
 

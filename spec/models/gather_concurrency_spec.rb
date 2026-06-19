@@ -107,7 +107,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
       allow(gather).to receive(:voting_timeout).and_return(1) # timeout is 1 second old
 
-      initial_status = gather.status
+      gather.status
 
       # Sequential refresh calls that would have caused optimistic locking conflicts
       gather.refresh(nil)

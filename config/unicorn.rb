@@ -21,24 +21,24 @@ worker_processes 4
 
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
-working_directory "/var/www" # available in 0.94.0+
+working_directory '/var/www' # available in 0.94.0+
 
 # listen on both a Unix domain socket and a TCP port,
 # we use a shorter backlog for quicker failover when busy
-listen File.join("tmp/sockets/unicorn.sock"), :backlog => 64
-listen 4000, :tcp_nopush => true
+listen File.join('tmp/sockets/unicorn.sock'), backlog: 64
+listen 4000, tcp_nopush: true
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 30
 
 # feel free to point this anywhere accessible on the filesystem
-pid File.join("tmp/pids/unicorn.pid")
+pid File.join('tmp/pids/unicorn.pid')
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
 # so prevent them from going to /dev/null when daemonized here:
-stderr_path File.join("log/unicorn.stderr.log")
-stdout_path File.join("log/unicorn.stdout.log")
+stderr_path File.join('log/unicorn.stderr.log')
+stdout_path File.join('log/unicorn.stdout.log')
 
 # combine Ruby 2.0.0+ with "preload_app true" for memory savings
 preload_app true
@@ -54,7 +54,7 @@ check_client_connection false
 # local variable to guard against running a hook multiple times
 run_once = true
 
-before_fork do |server, worker|
+before_fork do |_server, _worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
   defined?(ActiveRecord::Base) and
@@ -93,7 +93,7 @@ before_fork do |server, worker|
   # sleep 1
 end
 
-after_fork do |server, worker|
+after_fork do |_server, _worker|
   # per-process listener ports for debugging/admin/migrations
   # addr = "127.0.0.1:#{9293 + worker.nr}"
   # server.listen(addr, :tries => -1, :delay => 5, :tcp_nopush => true)

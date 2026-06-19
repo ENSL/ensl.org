@@ -113,9 +113,9 @@ describe Directory do
   describe 'scopes' do
     describe '.ordered' do
       it 'returns directories ordered by name ASC' do
-        dir_b = create(:directory, name: 'bravo')
-        dir_a = create(:directory, name: 'alpha')
-        dir_c = create(:directory, name: 'charlie')
+        create(:directory, name: 'bravo')
+        create(:directory, name: 'alpha')
+        create(:directory, name: 'charlie')
 
         result = Directory.ordered
         expect(result.pluck(:name)).to eq(%w[alpha bravo charlie])
@@ -126,7 +126,7 @@ describe Directory do
       it 'returns directories ordered by path ASC' do
         dir1 = create(:directory, path: "#{@test_root}/zebra")
         dir2 = create(:directory, path: "#{@test_root}/apple")
-        dir3 = create(:directory, path: "#{@test_root}/middle")
+        create(:directory, path: "#{@test_root}/middle")
 
         result = Directory.path_sorted
         expect(result.first).to eq(dir2)

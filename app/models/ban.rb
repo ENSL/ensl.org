@@ -103,7 +103,7 @@ class Ban < ActiveRecord::Base
     cuser and (cuser.admin? or (creator == cuser and cuser.allowed_to_ban?))
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:ban).permit(:steamid, :user_name, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
   end
 end

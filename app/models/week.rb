@@ -49,7 +49,7 @@ class Week < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:week).permit(:name, :start_date, :contest_id, :map1_id, :map2_id)
   end
 end

@@ -293,7 +293,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
   describe 'admin functions' do
     scenario 'admin can open movies admin index' do
-      movie = create_movie_with_file(
+      create_movie_with_file(
         name: 'Admin Panel Movie',
         user: admin,
         category: movie_category,

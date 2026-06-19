@@ -15,13 +15,13 @@ begin
 
     def upcoming
       @events && @events.select do |event|
-        (!(nsltv_regex =~ event.summary))
+        !(nsltv_regex =~ event.summary)
       end
     end
 
     def upcoming_nsltv
       @events && @events.select do |event|
-        (nsltv_regex =~ event.summary)
+        nsltv_regex =~ event.summary
       end
     end
 

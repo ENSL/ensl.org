@@ -107,7 +107,7 @@ class Issue < ActiveRecord::Base
     ((author == cuser) or Issue.allowed_categories(cuser).include?(category_id))
   end
 
-  def can_create?(cuser)
+  def can_create?(_cuser)
     true
   end
 
@@ -134,7 +134,7 @@ class Issue < ActiveRecord::Base
     allowed
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:issue).permit(:solution, :status, :text, :title,
                                   :assigned_id, :author_id, :category_id)
   end

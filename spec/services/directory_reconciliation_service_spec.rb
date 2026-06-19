@@ -61,7 +61,7 @@ describe DirectoryReconciliationService do
     it 'discovers new directories on disk and creates DB records' do
       # Create initial structure
       filesystem = create_test_filesystem(@test_root, depth: 2, files_per_dir: 2)
-      initial_db_dirs = sync_filesystem_to_db(filesystem, root_directory)
+      sync_filesystem_to_db(filesystem, root_directory)
 
       # Add new directories to disk only
       new_dirs = add_random_directories(filesystem, 3)
@@ -114,7 +114,7 @@ describe DirectoryReconciliationService do
     it 'removes database records for deleted directories' do
       # Create initial structure
       filesystem = create_test_filesystem(@test_root, depth: 2, files_per_dir: 2)
-      initial_db = sync_filesystem_to_db(filesystem, root_directory)
+      sync_filesystem_to_db(filesystem, root_directory)
 
       # Delete some directories from the filesystem
       deleted_dirs = delete_random_directories(filesystem, 2)
@@ -140,10 +140,10 @@ describe DirectoryReconciliationService do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 3)
       sync_filesystem_to_db(filesystem, root_directory)
 
-      initial_file_count = DataFile.count
+      DataFile.count
 
       # Delete some files from filesystem
-      deleted_files = delete_random_files(filesystem, 2)
+      delete_random_files(filesystem, 2)
 
       # NOTE: The current reconciliation logic doesn't automatically delete orphaned files
       # during recursive directory scans. Files are only deleted when their parent directory
@@ -323,9 +323,9 @@ describe DirectoryReconciliationService do
     it 'handles complex filesystem changes in single transaction' do
       # Create initial structure with decent depth
       filesystem = create_test_filesystem(@test_root, depth: 2, files_per_dir: 2, name_pattern: 'complex')
-      initial_db = sync_filesystem_to_db(filesystem, root_directory)
+      sync_filesystem_to_db(filesystem, root_directory)
 
-      initial_dir_count = Directory.count
+      Directory.count
 
       # Simulate realistic changes:
       # 1. Add new files
@@ -350,13 +350,13 @@ describe DirectoryReconciliationService do
     it 'updates file metadata when syncing' do
       # Create a file with initial metadata
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 1)
-      initial_db = sync_filesystem_to_db(filesystem, root_directory)
+      sync_filesystem_to_db(filesystem, root_directory)
 
       # Get the file record
       file_path = filesystem[:files].first
       db_file = DataFile.find_by(path: file_path)
-      original_md5 = db_file.md5
-      original_size = db_file.size
+      db_file.md5
+      db_file.size
 
       # Modify file on disk
       new_content = SecureRandom.random_bytes(5000)
@@ -368,7 +368,7 @@ describe DirectoryReconciliationService do
 
       # Reload and verify metadata was updated
       db_file.reload
-      new_md5 = Digest::MD5.hexdigest(new_content)
+      Digest::MD5.hexdigest(new_content)
 
       # The reconciliation doesn't directly update metadata,
       # but it should preserve the file record
@@ -377,10 +377,10 @@ describe DirectoryReconciliationService do
 
     it 'handles multiple branch structures without errors' do
       # Create two separate directory branches
-      filesystem1 = create_test_filesystem(File.join(@test_root, 'branch1'), depth: 1, files_per_dir: 2,
-                                                                             name_pattern: 'b1')
-      filesystem2 = create_test_filesystem(File.join(@test_root, 'branch2'), depth: 1, files_per_dir: 2,
-                                                                             name_pattern: 'b2')
+      create_test_filesystem(File.join(@test_root, 'branch1'), depth: 1, files_per_dir: 2,
+                                                               name_pattern: 'b1')
+      create_test_filesystem(File.join(@test_root, 'branch2'), depth: 1, files_per_dir: 2,
+                                                               name_pattern: 'b2')
 
       # Run reconciliation on filesystem with multiple branches
       service = DirectoryReconciliationService.new(root_directory)
@@ -404,7 +404,7 @@ describe DirectoryReconciliationService do
 
       # Run reconciliation
       service = DirectoryReconciliationService.new(root_directory)
-      result = service.call
+      service.call
 
       # Empty directory should be created in DB
       expect(Directory.exists?(name: 'emptydir')).to be true
@@ -522,7 +522,7 @@ describe DirectoryReconciliationService do
     it 'handles directory moves with file modifications without creating duplicate file records' do
       # Create initial 4-level filesystem
       filesystem = create_test_filesystem(@test_root, depth: 4, files_per_dir: 3, name_pattern: 'filetest')
-      initial_db = sync_filesystem_to_db(filesystem, root_directory)
+      sync_filesystem_to_db(filesystem, root_directory)
 
       initial_file_count = DataFile.count
       initial_dir_count = Directory.count
@@ -535,7 +535,7 @@ describe DirectoryReconciliationService do
         d.count('/') == @test_root.count('/') + 3 && File.directory?(d)
       end
       source_dir = source_dirs.sample
-      moved_dir_old_path = nil
+      nil
       moved_dir_new_path = nil
 
       if source_dir
@@ -545,7 +545,6 @@ describe DirectoryReconciliationService do
         target_dir = target_dirs.sample
 
         if target_dir
-          moved_dir_old_path = source_dir
           moved_dir_new_path = File.join(target_dir, File.basename(source_dir))
 
           unless File.exist?(moved_dir_new_path)
@@ -865,7 +864,7 @@ describe DirectoryReconciliationService do
 
       # Run reconciliation
       service = DirectoryReconciliationService.new(det_root_directory)
-      result = service.call
+      service.call
 
       # Directory count should stay the same (moved, not deleted+created)
       expect(Directory.count).to eq(initial_dir_count),

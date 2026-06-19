@@ -19,7 +19,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.after(:each, type: :system) do |example|
+  config.after(:each, type: :system) do |_example|
     driver = Capybara.current_session.driver
 
     # Handle Playwright driver

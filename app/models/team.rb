@@ -152,7 +152,7 @@ class Team < ActiveRecord::Base
     cuser and cuser.admin?
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     return {} unless params
 
     if params[:team].present?

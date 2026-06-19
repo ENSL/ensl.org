@@ -7,8 +7,7 @@ class ServersController < ApplicationController
     @officials = Server.ns2.active.ordered.where(['name LIKE ?', '%NSL%']).includes(:versions)
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @server = Server.new

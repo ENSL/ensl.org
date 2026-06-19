@@ -5,8 +5,7 @@ class BansController < ApplicationController
     @bans = Ban.ordered
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @ban = Ban.new

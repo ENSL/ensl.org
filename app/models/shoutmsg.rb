@@ -86,7 +86,7 @@ class Shoutmsg < ActiveRecord::Base
     true
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
   end
 end

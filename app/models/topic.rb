@@ -137,7 +137,7 @@ class Topic < ActiveRecord::Base
     { STATE_NORMAL => 'Normal', STATE_STICKY => 'Sticky' }
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:topic).permit(:state, :title, :forum_id, :user_id, :first_post)
   end
 end

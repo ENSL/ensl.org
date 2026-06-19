@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  before_action :get_message, only: [:show, :edit, :update, :destroy]
+  before_action :get_message, only: %i[show edit update destroy]
 
   def index
     raise AccessError unless cuser
@@ -7,6 +7,7 @@ class MessagesController < ApplicationController
 
   def show
     raise AccessError unless @message.can_show? cuser
+
     @message.mark_as_read! for: cuser
     @messages = @message.thread
   end
@@ -16,21 +17,21 @@ class MessagesController < ApplicationController
     raise AccessError unless @message.can_create? cuser
 
     case params[:id]
-    when "User"
+    when 'User'
       @message.recipient = User.find(params[:id2])
-    when "Team"
+    when 'Team'
       @message.recipient = Team.find(params[:id2])
-    when "Group"
+    when 'Group'
       @message.recipient = Group.find(params[:id2])
     else
-      raise Error, "Illegible recipient"
+      raise Error, 'Illegible recipient'
     end
     @message.title = params[:title]
   end
 
   def create
     @message = Message.new(Message.params(params, cuser))
-    @message.sender = @message.sender_raw == "" ? cuser : cuser.active_teams.find(@message.sender_raw)
+    @message.sender = @message.sender_raw == '' ? cuser : cuser.active_teams.find(@message.sender_raw)
     raise AccessError unless @message.can_create? cuser
 
     if @message.save

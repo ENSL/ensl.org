@@ -72,7 +72,7 @@ class Vote < ActiveRecord::Base
     true
   end
 
-  def self.params(params, cuser)
+  def self.params(params, _cuser)
     params.require(:vote).permit(:votable_type, :votable_id, :poll_id, :user_id)
   end
 

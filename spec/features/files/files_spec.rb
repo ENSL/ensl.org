@@ -97,7 +97,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       demo_file = create(:data_file, directory: dir, title: 'MatchDemo')
 
       contest = create(:contest)
-      match = create(:match, contest: contest, demo: demo_file)
+      create(:match, contest: contest, demo: demo_file)
 
       visit data_file_path(demo_file)
 
@@ -167,7 +167,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
     it 'retrieves recent files limited to 8' do
       dir = create(:directory)
-      files = create_list(:data_file, 10, directory: dir)
+      create_list(:data_file, 10, directory: dir)
 
       recent = DataFile.recent
 

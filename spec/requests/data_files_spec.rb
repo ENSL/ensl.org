@@ -40,8 +40,8 @@ RSpec.describe 'DataFilesController', type: :request do
   describe 'GET /data_files/admin' do
     it 'renders broken and unrelated movie files for admins' do
       regular_directory = create(:directory, parent: ensure_root_directory)
-      broken_file = create(:data_file, directory: regular_directory, title: 'Broken file',
-                                       path: File.join(regular_directory.full_path, 'broken.txt'))
+      create(:data_file, directory: regular_directory, title: 'Broken file',
+                         path: File.join(regular_directory.full_path, 'broken.txt'))
 
       unrelated_path = File.join(ensure_movies_directory.full_path, 'unrelated.mp4')
       FileUtils.mkdir_p(File.dirname(unrelated_path))

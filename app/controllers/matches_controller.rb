@@ -22,8 +22,7 @@ class MatchesController < ApplicationController
     render layout: 'full'
   end
 
-  def extra
-  end
+  def extra; end
 
   def ref
     raise AccessError unless @match.can_update? cuser, [:report]
