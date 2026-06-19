@@ -500,7 +500,7 @@ class User < ActiveRecord::Base
 
     i = 2
     loop do
-      new_username = format('%s%d', username, i)
+      new_username = "#{username}#{i}"
       i += 1
       if User.where(username: new_username).count.zero? || (i > 50)
         self.username = new_username

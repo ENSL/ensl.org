@@ -12,7 +12,7 @@ module Api
           @user = User.find(params[:id])
         elsif params[:format] == 'steamid'
           steamid_i = params[:id].to_i
-          @user = User.where(steamid: format('0:%d:%d', steamid_i % 2, steamid_i >> 1)).first
+          @user = User.where(steamid: "0:#{steamid_i % 2}:#{steamid_i >> 1}").first
         elsif params[:format] == 'steamidstr'
           @user = User.where(steamid: params[:id]).first
         end

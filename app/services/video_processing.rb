@@ -195,9 +195,9 @@ class VideoProcessing
                      m = ((duration_s % 3600) / 60).floor
                      s = (duration_s % 60)
                      if h.positive?
-                       format('%d:%02d:%05.2f', h, m, s)
+                       format('%<hours>d:%<minutes>02d:%<seconds>05.2f', hours: h, minutes: m, seconds: s)
                      else
-                       format('%d:%05.2f', m, s)
+                       format('%<minutes>d:%<seconds>05.2f', minutes: m, seconds: s)
                      end
                    else
                      '?'

@@ -207,9 +207,9 @@ class UsersController < ApplicationController
     if user.banned? Ban::TYPE_SITE
       flash[:error] = t(:accounts_locked)
     else
-      flash[:notice] = format('%s', t(:login_successful))
+      flash[:notice] = t(:login_successful)
       # FIXME: this doesn't work because model is saved before
-      flash[:notice] << " \n%s" % I18n.t(:password_md5_scrypt) if user.password_hash_changed?
+      flash[:notice] << " \n#{I18n.t(:password_md5_scrypt)}" if user.password_hash_changed?
       if !session[:verified_steamid].blank? && \
          (user.steamid != session[:verified_steamid]) && \
          user.update_attribute(:steamid, session[:verified_steamid])
