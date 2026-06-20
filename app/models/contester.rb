@@ -81,9 +81,11 @@ class Contester < ActiveRecord::Base
     contest.matches.where('contester1_id = ? OR contester2_id = ?', id, id)
   end
 
-  def get_matches
+  def matches_for_contester
     contest_matches
   end
+
+  alias get_matches matches_for_contester
 
   def stats_from_matches(matches_scope = nil)
     matches = matches_scope || contest_matches.realfinished

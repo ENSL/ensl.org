@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Gather, type: :model do
-  def stub_refresh_state(gather, team1_count:, team2_count:, lobby_member: nil)
+  def stub_refresh_state(gather, team_one_count:, team_two_count:, lobby_member: nil)
     fake_assoc = double('gatherers_assoc')
 
-    allow(fake_assoc).to receive(:team).with(1).and_return(double(count: team1_count))
-    allow(fake_assoc).to receive(:team).with(2).and_return(double(count: team2_count))
+    allow(fake_assoc).to receive(:team).with(1).and_return(double(count: team_one_count))
+    allow(fake_assoc).to receive(:team).with(2).and_return(double(count: team_two_count))
     allow(fake_assoc).to receive(:lobby).and_return(double(first: lobby_member))
     allow(gather).to receive(:gatherers).and_return(fake_assoc)
     allow(gather).to receive(:with_lock).and_yield
@@ -61,12 +61,12 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       create_list(:gatherer, 12, gather: gather)
 
-      stale_copy_1 = Gather.find(gather.id)
-      stale_copy_2 = Gather.find(gather.id)
+      stale_copy_one = Gather.find(gather.id)
+      stale_copy_two = Gather.find(gather.id)
 
       expect do
-        stale_copy_1.update!(status: Gather::STATE_PICKING)
-        stale_copy_2.update!(status: Gather::STATE_PICKING)
+        stale_copy_one.update!(status: Gather::STATE_PICKING)
+        stale_copy_two.update!(status: Gather::STATE_PICKING)
       end.to change { Gather.where(category_id: gather.category_id).count }.by(1)
     end
   end
@@ -75,7 +75,7 @@ RSpec.describe Gather, type: :model do
     it 'changes turn based on team counts' do
       gather = create(:gather)
       gather.update!(status: Gather::STATE_PICKING, turn: 1)
-      # set teams so that team1 count == 2 and team2 count == 1
+      # set teams so that team one count == 2 and team two count == 1
       gather.gatherers.create!(user: create(:user), team: 1)
       gather.gatherers.create!(user: create(:user), team: 1)
       gather.gatherers.create!(user: create(:user), team: 2)
@@ -104,7 +104,7 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       gather.update_columns(status: Gather::STATE_PICKING, turn: 2)
       gather.reload
-      stub_refresh_state(gather, team1_count: 2, team2_count: 3)
+      stub_refresh_state(gather, team_one_count: 2, team_two_count: 3)
 
       gather.refresh(nil)
 
@@ -115,7 +115,7 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
-      stub_refresh_state(gather, team1_count: 4, team2_count: 3)
+      stub_refresh_state(gather, team_one_count: 4, team_two_count: 3)
 
       gather.refresh(nil)
 
@@ -126,7 +126,7 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       gather.update_columns(status: Gather::STATE_PICKING, turn: 2)
       gather.reload
-      stub_refresh_state(gather, team1_count: 4, team2_count: 5)
+      stub_refresh_state(gather, team_one_count: 4, team_two_count: 5)
 
       gather.refresh(nil)
 
@@ -139,7 +139,7 @@ RSpec.describe Gather, type: :model do
       gather.reload
       lobby_member = instance_double(Gatherer)
       allow(lobby_member).to receive(:update!)
-      stub_refresh_state(gather, team1_count: 6, team2_count: 5, lobby_member: lobby_member)
+      stub_refresh_state(gather, team_one_count: 6, team_two_count: 5, lobby_member: lobby_member)
 
       gather.refresh(nil)
 
@@ -151,7 +151,7 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
-      stub_refresh_state(gather, team1_count: 6, team2_count: 5, lobby_member: nil)
+      stub_refresh_state(gather, team_one_count: 6, team_two_count: 5, lobby_member: nil)
 
       expect { gather.refresh(nil) }.not_to raise_error
       expect(gather.reload.turn).to eq(2)
@@ -161,7 +161,7 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
-      stub_refresh_state(gather, team1_count: 1, team2_count: 1)
+      stub_refresh_state(gather, team_one_count: 1, team_two_count: 1)
 
       expect(gather).not_to receive(:with_lock)
 

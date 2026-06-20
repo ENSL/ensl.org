@@ -6,8 +6,8 @@ RSpec.describe 'User login', type: :request do
   let(:username) { 'legacy_md5' }
   let(:raw_password) { 'OldPass123!' }
 
-  def login_post(name, pw)
-    post '/users/login', params: { login: { username: name, password: pw } }
+  def login_post(username, password)
+    post '/users/login', params: { login: { username: username, password: password } }
   end
 
   it 'allows MD5 users to log in and upgrades password to scrypt' do

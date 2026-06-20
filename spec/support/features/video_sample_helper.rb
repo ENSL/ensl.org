@@ -2,6 +2,8 @@
 
 require 'open3'
 require 'shellwords'
+require 'net/http'
+require 'uri'
 
 module Features
   module VideoSampleHelper
@@ -135,8 +137,6 @@ module Features
     # Download a file from URL to local path
     # Bypasses WebMock restriction for this specific request
     def download_file(url, destination)
-      require 'open-uri'
-
       # Temporarily allow this specific host
       uri = URI.parse(url)
 
@@ -144,19 +144,25 @@ module Features
       WebMock.disable_net_connect!(allow_localhost: true, allow: uri.host) if defined?(WebMock)
 
       begin
-        URI.open(url) do |remote_file|
-          File.open(destination, 'wb') do |local_file|
-            local_file.write(remote_file.read)
-          end
+        response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          http.open_timeout = 20
+          http.read_timeout = 120
+          http.get(uri.request_uri)
+        end
+
+        raise "Unexpected response: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+        File.open(destination, 'wb') do |local_file|
+          local_file.write(response.body)
         end
         true
+      rescue StandardError => e
+        Rails.logger.warn("Could not download #{url}: #{e.message}. Skipping remote sample.")
+        false
       ensure
         # Restore WebMock restrictions
         WebMock.disable_net_connect!(allow_localhost: true) if defined?(WebMock)
       end
-    rescue OpenURI::HTTPError, SocketError, Errno::ENOENT, URI::InvalidURIError => e
-      Rails.logger.warn("Could not download #{url}: #{e.message}. Skipping remote sample.")
-      false
     end
 
     def generate_video_fixture(spec, output_path)

@@ -51,6 +51,19 @@ class Shoutmsg < ActiveRecord::Base
     cuser&.admin?
   end
 
+  def self.flood?(cuser, type = nil, id = nil)
+    return false if of_object(type, id).count < 3
+
+    of_object(type, id).all(order: 'created_at DESC', limit: 10).each do |msg|
+      return false if cuser != msg.user
+    end
+    true
+  end
+
+  def self.params(params, _cuser)
+    params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
+  end
+
   private
 
   def normalize_emoji_aliases
@@ -77,18 +90,5 @@ class Shoutmsg < ActiveRecord::Base
     rescue StandardError => e
       Rails.logger.error "Shoutmsg broadcast failed: #{e.class}: #{e.message} -- shout_id=#{shout.id.inspect}, user_id=#{shout.user_id.inspect}, user=#{shout.user.inspect}"
     end
-  end
-
-  def self.flood?(cuser, type = nil, id = nil)
-    return false if of_object(type, id).count < 3
-
-    of_object(type, id).all(order: 'created_at DESC', limit: 10).each do |msg|
-      return false if cuser != msg.user
-    end
-    true
-  end
-
-  def self.params(params, _cuser)
-    params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
   end
 end

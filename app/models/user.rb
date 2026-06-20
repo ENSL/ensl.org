@@ -563,11 +563,6 @@ class User < ActiveRecord::Base
       end
       Rails.logger.info("Auth failed: password mismatch user_id=#{user.id} username=#{user.username} hash=md5")
     end
-    return nil
-    # TODO: controller needs to handle this
-    # rescue Exception => ex
-    #  user.errors.add(:password, "%s (%s)" % [I18n.t(:password_corrupt), ex.class.to_s])
-    #  return nil
     nil
   end
 

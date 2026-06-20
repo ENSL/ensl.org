@@ -8,14 +8,16 @@
 
 require_relative '../../config/environment'
 
-include FactoryBot::Syntax::Methods
+module BracketFill
+  extend FactoryBot::Syntax::Methods
+end
 
 # Run the script
 begin
   ActiveRecord::Base.transaction do
     # Create a complete randomized bracket contest with all related data
-    contest = create(:contest, :randomized_bracket_contest,
-                     name: "Random Bracket Contest #{Time.now.to_i}")
+    contest = BracketFill.create(:contest, :randomized_bracket_contest,
+                                 name: "Random Bracket Contest #{Time.now.to_i}")
 
     # Print summary
     puts "\n#{'=' * 60}"

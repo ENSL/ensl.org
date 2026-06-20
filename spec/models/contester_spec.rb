@@ -169,13 +169,13 @@ RSpec.describe Contester, type: :model do
   end
 
   describe 'relations and destructive helpers' do
-    it 'delegates get_matches to contest.matches.where' do
+    it 'delegates matches_for_contester to contest.matches.where' do
       contester = create(:contester)
       matches_rel = double('Relation')
       allow(contester.contest).to receive(:matches).and_return(matches_rel)
       expect(matches_rel).to receive(:where).with('contester1_id = ? OR contester2_id = ?', contester.id,
                                                   contester.id).and_return(:found)
-      expect(contester.get_matches).to eq :found
+      expect(contester.matches_for_contester).to eq :found
     end
 
     it 'calls update_attribute on destroy' do

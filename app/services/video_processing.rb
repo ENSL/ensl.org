@@ -16,6 +16,7 @@ require 'fileutils'
 require 'securerandom'
 require 'bigdecimal'
 require 'json'
+require 'timeout'
 
 class VideoProcessing
   class Error < StandardError; end
@@ -296,8 +297,10 @@ class VideoProcessing
       path.to_s
     ]
 
-    json = run_cmd!(args, 'ffprobe failed', capture: true)
+    json = Timeout.timeout(timeout_s) { run_cmd!(args, 'ffprobe failed', capture: true) }
     JSON.parse(json)
+  rescue Timeout::Error => e
+    raise CommandFailed, "ffprobe timed out after #{timeout_s}s: #{e.message}"
   rescue JSON::ParserError => e
     raise CommandFailed, "ffprobe returned invalid JSON: #{e.message}"
   end

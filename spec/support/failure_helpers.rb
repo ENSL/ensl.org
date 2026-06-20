@@ -28,7 +28,7 @@ RSpec.configure do |config|
     # Save screenshot
     begin
       if defined?(page) && page.respond_to?(:save_screenshot)
-        page.save_screenshot("#{base}.png", full: true)
+        page.driver.save_screenshot("#{base}.png")
       elsif defined?(Capybara) && Capybara.respond_to?(:save_screenshot)
         Capybara.save_screenshot("#{base}.png")
       end
@@ -41,7 +41,8 @@ RSpec.configure do |config|
       if defined?(page) && page.respond_to?(:current_url)
         File.open("#{base}.url.txt", 'w') { |f| f.write(page.current_url.to_s) }
       end
-    rescue StandardError
+    rescue StandardError => e
+      File.open("#{base}.url_error.txt", 'w') { |f| f.write(e.message) }
     end
 
     # Save browser console logs (if available)
@@ -68,7 +69,8 @@ RSpec.configure do |config|
         lines = File.readlines(test_log).last(500) || []
         File.open("#{base}.test.log", 'w') { |f| f.puts(lines) }
       end
-    rescue StandardError
+    rescue StandardError => e
+      File.open("#{base}.test_log_error.txt", 'w') { |f| f.write(e.message) }
     end
   end
 

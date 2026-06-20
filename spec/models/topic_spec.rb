@@ -44,13 +44,15 @@ describe Topic do
       recent_topics = Topic.recent_topics
 
       post_max_ids = Post.group(:topic_id).maximum(:id)
-      top_200 = post_max_ids.sort_by { |_topic_id, max_id| -max_id }.first(200)
+      top_topics = post_max_ids.sort_by { |topic_id, max_id| [-max_id, topic_id] }.first(200)
 
       expected_ids = []
-      top_200.each do |topic_id, _max_id|
+      top_topics.each do |topic_id, max_id|
         topic = Topic.find_by(id: topic_id)
         next unless topic
         next if Forumer.exists?(forum_id: topic.forum_id)
+
+        next unless max_id
 
         expected_ids << topic_id
         break if expected_ids.length == 5

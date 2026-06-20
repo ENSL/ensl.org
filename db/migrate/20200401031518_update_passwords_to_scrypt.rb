@@ -5,7 +5,7 @@ class UpdatePasswordsToScrypt < ActiveRecord::Migration[4.2][6.0]
   require 'scrypt'
 
   def up
-    puts('SCRYPT_MAX_TIME=%s' % ENV['SCRYPT_MAX_TIME'])
+    puts(format('SCRYPT_MAX_TIME=%<value>s', value: ENV['SCRYPT_MAX_TIME']))
     SCrypt::Engine.calibrate!(max_time: ENV['SCRYPT_MAX_TIME'].to_f)
 
     puts('Updating passwords to scrypt...')
@@ -15,9 +15,10 @@ class UpdatePasswordsToScrypt < ActiveRecord::Migration[4.2][6.0]
       user.team = nil unless user&.team&.present?
       user.update_password
       user.save!(validate: false)
-      print(format('%s (%d) ', user.username, user.id))
+      print(format('%<username>s (%<id>d) ', username: user.username, id: user.id))
     rescue StandardError => e
-      puts(format('User %s (%d) skipped: %s', user.username, user.id, e.message))
+      puts(format('User %<username>s (%<id>d) skipped: %<message>s', username: user.username, id: user.id,
+                                                                     message: e.message))
     end
   end
 end

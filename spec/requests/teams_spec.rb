@@ -6,8 +6,8 @@ RSpec.describe 'TeamsController', type: :request do
   let(:admin) { create(:user, :admin) }
   let(:user) { create(:user) }
 
-  def login_as(u)
-    post '/users/login', params: { login: { username: u.username, password: u.raw_password } }
+  def login_as(user)
+    post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
     follow_redirect! if response.redirect?
     expect(flash[:notice]).to be_present
   end

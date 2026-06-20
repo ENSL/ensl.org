@@ -53,10 +53,7 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
     # Confirm a second click does not create another Vote
     count = Vote.count
     if page.has_selector?('a.vote-link:not(.disabled)', visible: :all)
-      begin
-        find('a.vote-link:not(.disabled)', match: :first).click
-      rescue StandardError
-      end
+      find('a.vote-link:not(.disabled)', match: :first).click
     end
     expect(Vote.count).to eq(count)
   end

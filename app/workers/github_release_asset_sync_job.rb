@@ -3,7 +3,8 @@
 require 'cgi'
 require 'fileutils'
 require 'json'
-require 'open-uri'
+require 'net/http'
+require 'uri'
 
 class GithubReleaseAssetSyncJob
   include Sidekiq::Job
@@ -102,9 +103,18 @@ class GithubReleaseAssetSyncJob
       return
     end
 
-    URI.open(asset_url, 'User-Agent' => USER_AGENT, open_timeout: 20, read_timeout: 120) do |stream|
-      File.open(destination_path, 'wb') { |file| IO.copy_stream(stream, file) }
+    uri = URI.parse(asset_url)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+      request = Net::HTTP::Get.new(uri)
+      request['User-Agent'] = USER_AGENT
+      http.open_timeout = 20
+      http.read_timeout = 120
+      http.request(request)
     end
+
+    raise "Download failed with #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+    File.open(destination_path, 'wb') { |file| file.write(response.body) }
 
     Rails.logger.info("[GithubReleaseAssetSyncJob] Downloaded #{asset_url} -> #{destination_path}")
   rescue StandardError => e

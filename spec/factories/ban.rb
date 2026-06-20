@@ -28,7 +28,7 @@ FactoryBot.define do
     end
 
     trait :gather do
-      ban_type { Ban::TYPE_GATHER  }
+      ban_type { Ban::TYPE_GATHER }
     end
 
     trait :expired do

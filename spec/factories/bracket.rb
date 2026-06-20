@@ -195,7 +195,7 @@ module BracketFactoryHelpers
   end
 
   # ── Wild west bracket: anything goes. Orphans, empty, mis-matched, etc. ──
-  def self.build_wild_west(bracket, teams_pool:)
+  def self.build_wild_west(bracket, _teams_pool:)
     slots = bracket.slots
     contest = bracket.contest
     maps = contest.maps.to_a
@@ -273,7 +273,7 @@ FactoryBot.define do
         teams_pool { [] }
       end
       after(:create) do |bracket, evaluator|
-        BracketFactoryHelpers.build_wild_west(bracket, teams_pool: evaluator.teams_pool)
+        BracketFactoryHelpers.build_wild_west(bracket, _teams_pool: evaluator.teams_pool)
       end
     end
   end

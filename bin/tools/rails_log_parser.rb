@@ -98,7 +98,7 @@ module RailsLog
   end
 
   def self.print_usage
-    puts <<~END
+    puts <<~USAGE
       ruby #{File.basename(__FILE__)} [options] [FILE]
 
       Parses a rails log file and prints out call time information by controller#action pair.
@@ -122,7 +122,7 @@ module RailsLog
 
         gunzip -c $RAILS_ROOT/logs/development.log.gz | ruby #{File.basename(__FILE__)} --sort count --limit 20 -
 
-    END
+    USAGE
     exit
   end
 end

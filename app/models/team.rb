@@ -51,7 +51,7 @@ class Team < ActiveRecord::Base
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
   scope :ordered, -> { order('name') }
-  scope :recruiting, -> {  where("recruiting IS NOT NULL AND recruiting != ''") }
+  scope :recruiting, -> { where("recruiting IS NOT NULL AND recruiting != ''") }
   scope :not_in_contest, lambda { |contest|
     contest_id = contest.respond_to?(:id) ? contest.id : contest
     where.not(id: Contester.where(contest_id: contest_id).select(:team_id))

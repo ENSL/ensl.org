@@ -7,8 +7,8 @@ RSpec.describe 'Gathers version endpoint', type: :request do
   let(:admin) { create(:user, :admin) }
   let(:gather) { create(:gather) }
 
-  def login_as(u)
-    post '/users/login', params: { login: { username: u.username, password: u.raw_password } }
+  def login_as(user)
+    post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
     follow_redirect! if response.redirect?
   end
 

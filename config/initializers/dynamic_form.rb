@@ -4,7 +4,7 @@
 compat = Module.new do
   def full_messages
     super
-  rescue NoMethodError, NameError
+  rescue NameError
     msgs = []
     to_hash.each do |attribute, messages|
       Array(messages).each do |message|

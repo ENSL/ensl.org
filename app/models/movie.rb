@@ -142,8 +142,9 @@ class Movie < ActiveRecord::Base
     view_counts.count
   end
 
-  def record_view_count(ip_address, logged_in = false, **options)
-    logged_in = options[:logged_in] if options.key?(:logged_in)
+  def record_view_count(ip_address, logged_in = nil, **options)
+    logged_in = options.fetch(:logged_in, logged_in)
+    logged_in = false if logged_in.nil?
     view_counts.find_or_create_by(ip_address: ip_address) do |vc|
       vc.logged_in = logged_in
     end
@@ -236,7 +237,7 @@ class Movie < ActiveRecord::Base
     Rails.logger.warn("Skipping movie length probe for movie##{id || 'new'}: #{e.message}")
   end
 
-  def make_preview(_x = nil, _y = nil)
+  def make_preview(_width = nil, _height = nil)
     return unless file&.location
 
     VideoProcessing.transcode_for_web!(
