@@ -1,42 +1,34 @@
 # frozen_string_literal: true
 
-# Collect browser console logs after system (JS) specs and fail on errors.
-RSpec.configure do |config|
-  # Set up console listener for Playwright before each test
-  config.before(:each, type: :system) do
-    next unless Capybara.current_driver.to_s.include?('playwright')
+# Collect browser console logs after feature and system specs and fail on errors.
+module Features
+  module JsConsoleLogger
+    module_function
 
-    begin
+    def prepare_playwright_console_listener
+      return unless Capybara.current_driver.to_s.include?('playwright')
+
       driver = Capybara.current_session.driver
-      next unless driver.is_a?(Capybara::Playwright::Driver)
+      return unless driver.is_a?(Capybara::Playwright::Driver)
 
-      # Initialize thread-safe storage for console messages
       Thread.current[:playwright_console_logs] = []
-
-      # The page might not be created yet, so we'll set up the listener later
-      # Store a flag to set it up on first page access
       Thread.current[:playwright_console_listener_needed] = true
     rescue StandardError => e
       warn "js_console_logger: failed to prepare Playwright console listener: #{e.class}: #{e.message}"
     end
-  end
 
-  config.after(:each, type: :system) do |_example|
-    driver = Capybara.current_session.driver
+    def collect_playwright_console_logs
+      driver = Capybara.current_session.driver
+      return unless driver.is_a?(Capybara::Playwright::Driver)
 
-    # Handle Playwright driver
-    if driver.is_a?(Capybara::Playwright::Driver)
-      # Ensure console listener is set up
       if Thread.current[:playwright_console_listener_needed]
         begin
-          driver.current_url # Ensure page is initialized
+          driver.current_url
           browser_wrapper = driver.instance_variable_get(:@browser)
           playwright_page = browser_wrapper&.instance_variable_get(:@playwright_page)
 
           if playwright_page
             Thread.current[:playwright_console_logs] ||= []
-
-            # Set up console message listener
             playwright_page.on('console', lambda { |msg|
               Thread.current[:playwright_console_logs] << {
                 type: msg.type,
@@ -44,7 +36,6 @@ RSpec.configure do |config|
                 args: msg.args
               }
             })
-
             Thread.current[:playwright_console_listener_needed] = false
           end
         rescue StandardError => e
@@ -56,12 +47,10 @@ RSpec.configure do |config|
       Thread.current[:playwright_console_logs] = nil
       Thread.current[:playwright_console_listener_needed] = nil
 
-      next if logs.empty?
+      return if logs.empty?
 
-      # Map Playwright console types to severity
       errors = logs.select { |l| l[:type] == 'error' }
       warnings = logs.select { |l| l[:type] == 'warning' }
-
       strict = ENV['JS_CONSOLE_STRICT'] == '1'
 
       if errors.any? || (strict && warnings.any?)
@@ -74,26 +63,22 @@ RSpec.configure do |config|
         warn 'JavaScript console warnings (non-strict):'
         warnings.each { |w| warn "[#{w[:type].upcase}] #{w[:text]}" }
       end
+    rescue StandardError => e
+      warn "js_console_logger: failed to collect console logs: #{e.class}: #{e.message}"
+    end
 
-    # Handle Selenium driver (legacy support)
-    elsif driver.respond_to?(:browser)
+    def collect_legacy_browser_logs
+      driver = Capybara.current_session.driver
+      return unless driver.respond_to?(:browser)
+
       browser = driver.browser
+      return unless browser.respond_to?(:manage) && browser.manage.respond_to?(:logs)
 
-      # Only proceed if browser exposes logs
-      next unless browser.respond_to?(:manage) && browser.manage.respond_to?(:logs)
-
-      raw_logs = []
-      begin
-        raw_logs = browser.manage.logs.get(:browser) || []
-      rescue StandardError
-        raw_logs = []
-      end
-
-      next if raw_logs.empty?
+      raw_logs = browser.manage.logs.get(:browser) || []
+      return if raw_logs.empty?
 
       errors = raw_logs.select { |l| l.level == 'SEVERE' }
       warnings = raw_logs.select { |l| l.level == 'WARNING' }
-
       strict = ENV['JS_CONSOLE_STRICT'] == '1'
 
       if errors.any? || (strict && warnings.any?)
@@ -106,8 +91,19 @@ RSpec.configure do |config|
         warn 'JavaScript console warnings (non-strict):'
         warnings.each { |w| warn "[#{w.level}] #{w.message}" }
       end
+    rescue StandardError => e
+      warn "js_console_logger: failed to collect console logs: #{e.class}: #{e.message}"
     end
-  rescue StandardError => e
-    warn "js_console_logger: failed to collect console logs: #{e.class}: #{e.message}"
+  end
+end
+
+RSpec.configure do |config|
+  config.before(:each, type: %i[feature system]) do
+    Features::JsConsoleLogger.prepare_playwright_console_listener
+  end
+
+  config.after(:each, type: %i[feature system]) do
+    Features::JsConsoleLogger.collect_playwright_console_logs
+    Features::JsConsoleLogger.collect_legacy_browser_logs
   end
 end
