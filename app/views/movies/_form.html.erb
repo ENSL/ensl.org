@@ -1,16 +1,16 @@
-<div id="<%= error_wrapper_id_for(@movie) %>">
-  <%= render 'shared/errors', messages: @movie.errors.full_messages, container_id: error_container_id_for(@movie) %>
+<div id="<%= error_wrapper_id_for(movie) %>">
+  <%= render 'shared/errors', messages: movie.errors.full_messages, container_id: error_container_id_for(movie) %>
 </div>
 
-<%= form_for @movie, html: { multipart: true, class: 'square', id: dom_id(@movie, :form) } do |f| %>
+<%= form_for movie, html: { multipart: true, class: 'square', id: dom_id(movie, :form) } do |f| %>
 
   <div class="fields horizontal">
     <%= f.label :name %>
-    <%= f.text_field :name, { value: @movie.file.to_s } %>
+    <%= f.text_field :name, { value: movie.file.to_s } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :category_id %>
-    <%= f.select :category_id, @movie_categories %>
+    <%= f.select :category_id, movie_categories %>
   </div>
   <div class="fields horizontal">
     <%= f.label :content %>
@@ -26,21 +26,21 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :user_name, "Author" %>
-    <%= f.text_field :user_name, { value: @movie&.user } %>
+    <%= f.text_field :user_name, { value: movie&.user } %>
   </div>
   <% file_options = DataFile.movies.collect { |d| ["#{d.name}", d.id] } %>
-  <% if @movie.file && !file_options.any? { |(_, id)| id == @movie.file_id } %>
-    <% file_options.unshift([@movie.file.name.to_s, @movie.file_id]) %>
+  <% if movie.file && !file_options.any? { |(_, id)| id == movie.file_id } %>
+    <% file_options.unshift([movie.file.name.to_s, movie.file_id]) %>
   <% end %>
   <div class="fields horizontal">
     <%= f.label :file %>
     <div class="inputs">
-      <%= f.select :file_id, file_options, { include_blank: true }, { selected: @movie.file_id } %>
+      <%= f.select :file_id, file_options, { include_blank: true }, { selected: movie.file_id } %>
     </div>
   </div>
   <div class="fields horizontal">
     <%= f.label :preview_id %>
-    <%= f.select :preview_id, @movie.all_files.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
+    <%= f.select :preview_id, movie.all_files.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :picture %>
@@ -49,8 +49,8 @@
 
   <div class="controls">
     <%= f.submit 'Save' %>
-    <% if @movie.file %>
-      <%= link_to "View File", edit_data_file_path(@movie.file), class: 'button' %>
+    <% if movie.file %>
+      <%= link_to "View File", edit_data_file_path(movie.file), class: 'button' %>
     <% end %>
   </div>
 <% end %>

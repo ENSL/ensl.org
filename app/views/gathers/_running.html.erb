@@ -1,11 +1,12 @@
 <div class="gather-columns">
   <div class="data players">
     <div class="contents">
+      <% gather = @gather %>
       <h4>Signed Up</h4>
       <%= render partial: 'gathers/progress' %>
 
       <ul id="gatherers">
-        <% @gather.gatherers.each do |gatherer| %>
+        <% gather.gatherers.each do |gatherer| %>
           <li<% if gatherer.status > 0 %> class="away"<% end %>>
             <%= flag gatherer.user.country %>
             <%= namelink gatherer.user %>
@@ -28,5 +29,4 @@
   <%= render partial: 'gathers/votes' %>
 </div>
 
-<%= render partial: 'gathers/status' %>
-  
+<%= render partial: 'gathers/status', locals: { gather: gather, gatherer: @gatherer } %>

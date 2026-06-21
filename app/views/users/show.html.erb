@@ -35,7 +35,7 @@
     </ul>
 
     <div id="user-data" class="tabbed-contents">
-      <%= render :partial => "general" %>
+      <%= render partial: "general", locals: { user: @user } %>
     </div>
   </div>
 

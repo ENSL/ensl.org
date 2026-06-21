@@ -1,103 +1,103 @@
 <div class="group">
   <h4>General information</h4>
-  
+
   <dl>
     <dt>Age</dt>
-    <dd><%= @user.age %></dd>
+    <dd><%= user.age %></dd>
 
-    <% if !@user.country.blank? %>
+    <% if !user.country.blank? %>
       <dt>Country</dt>
-      <dd><%= @user.country %></dd>
+      <dd><%= user.country %></dd>
     <% end %>
 
-    <% if !@user.profile.town.blank? %>
+    <% if !user.profile.town.blank? %>
       <dt>Town</dt>
-      <dd><%= @user.profile.town %></dd>
+      <dd><%= user.profile.town %></dd>
     <% end %>
 
-    <% if !@user.steamid.blank? %>
+    <% if !user.steamid.blank? %>
       <dt>SteamID</dt>
       <dd>
-        <p><%= @user.steamid %></p>
-        <div id="steam-search" data-user-id="<%= @user.id %>">
-          <%= link_to "Search for Steam Account" %>  
+        <p><%= user.steamid %></p>
+        <div id="steam-search" data-user-id="<%= user.id %>">
+          <%= link_to "Search for Steam Account" %>
         </div>
       </dd>
     <% end %>
 
-    <% if !@user.profile.stream.blank? %>
+    <% if !user.profile.stream.blank? %>
       <dt>Stream</dt>
-      <dd><%= @user.profile.stream %></dd>
+      <dd><%= user.profile.stream %></dd>
     <% end %>
   </dl>
 
   <h4>Contact</h4>
 
   <dl>
-    <% if !@user.profile.web.blank? %>
+    <% if !user.profile.web.blank? %>
       <dt>Web</dt>
-      <dd><%= @user.profile.web %></dd>
+      <dd><%= user.profile.web %></dd>
     <% end %>
 
-    <% if cuser and cuser.admin? or @user.public_email %>
+    <% if cuser and cuser.admin? or user.public_email %>
       <dt>Email</dt>
-      <dd><%= @user.email_s %></dd>
+      <dd><%= user.email_s %></dd>
     <% end %>
 
-    <% if @user.profile.steam_profile and @user.profile.steam_profile != "" %>
+    <% if user.profile.steam_profile and user.profile.steam_profile != "" %>
       <dt>Steam</dt>
       <dd>
-        <% if @user.profile.steam_profile.match(/\A[0-9]*\z/) %>
-          <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/profiles/#{@user.profile.steam_profile}" %>
-        <% elsif @user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
-          <%= link_to @user.profile.steam_profile, "http://steamcommunity.com/id/#{@user.profile.steam_profile}" %>
+        <% if user.profile.steam_profile.match(/\A[0-9]*\z/) %>
+          <%= link_to user.profile.steam_profile, "http://steamcommunity.com/profiles/#{user.profile.steam_profile}" %>
+        <% elsif user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
+          <%= link_to user.profile.steam_profile, "http://steamcommunity.com/id/#{user.profile.steam_profile}" %>
         <% end %>
       </dd>
     <% end %>
   </dl>
 
-  <% if @user.profile.achievements and !@user.profile.achievements.empty? %>
+  <% if user.profile.achievements and !user.profile.achievements.empty? %>
     <h4>Achievements</h4>
     <div class="achievements">
-      <%= sanitize(@user.profile.achievements_parsed) %>  
+      <%= sanitize(user.profile.achievements_parsed) %>
     </div>
   <% end %>
 
-  <% if cuser && Message.new.can_create?(cuser) && @user != cuser %>
-    <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: @user }, { class: 'button tiny' } %>
+  <% if cuser && Message.new.can_create?(cuser) && user != cuser %>
+    <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: user }, { class: 'button tiny' } %>
   <% end %>
 </div>
 
 <div class="group">
   <h4>Statistics</h4>
-  
+
   <dl>
     <dt>Joined</dt>
-    <dd><%= longtime @user.created_at %></dd>
+    <dd><%= longtime user.created_at %></dd>
     <dt>Last visit</dt>
-    <dd><%= longtime @user.lastvisit %></dd>
-    <dt></dt>  
+    <dd><%= longtime user.lastvisit %></dd>
+    <dt></dt>
 
     <% if cuser and cuser.admin? %>
       <dt>Last IP</dt>
-      <dd><%= @user.lastip %></dd>
+      <dd><%= user.lastip %></dd>
     <% end %>
 
     <dt>Comments</dt>
-    <dd><%= @user.posted_comments.count %></dd>
+    <dd><%= user.posted_comments.count %></dd>
     <dt>Matches</dt>
-    <dd><%= @user.matches.count %></dd>
+    <dd><%= user.matches.count %></dd>
 
-    <% if @user.groups.count > 0 %>
+    <% if user.groups.count > 0 %>
       <dt>Groups</dt>
-      <% for group in @user.groups.all %>
+      <% for group in user.groups.all %>
         <dd><%= namelink group %></dd>
       <% end %>
     <% end %>
 
-    <% if @user.teamers.active.count > 0 %>
+    <% if user.teamers.active.count > 0 %>
       <dt>Teams</dt>
-      <% @user.teamers.active.each do |teamer| %>
+      <% user.teamers.active.each do |teamer| %>
         <dd><%= namelink teamer.team %></dd>
       <% end %>
     <% end %>

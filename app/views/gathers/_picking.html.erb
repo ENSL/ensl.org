@@ -5,7 +5,7 @@
         Lobby
       </h4>
       <%= render partial: 'gathers/progress' %>
-      <%= render partial: "gatherers/list", locals: { team: nil } %>  
+      <%= render partial: "gatherers/list", locals: { team: nil } %>
     </div>
   </div>
 
@@ -14,7 +14,7 @@
       <h4>
         Marines
       </h4>
-      <%= render partial: "gatherers/list", locals: { team: 1 } %>  
+      <%= render partial: "gatherers/list", locals: { team: 1 } %>
     </div>
   </div>
 
@@ -23,10 +23,10 @@
       <h4>
         Aliens
       </h4>
-      <%= render partial: "gatherers/list", locals: { team: 2 } %>  
+      <%= render partial: "gatherers/list", locals: { team: 2 } %>
     </div>
   </div>
 </div>
 
-<%= render partial: "gathers/status" %>
+<%= render partial: "gathers/status", locals: { gather: @gather, gatherer: @gatherer } %>
 

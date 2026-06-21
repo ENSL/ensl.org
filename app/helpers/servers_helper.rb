@@ -7,7 +7,7 @@ module ServersHelper
     since = server_offline_since(server)
     return 'Status: offline' unless since
 
-    "Status: offline since #{time_ago_in_words(since)}"
+    "Status: offline since #{distance_of_time_in_words(since, Time.current)}"
   end
 
   private

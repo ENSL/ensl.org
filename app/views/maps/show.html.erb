@@ -3,13 +3,13 @@
     <span><%=h @map.name %></span>
   </h1>
 
-  <% if @map.picture.present? %>
+  <% if @map.picture? %>
     <div class="preview">
       <%= image_tag @map.picture.url %>
     </div>
   <% end %>
 
-  <% if @map.download.present? %>
+  <% if @map.download? %>
     <strong>Download</strong><br>
     <p><%= link_to (h @map.download), (h @map.download) %></p>
   <% end %>
@@ -23,7 +23,7 @@
   <ul class="disc">
     <% @map.contests.each do |contest| %>
       <li><%= namelink contest %></li>
-    <% end %>  
+    <% end %>
   </ul>
 
   <%= link_to 'Edit Map', edit_map_path(@map), class: 'button' %>

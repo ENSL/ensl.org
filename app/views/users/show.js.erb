@@ -1,5 +1,5 @@
 $("#user-data").fadeIn("fast");
-$("#user-data").html("<%= escape_javascript(render(:partial => @page)) %>");
+$("#user-data").html("<%= escape_javascript(render(@page == 'general' ? { partial: 'general', locals: { user: @user } } : { partial: @page })) %>");
 
 <% if ["comments", "matches", "predictions", "teams"].include? @page %>
   $("#user-data").removeClass("box");

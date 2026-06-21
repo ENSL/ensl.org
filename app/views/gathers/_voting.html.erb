@@ -1,6 +1,8 @@
 <div class="gather-columns">
   <div class="data">
     <div class="contents">
+      <% gather = @gather %>
+      <% current_gatherer = @gatherer %>
       <h4>Vote Captains</h4>
       <%= render partial: 'gathers/progress' %>
 
@@ -10,7 +12,7 @@
             <td><%= flag gatherer.user.country %></td>
             <td>
               (<%= gatherer.votes %>)
-              <% if @gatherer and gatherer.real_votes.build(user: gather_current_user).can_create? gather_current_user %>
+              <% if current_gatherer and gatherer.real_votes.build(user: gather_current_user).can_create? gather_current_user %>
                 <%= link_to gatherer.user, votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: gatherer.id, votable_type: "Gatherer" }), turbo: false } %>
               <% else %>
                 <%= link_to gatherer.user.to_s, gatherer.user, class: 'user', data: { turbo_frame: '_top' } %>
@@ -20,7 +22,7 @@
         <% end %>
       </table>
 
-      <% if @gatherer %>
+      <% if current_gatherer %>
         <p>Click to vote for captain.</p>
       <% end %>
     </div>
@@ -29,4 +31,4 @@
   <%= render partial: 'gathers/votes' %>
 </div>
 
-<%= render partial: 'gathers/status' %>
+<%= render partial: 'gathers/status', locals: { gather: @gather, gatherer: @gatherer } %>
