@@ -31,9 +31,9 @@
           <% end %>
         </tr>
       <% end %>
-    </table>  
+    </table>
   </div>
-    
+
   <div class="previous">
     <h3 class="title">Previous Contests</h3>
 
@@ -66,7 +66,7 @@
       <% end %>
     </table>
   </div>
-    
+
   <% if cuser and cuser.admin? %>
     <%= link_to 'New Contest', new_contest_path, class: 'button' %>
   <% end %>

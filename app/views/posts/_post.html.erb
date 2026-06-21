@@ -5,7 +5,7 @@
     </h5>
 
     <div class="image">
-      <%= image_tag post.user.profile.avatar.url %>  
+      <%= image_tag post.user.profile.avatar.url %>
     </div>
 
     <% if post.user.team %>
@@ -81,7 +81,7 @@
         <% end %>
       <% end %>
     </div>
-    
+
     <div class="signature">
       <%= sanitize(post.user.profile.signature_parsed) if post.user.profile.signature_parsed %>
     </div>

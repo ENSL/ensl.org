@@ -5,7 +5,7 @@
 </div>
 
 <div class="topic-controls">
-  <%= render partial: 'controls', locals: { forum: @forum } %>  
+  <%= render partial: 'controls', locals: { forum: @forum } %>
 </div>
 
 <h2><%=h @forum.title %></h2>
@@ -20,9 +20,9 @@
       <th class="replies">Replies</th>
       <th class="views">Views</th>
       <th class="last">Last Post</th>
-    </tr>  
+    </tr>
   </thead>
-  
+
   <% @topics.each do |topic| %>
     <tr>
       <td>

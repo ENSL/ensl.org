@@ -15,7 +15,7 @@
       <td><%= link_to match.contester1.team.tag, :controller => :contesters, :action => :show, :id => match.contester1 %></td>
       <td><%= link_to match.contester2.team.tag, :controller => :contesters, :action => :show, :id => match.contester2 %></td>
       <td><% if match.map1 and match.map2 %>
-        <%= link_to match.map1, :controller => :maps, :action => :show, :id => match.map1 %>, 
+        <%= link_to match.map1, :controller => :maps, :action => :show, :id => match.map1 %>,
         <%= link_to match.map2, :controller => :maps, :action => :show, :id => match.map2 %>
         <% end %>
       </td>

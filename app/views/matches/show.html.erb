@@ -34,7 +34,7 @@
                 <%= teamer.user.username %>
                 <%= flag teamer.user.country %>
               </li>
-            <% end %>  
+            <% end %>
           </ul>
         </div>
       <% end %>
@@ -45,12 +45,12 @@
             <% @match.team2_lineup.each do |teamer| %>
               <li>
                 <%= flag teamer.user.country %>
-                <%= teamer.user.username %>  
+                <%= teamer.user.username %>
                 <% if teamer.user == @match.motm %>
                   <%= fa_icon 'star' %>
                 <% end %>
               </li>
-            <% end %>  
+            <% end %>
           </ul>
         </div>
       <% end %>
@@ -62,7 +62,7 @@
     <h5 class="date"><%= @match.match_time.strftime("%A %e %B %Y") %></h5>
     <h5 class="date"><%= Time.use_zone(timezone_offset) { @match.match_time.strftime("%H:%M %Z") } %></h5>
   </div>
-  
+
   <div class="predictions">
     <h4>Predictions (<%= @match.predictions.count %>)</h4>
 
@@ -72,7 +72,7 @@
 
         <div class="fields">
           <div class="team-1">
-            <%= f.text_field :score1, size: 1, placeholder: 0 %>  
+            <%= f.text_field :score1, size: 1, placeholder: 0 %>
           </div>
           <div class="team-2">
             <%= f.text_field :score2, size: 1, placeholder: 0 %>
@@ -80,7 +80,7 @@
         </div>
 
         <div class="add">
-          <%= submit_tag "Add Prediction", class: 'button tiny' %>  
+          <%= submit_tag "Add Prediction", class: 'button tiny' %>
         </div>
       <% end %>
     <% else %>
@@ -109,7 +109,7 @@
     </dl>
     <% end %>
   </div>
-  
+
   <% unless @match.report.nil? or @match.report.empty? %>
     <div class="report">
       <h3>Match Report</h3>

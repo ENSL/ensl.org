@@ -1,7 +1,7 @@
 <div id="issue">
   <h1>Issue: <%= h @issue %></h1>
   <h2 class="title">Created: <%= @issue.created_at.strftime("%Y-%m-%d %H:%M:%S") %></h2>
-  
+
   <%= cascade @issue, [:author, :assigned, :category, "status_s"] %>
 
   <h3>Issue details:</h3>
@@ -20,4 +20,3 @@
 
   <%= add_comments @issue %>
 </div>
-  

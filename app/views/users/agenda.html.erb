@@ -143,12 +143,12 @@
               <td>
                 <%= link_to 'Referee this match',
                   remote: true,
-                  url: { 
+                  url: {
                     controller: "matches", action: "update", id: match.id,
-                    match: { 
-                      referee_id: @user.id 
+                    match: {
+                      referee_id: @user.id
                     }
-                  }, 
+                  },
                   method: "put",
                   loading: "$('matchlink_#{match.id}').parentNode.innerHTML='Processing..';",
                   success: "$('matchlink_#{match.id}').parentNode.innerHTML='Complete';",
@@ -223,7 +223,7 @@
         <h4>Issues created by you</h4>
         <%= render partial: "issues/list", locals: { issues: @user.issues } %>
       <% end %>
-      
+
       <% if @user.assigned_issues.size > 0 %>
         <h4>Open issues assigned to you</h4>
         <%= render partial: "issues/list", locals: { issues: @user.assigned_issues } %>

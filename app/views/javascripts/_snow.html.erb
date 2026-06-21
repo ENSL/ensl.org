@@ -1,4 +1,4 @@
-<script> 
+<script>
   // CREDITS:
   // Snowmaker Copyright (c) 2003 Peter Gehrig. All rights reserved.
   // Distributed by http://www.hypergurl.com
@@ -26,7 +26,7 @@
   var snowminsize=8
 
   // Set the snowing-zone
-  // Set 1 for all-over-snowing, set 2 for left-side-snowing 
+  // Set 1 for all-over-snowing, set 2 for left-side-snowing
   // Set 3 for center-snowing, set 4 for right-side-snowing
   var snowingzone=1
 
@@ -44,13 +44,13 @@
   var x_mv=new Array();
   var crds=new Array();
   var lftrght=new Array();
-  var browserinfos=navigator.userAgent 
+  var browserinfos=navigator.userAgent
   var ie5=document.all&&document.getElementById&&!browserinfos.match(/Opera/)
   var ns6=document.getElementById&&!document.all
-  var opera=browserinfos.match(/Opera/)  
+  var opera=browserinfos.match(/Opera/)
   var browserok=ie5||ns6||opera
 
-  function randommaker(range) {		
+  function randommaker(range) {
   rand=Math.floor(range*Math.random())
   return rand
   }
@@ -66,8 +66,8 @@
   }
   var snowsizerange=snowmaxsize-snowminsize
   for (i=0;i<=snowmax;i++) {
-  crds[i] = 0;                      
-  lftrght[i] = Math.random()*15;         
+  crds[i] = 0;
+  lftrght[i] = Math.random()*15;
   x_mv[i] = 0.03 + Math.random()/10;
   snow[i]=document.getElementById("s"+i)
   snow[i].style.fontFamily=snowtype[randommaker(snowtype.length)]

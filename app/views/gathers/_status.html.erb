@@ -53,10 +53,10 @@
       (function() {
         const timerEl = document.getElementById('voting-timer');
         if (!timerEl) return;
-        
+
         let remaining = parseInt(timerEl.dataset.remaining);
         const timeLeftEl = timerEl.querySelector('.time-left');
-        
+
         const interval = setInterval(function() {
           remaining--;
           if (remaining <= 0) {

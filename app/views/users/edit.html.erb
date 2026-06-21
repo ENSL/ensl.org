@@ -52,13 +52,13 @@
               <%= f.label :lastname do %>
                 <p>Last Name</p>
                 <em>(only visible to members)</em>
-              <% end %> 
+              <% end %>
               <%= f.text_field :lastname %>
             </div>
             <div class="fields horizontal">
               <%= f.label :birthdate %>
               <div class="inputs">
-                <%= date_select :user, :birthdate, order: [:year, :month, :day], default: @user.birthdate, start_year: 1950 %>  
+                <%= date_select :user, :birthdate, order: [:year, :month, :day], default: @user.birthdate, start_year: 1950 %>
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@
             <div class="fields horizontal">
               <%= p.label :layout %>
               <div class="inputs">
-                <%= p.select :layout, ['default', 'flat'] %>  
+                <%= p.select :layout, ['default', 'flat'] %>
               </div>
             </div>
           </div>

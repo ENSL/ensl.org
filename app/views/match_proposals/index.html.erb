@@ -29,7 +29,7 @@
             <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REJECTED) %>
               <%= link_to fa_icon('times'), "#", 'data-id': "#{MatchProposal::STATUS_REJECTED}", title: 'Reject' %>
-            <% end %> 
+            <% end %>
             <% if proposal.status_change_allowed?(cuser, MatchProposal::STATUS_REVOKED) %>
               <%= link_to fa_icon('undo'), "#", 'data-id': "#{MatchProposal::STATUS_REVOKED}", title: 'Revoke' %>
             <% end %>

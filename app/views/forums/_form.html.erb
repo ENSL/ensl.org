@@ -22,7 +22,7 @@
   <% unless @forum.new_record? %>
     <h2>Access Rights</h2>
     <p>If no groups are specified, everyone is allowed for the specific access type.</p>
-    
+
     <table id="acl" class="striped">
       <tr>
         <th class="group">Group</th>
@@ -52,14 +52,14 @@
       <%= render 'shared/errors', messages: @forum.errors.full_messages %>
 
       <%= f.hidden_field :forum_id %>
-      
+
       <div class="fields permissions">
         <h4>Grant Access</h4>
         <%= f.select :group_id, Group.all.collect{|g| [g, g.id]} %>
         <%= f.select :access, Forumer.accesses.invert %>
       </div>
       <div class="controls">
-        <%= f.submit "Add" %>  
+        <%= f.submit "Add" %>
       </div>
     <% end %>
   <% end %>

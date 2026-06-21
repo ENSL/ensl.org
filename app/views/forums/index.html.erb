@@ -14,9 +14,9 @@
             <th class="topics">Topics</th>
             <th class="posts">Posts</th>
             <th class="last">Last Post</th>
-          </tr>  
+          </tr>
         </thead>
-        
+
         <% forums.each do |forum| %>
           <tr>
             <td class="bullet <%= 'updated' if cuser and !cuser.have_read?(forum) %>"></td>

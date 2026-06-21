@@ -28,7 +28,7 @@
 
     <% if @contest.can_join?(cuser) %>
       <h4>Join Contest</h4>
-      
+
       <%= form_for @contest.contesters.build, html: { class: 'square' } do |f| %>
         <%= f.hidden_field :contest_id %>
 
@@ -37,7 +37,7 @@
         </div>
 
         <div class="controls inline">
-          <%= f.submit "Join Contest" %>  
+          <%= f.submit "Join Contest" %>
         </div>
       <% end %>
     <% end %>

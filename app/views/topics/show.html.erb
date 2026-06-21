@@ -36,9 +36,9 @@
 
   <div id="reply" style="display: none;">
     <h5>New Reply</h5>
-    
+
     <div id="reply-errors"></div>
-    
+
     <%= form_for(@newpost, remote: true, html: { class: 'square', id: 'reply-form' }) do |f| %>
       <%= f.hidden_field :topic_id %>
       <div class="fields horizontal">
@@ -74,4 +74,4 @@
   </div>
 
   <%= render partial: 'breadcrumbs', locals: { topic: @topic } %>
-</div> 
+</div>

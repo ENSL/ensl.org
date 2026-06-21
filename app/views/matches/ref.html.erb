@@ -24,13 +24,13 @@
           <%= render partial: "lineup", locals: { contester: contester } %>
         <% end %>
       </div>
-      
+
       <div class="team-2">
         <% [@match.contester2].each do |contester| %>
           <%= render partial: "lineup", locals: { contester: contester } %>
         <% end %>
       </div>
-      
+
       <div class="controls">
         <%= f.submit 'Save Lineups' %>
       </div>
@@ -58,7 +58,7 @@
         <%= f.label "Scores" %>
         <div class="inputs scores">
           <%= f.text_field :score1, size: 1 %>
-          <%= f.text_field :score2, size: 2 %>  
+          <%= f.text_field :score2, size: 2 %>
         </div>
       </div>
 

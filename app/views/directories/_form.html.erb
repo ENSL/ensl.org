@@ -3,7 +3,7 @@
     <div id="<%= dom_id(@directory) %>_errors_wrapper">
       <%= render 'shared/errors', messages: @directory.errors.full_messages, container_id: "#{dom_id(@directory)}_errors" %>
     </div>
-    
+
     <% if @directory.new_record? %>
       <%= f.hidden_field :parent_id %>
     <% end %>

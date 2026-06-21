@@ -12,7 +12,7 @@
       </div>
       <p>Sent by: <% if message.sender_type == 'System' %>System<% else %><%= namelink message.sender %><% end %> on <%= shortdate message.created_at %></p>
       <p>
-        <%= link_to "Reply", 
+        <%= link_to "Reply",
           { controller: "messages", action: "new", id: message.sender_type, id2: message.sender_id, title: message.title },
           { class: 'button tiny'} %>
       </p>
@@ -21,4 +21,3 @@
 
   <%= link_to 'Back to Messages', messages_path, class: 'button back' %>
 </div>
-  
