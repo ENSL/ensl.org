@@ -37,14 +37,7 @@ class DataFilesController < ApplicationController
 
     if @file.save
       flash[:notice] = t(:files_create)
-      created_movie = @file.movie || Movie.find_by(file_id: @file.id)
-      if @file.article
-        redirect_to @file.article
-      elsif created_movie
-        redirect_to created_movie
-      else
-        redirect_to @file
-      end
+      redirect_to @file.redirect_target_after_create
     else
       respond_with_validation_errors(@file, template: :new)
     end

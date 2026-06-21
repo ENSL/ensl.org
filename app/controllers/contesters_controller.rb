@@ -9,11 +9,7 @@ class ContestersController < ApplicationController
 
     raise AccessError unless @contester&.contest && @contester.team
 
-    @members = if @contester.contest.status == Contest::STATUS_CLOSED
-                 @contester.team.teamers.distinct.ordered
-               else
-                 @contester.team.teamers.active.distinct.ordered
-               end
+    @members = @contester.lineup_for_show
   end
 
   def edit
@@ -32,7 +28,7 @@ class ContestersController < ApplicationController
 
     if @contester.save
       flash[:notice] = t(:contests_join)
-      redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
+      redirect_to_teams_tab
     else
       flash.now[:error] = @contester.errors.full_messages.to_sentence.presence || t(:error)
       render :new, status: :unprocessable_entity
@@ -53,7 +49,7 @@ class ContestersController < ApplicationController
 
     if @contester.update(Contester.params(params, cuser))
       flash[:notice] = t(:contests_contester_update)
-      redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
+      redirect_to_teams_tab
     else
       flash.now[:error] = @contester.errors.full_messages.to_sentence.presence || t(:error)
       render :edit, status: :unprocessable_entity
@@ -65,7 +61,7 @@ class ContestersController < ApplicationController
 
     @contester.recover
     flash[:notice] = t(:contests_contester_recovered)
-    redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
+    redirect_to_teams_tab
   end
 
   def destroy
@@ -73,12 +69,16 @@ class ContestersController < ApplicationController
 
     @contester.destroy
     flash[:notice] = t(:contests_contester_destroy)
-    redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
+    redirect_to_teams_tab
   end
 
   private
 
   def load_contester
     @contester = Contester.find params[:id]
+  end
+
+  def redirect_to_teams_tab
+    redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
   end
 end

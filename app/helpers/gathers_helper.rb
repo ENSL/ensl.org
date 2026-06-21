@@ -35,4 +35,10 @@ module GathersHelper
       !@gather.map_votes.where(user_id: user.id).exists? &&
       !@gather.server_votes.where(user_id: user.id).exists?
   end
+
+  def gather_archive_link(css_class = 'button tiny')
+    link_to gathers_path, class: css_class, data: { turbo_frame: '_top' } do
+      'Gather archive'
+    end
+  end
 end

@@ -158,6 +158,10 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  def redirect_target_after_create
+    article || movie || Movie.find_by(file_id: id) || self
+  end
+
   private
 
   # Absolute destination path based on CarrierWave storage rules.

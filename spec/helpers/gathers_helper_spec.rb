@@ -152,4 +152,20 @@ RSpec.describe GathersHelper, type: :helper do
       expect(helper.gather_music_should_play?).to be(true)
     end
   end
+
+  describe '#gather_archive_link' do
+    it 'renders the archive link with the default button class' do
+      html = helper.gather_archive_link
+
+      expect(html).to include('Gather archive')
+      expect(html).to include('class="button tiny"')
+    end
+
+    it 'renders the archive link with a custom class' do
+      html = helper.gather_archive_link('button')
+
+      expect(html).to include('Gather archive')
+      expect(html).to include('class="button"')
+    end
+  end
 end

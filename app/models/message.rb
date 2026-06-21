@@ -92,6 +92,23 @@ class Message < ActiveRecord::Base
     cuser and !cuser.banned?(Ban::TYPE_MUTE)
   end
 
+  def self.recipient_for(recipient_type, recipient_id)
+    case recipient_type
+    when 'User'
+      User.find(recipient_id)
+    when 'Team'
+      Team.find(recipient_id)
+    when 'Group'
+      Group.find(recipient_id)
+    else
+      raise Error, 'Illegible recipient'
+    end
+  end
+
+  def sender_for(cuser)
+    sender_raw == '' ? cuser : cuser.active_teams.find(sender_raw)
+  end
+
   def self.params(params, _cuser)
     # FIXME: check this
     params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id,

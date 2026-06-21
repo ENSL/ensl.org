@@ -27,17 +27,13 @@
         </p>
         <p>
           <%= f.submit 'Click to join gather!', class: 'button' %>
-          <%= link_to gathers_path(), class: 'button', data: { turbo_frame: '_top' } do %>
-            Gather archive
-          <% end %>
+            <%= gather_archive_link('button') %>
         </p>
       <% end %>
 
     <% else %>
       <p>Log in to join the gather.</p>
-      <%= link_to gathers_path(), class: 'button tiny', data: { turbo_frame: '_top' } do %>
-        Gather archive
-      <% end %>
+        <%= gather_archive_link %>
     <% end %>
 
   <% elsif gather.status == Gather::STATE_VOTING %>
@@ -101,9 +97,7 @@
     <% if gather.server and gather.server.ip and gather.server.password %>
       <%= link_to "Click to join Server", "steam://run/4920//connect #{gather.server.ip} #{gather.server.password}", class: 'join button tiny', data: { turbo_frame: '_top' } %>
     <% end %>
-    <%= link_to gathers_path(), class: 'button tiny', data: { turbo_frame: '_top' } do %>
-      Gather archive
-    <% end %>
+    <%= gather_archive_link %>
     </p>
   <% end %>
   <div class="gather-controls"

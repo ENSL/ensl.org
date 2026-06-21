@@ -48,11 +48,8 @@ class UsersController < ApplicationController
   end
 
   def new
-    if cuser && !cuser.admin?
-      flash[:notice] = 'You are already logged in.'
-      redirect_to edit_user_path(cuser)
-      return
-    end
+    return if already_logged_in?
+
     # Use cached OAuth-created user only for anonymous visitors.
     if session[:cached_user]&.present? && cuser.nil?
       @user = begin
@@ -74,11 +71,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    if cuser && !cuser.admin?
-      flash[:notice] = 'You are already logged in.'
-      redirect_to edit_user_path(cuser)
-      return
-    end
+    return if already_logged_in?
+
     @user = User.new(User.params(params, cuser, 'create'))
     @user.lastip = request.env['REMOTE_ADDR']
 
@@ -120,16 +114,13 @@ class UsersController < ApplicationController
 
   def callback
     unless request.env['omniauth.auth']
-      flash[:error] = t(:users_callback_fail)
-      Rails.logger.warn('Steam callback: auth_hash is missing')
-      redirect_to_home
+      callback_failed('Steam callback: auth_hash is missing')
       return
     end
 
     @user = User.find_or_build(auth_hash, request.ip)
     unless @user.is_a?(ActiveRecord::Base)
-      flash[:error] = t(:users_callback_fail)
-      redirect_to_home
+      callback_failed
       return
     end
 
@@ -201,6 +192,20 @@ class UsersController < ApplicationController
 
   def load_user
     @user = User.find(params[:id])
+  end
+
+  def already_logged_in?
+    return false unless cuser && !cuser.admin?
+
+    flash[:notice] = 'You are already logged in.'
+    redirect_to edit_user_path(cuser)
+    true
+  end
+
+  def callback_failed(warning = nil)
+    flash[:error] = t(:users_callback_fail)
+    Rails.logger.warn(warning) if warning
+    redirect_to_home
   end
 
   def login_user(user)

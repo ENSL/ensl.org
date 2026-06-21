@@ -77,6 +77,10 @@ class Contester < ActiveRecord::Base
     contest.status == Contest::STATUS_CLOSED ? team.teamers.distinct : team.teamers.active
   end
 
+  def lineup_for_show
+    lineup.distinct.ordered
+  end
+
   def contest_matches
     contest.matches.where('contester1_id = ? OR contester2_id = ?', id, id)
   end

@@ -18,22 +18,13 @@ class MessagesController < ApplicationController
     @message = Message.new
     raise AccessError unless @message.can_create? cuser
 
-    case params[:id]
-    when 'User'
-      @message.recipient = User.find(params[:id2])
-    when 'Team'
-      @message.recipient = Team.find(params[:id2])
-    when 'Group'
-      @message.recipient = Group.find(params[:id2])
-    else
-      raise Error, 'Illegible recipient'
-    end
+    @message.recipient = Message.recipient_for(params[:id], params[:id2])
     @message.title = params[:title]
   end
 
   def create
     @message = Message.new(Message.params(params, cuser))
-    @message.sender = @message.sender_raw == '' ? cuser : cuser.active_teams.find(@message.sender_raw)
+    @message.sender = @message.sender_for(cuser)
     raise AccessError unless @message.can_create? cuser
 
     if @message.save
