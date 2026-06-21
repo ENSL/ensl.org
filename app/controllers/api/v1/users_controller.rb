@@ -22,7 +22,7 @@ module Api
           return
         end
 
-        @steam = steam_profile @user if @user.steamid.present?
+        @steam = steam_profile @user if @user.steamid?
 
         render json: {
           id: @user.id,
@@ -35,7 +35,7 @@ module Api
           caster: @user.caster?,
           moderator: @user.gather_moderator?,
           contributor: @user.contributor?,
-          steam: if @user.steamid.nil?
+          steam: if !@user.steamid?
                    nil
                  else
                    {

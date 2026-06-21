@@ -16,8 +16,7 @@ class MatchProposalsController < ApplicationController
       flash[:error] = 'Cannot create a new proposal if there is already a confirmed one'
       redirect_to(match_proposals_path(@match)) && return
     end
-    @proposal = MatchProposal.new
-    @proposal.match = @match
+    @proposal = MatchProposal.new(match: @match)
     raise AccessError unless @proposal.can_create? cuser
   end
 
@@ -26,8 +25,7 @@ class MatchProposalsController < ApplicationController
     @proposal.match = @match
     raise AccessError unless @proposal.can_create? cuser
 
-    @proposal.team = cuser.team
-    @proposal.status = MatchProposal::STATUS_PENDING
+    @proposal.assign_attributes(team: cuser.team, status: MatchProposal::STATUS_PENDING)
     if @proposal.save
       recipient = @match.get_opposing_team(cuser.team)
       msg_text = "There is a new scheduling proposal for your match against #{cuser.team.name}.\n" \
@@ -112,12 +110,13 @@ class MatchProposalsController < ApplicationController
   end
 
   def send_message_to_opp_team(text, title, recipient_team)
-    msg = Message.new
-    msg.sender_type = 'System'
-    msg.recipient_type = 'Team'
-    msg.title = title
-    msg.recipient = recipient_team
-    msg.text = text
+    msg = Message.new(
+      sender_type: 'System',
+      recipient_type: 'Team',
+      title: title,
+      recipient: recipient_team,
+      text: text
+    )
     msg.save if text
   end
 end

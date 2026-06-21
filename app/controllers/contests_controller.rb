@@ -91,10 +91,7 @@ class ContestsController < ApplicationController
         redirect_to edit_contest_path(@contest, contest: 'maps')
       end
     when 'team'
-      contester = Contester.new
-      contester.team = Team.find params[:team]
-      contester.contest = @contest
-      contester.active = true
+      contester = Contester.new(team: Team.find(params[:team]), contest: @contest, active: true)
       if contester.valid?
         contester.save!
       else

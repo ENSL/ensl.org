@@ -30,8 +30,7 @@ class TeamersController < ApplicationController
   def edit
     teamer_id = params['teamer']
     @teamer = Teamer.find(teamer_id)
-    @teamer.team_id = params['id']
-    @teamer.save
+    @teamer.update(team_id: params['id'])
     redirect_to_back
   end
 

@@ -29,7 +29,7 @@ class PostsController < ApplicationController
     respond_to do |format|
       if @post.save
         flash[:notice] = t(:posts_create)
-        format.js { render }
+        format.js
         format.html { redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}") }
       else
         # For AJAX/fast reply, render errors as JSON/JS

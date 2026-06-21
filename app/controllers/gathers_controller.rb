@@ -23,8 +23,7 @@ class GathersController < ApplicationController
   end
 
   def create
-    @gather = Gather.new
-    @gather.category_id = params[:gather][:category_id]
+    @gather = Gather.new(category_id: params.dig(:gather, :category_id))
     raise AccessError unless @gather.can_create? cuser
 
     flash[:notice] = t(:gather_create) if @gather.save
