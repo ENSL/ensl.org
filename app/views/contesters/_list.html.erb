@@ -36,9 +36,9 @@
       <td><%= h contester.draw %></td>
       <% if actions %>
         <td class="actions">
-          <% if @friendly %>
+          <% if friendly %>
             <% challenge = Challenge.new
-            challenge.contester1 = @friendly
+            challenge.contester1 = friendly
             challenge.contester2 = contester %>
             <% if challenge.can_create? cuser %>
               <%= link_to 'C', controller: 'challenges', id: contester, action: 'new' %>

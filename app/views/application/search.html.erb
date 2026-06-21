@@ -19,7 +19,7 @@
 
   <div id="searchResults">
     <% unless @results.nil? %>
-      <%= render "results" %>
+      <%= render "results", results: @results %>
     <% end %>
   </div>
 </div>

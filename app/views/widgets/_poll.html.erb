@@ -1,8 +1,8 @@
-<% if @current_action == "news_index" %>
+<% if action_name == "news_index" %>
   <div class="widget poll">
     <h4><%= t('widget.poll') %></h4>
 
-    <% @poll = Poll.first %>
-    <%= render(partial: "polls/show") if @poll %>
+    <% poll = Poll.first %>
+    <%= render(partial: "polls/show", locals: { poll: poll }) if poll %>
   </div>
 <% end %>

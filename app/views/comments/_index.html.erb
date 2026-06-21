@@ -1,5 +1,5 @@
 <div id="comments-thread">
   <h3>Comments</h3>
-  <%= render partial: "comments/comment", collection: @comments %>
-  <%= render partial: "comments/new" %>
+  <%= render partial: "comments/comment", collection: comments %>
+  <%= render partial: "comments/new", locals: { comment: comment } %>
 </div>

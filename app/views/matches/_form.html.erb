@@ -1,23 +1,23 @@
 <div class="wide box">
-  <%= form_for @match, html: { class: 'square' } do |f| %>
-    <%= render 'shared/errors', messages: @match.errors.full_messages %>
+  <%= form_for match, html: { class: 'square' } do |f| %>
+    <%= render 'shared/errors', messages: match.errors.full_messages %>
     <%= f.hidden_field :contest_id %>
 
     <div class="fields horizontal">
       <%= f.label :contester1_id, "Team #1" %>
-      <%= f.select :contester1_id, @match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
+      <%= f.select :contester1_id, match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
     </div>
     <div class="fields horizontal">
       <%= f.label :contester2_id, "Team #2" %>
-      <%= f.select :contester2_id, @match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
+      <%= f.select :contester2_id, match.contest.contesters.active.collect{|c| ["#{c.team.name}", c.id]} %>
     </div>
     <div class="fields horizontal">
       <%= f.label :map1_id, "Map #1" %>
-      <%= f.select :map1_id, @match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+      <%= f.select :map1_id, match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
     </div>
     <div class="fields horizontal">
       <%= f.label :map2_id, "Map #2" %>
-      <%= f.select :map2_id, @match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+      <%= f.select :map2_id, match.contest.maps.basic.collect{|m| [m.name, m.id]} %>
     </div>
     <div class="fields horizontal">
       <%= f.label :match_time %>
@@ -29,7 +29,7 @@
     </div>
     <div class="fields horizontal">
       <%= f.label :week_id %>
-      <%= f.select :week_id, @match.contest.weeks.ordered.collect{|w| [w, w.id]}, {:include_blank => true} %>
+      <%= f.select :week_id, match.contest.weeks.ordered.collect{|w| [w, w.id]}, {:include_blank => true} %>
     </div>
     <div class="controls">
       <%= f.submit 'Save Match' %>

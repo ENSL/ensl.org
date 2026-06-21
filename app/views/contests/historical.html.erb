@@ -14,7 +14,7 @@
         <% elsif contest.contest_type == Contest::TYPE_LADDER %>
         <%= render "contesters/ladder", actions: false, contest: contest %>
         <% else %>
-        <%= render "contesters/list", contesters: contest.contesters.active.ordered, actions: false %>
+        <%= render "contesters/list", contesters: contest.contesters.active.ordered, actions: false, friendly: nil %>
       <% end %>
     </div>
 

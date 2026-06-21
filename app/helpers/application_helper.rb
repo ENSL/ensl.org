@@ -171,11 +171,11 @@ module ApplicationHelper
   def add_comments(object)
     return ''.html_safe unless object.respond_to?(:comments)
 
-    @comment = Comment.new(commentable: object)
-    @comments = object.comments.ordered.with_userteam
+    comment = Comment.new(commentable: object)
+    comments = object.comments.ordered.with_userteam
 
     return_here
-    render partial: 'comments/index'
+    render partial: 'comments/index', locals: { comment: comment, comments: comments }
   end
 
   def bbcode

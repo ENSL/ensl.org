@@ -9,6 +9,6 @@
     <%= render "contesters/ladder", actions: true, contest: contest %>
   <% else %>
     <%= render "contesters/list", contesters: contest.contesters.active.ordered,
-        actions: true, contest: contest %>
+      actions: true, contest: contest, friendly: nil %>
   <% end %>
 <% end %>

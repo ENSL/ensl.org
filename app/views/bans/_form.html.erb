@@ -1,13 +1,13 @@
-<%= form_for @ban, html: { class: 'square' } do |f| %>
-  <%= render 'shared/errors', messages: @ban.errors.full_messages %>
+<%= form_for ban, html: { class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: ban.errors.full_messages %>
 
   <div class="fields horizontal">
     <%= f.label :user_name %>
-    <%= f.text_field :user_name, { value: @ban.user.to_s } %>
+    <%= f.text_field :user_name, { value: ban.user.to_s } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :ban_type %>
-    <%= f.select :ban_type, @ban.types.invert %>
+    <%= f.select :ban_type, ban.types.invert %>
   </div>
   <div class="fields horizontal">
     <%= f.label :steamid %>
@@ -24,6 +24,6 @@
     <%= f.text_area :reason %>
   </div>
   <div class="controls">
-    <%= f.submit @ban.new_record? ? 'Create' : 'Update' %>
+    <%= f.submit ban.new_record? ? 'Create' : 'Update' %>
   </div>
 <% end %>

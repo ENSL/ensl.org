@@ -6,7 +6,7 @@
     <th class="team">Team</th>
   </tr>
 
-  <% @user.teamers.past.each do |teamer| %>
+  <% user.teamers.past.each do |teamer| %>
     <tr>
       <td>
         <%= longdate teamer.created_at %>

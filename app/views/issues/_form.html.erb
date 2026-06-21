@@ -1,17 +1,17 @@
-<%= form_for(@issue, html: { class: 'square' }) do |f| %>
-  <%= render 'shared/errors', messages: @issue.errors.full_messages %>
+<%= form_for(issue, html: { class: 'square' }) do |f| %>
+  <%= render 'shared/errors', messages: issue.errors.full_messages %>
   <div class="fields horizontal">
     <%= f.label :title %>
     <%= f.text_field :title %>
   </div>
-  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(@issue.category_id)) %>
+  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(issue.category_id)) %>
     <div class="fields horizontal">
       <%= f.label :status %>
-      <%= f.select :status, @issue.statuses.invert %>
+      <%= f.select :status, issue.statuses.invert %>
     </div>
     <div class="fields horizontal">
       <%= f.label :assigned %>
-      <% assigned_username = @issue.assigned.present? ? User.find_by(id: @issue.assigned)&.username : nil %>
+      <% assigned_username = issue.assigned.present? ? User.find_by(id: issue.assigned)&.username : nil %>
       <div class="inputs">
         <%= f.text_field :assigned_name, list: 'staff_list', value: assigned_username, placeholder: 'Enter username or pick from list' %>
         <datalist id="staff_list">
@@ -31,7 +31,7 @@
     <%= f.label :text %>
     <%= f.text_area :text, rows: 7 %>
   </div>
-  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(@issue.category_id)) %>
+  <% if cuser and (cuser.admin? or Issue::allowed_categories(cuser).include?(issue.category_id)) %>
     <div class="fields horizontal">
       <%= f.label :solution %>
       <%= f.text_area :solution, rows: 7 %>

@@ -51,7 +51,8 @@
 
       <p>Use % for asterisk.</p>
 
-      <% if @results %>
+      <% results = local_assigns[:results] || [] %>
+      <% if results %>
         <h3 class="center">
           Results
         </h3>
@@ -63,7 +64,7 @@
             <th>Options</th>
           </tr>
 
-          <% for user in @results %>
+          <% for user in results %>
             <tr class="<%= cycle('even', 'odd') %>">
               <td><%= h user %></td>
               <td><%= h user.steamid %></td>

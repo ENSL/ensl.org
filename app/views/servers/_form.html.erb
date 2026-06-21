@@ -1,6 +1,6 @@
-<%= form_for @server, html: { class: 'server square' } do |f| %>
-  <div id="<%= error_wrapper_id_for(@server) %>">
-    <%= render 'shared/errors', messages: @server.errors.full_messages, container_id: error_container_id_for(@server) %>
+<%= form_for server, html: { class: 'server square' } do |f| %>
+  <div id="<%= error_wrapper_id_for(server) %>">
+    <%= render 'shared/errors', messages: server.errors.full_messages, container_id: error_container_id_for(server) %>
   </div>
 
   <div class="fields horizontal">
@@ -32,14 +32,14 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :domain %>
-    <%= f.select :domain, @server.domains.invert %>
+    <%= f.select :domain, server.domains.invert %>
   </div>
   <div class="fields horizontal">
     <%= f.label :official, "Available for officials?" %>
     <%= f.check_box :official %>
     <%= f.label :official, class: 'checkbox' %>
   </div>
-  <% if @server.persisted? %>
+  <% if server.persisted? %>
     <div class="fields horizontal">
       <%= f.label :disabled, 'Disable server?' %>
       <%= f.check_box :disabled %>

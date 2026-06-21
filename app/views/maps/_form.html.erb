@@ -1,5 +1,5 @@
-<%= form_for @map, html: { multipart: true, class: 'square' } do |f| %>
-  <%= render 'shared/errors', messages: @map.errors.full_messages %>
+<%= form_for(map, html: { multipart: true, class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: map.errors.full_messages %>
 
   <div class="fields horizontal">
     <%= f.label :name %>
@@ -16,8 +16,8 @@
   <div class="fields horizontal">
     <%= f.label :picture %>
     <div class="inputs">
-      <% if @map.picture&.file&.exists? %>
-        <%= image_tag @map.picture.url %><br>
+      <% if map.picture&.file&.exists? %>
+        <%= image_tag map.picture.url %><br>
       <% end %>
       <%= f.file_field :picture %>
     </div>

@@ -1,17 +1,17 @@
 <div class="wide box">
-  <%= form_for @directory, html: { class: "square" } do |f| %>
-    <div id="<%= dom_id(@directory) %>_errors_wrapper">
-      <%= render 'shared/errors', messages: @directory.errors.full_messages, container_id: "#{dom_id(@directory)}_errors" %>
+  <%= form_for directory, html: { class: "square" } do |f| %>
+    <div id="<%= dom_id(directory) %>_errors_wrapper">
+      <%= render 'shared/errors', messages: directory.errors.full_messages, container_id: "#{dom_id(directory)}_errors" %>
     </div>
 
-    <% if @directory.new_record? %>
+    <% if directory.new_record? %>
       <%= f.hidden_field :parent_id %>
     <% end %>
 
     <div class="fields horizontal">
       <label><strong>Parent:</strong></label>
       <div class="inputs">
-        <%= @directory.parent.full_path %>
+        <%= directory.parent.full_path %>
       </div>
     </div>
 

@@ -20,14 +20,15 @@
       <%= render 'shared/errors', messages: @match.errors.full_messages %>
 
       <div class="team-1">
+        <% counter = [0] %>
         <% [@match.contester1].each do |contester| %>
-          <%= render "lineup", contester: contester %>
+          <%= render "lineup", contester: contester, match: @match, counter: counter %>
         <% end %>
       </div>
 
       <div class="team-2">
         <% [@match.contester2].each do |contester| %>
-          <%= render "lineup", contester: contester %>
+          <%= render "lineup", contester: contester, match: @match, counter: counter %>
         <% end %>
       </div>
 

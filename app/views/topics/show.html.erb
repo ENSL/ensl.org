@@ -20,7 +20,7 @@
 
   <div id="posts">
     <% @posts.each_with_index do |post, n| %>
-      <%= render "posts/post", post: post, n: n %>
+      <%= render "posts/post", post: post, n: n, posts: @posts %>
     <% end %>
 
     <% if @newpost.errors.count > 0 %>

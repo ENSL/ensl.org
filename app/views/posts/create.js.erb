@@ -1,7 +1,7 @@
 $("#reply-errors").html("");
 $("#reply-form")[0].reset();
 $("#reply").fadeOut('fast');
-$("#posts").append("<%= escape_javascript(render(partial: 'post', locals: { post: @post, n: -1 })) %>");
+$("#posts").append("<%= escape_javascript(render(partial: 'post', locals: { post: @post, n: -1, posts: @post.topic.posts })) %>");
 $(".fastReply").removeClass('invisible');
 bindLocalHandlers();
 

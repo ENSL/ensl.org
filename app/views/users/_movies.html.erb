@@ -5,7 +5,7 @@
     <div id="user-movies-grid"
       class="grid gap-5 w-max mx-auto [grid-template-columns:repeat(3,10rem)]">
 
-      <% @user.movies.each do |movie| %>
+      <% user.movies.each do |movie| %>
         <%= link_to movie_path(movie),
           class: "movie-card relative w-40 h-32 overflow-hidden rounded bg-gray-100" do %>
 

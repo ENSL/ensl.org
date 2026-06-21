@@ -2,7 +2,7 @@
   Results:
 </h3>
 
-<% @results.each do |result| %>
+<% results.each do |result| %>
   <ul>
     <li>
       <%= namelink result, 30 %>
@@ -10,4 +10,4 @@
   </ul>
 <% end %>
 
-<%= will_paginate @results, :params => {:query => params[:query], :domain => params[:domain]} %>
+<%= will_paginate results, :params => {:query => params[:query], :domain => params[:domain]} %>

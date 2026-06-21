@@ -1,12 +1,12 @@
-<% if @article.text_coding == Article::CODING_HTML %>
+<% if article.text_coding == Article::CODING_HTML %>
   <%= render partial: "javascripts/mce_full" %>
 <% end %>
 
 <h1>Editing Article</h1>
 
-<%= form_for(@article, html: { class: 'article square' }) do |f| %>
-  <div id="<%= error_wrapper_id_for(@article) %>">
-    <%= render 'shared/errors', messages: @article.errors.full_messages, container_id: error_container_id_for(@article) %>
+<%= form_for(article, html: { class: 'article square' }) do |f| %>
+  <div id="<%= error_wrapper_id_for(article) %>">
+    <%= render 'shared/errors', messages: article.errors.full_messages, container_id: error_container_id_for(article) %>
   </div>
 
   <div class="fields horizontal">
@@ -16,12 +16,12 @@
   <% if cuser.admin? %>
     <div class="fields horizontal">
       <%= f.label :status %>
-      <%= f.select :status, @article.statuses.invert %>
+      <%= f.select :status, article.statuses.invert %>
     </div>
   <% end %>
   <div class="fields horizontal">
     <%= f.label :text_coding %>
-    <%= f.select :text_coding, @article.codings.invert %>
+    <%= f.select :text_coding, article.codings.invert %>
   </div>
   <div class="fields horizontal">
     <%= f.label :category_id %>
@@ -36,17 +36,17 @@
   </div>
 <% end %>
 
-<% unless @article.new_record? %>
+<% unless article.new_record? %>
   <div class="files">
     <h4>Files</h4>
 
-    <%= render partial: "data_files/list", locals: { files: @article.files } %>
+    <%= render partial: "data_files/list", locals: { files: article.files } %>
 
-    <% if @file && @file.can_create?(cuser) %>
+    <% if file && file.can_create?(cuser) %>
       <h4>New File</h4>
 
-      <%= form_for @file, html: { multipart: true } do |f| %>
-        <%= render 'shared/errors', messages: @file.errors.full_messages %>
+      <%= form_for file, html: { multipart: true } do |f| %>
+        <%= render 'shared/errors', messages: file.errors.full_messages %>
 
         <%= f.hidden_field :directory_id %>
         <%= f.hidden_field :article_id %>

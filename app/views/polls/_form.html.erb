@@ -1,7 +1,7 @@
 <div id="poll">
-  <%= form_for(@poll, html: { id: 'new_poll', class: 'square', data: { turbo: false } }) do |f| %>
+  <%= form_for(poll, html: { id: 'new_poll', class: 'square', data: { turbo: false } }) do |f| %>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-    <%= render 'shared/errors', messages: @poll.errors.full_messages %>
+    <%= render 'shared/errors', messages: poll.errors.full_messages %>
 
     <div class="fields horizontal">
       <%= f.label :question %>

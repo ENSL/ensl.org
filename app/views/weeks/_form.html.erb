@@ -1,7 +1,7 @@
-<h3><%= @week.contest if @week.contest %></h3>
+<h3><%= week.contest if week.contest %></h3>
 
-<%= form_for @week, html: { class: 'square' } do |f| %>
-  <%= render 'shared/errors', messages: @week.errors.full_messages %>
+<%= form_for week, html: { class: 'square' } do |f| %>
+  <%= render 'shared/errors', messages: week.errors.full_messages %>
   <%= f.hidden_field :contest_id %>
 
   <div class="fields horizontal">
@@ -14,11 +14,11 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :map1_id, "1st map" %>
-    <%= f.select :map1_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+    <%= f.select :map1_id, week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
   </div>
   <div class="fields horizontal">
     <%= f.label :map2_id, "2nd map" %>
-    <%= f.select :map2_id, @week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
+    <%= f.select :map2_id, week.contest.maps.basic.collect{|m| [m.name, m.id]} %>
   </div>
   <div class="controls">
     <%= f.submit 'Save Week' %>

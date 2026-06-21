@@ -2,9 +2,9 @@
   <h5>New Comment</h5>
 
   <% if cuser %>
-    <%= form_for(@comment, remote: true) do |f| %>
+    <%= form_for(comment, remote: true) do |f| %>
       <ul>
-        <% @comment.errors.full_messages.each do |msg| %>
+        <% comment.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
       </ul>
