@@ -67,7 +67,11 @@ jobs:
           command: |
             PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION')
             echo "Installing Playwright browser for Ruby client version: $PLAYWRIGHT_VERSION"
-            npx -y "playwright@$PLAYWRIGHT_VERSION" install --with-deps chromium --only-shell
+            npx -y "playwright@$PLAYWRIGHT_VERSION" install --with-deps chromium chromium-headless-shell
+            if ! ls "$HOME"/.cache/ms-playwright/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell >/dev/null 2>&1; then
+              echo "Playwright headless shell binary was not installed to expected path"
+              exit 1
+            fi
       - save_cache:
           key: ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
           paths:
