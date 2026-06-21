@@ -34,7 +34,7 @@ class PostsController < ApplicationController
       else
         # For AJAX/fast reply, render errors as JSON/JS
         @newpost = @post
-        format.js { render action: 'create_error' }
+        format.js { render :create_error }
         format.html { render :new }
       end
     end

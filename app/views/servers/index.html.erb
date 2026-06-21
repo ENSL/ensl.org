@@ -2,10 +2,10 @@
 
 <div class="servers-index" data-controller="server-table">
   <h3>NS2 Servers</h3>
-  <%= render partial: 'servers_table', locals: { servers: @ns2 } %>
+  <%= render "servers_table", servers: @ns2 %>
 
   <h3>NS1 Servers</h3>
-  <%= render partial: 'servers_table', locals: { servers: @servers } %>
+  <%= render "servers_table", servers: @servers %>
 </div>
 
 <%= link_to 'New server', new_server_path, class: 'button' %>

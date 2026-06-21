@@ -3,7 +3,7 @@
         <span><%= namelink @movie %></span>
     </h1>
 
-    <%= render partial: "movie", object: @movie %>
+    <%= render @movie %>
 
     <% if @movie.playback_url %>
     <div class="player">

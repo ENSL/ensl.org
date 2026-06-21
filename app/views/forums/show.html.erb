@@ -5,7 +5,7 @@
 </div>
 
 <div class="topic-controls">
-  <%= render partial: 'controls', locals: { forum: @forum } %>
+  <%= render "controls", forum: @forum %>
 </div>
 
 <h2><%=h @forum.title %></h2>
@@ -61,4 +61,4 @@
 
 <%= will_paginate @topics %>
 
-<%= render partial: 'controls', locals: { forum: @forum } %>
+<%= render "controls", forum: @forum %>

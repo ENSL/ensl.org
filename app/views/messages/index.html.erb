@@ -23,7 +23,7 @@
           <% else %>
             <div class="message">
           <% end %>
-            <%= render partial: 'message', locals: { message: message } %>
+            <%= render "message", message: message %>
           </div>
         <% end %>
       <% else %>
@@ -34,7 +34,7 @@
       <% if cuser.sent_messages.any? %>
         <% cuser.sent_messages.reverse_each do |message| %>
           <div class="message">
-            <%= render partial: 'message', locals: { message: message } %>
+            <%= render "message", message: message %>
           </div>
         <% end %>
       <% else %>

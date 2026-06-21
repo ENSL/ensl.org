@@ -14,7 +14,7 @@
       <%= f.text_field :slots %>
     </div>
 
-    <%= render partial: "bracket", locals: { bracket: @bracket, edit: true } %>
+    <%= render "bracket", bracket: @bracket, edit: true %>
 
     <div class="controls">
       <%= f.submit 'Update' %>

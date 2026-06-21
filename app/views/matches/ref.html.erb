@@ -11,7 +11,7 @@
     <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
   </div>
 
-  <%= render partial: 'javascripts/mce_full' %>
+  <%= render "javascripts/mce_full" %>
 
   <div class="lineups">
     <h3>Lineups</h3>
@@ -21,13 +21,13 @@
 
       <div class="team-1">
         <% [@match.contester1].each do |contester| %>
-          <%= render partial: "lineup", locals: { contester: contester } %>
+          <%= render "lineup", contester: contester %>
         <% end %>
       </div>
 
       <div class="team-2">
         <% [@match.contester2].each do |contester| %>
-          <%= render partial: "lineup", locals: { contester: contester } %>
+          <%= render "lineup", contester: contester %>
         <% end %>
       </div>
 

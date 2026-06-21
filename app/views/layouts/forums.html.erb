@@ -1,19 +1,19 @@
 <!doctype html>
 <html>
-  <%= render partial: "head" %>
+  <%= render "head" %>
   <body>
     <div id="container">
-      <%= render partial: "header" %>
-      <%= render partial: "navigation" %>
+      <%= render "header" %>
+      <%= render "navigation" %>
       <div class="body wrapper">
         <div id="content" class="full <%= yield :content_class %>">
-          <%= render partial: "messages" %>
+          <%= render "messages" %>
           <div id="forums">
             <%= yield %>
           </div>
         </div>
       </div>
-      <%= render partial: "footer" %>
+      <%= render "footer" %>
     </div>
   </body>
 </html>

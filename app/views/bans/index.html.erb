@@ -3,11 +3,11 @@
 
   <%= link_to 'New Ban', new_ban_path, class: 'button' %>
 
-  <%= render partial: "list", locals: { bans: @bans.effective } %>
+  <%= render "list", bans: @bans.effective %>
 
   <h1>Ban History</h1>
 
-  <%= render partial: "list", locals: { bans: @bans.ineffective } %>
+  <%= render "list", bans: @bans.ineffective %>
 
   <%= link_to 'New Ban', new_ban_path, class: 'button' %>
 </div>

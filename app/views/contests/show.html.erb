@@ -46,12 +46,11 @@
 
 <div class="standings">
   <% if @contest.contest_type == Contest::TYPE_BRACKET %>
-    <%= render partial: 'bracket', locals: { contest: @contest } %>
+    <%= render "bracket", contest: @contest %>
   <% elsif @contest.contest_type == Contest::TYPE_LADDER %>
-    <%= render partial: "contesters/ladder",
-        locals: { actions: true, contest: @contest } %>
+    <%= render "contesters/ladder", actions: true, contest: @contest %>
   <% else %>
-    <%= render partial: 'normal' %>
+    <%= render "normal" %>
   <% end %>
 </div>
 

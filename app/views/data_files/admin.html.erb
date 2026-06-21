@@ -2,10 +2,10 @@
   Broken files
 </h1>
 
-<%= render :partial => "list", :locals => {:files => @files} %>
+<%= render "list", files: @files %>
 
 <h1>
   Unrelated Movie Files
 </h1>
 
-<%= render :partial => "list", :locals => {:files => @movies} %>
+<%= render "list", files: @movies %>

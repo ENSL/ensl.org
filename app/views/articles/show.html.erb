@@ -1,6 +1,6 @@
 <% if @article.category.domain == Category::DOMAIN_NEWS %>
-  <%= render partial: "top", locals: { article: @article } %>
+  <%= render "top", article: @article %>
 <% end %>
 
-<%= render partial: "articles/article", object: @article %>
+<%= render @article %>
 <%= add_comments @article %>

@@ -17,7 +17,7 @@
 <%= will_paginate @teams %>
 
 <div id="teams">
-  <%= render partial: 'list', locals: { teams: @teams } %>
+  <%= render "list", teams: @teams %>
 </div>
 
 <%= will_paginate @teams %>
