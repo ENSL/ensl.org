@@ -102,7 +102,7 @@ class ServerMetadataSyncJob
   def mark_offline(server, error)
     updates = {}
     updates[:status] = Server::STATUS_OFFLINE if server.status != Server::STATUS_OFFLINE
-    updates[:ping] = nil if server.ping.present?
+    updates[:ping] = nil if server.ping?
 
     server.update!(updates) if updates.any?
 

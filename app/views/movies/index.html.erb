@@ -44,7 +44,7 @@
           <!-- Image / Icon Layer -->
           <div class="absolute inset-0 transition-opacity duration-300 group-hover:opacity-0">
 
-            <% if movie.picture.present? %>
+            <% if movie.picture? %>
               <%= image_tag movie.picture.url,
                   class: "w-full h-full object-cover" %>
             <% elsif movie.snapshot? %>

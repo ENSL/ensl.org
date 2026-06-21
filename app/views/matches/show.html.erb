@@ -110,7 +110,7 @@
     <% end %>
   </div>
 
-  <% unless @match.report.nil? or @match.report.empty? %>
+  <% unless @match.report? %>
     <div class="report">
       <h3>Match Report</h3>
       <p><%= sanitize(@match.report) %></p>

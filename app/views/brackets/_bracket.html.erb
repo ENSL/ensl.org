@@ -49,7 +49,7 @@
               <div class="team-content"><%= link_to bracketer, bracketer.match %></div>
             <% elsif bracketer.contester %>
               <div class="team-content"><%= link_to bracketer.contester.team.name, bracketer.contester %></div>
-            <% elsif bracketer.custom_text.present? %>
+            <% elsif bracketer.custom_text? %>
               <div class="team-content" style="font-size: 0.9em; color: #666;"><%= bracketer.custom_text %></div>
             <% end %>
           <% end %>

@@ -38,7 +38,7 @@
               &nbsp; | &nbsp;
               <strong>Password:</strong> <%= h(server.password.presence || '-') %>
             </div>
-            <% if server.description.present? %>
+            <% if server.description? %>
               <div class="server-description"><%= h(server.description) %></div>
             <% end %>
           </td>
