@@ -84,11 +84,7 @@ class Article < ActiveRecord::Base
   # FIXME: consider migrating to updated_at to allow
   #        read marks to update on edit
   acts_as_readable on: :created_at
-  acts_as_versioned
-
-  non_versioned_columns << 'category_id'
-  non_versioned_columns << 'status'
-  non_versioned_columns << 'user_id'
+  has_paper_trail on: [:update], only: %i[title text text_parsed text_coding]
 
   def to_s
     title

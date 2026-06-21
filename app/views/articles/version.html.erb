@@ -1,9 +1,10 @@
 <div class="article">
+  <h3>Version <%= @version_number %></h3>
   <div class="box">
-    <% if @version.text_coding == Article::CODING_HTML %>
-      <%= sanitize(@version.text) %>
+    <% if @snapshot.text_coding == Article::CODING_HTML %>
+      <%= sanitize(@snapshot.text) %>
     <% else %>
-      <%= sanitize(@version.text_parsed) %>
+      <%= sanitize(@snapshot.text_parsed) %>
     <% end %>
   </div>
   <% if @article.can_update? cuser %>

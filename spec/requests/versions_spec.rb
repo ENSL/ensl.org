@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'VersionsController', type: :request do
-  let!(:article) { create(:article) }
+  let!(:article) do
+    create(:article, title: 'Initial title', text: '<p>Old body</p>', text_coding: Article::CODING_HTML)
+  end
   let!(:admin) { create(:user, :admin) }
 
   def login_as(account)
@@ -16,10 +18,12 @@ RSpec.describe 'VersionsController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response).to render_template('articles/history')
+      expect(response.body).to include('History for')
+      expect(response.body).to include('Initial title')
     end
 
-    it 'returns 404 when article version table is unavailable' do
-      allow(ActiveRecord::Base.connection).to receive(:data_source_exists?).with('article_versions').and_return(false)
+    it 'returns 404 when PaperTrail versions table is unavailable' do
+      allow(ActiveRecord::Base.connection).to receive(:data_source_exists?).with('versions').and_return(false)
 
       get "/articles/#{article.id}/versions"
 
@@ -29,7 +33,7 @@ RSpec.describe 'VersionsController', type: :request do
 
   describe 'GET /articles/:article_id/versions/:id' do
     let!(:versioned_article) do
-      article.update!(title: 'Updated title')
+      article.update!(title: 'Updated title', text: '<p>New body</p>')
       article.reload
     end
 
@@ -40,6 +44,7 @@ RSpec.describe 'VersionsController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response).to render_template('articles/version')
+      expect(response.body).to include('Old body')
     end
 
     it 'returns 403 for non-admins' do
@@ -51,8 +56,9 @@ RSpec.describe 'VersionsController', type: :request do
 
   describe 'PATCH /articles/:article_id/versions/:id' do
     let!(:original_title) { article.title }
+    let!(:original_text) { article.text }
     let!(:versioned_article) do
-      article.update!(title: 'Updated title')
+      article.update!(title: 'Updated title', text: '<p>New body</p>')
       article.reload
     end
 
@@ -63,6 +69,7 @@ RSpec.describe 'VersionsController', type: :request do
 
       expect(response).to redirect_to(article_path(versioned_article))
       expect(versioned_article.reload.title).to eq(original_title)
+      expect(versioned_article.text).to eq(original_text)
       expect(flash[:notice]).to be_present
     end
 

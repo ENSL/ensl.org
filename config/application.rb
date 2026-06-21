@@ -88,6 +88,17 @@ module Ensl
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
+    # PaperTrail uses YAML.safe_load for versions.object. Permit common time/date
+    # classes so `version.reify` can deserialize historical records safely.
+    yaml_classes = Array(config.active_record.yaml_column_permitted_classes)
+    config.active_record.yaml_column_permitted_classes = (yaml_classes + [
+      Symbol,
+      Date,
+      DateTime,
+      Time,
+      ActiveSupport::TimeWithZone
+    ]).uniq
+
     # il8n fix
     config.i18n.fallbacks = true
     config.i18n.enforce_available_locales = false
