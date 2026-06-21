@@ -28,7 +28,7 @@ Rails.application.routes.draw do
   root to: 'articles#news_index'
 
   resources :articles do
-    resources :versions
+    resources :versions, only: %i[index show update]
     collection do
       get :news_index, path: 'news' # /articles/news
       get :news_archive, path: 'news/archive'
@@ -66,12 +66,12 @@ Rails.application.routes.draw do
   get 'custom_urls', to: 'custom_urls#administrate'
   resources :custom_urls, only: %i[create update destroy]
 
-  resources :brackets
+  resources :brackets, except: %i[index new]
 
   get 'comments/quote'
-  resources :comments
-  resources :shoutmsgs
-  resources :teamers do
+  resources :comments, except: [:new]
+  resources :shoutmsgs, except: %i[edit new update]
+  resources :teamers, except: %i[new show update] do
     collection do
       get :replace
     end
@@ -82,7 +82,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :gathers do
+  resources :gathers, except: %i[destroy new] do
     collection do
       get :refresh
       get :latest, path: 'latest/:game'
@@ -94,7 +94,7 @@ Rails.application.routes.draw do
   end
   get 'gather', to: 'gathers#latest', game: 'ns2'
 
-  resources :gatherers do
+  resources :gatherers, only: %i[create destroy update] do
     member do
       post :status
     end
@@ -102,7 +102,7 @@ Rails.application.routes.draw do
 
   resources :groups
   resources :groupers
-  resources :forumers
+  resources :forumers, only: %i[create destroy update]
   resources :topics
   resources :matches
 
@@ -139,12 +139,12 @@ Rails.application.routes.draw do
   # Disallow format extensions to avoid cross-origin JS embedding attempts.
   match 'auth/:provider/callback', to: 'users#callback', via: %i[get post], format: false
 
-  resources :locks
-  resources :contesters
+  resources :locks, only: %i[create destroy]
+  resources :contesters, except: %i[index new]
 
-  resources :challenges
+  resources :challenges, except: [:edit]
   resources :servers
-  resources :predictions
+  resources :predictions, only: [:create]
   resources :rounds
 
   resources :matches do
@@ -160,7 +160,7 @@ Rails.application.routes.draw do
   resources :maps
   resources :logs
   resources :log_files
-  resources :directories do
+  resources :directories, except: [:index] do
     member do
       post :reconcile
     end
@@ -169,14 +169,14 @@ Rails.application.routes.draw do
       get :show, path: '', defaults: { id: 1 }
     end
   end
-  resources :data_files do
+  resources :data_files, except: [:index] do
     collection do
       get :admin
       get :trash
     end
   end
 
-  resources :weeks
+  resources :weeks, except: %i[index show]
   resources :movies do
     member do
       post :preview
@@ -188,13 +188,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :messages
+  resources :messages, except: %i[destroy edit update]
 
   resources :bans
   resources :tweets
   resources :issues
 
-  resources :posts do
+  resources :posts, except: %i[index show] do
     member do
       get :quote
     end
