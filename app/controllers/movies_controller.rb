@@ -3,6 +3,7 @@
 class MoviesController < ApplicationController
   before_action :load_movie, except: %i[index new create admin]
   respond_to :html, :turbo_stream
+  helper_method :vlc_installer_file
 
   def index
     # Movie.filter_or_all expects (order, rating, size, author)
@@ -149,6 +150,10 @@ class MoviesController < ApplicationController
   end
 
   private
+
+  def vlc_installer_file
+    @vlc_installer_file ||= DataFile.find(855)
+  end
 
   def load_movie
     @movie = Movie.find(params[:id])

@@ -14,9 +14,9 @@
       Files
     </h4>
     <ul class="disc">
-        <% if Directory.first %>
-        <li><%= link_to "Recreate Root", reconcile_directory_path(Directory.find(Directory::ROOT)), method: :post %></li>
-        <li><%= link_to "Files Admin", controller: "directories", action: "show", id: Directory.first %></li>
+        <% if @first_directory %>
+        <li><%= link_to "Recreate Root", reconcile_directory_path(@root_directory), method: :post %></li>
+        <li><%= link_to "Files Admin", controller: "directories", action: "show", id: @first_directory %></li>
         <li><%= link_to "Movie Admin", admin_movies_path()%></li>
         <% end %>
     </ul>

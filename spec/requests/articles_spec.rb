@@ -36,6 +36,25 @@ RSpec.describe 'ArticlesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:news_index)
     end
+
+    it 'renders the newest poll in sidebar widget' do
+      old_poll = Poll.new(question: 'Old poll question')
+      old_poll.options.build(option: 'Old A')
+      old_poll.options.build(option: 'Old B')
+      old_poll.save!
+      old_poll.update_column(:created_at, 2.days.ago)
+
+      newest_poll = Poll.new(question: 'Newest poll question')
+      newest_poll.options.build(option: 'New A')
+      newest_poll.options.build(option: 'New B')
+      newest_poll.save!
+
+      get '/articles/news'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(newest_poll.question)
+      expect(response.body).not_to include(old_poll.question)
+    end
   end
 
   describe 'GET /articles/news/archive' do

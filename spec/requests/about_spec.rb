@@ -42,6 +42,28 @@ RSpec.describe 'AboutController', type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'shows root directory links when a root directory exists' do
+      root = create(:directory, :root)
+      login_as(admin)
+
+      get '/about/adminpanel'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(reconcile_directory_path(root))
+      expect(response.body).to include(directory_path(root))
+    end
+
+    it 'hides root directory links when there are no directories' do
+      Directory.delete_all
+      login_as(admin)
+
+      get '/about/adminpanel'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('Recreate Root')
+      expect(response.body).not_to include('Files Admin')
+    end
   end
 
   describe 'GET /about/statistics' do

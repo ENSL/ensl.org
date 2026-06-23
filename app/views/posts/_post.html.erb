@@ -1,7 +1,6 @@
 <div id="post_<%= post.id %>" class="post">
   <% user = post.user %>
   <% profile = user.profile %>
-  <% groupers = user.groupers %>
   <div class="avatar" rowspan="2">
     <h5>
       <%= link_to user, user, class: ("admin" if user.admin?) %>
@@ -16,28 +15,10 @@
     <% end %>
 
     <dl>
-      <% if groupers.count > 0 %>
-        <% if user.admin? %>
-          <% grouper = groupers.find_by(group_id: Group::ADMINS) %>
-          <dt><%= namelink Group.find(Group::ADMINS) %></dt>
-          <dd><%= grouper.task %></dd>
-        <% elsif user.staff? %>
-          <% grouper = groupers.find_by(group_id: Group::STAFF) %>
-          <dt><%= namelink Group.find(Group::STAFF) %></dt>
-          <dd><%= grouper.task %></dd>
-        <% elsif user.caster? %>
-          <% grouper = groupers.find_by(group_id: Group::CASTERS) %>
-          <dt><%= namelink Group.find(Group::CASTERS) %></dt>
-          <dd><%= grouper.task %></dd>
-        <% elsif user.ref? %>
-          <% grouper = groupers.find_by(group_id: Group::REFEREES) %>
-          <dt><%= namelink Group.find(Group::REFEREES) %></dt>
-          <dd><%= grouper.task %></dd>
-        <% else %>
-          <% grouper = groupers.first %>
-          <dt><%= namelink Group.find(grouper.group_id) %></dt>
-          <dd><%= grouper.task %></dd>
-        <% end %>
+      <% if (entry = post_primary_group_entry(user)) %>
+        <% group, task = entry %>
+        <dt><%= namelink group %></dt>
+        <dd><%= task %></dd>
       <% end %>
       <dt>Posts</dt>
       <dd><%= user.posts.count %></dd>

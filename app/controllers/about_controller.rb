@@ -5,7 +5,10 @@ class AboutController < ApplicationController
 
   def staff; end
 
-  def adminpanel; end
+  def adminpanel
+    @first_directory = Directory.first
+    @root_directory = Directory.find(Directory::ROOT) if @first_directory
+  end
 
   def statistics; end
 
