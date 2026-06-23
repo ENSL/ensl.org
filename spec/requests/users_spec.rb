@@ -157,6 +157,27 @@ RSpec.describe 'UsersController', type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'renders team-join form tags (not just inner fields)' do
+      create(:team)
+      login_as(user)
+
+      get "/users/#{user.id}/agenda"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('action="/teamers"')
+      expect(response.body).to include('name="teamer[user_id]"')
+      expect(response.body).to include('Join an existing team')
+    end
+
+    it 'keeps movie upload link on agenda using the hardcoded movies directory id constant' do
+      login_as(user)
+
+      get "/users/#{user.id}/agenda"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("/data_files/new?id=#{Directory::MOVIES}")
+    end
   end
 
   describe 'GET /users/:id/history' do

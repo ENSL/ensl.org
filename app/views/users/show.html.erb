@@ -1,33 +1,41 @@
 <div id="user-profile">
+  <% user = @user %>
+  <% profile = user.profile %>
+  <% past_teamers = user.teamers.past %>
+  <% match_teams = user.match_teams %>
+  <% predictions = user.predictions %>
+  <% articles = user.articles %>
+  <% movies = user.movies %>
+  <% can_update = cuser && user.can_update?(cuser) %>
   <h1 class="fancy">
-    <span><%= @user.username %></span>
+    <span><%= user.username %></span>
   </h1>
 
   <div class="photo">
-    <%= image_tag @user.profile.avatar.url %>
+    <%= image_tag profile.avatar.url %>
   </div>
 
   <div class="tabs tabbed">
     <ul id="user-nav" class="tabs">
       <li class="activeli"><a id="general">General</a></li>
 
-      <% if @user.teamers.past.count > 0 %>
+      <% if past_teamers.count > 0 %>
         <li><a id="teams">Teams</a></li>
       <% end %>
 
-      <% if @user.match_teams.length > 0 %>
+      <% if match_teams.length > 0 %>
         <li><a id="matches">Matches</a></li>
       <% end %>
 
-      <% if @user.predictions.count > 0 %>
+      <% if predictions.count > 0 %>
         <li><a id="predictions">Predictions</a></li>
       <% end %>
 
-      <% if @user.articles.count > 0 %>
+      <% if articles.count > 0 %>
         <li><a id="articles">Articles</a></li>
       <% end %>
 
-      <% if @user.movies.count > 0 %>
+      <% if movies.count > 0 %>
         <li><a id="movies">Movies</a></li>
       <% end %>
 
@@ -35,16 +43,16 @@
     </ul>
 
     <div id="user-data" class="tabbed-contents">
-      <%= render "general", user: @user %>
+      <%= render "general", user: user %>
     </div>
   </div>
 
-  <% if cuser and @user.can_update? cuser %>
-    <%= link_to 'Edit', edit_user_path(@user), class: 'button' %>
-    <%= link_to 'My Agenda', agenda_user_path(@user), class: 'button' %>
+  <% if can_update %>
+    <%= link_to 'Edit', edit_user_path(user), class: 'button' %>
+    <%= link_to 'My Agenda', agenda_user_path(user), class: 'button' %>
   <% end %>
   <% if cuser and cuser.admin? %>
-    <%= link_to 'Show History', "/users/history/#{@user.id}", class: 'button' %>
+    <%= link_to 'Show History', "/users/history/#{user.id}", class: 'button' %>
   <% end %>
 </div>
 

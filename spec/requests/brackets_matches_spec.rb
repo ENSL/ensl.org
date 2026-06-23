@@ -157,6 +157,31 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'renders prediction form tags for logged-in users when predictions are allowed' do
+      login_as(user)
+      match_record.update!(match_time: 2.hours.from_now, score1: nil, score2: nil)
+
+      get "/matches/#{match_record.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('action="/predictions"')
+      expect(response.body).to include('name="prediction[score1]"')
+      expect(response.body).to include('name="prediction[score2]"')
+    end
+
+    it 'renders referee signup form tags for referees when no referee is assigned' do
+      ref_user = create(:user, :ref)
+      login_as(ref_user)
+      match_record.update!(match_time: 2.hours.from_now, referee: nil)
+
+      get "/matches/#{match_record.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Signup as referee')
+      expect(response.body).to include("action=\"/matches/#{match_record.id}\"")
+      expect(response.body).to include('name="match[referee_id]"')
+    end
+
     it 'renders the new form for admins' do
       login_as(admin)
 

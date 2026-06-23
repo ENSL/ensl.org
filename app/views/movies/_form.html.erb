@@ -2,11 +2,18 @@
   <%= render 'shared/errors', messages: movie.errors.full_messages, container_id: error_container_id_for(movie) %>
 </div>
 
+<% user = movie.user %>
+<% file = movie.file %>
+<% files = movie.all_files %>
+<% file_name = file&.to_s %>
+<% selected_file_id = movie.file_id %>
+<% preview_files = files.collect { |d| [d.name.to_s, d.id] } %>
+
 <%= form_for movie, html: { multipart: true, class: 'square', id: dom_id(movie, :form) } do |f| %>
 
   <div class="fields horizontal">
     <%= f.label :name %>
-    <%= f.text_field :name, { value: movie.file.to_s } %>
+    <%= f.text_field :name, { value: file_name } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :category_id %>
@@ -26,21 +33,26 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :user_name, "Author" %>
-    <%= f.text_field :user_name, { value: movie&.user } %>
+    <%= f.text_field :user_name, { value: user } %>
   </div>
   <% file_options = DataFile.movies.collect { |d| ["#{d.name}", d.id] } %>
-  <% if movie.file && !file_options.any? { |(_, id)| id == movie.file_id } %>
-    <% file_options.unshift([movie.file.name.to_s, movie.file_id]) %>
+  <% if file && !file_options.any? { |(_, id)| id == movie.file_id } %>
+    <% file_options.unshift([file.name.to_s, selected_file_id]) %>
+  <% end %>
+  <% if file_options.empty? %>
+    <div class="message warning">
+      No movie files are available in this environment. Add/import movie files first, then select one below.
+    </div>
   <% end %>
   <div class="fields horizontal">
     <%= f.label :file %>
     <div class="inputs">
-      <%= f.select :file_id, file_options, { include_blank: true }, { selected: movie.file_id } %>
+      <%= f.select :file_id, file_options, { include_blank: true }, { selected: selected_file_id } %>
     </div>
   </div>
   <div class="fields horizontal">
     <%= f.label :preview_id %>
-    <%= f.select :preview_id, movie.all_files.collect { |d| ["#{d.name}", d.id] }, { include_blank: true } %>
+    <%= f.select :preview_id, preview_files, { include_blank: true } %>
   </div>
   <div class="fields horizontal">
     <%= f.label :picture %>
@@ -49,8 +61,8 @@
 
   <div class="controls">
     <%= f.submit 'Save' %>
-    <% if movie.file %>
-      <%= link_to "View File", edit_data_file_path(movie.file), class: 'button' %>
+    <% if file %>
+      <%= link_to "View File", edit_data_file_path(file), class: 'button' %>
     <% end %>
   </div>
 <% end %>

@@ -1,11 +1,14 @@
 <div class="contester">
-  <h1>Editing: <%= h @contester.team.name %></h1>
-  <h3 class="title"><%= h @contester.contest.name %></h3>
+  <% contester = @contester %>
+  <% team = contester.team %>
+  <% contest = contester.contest %>
+  <h1>Editing: <%= h team.name %></h1>
+  <h3 class="title"><%= h contest.name %></h3>
 
-  <%= form_for @contester, html: { class: 'square' } do |f| %>
-    <%= render 'shared/errors', messages: @contester.errors.full_messages %>
+  <%= form_for(contester, html: { class: 'square' }) do |f| %>
+    <%= render 'shared/errors', messages: contester.errors.full_messages %>
 
-    <% if @contester.contest.contest_type == Contest::TYPE_LADDER %>
+    <% if contest.contest_type == Contest::TYPE_LADDER %>
         <div class="fields horizontal">
           <%= f.label :rank %>
           <%= f.text_field :score %>
@@ -34,7 +37,7 @@
     </div>
     <div class="controls">
       <%= f.submit 'Save Contester' %>
-      <%= link_to 'Back to contest', edit_contest_path(@contester.contest, anchor: 'teams'), class: 'button' %>
+      <%= link_to 'Back to contest', edit_contest_path(contest, anchor: 'teams'), class: 'button' %>
     </div>
   <% end %>
 </div>

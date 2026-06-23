@@ -24,7 +24,8 @@ module Gathers
           vote = Vote.new(@params)
           vote.user = @actor
 
-          gather = vote.votable.respond_to?(:gather) ? vote.votable.gather : nil
+          votable = vote.votable
+          gather = votable.respond_to?(:gather) ? votable.gather : nil
 
           if gather
             gather.with_lock do

@@ -1,42 +1,50 @@
 <div id="post_<%= post.id %>" class="post">
+  <% user = post.user %>
+  <% profile = user.profile %>
+  <% groupers = user.groupers %>
   <div class="avatar" rowspan="2">
     <h5>
-      <%= link_to post.user, post.user, class: ("admin" if post.user.admin?) %>
+      <%= link_to user, user, class: ("admin" if user.admin?) %>
     </h5>
 
     <div class="image">
-      <%= image_tag post.user.profile.avatar.url %>
+      <%= image_tag profile.avatar.url %>
     </div>
 
-    <% if post.user.team %>
-      <strong><%= namelink post.user.team %></strong>
+    <% if user.team %>
+      <strong><%= namelink user.team %></strong>
     <% end %>
 
     <dl>
-      <% if post.user.groups.count > 0 %>
-        <% if post.user.admin? %>
+      <% if groupers.count > 0 %>
+        <% if user.admin? %>
+          <% grouper = groupers.find_by(group_id: Group::ADMINS) %>
           <dt><%= namelink Group.find(Group::ADMINS) %></dt>
-          <dd><%= post.user.groupers.where(:group_id => Group::ADMINS).first.task %></dd>
-        <% elsif post.user.staff? %>
+          <dd><%= grouper.task %></dd>
+        <% elsif user.staff? %>
+          <% grouper = groupers.find_by(group_id: Group::STAFF) %>
           <dt><%= namelink Group.find(Group::STAFF) %></dt>
-          <dd><%= post.user.groupers.where(:group_id => Group::STAFF).first.task %></dd>
-        <% elsif post.user.caster? %>
+          <dd><%= grouper.task %></dd>
+        <% elsif user.caster? %>
+          <% grouper = groupers.find_by(group_id: Group::CASTERS) %>
           <dt><%= namelink Group.find(Group::CASTERS) %></dt>
-          <dd><%= post.user.groupers.where(:group_id => Group::CASTERS).first.task %></dd>
-        <% elsif post.user.ref? %>
+          <dd><%= grouper.task %></dd>
+        <% elsif user.ref? %>
+          <% grouper = groupers.find_by(group_id: Group::REFEREES) %>
           <dt><%= namelink Group.find(Group::REFEREES) %></dt>
-          <dd><%= post.user.groupers.where(:group_id => Group::REFEREES).first.task %></dd>
+          <dd><%= grouper.task %></dd>
         <% else %>
-          <dt><%= namelink Group.find(post.user.groupers.first.group_id) %></dt>
-          <dd><%= post.user.groupers.first.task %></dd>
+          <% grouper = groupers.first %>
+          <dt><%= namelink Group.find(grouper.group_id) %></dt>
+          <dd><%= grouper.task %></dd>
         <% end %>
       <% end %>
       <dt>Posts</dt>
-      <dd><%= post.user.posts.count %></dd>
+      <dd><%= user.posts.count %></dd>
       <dt>Location</dt>
-      <dd><%= post.user.from %></dd>
+      <dd><%= user.from %></dd>
       <dt>Joined</dt>
-      <dd><%= longdate post.user.created_at %></dd>
+      <dd><%= longdate user.created_at %></dd>
     </dl>
   </div>
 
@@ -58,7 +66,7 @@
   </div>
 
   <div class="controls">
-    <% if post.topic.posts.build.can_create? cuser %>
+     <% if post.topic.posts.build.can_create? cuser %>
        <%= link_to 'Quote', '#', data:{on: :click, call: 'QuoteText', args: "#{post.id}"}, class: 'button tiny' %>
     <% end %>
     <% if post.can_update? cuser %>
@@ -71,10 +79,10 @@
 
   <div class="base">
     <div class="user">
-      <% if cuser && post.user.present? && post.user != cuser %>
+      <% if cuser && user.present? && user != cuser %>
         <% begin %>
           <% if Message.new.can_create?(cuser) %>
-            <%= link_to "Send PM", new_message_path(id: 'User', id2: post.user.id), class: 'button tiny' %>
+            <%= link_to "Send PM", new_message_path(id: 'User', id2: user.id), class: 'button tiny' %>
           <% end %>
         <% rescue => e %>
           <!-- Send PM not available -->
@@ -83,7 +91,7 @@
     </div>
 
     <div class="signature">
-      <%= sanitize(post.user.profile.signature_parsed) if post.user.profile.signature_parsed %>
+      <%= sanitize(profile.signature_parsed) if profile.signature_parsed %>
     </div>
   </div>
 </div>

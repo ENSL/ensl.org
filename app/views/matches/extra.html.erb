@@ -7,38 +7,42 @@
     HLTV Management
   </h2>
 
-  <% if @match.hltv and @match.hltv.recording %>
-    <p class="red bold">
-      Currently recording: <%= namelink @match.hltv %>
-  </p>
-<% end %>
-<%= form_tag :action => "hltv", :id => @match do %>
-  <p>
-    <%= label_tag "IP:Port" %><br />
-    <%= text_field_tag "addr", (@match.server.addr if @match.server) %>
-  </p>
-  <p>
-    <%= label_tag "Server password" %><br />
-    <%= text_field_tag "pwd", (@match.server.password if @match.server) %>
-  </p>
+  <% hltv = @match.hltv %>
+  <% server = @match.server %>
 
-  <% if @match.hltv and @match.hltv.recording %>
-    <p>
-      <%= label_tag "Wait 90s before stop/move" %><br />
-      <%= check_box_tag "wait", "1", false %>
-    </p>
-    <p>
-      <%= submit_tag 'Move HLTV to new address' %>
-    </p>
-    <p>
-      <%= submit_tag 'Stop HLTV and upload demos' %>
-    </p>
-  <% else %>
-    <p>
-      <%= submit_tag 'Send HLTV for recording' %>
+  <% if hltv and hltv.recording %>
+    <p class="red bold">
+      Currently recording: <%= namelink hltv %>
     </p>
   <% end %>
-<% end %>
+
+  <%= form_tag :action => "hltv", :id => @match do %>
+    <p>
+      <%= label_tag "IP:Port" %><br />
+      <%= text_field_tag "addr", (server.addr if server) %>
+    </p>
+    <p>
+      <%= label_tag "Server password" %><br />
+      <%= text_field_tag "pwd", (server.password if server) %>
+    </p>
+
+    <% if hltv and hltv.recording %>
+      <p>
+        <%= label_tag "Wait 90s before stop/move" %><br />
+        <%= check_box_tag "wait", "1", false %>
+      </p>
+      <p>
+        <%= submit_tag 'Move HLTV to new address' %>
+      </p>
+      <p>
+        <%= submit_tag 'Stop HLTV and upload demos' %>
+      </p>
+    <% else %>
+      <p>
+        <%= submit_tag 'Send HLTV for recording' %>
+      </p>
+    <% end %>
+  <% end %>
 </div>
 
 <% if cuser and cuser.admin? %>
@@ -56,13 +60,13 @@
       </p>
       <p>
         IP: <%= f.text_field :stream_ip, :size => 12 %> : <%= f.text_field :stream_port, :size => 3 %>
-    </p>
+      </p>
 
-    <p>
-      <%= submit_tag "Download" %>
-    </p>
-  <% end %>
-</div>
+      <p>
+        <%= submit_tag "Download" %>
+      </p>
+    <% end %>
+  </div>
 <% end %>
 
 <%= link_to "Back", @match %>

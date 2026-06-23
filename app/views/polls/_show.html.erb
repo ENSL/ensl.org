@@ -1,16 +1,19 @@
 <div class="widget-content-wrapper">
-  <div class="question">
-    <h5><%= @poll.question %></h5>
+  <% poll = local_assigns[:poll] || @poll %>
+  <% return unless poll %>
 
-    <% @poll.options.all.each do |opt| %>
+  <div class="question">
+    <h5><%= poll.question %></h5>
+
+    <% poll.options.all.each do |opt| %>
       <div class="option">
-        <% if cuser and !@poll.voted?(cuser) %>
+        <% if cuser and !poll.voted?(cuser) %>
           <%= link_to h(opt), votes_path(vote: { votable_id: opt.id, votable_type: 'Option' }), class: 'vote-link', data: { submit_form: true, form_id: 'vote_form', url: votes_path(vote: { votable_id: opt.id, votable_type: 'Option' }), turbo: false } %>
         <% else %>
           <%= opt.option %> <br />
         <% end %>
         <% if opt.votes > 0 %>
-          <%= content_tag :div, "", { class: "bar", style: "width: #{opt.votes*100/@poll.votes}%;" } %>
+          <%= content_tag :div, "", { class: "bar", style: "width: #{opt.votes*100/poll.votes}%;" } %>
         <% end %>
         <span><%= opt.votes %></span>
       </div>

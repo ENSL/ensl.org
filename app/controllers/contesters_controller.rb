@@ -22,9 +22,9 @@ class ContestersController < ApplicationController
     @contester.user = cuser
     raise AccessError unless @contester.can_create?(cuser, contester_params)
 
-    if @contester.contest.contest_type == Contest::TYPE_LADDER
-      @contester.score = @contester.contest.contesters.active.count + 1
-    end
+    contest = @contester.contest
+
+    @contester.score = contest.contesters.active.count + 1 if contest.contest_type == Contest::TYPE_LADDER
 
     if @contester.save
       flash[:notice] = t(:contests_join)
@@ -38,13 +38,15 @@ class ContestersController < ApplicationController
   def update
     raise AccessError unless @contester.can_update? cuser
 
-    if @contester.contest.contest_type == Contest::TYPE_LADDER
+    contest = @contester.contest
+
+    if contest.contest_type == Contest::TYPE_LADDER
       old_rank = @contester.score
       new_rank = params[:contester][:score].to_i
       raise Error, t(:rank_invalid) unless new_rank.positive? &&
-                                           (new_rank <= @contester.contest.contesters.active.count)
+                                           (new_rank <= contest.contesters.active.count)
 
-      @contester.contest.update_ranks(@contester, old_rank, new_rank) if old_rank != new_rank
+      contest.update_ranks(@contester, old_rank, new_rank) if old_rank != new_rank
     end
 
     if @contester.update(Contester.params(params, cuser))

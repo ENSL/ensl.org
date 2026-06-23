@@ -24,6 +24,9 @@
   </thead>
 
   <% @topics.each do |topic| %>
+    <% topic_user = topic.user %>
+    <% latest = topic.latest %>
+    <% posts_count = topic.posts.count %>
     <tr>
       <td>
         <h5>
@@ -38,21 +41,21 @@
                      ((topic.state == Topic::STATE_STICKY) ? " sticky" : "") %>
         </h5>
 
-        <% if topic.posts.count > Topic::POSTS_PAGE %>
+        <% if posts_count > Topic::POSTS_PAGE %>
           Page:
-          <% (1..((topic.posts.count/Topic::POSTS_PAGE).ceil + 1)).to_a.each do |page| %>
+          <% (1..((posts_count/Topic::POSTS_PAGE).ceil + 1)).to_a.each do |page| %>
             <%= ", " unless page == 1 %>
             <%= link_to page, topic_url(topic, page: page) %>
           <% end %>
         <% end %>
       </td>
-      <td><%= namelink(topic.user) %></td>
+      <td><%= namelink(topic_user) %></td>
       <td><%=h topic.cached_posts_count %></td>
       <td><%=h topic.cached_view_count %></td>
       <td>
         <%= link_to lastpost(topic) do %>
-          <%=h topic.latest.user %><br>
-          <%= shortdate(topic.latest.created_at) %>
+          <%=h latest.user %><br>
+          <%= shortdate(latest.created_at) %>
         <% end %>
       </td>
     </tr>

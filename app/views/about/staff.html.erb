@@ -36,22 +36,18 @@
           <th>Age</th>
         </tr>
         <% Group.admins.each do |grouper| %>
+          <% user = grouper.user %>
+          <% task = grouper.display_task %>
           <tr>
-            <td class="country"><%= flag grouper.user.country_s %></td>
-            <td class="username"><%= namelink grouper.user %></td>
-            <% if grouper.user.public_email %>
-            <td><%= h grouper.user.email_s %></td>
+            <td class="country"><%= flag user.country_s %></td>
+            <td class="username"><%= namelink user %></td>
+            <% if user.public_email %>
+            <td><%= h user.email_s %></td>
             <% else %>
             <td></td>
             <% end %>
-            <td>
-              <% if grouper.task %>
-                <%= h grouper.task %>
-              <% else %>
-                <%= h grouper.group.name.singularize %>
-              <% end %>
-            </td>
-            <td class="age"><%= h grouper.user.age %></td>
+            <td><%= h task %></td>
+            <td class="age"><%= h user.age %></td>
           </tr>
         <% end %>
       </table>
@@ -67,22 +63,18 @@
           <th>Age</th>
         </tr>
         <% Group.contributors.each do |grouper| %>
+          <% user = grouper.user %>
+          <% task = grouper.display_task %>
           <tr>
-            <td class="country"><%= flag grouper.user.country %></td>
-            <td class="username"><%= namelink grouper.user %></td>
-            <% if grouper.user.public_email %>
-            <td><%= h grouper.user.email_s %></td>
+            <td class="country"><%= flag user.country_s %></td>
+            <td class="username"><%= namelink user %></td>
+            <% if user.public_email %>
+            <td><%= h user.email_s %></td>
             <% else %>
             <td></td>
             <% end %>
-            <td>
-              <% if grouper.task %>
-                <%= h grouper.task %>
-              <% else %>
-                <%= h grouper.group.name.singularize %>
-              <% end %>
-            </td>
-            <td class="age"><%= h grouper.user.age %></td>
+            <td><%= h task %></td>
+            <td class="age"><%= h user.age %></td>
           </tr>
         <% end %>
       </table>
@@ -98,22 +90,18 @@
           <th>Age</th>
         </tr>
         <% Group.referees.each do |grouper| %>
+          <% user = grouper.user %>
+          <% task = grouper.display_task %>
           <tr>
-            <td class="country"><%= flag grouper.user.country %></td>
-            <td class="username"><%= namelink grouper.user %></td>
-            <% if grouper.user.public_email %>
-                <td><%= h grouper.user.email_s %></td>
+            <td class="country"><%= flag user.country_s %></td>
+            <td class="username"><%= namelink user %></td>
+            <% if user.public_email %>
+                <td><%= h user.email_s %></td>
             <% else %>
                 <td></td>
             <% end %>
-            <td>
-              <% if grouper.task %>
-                <%= h grouper.task %>
-              <% else %>
-                <%= h grouper.group.name.singularize %>
-              <% end %>
-            </td>
-            <td class="age"><%= h grouper.user.age %></td>
+            <td><%= h task %></td>
+            <td class="age"><%= h user.age %></td>
           </tr>
         <% end %>
       </table>
@@ -129,22 +117,18 @@
           <th>Age</th>
         </tr>
         <% Group.casters.each do |grouper| %>
+          <% user = grouper.user %>
+          <% task = grouper.display_task %>
           <tr>
-            <td class="country"><%= flag grouper.user.country %></td>
-            <td class="username"><%= namelink grouper.user %></td>
-            <% if grouper.user.public_email %>
-                <td><%= h grouper.user.email_s %></td>
+            <td class="country"><%= flag user.country_s %></td>
+            <td class="username"><%= namelink user %></td>
+            <% if user.public_email %>
+                <td><%= h user.email_s %></td>
             <% else %>
                 <td></td>
             <% end %>
-            <td>
-              <% if grouper.task %>
-                <%= h grouper.task %>
-              <% else %>
-                <%= h grouper.group.name.singularize %>
-              <% end %>
-            </td>
-            <td class="age"><%= h grouper.user.age %></td>
+            <td><%= h task %></td>
+            <td class="age"><%= h user.age %></td>
           </tr>
         <% end %>
       </table>
@@ -160,22 +144,18 @@
           <th>Age</th>
         </tr>
         <% Group.gathermods.each do |grouper| %>
+            <% user = grouper.user %>
+          <% task = grouper.display_task %>
             <tr>
-              <td class="country"><%= flag grouper.user.country %></td>
-              <td class="username"><%= namelink grouper.user %></td>
-              <% if grouper.user.public_email %>
-                  <td><%= h grouper.user.email_s %></td>
+              <td class="country"><%= flag user.country_s %></td>
+              <td class="username"><%= namelink user %></td>
+              <% if user.public_email %>
+                  <td><%= h user.email_s %></td>
               <% else %>
                   <td></td>
               <% end %>
-              <td>
-                <% if grouper.task %>
-                    <%= h grouper.task %>
-                <% else %>
-                    <%= h grouper.group.name.singularize %>
-                <% end %>
-              </td>
-              <td class="age"><%= h grouper.user.age %></td>
+              <td><%= h task %></td>
+              <td class="age"><%= h user.age %></td>
             </tr>
         <% end %>
       </table>
@@ -191,22 +171,18 @@
           <th>Age</th>
         </tr>
         <% Group.extras.each do |grouper| %>
+          <% user = grouper.user %>
+          <% task = grouper.display_task %>
           <tr>
-            <td class="country"><%= flag grouper.user.country %></td>
-            <td class="username"><%= namelink grouper.user %></td>
-            <% if grouper.user.public_email %>
-                <td><%= h grouper.user.email_s %></td>
+            <td class="country"><%= flag user.country_s %></td>
+            <td class="username"><%= namelink user %></td>
+            <% if user.public_email %>
+                <td><%= h user.email_s %></td>
             <% else %>
                 <td></td>
             <% end %>
-            <td>
-              <% if grouper.task %>
-                <%= h grouper.task %>
-              <% else %>
-                <%= h grouper.group.name.singularize %>
-              <% end %>
-            </td>
-            <td class="age"><%= h grouper.user.age %></td>
+            <td><%= h task %></td>
+            <td class="age"><%= h user.age %></td>
           </tr>
         <% end %>
       </table>

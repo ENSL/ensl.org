@@ -78,6 +78,18 @@ RSpec.describe 'ForumsController', type: :request do
       expect(response.body).to include('Hidden Forum')
       expect(response.body).to include('Private Topic')
     end
+
+    it 'renders last-post content inside a link anchor' do
+      topic = create(:topic, forum: public_forum)
+      create(:post, topic: topic, created_at: 1.day.ago)
+      latest = create(:post, topic: topic, created_at: Time.current)
+
+      get forum_path(public_forum)
+
+      expect(response).to have_http_status(:ok)
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.css("a[href*='post_#{latest.id}']")).not_to be_empty
+    end
   end
 
   describe 'GET /forums/new' do

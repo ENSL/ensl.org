@@ -37,6 +37,10 @@ class Grouper < ActiveRecord::Base
     user.to_s
   end
 
+  def display_task
+    task.presence || group&.name&.singularize
+  end
+
   def fetch_user
     self.user = User.find_by_username(username)
   end

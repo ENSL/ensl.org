@@ -33,7 +33,7 @@ class CustomUrlsController < ApplicationController
       render json: {
         status: 200,
         message: t(:custom_urls_update),
-        obj: { name: @custom_url.name, title: @custom_url.article.title }
+        obj: { name: @custom_url.name, title: @custom_url.article&.title }
       }, status: :ok
     else
       render json: {

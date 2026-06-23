@@ -169,7 +169,7 @@ describe Directory do
     end
 
     it 'defines MOVIES constant' do
-      expect(Directory::MOVIES).to eq(30)
+      expect(Directory::MOVIES).to eq(313)
     end
 
     it 'defines ARTICLES constant' do

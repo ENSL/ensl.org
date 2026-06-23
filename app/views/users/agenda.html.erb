@@ -1,4 +1,9 @@
 <div id="agenda" class="tabbed">
+  <% user = @user %>
+  <% teamers = user.teamers %>
+  <% joining_request = teamers.joining.first %>
+  <% pending_challenges = user.challenges_received.future.pending %>
+  <% sent_challenges = user.challenges_sent.future %>
   <ul id="agenda-nav" class="tabs">
     <li><a href="#teams">Teams</a></li>
     <li><a href="#matches">Matches</a></li>
@@ -21,17 +26,18 @@
           <th>Actions</th>
         </tr>
 
-        <% @user.teamers.active.each do |teamer| %>
+        <% teamers.active.each do |teamer| %>
+          <% team = teamer.team %>
           <tr>
-            <td class="<%= 'current' if teamer.team == @user.team %>">
-              <%= link_to (h teamer.team.name), teamer.team %>
+            <td class="<%= 'current' if team == user.team %>">
+              <%= link_to (h team.name), team %>
             </td>
             <td><%=h teamer.comment %></td>
             <td><%=h teamer.ranks[teamer.rank] %></td>
             <td>
-              <% if @user.team != teamer.team %>
-                <%= form_for @user, html: { class: 'inline' } do |u| %>
-                  <%= link_to "Set as Primary", user_path(@user, user: { team_id: teamer.team.id }), method: :put, confirm: "Are you sure?", class: 'button tiny' %>
+              <% if user.team != teamer.team %>
+                <%= form_for user, html: { class: 'inline' } do |u| %>
+                  <%= link_to "Set as Primary", user_path(user, user: { team_id: teamer.team.id }), method: :put, confirm: "Are you sure?", class: 'button tiny' %>
                 <% end %>
               <% end %>
 
@@ -41,7 +47,7 @@
         <% end %>
       </table>
 
-      <% if @user.teamers.joining.count == 0  %>
+      <% if teamers.joining.count == 0  %>
         <%= form_for @teamer do |f| %>
           <%= render 'shared/errors', messages: @teamer.errors.full_messages %>
           <%= f.hidden_field :user_id %>
@@ -58,18 +64,18 @@
       <% else %>
         <div class="flash warning">
           <p>You can only request to join one team at a time.</p>
-          <p>Currently you are trying to join <%= namelink @user.teamers.joining.first.team %></p>
+          <p>Currently you are trying to join <%= namelink joining_request.team %></p>
           <p>You can cancel this request by clicking "Cancel Request"</p>
         </div>
 
-        <%= link_to "Cancel Request", @user.teamers.joining.first, method: :delete, class: 'button' %>
+        <%= link_to "Cancel Request", joining_request, method: :delete, class: 'button' %>
       <% end %>
 
       <%= link_to 'Create a new team', new_team_path, class: 'button' %>
     </div>
 
     <div class="tab" id="matches">
-      <% if @user.challenges_received.future.pending.count > 0 %>
+      <% if pending_challenges.count > 0 %>
         <h4>Pending challenges for your response</h4>
 
         <table class="data">
@@ -80,7 +86,7 @@
             <th>Default time</th>
           </tr>
 
-          <% @user.challenges_received.future.pending.each do |challenge| %>
+            <% pending_challenges.each do |challenge| %>
             <tr>
               <td>
                 <%= link_to ("Open"), challenge %>
@@ -96,7 +102,7 @@
         </table>
       <% end %>
 
-      <% if @user.challenges_sent.future.count > 0 %>
+      <% if sent_challenges.count > 0 %>
         <h4>Sent challenges</h4>
 
         <table class="data">
@@ -108,7 +114,7 @@
             <th>Status</th>
           </tr>
 
-          <% @user.challenges_sent.future.each do |challenge| %>
+            <% sent_challenges.each do |challenge| %>
             <tr>
               <td><%= link_to ("Open"), challenge %></td>
               <td><%= namelink challenge.contester2 %></td>
@@ -209,7 +215,7 @@
     <div class="tab" id="movies">
       <%= render partial: "movies/movie", collection: @user.movies %>
 
-      <%= link_to "New Movie", { controller: "data_files", action: "new", id: Directory::MOVIES }, { class: 'button' } %>
+      <%= link_to "New Movie", new_data_file_path(id: Directory::MOVIES), class: 'button' %>
     </div>
 
     <div class="tab" id="servers">

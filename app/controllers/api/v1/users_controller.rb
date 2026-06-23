@@ -23,33 +23,34 @@ module Api
         end
 
         @steam = steam_profile @user if @user.steamid?
+        user = @user
 
         render json: {
-          id: @user.id,
-          username: @user.username,
-          country: @user.country,
-          time_zone: @user.time_zone,
-          avatar: @user.profile.avatar.url,
-          admin: @user.admin?,
-          referee: @user.ref?,
-          caster: @user.caster?,
-          moderator: @user.gather_moderator?,
-          contributor: @user.contributor?,
-          steam: if !@user.steamid?
+          id: user.id,
+          username: user.username,
+          country: user.country,
+          time_zone: user.time_zone,
+          avatar: user.avatar_url,
+          admin: user.admin?,
+          referee: user.ref?,
+          caster: user.caster?,
+          moderator: user.gather_moderator?,
+          contributor: user.contributor?,
+          steam: if !user.steamid?
                    nil
                  else
                    {
-                     id: @user.steamid,
+                     id: user.steamid,
                      url: @steam&.base_url,
                      nickname: @steam&.nickname
                    }
                  end,
           bans: {
-            gather: @user.banned?(Ban::TYPE_GATHER).present?,
-            mute: @user.banned?(Ban::TYPE_MUTE).present?,
-            site: @user.banned?(Ban::TYPE_SITE).present?
+            gather: user.banned?(Ban::TYPE_GATHER).present?,
+            mute: user.banned?(Ban::TYPE_MUTE).present?,
+            site: user.banned?(Ban::TYPE_SITE).present?
           },
-          team: @user.team.present? ? { id: @user.team.id, name: @user.team.name } : nil
+          team: user.team_summary
         }
       rescue ActiveRecord::RecordNotFound
         not_found

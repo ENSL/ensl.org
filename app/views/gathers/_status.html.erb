@@ -1,27 +1,33 @@
 <div id="gather-stats">
+  <% current_user = gather_current_user %>
+  <% gatherers_count = gather.gatherers.length %>
+  <% server = gather.server %>
+  <% map1 = gather.map1 %>
+  <% map2 = gather.map2 %>
+
   <% if gatherer && gatherer.created_at && gatherer.created_at > 10.seconds.ago %>
     <div class="message notice"><%= t(:gathers_join) %></div>
   <% end %>
 
   <% if gather.status == Gather::STATE_RUNNING %>
 
-    <% if gatherer and gatherer.can_destroy? gather_current_user %>
-      <p>Gather running, <%= Gather::FULL - gather.gatherers.length %> more needed.</p>
+    <% if gatherer and gatherer.can_destroy? current_user %>
+      <p>Gather running, <%= Gather::FULL - gatherers_count %> more needed.</p>
       <%= button_to 'Leave Gather', gatherer, method: :delete, form: { data: { turbo: false }, class: 'inline' }, class: 'button', data: { confirm: 'Are you sure?' } %>
 
-    <% elsif (g = Gatherer.new(gather: gather, user: gather_current_user)).can_create?(gather_current_user) %>
+    <% elsif (g = Gatherer.new(gather: gather, user: current_user)).can_create?(current_user) %>
       <%= form_for g, url: gatherers_path, authenticity_token: false, html: { id: "new_gatherer_#{gather.id}", data: { turbo_stream: true } } do |f| %>
         <%= f.hidden_field :gather_id, value: gather.id %>
-        <%= f.hidden_field :user_id, value: gather_current_user.id %>
+        <%= f.hidden_field :user_id, value: current_user.id %>
 
-        <p>Gather running, <%= Gather::FULL - gather.gatherers.length %> more needed.</p>
+        <p>Gather running, <%= Gather::FULL - gatherers_count %> more needed.</p>
         <p>
           You can download custom maps via the
           <%= link_to "Steam Workshop", "http://steamcommunity.com/workshop/browse?searchtext=&childpublishedfileid=0&section=items&appid=4920&browsesort=trend&requiredtags%5B%5D=level", data: { turbo_frame: '_top' } %>.
         </p>
 
         <p>
-          <% if gather_current_user.gatherers.count < 5 %>
+          <% if current_user.gatherers.count < 5 %>
             <%= f.check_box :confirm %> I have read the <%= link_to "rules", article_url(Article::G_RULES), data: { turbo_frame: '_top' } %>, installed NS and Discord.
           <% end  %>
         </p>
@@ -83,19 +89,19 @@
 
     <p>
       <strong>Maps</strong>:
-      <%= link_to gather.map1.map.to_s, gather.map1.map, data: { turbo_frame: '_top' } if gather.map1 %>,
-      <%= link_to gather.map2.map.to_s, gather.map2.map, data: { turbo_frame: '_top' } if gather.map2 %> <br>
+      <%= link_to map1.map.to_s, map1.map, data: { turbo_frame: '_top' } if map1 %>,
+      <%= link_to map2.map.to_s, map2.map, data: { turbo_frame: '_top' } if map2 %> <br>
       <strong>Server</strong>:
-      <% if gather.server %>
-        <%= gather.server %>
-        (<%= gather.server.ip %>:<%= gather.server.port %> ;
-        password = <%= if gather.server.password then gather.server.password else "<Password not specified>" end %>)
+      <% if server %>
+        <%= server %>
+        (<%= server.ip %>:<%= server.port %> ;
+        password = <%= if server.password then server.password else "<Password not specified>" end %>)
       <% end %>
     </p>
 
     <p>
-    <% if gather.server and gather.server.ip and gather.server.password %>
-      <%= link_to "Click to join Server", "steam://run/4920//connect #{gather.server.ip} #{gather.server.password}", class: 'join button tiny', data: { turbo_frame: '_top' } %>
+    <% if server and server.ip and server.password %>
+      <%= link_to "Click to join Server", "steam://run/4920//connect #{server.ip} #{server.password}", class: 'join button tiny', data: { turbo_frame: '_top' } %>
     <% end %>
     <%= gather_archive_link %>
     </p>
@@ -105,7 +111,7 @@
        data-gather-music-should-play-value="<%= gather_music_should_play? %>">
     <%= audio_tag '/sounds/gather-1.mp3', id: 'gather-music', class: 'gather-audio', loop: true, preload: 'metadata', data: { gather_music_target: 'audio' } %>
     <%= button_tag 'Mute', type: 'button', id: 'mute', class: 'button', data: { gather_music_target: 'muteButton', action: 'gather-music#toggleMute' } %>
-    <% if gather_current_user and (gather_current_user.admin? or gather_current_user.gather_moderator?) %>
+    <% if current_user and (current_user.admin? or current_user.gather_moderator?) %>
       <%= link_to "Admin Page", edit_gather_path(gather), class: 'admin button', data: { turbo: false } %>
     <% end %>
   </div>

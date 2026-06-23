@@ -152,6 +152,73 @@ module ApplicationHelper
     end
   end
 
+  def match_lineup_display(match, lineup, team_class, reverse = false)
+    return ''.html_safe unless lineup.any?
+
+    content_tag(:div, class: team_class) do
+      content_tag(:ul) do
+        safe_join(lineup.map do |teamer|
+          user = teamer.user
+          items = []
+          if reverse
+            items << flag(user.country)
+            items << h(user.username)
+            items << (user == match.motm ? fa_icon('star') : ''.html_safe)
+          else
+            items << (user == match.motm ? fa_icon('star') : ''.html_safe)
+            items << h(user.username)
+            items << flag(user.country)
+          end
+
+          content_tag(:li) do
+            safe_join(items, ' ')
+          end
+        end)
+      end
+    end
+  end
+
+  def match_lineups_display(match, team1_lineup, team2_lineup)
+    return ''.html_safe unless team1_lineup.any? || team2_lineup.any?
+
+    classes = ['lineups']
+    classes << 'shift' unless team1_lineup.any?
+
+    content_tag(:div, class: classes.join(' ')) do
+      safe_join([
+                  match_lineup_display(match, team1_lineup, 'team-1'),
+                  match_lineup_display(match, team2_lineup, 'team-2', true)
+                ])
+    end
+  end
+
+  def match_list_opponent_team(match, friendly_team = nil)
+    home_team = match.contester1&.team
+    away_team = match.contester2&.team
+
+    return away_team unless home_team && away_team
+    return away_team unless friendly_team
+
+    if friendly_team == home_team
+      away_team
+    elsif friendly_team == away_team
+      home_team
+    else
+      away_team
+    end
+  end
+
+  def match_list_score_color(match)
+    return 'black' if match.score1.nil? || match.score2.nil?
+    return 'yellow' if match.score1 == match.score2
+
+    match.score1 > match.score2 ? 'green' : 'red'
+  end
+
+  def match_list_score_text(match)
+    "#{match.score1} - #{match.score2}"
+  end
+
   def abslink(text, url)
     raw link_to text, url
   end

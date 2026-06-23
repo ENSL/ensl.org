@@ -1,6 +1,10 @@
 <table id="matches" class="<%= 'contest' if defined? contest and contest %> striped">
+  <% list_friendly = local_assigns[:friendly] %>
+  <% show_contest_column = defined?(contest) && contest %>
+  <% max_columns_allow_points = !defined?(max_columns) || max_columns > 4 %>
+  <% show_points = max_columns_allow_points && matches.any? { |m| m.contest&.contest_type == Contest::TYPE_LADDER } %>
   <tr>
-    <% if defined? contest and contest %>
+    <% if show_contest_column %>
       <th class="contest">Contest</th>
       <th class="opponent">Opponent</th>
     <% else %>
@@ -10,22 +14,25 @@
     <% unless defined? exclude_maps %>
       <th class="maps">Maps</th>
     <% end %>
-    <th class="score">Score</th>
-    <% if matches.first&.contest&.contest_type == Contest::TYPE_LADDER %>
+    <% if show_points %>
       <th class="points">Points</th>
     <% end %>
+    <th class="score">Score</th>
   </tr>
 
   <% matches.each do |match| %>
-    <% match.friendly = defined? friendly ? friendly : nil %>
+    <% match_contest = match.contest %>
+    <% opponent_team = match_list_opponent_team(match, list_friendly) %>
+    <% score_class = "bold #{match_list_score_color(match)}" %>
+    <% score_text = match_list_score_text(match) %>
     <tr>
-      <% if defined? contest and contest %>
+      <% if show_contest_column %>
         <td>
-          <%= namelink match.contest %>
+          <%= namelink match_contest %>
         </td>
       <% end %>
       <td>
-        <%= namelink (match.get_opponent.team) %>
+        <%= namelink opponent_team %>
       </td>
       <td>
         <%= shorttime match.match_time %>
@@ -35,25 +42,22 @@
           <%= match.map1 %>, <%= match.map2 %>
         </td>
       <% end %>
-      <td class="score">
-        <%= link_to match, :class => "bold #{match.score_color}" do %>
-          <% if match.friendly == match.contester1.team %>
-            <%=h match.score1 %> - <%=h match.score2 %>
-          <% else %>
-            <%=h match.score2 %> - <%=h match.score1 %>
+      <% if show_points %>
+        <td class="points">
+          <% if match_contest&.contest_type == Contest::TYPE_LADDER %>
+            <% points = match.points1 %>
+            <% if points.to_i > 0 %>
+              <%= fa_icon 'chevron-up' %>
+            <% elsif points.to_i < 0 %>
+              <%= fa_icon 'chevron-down' %>
+            <% end %>
+            <%= points %>
           <% end %>
-        <% end %>
-      </td>
-      <% if match.contest.contest_type == Contest::TYPE_LADDER and (max_columns > 4 if (defined? max_columns)) %>
-        <td>
-          <% if match.get_friendly(:points) > 0 %>
-            <%= fa_icon 'chevron-up' %>
-          <% elsif match.get_friendly(:points) < 0 %>
-            <%= fa_icon 'chevron-down' %>
-          <% end %>
-          <%= match.get_friendly(:points) %>
         </td>
       <% end %>
+      <td class="score">
+        <%= link_to score_text, match, class: score_class %>
+      </td>
     </tr>
   <% end %>
 </table>

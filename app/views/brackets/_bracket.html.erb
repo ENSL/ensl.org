@@ -7,16 +7,18 @@
 <% end %>
 
 <% if controller_name == 'brackets' && action_name == 'show' %>
+  <% contest = bracket.contest %>
+  <% matches = contest.matches %>
   <table class="striped">
     <tr>
       <td class="label">Tournament:</td>
-      <td><%= link_to bracket.contest.name, bracket.contest %></td>
+      <td><%= link_to contest.name, contest %></td>
     </tr>
     <tr>
       <td class="label">Status:</td>
       <td>
-        <% completed_matches = bracket.contest.matches.where.not(score1: nil, score2: nil).count %>
-        <% total_matches = bracket.contest.matches.count %>
+        <% completed_matches = matches.where.not(score1: nil, score2: nil).count %>
+        <% total_matches = matches.count %>
         <%= "#{completed_matches}/#{total_matches} matches completed" %>
       </td>
     </tr>
@@ -46,9 +48,12 @@
             </div>
           <% elsif bracket_show_content?(bracketer) %>
             <% if bracketer.match %>
-              <div class="team-content"><%= link_to bracketer, bracketer.match %></div>
+              <% match = bracketer.match %>
+              <div class="team-content"><%= link_to bracketer, match %></div>
             <% elsif bracketer.contester %>
-              <div class="team-content"><%= link_to bracketer.contester.team.name, bracketer.contester %></div>
+              <% contester = bracketer.contester %>
+              <% team = contester.team %>
+              <div class="team-content"><%= link_to team.name, contester %></div>
             <% elsif bracketer.custom_text? %>
               <div class="team-content" style="font-size: 0.9em; color: #666;"><%= bracketer.custom_text %></div>
             <% end %>

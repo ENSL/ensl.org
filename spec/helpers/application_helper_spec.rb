@@ -228,6 +228,43 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe 'matches list helpers' do
+    let(:home_team) { build_stubbed(:team, name: 'Home Team') }
+    let(:away_team) { build_stubbed(:team, name: 'Away Team') }
+    let(:home_contester) { instance_double(Contester, team: home_team) }
+    let(:away_contester) { instance_double(Contester, team: away_team) }
+    let(:match) do
+      instance_double(
+        Match,
+        contester1: home_contester,
+        contester2: away_contester,
+        score1: 3,
+        score2: 1
+      )
+    end
+
+    it 'returns away team as opponent by default' do
+      expect(helper.match_list_opponent_team(match, nil)).to eq(away_team)
+    end
+
+    it 'returns home team as opponent when friendly is away' do
+      expect(helper.match_list_opponent_team(match, away_team)).to eq(home_team)
+    end
+
+    it 'returns home-based score color and text' do
+      expect(helper.match_list_score_color(match)).to eq('green')
+      expect(helper.match_list_score_text(match)).to eq('3 - 1')
+    end
+
+    it 'returns red when home loses and yellow on draw' do
+      losing_match = instance_double(Match, score1: 1, score2: 3)
+      draw_match = instance_double(Match, score1: 2, score2: 2)
+
+      expect(helper.match_list_score_color(losing_match)).to eq('red')
+      expect(helper.match_list_score_color(draw_match)).to eq('yellow')
+    end
+  end
+
   describe '#timezone_offset' do
     it 'returns the current user timezone when available' do
       helper.instance_variable_set(:@cuser, instance_double(User, time_zone: 'Europe/Helsinki'))

@@ -1,14 +1,17 @@
 <div id="team-profile">
+  <% contester = @contester %>
+  <% team = contester.team %>
+  <% contest = contester.contest %>
   <h1 class="fancy">
     <span>
-      <%= link_to (h @contester.team.name), team_url(@contester.team, team: 'matches', anchor: "contest_#{@contester.contest.id}") %>
+      <%= link_to (h team.name), team_url(team, team: 'matches', anchor: "contest_#{contest.id}") %>
     </span>
   </h1>
-  <h4 class="fancy">in <%= namelink @contester.contest %></h4>
+  <h4 class="fancy">in <%= namelink contest %></h4>
 
-  <% if @contester.team.logo %>
+  <% if team.logo %>
     <div class="logo">
-      <%= image_tag @contester.team.logo.url, class: 'logo', alt: h(@contester.team.name) %>
+      <%= image_tag team.logo.url, class: 'logo', alt: h(team.name) %>
     </div>
   <% end %>
 </div>
@@ -24,7 +27,7 @@
 
   <div class="tabbed-contents">
     <div class="tab" id="results">
-      <%= render partial: 'matches/list', locals: { matches: @results, friendly: @contester.team, contest: false } %>
+      <%= render partial: 'matches/list', locals: { matches: @results, friendly: team, contest: false } %>
     </div>
 
     <div class="tab" id="results">
@@ -39,7 +42,7 @@
         </tr>
 
         <% @matches.each do |match| %>
-          <% match.friendly = @contester.team %>
+          <% match.friendly = team %>
           <tr>
             <td><%= namelink match.get_opponent %></td>
             <td><%= link_to shorttime(match.match_time), match %></td>
@@ -52,9 +55,9 @@
 
     <div class="tab" id="info">
       <h3>Rank</h3>
-      <%= cascade @contester, ["total", "win", "loss", "draw"] %>
+      <%= cascade contester, ["total", "win", "loss", "draw"] %>
 
-      <% if !@contester.active %>
+      <% if !contester.active %>
         <p><strong>INACTIVE</strong></p>
       <% end %>
     </div>
@@ -67,11 +70,11 @@
 </div>
 
 <% if @contester.can_update? cuser %>
-  <%= link_to 'Edit Contester', edit_contester_path(@contester), class: 'button' %>
+  <%= link_to 'Edit Contester', edit_contester_path(contester), class: 'button' %>
 <% end %>
 
-<% if @contester.team.can_update? cuser %>
-  <%= link_to 'Edit Team', edit_team_path(@contester.team), class: 'button' %>
+<% if team.can_update? cuser %>
+  <%= link_to 'Edit Team', edit_team_path(team), class: 'button' %>
 <% end %>
 
 <script type="text/javascript">

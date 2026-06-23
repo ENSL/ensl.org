@@ -14,6 +14,17 @@ RSpec.describe 'MoviesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:index)
     end
+
+    it 'shows both new movie and movie file upload links for movie makers' do
+      movie_maker = create(:user, :movie_maker)
+      login_as(movie_maker)
+
+      get '/movies'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('/movies/new')
+      expect(response.body).to include("/data_files/new?id=#{Directory::MOVIES}")
+    end
   end
 
   def login_as(account)

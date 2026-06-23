@@ -9,19 +9,27 @@
     <th>Score</th>
   </tr>
   <% matches.each do |match| %>
+    <% contest = match.contest %>
+    <% contester1 = match.contester1 %>
+    <% contester2 = match.contester2 %>
+    <% team1 = contester1.team %>
+    <% team2 = contester2.team %>
+    <% map1 = match.map1 %>
+    <% map2 = match.map2 %>
+    <% score_class = "bold #{match.score_color}" %>
     <tr class="<%=cycle('even', 'odd') %>">
       <td><%= shorttime match.match_time%></td>
-      <td><%= link_to match.contest.short_name, :controller => :contests, :action => :show, :id => match.contest.id %></td>
-      <td><%= link_to match.contester1.team.tag, :controller => :contesters, :action => :show, :id => match.contester1 %></td>
-      <td><%= link_to match.contester2.team.tag, :controller => :contesters, :action => :show, :id => match.contester2 %></td>
-      <td><% if match.map1 and match.map2 %>
-        <%= link_to match.map1, :controller => :maps, :action => :show, :id => match.map1 %>,
-        <%= link_to match.map2, :controller => :maps, :action => :show, :id => match.map2 %>
+      <td><%= link_to contest.short_name, :controller => :contests, :action => :show, :id => contest.id %></td>
+      <td><%= link_to team1.tag, :controller => :contesters, :action => :show, :id => contester1 %></td>
+      <td><%= link_to team2.tag, :controller => :contesters, :action => :show, :id => contester2 %></td>
+      <td><% if map1 and map2 %>
+        <%= link_to map1, :controller => :maps, :action => :show, :id => map1 %>,
+        <%= link_to map2, :controller => :maps, :action => :show, :id => map2 %>
         <% end %>
       </td>
       <td><%= match.preds(1) %>% - <%= match.preds(2) %>%</td>
       <td>
-        <%= link_to match, :class => "bold #{match.score_color}" do %>
+        <%= link_to match, :class => score_class do %>
           <%= h match.score1 %> - <%= h match.score2 %>
         <% end %>
       </td>

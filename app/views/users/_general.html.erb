@@ -1,5 +1,8 @@
 <div class="group">
   <h4>General information</h4>
+  <% profile = user.profile %>
+  <% groups = user.groups %>
+  <% teamers = user.teamers.active %>
 
   <dl>
     <dt>Age</dt>
@@ -10,9 +13,9 @@
       <dd><%= user.country %></dd>
     <% end %>
 
-    <% if !user.profile.town.blank? %>
+    <% if !profile.town.blank? %>
       <dt>Town</dt>
-      <dd><%= user.profile.town %></dd>
+      <dd><%= profile.town %></dd>
     <% end %>
 
     <% if !user.steamid.blank? %>
@@ -25,18 +28,18 @@
       </dd>
     <% end %>
 
-    <% if !user.profile.stream.blank? %>
+    <% if !profile.stream.blank? %>
       <dt>Stream</dt>
-      <dd><%= user.profile.stream %></dd>
+      <dd><%= profile.stream %></dd>
     <% end %>
   </dl>
 
   <h4>Contact</h4>
 
   <dl>
-    <% if !user.profile.web.blank? %>
+    <% if !profile.web.blank? %>
       <dt>Web</dt>
-      <dd><%= user.profile.web %></dd>
+      <dd><%= profile.web %></dd>
     <% end %>
 
     <% if cuser and cuser.admin? or user.public_email %>
@@ -44,22 +47,22 @@
       <dd><%= user.email_s %></dd>
     <% end %>
 
-    <% if user.profile.steam_profile and user.profile.steam_profile != "" %>
+    <% if profile.steam_profile and profile.steam_profile != "" %>
       <dt>Steam</dt>
       <dd>
-        <% if user.profile.steam_profile.match(/\A[0-9]*\z/) %>
-          <%= link_to user.profile.steam_profile, "http://steamcommunity.com/profiles/#{user.profile.steam_profile}" %>
-        <% elsif user.profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
-          <%= link_to user.profile.steam_profile, "http://steamcommunity.com/id/#{user.profile.steam_profile}" %>
+        <% if profile.steam_profile.match(/\A[0-9]*\z/) %>
+          <%= link_to profile.steam_profile, "http://steamcommunity.com/profiles/#{profile.steam_profile}" %>
+        <% elsif profile.steam_profile.match(/\A[A-Za-z0-9_\-\+]{1,40}\z/) %>
+          <%= link_to profile.steam_profile, "http://steamcommunity.com/id/#{profile.steam_profile}" %>
         <% end %>
       </dd>
     <% end %>
   </dl>
 
-  <% if user.profile.achievements and !user.profile.achievements.empty? %>
+  <% if profile.achievements and !profile.achievements.empty? %>
     <h4>Achievements</h4>
     <div class="achievements">
-      <%= sanitize(user.profile.achievements_parsed) %>
+      <%= sanitize(profile.achievements_parsed) %>
     </div>
   <% end %>
 
@@ -88,16 +91,16 @@
     <dt>Matches</dt>
     <dd><%= user.matches.count %></dd>
 
-    <% if user.groups.count > 0 %>
+    <% if groups.count > 0 %>
       <dt>Groups</dt>
-      <% for group in user.groups.all %>
+      <% for group in groups.all %>
         <dd><%= namelink group %></dd>
       <% end %>
     <% end %>
 
-    <% if user.teamers.active.count > 0 %>
+    <% if teamers.count > 0 %>
       <dt>Teams</dt>
-      <% user.teamers.active.each do |teamer| %>
+      <% teamers.each do |teamer| %>
         <dd><%= namelink teamer.team %></dd>
       <% end %>
     <% end %>

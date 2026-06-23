@@ -18,6 +18,8 @@
   <tbody>
   <% contesters = contest.contesters.active.ranked
      contesters.each_with_index do |contester, rank| %>
+    <% team = contester.team %>
+    <% contest = contester.contest %>
     <tr>
       <td><%= h rank + 1%>.</td>
       <% if contester.trend == Contester::TREND_UP %>
@@ -29,9 +31,9 @@
       <% else %>
         <td></td>
       <% end %>
-      <td><%= flag contester.team.country %></td>
-      <td><%= link_to (h contester.team.name), contester %></td>
-      <td><%= fa_icon 'trophy' if contester == contester.contest.winner %></td>
+      <td><%= flag team.country %></td>
+      <td><%= link_to (h team.name), contester %></td>
+      <td><%= fa_icon 'trophy' if contester == contest.winner %></td>
       <td><%= h contester.win %></td>
       <td><%= h contester.loss %></td>
       <td><%= h contester.draw %></td>

@@ -261,6 +261,19 @@ class User < ActiveRecord::Base
     email.gsub(/@/, ' (at) ')
   end
 
+  def avatar_url
+    profile&.avatar&.url
+  end
+
+  def team_summary
+    return nil unless team
+
+    {
+      id: team.id,
+      name: team.name
+    }
+  end
+
   def country_s
     country_object = ISO3166::Country[country]
     if country_object

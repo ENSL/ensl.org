@@ -13,11 +13,14 @@
     </tr>
 
     <% contest.contesters.active.each do |contester| %>
+      <% team = contester.team %>
+      <% founder = team.founder %>
+      <% teamers = team.teamers.active %>
       <tr class="<%= cycle('even', 'odd') %>" height="18">
-        <td><%= flag contester.team.country %></td>
-        <td><%= link_to (h contester.team.name), contester %></td>
-        <td><%= namelink contester.team.founder %></td>
-        <td><%= contester.team.teamers.active.count %></td>
+        <td><%= flag team.country %></td>
+        <td><%= link_to (h team.name), contester %></td>
+        <td><%= namelink founder %></td>
+        <td><%= teamers.count %></td>
       </tr>
     <% end %>
   </table>

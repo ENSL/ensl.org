@@ -1,70 +1,58 @@
 <div id="match">
+  <% match = @match %>
+  <% contester1 = match.contester1 %>
+  <% contester2 = match.contester2 %>
+  <% team1_lineup = match.team1_lineup %>
+  <% team2_lineup = match.team2_lineup %>
+  <% caster_profile = match.caster&.profile %>
+  <% caster_stream = caster_profile&.stream %>
+
   <div class="contesters">
-    <% if @match.score1 and @match.score2 %>
-      <h1 class="team-1"><%= namelink @match.contester1.team if @match.contester1 %></h1>
+    <% if match.score1 and match.score2 %>
+      <h1 class="team-1"><%= namelink contester1.team if contester1 %></h1>
       <div class="versus split">
         <div class="score-1">
-          <%= h @match.score1 %>
+          <%= h match.score1 %>
         </div>
         <span class="vs"></span>
         <div class="score-2">
-          <%= h @match.score2 %>
+          <%= h match.score2 %>
         </div>
       </div>
-      <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
+      <h1 class="team-2"><%= namelink contester2.team if contester2 %></h1>
     <% else %>
-      <h1 class="team-1"><%= namelink @match.contester1.team if @match.contester1 %></h1>
+      <h1 class="team-1"><%= namelink contester1.team if contester1 %></h1>
       <div class="versus">
         <span class="vs">VS</span>
       </div>
-      <h1 class="team-2"><%= namelink @match.contester2.team if @match.contester2 %></h1>
+      <h1 class="team-2"><%= namelink contester2.team if contester2 %></h1>
     <% end %>
   </div>
 
-  <% if @match.team1_lineup.any? || @match.team2_lineup.any? %>
-    <div class="lineups <%= 'shift' if !@match.team1_lineup.any? %>">
-      <% if @match.team1_lineup.any? %>
-        <div class="team-1">
-          <ul>
-            <% @match.team1_lineup.each do |teamer| %>
-              <li>
-                <% if teamer.user == @match.motm %>
-                  <%= fa_icon 'star' %>
-                <% end %>
-                <%= teamer.user.username %>
-                <%= flag teamer.user.country %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <% if @match.team2_lineup.any? %>
-        <div class="team-2">
-          <ul>
-            <% @match.team2_lineup.each do |teamer| %>
-              <li>
-                <%= flag teamer.user.country %>
-                <%= teamer.user.username %>
-                <% if teamer.user == @match.motm %>
-                  <%= fa_icon 'star' %>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+  <%= match_lineups_display(match, team1_lineup, team2_lineup) %>
 
   <div class="details">
-    <h3 class="contest"><%= namelink @match.contest %></h3>
-    <h5 class="date"><%= @match.match_time.strftime("%A %e %B %Y") %></h5>
-    <h5 class="date"><%= Time.use_zone(timezone_offset) { @match.match_time.strftime("%H:%M %Z") } %></h5>
+    <h3 class="contest"><%= namelink match.contest %></h3>
+    <h5 class="date"><%= match.match_time.strftime("%A %e %B %Y") %></h5>
+    <h5 class="date"><%= Time.use_zone(timezone_offset) { match.match_time.strftime("%H:%M %Z") } %></h5>
+
+    <%= cascade match, [:server, :demo, :referee] %>
+    <strong>Maps</strong><br>
+    <%= namelink match.map1 %>, <%= namelink match.map2 %>
+
+    <% if caster_stream %>
+    <dl>
+      <dt>Stream</dt>
+      <dd>
+        <%= link_to caster_stream, caster_stream %>
+      </dd>
+    </dl>
+    <% end %>
+
   </div>
 
   <div class="predictions">
-    <h4>Predictions (<%= @match.predictions.count %>)</h4>
+    <h4>Predictions (<%= match.predictions.count %>)</h4>
 
     <% if @newpred.can_create? cuser %>
       <%= form_for @newpred do |f| %>
@@ -85,56 +73,47 @@
       <% end %>
     <% else %>
       <div class="team-1">
-        <%= @match.contester1.team if @match.contester1 %>
-        <div class="highlight"><%= @match.preds(1) %>%</div>
+        <%= contester1.team if contester1 %>
+        <div class="highlight"><%= match.preds(1) %>%</div>
       </div>
       <div class="team-2">
-        <div class="highlight"><%= @match.preds(2) %>%</div>
-        <%= @match.contester2.team if @match.contester2 %>
+        <div class="highlight"><%= match.preds(2) %>%</div>
+        <%= contester2.team if contester2 %>
       </div>
     <% end %>
+
   </div>
 
-  <div class="details">
-    <%= cascade @match, [:server, :demo, :referee] %>
-    <strong>Maps</strong><br>
-    <%= namelink @match.map1 %>, <%= namelink @match.map2 %>
-
-    <% if @match.caster && @match.caster.profile.stream %>
-    <dl>
-      <dt>Stream</dt>
-      <dd>
-        <%= link_to @match.caster.profile.stream, @match.caster.profile.stream %>
-      </dd>
-    </dl>
-    <% end %>
-  </div>
-
-  <% unless @match.report? %>
+  <% unless match.report? %>
     <div class="report">
       <h3>Match Report</h3>
-      <p><%= sanitize(@match.report) %></p>
+      <p><%= sanitize(match.report) %></p>
     </div>
-  <% end %>
-  <% if cuser and (cuser.admin? or @match.user_in_match? cuser) %>
-      <div class="referee">
-        <%= link_to 'Proposals', match_proposals_path(@match), class: 'button' %>
-      </div>
   <% end %>
 
-  <% if cuser and @match.can_update? cuser, [:report] %>
+  <% if cuser and (cuser.admin? or match.user_in_match? cuser) %>
     <div class="referee">
-      <%= link_to "Referee Admin", ref_match_path(@match), class: 'button' %>
+      <%= link_to 'Proposals', match_proposals_path(match), class: 'button' %>
     </div>
   <% end %>
-  <% if cuser and @match.referee.nil? and cuser.ref? %>
+
+  <% if cuser and match.can_update? cuser, [:report] %>
     <div class="referee">
-      <%= form_for @match do |f| %>
+      <%= link_to "Referee Admin", ref_match_path(match), class: 'button' %>
+    </div>
+  <% end %>
+
+  <% if cuser and match.referee.nil? and cuser.ref? %>
+    <div class="referee">
+      <%= form_for match do |f| %>
         <%= f.hidden_field :referee_id, value: cuser.id %>
         <%= f.submit "Signup as referee", class: 'button' %>
       <% end %>
     </div>
   <% end %>
+
+  </div>
+
 </div>
 
-<%= add_comments @match %>
+<%= add_comments match %>

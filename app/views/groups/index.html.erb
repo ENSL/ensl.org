@@ -9,10 +9,12 @@
   </tr>
 
   <% @groups.each do |group| %>
+    <% founder = group.founder %>
+    <% created_at = group.created_at %>
     <tr>
       <td><%= link_to (h group.name), group %></td>
-      <td><%= h group.created_at.strftime("%d %B %y") %></td>
-      <td><%= link_to (h group.founder.username), group.founder %></td>
+      <td><%= h created_at.strftime("%d %B %y") %></td>
+      <td><%= link_to (h founder.username), founder %></td>
       <td class="actions">
         <%= link_to fa_icon('pencil'), edit_group_path(group) %>
         <% if group.can_destroy? cuser %>

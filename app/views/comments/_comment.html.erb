@@ -1,12 +1,14 @@
 <div id="comment_<%= comment.id %>" class="comment">
+  <% user = comment.user %>
+  <% profile = user.profile %>
   <div class="comment-image">
-    <%= image_tag comment.user.profile.avatar.url %>
+    <%= image_tag profile.avatar.url %>
   </div>
   <div class="comment-content">
     <h1>
-      <%= flag(comment.user.country) if comment.user.country %>
-      <%= namelink(comment.user) %>
-      <% if comment.user.team %> | <%= namelink(comment.user.team) %><% end %>
+      <%= flag(user.country) if user.country %>
+      <%= namelink(user) %>
+      <% if user.team %> | <%= namelink(user.team) %><% end %>
     </h1>
     <div class="controls">
       <% if cuser %>
@@ -22,6 +24,6 @@
     <div class="comment-body">
       <%= sanitize(comment.text_parsed) %>
     </div>
-    <p class="comment-detail"><%= comment.created_at.strftime("%-d %B %Y, %H:%M") %></h2>
+    <p class="comment-detail"><%= comment.created_at.strftime("%-d %B %Y, %H:%M") %></p>
   </div>
 </div>

@@ -22,7 +22,8 @@ class DataFilesController < ApplicationController
 
   def new
     @file = DataFile.new
-    @file.directory = Directory.find params[:id]
+    directory_id = params[:directory_id].presence || params[:id].presence || Directory::ROOT
+    @file.directory = Directory.find(directory_id)
     raise AccessError unless @file.can_create? cuser
   end
 

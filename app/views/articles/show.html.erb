@@ -1,4 +1,5 @@
-<% if @article.category.domain == Category::DOMAIN_NEWS %>
+<% category = @article.category %>
+<% if category.domain == Category::DOMAIN_NEWS %>
   <%= render "top", article: @article %>
 <% end %>
 

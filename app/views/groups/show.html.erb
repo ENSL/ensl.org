@@ -1,6 +1,8 @@
 <div id="group">
-  <h1><%=h @group.name %></h1>
-  <h3 class="title">Founder: <%=h @group.founder.username %></h3>
+  <% group = @group %>
+  <% founder = group.founder %>
+  <h1><%=h group.name %></h1>
+  <h3 class="title">Founder: <%=h founder.username %></h3>
 
   <table class="striped">
     <tr>
@@ -9,7 +11,8 @@
       <th>SteamID</th>
     </tr>
 
-    <% @group.users.each do |user| %>
+    <% users = group.users %>
+    <% users.each do |user| %>
       <tr>
         <td><%=link_to (h user.username), user %></td>
         <td><%=h user.firstname %> <%=h user.lastname %></td>
@@ -19,6 +22,6 @@
   </table>
 
   <% if cuser and cuser.admin? %>
-    <%= link_to 'Edit Group', edit_group_path(@group), class: 'button' %>
+    <%= link_to 'Edit Group', edit_group_path(group), class: 'button' %>
   <% end %>
 </div>

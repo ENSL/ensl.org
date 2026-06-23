@@ -49,7 +49,7 @@ class Directory < ActiveRecord::Base
   DEMOS = 5
   DEMOS_DEFAULT = 19
   DEMOS_GATHERS = 92
-  MOVIES = 30
+  MOVIES = 313
   ARTICLES = 39
 
   attr_accessor :preserve_files, :move_to_trash
