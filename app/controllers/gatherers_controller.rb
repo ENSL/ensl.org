@@ -4,31 +4,13 @@ class GatherersController < ApplicationController
   before_action :load_gatherer, except: [:create]
 
   def create
-    result = Gathers::Join.call(actor: cuser, params: Gatherer.params(params, cuser))
-    @gatherer = result.gatherer
-
-    if result.success?
-      flash[:notice] = t(:gathers_join)
-    else
-      flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || result.error.to_s
-    end
+    join_result = Gathers::Join.call(actor: cuser, params: Gatherer.params(params, cuser))
+    @gatherer = join_result.gatherer
+    set_join_flash(join_result)
 
     respond_to do |format|
-      format.turbo_stream do
-        @gather = result.gather || @gatherer&.gather
-        @gatherer = result.gatherer || @gather&.gatherers&.of_user(cuser)&.first
-        if result.success?
-          flash.now[:notice] = flash[:notice]
-        else
-          flash.now[:error] = flash[:error]
-        end
-        render turbo_stream: [
-          turbo_stream.replace('notification', partial: 'application/messages'),
-          turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
-                                                                     locals: { gather: @gather, gatherer: @gatherer })
-        ]
-      end
-      format.html { redirect_to(result.gather || @gatherer&.gather || '/') }
+      format.turbo_stream { render_join_turbo_stream(join_result) }
+      format.html { redirect_to(join_result.gather || @gatherer&.gather || '/') }
     end
   end
 
@@ -84,5 +66,29 @@ class GatherersController < ApplicationController
 
   def load_gatherer
     @gatherer = Gatherer.find params[:id]
+  end
+
+  def set_join_flash(join_result)
+    if join_result.success?
+      flash[:notice] = t(:gathers_join)
+    else
+      flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || join_result.error.to_s
+    end
+  end
+
+  def render_join_turbo_stream(join_result)
+    @gather = join_result.gather || @gatherer&.gather
+    @gatherer = join_result.gatherer || @gather&.gatherers&.of_user(cuser)&.first
+    if join_result.success?
+      flash.now[:notice] = flash[:notice]
+    else
+      flash.now[:error] = flash[:error]
+    end
+
+    render turbo_stream: [
+      turbo_stream.replace('notification', partial: 'application/messages'),
+      turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
+                                                                 locals: { gather: @gather, gatherer: @gatherer })
+    ]
   end
 end

@@ -16,8 +16,7 @@ class ShoutmsgsController < ApplicationController
   end
 
   def create
-    @shoutmsg = Shoutmsg.new(Shoutmsg.params(params, cuser))
-    @shoutmsg.user = cuser
+    @shoutmsg = Shoutmsg.build_for_actor(params, cuser)
     Rails.logger.debug "Shoutmsgs#create params=#{params[:shoutmsg].inspect} cuser_id=#{cuser&.id}"
     raise AccessError unless @shoutmsg.can_create? cuser
 

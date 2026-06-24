@@ -9,18 +9,7 @@ module Api
 
       def show
         @team = Team.find params[:id]
-        render json: {
-          id: @team.id,
-          name: @team.name,
-          logo: @team.logo,
-          members: @team.teamers.active.map do |m|
-            {
-              id: m.user.id,
-              username: m.user.username,
-              steamid: m.user.steamid
-            }
-          end
-        }
+        render json: @team.api_v1_payload
       rescue ActiveRecord::RecordNotFound
         raise ActionController::RoutingError, 'User Not Found'
       end

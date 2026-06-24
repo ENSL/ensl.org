@@ -94,9 +94,7 @@ class UsersController < ApplicationController
       Rails.logger.debug(params.inspect)
     end
 
-    # FIXME: use permit
-    params[:user].delete(:username) unless @user.can_change_name? cuser
-    if @user.update(User.params(params, cuser, 'update'))
+    if @user.update(@user.filtered_update_attributes(params, cuser))
       flash[:notice] = t(:user_updated)
       redirect_back(fallback_location: user_path(@user))
     else
@@ -118,19 +116,20 @@ class UsersController < ApplicationController
       return
     end
 
-    @user = User.find_or_build(auth_hash, request.ip)
-    unless @user.is_a?(ActiveRecord::Base)
+    user = User.find_or_build(auth_hash, request.ip)
+    unless user.is_a?(ActiveRecord::Base)
       callback_failed
       return
     end
 
     # After steam validates SteamID, we know its right.
-    session[:verified_steamid] = @user.steamid
+    session[:verified_steamid] = user.steamid
 
     # Store user in session store
-    session[:cached_user] = @user.to_json
+    session[:cached_user] = user.to_json
 
-    if @user.new_record?
+    if user.new_record?
+      @user = user
       # If user mistypes username and password, return to user creation page.
       session[:return_to] = new_user_url(@user)
 
@@ -138,7 +137,7 @@ class UsersController < ApplicationController
       # flash[:notice] = t(:users_signup_steam)
       render :new, formats: :html
     else
-      login_user(@user)
+      login_user(user)
       return_back
     end
   end

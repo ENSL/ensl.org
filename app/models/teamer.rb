@@ -114,4 +114,10 @@ class Teamer < ActiveRecord::Base
   def self.params(params, _cuser)
     params.require(:teamer).permit(:comment, :rank, :team_id, :user_id)
   end
+
+  def self.build_for_actor(params, actor)
+    teamer_params = self.params(params, actor)
+    teamer = new(teamer_params)
+    [teamer, teamer_params]
+  end
 end

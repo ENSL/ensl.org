@@ -108,4 +108,8 @@ class Ban < ActiveRecord::Base
   def self.params(params, _cuser)
     params.require(:ban).permit(:steamid, :user_name, :user_id, :addr, :server_id, :expiry, :reason, :ban_type, :ip)
   end
+
+  def self.active_server_ban_for(steamid)
+    server_ban(steamid).order(expiry: :desc).first
+  end
 end

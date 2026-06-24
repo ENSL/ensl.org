@@ -102,6 +102,23 @@ class Server < ActiveRecord::Base
     name
   end
 
+  def api_v1_payload
+    {
+      id: id,
+      name: name,
+      description: description,
+      dns: dns,
+      ip: ip,
+      port: port,
+      password: password,
+      category_id: category_id
+    }
+  end
+
+  def self.active_api_v1_payload
+    active.map(&:api_v1_payload)
+  end
+
   def online?
     status == STATUS_ONLINE
   end

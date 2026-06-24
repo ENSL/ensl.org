@@ -2,8 +2,7 @@
 
 class PredictionsController < ApplicationController
   def create
-    @prediction = Prediction.new(Prediction.params(params, cuser))
-    @prediction.user = cuser
+    @prediction = Prediction.build_for_actor(params, cuser)
     raise AccessError unless @prediction.can_create? cuser
 
     if @prediction.save

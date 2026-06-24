@@ -258,6 +258,12 @@ class Gather < ActiveRecord::Base
     end
   end
 
+  def refresh_and_broadcast_if_status_changed!
+    previous_status = status
+    refresh(nil)
+    Gathers::Broadcaster.call(self) if status != previous_status
+  end
+
   def can_create?(cuser)
     true if cuser.admin? || cuser.gather_moderator?
   end

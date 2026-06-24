@@ -117,6 +117,29 @@ class Challenge < ActiveRecord::Base
     self.contester1 = user.active_contesters.of_contest(contester2.contest).first
   end
 
+  def self.build_for_new(user:, contester2:)
+    challenge = new(user: user, contester2: contester2)
+    contest = contester2.contest
+    challenge.contester1 = user.active_contesters.of_contest(contest).first
+    challenge.match_time = Time.current + 2.days
+    challenge
+  end
+
+  def apply_commit_status(commit_value)
+    self.status = case commit_value
+                  when 'Accept'
+                    STATUS_ACCEPTED
+                  when 'Default time'
+                    STATUS_DEFAULT
+                  when 'Forfeit'
+                    STATUS_FORFEIT
+                  when 'Decline'
+                    STATUS_DECLINED
+                  else
+                    status
+                  end
+  end
+
   def set_defaults
     self.status = STATUS_PENDING
     # Ensure contest default_time responds to hour/minute; caller tests should set a Time
@@ -209,9 +232,9 @@ class Challenge < ActiveRecord::Base
       return
     end
 
-    errors.add(:base, I18n.t(:servers_notfree_specifictime)) unless server.free?(match_time)
+    errors.add(:base, I18n.t(:servers_notfree_specifictime)) unless server.is_free(match_time)
 
-    return if server.free?(default_time)
+    return if server.is_free(default_time)
 
     errors.add(:base, I18n.t(:servers_notfree_defaulttime))
   end

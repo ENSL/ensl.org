@@ -25,7 +25,10 @@ class VotesController < ApplicationController
 
   def handle_gather_vote(vote_params)
     result = Gathers::CastVote.call(actor: cuser, params: vote_params)
+    apply_gather_vote_result(result)
+  end
 
+  def apply_gather_vote_result(result)
     if result.success?
       flash[:notice] = t(:votes_success)
       result.gather ? redirect_to(result.gather) : redirect_to_back

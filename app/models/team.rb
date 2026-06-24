@@ -89,6 +89,25 @@ class Team < ActiveRecord::Base
     name
   end
 
+  def api_v1_payload
+    {
+      id: id,
+      name: name,
+      logo: logo,
+      members: api_v1_members_payload
+    }
+  end
+
+  def api_v1_members_payload
+    teamers.active.map do |teamer|
+      {
+        id: teamer.user.id,
+        username: teamer.user.username,
+        steamid: teamer.user.steamid
+      }
+    end
+  end
+
   def leaders_s
     leaders.join(', ')
   end
@@ -154,6 +173,26 @@ class Team < ActiveRecord::Base
 
   def can_destroy?(cuser)
     cuser&.admin?
+  end
+
+  def apply_member_rank_updates!(actor:, rank_params:, comment_params: nil)
+    return unless rank_params.present?
+
+    actor_rank = actor.teamers.active.of_team(self).first&.rank
+
+    teamers.each do |member|
+      new_rank_raw = rank_params[member.id.to_s]
+      next if new_rank_raw.nil?
+
+      new_rank = new_rank_raw.to_i
+      next unless actor.admin? || (actor_rank && new_rank <= actor_rank)
+      next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
+
+      member.user.update_attribute :team, self if member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
+
+      member.update_attribute :rank, new_rank
+      member.update_attribute :comment, comment_params&.[](member.id.to_s)
+    end
   end
 
   def self.params(params, _cuser)

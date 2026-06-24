@@ -22,8 +22,7 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = Post.new(Post.params(params, cuser))
-    @post.user = cuser
+    @post = Post.build_for_actor(params, cuser)
     raise AccessError unless @post.can_create? cuser
 
     respond_to do |format|

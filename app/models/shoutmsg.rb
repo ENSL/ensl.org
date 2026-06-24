@@ -64,6 +64,12 @@ class Shoutmsg < ActiveRecord::Base
     params.require(:shoutmsg).permit(:shoutable_id, :shoutable_type, :text)
   end
 
+  def self.build_for_actor(params, actor)
+    shoutmsg = new(self.params(params, actor))
+    shoutmsg.user = actor
+    shoutmsg
+  end
+
   private
 
   def normalize_emoji_aliases

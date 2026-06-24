@@ -81,9 +81,7 @@ class GathersController < ApplicationController
       # Only the fields required by refresh + the version response are needed here.
       # Avoid Gather.basic (5 association JOINs) on every poll from 12 sessions.
       gather = Gather.find(params[:id])
-      previous_status = gather.status
-      gather.refresh(nil)
-      Gathers::Broadcaster.call(gather) if gather.status != previous_status
+      gather.refresh_and_broadcast_if_status_changed!
 
       render json: { id: gather.id, version: gather.version }
     end

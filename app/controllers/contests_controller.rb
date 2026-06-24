@@ -30,13 +30,15 @@ class ContestsController < ApplicationController
   def scores
     raise AccessError unless @contest.contest_type == Contest::TYPE_LADDER
 
-    @friendly = params[:friendly] ? @contest.contesters.find(params[:friendly]) : @contest.contesters.first
-    @rounds = [@contest.modulus_even, @contest.modulus_3to1, @contest.modulus_4to0]
-    @modulus_base = @contest.modulus_base || 30
-    @rounds.each_index do |key|
-      @rounds[key] = params['rounds'][key.to_s].to_f if params['rounds'] && params['rounds'][key.to_s]
-    end
-    @weight = params[:weight] ? params[:weight].to_f : @contest.weight
+    state = @contest.scores_page_state(
+      friendly_id: params[:friendly],
+      rounds_param: params[:rounds],
+      weight_param: params[:weight]
+    )
+    @friendly = state[:friendly]
+    @rounds = state[:rounds]
+    @modulus_base = state[:modulus_base]
+    @weight = state[:weight]
   end
 
   def recalc

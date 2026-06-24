@@ -80,4 +80,10 @@ class Post < ActiveRecord::Base
     # FIXME: check this
     params.require(:post).permit(:text, :topic_id)
   end
+
+  def self.build_for_actor(params, actor)
+    post = new(self.params(params, actor))
+    post.user = actor
+    post
+  end
 end

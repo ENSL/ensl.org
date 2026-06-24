@@ -274,6 +274,28 @@ class User < ActiveRecord::Base
     }
   end
 
+  def api_v1_payload(steam_profile: nil)
+    {
+      id: id,
+      username: username,
+      country: country,
+      time_zone: time_zone,
+      avatar: avatar_url,
+      admin: admin?,
+      referee: ref?,
+      caster: caster?,
+      moderator: gather_moderator?,
+      contributor: contributor?,
+      steam: steamid? ? { id: steamid, url: steam_profile&.base_url, nickname: steam_profile&.nickname } : nil,
+      bans: {
+        gather: banned?(Ban::TYPE_GATHER).present?,
+        mute: banned?(Ban::TYPE_MUTE).present?,
+        site: banned?(Ban::TYPE_SITE).present?
+      },
+      team: team_summary
+    }
+  end
+
   def country_s
     country_object = ISO3166::Country[country]
     if country_object
@@ -332,6 +354,61 @@ class User < ActiveRecord::Base
 
   def preformat
     self.email = '' if email&.include?('@ensl.org')
+  end
+
+  def touch_last_visit_if_stale!(threshold: 2.minutes)
+    return false unless lastvisit&.<(threshold.ago.utc)
+
+    update_attribute(:lastvisit, Time.now.utc)
+  end
+
+  def ensure_profile!
+    return false if profile.present?
+
+    build_profile
+    save
+  end
+
+  def plugin_rank_and_icon
+    icon = 0
+    rank = 'User'
+
+    if groups.exists?(id: Group::DONORS)
+      rank = 'Donor'
+      icon |= 1
+    end
+
+    icon |= 2 if groups.exists?(id: Group::CHAMPIONS)
+
+    if ref?
+      rank = 'Referee'
+      icon |= 4
+    end
+
+    if admin?
+      rank = 'Admin'
+      icon |= 8
+    end
+
+    [rank, icon]
+  end
+
+  def plugin_verified_buffer(channel: nil)
+    rank, icon = plugin_rank_and_icon
+
+    [
+      steamid,
+      username,
+      '0.0.0.0',
+      team ? Verification.uncrap(team.to_s) : 'No Team',
+      id,
+      team_id,
+      rank,
+      current_teamer&.rank_s,
+      icon,
+      channel || '',
+      can_play? ? '1' : '0'
+    ]
   end
 
   def banned?(type = Ban::TYPE_SITE)
@@ -579,6 +656,30 @@ class User < ActiveRecord::Base
     nil
   end
 
+  def self.find_for_api(identifier, format = nil)
+    case format
+    when nil, 'id'
+      find(identifier)
+    when 'steamid'
+      steamid_i = identifier.to_i
+      where(steamid: "0:#{steamid_i % 2}:#{steamid_i >> 1}").first
+    when 'steamidstr'
+      where(steamid: identifier).first
+    end
+  end
+
+  def self.plugin_response(steamid:, channel: nil)
+    if (ban = Ban.active_server_ban_for(steamid))
+      return ['#USER#', 'BANNED', ban.expiry.utc.to_i, ban.reason, "\r\r\r\r\r\r\r"]
+    end
+
+    user = find_by(steamid: steamid)
+    return ['#FAIL#'] unless user
+
+    buffer = user.plugin_verified_buffer(channel: channel)
+    ['#USER#', Verification.verify(buffer.join), buffer.join("\r")]
+  end
+
   def self.get(id)
     id ? User.find(id) : ''
   end
@@ -618,6 +719,13 @@ class User < ActiveRecord::Base
     allowed << :username if cuser&.admin? || operation == 'create'
 
     params.require(:user).permit(*allowed)
+  end
+
+  # FIXME: revisit this
+  def filtered_update_attributes(raw_params, actor)
+    attrs = self.class.params(raw_params, actor, 'update')
+    attrs = attrs.except(:username) unless can_change_name?(actor)
+    attrs
   end
 
   def self.find_or_build(auth_hash, lastip)

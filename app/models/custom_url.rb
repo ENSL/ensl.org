@@ -35,4 +35,11 @@ class CustomUrl < ActiveRecord::Base
 
     article
   end
+
+  def update_response_payload
+    {
+      name: name,
+      title: article&.title
+    }
+  end
 end

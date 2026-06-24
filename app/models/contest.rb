@@ -119,6 +119,23 @@ class Contest < ActiveRecord::Base
     end
   end
 
+  def scores_page_state(friendly_id: nil, rounds_param: nil, weight_param: nil)
+    rounds = [modulus_even, modulus_3to1, modulus_4to0]
+
+    rounds.each_index do |index|
+      next unless rounds_param && rounds_param[index.to_s]
+
+      rounds[index] = rounds_param[index.to_s].to_f
+    end
+
+    {
+      friendly: friendly_id ? contesters.find(friendly_id) : contesters.first,
+      rounds: rounds,
+      modulus_base: modulus_base || 30,
+      weight: weight_param ? weight_param.to_f : weight
+    }
+  end
+
   def elo_score(score1, score2, diff, level = modulus_base, weight = self.weight,
                 moduluses = [modulus_even, modulus_3to1, modulus_4to0])
     # Defensive defaults to avoid NaN / division by zero

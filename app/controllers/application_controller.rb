@@ -117,11 +117,9 @@ class ApplicationController < ActionController::Base
 
     begin
       uri = URI.parse(url.to_s)
-      if uri.scheme.nil? && uri.path.present?
-        # relative path
-        return uri.to_s
-      end
-      return uri.to_s if %w[http https].include?(uri.scheme)
+      safe_scheme = %w[http https].include?(uri.scheme)
+      safe_relative = uri.scheme.nil? && uri.path.present?
+      return uri.to_s if safe_scheme || safe_relative
     rescue StandardError
       return '#'
     end
@@ -213,19 +211,16 @@ class ApplicationController < ActionController::Base
 
   # FIXME: move to model
   def update_user
-    return unless cuser
+    user = cuser
+    return unless user
 
-    Time.zone = cuser.time_zone
-    cuser.update_attribute :lastvisit, Time.now.utc if cuser&.lastvisit&.< 2.minutes.ago.utc
+    Time.zone = user.time_zone
+    user.touch_last_visit_if_stale!
 
     # FIXME: there is a bug in steam auth that causes nil profile
-    unless cuser.profile&.present?
-      flash[:notice] = 'Your profile has been removed and recreated.'
-      cuser.build_profile
-      cuser.save
-    end
+    flash[:notice] = 'Your profile has been removed and recreated.' if user.ensure_profile!
 
-    return unless cuser.banned? Ban::TYPE_SITE
+    return unless user.banned? Ban::TYPE_SITE
 
     session[:user] = nil
     @cuser = nil

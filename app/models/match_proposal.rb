@@ -71,6 +71,14 @@ class MatchProposal < ActiveRecord::Base
     [STATUS_REJECTED, STATUS_DELAYED, STATUS_REVOKED].include?(status)
   end
 
+  def apply_status(new_status)
+    previous_status = status
+    self.status = new_status
+    return nil unless save
+
+    previous_status != status
+  end
+
   def status_change_allowed?(cuser, new_status)
     case new_status
     when STATUS_PENDING

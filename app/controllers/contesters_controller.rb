@@ -24,7 +24,7 @@ class ContestersController < ApplicationController
 
     contest = @contester.contest
 
-    @contester.score = contest.contesters.active.count + 1 if contest.contest_type == Contest::TYPE_LADDER
+    @contester.assign_ladder_join_score! if contest.contest_type == Contest::TYPE_LADDER
 
     if @contester.save
       flash[:notice] = t(:contests_join)

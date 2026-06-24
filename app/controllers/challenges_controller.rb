@@ -12,12 +12,7 @@ class ChallengesController < ApplicationController
   end
 
   def new
-    @challenge = Challenge.new
-    @challenge.user = cuser
-    @challenge.contester2 = Contester.active.find params[:id]
-    contest = @challenge.contester2.contest
-    @challenge.contester1 = @challenge.user.active_contesters.of_contest(contest).first
-    @challenge.match_time = Time.current + 2.days
+    @challenge = Challenge.build_for_new(user: cuser, contester2: Contester.active.find(params[:id]))
     raise AccessError unless @challenge.can_create? cuser
   end
 
@@ -37,16 +32,7 @@ class ChallengesController < ApplicationController
   def update
     raise AccessError unless @challenge.can_update? cuser
 
-    case params[:commit]
-    when 'Accept'
-      @challenge.status = Challenge::STATUS_ACCEPTED
-    when 'Default time'
-      @challenge.status = Challenge::STATUS_DEFAULT
-    when 'Forfeit'
-      @challenge.status = Challenge::STATUS_FORFEIT
-    when 'Decline'
-      @challenge.status = Challenge::STATUS_DECLINED
-    end
+    set_challenge_status_from_commit(@challenge, params[:commit])
 
     flash[:notice] = t(:challenges_update) if @challenge.update(Challenge.params(params, cuser))
 
@@ -71,6 +57,24 @@ class ChallengesController < ApplicationController
   end
 
   private
+
+  def set_challenge_status_from_commit(challenge, commit_value)
+    if challenge.respond_to?(:apply_commit_status)
+      challenge.apply_commit_status(commit_value)
+      return
+    end
+
+    case commit_value
+    when 'Accept'
+      challenge.status = Challenge::STATUS_ACCEPTED
+    when 'Default time'
+      challenge.status = Challenge::STATUS_DEFAULT
+    when 'Forfeit'
+      challenge.status = Challenge::STATUS_FORFEIT
+    when 'Decline'
+      challenge.status = Challenge::STATUS_DECLINED
+    end
+  end
 
   def load_challenge
     @challenge = Challenge.find params[:id]

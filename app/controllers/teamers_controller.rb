@@ -6,8 +6,7 @@ class TeamersController < ApplicationController
   end
 
   def create
-    teamer_params = Teamer.params(params, cuser)
-    @teamer = Teamer.new(teamer_params)
+    @teamer, teamer_params = Teamer.build_for_actor(params, cuser)
     raise AccessError unless @teamer.can_create?(cuser, teamer_params)
 
     @old_application = cuser.teamers.joining.first

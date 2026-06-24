@@ -41,4 +41,10 @@ class Prediction < ActiveRecord::Base
   def self.params(params, _cuser)
     params.require(:prediction).permit(:result, :score1, :score2, :match_id, :user_id)
   end
+
+  def self.build_for_actor(params, actor)
+    prediction = new(self.params(params, actor))
+    prediction.user = actor
+    prediction
+  end
 end

@@ -8,50 +8,15 @@ module Api
       end
 
       def show
-        if params[:format].nil? || params[:format] == 'id'
-          @user = User.find(params[:id])
-        elsif params[:format] == 'steamid'
-          steamid_i = params[:id].to_i
-          @user = User.where(steamid: "0:#{steamid_i % 2}:#{steamid_i >> 1}").first
-        elsif params[:format] == 'steamidstr'
-          @user = User.where(steamid: params[:id]).first
-        end
+        @user = User.find_for_api(params[:id], params[:format])
 
         if @user.nil?
           not_found
           return
         end
 
-        @steam = steam_profile @user if @user.steamid?
-        user = @user
-
-        render json: {
-          id: user.id,
-          username: user.username,
-          country: user.country,
-          time_zone: user.time_zone,
-          avatar: user.avatar_url,
-          admin: user.admin?,
-          referee: user.ref?,
-          caster: user.caster?,
-          moderator: user.gather_moderator?,
-          contributor: user.contributor?,
-          steam: if !user.steamid?
-                   nil
-                 else
-                   {
-                     id: user.steamid,
-                     url: @steam&.base_url,
-                     nickname: @steam&.nickname
-                   }
-                 end,
-          bans: {
-            gather: user.banned?(Ban::TYPE_GATHER).present?,
-            mute: user.banned?(Ban::TYPE_MUTE).present?,
-            site: user.banned?(Ban::TYPE_SITE).present?
-          },
-          team: user.team_summary
-        }
+        steam = steam_profile(@user) if @user.steamid?
+        render json: @user.api_v1_payload(steam_profile: steam)
       rescue ActiveRecord::RecordNotFound
         not_found
       end

@@ -108,6 +108,12 @@ class Contester < ActiveRecord::Base
     stats
   end
 
+  def assign_ladder_join_score!
+    return unless contest&.contest_type == Contest::TYPE_LADDER
+
+    self.score = contest.contesters.active.count + 1
+  end
+
   def init_variables
     self.active = true
     self.trend = Contester::TREND_FLAT
