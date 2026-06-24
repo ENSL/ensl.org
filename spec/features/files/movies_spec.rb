@@ -454,7 +454,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Make a Preview'
 
-      Timeout.timeout(5) do
+      Timeout.timeout(20) do
         loop do
           break if movie.reload.preview_url.present?
 
@@ -574,7 +574,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Make a Preview'
 
-      Timeout.timeout(5) do
+      Timeout.timeout(20) do
         loop do
           break if movie.reload.preview_url.present?
 

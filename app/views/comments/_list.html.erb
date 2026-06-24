@@ -1,3 +1,4 @@
-<% comments.reverse_each do |comment| %>
+<% comments_to_render = local_assigns.fetch(:comments, @comments || []) %>
+<% comments_to_render.reverse_each do |comment| %>
   <%= namelink comment.user %>: <%= sanitize(comment.text_parsed) %><br />
 <% end %>

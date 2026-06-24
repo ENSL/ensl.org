@@ -51,10 +51,8 @@ RSpec.describe 'PluginController', type: :request do
     end
 
     it 'falls back to no team when the user has none' do
-      lone_user = create :user_with_team
-      allow(lone_user).to receive(:team).and_return(nil)
-      allow(lone_user).to receive(:current_teamer).and_return(double(rank_s: ''))
-      allow(User).to receive(:where).with(steamid: lone_user.steamid).and_return(double(first: lone_user))
+      lone_user = create :user
+      expect(lone_user.team).to be_nil
       allow(Verification).to receive(:verify) { |value| value }
 
       get '/plugin/user', params: { id: lone_user.steamid }

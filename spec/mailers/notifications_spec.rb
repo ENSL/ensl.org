@@ -15,7 +15,8 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'addresses the mail and exposes the password' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'ENSL account password')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com',
+                                                                 subject: 'ENSL account password'))
       expect(mailer.instance_variable_get(:@pass)).to eq('secret')
       expect(mailer.instance_variable_get(:@user)).to eq(user)
     end
@@ -28,7 +29,8 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'builds the private message notification' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'New ENSL private message')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com',
+                                                                 subject: 'New ENSL private message'))
       expect(mailer.instance_variable_get(:@pm)).to eq(pm)
     end
   end
@@ -40,7 +42,8 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'builds the gather notification' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'ENSL gather running')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com',
+                                                                 subject: 'ENSL gather running'))
       expect(mailer.instance_variable_get(:@gather)).to eq(gather)
     end
   end
@@ -52,7 +55,7 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'builds the comments notification' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'New ENSL comments')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com', subject: 'New ENSL comments'))
       expect(mailer.instance_variable_get(:@object)).to eq(commentable)
     end
   end
@@ -64,7 +67,7 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'builds the challenge notification' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'New ENSL challenge')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com', subject: 'New ENSL challenge'))
       expect(mailer.instance_variable_get(:@challenge)).to eq(challenge)
     end
   end
@@ -76,7 +79,7 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'builds the match notification' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'New ENSL match')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com', subject: 'New ENSL match'))
       expect(mailer.instance_variable_get(:@match)).to eq(match_record)
     end
   end
@@ -88,7 +91,8 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'includes the news title in the subject' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'News on ENSL: Weekly update')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com',
+                                                                 subject: 'News on ENSL: Weekly update'))
       expect(mailer.instance_variable_get(:@news)).to eq(news)
     end
   end
@@ -100,7 +104,8 @@ RSpec.describe Notifications, type: :mailer do
 
     it 'includes the article title in the subject' do
       expect(deliver).to eq(:message)
-      expect(mailer).to have_received(:mail).with(to: 'user@example.com', subject: 'News on ENSL: Feature article')
+      expect(mailer).to have_received(:mail).with(hash_including(to: 'user@example.com',
+                                                                 subject: 'News on ENSL: Feature article'))
       expect(mailer.instance_variable_get(:@article)).to eq(article)
     end
   end

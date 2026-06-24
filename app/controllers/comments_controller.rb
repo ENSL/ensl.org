@@ -10,7 +10,7 @@ class CommentsController < ApplicationController
 
   def show
     @comments = Comment.recent5.where(commentable_id: params[:id2], commentable_type: params[:id])
-    render partial: 'list', layout: false
+    render partial: 'list', layout: false, locals: { comments: @comments }
   end
 
   def edit

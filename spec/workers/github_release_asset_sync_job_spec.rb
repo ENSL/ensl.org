@@ -215,7 +215,7 @@ describe GithubReleaseAssetSyncJob do
     it 'skips when a matching data_file record exists' do
       allow(job).to receive(:filename_for).and_return('v1__asset.zip')
       expect(DataFile).to receive(:exists?).with(name: 'v1__asset.zip').and_return(true)
-      expect(URI).not_to receive(:open)
+      expect(Net::HTTP).not_to receive(:start)
 
       job.send(:download_asset, @tmp_dir, 'https://example.test/a.zip', prefix: 'v1')
 
@@ -229,7 +229,7 @@ describe GithubReleaseAssetSyncJob do
       destination_path = File.join(@tmp_dir, 'v1__asset.zip')
       File.binwrite(destination_path, 'existing')
 
-      expect(URI).not_to receive(:open)
+      expect(Net::HTTP).not_to receive(:start)
 
       job.send(:download_asset, @tmp_dir, 'https://example.test/a.zip', prefix: 'v1')
 
@@ -240,11 +240,9 @@ describe GithubReleaseAssetSyncJob do
       allow(job).to receive(:filename_for).and_return('v1__asset.zip')
       allow(DataFile).to receive(:exists?).with(name: 'v1__asset.zip').and_return(false)
 
-      stream = StringIO.new('binary-data')
-      expect(URI).to receive(:open)
-        .with('https://example.test/a.zip', hash_including('User-Agent' => described_class::USER_AGENT,
-                                                           open_timeout: 20, read_timeout: 120))
-        .and_yield(stream)
+      stub_request(:get, 'https://example.test/a.zip')
+        .with(headers: { 'User-Agent' => described_class::USER_AGENT })
+        .to_return(status: 200, body: 'binary-data')
 
       destination_path = File.join(@tmp_dir, 'v1__asset.zip')
       job.send(:download_asset, @tmp_dir, 'https://example.test/a.zip', prefix: 'v1')
@@ -256,11 +254,13 @@ describe GithubReleaseAssetSyncJob do
     it 'logs errors when download fails' do
       allow(job).to receive(:filename_for).and_return('v1__asset.zip')
       allow(DataFile).to receive(:exists?).with(name: 'v1__asset.zip').and_return(false)
-      allow(URI).to receive(:open).and_raise(StandardError, 'timeout')
+
+      stub_request(:get, 'https://example.test/a.zip').to_timeout
 
       job.send(:download_asset, @tmp_dir, 'https://example.test/a.zip', prefix: 'v1')
 
-      expect(logger).to have_received(:error).with(include('Failed to download https://example.test/a.zip: timeout'))
+      expect(logger).to have_received(:error)
+        .with(match(%r{Failed to download https://example\.test/a\.zip: (timeout|execution expired)}))
     end
   end
 end

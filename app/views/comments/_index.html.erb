@@ -1,5 +1,7 @@
 <div id="comments-thread">
   <h3>Comments</h3>
-  <%= render partial: "comments/comment", collection: comments %>
-  <%= render partial: "comments/new", locals: { comment: comment } %>
+  <% comments_to_render = local_assigns.fetch(:comments, @comments || []) %>
+  <% comment_to_render = local_assigns.fetch(:comment, @comment) %>
+  <%= render partial: "comments/comment", collection: comments_to_render %>
+  <%= render partial: "comments/new", locals: { comment: comment_to_render } %>
 </div>

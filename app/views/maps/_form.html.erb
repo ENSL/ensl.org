@@ -1,4 +1,4 @@
-<%= form_for(map, html: { multipart: true, class: 'square' } do |f| %>
+<%= form_for(map, html: { multipart: true, class: 'square' }) do |f| %>
   <%= render 'shared/errors', messages: map.errors.full_messages %>
 
   <div class="fields horizontal">
