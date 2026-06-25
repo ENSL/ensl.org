@@ -5,7 +5,7 @@
     <% can_create_movie = Movie.new.can_create?(cuser) %>
     <% can_upload_movie_file = cuser && DataFile.new(directory_id: Directory::MOVIES).can_create?(cuser) %>
     <% if can_create_movie %>
-      You can add a movie <%= link_to "here", new_data_file_path(id: Directory::MOVIES) %> from an existing file on server.
+      You can add a movie <%= link_to "here", new_movie_path %> from an existing file on server.
     <% end %>
     <% if can_upload_movie_file %>
       Or you can use <%= link_to "movie file upload", new_data_file_path(id: Directory::MOVIES) %>.
