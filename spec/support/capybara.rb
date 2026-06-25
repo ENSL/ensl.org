@@ -16,6 +16,7 @@ Capybara.register_driver :playwright_chrome do |app|
   Capybara::Playwright::Driver.new(
     app,
     browser_type: :chromium,
+    default_navigation_timeout: 120_000,
     headless: false,
     screen: { width: 1280, height: 1024 },
     browser_options: {
@@ -32,6 +33,7 @@ Capybara.register_driver :playwright_chrome_headless do |app|
   Capybara::Playwright::Driver.new(
     app,
     browser_type: :chromium,
+    default_navigation_timeout: 120_000,
     headless: true,
     screen: { width: 1280, height: 1024 },
     browser_options: {

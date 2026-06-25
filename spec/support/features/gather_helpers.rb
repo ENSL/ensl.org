@@ -176,8 +176,6 @@ module Features
     def with_votes_scope(list_id)
       return false unless gather.reload.status == Gather::STATE_VOTING
 
-      nudge_gather_sync
-
       frame_selector = "turbo-frame#gather_#{gather.id}_frame"
 
       # After removing page re-visits from vote helpers we must allow enough
@@ -202,10 +200,10 @@ module Features
       Capybara.using_session(session_name) do
         gather_page = gather_arg || gather
 
-        visit '/robots.txt'
-        session_key = Rails.application.config.session_options[:key]
-        cookie_value = session_cookie_for(user, session_key)
-        set_session_cookie(session_key, cookie_value)
+        # Reuse the stable session sign-in path used across feature specs.
+        # The lower-level cookie shortcut is faster but proved brittle with
+        # many concurrent Playwright sessions.
+        sign_in_via_session(user)
 
         # Visit the gather page with authenticated session
         visit_gather_with_retry(gather_page)
@@ -233,23 +231,10 @@ module Features
 
     private
 
-    # Simple navigation – rely on Capybara's built-in visit rather than
-    # bypassing it with raw Playwright goto. Capybara handles driver
-    # differences and its default wait-until is appropriate for the test
-    # Puma server we configure.
+    # Keep gather navigation on Capybara's visit path so Playwright driver
+    # state remains consistent across sessions.
     def visit_gather_with_retry(gather_page)
       visit gather_path(gather_page)
-    end
-
-    def nudge_gather_sync
-      # Force the existing gather-sync controller to run an immediate
-      # version check without a full page navigation.
-      execute_script(<<~JS)
-        window.dispatchEvent(new Event('online'));
-        document.dispatchEvent(new Event('visibilitychange'));
-      JS
-    rescue StandardError
-      nil
     end
   end
 end

@@ -14,6 +14,8 @@ export default class extends Controller {
     this.deadSinceAt = null
     this.deadReloadTimer = null
     this.isReloading = false
+    this.checkInFlight = false
+    this.lastCheckAt = 0
 
     this.poll = setInterval(() => this.checkVersion(), interval)
     this.checkVersion()
@@ -34,6 +36,15 @@ export default class extends Controller {
   }
 
   async checkVersion() {
+    if (this.checkInFlight) return
+
+    const now = Date.now()
+    // Coalesce bursty triggers (poll + visibility + online) into one request.
+    if ((now - this.lastCheckAt) < 300) return
+
+    this.checkInFlight = true
+    this.lastCheckAt = now
+
     // Lightweight endpoint that tells us whether gather content changed.
     try {
       const res = await fetch(`/gathers/${this.gatherIdValue}/version`, {
@@ -51,6 +62,8 @@ export default class extends Controller {
       }
     } catch (e) {
       this.trackDeadConnection()
+    } finally {
+      this.checkInFlight = false
     }
   }
 
