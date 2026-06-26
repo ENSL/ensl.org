@@ -178,4 +178,12 @@ class Contester < ActiveRecord::Base
   def self.params(params, _cuser)
     params.require(:contester).permit(:team_id, :score, :win, :loss, :draw, :contest_id, :active, :extra, :user)
   end
+
+  def self.build_for_create(raw_params:, actor:)
+    contester_params = params(raw_params, actor)
+    contester = new(contester_params)
+    contester.user = actor
+    contester.assign_ladder_join_score!
+    [contester, contester_params]
+  end
 end

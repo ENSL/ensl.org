@@ -43,46 +43,16 @@ class MatchProposalsController < ApplicationController
   def update
     raise AccessError unless request.xhr? # Only respond to ajax requests
 
-    proposal = @match.match_proposals.find_by(id: params[:id])
-    unless proposal
-      render json: {
-        error: {
-          code: 404,
-          message: "No proposal with id #{params[:id]}"
-        }
-      }, status: :not_found and return
-    end
+    result = MatchProposal.update_status_for_match(
+      match: @match,
+      proposal_id: params[:id],
+      raw_params: params,
+      actor: cuser
+    )
 
-    unless proposal.can_update?(cuser, MatchProposal.params(params, cuser))
-      render json: {
-        error: {
-          code: 403,
-          message: "You are not allowed to update the state to #{MatchProposal.status_strings[params[:match_proposal][:status].to_i]}"
-        }
-      }, status: :forbidden and return
-    end
+    return render_status_update_error(result) unless result.success?
 
-    new_status = params[:match_proposal][:status].to_i
-    status_updated = proposal.apply_status(new_status)
-    if status_updated.nil?
-      render json: {
-        error: {
-          code: 500,
-          message: 'Something went wrong! Please try again.'
-        }
-      }, status: 500
-    else
-      if status_updated
-        recipient = @match.get_opposing_team(cuser.team)
-        msg_text = message_text(new_status)
-        send_message_to_opp_team(msg_text, 'Scheduling Proposal Update', recipient)
-      end
-
-      render json: {
-        status: MatchProposal.status_strings[proposal.status],
-        message: "Successfully updated status to #{MatchProposal.status_strings[proposal.status]}"
-      }, status: :accepted
-    end
+    render_status_update_success(result)
   end
 
   private
@@ -119,5 +89,27 @@ class MatchProposalsController < ApplicationController
       text: text
     )
     msg.save if text
+  end
+
+  def render_status_update_error(result)
+    render json: {
+      error: {
+        code: Rack::Utils.status_code(result.http_status),
+        message: result.error_message
+      }
+    }, status: result.http_status
+  end
+
+  def render_status_update_success(result)
+    if result.status_updated
+      recipient = @match.get_opposing_team(cuser.team)
+      msg_text = message_text(result.new_status)
+      send_message_to_opp_team(msg_text, 'Scheduling Proposal Update', recipient)
+    end
+
+    render json: {
+      status: result.proposal.status_name,
+      message: result.proposal.status_update_message
+    }, status: :accepted
   end
 end

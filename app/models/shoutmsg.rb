@@ -70,6 +70,14 @@ class Shoutmsg < ActiveRecord::Base
     shoutmsg
   end
 
+  def reset_form_shout
+    self.class.new(shoutable_type: shoutable_type, shoutable_id: shoutable_id)
+  end
+
+  def validation_error_message(default_message)
+    errors.full_messages.any? ? errors.full_messages.join(', ') : default_message
+  end
+
   private
 
   def normalize_emoji_aliases

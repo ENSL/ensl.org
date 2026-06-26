@@ -113,17 +113,7 @@ class ApplicationController < ActionController::Base
 
   # Return a safe URL (allow only http(s) or relative paths). Returns '#' if unsafe.
   def safe_url_for(url)
-    return '#' unless url.present?
-
-    begin
-      uri = URI.parse(url.to_s)
-      safe_scheme = %w[http https].include?(uri.scheme)
-      safe_relative = uri.scheme.nil? && uri.path.present?
-      return uri.to_s if safe_scheme || safe_relative
-    rescue StandardError
-      return '#'
-    end
-    '#'
+    SafeUrl.sanitize(url)
   end
 
   rescue_from AccessError do |_exception|

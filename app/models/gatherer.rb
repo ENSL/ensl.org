@@ -27,6 +27,13 @@ class Gatherer < ActiveRecord::Base
   STATE_ACTIVE = 0
   STATE_AWAY = 1
   STATE_LEAVING = 2
+  STATUS_BY_KEY = {
+    'leaving' => STATE_LEAVING,
+    'away' => STATE_AWAY,
+    'active' => STATE_ACTIVE
+  }.freeze
+
+  UpdateForActorResult = Struct.new(:authorized, :updated, :errors, keyword_init: true)
 
   include Extra
 
@@ -195,6 +202,29 @@ class Gatherer < ActiveRecord::Base
 
   def turn?
     (gather.captain1 == self and gather.turn == 1) or (gather.captain2 == self and gather.turn == 2)
+  end
+
+  def self.status_from_key(status_key)
+    STATUS_BY_KEY[status_key.to_s]
+  end
+
+  def update_for_actor(raw_params, actor)
+    gatherer_params = self.class.params(raw_params, actor)
+    return UpdateForActorResult.new(authorized: false, updated: false, errors: errors) unless can_update?(actor,
+                                                                                                          gatherer_params)
+
+    updated = update(gatherer_params)
+    Gathers::Broadcaster.call(gather) if updated
+    UpdateForActorResult.new(authorized: true, updated: updated, errors: errors)
+  end
+
+  def update_status_from_key(status_key)
+    status_value = self.class.status_from_key(status_key)
+    return false unless status_value
+
+    update_attribute(:status, status_value)
+    Gathers::Broadcaster.call(gather)
+    true
   end
 
   def can_create?(cuser, _params = {})

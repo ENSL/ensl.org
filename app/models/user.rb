@@ -721,6 +721,26 @@ class User < ActiveRecord::Base
     params.require(:user).permit(*allowed)
   end
 
+  def self.build_for_registration(raw_params:, actor:, remote_ip:)
+    user = new(params(raw_params, actor, 'create'))
+    user.lastip = remote_ip
+    user
+  end
+
+  def register_with_preformat
+    return true if valid? && save
+
+    preformat
+    false
+  end
+
+  def callback_session_payload
+    {
+      verified_steamid: steamid,
+      cached_user: to_json
+    }
+  end
+
   # FIXME: revisit this
   def filtered_update_attributes(raw_params, actor)
     attrs = self.class.params(raw_params, actor, 'update')

@@ -403,4 +403,80 @@ RSpec.describe MatchProposal, type: :model do
       expect(permitted.key?(:unauthorized_param)).to be false
     end
   end
+
+  describe '.update_status_for_match' do
+    let(:raw_params) do
+      ActionController::Parameters.new(match_proposal: { status: MatchProposal::STATUS_CONFIRMED })
+    end
+
+    it 'returns not_found when proposal is missing for the match' do
+      result = described_class.update_status_for_match(
+        match: match,
+        proposal_id: -1,
+        raw_params: raw_params,
+        actor: user1
+      )
+
+      expect(result.success?).to be false
+      expect(result.http_status).to eq(:not_found)
+      expect(result.proposal).to be_nil
+    end
+
+    it 'returns forbidden when actor cannot perform requested transition' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
+
+      result = described_class.update_status_for_match(
+        match: match,
+        proposal_id: proposal.id,
+        raw_params: raw_params,
+        actor: user1
+      )
+
+      expect(result.success?).to be false
+      expect(result.http_status).to eq(:forbidden)
+      expect(proposal.reload.status).to eq(MatchProposal::STATUS_PENDING)
+    end
+
+    it 'returns accepted and updates status for a valid transition' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
+
+      result = described_class.update_status_for_match(
+        match: match,
+        proposal_id: proposal.id,
+        raw_params: raw_params,
+        actor: user2
+      )
+
+      expect(result.success?).to be true
+      expect(result.http_status).to eq(:accepted)
+      expect(result.status_updated).to be true
+      expect(result.new_status).to eq(MatchProposal::STATUS_CONFIRMED)
+      expect(proposal.reload.status).to eq(MatchProposal::STATUS_CONFIRMED)
+    end
+
+    it 'returns 500 when save fails while applying status' do
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
+      allow_any_instance_of(MatchProposal).to receive(:apply_status).and_return(nil)
+
+      result = described_class.update_status_for_match(
+        match: match,
+        proposal_id: proposal.id,
+        raw_params: raw_params,
+        actor: user2
+      )
+
+      expect(result.success?).to be false
+      expect(result.http_status).to eq(500)
+      expect(result.error_message).to eq('Something went wrong! Please try again.')
+    end
+  end
+
+  describe 'status display helpers' do
+    it 'returns the status name and update message' do
+      proposal = build(:match_proposal, status: MatchProposal::STATUS_DELAYED)
+
+      expect(proposal.status_name).to eq('Delayed')
+      expect(proposal.status_update_message).to eq('Successfully updated status to Delayed')
+    end
+  end
 end

@@ -202,4 +202,32 @@ RSpec.describe Contester, type: :model do
       expect(Contester.params(params, nil).to_h).to eq('team_id' => 1, 'contest_id' => 2)
     end
   end
+
+  describe '.build_for_create' do
+    it 'assigns actor and ladder join score for ladder contests' do
+      actor = create(:user)
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      create(:contester, contest: ladder)
+      team = create(:team)
+      raw_params = ActionController::Parameters.new(contester: { team_id: team.id, contest_id: ladder.id })
+
+      contester, contester_params = described_class.build_for_create(raw_params: raw_params, actor: actor)
+
+      expect(contester.user).to eq(actor)
+      expect(contester.score).to eq(2)
+      expect(contester_params.to_h).to include('team_id' => team.id, 'contest_id' => ladder.id)
+    end
+
+    it 'keeps default score for non-ladder contests' do
+      actor = create(:user)
+      bracket = create(:contest, contest_type: Contest::TYPE_BRACKET)
+      team = create(:team)
+      raw_params = ActionController::Parameters.new(contester: { team_id: team.id, contest_id: bracket.id })
+
+      contester, = described_class.build_for_create(raw_params: raw_params, actor: actor)
+
+      expect(contester.user).to eq(actor)
+      expect(contester.score).to eq(0)
+    end
+  end
 end

@@ -111,6 +111,16 @@ class Teamer < ActiveRecord::Base
     cuser and (user == cuser or team.is_leader? cuser or cuser.admin?)
   end
 
+  def submit_for_actor(actor)
+    return false unless actor
+
+    self.user = actor unless actor.admin?
+    old_application = actor.teamers.joining.first
+    saved = save
+    old_application&.destroy if saved
+    saved
+  end
+
   def self.params(params, _cuser)
     params.require(:teamer).permit(:comment, :rank, :team_id, :user_id)
   end

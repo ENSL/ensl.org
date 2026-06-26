@@ -73,16 +73,15 @@ class UsersController < ApplicationController
   def create
     return if already_logged_in?
 
-    @user = User.new(User.params(params, cuser, 'create'))
-    @user.lastip = request.env['REMOTE_ADDR']
+    user = User.build_for_registration(raw_params: params, actor: cuser, remote_ip: request.env['REMOTE_ADDR'])
 
-    raise AccessError unless @user.can_create? cuser
+    raise AccessError unless user.can_create? cuser
 
-    if @user.valid? && @user.save
-      redirect_to action: :show, id: @user.id
-      save_session @user
+    if user.register_with_preformat
+      redirect_to action: :show, id: user.id
+      save_session user
     else
-      @user.preformat
+      @user = user
       render :new
     end
   end
@@ -122,20 +121,10 @@ class UsersController < ApplicationController
       return
     end
 
-    # After steam validates SteamID, we know its right.
-    session[:verified_steamid] = user.steamid
-
-    # Store user in session store
-    session[:cached_user] = user.to_json
+    cache_callback_user(user)
 
     if user.new_record?
-      @user = user
-      # If user mistypes username and password, return to user creation page.
-      session[:return_to] = new_user_url(@user)
-
-      # if @user.created_at > (Time.zone.now - 1.week)
-      # flash[:notice] = t(:users_signup_steam)
-      render :new, formats: :html
+      render_new_user_from_callback(user)
     else
       login_user(user)
       return_back
@@ -205,6 +194,22 @@ class UsersController < ApplicationController
     flash[:error] = t(:users_callback_fail)
     Rails.logger.warn(warning) if warning
     redirect_to_home
+  end
+
+  def cache_callback_user(user)
+    payload = user.callback_session_payload
+    session[:verified_steamid] = payload[:verified_steamid]
+    session[:cached_user] = payload[:cached_user]
+  end
+
+  def render_new_user_from_callback(user)
+    @user = user
+    # If user mistypes username and password, return to user creation page.
+    session[:return_to] = new_user_url(@user)
+
+    # if @user.created_at > (Time.zone.now - 1.week)
+    # flash[:notice] = t(:users_signup_steam)
+    render :new, formats: :html
   end
 
   def login_user(user)

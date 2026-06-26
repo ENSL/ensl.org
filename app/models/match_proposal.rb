@@ -24,6 +24,13 @@ class MatchProposal < ActiveRecord::Base
   # latest time before a match to be confirmed/rejected (in minutes)
   CONFIRMATION_LIMIT = 30
 
+  StatusUpdateResult = Struct.new(:proposal, :http_status, :error_message, :status_updated, :new_status,
+                                  keyword_init: true) do
+    def success?
+      http_status == :accepted
+    end
+  end
+
   belongs_to :match, optional: true
   belongs_to :team, optional: true
   # has_many :confirmed_by, class_name: 'Team', uniq: true
@@ -44,6 +51,46 @@ class MatchProposal < ActiveRecord::Base
       STATUS_REJECTED => 'Rejected',
       STATUS_CONFIRMED => 'Confirmed',
       STATUS_DELAYED => 'Delayed' }
+  end
+
+  def self.update_status_for_match(match:, proposal_id:, raw_params:, actor:)
+    proposal = match.match_proposals.find_by(id: proposal_id)
+    unless proposal
+      return StatusUpdateResult.new(proposal: nil, http_status: :not_found,
+                                    error_message: "No proposal with id #{proposal_id}")
+    end
+
+    proposal_params = params(raw_params, actor)
+    unless proposal.can_update?(actor, proposal_params)
+      status_name = status_strings[proposal_params[:status].to_i]
+      return StatusUpdateResult.new(
+        proposal: proposal,
+        http_status: :forbidden,
+        error_message: "You are not allowed to update the state to #{status_name}"
+      )
+    end
+
+    new_status = proposal_params[:status].to_i
+    status_updated = proposal.apply_status(new_status)
+    if status_updated.nil?
+      return StatusUpdateResult.new(proposal: proposal, http_status: 500,
+                                    error_message: 'Something went wrong! Please try again.')
+    end
+
+    StatusUpdateResult.new(
+      proposal: proposal,
+      http_status: :accepted,
+      status_updated: status_updated,
+      new_status: new_status
+    )
+  end
+
+  def status_name
+    self.class.status_strings[status]
+  end
+
+  def status_update_message
+    "Successfully updated status to #{status_name}"
   end
 
   def can_create?(cuser)

@@ -416,4 +416,55 @@ describe User do
       end
     end
   end
+
+  describe 'extracted helper methods' do
+    describe '.build_for_registration' do
+      it 'builds a user from params and applies remote ip' do
+        raw = ActionController::Parameters.new(
+          user: {
+            username: 'reg_user',
+            email: 'reg_user@example.com',
+            raw_password: 'Secret123!',
+            firstname: 'Reg',
+            lastname: 'User'
+          }
+        )
+
+        built = described_class.build_for_registration(raw_params: raw, actor: nil, remote_ip: '10.9.8.7')
+
+        expect(built).to be_a(User)
+        expect(built).to be_new_record
+        expect(built.lastip).to eq('10.9.8.7')
+        expect(built.username).to eq('reg_user')
+      end
+    end
+
+    describe '#register_with_preformat' do
+      it 'returns true and persists when record is valid' do
+        subject = build(:user)
+
+        expect(subject.register_with_preformat).to be true
+        expect(subject).to be_persisted
+      end
+
+      it 'calls preformat and returns false when record is invalid' do
+        subject = build(:user, email: 'not-an-email')
+        allow(subject).to receive(:preformat).and_call_original
+
+        expect(subject.register_with_preformat).to be false
+        expect(subject).to have_received(:preformat)
+      end
+    end
+
+    describe '#callback_session_payload' do
+      it 'returns verified steamid and cached user json' do
+        subject = create(:user, steamid: '0:1:123')
+
+        payload = subject.callback_session_payload
+
+        expect(payload[:verified_steamid]).to eq('0:1:123')
+        expect(payload[:cached_user]).to eq(subject.to_json)
+      end
+    end
+  end
 end

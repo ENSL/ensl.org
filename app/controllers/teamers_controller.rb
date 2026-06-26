@@ -9,16 +9,7 @@ class TeamersController < ApplicationController
     @teamer, teamer_params = Teamer.build_for_actor(params, cuser)
     raise AccessError unless @teamer.can_create?(cuser, teamer_params)
 
-    @old_application = cuser.teamers.joining.first
-
-    @teamer.user = cuser unless cuser.admin?
-
-    if @teamer.save
-      flash[:notice] = t(:applying_team) + @teamer.team.to_s
-      @old_application&.destroy
-    else
-      flash[:error] = @teamer.errors.full_messages.to_s
-    end
+    submit_teamer_application
 
     respond_to do |format|
       format.html { redirect_to_back }
@@ -41,6 +32,16 @@ class TeamersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to_back }
       format.turbo_stream { head :no_content }
+    end
+  end
+
+  private
+
+  def submit_teamer_application
+    if @teamer.submit_for_actor(cuser)
+      flash[:notice] = t(:applying_team) + @teamer.team.to_s
+    else
+      flash[:error] = @teamer.errors.full_messages.to_s
     end
   end
 end

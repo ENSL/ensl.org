@@ -140,4 +140,72 @@ RSpec.describe Gatherer, type: :model do
       expect(actual_orders).to eq(expected_orders)
     end
   end
+
+  describe 'delegated helper methods' do
+    describe '.status_from_key' do
+      it 'maps known status keys and returns nil for unknown values' do
+        expect(described_class.status_from_key('away')).to eq(described_class::STATE_AWAY)
+        expect(described_class.status_from_key(:active)).to eq(described_class::STATE_ACTIVE)
+        expect(described_class.status_from_key('unknown')).to be_nil
+      end
+    end
+
+    describe '#update_for_actor' do
+      let(:gather) { create(:gather, :running) }
+      let(:gatherer) { create(:gatherer, gather: gather, user: create(:user)) }
+      let(:actor) { create(:user, :admin) }
+      let(:raw_params) { ActionController::Parameters.new(gatherer: { team: 1 }) }
+
+      before do
+        allow(Gatherer).to receive(:params).and_return(team: 1)
+        allow(Gathers::Broadcaster).to receive(:call)
+      end
+
+      it 'returns an unauthorized result when actor cannot update' do
+        allow(gatherer).to receive(:can_update?).and_return(false)
+
+        result = gatherer.update_for_actor(raw_params, actor)
+
+        expect(result.authorized).to be false
+        expect(result.updated).to be false
+      end
+
+      it 'updates and broadcasts when actor is authorized and update succeeds' do
+        allow(gatherer).to receive(:can_update?).and_return(true)
+        allow(gatherer).to receive(:update).and_return(true)
+
+        result = gatherer.update_for_actor(raw_params, actor)
+
+        expect(result.authorized).to be true
+        expect(result.updated).to be true
+        expect(Gathers::Broadcaster).to have_received(:call).with(gather)
+      end
+    end
+
+    describe '#update_status_from_key' do
+      it 'updates status and broadcasts for valid keys' do
+        gather = create(:gather, :running)
+        gatherer = create(:gatherer, gather: gather, user: create(:user), status: Gatherer::STATE_ACTIVE)
+        allow(Gathers::Broadcaster).to receive(:call)
+
+        result = gatherer.update_status_from_key('away')
+
+        expect(result).to be true
+        expect(gatherer.reload.status).to eq(Gatherer::STATE_AWAY)
+        expect(Gathers::Broadcaster).to have_received(:call).with(gather)
+      end
+
+      it 'returns false and does not broadcast for invalid keys' do
+        gather = create(:gather, :running)
+        gatherer = create(:gatherer, gather: gather, user: create(:user), status: Gatherer::STATE_ACTIVE)
+        allow(Gathers::Broadcaster).to receive(:call)
+
+        result = gatherer.update_status_from_key('nope')
+
+        expect(result).to be false
+        expect(gatherer.reload.status).to eq(Gatherer::STATE_ACTIVE)
+        expect(Gathers::Broadcaster).not_to have_received(:call)
+      end
+    end
+  end
 end

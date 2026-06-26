@@ -286,4 +286,35 @@ RSpec.describe Shoutmsg, type: :model do
       expect { described_class.params(params, user) }.to raise_error(ActionController::ParameterMissing)
     end
   end
+
+  describe 'form helper methods' do
+    describe '#reset_form_shout' do
+      it 'returns a new shout with the same domain target attributes' do
+        gather = create(:gather, :running)
+        shout = build(:shoutmsg, user: user, shoutable: gather, text: 'hello')
+
+        reset = shout.reset_form_shout
+
+        expect(reset).to be_new_record
+        expect(reset.shoutable_type).to eq('Gather')
+        expect(reset.shoutable_id).to eq(gather.id)
+        expect(reset.text).to be_nil
+      end
+    end
+
+    describe '#validation_error_message' do
+      it 'returns joined full messages when errors are present' do
+        shout = build(:shoutmsg, user: user, text: '')
+        shout.errors.add(:base, 'Custom error')
+
+        expect(shout.validation_error_message('fallback')).to eq('Custom error')
+      end
+
+      it 'returns fallback message when there are no validation errors' do
+        shout = build(:shoutmsg, user: user, text: 'ok')
+
+        expect(shout.validation_error_message('fallback')).to eq('fallback')
+      end
+    end
+  end
 end

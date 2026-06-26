@@ -17,14 +17,8 @@ class ContestersController < ApplicationController
   end
 
   def create
-    contester_params = Contester.params(params, cuser)
-    @contester = Contester.new(contester_params)
-    @contester.user = cuser
+    @contester, contester_params = Contester.build_for_create(raw_params: params, actor: cuser)
     raise AccessError unless @contester.can_create?(cuser, contester_params)
-
-    contest = @contester.contest
-
-    @contester.assign_ladder_join_score! if contest.contest_type == Contest::TYPE_LADDER
 
     if @contester.save
       flash[:notice] = t(:contests_join)

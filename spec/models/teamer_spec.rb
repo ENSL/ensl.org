@@ -137,4 +137,39 @@ RSpec.describe Teamer, type: :model do
       expect(t.can_destroy?(other)).to be false
     end
   end
+
+  describe '#submit_for_actor' do
+    it 'assigns actor to non-admin applications and removes previous join application on success' do
+      actor = create(:user)
+      old_team = create(:team)
+      new_team = create(:team)
+      old_application = create(:teamer, user: actor, team: old_team, rank: Teamer::RANK_JOINER)
+      teamer = build(:teamer, user: nil, team: new_team, rank: Teamer::RANK_JOINER)
+
+      result = teamer.submit_for_actor(actor)
+
+      expect(result).to be true
+      expect(teamer.user).to eq(actor)
+      expect(teamer).to be_persisted
+      expect(Teamer.exists?(old_application.id)).to be false
+    end
+
+    it 'does not override the teamer user when actor is admin' do
+      actor = create(:user, :admin)
+      owner = create(:user)
+      teamer = build(:teamer, user: owner, team: create(:team), rank: Teamer::RANK_JOINER)
+
+      result = teamer.submit_for_actor(actor)
+
+      expect(result).to be true
+      expect(teamer.user).to eq(owner)
+    end
+
+    it 'returns false when save fails' do
+      actor = create(:user)
+      teamer = build(:teamer, user: nil, team: nil)
+
+      expect(teamer.submit_for_actor(actor)).to be false
+    end
+  end
 end

@@ -16,13 +16,13 @@ class GatherersController < ApplicationController
 
   def update
     @gatherer = Gatherer.find params[:gatherer][:id]
-    raise AccessError unless @gatherer.can_update?(cuser, Gatherer.params(params, cuser))
+    update_result = @gatherer.update_for_actor(params, cuser)
+    raise AccessError unless update_result.authorized
 
-    if @gatherer.update(Gatherer.params(params, cuser))
+    if update_result.updated
       flash[:notice] = t(:gatherers_update)
-      Gathers::Broadcaster.call(@gatherer.gather)
     else
-      flash[:error] = @gatherer.errors.full_messages.to_sentence
+      flash[:error] = update_result.errors.full_messages.to_sentence
     end
 
     redirect_to_back
@@ -31,16 +31,7 @@ class GatherersController < ApplicationController
   def status
     raise AccessError unless @gatherer.can_destroy? cuser
 
-    states = {
-      'leaving' => Gatherer::STATE_LEAVING,
-      'away' => Gatherer::STATE_AWAY,
-      'active' => Gatherer::STATE_ACTIVE
-    }
-
-    if states.key?(params[:status])
-      @gatherer.update_attribute(:status, states[params[:status]])
-      Gathers::Broadcaster.call(@gatherer.gather)
-    end
+    @gatherer.update_status_from_key(params[:status])
 
     render body: nil, status: 200
   end
