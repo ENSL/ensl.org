@@ -25,14 +25,8 @@ class MatchProposalsController < ApplicationController
     @proposal.match = @match
     raise AccessError unless @proposal.can_create? cuser
 
-    @proposal.assign_attributes(team: cuser.team, status: MatchProposal::STATUS_PENDING)
+    @proposal.assign_attributes(team: cuser.team, status: MatchProposal::STATUS_PENDING, actor: cuser)
     if @proposal.save
-      recipient = @match.get_opposing_team(cuser.team)
-      msg_text = "There is a new scheduling proposal for your match against #{cuser.team.name}.\n" \
-                 "Find it [url=#{match_proposals_path(@match)}]here[/url]"
-
-      send_message_to_opp_team(msg_text, 'New Scheduling Proposal', recipient)
-
       flash[:notice] = 'Created new proposal'
       redirect_to(match_proposals_path(@match))
     else
@@ -43,16 +37,17 @@ class MatchProposalsController < ApplicationController
   def update
     raise AccessError unless request.xhr? # Only respond to ajax requests
 
-    result = MatchProposal.update_status_for_match(
-      match: @match,
-      proposal_id: params[:id],
-      raw_params: params,
-      actor: cuser
-    )
+    proposal = @match.match_proposals.find_by(id: params[:id])
+    return render_proposal_missing unless proposal
 
-    return render_status_update_error(result) unless result.success?
+    proposal_params = MatchProposal.params(params, cuser)
+    return render_proposal_forbidden(proposal_params[:status].to_i) unless proposal.can_update?(cuser, proposal_params)
 
-    render_status_update_success(result)
+    proposal.actor = cuser
+    return render_proposal_error unless proposal.update(proposal_params)
+
+    name = proposal.status_name
+    render json: { status: name, message: "Successfully updated status to #{name}" }, status: :accepted
   end
 
   private
@@ -61,55 +56,20 @@ class MatchProposalsController < ApplicationController
     @match = Match.find params[:match_id]
   end
 
-  def message_text(new_status)
-    case new_status
-    when MatchProposal::STATUS_CONFIRMED
-      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was confirmed!.\n" \
-      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
-    when MatchProposal::STATUS_REJECTED
-      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was rejected!.\n" \
-      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
-    when MatchProposal::STATUS_REVOKED
-      "A scheduling proposal for your match against [b]#{cuser.team.name}[/b] was revoked!.\n" \
-      "Find it [url=#{match_proposals_path(@match)}]here[/url]"
-    when MatchProposal::STATUS_DELAYED
-      "Delaying for your match against [b]#{cuser.team.name}[/b] was permitted!.\n" \
-      "Schedule a new time as soon as possible [url=#{match_proposals_path(@match)}]here[/url]"
-    else
-      false # Should not happen as transition to any other state is not allowed
-    end
+  def render_proposal_missing
+    render json: { error: { code: 404, message: "No proposal with id #{params[:id]}" } }, status: :not_found
   end
 
-  def send_message_to_opp_team(text, title, recipient_team)
-    msg = Message.new(
-      sender_type: 'System',
-      recipient_type: 'Team',
-      title: title,
-      recipient: recipient_team,
-      text: text
-    )
-    msg.save if text
-  end
-
-  def render_status_update_error(result)
+  def render_proposal_forbidden(new_status)
     render json: {
       error: {
-        code: Rack::Utils.status_code(result.http_status),
-        message: result.error_message
+        code: 403,
+        message: "You are not allowed to update the state to #{MatchProposal.status_strings[new_status]}"
       }
-    }, status: result.http_status
+    }, status: :forbidden
   end
 
-  def render_status_update_success(result)
-    if result.status_updated
-      recipient = @match.get_opposing_team(cuser.team)
-      msg_text = message_text(result.new_status)
-      send_message_to_opp_team(msg_text, 'Scheduling Proposal Update', recipient)
-    end
-
-    render json: {
-      status: result.proposal.status_name,
-      message: result.proposal.status_update_message
-    }, status: :accepted
+  def render_proposal_error
+    render json: { error: { code: 500, message: 'Something went wrong! Please try again.' } }, status: 500
   end
 end

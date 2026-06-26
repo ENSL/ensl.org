@@ -237,7 +237,7 @@ RSpec.describe 'MatchProposalsController', type: :request do
     it 'returns accepted without sending a message when message text is blank' do
       proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1_leader.team)
       login_as(team2_leader)
-      allow_any_instance_of(MatchProposalsController).to receive(:message_text).and_return(false)
+      allow_any_instance_of(MatchProposal).to receive(:status_change_message).and_return(false)
 
       expect do
         patch "/matches/#{match.id}/proposals/#{proposal.id}",

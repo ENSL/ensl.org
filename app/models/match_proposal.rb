@@ -24,19 +24,17 @@ class MatchProposal < ActiveRecord::Base
   # latest time before a match to be confirmed/rejected (in minutes)
   CONFIRMATION_LIMIT = 30
 
-  StatusUpdateResult = Struct.new(:proposal, :http_status, :error_message, :status_updated, :new_status,
-                                  keyword_init: true) do
-    def success?
-      http_status == :accepted
-    end
-  end
-
   belongs_to :match, optional: true
   belongs_to :team, optional: true
   # has_many :confirmed_by, class_name: 'Team', uniq: true
   # FIXME: attr_accessible :proposed_time, :status
 
   validates_presence_of :match, :team, :proposed_time
+
+  attr_accessor :actor
+
+  after_create :notify_new_proposal
+  after_update :notify_status_change, if: :saved_change_to_status?
 
   scope :of_match, ->(match) { where('match_id = ?', match.id) }
   scope :confirmed_for_match, ->(match) { where('match_id = ? AND status = ?', match.id, STATUS_CONFIRMED) }
@@ -53,44 +51,8 @@ class MatchProposal < ActiveRecord::Base
       STATUS_DELAYED => 'Delayed' }
   end
 
-  def self.update_status_for_match(match:, proposal_id:, raw_params:, actor:)
-    proposal = match.match_proposals.find_by(id: proposal_id)
-    unless proposal
-      return StatusUpdateResult.new(proposal: nil, http_status: :not_found,
-                                    error_message: "No proposal with id #{proposal_id}")
-    end
-
-    proposal_params = params(raw_params, actor)
-    unless proposal.can_update?(actor, proposal_params)
-      status_name = status_strings[proposal_params[:status].to_i]
-      return StatusUpdateResult.new(
-        proposal: proposal,
-        http_status: :forbidden,
-        error_message: "You are not allowed to update the state to #{status_name}"
-      )
-    end
-
-    new_status = proposal_params[:status].to_i
-    status_updated = proposal.apply_status(new_status)
-    if status_updated.nil?
-      return StatusUpdateResult.new(proposal: proposal, http_status: 500,
-                                    error_message: 'Something went wrong! Please try again.')
-    end
-
-    StatusUpdateResult.new(
-      proposal: proposal,
-      http_status: :accepted,
-      status_updated: status_updated,
-      new_status: new_status
-    )
-  end
-
   def status_name
     self.class.status_strings[status]
-  end
-
-  def status_update_message
-    "Successfully updated status to #{status_name}"
   end
 
   def can_create?(cuser)
@@ -116,14 +78,6 @@ class MatchProposal < ActiveRecord::Base
 
   def state_immutable?
     [STATUS_REJECTED, STATUS_DELAYED, STATUS_REVOKED].include?(status)
-  end
-
-  def apply_status(new_status)
-    previous_status = status
-    self.status = new_status
-    return nil unless save
-
-    previous_status != status
   end
 
   def status_change_allowed?(cuser, new_status)
@@ -157,5 +111,57 @@ class MatchProposal < ActiveRecord::Base
 
   def self.params(params, _cuser)
     params.require(:match_proposal).permit(:status, :match_id, :team_id, :proposed_time)
+  end
+
+  private
+
+  def notify_new_proposal
+    return unless actor
+
+    send_team_message('New Scheduling Proposal', new_proposal_message)
+  end
+
+  def notify_status_change
+    return unless actor
+
+    send_team_message('Scheduling Proposal Update', status_change_message)
+  end
+
+  def send_team_message(title, text)
+    return unless text
+
+    Message.create(
+      sender_type: 'System',
+      recipient_type: 'Team',
+      title: title,
+      recipient: match.get_opposing_team(actor.team),
+      text: text
+    )
+  end
+
+  def new_proposal_message
+    "There is a new scheduling proposal for your match against #{actor.team.name}.\n" \
+      "Find it [url=#{proposals_path}]here[/url]"
+  end
+
+  def status_change_message
+    case status
+    when STATUS_CONFIRMED
+      "A scheduling proposal for your match against [b]#{actor.team.name}[/b] was confirmed!.\n" \
+        "Find it [url=#{proposals_path}]here[/url]"
+    when STATUS_REJECTED
+      "A scheduling proposal for your match against [b]#{actor.team.name}[/b] was rejected!.\n" \
+        "Find it [url=#{proposals_path}]here[/url]"
+    when STATUS_REVOKED
+      "A scheduling proposal for your match against [b]#{actor.team.name}[/b] was revoked!.\n" \
+        "Find it [url=#{proposals_path}]here[/url]"
+    when STATUS_DELAYED
+      "Delaying for your match against [b]#{actor.team.name}[/b] was permitted!.\n" \
+        "Schedule a new time as soon as possible [url=#{proposals_path}]here[/url]"
+    end
+  end
+
+  def proposals_path
+    Rails.application.routes.url_helpers.match_proposals_path(match)
   end
 end
