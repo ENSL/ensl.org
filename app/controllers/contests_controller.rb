@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ContestsController < ApplicationController
-  before_action :load_contest, only: %i[show edit update destroy del_map scores recalc confirmed_matches]
+  before_action :load_contest, only: %i[show edit update destroy scores recalc confirmed_matches]
 
   def index
     # @contests = Contest.all
@@ -65,41 +65,15 @@ class ContestsController < ApplicationController
     end
   end
 
-  # FIXME: don't use this kind of update
   def update
     raise AccessError unless @contest.can_update? cuser
 
-    case update_type
-    when 'contest'
-      if @contest.update(Contest.params(params, cuser))
-        flash[:notice] = t(:contests_update)
-        redirect_to @contest
-      else
-        render :edit, status: :unprocessable_entity
-      end
-    when 'map'
-      if @contest.add_map_by_id(params[:map])
-        flash[:notice] = t(:maps_update)
-        redirect_to edit_contest_path(@contest, contest: 'maps')
-      else
-        flash.now[:error] = t(:error)
-        render :edit, status: :unprocessable_entity
-      end
-    when 'team'
-      @contest.add_team_by_id(params[:team])
-      render :edit
-    end
-  end
-
-  def del_map
-    raise AccessError unless @contest.can_update? cuser
-
-    if @contest.remove_map_by_id(params[:id2])
-      flash[:notice] = t(:maps_destroy)
+    if @contest.update(Contest.params(params, cuser))
+      flash[:notice] = t(:contests_update)
+      redirect_to @contest
     else
-      flash[:error] = t(:error)
+      render :edit, status: :unprocessable_entity
     end
-    redirect_to edit_contest_path(@contest, contest: 'maps')
   end
 
   def destroy
@@ -117,9 +91,5 @@ class ContestsController < ApplicationController
 
   def load_contest
     @contest = Contest.find params[:id]
-  end
-
-  def update_type
-    params[:type]
   end
 end

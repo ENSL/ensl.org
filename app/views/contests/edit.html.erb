@@ -16,7 +16,6 @@
         <div class="tab" id="general">
             <%= form_for @contest, html: { class: 'square' } do |f| %>
             <%= render 'shared/errors', messages: @contest.errors.full_messages %>
-            <%= hidden_field_tag :type, 'contest' %>
 
             <div class="fields horizontal">
                 <%= f.label :name %>
@@ -107,7 +106,6 @@
 
             <%= form_for @contest.brackets.build, html: { class: 'square' } do |f| %>
             <%= render 'shared/errors', messages: @contest.brackets.last.errors.full_messages %>
-            <%= hidden_field_tag :type, 'contest' %>
 
             <%= f.hidden_field :contest_id %>
             <div class="fields horizontal">
@@ -139,21 +137,18 @@
                     <td><%= h map.download %></td>
                     <td class="actions">
                         <%= link_to fa_icon('pencil'), edit_map_path(map) %>
-                        <%= link_to fa_icon('times'), del_map_contests_path(id: @contest.id, id2: map.id), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
+                        <%= link_to fa_icon('times'), contest_map_path(@contest, map), method: :delete, data: { confirm: 'Are you sure?' }, form: { style: 'display:inline;margin:0;' } %>
                     </td>
                 </tr>
                 <% end %>
             </table>
 
-            <%= form_for @contest do |f| %>
-            <%= render 'shared/errors', messages: @contest.errors.full_messages %>
-            <%= hidden_field_tag :type, 'map' %>
-
+            <%= form_tag contest_maps_path(@contest), method: :post, class: 'square' do %>
             <div class="fields">
                 <%= select_tag :map, options_from_collection_for_select(Map.basic, :id, :name) %>
             </div>
             <div class="controls">
-                <%= f.submit 'Add map' %>
+                <%= submit_tag 'Add map' %>
             </div>
             <% end %>
         </div>
@@ -195,7 +190,6 @@
 
             <%= form_for @contest.contesters.build do |f| %>
             <%= render 'shared/errors', messages: @contest.contesters.last.errors.full_messages %>
-            <%= hidden_field_tag :type, 'team' %>
 
             <%= f.hidden_field :contest_id %>
 

@@ -147,17 +147,6 @@ RSpec.describe Contest, type: :model do
       expect(contest.add_map_by_id(0)).to be false
       expect(contest.remove_map_by_id(0)).to be false
     end
-
-    it 'adds a team as contester and records validation errors for duplicates' do
-      team = create(:team)
-
-      expect do
-        expect(contest.add_team_by_id(team.id)).to be true
-      end.to change(Contester, :count).by(1)
-
-      expect(contest.add_team_by_id(team.id)).to be false
-      expect(contest.errors[:base]).not_to be_empty
-    end
   end
 
   describe 'ranking helpers and recalculation' do

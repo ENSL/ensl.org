@@ -40,7 +40,6 @@ Rails.application.routes.draw do
   resources :contests do
     collection do
       get :current
-      delete :del_map
       get :scores
       get :historical, path: 'historical(/:id)'
     end
@@ -48,6 +47,8 @@ Rails.application.routes.draw do
       get :confirmed_matches, path: 'confirmedmatches'
       get :recalc
     end
+
+    resources :maps, only: %i[create destroy], module: :contests
   end
 
   resources :log_events

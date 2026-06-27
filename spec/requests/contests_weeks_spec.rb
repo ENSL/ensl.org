@@ -198,12 +198,11 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
   end
 
   describe 'PATCH /contests/:id' do
-    it 'updates contest attributes through the contest branch' do
+    it 'updates contest attributes' do
       contest = create(:contest, name: 'Original Contest')
       login_as(admin)
 
       patch "/contests/#{contest.id}", params: {
-        type: 'contest',
         contest: { name: 'Updated Contest' }
       }
 
@@ -216,53 +215,10 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       login_as(admin)
 
       patch "/contests/#{contest.id}", params: {
-        type: 'contest',
         contest: { name: '' }
       }
 
       expect(response).to have_http_status(:unprocessable_content)
-    end
-
-    it 'returns 422 when a requested map does not exist' do
-      contest = create(:contest)
-      login_as(admin)
-
-      patch "/contests/#{contest.id}", params: {
-        type: 'map',
-        map: '0'
-      }
-
-      expect(response).to have_http_status(:unprocessable_content)
-    end
-
-    it 'adds a map and redirects to the maps tab' do
-      contest = create(:contest)
-      map = create(:map)
-      login_as(admin)
-
-      patch "/contests/#{contest.id}", params: {
-        type: 'map',
-        map: map.id
-      }
-
-      expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
-      expect(contest.reload.maps).to include(map)
-    end
-
-    it 'adds a team to the contest through the team branch' do
-      contest = create(:contest)
-      team = create(:team)
-      login_as(admin)
-
-      expect do
-        patch "/contests/#{contest.id}", params: {
-          type: 'team',
-          team: team.id
-        }
-      end.to change(Contester, :count).by(1)
-
-      expect(response).to have_http_status(:ok)
-      expect(contest.reload.contesters.find_by(team: team)).to be_present
     end
 
     it 'returns 403 for non-admins' do
@@ -270,7 +226,6 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       login_as(user)
 
       patch "/contests/#{contest.id}", params: {
-        type: 'contest',
         contest: { name: 'Blocked Contest' }
       }
 
@@ -279,13 +234,47 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
     end
   end
 
-  describe 'DELETE /contests/del_map' do
+  describe 'POST /contests/:contest_id/maps' do
+    it 'adds a map and redirects to the maps tab' do
+      contest = create(:contest)
+      map = create(:map)
+      login_as(admin)
+
+      post "/contests/#{contest.id}/maps", params: { map: map.id }
+
+      expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
+      expect(contest.reload.maps).to include(map)
+    end
+
+    it 'redirects with an error when the requested map does not exist' do
+      contest = create(:contest)
+      login_as(admin)
+
+      post "/contests/#{contest.id}/maps", params: { map: '0' }
+
+      expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
+      expect(flash[:error]).to be_present
+    end
+
+    it 'returns 403 for non-admins' do
+      contest = create(:contest)
+      map = create(:map)
+      login_as(user)
+
+      post "/contests/#{contest.id}/maps", params: { map: map.id }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(contest.reload.maps).not_to include(map)
+    end
+  end
+
+  describe 'DELETE /contests/:contest_id/maps/:id' do
     it 'removes an attached map and redirects to the maps tab' do
       contest = create(:contest, :with_maps, maps_count: 1)
       map = contest.maps.first
       login_as(admin)
 
-      delete '/contests/del_map', params: { id: contest.id, id2: map.id }
+      delete "/contests/#{contest.id}/maps/#{map.id}"
 
       expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
       expect(contest.reload.maps).not_to include(map)
@@ -295,7 +284,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       contest = create(:contest)
       login_as(admin)
 
-      delete '/contests/del_map', params: { id: contest.id, id2: 0 }
+      delete "/contests/#{contest.id}/maps/0"
 
       expect(response).to redirect_to(edit_contest_path(contest, contest: 'maps'))
       expect(flash[:error]).to be_present

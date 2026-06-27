@@ -152,17 +152,6 @@ class Contest < ActiveRecord::Base
     true
   end
 
-  def add_team_by_id(team_id)
-    contester = Contester.new(team: Team.find(team_id), contest: self, active: true)
-    if contester.valid?
-      contester.save!
-      true
-    else
-      errors.add(:base, contester.errors.full_messages.to_sentence)
-      false
-    end
-  end
-
   def elo_score(score1, score2, diff, level = modulus_base, weight = self.weight,
                 moduluses = [modulus_even, modulus_3to1, modulus_4to0])
     # Defensive defaults to avoid NaN / division by zero
