@@ -162,6 +162,24 @@ class DataFile < ActiveRecord::Base
     article || movie || Movie.find_by(file_id: id) || self
   end
 
+  # Files whose cached path no longer exists on disk.
+  def self.missing
+    all.reject { |f| File.exist?(f.path) }
+  end
+
+  # Movies that have no associated (own or related) movie or preview.
+  def self.movies_without_video
+    movies.reject { |f| f.movie || f.preview || f.related&.movie }
+  end
+
+  # Select options for relating other files in the same directory.
+  def self.related_selection_options(file)
+    for_related_selection(file).map do |f|
+      suffix = f.related_files.any? ? " (+#{f.related_files.size} related files)" : ''
+      ["#{f}#{suffix}", f.id]
+    end
+  end
+
   private
 
   # Absolute destination path based on CarrierWave storage rules.

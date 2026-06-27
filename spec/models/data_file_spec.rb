@@ -149,6 +149,67 @@ describe DataFile do
     end
   end
 
+  describe '.missing' do
+    it 'returns only files whose cached path is absent from disk' do
+      directory = create(:directory)
+      missing = create(:data_file, directory: directory, path: '/tmp/test_dirs/missing_file.txt')
+      existing_path = '/tmp/test_dirs/existing_file.txt'
+      File.write(existing_path, 'ok')
+      existing = create(:data_file, directory: directory, path: existing_path)
+
+      result = DataFile.missing
+
+      expect(result).to include(missing)
+      expect(result).not_to include(existing)
+    end
+  end
+
+  describe '.movies_without_video' do
+    before { allow_any_instance_of(DataFile).to receive(:create_movie) }
+
+    it 'returns movie files lacking an own, preview, or related movie' do
+      without_video = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/no_video.mp4')
+      with_video = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/has_video.mp4')
+      create(:movie, file: with_video)
+
+      result = DataFile.movies_without_video
+
+      expect(result).to include(without_video)
+      expect(result).not_to include(with_video)
+    end
+
+    it 'excludes movie files whose related file carries the movie' do
+      related = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/related_video.mp4')
+      create(:movie, file: related)
+      file = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/child_video.mp4',
+                                related: related)
+
+      expect(DataFile.movies_without_video).not_to include(file)
+    end
+  end
+
+  describe '.related_selection_options' do
+    it 'builds select options with a related-count suffix' do
+      directory = create(:directory)
+      target = create(:data_file, directory: directory)
+      candidate = create(:data_file, directory: directory, title: 'Candidate')
+      create(:data_file, directory: directory, related: candidate)
+      plain = create(:data_file, directory: directory, title: 'Plain')
+
+      options = DataFile.related_selection_options(target)
+
+      expect(options).to include(['Candidate (+1 related files)', candidate.id])
+      expect(options).to include(['Plain', plain.id])
+      expect(options.map(&:last)).not_to include(target.id)
+    end
+
+    it 'returns an empty array when the file has no directory' do
+      file = build(:data_file, directory: nil)
+
+      expect(DataFile.related_selection_options(file)).to eq([])
+    end
+  end
+
   describe '#to_s' do
     it 'returns title when present and not empty' do
       file = create(:data_file, title: 'My File')

@@ -10,14 +10,8 @@ class DataFilesController < ApplicationController
   def admin
     raise AccessError unless cuser&.admin?
 
-    @files = []
-    DataFile.all.each do |f|
-      @files << f unless File.exist?(f.path)
-    end
-    @movies = []
-    DataFile.movies.each do |f|
-      @movies << f unless f.movie || f.preview || f.related&.movie
-    end
+    @files = DataFile.missing
+    @movies = DataFile.movies_without_video
   end
 
   def new
@@ -49,12 +43,7 @@ class DataFilesController < ApplicationController
 
     if @file.update(DataFile.params(params, cuser))
       flash[:notice] = t(:files_update)
-      return_to = params[:return_to].to_s
-      if return_to.start_with?('/') && !return_to.start_with?('//')
-        redirect_to(return_to)
-      else
-        redirect_to(@file)
-      end
+      redirect_to(safe_return_to || @file)
     else
       respond_with_validation_errors(@file, template: :edit)
     end
@@ -77,12 +66,9 @@ class DataFilesController < ApplicationController
   def trash
     raise AccessError unless cuser&.admin?
 
-    deleted_files = []
-    DataFile.all.each do |file|
-      unless File.exist?(file.path)
-        file.destroy
-        deleted_files << ERB::Util.html_escape(file.to_s)
-      end
+    deleted_files = DataFile.missing.map do |file|
+      file.destroy
+      ERB::Util.html_escape(file.to_s)
     end
     render html: helpers.safe_join(deleted_files, helpers.tag.br), layout: true
   end
@@ -94,10 +80,11 @@ class DataFilesController < ApplicationController
   end
 
   def prepare_edit_form_data
-    @available_related_files = DataFile.for_related_selection(@file)
-    @add_related_options = @available_related_files.map do |file|
-      suffix = file.related_files.any? ? " (+#{file.related_files.size} related files)" : ''
-      ["#{file}#{suffix}", file.id]
-    end
+    @add_related_options = DataFile.related_selection_options(@file)
+  end
+
+  def safe_return_to
+    return_to = params[:return_to].to_s
+    return_to if return_to.start_with?('/') && !return_to.start_with?('//')
   end
 end
