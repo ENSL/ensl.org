@@ -199,7 +199,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # FIXME: move to model
   def update_user
     user = cuser
     return unless user
@@ -207,7 +206,6 @@ class ApplicationController < ActionController::Base
     Time.zone = user.time_zone
     user.touch_last_visit_if_stale!
 
-    # FIXME: there is a bug in steam auth that causes nil profile
     flash[:notice] = 'Your profile has been removed and recreated.' if user.ensure_profile!
 
     return unless user.banned? Ban::TYPE_SITE

@@ -421,6 +421,24 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
       delete "/challenges/#{challenge.id}"
 
+      expect(response).to redirect_to(contest_path(contest))
+      expect(flash[:notice]).to eq(I18n.t(:challenges_cleared))
+      expect(Challenge.exists?(challenge.id)).to be(false)
+    end
+
+    it 'returns a plain-text success response for non-html requests' do
+      challenge = Challenge.create!(
+        contester1: contester1,
+        contester2: contester2,
+        user: team1_leader,
+        match_time: 2.days.from_now,
+        mandatory: false,
+        details: 'Pending challenge'
+      )
+      login_as(team1_leader)
+
+      delete "/challenges/#{challenge.id}", headers: { 'ACCEPT' => 'text/plain' }
+
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(I18n.t(:challenges_cleared))
       expect(Challenge.exists?(challenge.id)).to be(false)

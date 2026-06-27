@@ -27,7 +27,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # FIXME: consider merging
   def popup
     render layout: false
   end

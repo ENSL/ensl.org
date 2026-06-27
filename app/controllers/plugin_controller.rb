@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PluginController < ApplicationController
-  # FIXME: think this again. Use API.
   # Most logic should be in here no in AMXX
   # Use JSON?
 

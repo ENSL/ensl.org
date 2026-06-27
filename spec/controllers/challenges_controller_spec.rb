@@ -22,6 +22,7 @@ RSpec.describe ChallengesController, type: :controller do
       challenge = double('Challenge', can_update?: true, update: false, persisted?: false)
       allow(Challenge).to receive(:find).with('1').and_return(challenge)
       allow(Challenge).to receive(:params).and_return(ActionController::Parameters.new(response: 'No change'))
+      allow(challenge).to receive(:apply_commit_status).with('Unexpected')
 
       patch :update, params: { id: '1', commit: 'Unexpected', challenge: { response: 'No change' } }
 

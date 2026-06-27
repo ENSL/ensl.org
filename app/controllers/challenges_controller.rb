@@ -43,9 +43,13 @@ class ChallengesController < ApplicationController
   def destroy
     raise AccessError unless @challenge.can_destroy? cuser
 
+    contest = @challenge.contester1.contest
     @challenge.destroy
-    # return_to FIXME from challenge side
-    render plain: t(:challenges_cleared)
+
+    respond_to do |format|
+      format.html { redirect_to contest, notice: t(:challenges_cleared) }
+      format.any { render plain: t(:challenges_cleared) }
+    end
   end
 
   # Custom method

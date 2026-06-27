@@ -20,7 +20,6 @@ class ArticlesController < ApplicationController
   def admin
     raise AccessError unless cuser&.admin?
 
-    # FIXME: something better?
     @articles = { 'Drafts' => Article.drafts.ordered, 'Special' => Article.category(Category::SPECIAL).ordered }
   end
 
