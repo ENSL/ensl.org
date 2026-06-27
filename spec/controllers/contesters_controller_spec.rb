@@ -72,11 +72,9 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'returns 500 when the new ladder rank exceeds the active contester count' do
       session[:user] = admin.id
-      contesters = double('ContesterScope')
-      contest = double('Contest', contest_type: Contest::TYPE_LADDER, contesters: contesters)
-      contester = double('Contester', can_update?: true, contest: contest, score: 1)
-      allow(contesters).to receive_message_chain(:active, :count).and_return(1)
+      contester = double('Contester', can_update?: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
+      allow(contester).to receive(:rebalance_ladder_rank!).and_raise(Exceptions::Error, I18n.t(:rank_invalid))
 
       patch :update, params: {
         id: '1',
@@ -92,13 +90,10 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'does not rebalance ladder ranks when the rank stays the same' do
       session[:user] = admin.id
-      contesters = double('ContesterScope')
-      contest = double('Contest', contest_type: Contest::TYPE_LADDER, contesters: contesters)
-      contester = double('Contester', can_update?: true, contest: contest, score: 1, contest_id: 1, update: true)
-      allow(contesters).to receive_message_chain(:active, :count).and_return(2)
+      contester = double('Contester', can_update?: true, contest_id: 1, update: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       allow(Contester).to receive(:params).and_return(ActionController::Parameters.new(score: '1'))
-      expect(contest).not_to receive(:update_ranks)
+      expect(contester).to receive(:rebalance_ladder_rank!).with('1')
 
       patch :update, params: {
         id: '1',
@@ -114,13 +109,10 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'rebalances ladder ranks when the rank changes' do
       session[:user] = admin.id
-      contesters = double('ContesterScope')
-      contest = double('Contest', contest_type: Contest::TYPE_LADDER, contesters: contesters)
-      contester = double('Contester', can_update?: true, contest: contest, score: 1, contest_id: 1, update: true)
-      allow(contesters).to receive_message_chain(:active, :count).and_return(2)
+      contester = double('Contester', can_update?: true, contest_id: 1, update: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       allow(Contester).to receive(:params).and_return(ActionController::Parameters.new(score: '2'))
-      expect(contest).to receive(:update_ranks).with(contester, 1, 2)
+      expect(contester).to receive(:rebalance_ladder_rank!).with('2')
 
       patch :update, params: {
         id: '1',

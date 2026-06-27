@@ -57,6 +57,8 @@ class Category < ActiveRecord::Base
 
   acts_as_readable
 
+  after_create :align_sort_with_id
+
   # Get movie size filter categories (Shorts, Full Length, etc.)
   def self.movie_size_categories
     where(domain: DOMAIN_MOVIES).pluck(:name).compact.uniq
@@ -102,5 +104,13 @@ class Category < ActiveRecord::Base
 
   def self.options_for_select(relation = all)
     relation.map { |c| [c.display_name, c.id] }
+  end
+
+  private
+
+  def align_sort_with_id
+    return unless sort.blank? || sort.zero?
+
+    update_column(:sort, id)
   end
 end

@@ -52,15 +52,7 @@ class MatchesController < ApplicationController
   def update
     raise AccessError unless @match.can_update? cuser, params[:match]
 
-    # FIXME: better implementation
-    params[:match][:matchers_attributes]&.each do |key, matcher|
-      matcher['_destroy'] = matcher['_destroy'] != 'keep'
-      if matcher['user_id'] == ''
-        params[:match][:matchers_attributes].delete key
-      elsif matcher['user_id'].to_i.zero?
-        matcher['user_id'] = User.find_by_username(matcher['user_id']).id
-      end
-    end
+    Match.normalize_matchers_attributes!(params[:match])
 
     if @match.update(Match.params(params, cuser))
       respond_to do |format|

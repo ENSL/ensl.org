@@ -230,4 +230,40 @@ RSpec.describe Contester, type: :model do
       expect(contester.score).to eq(0)
     end
   end
+
+  describe '#rebalance_ladder_rank!' do
+    it 'does nothing for non-ladder contests' do
+      bracket = create(:contest, contest_type: Contest::TYPE_BRACKET)
+      contester = create(:contester, contest: bracket, score: 1)
+
+      expect(bracket).not_to receive(:update_ranks)
+      expect { contester.rebalance_ladder_rank!(2) }.not_to raise_error
+    end
+
+    it 'raises when requested ladder rank is out of range' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      contester = create(:contester, contest: ladder, score: 1)
+
+      expect { contester.rebalance_ladder_rank!(0) }.to raise_error(Exceptions::Error)
+      expect { contester.rebalance_ladder_rank!(99) }.to raise_error(Exceptions::Error)
+    end
+
+    it 'does not update ranks when the requested rank is unchanged' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      contester = create(:contester, contest: ladder, score: 1)
+      create(:contester, contest: ladder, score: 2)
+
+      expect(ladder).not_to receive(:update_ranks)
+      contester.rebalance_ladder_rank!(1)
+    end
+
+    it 'updates ranks when the requested rank changes' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      contester = create(:contester, contest: ladder, score: 1)
+      create(:contester, contest: ladder, score: 2)
+
+      expect(ladder).to receive(:update_ranks).with(contester, 1, 2)
+      contester.rebalance_ladder_rank!(2)
+    end
+  end
 end

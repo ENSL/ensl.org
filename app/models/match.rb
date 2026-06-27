@@ -461,4 +461,30 @@ class Match < ActiveRecord::Base
     params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,
                                   :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_id, :week_id)
   end
+
+  def self.normalize_matchers_attributes!(match_params)
+    return unless match_params
+
+    matchers_attributes = match_params[:matchers_attributes] || match_params['matchers_attributes']
+    return unless matchers_attributes.respond_to?(:keys)
+
+    matchers_attributes.keys.each do |key|
+      matcher = matchers_attributes[key]
+      next unless matcher.respond_to?(:[])
+
+      destroy_value = matcher[:_destroy] || matcher['_destroy']
+      matcher['_destroy'] = destroy_value != 'keep' if matcher.respond_to?(:[]=)
+
+      user_id = matcher[:user_id] || matcher['user_id']
+      if user_id.blank?
+        matchers_attributes.delete(key)
+        next
+      end
+
+      next unless user_id.to_i.zero?
+
+      user = User.find_by_username(user_id)
+      matcher['user_id'] = user.id if user
+    end
+  end
 end

@@ -29,8 +29,6 @@ class CategoriesController < ApplicationController
     raise AccessError unless @category.can_create? cuser
 
     if @category.save
-      # FIXME: move to model
-      @category.update_column :sort, @category.id
       flash[:notice] = t(:articles_category)
       redirect_to :categories
     else

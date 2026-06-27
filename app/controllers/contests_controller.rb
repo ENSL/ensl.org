@@ -83,22 +83,15 @@ class ContestsController < ApplicationController
         render :edit, status: :unprocessable_entity
       end
     when 'map'
-      map = Map.find_by(id: params[:map])
-      if map.nil?
-        flash.now[:error] = t(:error)
-        render :edit, status: :unprocessable_entity
-      else
-        @contest.maps << map unless @contest.maps.include?(map)
+      if @contest.add_map_by_id(params[:map])
         flash[:notice] = t(:maps_update)
         redirect_to edit_contest_path(@contest, contest: 'maps')
+      else
+        flash.now[:error] = t(:error)
+        render :edit, status: :unprocessable_entity
       end
     when 'team'
-      contester = Contester.new(team: Team.find(params[:team]), contest: @contest, active: true)
-      if contester.valid?
-        contester.save!
-      else
-        @contest.errors.add(:base, contester.errors.full_messages.to_sentence)
-      end
+      @contest.add_team_by_id(params[:team])
       render :edit
     end
   end
@@ -106,9 +99,7 @@ class ContestsController < ApplicationController
   def del_map
     raise AccessError unless @contest.can_update? cuser
 
-    map = Map.find_by(id: params[:id2])
-    if map
-      @contest.maps.delete(map)
+    if @contest.remove_map_by_id(params[:id2])
       flash[:notice] = t(:maps_destroy)
     else
       flash[:error] = t(:error)

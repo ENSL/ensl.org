@@ -114,6 +114,17 @@ class Contester < ActiveRecord::Base
     self.score = contest.contesters.active.count + 1
   end
 
+  def rebalance_ladder_rank!(new_rank_value)
+    return unless contest&.contest_type == Contest::TYPE_LADDER
+
+    new_rank = new_rank_value.to_i
+    max_rank = contest.contesters.active.count
+    raise Exceptions::Error, I18n.t(:rank_invalid) unless new_rank.positive? && (new_rank <= max_rank)
+
+    old_rank = score
+    contest.update_ranks(self, old_rank, new_rank) if old_rank != new_rank
+  end
+
   def init_variables
     self.active = true
     self.trend = Contester::TREND_FLAT

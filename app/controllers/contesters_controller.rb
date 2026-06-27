@@ -32,16 +32,7 @@ class ContestersController < ApplicationController
   def update
     raise AccessError unless @contester.can_update? cuser
 
-    contest = @contester.contest
-
-    if contest.contest_type == Contest::TYPE_LADDER
-      old_rank = @contester.score
-      new_rank = params[:contester][:score].to_i
-      raise Error, t(:rank_invalid) unless new_rank.positive? &&
-                                           (new_rank <= contest.contesters.active.count)
-
-      contest.update_ranks(@contester, old_rank, new_rank) if old_rank != new_rank
-    end
+    @contester.rebalance_ladder_rank!(params.dig(:contester, :score))
 
     if @contester.update(Contester.params(params, cuser))
       flash[:notice] = t(:contests_contester_update)

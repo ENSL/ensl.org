@@ -27,6 +27,25 @@ RSpec.describe Match, type: :model do
       permitted = Match.params(params, nil)
       expect(permitted[:server_id]).to eq 5
     end
+
+    it 'normalizes matcher attributes in-place' do
+      replacement_user = create(:user)
+      match_params = ActionController::Parameters.new(
+        matchers_attributes: {
+          '0' => { 'user_id' => '', '_destroy' => 'keep' },
+          '1' => { 'user_id' => replacement_user.username, '_destroy' => 'keep' },
+          '2' => { 'user_id' => 'missing_user', '_destroy' => 'delete' }
+        }
+      )
+
+      Match.normalize_matchers_attributes!(match_params)
+
+      expect(match_params[:matchers_attributes]).not_to have_key('0')
+      expect(match_params[:matchers_attributes]['1']['user_id']).to eq(replacement_user.id)
+      expect(match_params[:matchers_attributes]['1']['_destroy']).to be false
+      expect(match_params[:matchers_attributes]['2']['user_id']).to eq('missing_user')
+      expect(match_params[:matchers_attributes]['2']['_destroy']).to be true
+    end
   end
 
   describe 'set_hltv guard' do
