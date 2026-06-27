@@ -114,6 +114,24 @@ RSpec.describe Contest, type: :model do
     end
   end
 
+  describe '.historical' do
+    it "returns season and night contests for the 'NS1' key" do
+      season = create(:contest, name: 'S1: Opening')
+      night = create(:contest, name: 'Nightwatch Cup')
+      other = create(:contest, name: 'Random Cup')
+
+      result = Contest.historical('NS1')
+
+      expect(result).to include(season)
+      expect(result).to include(night)
+      expect(result).not_to include(other)
+    end
+
+    it 'filters to contests with an id greater than 113 for any other key' do
+      expect(Contest.historical('whatever').to_sql).to include("id > '113'")
+    end
+  end
+
   describe 'association mutation helpers' do
     it 'adds and removes maps by id' do
       map = create(:map)

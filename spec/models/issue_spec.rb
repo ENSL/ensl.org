@@ -125,6 +125,47 @@ describe Issue do
     end
   end
 
+  describe '.visible_to' do
+    it 'limits non-admin moderators to their allowed categories' do
+      moderator = create(:user)
+      create(:grouper, user: moderator, group: create(:group, :gather_moderator))
+      gather = create(:issue, category_id: Issue::CATEGORY_GATHER)
+      website = create(:issue, category_id: Issue::CATEGORY_WEBSITE)
+      uncategorized = create(:issue, category_id: nil)
+
+      result = described_class.visible_to(moderator)
+
+      expect(result).to include(gather)
+      expect(result).not_to include(website)
+      expect(result).not_to include(uncategorized)
+    end
+
+    it 'includes allowed and uncategorized issues for admins' do
+      admin = create(:user, :admin)
+      gather = create(:issue, category_id: Issue::CATEGORY_GATHER)
+      uncategorized = create(:issue, category_id: nil)
+
+      result = described_class.visible_to(admin)
+
+      expect(result).to include(gather)
+      expect(result).to include(uncategorized)
+    end
+  end
+
+  describe '.sort_column' do
+    it 'maps known sort keys to their columns' do
+      expect(described_class.sort_column('title')).to eq('title')
+      expect(described_class.sort_column('status')).to eq('status')
+      expect(described_class.sort_column('assigned')).to eq('assigned_id')
+      expect(described_class.sort_column('category')).to eq('category_id')
+    end
+
+    it 'defaults to created_at descending for unknown or missing keys' do
+      expect(described_class.sort_column(nil)).to eq('created_at DESC')
+      expect(described_class.sort_column('bogus')).to eq('created_at DESC')
+    end
+  end
+
   describe 'status helpers' do
     it 'maps statuses to colors' do
       expect(build(:issue, status: Issue::STATUS_OPEN).color).to eq('yellow')

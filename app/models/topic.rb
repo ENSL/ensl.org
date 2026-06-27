@@ -46,6 +46,15 @@ class Topic < ActiveRecord::Base
       .order(state: :desc)
       .order(Arel.sql('last_post_at DESC'))
   }
+  scope :for_forum_overview, lambda { |forum|
+    where(forum_id: forum.id)
+      .joins(posts: :user)
+      .includes(:lock)
+      .select('topics.*, MAX(posts.created_at) AS last_post_at')
+      .group('topics.id')
+      .order(state: :desc)
+      .order(Arel.sql('last_post_at DESC'))
+  }
 
   validates_presence_of :user_id, :forum_id
   validates_length_of :title, in: 1..50

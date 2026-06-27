@@ -5,13 +5,10 @@ class IssuesController < ApplicationController
   before_action :load_issue, only: %i[show edit update destroy]
 
   def index
-    allowed = Issue.allowed_categories cuser
-    qstring = 'category_id IN (?)'
-    qstring += ' OR category_id IS NULL' if cuser.admin?
-
-    @open = Issue.where(qstring, allowed).with_status(Issue::STATUS_OPEN).order(issue_sort)
-    @solved = Issue.where(qstring, allowed).with_status(Issue::STATUS_SOLVED).order(issue_sort)
-    @rejected = Issue.where(qstring, allowed).with_status(Issue::STATUS_REJECTED).order(issue_sort)
+    scope = Issue.visible_to(cuser).order(Issue.sort_column(params[:sort]))
+    @open = scope.with_status(Issue::STATUS_OPEN)
+    @solved = scope.with_status(Issue::STATUS_SOLVED)
+    @rejected = scope.with_status(Issue::STATUS_REJECTED)
   end
 
   def show
@@ -78,15 +75,5 @@ class IssuesController < ApplicationController
 
   def load_issue
     @issue = Issue.find params[:id]
-  end
-
-  def issue_sort
-    case params[:sort]
-    when 'title' then 'title'
-    when 'status' then 'status'
-    when 'assigned' then 'assigned_id'
-    when 'category' then 'category_id'
-    else 'created_at DESC'
-    end
   end
 end

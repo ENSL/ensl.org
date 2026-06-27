@@ -49,6 +49,11 @@ class Issue < ActiveRecord::Base
   #  :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
   #  :conditions => "readings.user_id IS NULL"} }
   scope :with_status, ->(s) { where(status: s) }
+  scope :visible_to, lambda { |cuser|
+    qstring = 'category_id IN (?)'
+    qstring += ' OR category_id IS NULL' if cuser&.admin?
+    where(qstring, allowed_categories(cuser))
+  }
 
   validates_length_of :title, in: 1..50
   validates_length_of :text, in: 1..65_000
@@ -135,6 +140,16 @@ class Issue < ActiveRecord::Base
     allowed << CATEGORY_LEAGUE if cuser.admin? # league
     allowed << CATEGORY_NSLPLUGIN if cuser.admin? # ensl plugin
     allowed
+  end
+
+  def self.sort_column(param)
+    case param
+    when 'title' then 'title'
+    when 'status' then 'status'
+    when 'assigned' then 'assigned_id'
+    when 'category' then 'category_id'
+    else 'created_at DESC'
+    end
   end
 
   def self.params(params, _cuser)

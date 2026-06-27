@@ -248,4 +248,22 @@ RSpec.describe Match, type: :model do
       expect(match.user_in_match?(outsider)).to be false
     end
   end
+
+  describe '#confirmed_proposal?' do
+    let(:match) { create(:match) }
+
+    it 'is true when a confirmed proposal exists for the match' do
+      create(:match_proposal, :confirmed, match: match)
+      expect(match.confirmed_proposal?).to be true
+    end
+
+    it 'is false when only non-confirmed proposals exist' do
+      create(:match_proposal, :pending, match: match)
+      expect(match.confirmed_proposal?).to be false
+    end
+
+    it 'is false when the match has no proposals' do
+      expect(match.confirmed_proposal?).to be false
+    end
+  end
 end

@@ -10,12 +10,7 @@ class ContestsController < ApplicationController
   end
 
   def historical
-    @contests = case params[:id]
-                when 'NS1'
-                  Contest.all.ordered.includes(:contesters).where('name LIKE ? OR name LIKE ?', 'S%:%', '%Night%')
-                else
-                  Contest.all.ordered.includes(:contesters).where('id > ?', '113')
-                end
+    @contests = Contest.historical(params[:id])
   end
 
   def current

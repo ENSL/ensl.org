@@ -456,6 +456,10 @@ class Match < ActiveRecord::Base
     !!(user && (user.team == contester1.team || user.team == contester2.team))
   end
 
+  def confirmed_proposal?
+    match_proposals.confirmed_for_match(self).exists?
+  end
+
   def self.params(params, _cuser)
     # FIXME: check this
     params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,

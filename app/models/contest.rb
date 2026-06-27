@@ -232,6 +232,16 @@ class Contest < ActiveRecord::Base
     cuser&.admin?
   end
 
+  def self.historical(key)
+    scope = ordered.includes(:contesters)
+    case key
+    when 'NS1'
+      scope.where('name LIKE ? OR name LIKE ?', 'S%:%', '%Night%')
+    else
+      scope.where('id > ?', '113')
+    end
+  end
+
   def self.params(params, _cuser)
     params.require(:contest).permit(:name, :start, :end, :status, :default_time,
                                     :contest_type, :winner_id, :demos_id, :short_name,

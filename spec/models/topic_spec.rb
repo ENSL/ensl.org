@@ -70,6 +70,31 @@ describe Topic do
     end
   end
 
+  describe '.for_forum_overview' do
+    it 'returns only the forum topics with a last_post_at, ordered by state then latest post' do
+      other_forum = create(:forum)
+      older = create(:topic, user: user, forum: forum)
+      newer = create(:topic, user: user, forum: forum)
+      create(:post, topic: newer, user: user, created_at: 1.hour.from_now)
+      create(:topic, user: user, forum: other_forum)
+
+      result = Topic.for_forum_overview(forum)
+
+      expect(result.map(&:id)).to eq([newer.id, older.id])
+      expect(result.first.last_post_at).to be_present
+    end
+
+    it 'prioritises pinned (higher state) topics regardless of last post' do
+      old_post = create(:topic, user: user, forum: forum)
+      pinned = create(:topic, user: user, forum: forum, state: 1)
+
+      result = Topic.for_forum_overview(forum)
+
+      expect(result.first.id).to eq(pinned.id)
+      expect(result.map(&:id)).to include(old_post.id)
+    end
+  end
+
   describe '#can_show?' do
     it 'allows public forum for anonymous user' do
       topic = create(:topic, user: user, forum: forum)

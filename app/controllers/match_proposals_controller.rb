@@ -9,12 +9,9 @@ class MatchProposalsController < ApplicationController
 
   def new
     # Don't allow creation of new proposals if there is a confirmed one already
-    if MatchProposal.exists?(
-      match_id: @match.id,
-      status: MatchProposal::STATUS_CONFIRMED
-    )
+    if @match.confirmed_proposal?
       flash[:error] = 'Cannot create a new proposal if there is already a confirmed one'
-      redirect_to(match_proposals_path(@match)) && return
+      return redirect_to(match_proposals_path(@match))
     end
     @proposal = MatchProposal.new(match: @match)
     raise AccessError unless @proposal.can_create? cuser
