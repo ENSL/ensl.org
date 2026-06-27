@@ -227,6 +227,15 @@ class Gatherer < ActiveRecord::Base
     true
   end
 
+  # When a player who had flagged themselves as leaving loads the gather again we
+  # treat them as active. Keeping this on the model avoids the controller poking
+  # at status constants directly.
+  def reactivate_if_returning!
+    return unless status == STATE_LEAVING
+
+    update_attribute(:status, STATE_ACTIVE)
+  end
+
   def can_create?(cuser, _params = {})
     # and check_params(params, [:user_id, :gather_id])
     cuser \

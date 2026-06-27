@@ -211,4 +211,49 @@ RSpec.describe 'GatherersController', type: :request do
       expect(flash[:error]).to include('Cannot leave')
     end
   end
+
+  describe 'POST /gatherers/pick' do
+    it 'redirects after a successful HTML pick' do
+      login_as(user)
+      player = create(:gatherer, gather: gather)
+      result = instance_double('Gathers::Result', success?: true, gather: gather, error: nil)
+      allow(Gathers::CaptainPick).to receive(:call).and_return(result)
+
+      post pick_gatherers_path, params: { player: player.id }
+
+      expect(response).to redirect_to(gather_path(gather))
+      expect(Gathers::CaptainPick).to have_received(:call).with(actor: user, gather: gather, player_id: player.id)
+    end
+
+    it 'renders a turbo-stream response after a successful pick' do
+      login_as(user)
+      create(:gatherer, gather: gather, user: user)
+      player = create(:gatherer, gather: gather)
+      result = instance_double('Gathers::Result', success?: true, gather: gather, error: nil)
+      allow(Gathers::CaptainPick).to receive(:call).and_return(result)
+
+      post pick_gatherers_path,
+           params: { player: player.id },
+           headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+    end
+
+    it 'renders a turbo-stream response after a failed pick' do
+      login_as(user)
+      create(:gatherer, gather: gather, user: user)
+      player = create(:gatherer, gather: gather)
+      result = instance_double('Gathers::Result', success?: false, gather: gather, error: 'Nope')
+      allow(Gathers::CaptainPick).to receive(:call).and_return(result)
+
+      post pick_gatherers_path,
+           params: { player: player.id },
+           headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('Nope')
+    end
+  end
 end

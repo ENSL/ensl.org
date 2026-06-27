@@ -89,12 +89,14 @@ Rails.application.routes.draw do
     end
     member do
       get :version
-      post :pick
     end
   end
   get 'gather', to: 'gathers#latest', game: 'ns2'
 
   resources :gatherers, only: %i[create destroy update] do
+    collection do
+      post :pick
+    end
     member do
       post :status
     end

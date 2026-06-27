@@ -207,5 +207,25 @@ RSpec.describe Gatherer, type: :model do
         expect(Gathers::Broadcaster).not_to have_received(:call)
       end
     end
+
+    describe '#reactivate_if_returning!' do
+      let(:gather) { create(:gather, :running) }
+
+      it 'marks a leaving gatherer as active' do
+        gatherer = create(:gatherer, gather: gather, user: create(:user), status: Gatherer::STATE_LEAVING)
+
+        gatherer.reactivate_if_returning!
+
+        expect(gatherer.reload.status).to eq(Gatherer::STATE_ACTIVE)
+      end
+
+      it 'leaves other statuses untouched' do
+        gatherer = create(:gatherer, gather: gather, user: create(:user), status: Gatherer::STATE_AWAY)
+
+        gatherer.reactivate_if_returning!
+
+        expect(gatherer.reload.status).to eq(Gatherer::STATE_AWAY)
+      end
+    end
   end
 end

@@ -294,6 +294,19 @@ class Gather < ActiveRecord::Base
     true if cuser.admin? || cuser.gather_moderator?
   end
 
+  # Admin/moderator edit performed from the gather edit form. The transaction and
+  # broadcast belong here rather than in the controller so the persistence rules
+  # travel with the model.
+  def admin_update(attributes)
+    self.admin = true
+    transaction do
+      next false unless update(attributes)
+
+      Gathers::Broadcaster.call(self)
+      true
+    end
+  end
+
   def self.last(name = 'NS2')
     return unless (game = find_game(name))
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GatherersController < ApplicationController
-  before_action :load_gatherer, except: [:create]
+  before_action :load_gatherer, except: %i[create pick]
 
   def create
     join_result = Gathers::Join.call(actor: cuser, params: Gatherer.params(params, cuser))
@@ -36,6 +36,18 @@ class GatherersController < ApplicationController
     render body: nil, status: 200
   end
 
+  def pick
+    player = Gatherer.find(params[:player])
+    @gather = player.gather
+    result = Gathers::CaptainPick.call(actor: cuser, gather: @gather, player_id: player.id)
+    set_pick_flash(result)
+
+    respond_to do |format|
+      format.turbo_stream { render_pick_turbo_stream(result) }
+      format.html { redirect_to(result.gather || @gather) }
+    end
+  end
+
   def destroy
     service = if cuser && (cuser.admin? || cuser.gather_moderator?) && @gatherer.user != cuser
                 Gathers::Kick
@@ -65,6 +77,30 @@ class GatherersController < ApplicationController
     else
       flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || join_result.error.to_s
     end
+  end
+
+  def set_pick_flash(result)
+    if result.success?
+      flash[:notice] = t(:gathers_user_pick)
+    else
+      flash[:error] = result.error.to_s
+    end
+  end
+
+  def render_pick_turbo_stream(result)
+    @gather = result.gather || @gather
+    @gatherer = @gather.gatherers.of_user(cuser).first if cuser
+    if result.success?
+      flash.now[:notice] = flash[:notice]
+    else
+      flash.now[:error] = flash[:error]
+    end
+
+    render turbo_stream: [
+      turbo_stream.replace('notification', partial: 'application/messages'),
+      turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
+                                                                 locals: { gather: @gather, gatherer: @gatherer })
+    ]
   end
 
   def render_join_turbo_stream(join_result)

@@ -36,6 +36,27 @@ RSpec.describe Gather, type: :model do
     end
   end
 
+  describe '#admin_update' do
+    it 'updates the gather, flags admin and broadcasts on success' do
+      gather = create(:gather)
+      allow(Gathers::Broadcaster).to receive(:call)
+
+      expect(gather.admin_update(turn: 1)).to be true
+      expect(gather.reload.turn).to eq(1)
+      expect(gather.admin).to be true
+      expect(Gathers::Broadcaster).to have_received(:call).with(gather)
+    end
+
+    it 'returns false and does not broadcast when the update fails' do
+      gather = create(:gather)
+      allow(gather).to receive(:update).and_return(false)
+      allow(Gathers::Broadcaster).to receive(:call)
+
+      expect(gather.admin_update(turn: 1)).to be false
+      expect(Gathers::Broadcaster).not_to have_received(:call)
+    end
+  end
+
   describe 'check_captains' do
     it 'assigns turn/status and updates gatherers teams when captains change' do
       gather = create(:gather)

@@ -123,43 +123,4 @@ RSpec.describe 'Gathers version endpoint', type: :request do
 
     expect(response).to have_http_status(:forbidden)
   end
-
-  it 'redirects after a successful HTML pick' do
-    login_as(user)
-    result = double(success?: true, error: nil)
-    allow(Gathers::CaptainPick).to receive(:call).and_return(result)
-
-    post pick_gather_path(gather), params: { player: create(:gatherer, gather: gather).id }
-
-    expect(response).to redirect_to(gather_path(gather))
-  end
-
-  it 'renders a turbo-stream response after a successful pick' do
-    login_as(user)
-    create(:gatherer, gather: gather, user: user)
-    result = double(success?: true, error: nil)
-    allow(Gathers::CaptainPick).to receive(:call).and_return(result)
-
-    post pick_gather_path(gather),
-         params: { player: create(:gatherer, gather: gather).id },
-         headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
-
-    expect(response).to have_http_status(:ok)
-    expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-  end
-
-  it 'renders a turbo-stream response after a failed pick' do
-    login_as(user)
-    create(:gatherer, gather: gather, user: user)
-    result = double(success?: false, error: 'Nope')
-    allow(Gathers::CaptainPick).to receive(:call).and_return(result)
-
-    post pick_gather_path(gather),
-         params: { player: create(:gatherer, gather: gather).id },
-         headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
-
-    expect(response).to have_http_status(:ok)
-    expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-    expect(response.body).to include('Nope')
-  end
 end
