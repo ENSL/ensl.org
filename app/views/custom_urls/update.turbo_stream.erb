@@ -1,0 +1,6 @@
+<%= turbo_stream.replace(
+  dom_id(@custom_url),
+  partial: 'custom_urls/custom_url_row',
+  locals: { url: @custom_url, articles_for_select: @articles_for_select }
+) %>
+<%= turbo_stream.replace('notification', partial: 'application/messages') %>

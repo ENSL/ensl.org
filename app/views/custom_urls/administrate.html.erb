@@ -1,9 +1,6 @@
 <div id="custom-urls-panel">
   <h1 class="fancy"><span>Custom URLs - Admin Panel</span></h1>
   <div>
-    <p>Don't delete custom URLs linked from the menu!</p>
-  </div>
-  <div>
     <table id="custom-urls" class="striped">
       <thead>
         <tr>
@@ -14,27 +11,7 @@
       </thead>
       <tbody>
         <% @custom_urls.each do |url| %>
-          <tr class="<%= cycle('odd', 'even') %>" id="<%= url.id %>">
-            <td class="name"><%= url.name %></td>
-            <td class="article"><%= url.article.title %></td>
-            <td>
-              <%= link_to fa_icon('pencil'), '#', onclick: "showEdit(#{url.id}); return false;" %>
-              <%= link_to fa_icon('times'), custom_url_path(url), data: { turbo_method: :delete, turbo_confirm: 'Are you sure you want to delete this item?' } %>
-            </td>
-            <td class="edit hidden" colspan="3">
-              <%= form_for url do |f| %>
-                <div class="fields">
-                  <div class="inline">
-                    <%= f.text_field :name %>
-                  </div>
-                  <div class="select-wrapper">
-                    <%= f.select :article_id, @articles_for_select %>
-                  </div>
-                  <%= link_to 'Save', '#', onclick: "submitEdit(#{url.id}); return false;", class: 'button' %>
-                </div>
-            <% end %>
-            </td>
-          </tr>
+          <%= render 'custom_url_row', url: url, articles_for_select: @articles_for_select, row_class: cycle('odd', 'even') %>
         <% end %>
       </tbody>
     </table>
@@ -42,15 +19,23 @@
       <%= render 'shared/errors', messages: @custom_url.errors.full_messages %>
       <br>
     <% end %>
-    <%= form_for @custom_url do |f| %>
-        <div class="fields">
-          <div class="inline">
-            <%= f.text_field :name %>
+    <%= form_for @custom_url, html: { class: 'custom-url-new-form square' } do |f| %>
+        <div class="fields horizontal">
+          <%= f.label :name, 'Name' %>
+          <div class="inputs">
+            <%= f.text_field :name, placeholder: 'Name', aria: { label: 'Name' } %>
           </div>
-          <div class="select-wrapper">
-            <%= f.select :article_id, @articles_for_select %>
+        </div>
+        <div class="fields horizontal">
+          <%= f.label :article_id, 'Article' %>
+          <div class="inputs">
+            <div class="select-wrapper">
+              <%= f.select :article_id, @articles_for_select, {}, { aria: { label: 'Article' }, title: 'Article' } %>
+            </div>
           </div>
-          <%= f.submit 'Add', class: 'button' %>
+        </div>
+        <div class="controls">
+          <%= f.submit 'Add' %>
         </div>
   <% end %>
   </div>

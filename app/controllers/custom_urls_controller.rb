@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
 class CustomUrlsController < ApplicationController
-  respond_to :html, :json
-  responders :flash
+  respond_to :html, :turbo_stream
 
   before_action :require_admin!, except: :show
   before_action :set_custom_url, only: %i[update destroy]
-  before_action :load_administrate_page, only: %i[administrate create]
+  before_action :load_administrate_page, only: %i[administrate create update]
 
   def administrate; end
 
   def create
-    @custom_url.assign_attributes(custom_url_params)
+    @custom_url.assign_attributes(CustomUrl.params(params))
 
     if @custom_url.save
-      respond_with @custom_url, location: custom_urls_url
+      redirect_to custom_urls_url,
+                  notice: t('flash.actions.create.notice', resource_name: CustomUrl.model_name.human)
     else
-      render :administrate, status: :unprocessable_entity
+      render :administrate, status: :unprocessable_content
     end
   end
 
@@ -29,34 +29,33 @@ class CustomUrlsController < ApplicationController
   end
 
   def update
-    if @custom_url.update(custom_url_params)
-      render json: {
-        status: 200,
-        message: t(:custom_urls_update),
-        obj: @custom_url.update_response_payload
-      }, status: :ok
-    else
-      render json: {
-        status: 422,
-        message: "#{t(:custom_urls_update_failed)}\n * #{@custom_url.errors.full_messages.join("\n * ")}",
-        errors: @custom_url.errors.full_messages
-      }, status: :unprocessable_entity
+    success = @custom_url.update(CustomUrl.params(params))
+    message = success ? t(:custom_urls_update) : @custom_url.errors.full_messages.to_sentence
+
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[success ? :notice : :error] = message
+        render :update, status: success ? :ok : :unprocessable_content
+      end
+      format.html { redirect_to custom_urls_url, flash: { (success ? :notice : :error) => message } }
     end
   end
 
   def destroy
-    @custom_url.destroy
+    @destroyed = @custom_url.destroy
+    message = if @destroyed
+                t(:custom_urls_destroy,
+                  name: @custom_url.name)
+              else
+                @custom_url.errors.full_messages.to_sentence
+              end
 
     respond_to do |format|
-      format.json do
-        render json: {
-          status: 200,
-          message: t(:custom_urls_destroy, name: @custom_url.name)
-        }, status: :ok
+      format.turbo_stream do
+        flash.now[@destroyed ? :notice : :error] = message
+        render :destroy, status: @destroyed ? :ok : :unprocessable_content
       end
-      format.html do
-        redirect_to custom_urls_url, notice: t(:custom_urls_destroy, name: @custom_url.name)
-      end
+      format.html { redirect_to custom_urls_url, flash: { (@destroyed ? :notice : :error) => message } }
     end
   end
 
@@ -68,10 +67,6 @@ class CustomUrlsController < ApplicationController
 
   def set_custom_url
     @custom_url = CustomUrl.find(params[:id])
-  end
-
-  def custom_url_params
-    params.require(:custom_url).permit(:name, :article_id)
   end
 
   def load_administrate_page

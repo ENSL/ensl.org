@@ -18,13 +18,18 @@
 
 # FIXME: move this to a gem
 class CustomUrl < ActiveRecord::Base
+  MENU_LINKED_NAMES = %w[compmod halloffame rules tutorials].freeze
+
   belongs_to :article, optional: true
   # FIXME: attr_accessible :name
+
+  before_validation :normalize_name
+  before_destroy :ensure_not_menu_linked
 
   validates :name,
             length: { in: 2..10 },
             uniqueness: true,
-            format: /\A[a-z]+(-)?[a-z]+\Z/
+            format: /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\Z/
 
   validates :article_id,
             presence: true
@@ -36,10 +41,26 @@ class CustomUrl < ActiveRecord::Base
     article
   end
 
-  def update_response_payload
-    {
-      name: name,
-      title: article&.title
-    }
+  def menu_linked?
+    MENU_LINKED_NAMES.include?(name)
+  end
+
+  def self.params(params)
+    params.require(:custom_url).permit(:name, :article_id)
+  end
+
+  private
+
+  def normalize_name
+    return if name.blank?
+
+    self.name = name.to_s.strip.downcase.parameterize
+  end
+
+  def ensure_not_menu_linked
+    return unless menu_linked?
+
+    errors.add(:base, I18n.t(:custom_urls_destroy_menu_linked, name: name))
+    throw :abort
   end
 end

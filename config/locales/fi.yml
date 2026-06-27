@@ -88,4 +88,6 @@
   custom_urls_update: "Päivitys onnistui!"
   custom_urls_update_failed: "Päivitys epäonnistui! Virheet:"
   custom_urls_destroy: "URL poistettu onnistuneesti: %{name}!"
+  custom_urls_destroy_failed: "Poisto epäonnistui."
+  custom_urls_destroy_menu_linked: "Valikkoon linkitettyä URL-osoitetta ei voi poistaa: %{name}."
   votes_success: "Äänestys hyväksytty."

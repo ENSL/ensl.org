@@ -39,6 +39,15 @@ RSpec.describe 'CustomUrlsController', type: :request do
       expect(CustomUrl.order(:id).last.article).to eq(article)
     end
 
+    it 'normalizes uppercase and spaced names for admins' do
+      login_as(admin)
+
+      post '/custom_urls', params: { custom_url: { name: '  Test SLUG  ', article_id: article.id } }
+
+      expect(response).to redirect_to(custom_urls_path)
+      expect(CustomUrl.order(:id).last.name).to eq('test-slug')
+    end
+
     it 'renders administrate for invalid data' do
       login_as(admin)
 
@@ -110,43 +119,41 @@ RSpec.describe 'CustomUrlsController', type: :request do
     end
     let!(:custom_url) { CustomUrl.create!(name: 'original', article: article) }
 
-    it 'updates the custom url for admins' do
-      login_as(admin)
-
-      patch "/custom_urls/#{custom_url.id}",
-            params: { custom_url: { name: 'updated', article_id: replacement_article.id } },
-            as: :json
-
-      expect(response).to have_http_status(:ok)
-      expect(custom_url.reload.name).to eq('updated')
-      expect(custom_url.article).to eq(replacement_article)
-
-      body = JSON.parse(response.body)
-      expect(body['obj']).to eq({ 'name' => 'updated', 'title' => 'Replacement title' })
-    end
-
-    it 'returns validation errors for invalid data' do
-      login_as(admin)
-
-      patch "/custom_urls/#{custom_url.id}",
-            params: { custom_url: { name: '', article_id: nil } },
-            as: :json
-
-      expect(response).to have_http_status(422)
-      expect(custom_url.reload.name).to eq('original')
-
-      body = JSON.parse(response.body)
-      expect(body['errors']).not_to be_empty
-    end
-
     it 'returns 403 for non-admins' do
       login_as(user)
 
       patch "/custom_urls/#{custom_url.id}",
             params: { custom_url: { name: 'blocked', article_id: replacement_article.id } },
-            as: :json
+            as: :turbo_stream
 
       expect(response).to have_http_status(:forbidden)
+      expect(custom_url.reload.name).to eq('original')
+    end
+
+    it 'updates the custom url over turbo stream' do
+      login_as(admin)
+
+      patch "/custom_urls/#{custom_url.id}",
+            params: { custom_url: { name: 'updated', article_id: replacement_article.id } },
+            as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(response.body).to include(%(turbo-stream action="replace" target="custom_url_#{custom_url.id}"))
+      expect(custom_url.reload.name).to eq('updated')
+    end
+
+    it 'renders validation errors over turbo stream' do
+      login_as(admin)
+
+      patch "/custom_urls/#{custom_url.id}",
+            params: { custom_url: { name: '', article_id: nil } },
+            as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(response.body).to include(%(turbo-stream action="replace" target="notification"))
+      expect(response.body).to include('can&#39;t be blank')
       expect(custom_url.reload.name).to eq('original')
     end
   end
@@ -163,18 +170,6 @@ RSpec.describe 'CustomUrlsController', type: :request do
       expect(response).to redirect_to(custom_urls_path)
     end
 
-    it 'destroys a custom url for admins over json' do
-      custom_url = CustomUrl.create!(name: 'deletejson', article: create(:article))
-      login_as(admin)
-
-      expect do
-        delete "/custom_urls/#{custom_url.id}", as: :json
-      end.to change(CustomUrl, :count).by(-1)
-
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['status']).to eq(200)
-    end
-
     it 'returns 403 for non-admins' do
       custom_url = CustomUrl.create!(name: 'keep-this', article: create(:article))
       login_as(user)
@@ -184,6 +179,31 @@ RSpec.describe 'CustomUrlsController', type: :request do
       end.not_to change(CustomUrl, :count)
 
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'rejects deleting menu-linked custom urls over turbo stream' do
+      protected_url = CustomUrl.create!(name: 'rules', article: create(:article))
+      login_as(admin)
+
+      expect do
+        delete "/custom_urls/#{protected_url.id}", as: :turbo_stream
+      end.not_to change(CustomUrl, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t(:custom_urls_destroy_menu_linked, name: 'rules'))
+    end
+
+    it 'destroys a custom url for admins over turbo stream' do
+      custom_url = CustomUrl.create!(name: 'delturbo', article: create(:article))
+      login_as(admin)
+
+      expect do
+        delete "/custom_urls/#{custom_url.id}", as: :turbo_stream
+      end.to change(CustomUrl, :count).by(-1)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(response.body).to include(%(turbo-stream action="remove" target="custom_url_#{custom_url.id}"))
     end
   end
 end

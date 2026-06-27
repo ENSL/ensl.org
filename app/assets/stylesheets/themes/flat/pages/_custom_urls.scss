@@ -3,11 +3,98 @@
     font-weight: bold;
   }
 
+  #custom-urls {
+    width: 100%;
+    table-layout: auto;
+  }
+
+  td.name {
+    input[type=text].edit-field {
+      width: 100%;
+      box-sizing: border-box;
+      margin-right: 0;
+      border-radius: $input-border-radius;
+      border: $input-border-colour solid $input-border-width;
+      background-color: $input-primary !important;
+      color: $input-text;
+      opacity: 1 !important;
+      font-size: $input-font-size;
+      height: $input-height;
+      line-height: $input-height;
+      padding: 0 $input-padding;
+    }
+  }
+
+  td.article {
+    .select-wrapper {
+      $select-padding: 6px;
+      $select-height: $input-height - 4px;
+
+      display: block;
+      width: 100%;
+      margin-right: 0;
+      border-radius: $input-border-radius;
+      border: $input-border-colour solid $input-border-width;
+      background-color: $input-primary !important;
+      opacity: 1 !important;
+      position: relative;
+
+      select.edit-field {
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        border: 0;
+        margin: 0;
+        font-size: $input-font-size;
+        max-height: $select-height;
+        line-height: $select-height;
+        padding: $select-padding ($select-height + 10) $select-padding $input-padding;
+        background-color: $input-primary !important;
+        color: $input-text;
+        opacity: 1 !important;
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+          border-top: 6px solid $input-border-colour;
+        transform: translateY(-35%);
+        pointer-events: none;
+      }
+    }
+  }
+
+  td.actions {
+    width: 56px;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+
+    .icon-action {
+      background: none;
+      border: 0;
+      padding: 0 4px;
+      margin: 0;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+      cursor: pointer;
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
   .hidden {
     display: none;
   }
 
-  input[type=text] {
-    margin-right: 8px;
+  .custom-url-new-form {
+    margin-top: 12px;
   }
 }

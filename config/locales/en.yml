@@ -103,6 +103,8 @@ en:
   custom_urls_update: "Successfully updated!"
   custom_urls_update_failed: "Update failed! Errors:"
   custom_urls_destroy: "Successfully deleted url with name: %{name}!"
+  custom_urls_destroy_failed: "Delete failed."
+  custom_urls_destroy_menu_linked: "Cannot delete menu-linked custom URL: %{name}."
   votes_success: "Voted successfully."
   users_signup_steam: "You have created an account via steam, please update your user details."
   users_steamid_update: "Your SteamID has been updated to %s. You can log in via Steam now."

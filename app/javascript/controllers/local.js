@@ -208,31 +208,6 @@ function add_fields(link, association, content) {
   $(link).parent().before(content.replace(regexp, newId))
 }
 
-function showEdit(urlId) {
-  const parent = $(`#${urlId}`)
-  parent.find("> td").toggleClass("hidden")
-}
-
-function submitEdit(urlId) {
-  const parent = $(`#${urlId}`)
-  const form = parent.find("form")
-
-  $.post(`/custom_urls/${urlId}`, form.serialize())
-    .done(function(data) {
-      const nameField = parent.children(".name")
-      const articleField = parent.children(".article")
-
-      nameField.text(data.obj.name)
-      articleField.text(data.obj.title)
-      parent.find("> td").toggleClass("hidden")
-
-      alert(data.message)
-    }).fail(function(errorRes) {
-      const error = JSON.parse(errorRes.responseText)
-      alert(error.message)
-    })
-}
-
 window.ShowUserPopup = ShowUserPopup
 window.HideUserPopup = HideUserPopup
 window.bindLocalHandlers = bindLocalHandlers
@@ -240,8 +215,6 @@ window.findUser = findUser
 window.QuoteText = QuoteText
 window.remove_fields = remove_fields
 window.add_fields = add_fields
-window.showEdit = showEdit
-window.submitEdit = submitEdit
 
 document.addEventListener("DOMContentLoaded", bindLocalHandlers)
 document.addEventListener("turbo:load", bindLocalHandlers)

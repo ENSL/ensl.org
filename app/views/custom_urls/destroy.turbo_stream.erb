@@ -1,0 +1,4 @@
+<% if @destroyed %>
+  <%= turbo_stream.remove(dom_id(@custom_url)) %>
+<% end %>
+<%= turbo_stream.replace('notification', partial: 'application/messages') %>

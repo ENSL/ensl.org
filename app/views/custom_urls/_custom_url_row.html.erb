@@ -1,0 +1,43 @@
+<% row_class = local_assigns.fetch(:row_class, (url.id.even? ? 'even' : 'odd')) %>
+<% form_id = "#{dom_id(url)}_form" %>
+
+<tr id="<%= dom_id(url) %>" class="<%= row_class %>">
+  <td class="name">
+    <%= text_field_tag 'custom_url[name]', url.name,
+                       id: "#{form_id}_name",
+                       form: form_id,
+                       class: 'edit-field',
+                       placeholder: 'Name',
+                       title: 'Custom URL name',
+                       aria: { label: 'Name' } %>
+  </td>
+  <td class="article">
+    <div class="select-wrapper">
+      <%= select_tag 'custom_url[article_id]',
+                     options_for_select(articles_for_select, url.article_id),
+                     id: "#{form_id}_article_id",
+                     form: form_id,
+                     class: 'edit-field',
+                     title: 'Linked article',
+                     aria: { label: 'Article' } %>
+    </div>
+  </td>
+  <td class="actions">
+    <%= form_with model: url, id: form_id do %>
+    <% end %>
+    <%= link_to fa_icon('check'),
+                '#',
+                class: 'icon-action',
+                title: 'Save custom URL',
+                aria: { label: 'Save custom URL' },
+                onclick: "document.getElementById('#{form_id}').requestSubmit(); return false;" %>
+    <% unless url.menu_linked? %>
+      <%= link_to fa_icon('trash-can'),
+                  custom_url_path(url),
+                  class: 'icon-action',
+                  title: 'Delete custom URL',
+                  aria: { label: 'Delete custom URL' },
+                  data: { turbo_method: :delete, turbo_confirm: 'Are you sure you want to delete this item?' } %>
+    <% end %>
+  </td>
+</tr>
