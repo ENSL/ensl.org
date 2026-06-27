@@ -567,6 +567,11 @@ class User < ActiveRecord::Base
     Notifications.password(self, raw_password).deliver
   end
 
+  def self.reset_password_for_identity(username:, email:)
+    user = find_by(username: username, email: email)
+    user ? user.send_new_password : false
+  end
+
   def send_password_message(text = User::PASSWORD_MESSAGE)
     msg = Message.new
     msg.title = 'New password for ENSL website'
@@ -579,6 +584,31 @@ class User < ActiveRecord::Base
 
   def can_play?
     gathers.where('gathers.status > ?', Gather::STATE_RUNNING).count.positive? or created_at < 2.years.ago
+  end
+
+  # Records a successful login by stamping the user's last IP and visit time.
+  def record_login!(ip)
+    update_columns(lastip: ip, lastvisit: Time.now.utc)
+  end
+
+  def apply_login_state!(verified_steamid:)
+    return { banned: true, password_upgraded: password_upgraded?, steamid_updated: false } if banned?(Ban::TYPE_SITE)
+
+    {
+      banned: false,
+      password_upgraded: password_upgraded?,
+      steamid_updated: attach_verified_steamid!(verified_steamid)
+    }
+  end
+
+  def password_upgraded?
+    !!password_updated
+  end
+
+  def attach_verified_steamid!(verified_steamid)
+    return false if verified_steamid.blank? || steamid == verified_steamid
+
+    update_attribute(:steamid, verified_steamid)
   end
 
   def can_create?(_cuser)
@@ -638,6 +668,7 @@ class User < ActiveRecord::Base
       # Match to Scrypt(Md5(password))
       if pass == Digest::MD5.hexdigest(login[:password])
         user.raw_password = login[:password]
+        user.password_updated = true
         user.update_password
         user.save!(validate: false)
         return user
@@ -647,6 +678,7 @@ class User < ActiveRecord::Base
     else
       if user.password == Digest::MD5.hexdigest(login[:password])
         user.raw_password = login[:password]
+        user.password_updated = true
         user.update_password
         user.save!(validate: false)
         return user
@@ -693,6 +725,29 @@ class User < ActiveRecord::Base
 
   def self.search(search)
     search ? where('LOWER(username) LIKE LOWER(?) OR steamid LIKE ?', "%#{search}%", "%#{search}%") : all
+  end
+
+  IP_SEARCH = /\Aip:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\z/
+
+  # Extracts an IP address from an "ip:1.2.3.4" search query, or nil.
+  def self.ip_search_address(query)
+    match = query.to_s.match(IP_SEARCH)
+    match && match[1]
+  end
+
+  # Builds the paginated collection for the users index, supporting an
+  # admin-only "ip:1.2.3.4" lookup and the "lately" recent-visitors filter.
+  def self.browse(search:, filter:, page:, ip_search: false, per_page: 40)
+    scope =
+      if ip_search && (address = ip_search_address(search))
+        where(lastip: address)
+      elsif filter == 'lately'
+        self.search(search).lately
+      else
+        self.search(search)
+      end
+
+    scope.paginate(per_page: per_page, page: page)
   end
 
   def self.refadmins

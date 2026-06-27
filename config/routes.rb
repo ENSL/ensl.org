@@ -119,14 +119,12 @@ Rails.application.routes.draw do
   # Users: resourceful + extra member/collection actions
   resources :users do
     collection do
-      get :forgot
-      post :forgot
-      get  :recover
-      # simple session-style endpoints (non-REST) kept under users for legacy
-      post :login
-      post :logout
-      get  :login
-      get  :logout
+      get :recover
+      # Session management lives in SessionsController; these legacy /users/*
+      # paths are preserved for backwards compatibility and rate-limiting.
+      match :login,  to: 'sessions#login',  via: %i[get post]
+      match :logout, to: 'sessions#logout', via: %i[get post]
+      match :forgot, to: 'sessions#forgot', via: %i[get post]
     end
     member do
       get :agenda
@@ -140,7 +138,7 @@ Rails.application.routes.draw do
 
   # OmniAuth callback — accept GET (provider redirects) and POST (some setups)
   # Disallow format extensions to avoid cross-origin JS embedding attempts.
-  match 'auth/:provider/callback', to: 'users#callback', via: %i[get post], format: false
+  match 'auth/:provider/callback', to: 'sessions#callback', via: %i[get post], format: false
 
   resources :locks, only: %i[create destroy]
   resources :contesters, except: %i[index new]

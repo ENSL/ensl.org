@@ -27,7 +27,7 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
   it 'builds and caches a new user when steam account not present' do
     OmniAuth.config.mock_auth[:steam] = auth_hash
     # avoid rendering the full new-user view (which may call route helpers)
-    allow_any_instance_of(UsersController).to receive(:render).and_return(true)
+    allow_any_instance_of(SessionsController).to receive(:render).and_return(true)
 
     post '/auth/steam/callback'
 
@@ -39,7 +39,7 @@ RSpec.describe 'Steam OmniAuth callback', type: :request do
 
   it 'hydrates the registration form from the cached user created by the callback' do
     OmniAuth.config.mock_auth[:steam] = auth_hash
-    allow_any_instance_of(UsersController).to receive(:render).and_call_original
+    allow_any_instance_of(SessionsController).to receive(:render).and_call_original
 
     post '/auth/steam/callback'
     cached = JSON.parse(session[:cached_user])

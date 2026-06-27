@@ -208,6 +208,14 @@ describe User do
       msg = Message.last
       expect(msg.recipient).to eq(u)
     end
+
+    it '.reset_password_for_identity resets only matching username/email pairs' do
+      u = create(:user)
+      allow_any_instance_of(User).to receive(:send_new_password).and_return(true)
+
+      expect(User.reset_password_for_identity(username: u.username, email: u.email)).to be true
+      expect(User.reset_password_for_identity(username: u.username, email: 'wrong@example.com')).to be false
+    end
   end
 
   describe 'validate_team' do
@@ -464,6 +472,28 @@ describe User do
 
         expect(payload[:verified_steamid]).to eq('0:1:123')
         expect(payload[:cached_user]).to eq(subject.to_json)
+      end
+    end
+
+    describe '#apply_login_state!' do
+      it 'reports password upgrades and links a verified steamid' do
+        subject = create(:user, steamid: '0:1:123')
+        subject.password_updated = true
+
+        result = subject.apply_login_state!(verified_steamid: '0:1:456')
+
+        expect(result).to eq(banned: false, password_upgraded: true, steamid_updated: true)
+        expect(subject.reload.steamid).to eq('0:1:456')
+      end
+
+      it 'blocks banned users without mutating their steamid' do
+        subject = create(:user, steamid: '0:1:123')
+        create(:ban, :site, user: subject)
+
+        result = subject.apply_login_state!(verified_steamid: '0:1:456')
+
+        expect(result).to eq(banned: true, password_upgraded: false, steamid_updated: false)
+        expect(subject.reload.steamid).to eq('0:1:123')
       end
     end
   end

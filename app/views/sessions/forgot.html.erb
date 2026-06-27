@@ -3,7 +3,7 @@
 <p>If you do not receive your new password by email, please see the guide <a href="https://www.ensl.org/articles/1042">here</a>.</p>
 <p>Make sure to check your <b>SPAM</b> folder, as many times the mail ends up there.</p>
 
-  <%= form_tag({ controller: 'users', action: 'forgot' }, { class: 'square' }) do %>
+  <%= form_tag(forgot_users_path, { class: 'square' }) do %>
     <div class="fields horizontal">
       <%= label_tag :username %>
       <%= text_field_tag :username %>
