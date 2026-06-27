@@ -111,6 +111,21 @@ class Bracket < ActiveRecord::Base
     true
   end
 
+  # Updates bracket attributes and bracket cell payload in one place.
+  # Reuses existing cell update methods to avoid duplicated logic.
+  def update_with_cells(params, cuser)
+    payload = self.class.update_payload(params, cuser)
+
+    transaction do
+      return false unless update(payload[:bracket])
+
+      update_cells(payload[:cell])
+      update_custom_text(payload[:cell_custom])
+    end
+
+    true
+  end
+
   def can_create?(cuser)
     cuser&.admin?
   end
@@ -125,6 +140,16 @@ class Bracket < ActiveRecord::Base
 
   def self.params(params, _cuser)
     params.require(:bracket).permit(:contest_id, :slots, :name)
+  end
+
+  def self.update_payload(params, cuser)
+    cell_params = params.permit(cell: {}, cell_custom: {})
+
+    {
+      bracket: self.params(params, cuser),
+      cell: cell_params[:cell] || {},
+      cell_custom: cell_params[:cell_custom] || {}
+    }
   end
 
   private

@@ -44,7 +44,7 @@ class ChallengesController < ApplicationController
     raise AccessError unless @challenge.can_destroy? cuser
 
     @challenge.destroy
-    # return_to FIX ME from challenge side
+    # return_to FIXME from challenge side
     render plain: t(:challenges_cleared)
   end
 

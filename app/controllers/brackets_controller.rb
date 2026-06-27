@@ -29,13 +29,7 @@ class BracketsController < ApplicationController
   def update
     raise AccessError unless @bracket.can_update? cuser
 
-    # Handle cell updates - permit nested structure with custom field
-    cell_params = params.permit(cell: {}, cell_custom: {})
-
-    if @bracket.update(Bracket.params(params, cuser))
-      @bracket.update_cells(cell_params[:cell] || {})
-      @bracket.update_custom_text(cell_params[:cell_custom] || {})
-
+    if @bracket.update_with_cells(params, cuser)
       flash[:notice] = t(:brackets_update)
       redirect_to edit_bracket_path(@bracket)
     else
