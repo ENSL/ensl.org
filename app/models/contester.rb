@@ -23,7 +23,7 @@
 #  index_contesters_on_team_id     (team_id)
 #
 
-class Contester < ActiveRecord::Base
+class Contester < ApplicationRecord
   include Extra
 
   TREND_FLAT = 0
@@ -51,9 +51,9 @@ class Contester < ActiveRecord::Base
     where('(contester1_id = contesters.id OR contester2_id = contesters.id)')
   }, through: :contest
 
-  validates_presence_of :team, :contest
-  validates_inclusion_of %i[score win loss draw extra], in: 0..9999, allow_nil: true
-  validates_uniqueness_of :team_id, scope: :contest_id, message: "You can't join same contest twice."
+  validates :team, :contest, presence: true
+  validates %i[score win loss draw extra], inclusion: { in: 0..9999, allow_nil: true }
+  validates :team_id, uniqueness: { scope: :contest_id, message: "You can't join same contest twice." }
 
   # validate_on_create:validate_member_participation
   validate :validate_contest, on: :create
@@ -61,9 +61,7 @@ class Contester < ActiveRecord::Base
 
   before_create :init_variables
 
-  def to_s
-    team.to_s
-  end
+  delegate :to_s, to: :team
 
   def total
     score + extra.to_i

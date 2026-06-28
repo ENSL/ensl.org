@@ -16,12 +16,12 @@
 #  index_options_on_poll_id  (poll_id)
 #
 
-class Option < ActiveRecord::Base
+class Option < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at, :votes
 
-  validates_length_of :option, in: 1..30
+  validates :option, length: { in: 1..30 }
 
   has_many :real_votes, class_name: 'Vote', as: :votable
   belongs_to :poll, optional: true

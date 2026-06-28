@@ -18,7 +18,7 @@
 #
 
 # Model for a discussion forum.
-class Forum < ActiveRecord::Base
+class Forum < ApplicationRecord
   include Extra
 
   BANS = 8

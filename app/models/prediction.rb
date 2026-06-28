@@ -19,15 +19,15 @@
 #  index_predictions_on_user_id   (user_id)
 #
 
-class Prediction < ActiveRecord::Base
+class Prediction < ApplicationRecord
   include Extra
 
   # attr_protected :id, :created_at, :updated_at, :result
 
-  validates_presence_of :match, :user
-  validates_inclusion_of :score1, in: 0..99, message: 'Invalid score'
-  validates_inclusion_of :score2, in: 0..99, message: 'Invalid score'
-  validates_uniqueness_of :match_id, scope: :user_id
+  validates :match, :user, presence: true
+  validates :score1, inclusion: { in: 0..99, message: 'Invalid score' }
+  validates :score2, inclusion: { in: 0..99, message: 'Invalid score' }
+  validates :match_id, uniqueness: { scope: :user_id }
 
   scope :with_contest, -> { includes({ match: :contest }) }
 

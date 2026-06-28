@@ -17,7 +17,7 @@
 #  index_groupers_on_user_id   (user_id)
 #
 
-class Grouper < ActiveRecord::Base
+class Grouper < ApplicationRecord
   # attr_protected :id, :created_at, :updated_at
   attr_accessor :username
 
@@ -31,18 +31,16 @@ class Grouper < ActiveRecord::Base
 
   scope :valid_users, -> { joins(:user).where.not(users: { id: nil }) }
 
-  before_validation :fetch_user, if: proc { |grouper| grouper.username and !grouper.username.empty? }
+  before_validation :fetch_user, if: proc { |grouper| grouper.username.present? }
 
-  def to_s
-    user.to_s
-  end
+  delegate :to_s, to: :user
 
   def display_task
     task.presence || group&.name&.singularize
   end
 
   def fetch_user
-    self.user = User.find_by_username(username)
+    self.user = User.find_by(username: username)
   end
 
   def can_create?(cuser)

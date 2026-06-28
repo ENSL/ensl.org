@@ -21,14 +21,14 @@
 #  index_messages_on_sender_id_and_sender_type        (sender_id,sender_type)
 #
 
-class Message < ActiveRecord::Base
+class Message < ApplicationRecord
   include Extra
 
   # attr_protected :id, :created_at, :updated_at
   attr_accessor :sender_raw
 
-  validates_length_of :title, in: 1..100
-  validates_length_of :text, in: 1..65_000
+  validates :title, length: { in: 1..100 }
+  validates :text, length: { in: 1..65_000 }
 
   scope :ordered, -> { order('created_at DESC') }
 

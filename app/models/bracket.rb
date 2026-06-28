@@ -19,7 +19,7 @@
 # Bracket model for contest brackets. Bracketers are the individual cells in the
 # bracket, which can be linked to either a match or a contester (team).
 # The model includes methods for managing the bracket structure.
-class Bracket < ActiveRecord::Base
+class Bracket < ApplicationRecord
   include Extra
 
   MATCH_PATTERN = /\Amatch_(\d+)\z/
@@ -84,7 +84,7 @@ class Bracket < ActiveRecord::Base
           b.update(match_id: nil, team_id: nil, disabled: false, custom_text: nil)
         elsif val_str == 'disabled'
           b.update(match_id: nil, team_id: nil, disabled: true, custom_text: nil)
-        elsif !val_str.blank? && !val_str.start_with?(SEPARATOR_PREFIX)
+        elsif val_str.present? && !val_str.start_with?(SEPARATOR_PREFIX)
           attributes = parse_cell_value(val_str)
           if attributes
             update_hash = attributes.merge(disabled: false)

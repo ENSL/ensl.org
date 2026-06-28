@@ -19,7 +19,7 @@
 #  index_matchers_on_user_id       (user_id)
 #
 
-class Matcher < ActiveRecord::Base
+class Matcher < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at
@@ -39,7 +39,7 @@ class Matcher < ActiveRecord::Base
   scope :mercs, -> { where(merc: true) }
   scope :of_contester, ->(contester) { where(contester_id: contester.id) }
 
-  validates_presence_of :match, :user
-  validates_uniqueness_of :user_id, scope: :match_id
-  validates_inclusion_of :merc, in: [true, false]
+  validates :match, :user, presence: true
+  validates :user_id, uniqueness: { scope: :match_id }
+  validates :merc, inclusion: { in: [true, false] }
 end

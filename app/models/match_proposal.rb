@@ -14,7 +14,7 @@
 #
 #  index_match_proposals_on_status  (status)
 #
-class MatchProposal < ActiveRecord::Base
+class MatchProposal < ApplicationRecord
   STATUS_PENDING   = 0
   STATUS_REVOKED   = 1
   STATUS_REJECTED  = 2
@@ -29,7 +29,7 @@ class MatchProposal < ActiveRecord::Base
   # has_many :confirmed_by, class_name: 'Team', uniq: true
   # FIXME: attr_accessible :proposed_time, :status
 
-  validates_presence_of :match, :team, :proposed_time
+  validates :match, :team, :proposed_time, presence: true
 
   attr_accessor :actor
 

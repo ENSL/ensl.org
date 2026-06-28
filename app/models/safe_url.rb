@@ -4,7 +4,7 @@ class SafeUrl
   ALLOWED_SCHEMES = %w[http https].freeze
 
   def self.sanitize(url)
-    return '#' unless url.present?
+    return '#' if url.blank?
 
     uri = URI.parse(url.to_s)
     safe_scheme = ALLOWED_SCHEMES.include?(uri.scheme)

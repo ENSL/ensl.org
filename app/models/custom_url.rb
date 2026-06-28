@@ -17,7 +17,7 @@
 #
 
 # FIXME: move this to a gem
-class CustomUrl < ActiveRecord::Base
+class CustomUrl < ApplicationRecord
   MENU_LINKED_NAMES = %w[compmod halloffame rules tutorials].freeze
 
   belongs_to :article, optional: true

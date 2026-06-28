@@ -55,7 +55,7 @@ class MatchesController < ApplicationController
     handle_match_update_failure
   end
 
-  def hltv # rubocop:disable Metrics/AbcSize
+  def hltv
     raise AccessError unless @match.can_update? cuser, [:hltv]
 
     if params[:commit].include?(t(:hltv_send))

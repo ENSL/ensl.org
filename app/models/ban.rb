@@ -24,7 +24,7 @@
 #  index_bans_on_user_id     (user_id)
 #
 
-class Ban < ActiveRecord::Base
+class Ban < ApplicationRecord
   include Extra
 
   TYPE_SITE = 0
@@ -54,7 +54,7 @@ class Ban < ActiveRecord::Base
   belongs_to :user, optional: true
   belongs_to :server, optional: true
 
-  belongs_to :creator, foreign_key: 'creator_id', class_name: 'User', optional: true
+  belongs_to :creator, class_name: 'User', optional: true
 
   def color
     expiry.past? ? 'green' : 'red'
@@ -81,7 +81,7 @@ class Ban < ActiveRecord::Base
 
   def check_user
     if user_name.present?
-      self.user = User.find_by_username(user_name)
+      self.user = User.find_by(username: user_name)
       errors.add :user_name, 'User not found' if user.nil? && ban_type != TYPE_SERVER
     else
       self.user = User.where(steamid: steamid).first

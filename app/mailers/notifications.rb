@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Notifications < ActionMailer::Base
+class Notifications < ApplicationMailer
   default from: 'staff@ensl.org'
 
   def password(user, password)

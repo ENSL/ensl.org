@@ -38,7 +38,7 @@ require 'digest/md5'
 require 'fileutils'
 require 'securerandom'
 
-class DataFile < ActiveRecord::Base
+class DataFile < ApplicationRecord
   include Extra
 
   MEGABYTE = 1_048_576
@@ -67,7 +67,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :related, class_name: 'DataFile', optional: true
   belongs_to :article, optional: true
 
-  validates_length_of %i[title path], maximum: 255
+  validates %i[title path], length: { maximum: 255 }
   validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation_or_update?
 
   attr_accessor :skip_file_validation
@@ -93,7 +93,7 @@ class DataFile < ActiveRecord::Base
   after_save :cache_path_from_uploader, if: -> { location.present? && File.exist?(location) }
 
   def to_s
-    title.present? ? title : File.basename(path.to_s)
+    title.presence || File.basename(path.to_s)
   end
 
   def md5_s
@@ -128,7 +128,7 @@ class DataFile < ActiveRecord::Base
   # Do not call the CarrierWave url method directly in views
   def url
     carrywave_url = name.url
-    return nil unless carrywave_url.present?
+    return nil if carrywave_url.blank?
 
     # Ensure URL starts with /files/
     carrywave_url.start_with?('/files/') ? carrywave_url : "/files#{carrywave_url}"

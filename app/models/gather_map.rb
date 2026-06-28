@@ -15,7 +15,7 @@
 #  index_gather_maps_on_map_id     (map_id)
 #
 
-class GatherMap < ActiveRecord::Base
+class GatherMap < ApplicationRecord
   scope :ordered, -> { order('votes DESC, id DESC') }
 
   belongs_to :gather, optional: true
@@ -24,9 +24,7 @@ class GatherMap < ActiveRecord::Base
 
   before_create :init_variables
 
-  def to_s
-    map.to_s
-  end
+  delegate :to_s, to: :map
 
   def init_variables
     self.votes = 0

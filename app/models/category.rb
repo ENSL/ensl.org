@@ -17,7 +17,7 @@
 #  index_categories_on_sort    (sort)
 #
 
-class Category < ActiveRecord::Base
+class Category < ApplicationRecord
   include Extra
 
   MAIN = 1
@@ -37,7 +37,7 @@ class Category < ActiveRecord::Base
 
   # attr_protected :id, :updated_at, :created_at, :sort
 
-  validates_length_of :name, in: 1..30
+  validates :name, length: { in: 1..30 }
   validate :validate_domain
 
   scope :ordered, -> { order('sort ASC, created_at DESC') }

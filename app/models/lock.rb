@@ -17,7 +17,7 @@
 
 # Model for locks on lockable objects. Used to prevent multiple
 # users from posting in locked threads, matches etc.
-class Lock < ActiveRecord::Base
+class Lock < ApplicationRecord
   include Extra
   belongs_to :lockable, polymorphic: true, optional: true
 

@@ -31,7 +31,7 @@
 #  index_contests_on_winner_id  (winner_id)
 #
 
-class Contest < ActiveRecord::Base
+class Contest < ApplicationRecord
   include Extra
 
   WEIGHT = 30.0
@@ -75,9 +75,9 @@ class Contest < ActiveRecord::Base
   belongs_to :winner, class_name: 'Contester', optional: true
   belongs_to :rules, class_name: 'Article', optional: true
 
-  validates_presence_of :name, :start, :end, :status, :default_time
-  validates_length_of :name, in: 1..50
-  validates_length_of :short_name, in: 1..8, allow_nil: true
+  validates :name, :start, :end, :status, :default_time, presence: true
+  validates :name, length: { in: 1..50 }
+  validates :short_name, length: { in: 1..8, allow_nil: true }
   validate :validate_status
   validate :validate_contest_type
 

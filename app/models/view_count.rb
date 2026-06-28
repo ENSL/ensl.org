@@ -16,7 +16,7 @@
 #  index_view_counts_on_viewable_type_and_viewable_id  (viewable_type,viewable_id)
 #
 
-class ViewCount < ActiveRecord::Base
+class ViewCount < ApplicationRecord
   belongs_to :viewable, polymorphic: true, optional: true
-  validates_uniqueness_of :ip_address, scope: %i[viewable_id viewable_type]
+  validates :ip_address, uniqueness: { scope: %i[viewable_id viewable_type] }
 end

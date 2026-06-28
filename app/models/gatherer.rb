@@ -20,7 +20,7 @@
 #  index_gatherers_on_user_id                   (user_id)
 #
 
-class Gatherer < ActiveRecord::Base
+class Gatherer < ApplicationRecord
   IDLE_TIME = 600
   EJECT_VOTES = 4
 
@@ -99,9 +99,9 @@ class Gatherer < ActiveRecord::Base
   belongs_to :gather, optional: true
   has_many :real_votes, class_name: 'Vote', as: :votable, dependent: :destroy
 
-  validates_uniqueness_of :user_id, scope: :gather_id
-  validates_inclusion_of :team, in: 1..2, allow_nil: true
-  validates_numericality_of :pick_order, only_integer: true, greater_than: 0, allow_nil: true
+  validates :user_id, uniqueness: { scope: :gather_id }
+  validates :team, inclusion: { in: 1..2, allow_nil: true }
+  validates :pick_order, numericality: { only_integer: true, greater_than: 0, allow_nil: true }
   validates :confirm, acceptance: true, unless: proc { |gatherer| gatherer.user.gatherers.count >= 5 }
   validate :validate_username
 
@@ -111,9 +111,7 @@ class Gatherer < ActiveRecord::Base
   after_update :change_turn, unless: proc { |gatherer| gatherer.skip_callbacks == true }
   after_destroy :cleanup_votes
 
-  def to_s
-    user.to_s
-  end
+  delegate :to_s, to: :user
 
   def validate_username
     return unless username
@@ -140,7 +138,7 @@ class Gatherer < ActiveRecord::Base
       return unless gather.gatherers.count >= Gather::NOTIFY
     end
 
-    Profile.where(notify_gather: 1).includes(:user).each do |p|
+    Profile.where(notify_gather: 1).includes(:user).find_each do |p|
       Notifications.gather p.user, gather if p.user&.profile&.notify_pms
     end
   end

@@ -40,7 +40,7 @@
 
 require 'yaml'
 
-class Server < ActiveRecord::Base
+class Server < ApplicationRecord
   include Extra
 
   DOMAIN_HLDS = 0
@@ -54,15 +54,15 @@ class Server < ActiveRecord::Base
 
   # attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
-  validates_length_of %i[name dns], in: 1..30
-  validates_length_of :password, maximum: 30, allow_blank: true
-  validates_length_of :description, maximum: 255, allow_blank: true
-  validates_format_of :ip, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/
-  validates_format_of :port, with: /\A[0-9]{1,5}\z/
-  validates_format_of :reservation, with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/,
-                                    allow_nil: true
-  validates_format_of :pwd, with: /\A[A-Za-z0-9_-]*\z/, allow_nil: true
-  validates_inclusion_of :status, in: [STATUS_OFFLINE, STATUS_ONLINE]
+  validates %i[name dns], length: { in: 1..30 }
+  validates :password, length: { maximum: 30, allow_blank: true }
+  validates :description, length: { maximum: 255, allow_blank: true }
+  validates :ip, format: { with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/ }
+  validates :port, format: { with: /\A[0-9]{1,5}\z/ }
+  validates :reservation, format: { with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}\z/,
+                                    allow_nil: true }
+  validates :pwd, format: { with: /\A[A-Za-z0-9_-]*\z/, allow_nil: true }
+  validates :status, inclusion: { in: [STATUS_OFFLINE, STATUS_ONLINE] }
 
   scope :ordered, -> { order('name') }
   scope :hlds, -> { where('domain = ?', DOMAIN_HLDS) }
@@ -158,7 +158,7 @@ class Server < ActiveRecord::Base
   end
 
   def self.move(addr, newaddr, newpwd)
-    hltvs.where(reservation => addr).each do |hltv|
+    hltvs.where(reservation => addr).find_each do |hltv|
       hltv.reservation = newaddr
       hltv.pwd = newpwd
       hltv.save!
@@ -166,7 +166,7 @@ class Server < ActiveRecord::Base
   end
 
   def self.stop(addr)
-    hltvs.where(reservation: addr).each do |hltv|
+    hltvs.where(reservation: addr).find_each do |hltv|
       hltv.reservation = nil
       hltv.save!
     end

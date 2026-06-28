@@ -27,9 +27,9 @@ require 'fileutils'
 require 'pathname'
 require 'digest/md5'
 
-ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
+ENV['FILES_ROOT'] ||= Rails.root.join('public/files').to_s
 
-class Directory < ActiveRecord::Base
+class Directory < ApplicationRecord
   include Extra
 
   MAX_FILE_COUNT_MATCH_CANDIDATES = 200
@@ -121,7 +121,7 @@ class Directory < ActiveRecord::Base
 
   def full_title
     Directory.directory_traverse(self).reverse.map do |dir|
-      dir.title.present? ? dir.title : dir.name
+      dir.title.presence || dir.name
     end.join(' » ')
   end
 
@@ -559,7 +559,7 @@ class Directory < ActiveRecord::Base
     return orphaned if orphaned
 
     # Fourth: match by file count (heuristic for moved directories)
-    find_by_file_count(subitem_path)
+    find_by(file_count: subitem_path)
   end
 
   # Find directory with same name that no longer exists on disk

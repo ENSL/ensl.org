@@ -62,27 +62,27 @@
 #  index_profiles_on_user_id  (user_id)
 #
 
-class Profile < ActiveRecord::Base
+class Profile < ApplicationRecord
   include Extra
 
   # attr_protected :user_id, :id, :updated_at, :created_at
 
   belongs_to :user, optional: true
 
-  validates_length_of :msn, maximum: 50
-  validates_format_of :msn, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i, allow_blank: true
-  validates_format_of :icq, with: /\A[0-9-]{1,9}\z/, allow_blank: true
-  validates_length_of :irc, maximum: 20
-  validates_length_of :web, maximum: 100
-  validates_length_of :town, maximum: 20
-  validates_length_of %i[singleplayer multiplayer food beverage hobby music book movie tvseries],
-                      maximum: 120
-  validates_length_of %i[res sensitivity monitor_hz], maximum: 30
-  validates_length_of %i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor mouse mouse_pad keyboard head_phones speakers],
-                      maximum: 100
-  validates_length_of :signature, maximum: 255
-  validates_length_of :achievements, maximum: 65_000
-  validates_format_of :steam_profile, with: /\A[A-Za-z0-9_\-+]{1,40}\z/, allow_blank: true
+  validates :msn, length: { maximum: 50 }
+  validates :msn, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i, allow_blank: true }
+  validates :icq, format: { with: /\A[0-9-]{1,9}\z/, allow_blank: true }
+  validates :irc, length: { maximum: 20 }
+  validates :web, length: { maximum: 100 }
+  validates :town, length: { maximum: 20 }
+  validates %i[singleplayer multiplayer food beverage hobby music book movie tvseries],
+            length: { maximum: 120 }
+  validates %i[res sensitivity monitor_hz], length: { maximum: 30 }
+  validates %i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor mouse mouse_pad keyboard head_phones speakers],
+            length: { maximum: 100 }
+  validates :signature, length: { maximum: 255 }
+  validates :achievements, length: { maximum: 65_000 }
+  validates :steam_profile, format: { with: /\A[A-Za-z0-9_\-+]{1,40}\z/, allow_blank: true }
 
   validates :stream, length: { maximum: 255 }
 

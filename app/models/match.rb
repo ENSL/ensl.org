@@ -47,7 +47,7 @@
 #  index_matches_on_week_id            (week_id)
 #
 
-class Match < ActiveRecord::Base
+class Match < ApplicationRecord
   include Extra
 
   MATCH_LENGTH = 7200
@@ -137,7 +137,7 @@ class Match < ActiveRecord::Base
 
   before_create :set_hltv
   after_create :send_notifications
-  before_save :set_motm, if: proc { |match| match.motm_name && !match.motm_name.empty? }
+  before_save :set_motm, if: proc { |match| match.motm_name.present? }
   before_update :reset_contest, if: proc { |match|
     match.will_save_change_to_score1? || match.will_save_change_to_score2?
   }
@@ -229,7 +229,7 @@ class Match < ActiveRecord::Base
   end
 
   def send_notifications
-    Profile.where('notify_any_match', 1).includes(:user).each do |p|
+    Profile.where('notify_any_match', 1).includes(:user).find_each do |p|
       Notifications.match p.user, self if p.user
     end
     contester2.team.teamers.active.each do |teamer|
@@ -238,7 +238,7 @@ class Match < ActiveRecord::Base
   end
 
   def set_motm
-    self.motm = User.find_by_username(motm_name)
+    self.motm = User.find_by(username: motm_name)
   end
 
   def set_predictions
@@ -472,7 +472,7 @@ class Match < ActiveRecord::Base
     matchers_attributes = match_params[:matchers_attributes] || match_params['matchers_attributes']
     return unless matchers_attributes.respond_to?(:keys)
 
-    matchers_attributes.keys.each do |key|
+    matchers_attributes.each_key do |key|
       matcher = matchers_attributes[key]
       next unless matcher.respond_to?(:[])
 
@@ -487,7 +487,7 @@ class Match < ActiveRecord::Base
 
       next unless user_id.to_i.zero?
 
-      user = User.find_by_username(user_id)
+      user = User.find_by(username: user_id)
       matcher['user_id'] = user.id if user
     end
   end

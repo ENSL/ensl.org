@@ -18,7 +18,7 @@
 #  index_topics_on_user_id   (user_id)
 #
 
-class Topic < ActiveRecord::Base
+class Topic < ApplicationRecord
   POSTS_PAGE = 30
   STATE_NORMAL = 0
   STATE_STICKY = 1
@@ -56,9 +56,9 @@ class Topic < ActiveRecord::Base
       .order(Arel.sql('last_post_at DESC'))
   }
 
-  validates_presence_of :user_id, :forum_id
-  validates_length_of :title, in: 1..50
-  validates_length_of :first_post, in: 1..10_000, on: :create
+  validates :user_id, :forum_id, presence: true
+  validates :title, length: { in: 1..50 }
+  validates :first_post, length: { in: 1..10_000, on: :create }
 
   after_create :make_post
 
@@ -104,7 +104,7 @@ class Topic < ActiveRecord::Base
   end
 
   def cached_view_count
-    Rails.cache.fetch(cache_key('view_count'), expires_in: 1.hours) do
+    Rails.cache.fetch(cache_key('view_count'), expires_in: 1.hour) do
       view_count
     end
   end

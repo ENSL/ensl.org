@@ -34,7 +34,7 @@
 # A challenge is created by a team leader to challenge another team to a match.
 # It contains the proposed match time, map, server, and response of the challenged team.
 # If accepted, a match is created with the same parameters as the challenge.
-class Challenge < ActiveRecord::Base
+class Challenge < ApplicationRecord
   include Extra
 
   STATUS_PENDING = 0

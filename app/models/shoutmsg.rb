@@ -18,13 +18,13 @@
 #  index_shoutmsgs_on_user_id                          (user_id)
 #
 
-class Shoutmsg < ActiveRecord::Base
+class Shoutmsg < ApplicationRecord
   include Extra
 
   # attr_protected :id, :created_at, :updated_at, :user_id
 
-  validates_length_of :text, in: 1..100
-  validates_presence_of :user
+  validates :text, length: { in: 1..100 }
+  validates :user, presence: true
 
   belongs_to :user, optional: true
   belongs_to :shoutable, polymorphic: true, optional: true
@@ -54,7 +54,7 @@ class Shoutmsg < ActiveRecord::Base
   def self.flood?(cuser, type = nil, id = nil)
     return false if of_object(type, id).count < 3
 
-    of_object(type, id).all(order: 'created_at DESC', limit: 10).each do |msg|
+    of_object(type, id).all(order: 'created_at DESC', limit: 10).find_each do |msg|
       return false if cuser != msg.user
     end
     true

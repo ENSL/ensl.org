@@ -24,7 +24,7 @@
 #  index_articles_on_user_id                (user_id)
 #
 
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   include Exceptions
   include Extra
 
@@ -70,10 +70,10 @@ class Article < ActiveRecord::Base
   has_many :files, class_name: 'DataFile', dependent: :destroy
   has_many :view_counts, as: :viewable, dependent: :destroy
 
-  validates_length_of :title, in: 1..50
-  validates_length_of :text, in: 1..16_000_000
+  validates :title, length: { in: 1..50 }
+  validates :text, length: { in: 1..16_000_000 }
 
-  validates_presence_of :user, :category
+  validates :user, :category, presence: true
   validate :validate_status
 
   before_validation :init_variables, if: proc(&:new_record?)
@@ -136,11 +136,11 @@ class Article < ActiveRecord::Base
 
     case category.domain
     when Category::DOMAIN_NEWS
-      Profile.includes(:user).where('notify_news = 1').each do |p|
+      Profile.includes(:user).where('notify_news = 1').find_each do |p|
         Notifications.news p.user, self if p.user
       end
     when Category::DOMAIN_ARTICLES
-      Profile.includes(:user).where('notify_articles = 1').each do |p|
+      Profile.includes(:user).where('notify_articles = 1').find_each do |p|
         Notifications.article p.user, self if p.user
       end
     end

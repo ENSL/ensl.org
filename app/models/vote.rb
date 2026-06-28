@@ -16,14 +16,14 @@
 #  index_votes_on_votable_id_and_votable_type  (votable_id,votable_type)
 #
 
-class Vote < ActiveRecord::Base
+class Vote < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at, :user_id
 
   validates :user_id,
             uniqueness: { scope: %i[votable_id votable_type], message: 'You have already voted for this choice' }
-  validates_presence_of :user_id, :votable_id, :votable_type
+  validates :user_id, :votable_id, :votable_type, presence: true
 
   belongs_to :user, optional: true
   belongs_to :votable, polymorphic: true, optional: true

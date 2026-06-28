@@ -5,7 +5,7 @@
 require 'English'
 class DirectoryReconciliationService
   PROGRESS_LOG_EVERY = 500
-  LOCKFILE_PATH = Rails.root.join('tmp', 'directory_reconciliation.lock')
+  LOCKFILE_PATH = Rails.root.join('tmp/directory_reconciliation.lock')
 
   class TeeIO
     def initialize(*targets)

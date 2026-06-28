@@ -21,7 +21,7 @@
 #  index_comments_on_user_id                              (user_id)
 #
 
-class Comment < ActiveRecord::Base
+class Comment < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at, :user_id
@@ -35,8 +35,8 @@ class Comment < ActiveRecord::Base
   belongs_to :user, optional: true
   belongs_to :commentable, polymorphic: true, optional: true
 
-  validates_presence_of :commentable, :user
-  validates_length_of :text, in: 1..10_000
+  validates :commentable, :user, presence: true
+  validates :text, length: { in: 1..10_000 }
 
   before_save :parse_text
 

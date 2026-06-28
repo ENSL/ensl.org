@@ -20,13 +20,13 @@
 #  index_weeks_on_map2_id     (map2_id)
 #
 
-class Week < ActiveRecord::Base
+class Week < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at
 
-  validates_presence_of :contest, :map1, :map2
-  validates_length_of :name, in: 1..30
+  validates :contest, :map1, :map2, presence: true
+  validates :name, length: { in: 1..30 }
 
   scope :ordered, -> { order('start_date ASC') }
 

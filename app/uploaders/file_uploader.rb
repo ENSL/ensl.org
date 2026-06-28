@@ -4,7 +4,7 @@ class FileUploader < CarrierWave::Uploader::Base
   # Configure storage root to use FILES_ROOT env var
   # This allows files to be stored in public/files (dev) or external path (production)
   def root
-    ENV['FILES_ROOT'] ||= File.join(Rails.root, 'public', 'files')
+    ENV['FILES_ROOT'] ||= Rails.root.join('public/files').to_s
   end
 
   # Override the directory where uploaded files will be stored.

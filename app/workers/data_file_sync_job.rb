@@ -10,7 +10,7 @@ class DataFileSyncJob
 
   sidekiq_options queue: :default, retry: 5
 
-  CONFIG_PATH = Rails.root.join('config', 'data_file_sync_servers.json')
+  CONFIG_PATH = Rails.root.join('config/data_file_sync_servers.json')
 
   def perform(_options = {})
     server_configs = load_server_configs

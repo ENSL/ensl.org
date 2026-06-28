@@ -19,15 +19,15 @@
 #
 
 # Model for forum posts
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
   scope :basic, -> { includes([{ user: %i[team profile] }, :topic]) }
 
-  validates_presence_of :topic, :user
-  validates_length_of :text, in: 1..10_000
+  validates :topic, :user, presence: true
+  validates :text, length: { in: 1..10_000 }
 
   before_save :parse_text
   after_destroy :remove_topics, if: proc { |post| post.topic.posts.count.zero? }

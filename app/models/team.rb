@@ -24,7 +24,7 @@
 #  index_teams_on_founder_id  (founder_id)
 #
 
-class Team < ActiveRecord::Base
+class Team < ApplicationRecord
   include Extra
 
   LOGOS = 'logos'
@@ -33,12 +33,12 @@ class Team < ActiveRecord::Base
 
   # attr_protected :id, :active, :founder_id, :created_at, :updated_at
 
-  validates_presence_of :name, :tag
-  validates_length_of :name, :tag, in: 2..20
-  validates_length_of :irc, maximum: 60, allow_blank: true
-  validates_length_of :web, maximum: 50, allow_blank: true
-  validates_format_of :country, with: /\A[A-Z]{2}\z/, allow_blank: true
-  validates_length_of %i[comment recruiting], in: 0..75, allow_blank: true
+  validates :name, :tag, presence: true
+  validates :name, :tag, length: { in: 2..20 }
+  validates :irc, length: { maximum: 60, allow_blank: true }
+  validates :web, length: { maximum: 50, allow_blank: true }
+  validates :country, format: { with: /\A[A-Z]{2}\z/, allow_blank: true }
+  validates %i[comment recruiting], length: { in: 0..75, allow_blank: true }
 
   scope :with_teamers_num, lambda { |num|
     select('teams.*, COUNT(T.id) AS teamers_num')
@@ -176,7 +176,7 @@ class Team < ActiveRecord::Base
   end
 
   def apply_member_rank_updates!(actor:, rank_params:, comment_params: nil)
-    return unless rank_params.present?
+    return if rank_params.blank?
 
     actor_rank = actor.teamers.active.of_team(self).first&.rank
 

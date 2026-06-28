@@ -14,7 +14,7 @@
 #  category_id :integer
 #
 
-class Map < ActiveRecord::Base
+class Map < ApplicationRecord
   include Extra
 
   # attr_protected :id, :updated_at, :created_at, :deleted
@@ -27,8 +27,8 @@ class Map < ActiveRecord::Base
   scope :classic, -> { where("name LIKE 'ns_%'") }
   scope :of_category, ->(category) { where(category_id: category.id) }
 
-  validates_length_of :name, maximum: 20
-  validates_length_of :download, maximum: 100
+  validates :name, length: { maximum: 20 }
+  validates :download, length: { maximum: 100 }
 
   mount_uploader :picture, MapUploader
 

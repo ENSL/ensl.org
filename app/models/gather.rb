@@ -28,7 +28,7 @@
 #  index_gathers_on_server_id    (server_id)
 #
 
-class Gather < ActiveRecord::Base
+class Gather < ApplicationRecord
   STATE_RUNNING = 0
   STATE_VOTING = 3
   STATE_PICKING = 1

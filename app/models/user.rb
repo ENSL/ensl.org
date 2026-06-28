@@ -47,7 +47,7 @@ class SteamIdValidator < ActiveModel::Validator
   end
 end
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Extra
 
   VERIFICATION_TIME = 604_800
@@ -148,21 +148,21 @@ class User < ActiveRecord::Base
 
   before_validation :update_password
 
-  validates_uniqueness_of :username, :email, case_sensitive: false
-  validates_presence_of :email
+  validates :username, :email, uniqueness: { case_sensitive: false }
+  validates :email, presence: true
   validate :steamid_uniqueness
-  validates_length_of :firstname, in: 1..15, allow_blank: true
-  validates_length_of :lastname, in: 1..25, allow_blank: true
-  validates_length_of :username, in: 1..30
-  validates_format_of :username, with: /\A[A-Za-z0-9_\-+]{1,30}\Z/
-  validates_presence_of :raw_password, on: :create
-  validates_length_of :email, maximum: 50
-  validates_format_of :email, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_length_of :steamid, maximum: 30
+  validates :firstname, length: { in: 1..15, allow_blank: true }
+  validates :lastname, length: { in: 1..25, allow_blank: true }
+  validates :username, length: { in: 1..30 }
+  validates :username, format: { with: /\A[A-Za-z0-9_\-+]{1,30}\Z/ }
+  validates :raw_password, presence: { on: :create }
+  validates :email, length: { maximum: 50 }
+  validates :email, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+  validates :steamid, length: { maximum: 30 }
   validates_with SteamIdValidator
   # validates_format_of :steamid, :with => /\A(STEAM_)?[0-5]:[01]:\d+\Z/
-  validates_length_of :time_zone, maximum: 100, allow_blank: true, allow_nil: true
-  validates_inclusion_of [:public_email], in: [true, false], allow_nil: true
+  validates :time_zone, length: { maximum: 100, allow_blank: true }
+  validates [:public_email], inclusion: { in: [true, false], allow_nil: true }
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team
 
@@ -520,7 +520,7 @@ class User < ActiveRecord::Base
     self.public_email = false
     self.time_zone = 'Amsterdam'
     generate_password if !raw_password && new_record?
-    build_profile unless profile&.present?
+    build_profile if profile.blank?
     # Email is required; do not auto-fill when blank.
   end
 

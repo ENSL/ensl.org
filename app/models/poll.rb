@@ -17,14 +17,14 @@
 #  index_polls_on_user_id  (user_id)
 #
 
-class Poll < ActiveRecord::Base
+class Poll < ApplicationRecord
   include Extra
 
   default_scope -> { order('created_at DESC') }
 
   # attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
-  validates_length_of :question, in: 1..50
+  validates :question, length: { in: 1..50 }
   # validates_datetime :end_date
 
   belongs_to :user, optional: true

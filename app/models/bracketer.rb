@@ -21,7 +21,7 @@
 
 # Model for a bracketer, which represents a position in a bracket.
 # It can be associated with a match and a team (contester).
-class Bracketer < ActiveRecord::Base
+class Bracketer < ApplicationRecord
   include Exceptions
   include Extra
 

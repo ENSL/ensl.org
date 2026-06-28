@@ -23,7 +23,7 @@
 #  index_issues_on_category_id  (category_id)
 #
 
-class Issue < ActiveRecord::Base
+class Issue < ApplicationRecord
   include Extra
 
   STATUS_OPEN = 0
@@ -55,8 +55,8 @@ class Issue < ActiveRecord::Base
     where(qstring, allowed_categories(cuser))
   }
 
-  validates_length_of :title, in: 1..50
-  validates_length_of :text, in: 1..65_000
+  validates :title, length: { in: 1..50 }
+  validates :text, length: { in: 1..65_000 }
   validate :validate_status
 
   before_validation :init_variables, if: proc(&:new_record?)
@@ -90,7 +90,7 @@ class Issue < ActiveRecord::Base
   end
 
   def init_variables
-    self.assigned = User.find_by_username(assigned_name) if assigned_name
+    self.assigned = User.find_by(username: assigned_name) if assigned_name
     self.status = STATUS_OPEN unless status
   end
 

@@ -17,7 +17,7 @@
 #  index_forumers_on_group_id  (group_id)
 #
 
-class Forumer < ActiveRecord::Base
+class Forumer < ApplicationRecord
   ACCESS_READ = 0
   ACCESS_REPLY = 1
   ACCESS_TOPIC = 2
@@ -26,9 +26,9 @@ class Forumer < ActiveRecord::Base
 
   scope :access, ->(level) { where('access >= ?', level) }
 
-  validates_uniqueness_of :group_id, scope: %i[forum_id access]
-  validates_presence_of %i[group_id forum_id]
-  validates_inclusion_of :access, in: 0..2
+  validates :group_id, uniqueness: { scope: %i[forum_id access] }
+  validates :group_id, :forum_id, presence: true
+  validates :access, inclusion: { in: 0..2 }
 
   belongs_to :forum, optional: true
   belongs_to :group, optional: true
@@ -39,9 +39,7 @@ class Forumer < ActiveRecord::Base
     self.access ||= ACCESS_READ
   end
 
-  def accesses
-    self.class.accesses
-  end
+  delegate :accesses, to: :class
 
   def self.accesses
     { ACCESS_READ => 'Read', ACCESS_REPLY => 'Reply', ACCESS_TOPIC => 'Post a Topic' }

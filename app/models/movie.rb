@@ -31,7 +31,7 @@
 require 'open3'
 require 'digest/md5'
 
-class Movie < ActiveRecord::Base
+class Movie < ApplicationRecord
   include Extra
 
   MOVIES = 'movies'
@@ -82,9 +82,7 @@ class Movie < ActiveRecord::Base
   # Can take too much time.
   # after_save :make_preview, unless: :web_friendly
 
-  def to_s
-    file.to_s
-  end
+  delegate :to_s, to: :file
 
   def file=(value)
     if value.nil? || value.is_a?(DataFile)
@@ -152,14 +150,14 @@ class Movie < ActiveRecord::Base
   end
 
   def assign_user_from_user_name
-    return unless user_name.present?
+    return if user_name.blank?
 
     user = User.find_by(username: user_name)
     self.user = user if user
   end
 
   def snapshot_path(_index = 0)
-    File.join(Rails.root, 'public', 'local', 'snapshots', "#{id}.png")
+    Rails.root.join('public', 'local', 'snapshots', "#{id}.png").to_s
   end
 
   def snapshot_url(_index = 0)

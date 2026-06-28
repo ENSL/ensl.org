@@ -18,7 +18,7 @@
 #  index_teamers_on_user_id  (user_id)
 #
 
-class Teamer < ActiveRecord::Base
+class Teamer < ApplicationRecord
   include Extra
 
   RANK_REMOVED = -2
@@ -29,9 +29,9 @@ class Teamer < ActiveRecord::Base
 
   # attr_protected :id, :created_at, :updated_at, :version
 
-  validates_length_of :comment, in: 0..15, allow_blank: true
-  validates_uniqueness_of :user_id, scope: %i[team_id rank]
-  validates_presence_of :user, :team
+  validates :comment, length: { in: 0..15, allow_blank: true }
+  validates :user_id, uniqueness: { scope: %i[team_id rank] }
+  validates :user, :team, presence: true
   # validate_on_create:validate_team
   # validate_on_create:validate_contests
   validate :validate_team
@@ -58,9 +58,7 @@ class Teamer < ActiveRecord::Base
 
   before_create :init_variables
 
-  def to_s
-    user.to_s
-  end
+  delegate :to_s, to: :user
 
   def ranks
     { RANK_JOINER => 'Joining', RANK_MEMBER => 'Member', RANK_DEPUTEE => 'Deputee', RANK_LEADER => 'Leader' }

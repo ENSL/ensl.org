@@ -12,16 +12,14 @@
 #  server_id  :integer
 #
 
-class GatherServer < ActiveRecord::Base
+class GatherServer < ApplicationRecord
   scope :ordered, -> { order('votes DESC') }
 
   belongs_to :gather, optional: true
   belongs_to :server, optional: true
   has_many :real_votes, class_name: 'Vote', as: :votable
 
-  def to_s
-    server.to_s
-  end
+  delegate :to_s, to: :server
 
   def before_create
     self.votes = 0

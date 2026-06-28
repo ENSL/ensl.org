@@ -16,7 +16,7 @@
 #
 
 # Group model for user groups such as Admins, Referees, Casters, etc.
-class Group < ActiveRecord::Base
+class Group < ApplicationRecord
   include Extra
 
   ADMINS = 1
