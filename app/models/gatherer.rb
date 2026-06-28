@@ -47,7 +47,8 @@ class Gatherer < ApplicationRecord
   scope :best,
         lambda { |gather|
           {
-            select: 'u.id, u.username, (COUNT(*) / (SELECT COUNT(*) FROM gatherers g3 WHERE g3.user_id = u.id)) AS skill, g4.id',
+            select: 'u.id, u.username, ' \
+                    '(COUNT(*) / (SELECT COUNT(*) FROM gatherers g3 WHERE g3.user_id = u.id)) AS skill, g4.id',
             from: 'gathers g1',
             joins: "LEFT JOIN gatherers g2 ON g1.captain1_id = g2.id OR g1.captain2_id = g2.id
   LEFT JOIN users u ON g2.user_id = u.id
@@ -208,8 +209,9 @@ class Gatherer < ApplicationRecord
 
   def update_for_actor(raw_params, actor)
     gatherer_params = self.class.params(raw_params, actor)
-    return UpdateForActorResult.new(authorized: false, updated: false, errors: errors) unless can_update?(actor,
-                                                                                                          gatherer_params)
+    unless can_update?(actor, gatherer_params)
+      return UpdateForActorResult.new(authorized: false, updated: false, errors: errors)
+    end
 
     updated = update(gatherer_params)
     Gathers::Broadcaster.call(gather) if updated
@@ -220,7 +222,7 @@ class Gatherer < ApplicationRecord
     status_value = self.class.status_from_key(status_key)
     return false unless status_value
 
-    update_column(:status, status_value)
+    update!(status: status_value)
     Gathers::Broadcaster.call(gather)
     true
   end
@@ -231,7 +233,7 @@ class Gatherer < ApplicationRecord
   def reactivate_if_returning!
     return unless status == STATE_LEAVING
 
-    update_column(:status, STATE_ACTIVE)
+    update!(status: STATE_ACTIVE)
   end
 
   def can_create?(cuser, _params = {})
@@ -253,8 +255,9 @@ class Gatherer < ApplicationRecord
       return false
 
     end
-    return false unless team.nil? \
-      && (((gather.captain1&.user == cuser) && (gather.turn == 1)) || ((gather.captain2&.user == cuser) && (gather.turn == 2)))
+    captain_turn = ((gather.captain1&.user == cuser) && (gather.turn == 1)) ||
+                   ((gather.captain2&.user == cuser) && (gather.turn == 2))
+    return false unless team.nil? && captain_turn
     return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 2) && (gather.gatherers.team(2).count < 3)
     return false if (gather.turn == 2) && (gather.gatherers.team(1).count < 4) && (gather.gatherers.team(2).count == 3)
     return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 4) && (gather.gatherers.team(2).count < 5)

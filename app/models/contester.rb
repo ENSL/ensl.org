@@ -33,8 +33,8 @@ class Contester < ApplicationRecord
   # attr_protected :id, :updated_at, :created_at, :trend
   attr_accessor :user
 
-  belongs_to :team, optional: true
-  belongs_to :contest, optional: true
+  belongs_to :team, optional: true, inverse_of: :contesters
+  belongs_to :contest, optional: true, inverse_of: :contesters
 
   scope :active, -> { includes(:team).where(active: true) }
   # ranked is used for ladder. lower score the higher the rank
@@ -45,8 +45,15 @@ class Contester < ApplicationRecord
   scope :chronological, -> { order('created_at DESC') }
   scope :of_contest, ->(contest) { where('contesters.contest_id', contest.id) }
 
-  has_many :challenges_sent, class_name: 'Challenge', foreign_key: 'contester1_id', dependent: :nullify
-  has_many :challenges_received, class_name: 'Challenge', foreign_key: 'contester2_id', dependent: :nullify
+  has_many :challenges_sent, class_name: 'Challenge', foreign_key: 'contester1_id', dependent: :nullify,
+                             inverse_of: :contester1
+  has_many :challenges_received, class_name: 'Challenge', foreign_key: 'contester2_id', dependent: :nullify,
+                                 inverse_of: :contester2
+  has_many :bracketers, foreign_key: 'team_id', inverse_of: :contester, dependent: :nullify
+  has_many :matches_as_contester1, class_name: 'Match', foreign_key: 'contester1_id', inverse_of: :contester1,
+                                   dependent: :nullify
+  has_many :matches_as_contester2, class_name: 'Match', foreign_key: 'contester2_id', inverse_of: :contester2,
+                                   dependent: :nullify
   has_many :matches, lambda {
     where('(contester1_id = contesters.id OR contester2_id = contesters.id)')
   }, through: :contest
@@ -164,7 +171,7 @@ class Contester < ApplicationRecord
   end
 
   def destroy
-    update_attribute(:active, false)
+    update!(active: false)
   end
 
   def can_create?(cuser, params = {})

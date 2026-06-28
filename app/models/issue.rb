@@ -46,7 +46,8 @@ class Issue < ApplicationRecord
 
   # scope :unread_by,
   #  lambda { |user| {
-  #  :joins => "LEFT JOIN readings ON readable_type = 'Issue' AND readable_id = issues.id AND readings.user_id = #{user.id}",
+  #  :joins => "LEFT JOIN readings ON readable_type = 'Issue' " \
+  #            "AND readable_id = issues.id AND readings.user_id = #{user.id}",
   #  :conditions => "readings.user_id IS NULL"} }
   scope :with_status, ->(s) { where(status: s) }
   scope :visible_to, lambda { |cuser|

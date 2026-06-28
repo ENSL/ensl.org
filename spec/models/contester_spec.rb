@@ -178,9 +178,9 @@ RSpec.describe Contester, type: :model do
       expect(contester.matches_for_contester).to eq :found
     end
 
-    it 'calls update_attribute on destroy' do
+    it 'calls update! on destroy' do
       contester = build(:contester)
-      expect(contester).to receive(:update_attribute).with(:active, false)
+      expect(contester).to receive(:update!).with(active: false)
       contester.destroy
     end
 

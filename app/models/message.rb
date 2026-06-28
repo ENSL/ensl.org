@@ -37,7 +37,8 @@ class Message < ApplicationRecord
   #  lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
   # scope :unread_by,
   #  lambda { |user| {
-  # :joins => "LEFT JOIN readings ON readable_type = 'Message' AND readable_id = messages.id AND readings.user_id = #{user.id}",
+  # :joins => "LEFT JOIN readings ON readable_type = 'Message' " \
+  #           "AND readable_id = messages.id AND readings.user_id = #{user.id}",
   # :conditions => "readings.user_id IS NULL"} }
 
   belongs_to :sender, polymorphic: true, optional: true
@@ -56,11 +57,15 @@ class Message < ApplicationRecord
     if sender_type == 'System'
       Message.where(recipient_id: recipient.id, sender_type: 'System')
     else
-      Message.find_by_sql ["
-                         (SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?)
-                         UNION
-                         (SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?)
-                         ORDER BY id", sender.id, recipient.id, recipient.id, sender.id]
+      Message.find_by_sql [
+        '(SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? ' \
+        "AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?) " \
+        'UNION ' \
+        '(SELECT `messages`.* FROM `messages` WHERE `messages`.`sender_id` = ? ' \
+        "AND `messages`.`sender_type` = 'User' AND `messages`.`recipient_id` = ?) " \
+        'ORDER BY id',
+        sender.id, recipient.id, recipient.id, sender.id
+      ]
     end
   end
 

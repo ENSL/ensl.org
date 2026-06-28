@@ -27,7 +27,7 @@ class Bracketer < ApplicationRecord
 
   belongs_to :bracket
   belongs_to :match, optional: true
-  belongs_to :contester, foreign_key: 'team_id', optional: true
+  belongs_to :contester, foreign_key: 'team_id', optional: true, inverse_of: :bracketers
 
   scope :pos, ->(row, col) { where(row: row, column: col) }
 

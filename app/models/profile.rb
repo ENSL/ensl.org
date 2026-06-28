@@ -78,7 +78,8 @@ class Profile < ApplicationRecord
   validates(*%i[singleplayer multiplayer food beverage hobby music book movie tvseries],
             length: { maximum: 120 })
   validates(*%i[res sensitivity monitor_hz], length: { maximum: 30 })
-  validates(*%i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor mouse mouse_pad keyboard head_phones speakers],
+  validates(*%i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor
+                mouse mouse_pad keyboard head_phones speakers],
             length: { maximum: 100 })
   validates :signature, length: { maximum: 255 }
   validates :achievements, length: { maximum: 65_000 }

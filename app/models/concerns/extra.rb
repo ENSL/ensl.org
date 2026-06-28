@@ -48,8 +48,10 @@ module Extra
       (objects = objects.order(column)).each_with_index do |item, i|
         if (item.id == id) && n.positive?
           old_position = item[column]
+          # rubocop:disable Rails/SkipsModelValidations
           item.update_column(column, objects[i - 1][column])
           objects[i - 1].update_column(column, old_position)
+          # rubocop:enable Rails/SkipsModelValidations
         end
         n += 1
       end
@@ -60,8 +62,10 @@ module Extra
       (objects = objects.order(column)).each_with_index do |item, _i|
         if (item.id == id) && (n < (objects.length - 1))
           old_position = item[column]
+          # rubocop:disable Rails/SkipsModelValidations
           item.update_column(column, objects[n + 1][column])
           objects[n + 1].update_column(column, old_position)
+          # rubocop:enable Rails/SkipsModelValidations
         end
         n += 1
       end

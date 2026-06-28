@@ -38,7 +38,7 @@ class Forum < ApplicationRecord
   has_many :posts, through: :topics
   has_many :forumers, dependent: :destroy
   has_many :groups, through: :forumers
-  has_one :forumer
+  has_one :forumer, dependent: :destroy, inverse_of: :forum
   belongs_to :category, optional: true
 
   after_create :update_position
@@ -50,7 +50,7 @@ class Forum < ApplicationRecord
   end
 
   def update_position
-    update_column(:position, id)
+    update!(position: id)
   end
 
   def can_show?(cuser)

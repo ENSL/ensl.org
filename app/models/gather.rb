@@ -137,7 +137,7 @@ class Gather < ApplicationRecord
 
   def bump_version!
     with_lock do
-      increment!(:version)
+      update!(version: version.to_i + 1)
     end
   end
 
@@ -173,14 +173,20 @@ class Gather < ApplicationRecord
   end
 
   def check_captains
-    changed = (respond_to?(:saved_change_to_captain1_id?) ? (saved_change_to_captain1_id? || saved_change_to_captain2_id?) : (captain1_id_changed? || captain2_id_changed?))
+    changed = if respond_to?(:saved_change_to_captain1_id?)
+                saved_change_to_captain1_id? || saved_change_to_captain2_id?
+              else
+                captain1_id_changed? || captain2_id_changed?
+              end
     return unless changed
 
     # Ensure attributes persisted before locking and updating other records
     reload
     if admin
       # Use update_columns to avoid triggering callbacks again (preventing infinite loop)
+      # rubocop:disable Rails/SkipsModelValidations
       update_columns(turn: 1, status: STATE_PICKING, updated_at: Time.current)
+      # rubocop:enable Rails/SkipsModelValidations
     elsif changed
       self.turn = 1
       self.status = STATE_PICKING
@@ -201,7 +207,11 @@ class Gather < ApplicationRecord
   end
 
   def pick_strategy_immutable
-    changed = respond_to?(:will_save_change_to_pick_strategy?) ? will_save_change_to_pick_strategy? : pick_strategy_changed?
+    changed = if respond_to?(:will_save_change_to_pick_strategy?)
+                will_save_change_to_pick_strategy?
+              else
+                pick_strategy_changed?
+              end
     errors.add(:pick_strategy, 'cannot be changed') if changed
   end
 

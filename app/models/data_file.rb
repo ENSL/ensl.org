@@ -238,7 +238,9 @@ class DataFile < ApplicationRecord
     return if current_path.blank? || !File.exist?(current_path)
     return if path == current_path
 
+    # rubocop:disable Rails/SkipsModelValidations
     update_column(:path, current_path)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   # Auto-generate title from filename or match data
@@ -313,12 +315,14 @@ class DataFile < ApplicationRecord
     preview_changes = {}
     preview_changes[:related_id] = source.id if preview.related_id != source.id
     preview_changes[:updated_at] = Time.current if preview.has_attribute?(:updated_at)
+    # rubocop:disable Rails/SkipsModelValidations
     preview.update_columns(preview_changes) if preview_changes.present?
 
     source_movie = source.movie
     return unless source_movie && source_movie.preview_id != preview.id
 
     source_movie.update_columns(preview_id: preview.id, updated_at: Time.current)
+    # rubocop:enable Rails/SkipsModelValidations
   end
   private :sync_preview_links, :in_movies_tree?, :preview_filename?, :source_basename,
           :find_source_for_preview, :find_preview_for_source, :link_preview_to_source!

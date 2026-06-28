@@ -19,10 +19,12 @@ class Map < ApplicationRecord
 
   # attr_protected :id, :updated_at, :created_at, :deleted
 
+  # rubocop:disable Rails/HasAndBelongsToMany
   has_and_belongs_to_many :contests
+  # rubocop:enable Rails/HasAndBelongsToMany
   has_many :matches, lambda { |map|
     unscope(:where).where('map1_id = :id OR map2_id = :id', id: map.id)
-  }, dependent: :nullify
+  }, dependent: :nullify, inverse_of: :map1
 
   scope :basic, -> { where(deleted: false).order('name') }
   scope :with_name, ->(name) { where(name: name) }
@@ -39,7 +41,7 @@ class Map < ApplicationRecord
   end
 
   def destroy
-    update_attribute :deleted, true
+    update!(deleted: true)
   end
 
   def can_create?(cuser)

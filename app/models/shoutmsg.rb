@@ -95,14 +95,20 @@ class Shoutmsg < ApplicationRecord
     begin
       # Render the partial to capture the exact turbo-stream/html payload for debugging
       html = ApplicationController.render(partial: 'shoutmsgs/shoutmsg', locals: { shoutmsg: shout, user: shout.user })
-      Rails.logger.info "Shoutmsg broadcast: stream_name=#{shout.domain.inspect} target=#{shout.domain.inspect} payload_size=#{html.bytesize}"
+      Rails.logger.info(
+        "Shoutmsg broadcast: stream_name=#{shout.domain.inspect} " \
+        "target=#{shout.domain.inspect} payload_size=#{html.bytesize}"
+      )
       if shout.shoutable_type.present?
         broadcast_append_to shout.domain, target: shout.domain, html: html
       else
         broadcast_prepend_to 'shoutbox', target: 'shoutbox', html: html
       end
     rescue StandardError => e
-      Rails.logger.error "Shoutmsg broadcast failed: #{e.class}: #{e.message} -- shout_id=#{shout.id.inspect}, user_id=#{shout.user_id.inspect}, user=#{shout.user.inspect}"
+      Rails.logger.error(
+        "Shoutmsg broadcast failed: #{e.class}: #{e.message} -- " \
+        "shout_id=#{shout.id.inspect}, user_id=#{shout.user_id.inspect}, user=#{shout.user.inspect}"
+      )
     end
   end
 end

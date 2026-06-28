@@ -317,17 +317,23 @@ class Movie < ApplicationRecord
     preview_file = DataFile.find_by(path: target_path)
 
     if preview_file
+      # rubocop:disable Rails/SkipsModelValidations
       preview_file.update_columns(payload)
+      # rubocop:enable Rails/SkipsModelValidations
     else
       payload[:created_at] = stat.mtime
+      # rubocop:disable Rails/SkipsModelValidations
       DataFile.insert_all!([payload])
+      # rubocop:enable Rails/SkipsModelValidations
       preview_file = DataFile.find_by(path: target_path)
     end
 
     return unless preview_file && preview_id != preview_file.id
 
+    # rubocop:disable Rails/SkipsModelValidations
     update_columns(preview_id: preview_file.id,
                    updated_at: Time.current)
+    # rubocop:enable Rails/SkipsModelValidations
   end
   private :ensure_preview_data_file!
 
@@ -343,7 +349,9 @@ class Movie < ApplicationRecord
     cmd = [VLC, src, '--sout', sout, 'vlc://quit']
     pid = Process.spawn(*cmd)
     Process.detach(pid)
+    # rubocop:disable Rails/SkipsModelValidations
     update_column(:status, pid)
+    # rubocop:enable Rails/SkipsModelValidations
     sout
   rescue StandardError
     nil

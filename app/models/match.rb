@@ -61,13 +61,15 @@ class Match < ApplicationRecord
   has_many :matchers, dependent: :destroy
   has_many :users, through: :matchers
   has_many :predictions, dependent: :destroy
-  has_many :comments, -> { order('created_at') }, as: :commentable, dependent: :destroy
+  has_many :comments, -> { order('created_at') }, as: :commentable, dependent: :destroy, inverse_of: :commentable
   has_many :match_proposals, inverse_of: :match, dependent: :destroy
 
   belongs_to :challenge, optional: true
   belongs_to :contest, optional: true
-  belongs_to :contester1, -> { includes('team') }, class_name: 'Contester', optional: true
-  belongs_to :contester2, -> { includes('team') }, class_name: 'Contester', optional: true
+  belongs_to :contester1, -> { includes('team') }, class_name: 'Contester', optional: true,
+                                                   inverse_of: :matches_as_contester1
+  belongs_to :contester2, -> { includes('team') }, class_name: 'Contester', optional: true,
+                                                   inverse_of: :matches_as_contester2
   belongs_to :map1, class_name: 'Map', optional: true
   belongs_to :map2, class_name: 'Map', optional: true
   belongs_to :server, optional: true
@@ -96,7 +98,8 @@ class Match < ApplicationRecord
   scope :of_user, ->(user) { includes(:matchers).where(matchers: { user_id: user.id }) }
   scope :of_team, lambda { |team|
     where(
-      'contester1_id IN (SELECT id FROM contesters WHERE team_id = ?) OR contester2_id IN (SELECT id FROM contesters WHERE team_id = ?)',
+      'contester1_id IN (SELECT id FROM contesters WHERE team_id = ?) ' \
+      'OR contester2_id IN (SELECT id FROM contesters WHERE team_id = ?)',
       team.id, team.id
     )
   }
@@ -242,12 +245,16 @@ class Match < ApplicationRecord
   end
 
   def set_predictions
+    # rubocop:disable Rails/SkipsModelValidations
     predictions.update_all(result: 0)
     predictions.where(score1: score1, score2: score2).update_all(result: 1)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def after_destroy
+    # rubocop:disable Rails/SkipsModelValidations
     predictions.update_all(result: 0)
+    # rubocop:enable Rails/SkipsModelValidations
     contest.recalculate
   end
 
@@ -420,10 +427,9 @@ class Match < ApplicationRecord
                                                motm_name matchers_attributes server_id])
         return true if Verification.contain(params, [:hltv]) && !demo
       end
-      if Verification.contain(params, [:referee_id]) && ((params[:referee_id].to_i == cuser.id && referee_id.blank?) ||
-                       (params[:referee_id].blank? && referee_id == cuser.id))
-        return true
-      end
+      referee_toggle = (params[:referee_id].to_i == cuser.id && referee_id.blank?) ||
+                       (params[:referee_id].blank? && referee_id == cuser.id)
+      return true if Verification.contain(params, [:referee_id]) && referee_toggle
     end
 
     if contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser)
@@ -435,11 +441,9 @@ class Match < ApplicationRecord
       return true if match_time.today? && Verification.contain(params, [:stream_id])
     end
 
-    if cuser.caster? && Verification.contain(params,
-                                             [:caster_id]) && ((params[:caster_id].to_i == cuser.id && caster_id.blank?) ||
-                     (params[:caster_id].blank? && caster_id.to_i == cuser.id))
-      return true
-    end
+    caster_toggle = (params[:caster_id].to_i == cuser.id && caster_id.blank?) ||
+                    (params[:caster_id].blank? && caster_id.to_i == cuser.id)
+    return true if cuser.caster? && Verification.contain(params, [:caster_id]) && caster_toggle
 
     false
   end
@@ -463,7 +467,9 @@ class Match < ApplicationRecord
   def self.params(params, _cuser)
     # FIXME: check this
     params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,
-                                  :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id, :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id, :server_id, :week_id)
+                                  :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id,
+                                  :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id,
+                                  :server_id, :week_id)
   end
 
   def self.normalize_matchers_attributes!(match_params)

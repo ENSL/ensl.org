@@ -56,7 +56,7 @@ class Contest < ApplicationRecord
 
   has_many :matches, dependent: :destroy
   has_many :weeks, dependent: :destroy
-  has_many :contesters, -> { includes(:team) }, dependent: :destroy
+  has_many :contesters, -> { includes(:team) }, dependent: :destroy, inverse_of: :contest
   has_many :predictions, through: :matches
   has_many :brackets, dependent: :destroy, inverse_of: :contest
   has_many :preds_with_score, lambda {
@@ -70,7 +70,9 @@ class Contest < ApplicationRecord
   },
            source: :predictions,
            through: :matches
+  # rubocop:disable Rails/HasAndBelongsToMany
   has_and_belongs_to_many :maps
+  # rubocop:enable Rails/HasAndBelongsToMany
   belongs_to :demos, class_name: 'Directory', optional: true
   belongs_to :winner, class_name: 'Contester', optional: true
   belongs_to :rules, class_name: 'Article', optional: true
@@ -111,8 +113,10 @@ class Contest < ApplicationRecord
   end
 
   def recalculate
+    # rubocop:disable Rails/SkipsModelValidations
     Match.where(contest_id: id).update_all('diff = null, points1 = null, points2 = null')
     Contester.where(contest_id: id).update_all('score = 0, win = 0, loss = 0, draw = 0, extra = 0')
+    # rubocop:enable Rails/SkipsModelValidations
     matches.finished.chrono.each do |match|
       match.recalculate
       match.save
@@ -185,14 +189,18 @@ class Contest < ApplicationRecord
 
   def update_ranks(contester, old_rank, new_rank)
     if old_rank < new_rank
+      # rubocop:disable Rails/SkipsModelValidations
       Contester.where(contest_id: id)
                .where('score > ? AND score <= ?', old_rank, new_rank)
                .update_all(['score = score - 1, trend = ?', Contester::TREND_UP])
+      # rubocop:enable Rails/SkipsModelValidations
       contester.trend = Contester::TREND_DOWN
     elsif old_rank > new_rank
+      # rubocop:disable Rails/SkipsModelValidations
       Contester.where(contest_id: id)
                .where('score < ? AND score >= ?', old_rank, new_rank)
                .update_all(['score = score + 1, trend = ?', Contester::TREND_DOWN])
+      # rubocop:enable Rails/SkipsModelValidations
       contester.trend = Contester::TREND_UP
     end
     contester.score = new_rank

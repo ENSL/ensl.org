@@ -88,16 +88,18 @@ class Teamer < ApplicationRecord
   end
 
   # rubocop:disable Rails/ActiveRecordOverride
-  # NOTE: This is a custom destroy method that preserves historical rows for non-joiners by marking them as removed instead of deleting them from the database.
+  # NOTE: This custom destroy preserves historical rows for non-joiners by marking
+  # them as removed instead of deleting them from the database.
   def destroy
     transaction do
-      user.update_column(:team_id, nil) if user && user.team_id == team_id
+      user.update!(team_id: nil) if user && user.team_id == team_id
 
       return super if rank == Teamer::RANK_JOINER
 
-      update_attribute(:rank, Teamer::RANK_REMOVED)
+      update!(rank: Teamer::RANK_REMOVED)
     end
   end
+  # rubocop:enable Rails/ActiveRecordOverride
 
   def can_create?(cuser, params)
     cuser and Verification.contain params, %i[user_id team_id]

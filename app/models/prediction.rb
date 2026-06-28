@@ -35,7 +35,8 @@ class Prediction < ApplicationRecord
   belongs_to :user, optional: true
 
   def can_create?(cuser)
-    cuser and match.match_time.future? and !match.score1 and !match.score2 and !cuser.predictions.exists?(match_id: match.id)
+    cuser and match.match_time.future? and !match.score1 and !match.score2 and
+      !cuser.predictions.exists?(match_id: match.id)
   end
 
   def self.params(params, _cuser)

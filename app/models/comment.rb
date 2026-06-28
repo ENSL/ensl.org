@@ -47,7 +47,8 @@ class Comment < ApplicationRecord
   end
 
   def after_create
-    #		if commentable_type == "Movie" or commentable_type == "Article" and commentable.user and commentable.user.profile.notify_own_stuff
+    #		if commentable_type == "Movie" or commentable_type == "Article" and
+    #		   commentable.user and commentable.user.profile.notify_own_stuff
     #			Notifications.deliver_comments commentable.user, commentable
     #		end
   end

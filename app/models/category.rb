@@ -111,6 +111,6 @@ class Category < ApplicationRecord
   def align_sort_with_id
     return unless sort.blank? || sort.zero?
 
-    update_column(:sort, id)
+    update!(sort: id)
   end
 end

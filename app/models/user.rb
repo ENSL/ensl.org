@@ -87,7 +87,7 @@ class User < ApplicationRecord
   has_many :posted_comments, dependent: :destroy, class_name: 'Comment'
   has_many :comments, lambda {
     order('created_at ASC')
-  }, class_name: 'Comment', as: :commentable, dependent: :destroy
+  }, class_name: 'Comment', as: :commentable, dependent: :destroy, inverse_of: :commentable
   has_many :teamers, dependent: :destroy
   has_many :active_teams, -> { where('teamers.rank >= ? AND teams.active = ?', Teamer::RANK_MEMBER, true) }, \
            through: :teamers, source: 'team'
@@ -105,11 +105,11 @@ class User < ApplicationRecord
   has_many :upcoming_team_matches, -> { where('match_time > UTC_TIMESTAMP()') },
            through: :active_teams, source: 'matches'
   has_many :upcoming_ref_matches, -> { where('match_time > UTC_TIMESTAMP()') },
-           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify
+           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify, inverse_of: :referee
   has_many :past_team_matches, -> { where('match_time < UTC_TIMESTAMP()') },
            through: :active_contesters, source: 'matches'
   has_many :past_ref_matches, -> { where('match_time < UTC_TIMESTAMP()') },
-           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify
+           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify, inverse_of: :referee
   has_many :received_personal_messages, class_name: 'Message', as: 'recipient', dependent: :destroy
   has_many :sent_personal_messages, class_name: 'Message', as: 'sender', dependent: :destroy
   has_many :sent_team_messages, through: :active_teams, source: :sent_messages
@@ -148,7 +148,9 @@ class User < ApplicationRecord
 
   before_validation :update_password
 
+  # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :username, :email, uniqueness: { case_sensitive: false }
+  # rubocop:enable Rails/UniqueValidationWithoutIndex
   validates :email, presence: true
   validate :steamid_uniqueness
   validates :firstname, length: { in: 1..15, allow_blank: true }
@@ -359,7 +361,7 @@ class User < ApplicationRecord
   def touch_last_visit_if_stale!(threshold: 2.minutes)
     return false unless lastvisit&.<(threshold.ago.utc)
 
-    update_column(:lastvisit, Time.now.utc)
+    update(lastvisit: Time.now.utc)
   end
 
   def ensure_profile!
@@ -588,7 +590,7 @@ class User < ApplicationRecord
 
   # Records a successful login by stamping the user's last IP and visit time.
   def record_login!(ip)
-    update_columns(lastip: ip, lastvisit: Time.now.utc)
+    update(lastip: ip, lastvisit: Time.now.utc)
   end
 
   def apply_login_state!(verified_steamid:)

@@ -32,8 +32,8 @@ class Topic < ApplicationRecord
 
   belongs_to :user, optional: true
   belongs_to :forum, optional: true
-  has_one :lock, as: :lockable
-  has_one :latest, -> { order('id DESC') }, class_name: 'Post'
+  has_one :lock, as: :lockable, dependent: :destroy
+  has_one :latest, -> { order('id DESC') }, class_name: 'Post', inverse_of: :topic, dependent: :destroy
   has_many :posts, -> { order('id ASC') }, dependent: :destroy, inverse_of: :topic
   has_many :view_counts, as: :viewable, dependent: :destroy
 

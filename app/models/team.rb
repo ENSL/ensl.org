@@ -59,9 +59,10 @@ class Team < ApplicationRecord
 
   belongs_to :founder, class_name: 'User', optional: true
 
-  has_many :active_teamers, -> { where('rank >= ?', Teamer::RANK_MEMBER) }, inverse_of: :team
+  has_many :active_teamers, -> { where('rank >= ?', Teamer::RANK_MEMBER) }, inverse_of: :team, dependent: :destroy
   has_many :teamers, dependent: :destroy, counter_cache: true
-  has_many :leaders, -> { where('rank = ?', Teamer::RANK_LEADER) }, class_name: 'Teamer', inverse_of: :team
+  has_many :leaders, -> { where('rank = ?', Teamer::RANK_LEADER) }, class_name: 'Teamer', inverse_of: :team,
+                                                                    dependent: :destroy
   has_many :contesters, dependent: :destroy
   has_many :contests, -> { where('contesters.active', true) }, through: :contesters
   has_many :received_messages, class_name: 'Message', as: 'recipient', dependent: :destroy
@@ -70,11 +71,15 @@ class Team < ApplicationRecord
   has_many :matches_finished, -> { where('(score1 != 0 OR score2 != 0)') },
            through: :contesters, source: :matches
   has_many :matches_won, lambda {
-    where('((score1 > score2 AND contester1_id = contesters.id) OR (score2 > score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)')
+    where('((score1 > score2 AND contester1_id = contesters.id) OR ' \
+      '(score2 > score1 AND contester2_id = contesters.id)) AND ' \
+        '(score1 != 0 OR score2 != 0)')
   },
            through: :contesters, source: :matches
   has_many :matches_lost, lambda {
-    where('((score1 < score2 AND contester1_id = contesters.id) OR (score2 < score1 AND contester2_id = contesters.id)) AND (score1 != 0 OR score2 != 0)')
+    where('((score1 < score2 AND contester1_id = contesters.id) OR ' \
+      '(score2 < score1 AND contester2_id = contesters.id)) AND ' \
+        '(score1 != 0 OR score2 != 0)')
   },
            through: :contesters, source: :matches
   has_many :matches_draw, -> { where('(score1 = score2 AND score1 > 0) AND (score1 != 0 OR score2 != 0)') },
@@ -124,7 +129,7 @@ class Team < ApplicationRecord
     transaction do
       teamer = Teamer.create!(user: founder, team: self, rank: Teamer::RANK_LEADER)
       # set founder's team_id without invoking validations that may block assignment
-      founder.update_column(:team_id, id)
+      founder.update!(team_id: id)
       teamer
     end
   end
@@ -137,11 +142,13 @@ class Team < ApplicationRecord
     has_matches = matches.count.positive?
 
     transaction do
+      # rubocop:disable Rails/SkipsModelValidations
       User.where(team_id: id).update_all(team_id: nil)
       if has_matches
         update!(active: false)
         teamers.update_all(rank: Teamer::RANK_REMOVED)
       end
+      # rubocop:enable Rails/SkipsModelValidations
     end
 
     # If no matches exist, destroy dependent associations then remove the record

@@ -32,15 +32,17 @@ class Vote < ApplicationRecord
   after_destroy :decrease_votes
 
   def increase_votes
-    votable.poll.increment! :votes if votable_type == 'Option'
-    # Use increment! for atomic update to avoid race conditions
-    votable.increment! :votes
+    # rubocop:disable Rails/SkipsModelValidations
+    votable.poll.class.increment_counter(:votes, votable.poll.id) if votable_type == 'Option'
+    votable.class.increment_counter(:votes, votable.id)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def decrease_votes
-    votable.poll.decrement! :votes if votable_type == 'Option'
-    # Use decrement! for atomic update to avoid race conditions
-    votable.decrement! :votes
+    # rubocop:disable Rails/SkipsModelValidations
+    votable.poll.class.decrement_counter(:votes, votable.poll.id) if votable_type == 'Option'
+    votable.class.decrement_counter(:votes, votable.id)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def can_create?(cuser)

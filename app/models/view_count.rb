@@ -18,5 +18,7 @@
 
 class ViewCount < ApplicationRecord
   belongs_to :viewable, polymorphic: true, optional: true
+  # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :ip_address, uniqueness: { scope: %i[viewable_id viewable_type] }
+  # rubocop:enable Rails/UniqueValidationWithoutIndex
 end

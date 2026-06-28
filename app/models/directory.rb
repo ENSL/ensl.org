@@ -249,7 +249,9 @@ class Directory < ApplicationRecord
   def update_timestamp
     return unless File.exist?(full_path)
 
+    # rubocop:disable Rails/SkipsModelValidations
     update_column(:created_at, File.mtime(full_path))
+    # rubocop:enable Rails/SkipsModelValidations
   rescue StandardError => e
     Rails.logger.warn("Failed to update timestamp for #{full_path}: #{e.message}")
   end
@@ -487,7 +489,9 @@ class Directory < ApplicationRecord
 
     # Reconciliation is disk-authoritative: update DB pointers only.
     # We intentionally bypass DataFile callbacks here to avoid filesystem moves.
+    # rubocop:disable Rails/SkipsModelValidations
     dbfile.update_columns(changes)
+    # rubocop:enable Rails/SkipsModelValidations
     dbfile.refresh_preview_links!
     increment_stat(stats, :files_relinked)
     logger.info("Reconciled file: #{dbfile.name} (ID: #{dbfile.id})")
@@ -505,6 +509,7 @@ class Directory < ApplicationRecord
     stat = File.stat(item_path)
     filename = File.basename(item_path)
 
+    # rubocop:disable Rails/SkipsModelValidations
     DataFile.insert_all!([
                            {
                              directory_id: id,
@@ -517,6 +522,7 @@ class Directory < ApplicationRecord
                              updated_at: Time.current
                            }
                          ])
+    # rubocop:enable Rails/SkipsModelValidations
 
     dbfile = DataFile.find_by(path: item_path)
     dbfile&.refresh_preview_links!
@@ -561,7 +567,7 @@ class Directory < ApplicationRecord
     return orphaned if orphaned
 
     # Fourth: match by file count (heuristic for moved directories)
-    find_by_file_count(subitem_path)
+    file_count_match_candidate(subitem_path)
   end
 
   # Find directory with same name that no longer exists on disk
@@ -588,7 +594,7 @@ class Directory < ApplicationRecord
   end
 
   # Attempt to find directory by matching file count (heuristic)
-  def find_by_file_count(subitem_path)
+  def file_count_match_candidate(subitem_path)
     file_count = count_files_in_path(subitem_path)
     return nil if file_count.zero?
 
@@ -606,8 +612,13 @@ class Directory < ApplicationRecord
 
     candidate_dirs.find { |dir| file_sizes_match?(dir, subitem_path) }
   rescue StandardError => e
-    Rails.logger.warn("Error in find_by_file_count: #{e.message}")
+    Rails.logger.warn("Error in file_count_match_candidate: #{e.message}")
     nil
+  end
+
+  # Backward-compatible wrapper used by specs and internal callers.
+  def find_by_file_count(subitem_path)
+    file_count_match_candidate(subitem_path)
   end
 
   # Count files in a directory path
