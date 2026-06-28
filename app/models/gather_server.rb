@@ -17,7 +17,7 @@ class GatherServer < ApplicationRecord
 
   belongs_to :gather, optional: true
   belongs_to :server, optional: true
-  has_many :real_votes, class_name: 'Vote', as: :votable
+  has_many :real_votes, class_name: 'Vote', as: :votable, dependent: :destroy
 
   delegate :to_s, to: :server
 

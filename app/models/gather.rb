@@ -65,16 +65,16 @@ class Gather < ApplicationRecord
   belongs_to :map2, class_name: 'GatherMap', optional: true
   belongs_to :category, optional: true
 
-  has_many :gatherers
+  has_many :gatherers, dependent: :destroy
   has_many :users, through: :gatherers
-  has_many :gather_maps, class_name: 'GatherMap'
+  has_many :gather_maps, class_name: 'GatherMap', dependent: :destroy
   has_many :gatherer_votes, through: :gatherers, source: :real_votes
   has_many :map_votes, through: :gather_maps, source: :real_votes
-  has_many :gather_servers, class_name: 'GatherServer'
+  has_many :gather_servers, class_name: 'GatherServer', dependent: :destroy
   has_many :maps, through: :gather_maps
   has_many :server_votes, through: :gather_servers, source: :real_votes
   has_many :servers, through: :gather_servers
-  has_many :shoutmsgs, as: 'shoutable'
+  has_many :shoutmsgs, as: 'shoutable', dependent: :destroy
   has_many :real_votes, class_name: 'Vote', as: :votable, dependent: :destroy
 
   validates :pick_strategy, inclusion: { in: PICK_STRATEGIES }

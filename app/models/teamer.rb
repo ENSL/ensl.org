@@ -30,7 +30,6 @@ class Teamer < ApplicationRecord
   # attr_protected :id, :created_at, :updated_at, :version
 
   validates :comment, length: { in: 0..15, allow_blank: true }
-  validates :user_id, uniqueness: { scope: %i[team_id rank] }
   validates :user, :team, presence: true
   # validate_on_create:validate_team
   # validate_on_create:validate_contests
@@ -71,8 +70,11 @@ class Teamer < ApplicationRecord
   def validate_team
     return unless user && team
 
-    # prevent joining the same team twice (exclude self when checking)
-    return unless Teamer.where(user_id: user.id, team_id: team.id).where.not(id: id).exists?
+    # Allow historical re-joins, but do not allow multiple current memberships/applications.
+    return unless Teamer.where(user_id: user.id, team_id: team.id)
+                        .where('rank >= ?', RANK_JOINER)
+                        .where.not(id: id)
+                        .exists?
 
     errors.add :team, I18n.t(:teams_join_twice)
   end
@@ -85,17 +87,23 @@ class Teamer < ApplicationRecord
     self.rank = RANK_JOINER unless rank
   end
 
-  def destroy
+  around_destroy :handle_destroy
+
+  private
+
+  def handle_destroy
     transaction do
       user.update_column(:team_id, nil) if user && user.team_id == team_id
 
       if rank == Teamer::RANK_JOINER
-        super
+        yield
       else
         update!(rank: Teamer::RANK_REMOVED)
       end
     end
   end
+
+  public
 
   def can_create?(cuser, params)
     cuser and Verification.contain params, %i[user_id team_id]

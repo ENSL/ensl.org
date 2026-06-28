@@ -45,14 +45,14 @@ class Contester < ApplicationRecord
   scope :chronological, -> { order('created_at DESC') }
   scope :of_contest, ->(contest) { where('contesters.contest_id', contest.id) }
 
-  has_many :challenges_sent, class_name: 'Challenge', foreign_key: 'contester1_id'
-  has_many :challenges_received, class_name: 'Challenge', foreign_key: 'contester2_id'
+  has_many :challenges_sent, class_name: 'Challenge', foreign_key: 'contester1_id', dependent: :nullify
+  has_many :challenges_received, class_name: 'Challenge', foreign_key: 'contester2_id', dependent: :nullify
   has_many :matches, lambda {
     where('(contester1_id = contesters.id OR contester2_id = contesters.id)')
   }, through: :contest
 
   validates :team, :contest, presence: true
-  validates %i[score win loss draw extra], inclusion: { in: 0..9999, allow_nil: true }
+  validates(*%i[score win loss draw extra], inclusion: { in: 0..9999, allow_nil: true })
   validates :team_id, uniqueness: { scope: :contest_id, message: "You can't join same contest twice." }
 
   # validate_on_create:validate_member_participation
@@ -164,7 +164,7 @@ class Contester < ApplicationRecord
   end
 
   def destroy
-    update_attribute :active, false
+    update_attribute(:active, false)
   end
 
   def can_create?(cuser, params = {})

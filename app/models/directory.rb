@@ -55,8 +55,8 @@ class Directory < ApplicationRecord
   attr_accessor :preserve_files, :move_to_trash
 
   belongs_to :parent, class_name: 'Directory', optional: true
-  has_many :subdirs, class_name: 'Directory', foreign_key: :parent_id
-  has_many :files, -> { order('name') }, class_name: 'DataFile'
+  has_many :subdirs, class_name: 'Directory', foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
+  has_many :files, -> { order('name') }, class_name: 'DataFile', inverse_of: :directory, dependent: :nullify
 
   scope :ordered, ->  { order('name ASC') }
   scope :path_sorted, -> { order('path ASC') }

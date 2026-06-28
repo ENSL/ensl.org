@@ -220,7 +220,7 @@ class Gatherer < ApplicationRecord
     status_value = self.class.status_from_key(status_key)
     return false unless status_value
 
-    update_attribute(:status, status_value)
+    update_column(:status, status_value)
     Gathers::Broadcaster.call(gather)
     true
   end
@@ -231,7 +231,7 @@ class Gatherer < ApplicationRecord
   def reactivate_if_returning!
     return unless status == STATE_LEAVING
 
-    update_attribute(:status, STATE_ACTIVE)
+    update_column(:status, STATE_ACTIVE)
   end
 
   def can_create?(cuser, _params = {})

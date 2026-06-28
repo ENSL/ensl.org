@@ -145,6 +145,17 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe '#record_view_count' do
+    it 'does not create duplicate counts for the same ip' do
+      article = create(:article, user: admin, category: category)
+
+      expect do
+        article.record_view_count('127.0.0.1', true)
+        article.record_view_count('127.0.0.1', false)
+      end.to change(article.view_counts, :count).by(1)
+    end
+  end
+
   describe 'XSS protection' do
     context 'with BBCode format' do
       it 'strips script tags from text' do

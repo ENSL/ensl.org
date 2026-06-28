@@ -47,13 +47,13 @@ class Category < ApplicationRecord
   # scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
   scope :of_user, ->(user) { where(articles: { user: user }).includes(:articles) }
 
-  has_many :articles, -> { order('created_at DESC') }
-  has_many :issues, -> { order('created_at DESC') }
-  has_many :forums, -> { order('forums.position') }
-  has_many :movies
-  has_many :maps
-  has_many :gathers
-  has_many :servers
+  has_many :articles, -> { order('created_at DESC') }, inverse_of: :category, dependent: :nullify
+  has_many :issues, -> { order('created_at DESC') }, inverse_of: :category, dependent: :nullify
+  has_many :forums, -> { order('forums.position') }, inverse_of: :category, dependent: :nullify
+  has_many :movies, dependent: :nullify
+  has_many :maps, dependent: :nullify
+  has_many :gathers, dependent: :nullify
+  has_many :servers, dependent: :nullify
 
   acts_as_readable
 

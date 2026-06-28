@@ -58,7 +58,7 @@ class Contest < ApplicationRecord
   has_many :weeks, dependent: :destroy
   has_many :contesters, -> { includes(:team) }, dependent: :destroy
   has_many :predictions, through: :matches
-  has_many :brackets
+  has_many :brackets, dependent: :destroy, inverse_of: :contest
   has_many :preds_with_score, lambda {
     select("predictions.id, predictions.user_id,
           SUM(result) AS correct,

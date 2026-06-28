@@ -34,7 +34,7 @@ class Topic < ApplicationRecord
   belongs_to :forum, optional: true
   has_one :lock, as: :lockable
   has_one :latest, -> { order('id DESC') }, class_name: 'Post'
-  has_many :posts, -> { order('id ASC') }, dependent: :destroy
+  has_many :posts, -> { order('id ASC') }, dependent: :destroy, inverse_of: :topic
   has_many :view_counts, as: :viewable, dependent: :destroy
 
   scope :basic, -> { includes([:latest, { forum: :forumer }, :user]) }
@@ -91,7 +91,9 @@ class Topic < ApplicationRecord
   def record_view_count(ip_address, logged_in = nil, **options)
     logged_in = options.fetch(:logged_in, logged_in)
     logged_in = false if logged_in.nil?
-    view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
+    view_counts.find_or_create_by(ip_address: ip_address) do |vc|
+      vc.logged_in = logged_in
+    end
     self
   end
 

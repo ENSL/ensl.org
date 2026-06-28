@@ -39,7 +39,7 @@ class Issue < ApplicationRecord
 
   # attr_protected :id, :created_at, :updated_at
 
-  has_many :comments, as: :commentable
+  has_many :comments, as: :commentable, dependent: :destroy
   belongs_to :category, optional: true
   belongs_to :author, class_name: 'User', optional: true
   belongs_to :assigned, class_name: 'User', optional: true

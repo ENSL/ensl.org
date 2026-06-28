@@ -81,6 +81,16 @@ RSpec.describe Teamer, type: :model do
       t2.validate
       expect(t2.errors[:team]).not_to be_empty
     end
+
+    it 'allows rejoining after previous membership is removed' do
+      user = create(:user)
+      team = create(:team)
+      create(:teamer, user: user, team: team, rank: Teamer::RANK_REMOVED)
+
+      t2 = Teamer.new(user: user, team: team, rank: Teamer::RANK_JOINER)
+
+      expect(t2).to be_valid
+    end
   end
 
   describe 'destroy behavior' do

@@ -153,7 +153,9 @@ class Article < ApplicationRecord
   def record_view_count(ip_address, logged_in = nil, **options)
     logged_in = options.fetch(:logged_in, logged_in)
     logged_in = false if logged_in.nil?
-    view_counts.create(viewable: self, ip_address: ip_address, logged_in: logged_in)
+    view_counts.find_or_create_by(ip_address: ip_address) do |vc|
+      vc.logged_in = logged_in
+    end
     self
   end
 

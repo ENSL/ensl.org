@@ -194,5 +194,14 @@ describe Topic do
 
       expect(topic.view_count).to eq(2)
     end
+
+    it 'does not create duplicate counts for the same ip' do
+      topic = create(:topic, user: user, forum: forum, first_post: 'Foo')
+
+      expect do
+        topic.record_view_count('127.0.0.1', true)
+        topic.record_view_count('127.0.0.1', false)
+      end.to change(topic.view_counts, :count).by(1)
+    end
   end
 end

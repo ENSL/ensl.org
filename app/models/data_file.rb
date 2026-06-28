@@ -58,16 +58,16 @@ class DataFile < ApplicationRecord
   scope :unrelated, -> { where(related_id: nil) }
   scope :orphaned, -> { where(directory_id: nil) }
 
-  has_many :related_files, class_name: 'DataFile', foreign_key: :related_id
-  has_many :comments, as: :commentable
-  has_one :movie, foreign_key: :file_id, dependent: :destroy
-  has_one :preview, class_name: 'Movie', foreign_key: :preview_id, dependent: :nullify
-  has_one :match, foreign_key: :demo_id
+  has_many :related_files, class_name: 'DataFile', foreign_key: :related_id, inverse_of: :related, dependent: :nullify
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_one :movie, foreign_key: :file_id, dependent: :destroy, inverse_of: :file
+  has_one :preview, class_name: 'Movie', foreign_key: :preview_id, dependent: :nullify, inverse_of: :preview
+  has_one :match, foreign_key: :demo_id, dependent: :nullify, inverse_of: :demo
   belongs_to :directory, optional: true
   belongs_to :related, class_name: 'DataFile', optional: true
   belongs_to :article, optional: true
 
-  validates %i[title path], length: { maximum: 255 }
+  validates(*%i[title path], length: { maximum: 255 })
   validates :name, presence: { message: 'Please select a file to upload' }, unless: :skip_file_validation_or_update?
 
   attr_accessor :skip_file_validation

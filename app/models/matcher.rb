@@ -40,6 +40,5 @@ class Matcher < ApplicationRecord
   scope :of_contester, ->(contester) { where(contester_id: contester.id) }
 
   validates :match, :user, presence: true
-  validates :user_id, uniqueness: { scope: :match_id }
   validates :merc, inclusion: { in: [true, false] }
 end

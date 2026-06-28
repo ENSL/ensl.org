@@ -63,9 +63,9 @@ class Movie < ApplicationRecord
   belongs_to :preview, class_name: 'DataFile', optional: true
   belongs_to :match, optional: true
   belongs_to :category, optional: true
-  has_many :ratings, as: :rateable
-  has_many :shoutmsgs, as: :shoutable
-  has_many :watchers
+  has_many :ratings, as: :rateable, dependent: :destroy
+  has_many :shoutmsgs, as: :shoutable, dependent: :destroy
+  has_many :watchers, dependent: :destroy
   has_many :watcher_users, through: :watchers, source: :user
   has_many :view_counts, as: :viewable, dependent: :destroy
 

@@ -23,7 +23,7 @@ class Option < ApplicationRecord
 
   validates :option, length: { in: 1..30 }
 
-  has_many :real_votes, class_name: 'Vote', as: :votable
+  has_many :real_votes, class_name: 'Vote', as: :votable, dependent: :destroy
   belongs_to :poll, optional: true
 
   def to_s

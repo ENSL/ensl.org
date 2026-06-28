@@ -38,7 +38,7 @@ class Team < ApplicationRecord
   validates :irc, length: { maximum: 60, allow_blank: true }
   validates :web, length: { maximum: 50, allow_blank: true }
   validates :country, format: { with: /\A[A-Z]{2}\z/, allow_blank: true }
-  validates %i[comment recruiting], length: { in: 0..75, allow_blank: true }
+  validates(*%i[comment recruiting], length: { in: 0..75, allow_blank: true })
 
   scope :with_teamers_num, lambda { |num|
     select('teams.*, COUNT(T.id) AS teamers_num')
@@ -59,13 +59,13 @@ class Team < ApplicationRecord
 
   belongs_to :founder, class_name: 'User', optional: true
 
-  has_many :active_teamers, -> { where('rank >= ?', Teamer::RANK_MEMBER) }
+  has_many :active_teamers, -> { where('rank >= ?', Teamer::RANK_MEMBER) }, inverse_of: :team
   has_many :teamers, dependent: :destroy, counter_cache: true
-  has_many :leaders, -> { where('rank = ?', Teamer::RANK_LEADER) }, class_name: 'Teamer'
+  has_many :leaders, -> { where('rank = ?', Teamer::RANK_LEADER) }, class_name: 'Teamer', inverse_of: :team
   has_many :contesters, dependent: :destroy
   has_many :contests, -> { where('contesters.active', true) }, through: :contesters
-  has_many :received_messages, class_name: 'Message', as: 'recipient'
-  has_many :sent_messages, class_name: 'Message', as: 'sender'
+  has_many :received_messages, class_name: 'Message', as: 'recipient', dependent: :destroy
+  has_many :sent_messages, class_name: 'Message', as: 'sender', dependent: :destroy
   has_many :matches, through: :contesters
   has_many :matches_finished, -> { where('(score1 != 0 OR score2 != 0)') },
            through: :contesters, source: :matches
@@ -154,7 +154,7 @@ class Team < ApplicationRecord
   end
 
   def recover
-    update_attribute :active, true
+    update(active: true)
   end
 
   def leader?(user)
@@ -188,10 +188,9 @@ class Team < ApplicationRecord
       next unless actor.admin? || (actor_rank && new_rank <= actor_rank)
       next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
 
-      member.user.update_attribute :team, self if member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
+      member.user.update(team: self) if member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
 
-      member.update_attribute :rank, new_rank
-      member.update_attribute :comment, comment_params&.[](member.id.to_s)
+      member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
     end
   end
 

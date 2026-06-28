@@ -54,7 +54,7 @@ class Server < ApplicationRecord
 
   # attr_protected :id, :user_id, :updated_at, :created_at, :map, :players, :maxplayers, :ping, :version
 
-  validates %i[name dns], length: { in: 1..30 }
+  validates(*%i[name dns], length: { in: 1..30 })
   validates :password, length: { maximum: 30, allow_blank: true }
   validates :description, length: { maximum: 255, allow_blank: true }
   validates :ip, format: { with: /\A[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/ }
@@ -84,9 +84,9 @@ class Server < ApplicationRecord
       .where('matches.hltv_id IS NULL')
   }
 
-  has_many :logs
-  has_many :matches
-  has_many :challenges
+  has_many :logs, dependent: :destroy
+  has_many :matches, dependent: :nullify
+  has_many :challenges, dependent: :nullify
   belongs_to :user, optional: true
   belongs_to :recordable, polymorphic: true, optional: true
 

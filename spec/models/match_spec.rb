@@ -90,6 +90,17 @@ RSpec.describe Match, type: :model do
       expect(match.team2_lineup).to contain_exactly(starter)
     end
 
+    it 'allows the same user on both sides of a match' do
+      match = create(:match)
+      user = create(:user)
+
+      left = Matcher.create!(match: match, user: user, contester: match.contester1, merc: false)
+      right = Matcher.create!(match: match, user: user, contester: match.contester2, merc: true)
+
+      expect(match.team1_lineup).to include(left)
+      expect(match.team2_lineup).to include(right)
+    end
+
     it 'returns correct score colors for friendly team' do
       contest = create(:contest)
       team1 = create(:team)

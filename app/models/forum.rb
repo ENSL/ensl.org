@@ -34,9 +34,9 @@ class Forum < ApplicationRecord
   scope :of_forum, ->(forum) { where('forums.id', forum.id) }
   scope :ordered, -> { order('position') }
 
-  has_many :topics
+  has_many :topics, dependent: :destroy
   has_many :posts, through: :topics
-  has_many :forumers
+  has_many :forumers, dependent: :destroy
   has_many :groups, through: :forumers
   has_one :forumer
   belongs_to :category, optional: true
@@ -50,7 +50,7 @@ class Forum < ApplicationRecord
   end
 
   def update_position
-    update_attribute :position, id
+    update_column(:position, id)
   end
 
   def can_show?(cuser)

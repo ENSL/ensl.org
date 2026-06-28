@@ -33,7 +33,7 @@ class Week < ApplicationRecord
   belongs_to :contest, optional: true
   belongs_to :map1, class_name: 'Map', optional: true
   belongs_to :map2, class_name: 'Map', optional: true
-  has_many :matches
+  has_many :matches, dependent: :nullify
 
   def to_s
     name

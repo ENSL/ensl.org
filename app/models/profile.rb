@@ -75,11 +75,11 @@ class Profile < ApplicationRecord
   validates :irc, length: { maximum: 20 }
   validates :web, length: { maximum: 100 }
   validates :town, length: { maximum: 20 }
-  validates %i[singleplayer multiplayer food beverage hobby music book movie tvseries],
-            length: { maximum: 120 }
-  validates %i[res sensitivity monitor_hz], length: { maximum: 30 }
-  validates %i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor mouse mouse_pad keyboard head_phones speakers],
-            length: { maximum: 100 }
+  validates(*%i[singleplayer multiplayer food beverage hobby music book movie tvseries],
+            length: { maximum: 120 })
+  validates(*%i[res sensitivity monitor_hz], length: { maximum: 30 })
+  validates(*%i[scripts cpu gpu ram psu motherboard soundcard hdd case monitor mouse mouse_pad keyboard head_phones speakers],
+            length: { maximum: 100 })
   validates :signature, length: { maximum: 255 }
   validates :achievements, length: { maximum: 65_000 }
   validates :steam_profile, format: { with: /\A[A-Za-z0-9_\-+]{1,40}\z/, allow_blank: true }

@@ -82,8 +82,8 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :groups, through: :groupers
   has_many :shoutmsgs, dependent: :destroy
-  has_many :issues, foreign_key: 'author_id', dependent: :destroy
-  has_many :assigned_issues, class_name: 'Issue', foreign_key: 'assigned_id'
+  has_many :issues, foreign_key: 'author_id', dependent: :destroy, inverse_of: :author
+  has_many :assigned_issues, class_name: 'Issue', foreign_key: 'assigned_id', dependent: :nullify, inverse_of: :assigned
   has_many :posted_comments, dependent: :destroy, class_name: 'Comment'
   has_many :comments, lambda {
     order('created_at ASC')
@@ -105,11 +105,11 @@ class User < ApplicationRecord
   has_many :upcoming_team_matches, -> { where('match_time > UTC_TIMESTAMP()') },
            through: :active_teams, source: 'matches'
   has_many :upcoming_ref_matches, -> { where('match_time > UTC_TIMESTAMP()') },
-           class_name: 'Match', foreign_key: 'referee_id'
+           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify
   has_many :past_team_matches, -> { where('match_time < UTC_TIMESTAMP()') },
            through: :active_contesters, source: 'matches'
   has_many :past_ref_matches, -> { where('match_time < UTC_TIMESTAMP()') },
-           class_name: 'Match', foreign_key: 'referee_id'
+           class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify
   has_many :received_personal_messages, class_name: 'Message', as: 'recipient', dependent: :destroy
   has_many :sent_personal_messages, class_name: 'Message', as: 'sender', dependent: :destroy
   has_many :sent_team_messages, through: :active_teams, source: :sent_messages
@@ -162,7 +162,7 @@ class User < ApplicationRecord
   validates_with SteamIdValidator
   # validates_format_of :steamid, :with => /\A(STEAM_)?[0-5]:[01]:\d+\Z/
   validates :time_zone, length: { maximum: 100, allow_blank: true }
-  validates [:public_email], inclusion: { in: [true, false], allow_nil: true }
+  validates :public_email, inclusion: { in: [true, false], allow_nil: true }
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team
 
@@ -359,7 +359,7 @@ class User < ApplicationRecord
   def touch_last_visit_if_stale!(threshold: 2.minutes)
     return false unless lastvisit&.<(threshold.ago.utc)
 
-    update_attribute(:lastvisit, Time.now.utc)
+    update_column(:lastvisit, Time.now.utc)
   end
 
   def ensure_profile!
@@ -608,7 +608,7 @@ class User < ApplicationRecord
   def attach_verified_steamid!(verified_steamid)
     return false if verified_steamid.blank? || steamid == verified_steamid
 
-    update_attribute(:steamid, verified_steamid)
+    update(steamid: verified_steamid)
   end
 
   def can_create?(_cuser)
