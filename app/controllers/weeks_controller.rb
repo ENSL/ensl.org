@@ -17,25 +17,17 @@ class WeeksController < ApplicationController
     @week = Week.new(Week.params(params, cuser))
     raise AccessError unless @week.can_create? cuser
 
-    if @week.save
-      flash[:notice] = t(:weeks_create)
-      redirect_to edit_contest_path(@week.contest, contest: 'weeks')
-    else
-      flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
-      render :new, status: :unprocessable_entity
-    end
+    save_and_respond(@week, notice: :weeks_create,
+                            location: edit_contest_path(@week.contest, contest: 'weeks'),
+                            template: :new) { @week.save }
   end
 
   def update
     raise AccessError unless @week.can_update? cuser
 
-    if @week.update(Week.params(params, cuser))
-      flash[:notice] = t(:weeks_update)
-      redirect_to edit_contest_path(@week.contest, contest: 'weeks')
-    else
-      flash.now[:error] = @week.errors.full_messages.to_sentence.presence || t(:error)
-      render :edit, status: :unprocessable_entity
-    end
+    save_and_respond(@week, notice: :weeks_update,
+                            location: edit_contest_path(@week.contest, contest: 'weeks'),
+                            template: :edit) { @week.update(Week.params(params, cuser)) }
   end
 
   def destroy

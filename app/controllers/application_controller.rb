@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   include Exceptions
   include ActionView::RecordIdentifier
+  include ResourceResponses
 
   helper :all
   helper_method :cuser, :strip, :return_here
@@ -84,31 +85,27 @@ class ApplicationController < ActionController::Base
 
   # Safe redirect helper: only allow redirects to same-host or relative paths.
   def safe_redirect_to(addr)
-    return redirect_to('/') unless addr.present?
+    return redirect_to('/') if addr.blank?
 
-    begin
-      uri = URI.parse(addr)
-      # Allow relative URLs or same-host absolute URLs
-      if uri.host.nil? || uri.host == request.host
-        path = uri.request_uri
-        begin
-          route = Rails.application.routes.recognize_path(path)
-          # Avoid redirecting to error pages after login
-          if route[:controller] == 'errors' || path.match?(%r{\A/(403|404|422|500)\b})
-            redirect_to('/')
-          else
-            redirect_to path
-          end
-        rescue StandardError
-          flash[:notice] = t(:invalid_message) if respond_to?(:flash)
-          redirect_to('/')
-        end
-      else
-        redirect_to('/')
-      end
-    rescue StandardError
+    uri = URI.parse(addr)
+    return redirect_to('/') unless uri.host.nil? || uri.host == request.host
+
+    redirect_to_recognized_path(uri.request_uri)
+  rescue StandardError
+    redirect_to('/')
+  end
+
+  # Resolve a same-host path through the router, refusing error pages.
+  def redirect_to_recognized_path(path)
+    route = Rails.application.routes.recognize_path(path)
+    if route[:controller] == 'errors' || path.match?(%r{\A/(403|404|422|500)\b})
       redirect_to('/')
+    else
+      redirect_to path
     end
+  rescue StandardError
+    flash[:notice] = t(:invalid_message) if respond_to?(:flash)
+    redirect_to('/')
   end
 
   # Return a safe URL (allow only http(s) or relative paths). Returns '#' if unsafe.
@@ -190,8 +187,11 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
-          turbo_stream.update(error_wrapper_id_for(record), partial: 'shared/errors',
-                                                            locals: { messages: record.errors.full_messages, container_id: error_container_id_for(record) }),
+          turbo_stream.update(
+            error_wrapper_id_for(record),
+            partial: 'shared/errors',
+            locals: { messages: record.errors.full_messages, container_id: error_container_id_for(record) }
+          ),
           turbo_stream.replace('notification', partial: 'application/messages')
         ], status: :unprocessable_entity
       end

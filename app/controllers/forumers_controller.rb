@@ -1,37 +1,33 @@
 # frozen_string_literal: true
 
 class ForumersController < ApplicationController
+  before_action :load_forumer, only: %i[update destroy]
+
   def create
     @forumer = Forumer.new(Forumer.params(params, cuser))
     raise AccessError unless @forumer.can_create? cuser
 
-    if @forumer.save
-      flash[:notice] = t(:groups_added)
-    else
-      flash[:error] = @forumer.errors.full_messages.to_s
-    end
-
+    save_and_flash(@forumer, notice: :groups_added) { @forumer.save }
     redirect_to_back
   end
 
   def update
-    @forumer = Forumer.find params[:id]
     raise AccessError unless @forumer.can_update? cuser
 
-    if @forumer.update(Forumer.params(params, cuser))
-      flash[:notice] = t(:groups_acl_update)
-    else
-      flash[:error] = @forumer.errors.full_messages.to_s
-    end
-
+    save_and_flash(@forumer, notice: :groups_acl_update) { @forumer.update(Forumer.params(params, cuser)) }
     redirect_to_back
   end
 
   def destroy
-    @forumer = Forumer.find params[:id]
     raise AccessError unless @forumer.can_destroy? cuser
 
     @forumer.destroy
     redirect_to_back
+  end
+
+  private
+
+  def load_forumer
+    @forumer = Forumer.find(params[:id])
   end
 end

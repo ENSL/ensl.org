@@ -12,44 +12,20 @@ class SessionsController < ApplicationController
   prepend_before_action :reject_js_callback, only: :callback
 
   def callback
-    unless request.env['omniauth.auth']
-      callback_failed('Steam callback: auth_hash is missing')
-      return
-    end
+    return callback_failed('Steam callback: auth_hash is missing') unless auth_hash
 
     user = User.find_or_build(auth_hash, request.ip)
-    unless user.is_a?(ActiveRecord::Base)
-      callback_failed
-      return
-    end
+    return callback_failed unless callback_user?(user)
 
     cache_callback_user(user)
+    return render_new_user_from_callback(user) if user.new_record?
 
-    if user.new_record?
-      render_new_user_from_callback(user)
-    else
-      login_user(user)
-      return_back
-    end
+    login_user(user)
+    return_back
   end
 
   def login
-    if params[:login]
-      Rails.logger.info(
-        "Login attempt username=#{params[:login][:username].to_s.inspect} " \
-        "ip=#{request.ip} ua=#{request.user_agent.to_s.inspect}"
-      )
-      if (u = User.authenticate(params[:login]))
-        Rails.logger.info("Login success user_id=#{u.id} username=#{u.username}")
-        login_user(u)
-      else
-        Rails.logger.warn(
-          "Login failed username=#{params[:login][:username].to_s.inspect} " \
-          "ip=#{request.ip}"
-        )
-        flash[:error] = t(:login_unsuccessful)
-      end
-    end
+    process_login_attempt if params[:login]
     return_back
   end
 
@@ -91,6 +67,36 @@ class SessionsController < ApplicationController
     session[:cached_user] = payload[:cached_user]
   end
 
+  def callback_user?(user)
+    user.is_a?(ActiveRecord::Base)
+  end
+
+  def process_login_attempt
+    log_login_attempt
+
+    if (user = User.authenticate(params[:login]))
+      Rails.logger.info("Login success user_id=#{user.id} username=#{user.username}")
+      login_user(user)
+    else
+      log_failed_login
+      flash[:error] = t(:login_unsuccessful)
+    end
+  end
+
+  def log_login_attempt
+    Rails.logger.info(
+      "Login attempt username=#{params[:login][:username].to_s.inspect} " \
+      "ip=#{request.ip} ua=#{request.user_agent.to_s.inspect}"
+    )
+  end
+
+  def log_failed_login
+    Rails.logger.warn(
+      "Login failed username=#{params[:login][:username].to_s.inspect} " \
+      "ip=#{request.ip}"
+    )
+  end
+
   def render_new_user_from_callback(user)
     @user = user
     # If user mistypes username and password, return to user creation page.
@@ -104,18 +110,30 @@ class SessionsController < ApplicationController
   def login_user(user)
     result = user.apply_login_state!(verified_steamid: session[:verified_steamid])
 
-    if result[:banned]
-      flash[:error] = t(:accounts_locked)
-    else
-      flash[:notice] = t(:login_successful)
-      flash[:notice] << " \n#{I18n.t(:password_md5_scrypt)}" if result[:password_upgraded]
-      if result[:steamid_updated]
-        session[:return_to] = edit_user_path(user)
-        flash[:notice] << format(t(:users_steamid_update), user.steamid)
-        session.delete :verified_steamid
-      end
-      save_session user
-    end
+    return handle_banned_login if result[:banned]
+
+    apply_login_notice(result, user)
+    save_session user
+  end
+
+  def handle_banned_login
+    flash[:error] = t(:accounts_locked)
+  end
+
+  def apply_login_notice(result, user)
+    flash[:notice] = t(:login_successful)
+    append_password_upgrade_notice if result[:password_upgraded]
+    apply_steamid_update_notice(user) if result[:steamid_updated]
+  end
+
+  def append_password_upgrade_notice
+    flash[:notice] << " \n#{I18n.t(:password_md5_scrypt)}"
+  end
+
+  def apply_steamid_update_notice(user)
+    session[:return_to] = edit_user_path(user)
+    flash[:notice] << format(t(:users_steamid_update), user.steamid)
+    session.delete :verified_steamid
   end
 
   def auth_hash

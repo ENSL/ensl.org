@@ -5,12 +5,7 @@ class LocksController < ApplicationController
     @lock = Lock.new(Lock.params(params, cuser))
     raise AccessError unless @lock.can_create? cuser
 
-    if @lock.save
-      flash[:notice] = t(:topics_locked)
-    else
-      flash[:error] = @lock.errors.full_messages.to_sentence
-    end
-
+    save_and_flash(@lock, notice: :topics_locked) { @lock.save }
     redirect_to_back
   end
 

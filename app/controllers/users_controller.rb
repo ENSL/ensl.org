@@ -46,7 +46,7 @@ class UsersController < ApplicationController
     return if already_logged_in?
 
     # Use cached OAuth-created user only for anonymous visitors.
-    if session[:cached_user]&.present? && cuser.nil?
+    if session[:cached_user].present? && cuser.nil?
       @user = begin
         User.new(JSON.parse(session[:cached_user]))
       rescue StandardError

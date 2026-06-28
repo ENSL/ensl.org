@@ -2,6 +2,7 @@
 
 class MoviesController < ApplicationController
   before_action :load_movie, except: %i[index new create admin]
+  before_action :load_movie_categories, only: %i[new edit create update]
   respond_to :html, :turbo_stream
   helper_method :vlc_installer_file
 
@@ -36,14 +37,10 @@ class MoviesController < ApplicationController
   def new
     @movie = Movie.new
     raise Exceptions::UserRegistrationReq unless @movie.can_create? cuser
-
-    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
   end
 
   def edit
     raise AccessError unless @movie.can_update? cuser
-
-    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
   end
 
   def create
@@ -55,7 +52,6 @@ class MoviesController < ApplicationController
       flash[:notice] = t(:movies_create)
       redirect_to(@movie)
     else
-      @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
       respond_with_validation_errors(@movie, template: :new)
     end
   end
@@ -63,11 +59,7 @@ class MoviesController < ApplicationController
   def update
     raise AccessError unless @movie.can_update? cuser
 
-    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
-    movie_params = Movie.params(params, cuser)
-    movie_params = movie_params.except(:file_id) if movie_params[:file_id].blank?
-
-    if @movie.update(movie_params)
+    if @movie.update(filtered_movie_params)
       flash[:notice] = t(:movies_update)
       redirect_to(@movie)
     else
@@ -78,8 +70,6 @@ class MoviesController < ApplicationController
   def preview
     raise AccessError unless @movie.can_update? cuser
 
-    # x = params[:x].to_i <= 1280 ? params[:x].to_i : 800
-    # y = params[:y].to_i <= 720 ? params[:y].to_i : 600
     begin
       result = @movie.make_preview
       flash[:notice] = "#{t(:executed)} #{result}".html_safe
@@ -96,35 +86,14 @@ class MoviesController < ApplicationController
   def snapshot
     raise AccessError unless @movie.can_update? cuser
 
-    seconds = begin
-      raw = params[:secs].to_s.strip
-      raw.present? ? Float(raw) : nil
-    rescue ArgumentError, TypeError
-      nil
-    end
-    seconds = nil if seconds&.negative?
-
-    success = @movie.make_snapshot(seconds: seconds)
-    notice_message = 'Snapshot created.'
-    alert_message = 'Snapshot could not be created.'
-
+    success = @movie.make_snapshot(seconds: snapshot_seconds)
     respond_to do |format|
       format.turbo_stream do
-        if success
-          flash.now[:notice] = notice_message
-        else
-          flash.now[:alert] = alert_message
-        end
-
+        apply_movie_snapshot_flash(success, flash.now)
         render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages')
       end
       format.html do
-        if success
-          flash[:notice] = notice_message
-        else
-          flash[:alert] = alert_message
-        end
-
+        apply_movie_snapshot_flash(success, flash)
         redirect_to edit_movie_path(@movie)
       end
     end
@@ -135,11 +104,13 @@ class MoviesController < ApplicationController
 
     @movie.stream_ip = params[:ip]
     @movie.stream_port = params[:port]
-    render html: helpers.safe_join([
-                                     ERB::Util.html_escape(t(:executed)),
-                                     helpers.tag.br,
-                                     ERB::Util.html_escape(@movie.make_stream.to_s)
-                                   ]), layout: true
+    render html: helpers.safe_join(
+      [
+        ERB::Util.html_escape(t(:executed)),
+        helpers.tag.br,
+        ERB::Util.html_escape(@movie.make_stream.to_s)
+      ]
+    ), layout: true
   end
 
   def destroy
@@ -157,5 +128,28 @@ class MoviesController < ApplicationController
 
   def load_movie
     @movie = Movie.find(params[:id])
+  end
+
+  def load_movie_categories
+    @movie_categories = Category.options_for_select(Category.domain(Category::DOMAIN_MOVIES))
+  end
+
+  def filtered_movie_params
+    movie_params = Movie.params(params, cuser)
+    return movie_params if movie_params[:file_id].present?
+
+    movie_params.except(:file_id)
+  end
+
+  def snapshot_seconds
+    raw = params[:secs].to_s.strip
+    seconds = raw.present? ? Float(raw) : nil
+    seconds&.negative? ? nil : seconds
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def apply_movie_snapshot_flash(success, flash_store)
+    flash_store[success ? :notice : :alert] = success ? 'Snapshot created.' : 'Snapshot could not be created.'
   end
 end

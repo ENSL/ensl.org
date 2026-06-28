@@ -18,39 +18,58 @@ class MatchProposalsController < ApplicationController
   end
 
   def create
-    @proposal = MatchProposal.new(MatchProposal.params(params, cuser))
-    @proposal.match = @match
+    @proposal = build_match_proposal
     raise AccessError unless @proposal.can_create? cuser
 
     @proposal.assign_attributes(team: cuser.team, status: MatchProposal::STATUS_PENDING, actor: cuser)
-    if @proposal.save
-      flash[:notice] = 'Created new proposal'
-      redirect_to(match_proposals_path(@match))
-    else
-      render :new
-    end
+    return handle_match_proposal_create_success if @proposal.save
+
+    render :new
   end
 
   def update
     raise AccessError unless request.xhr? # Only respond to ajax requests
 
-    proposal = @match.match_proposals.find_by(id: params[:id])
+    proposal = find_match_proposal
     return render_proposal_missing unless proposal
 
     proposal_params = MatchProposal.params(params, cuser)
     return render_proposal_forbidden(proposal_params[:status].to_i) unless proposal.can_update?(cuser, proposal_params)
 
-    proposal.actor = cuser
-    return render_proposal_error unless proposal.update(proposal_params)
+    return render_proposal_error unless update_match_proposal(proposal, proposal_params)
 
-    name = proposal.status_name
-    render json: { status: name, message: "Successfully updated status to #{name}" }, status: :accepted
+    render_proposal_success(proposal)
   end
 
   private
 
   def load_match
     @match = Match.find params[:match_id]
+  end
+
+  def build_match_proposal
+    MatchProposal.new(MatchProposal.params(params, cuser)).tap do |proposal|
+      proposal.match = @match
+    end
+  end
+
+  def handle_match_proposal_create_success
+    flash[:notice] = 'Created new proposal'
+    redirect_to(match_proposals_path(@match))
+  end
+
+  def find_match_proposal
+    @match.match_proposals.find_by(id: params[:id])
+  end
+
+  def update_match_proposal(proposal, proposal_params)
+    proposal.actor = cuser
+    proposal.update(proposal_params)
+  end
+
+  def render_proposal_success(proposal)
+    name = proposal.status_name
+    render json: { status: name, message: "Successfully updated status to #{name}" }, status: :accepted
   end
 
   def render_proposal_missing
@@ -67,6 +86,7 @@ class MatchProposalsController < ApplicationController
   end
 
   def render_proposal_error
-    render json: { error: { code: 500, message: 'Something went wrong! Please try again.' } }, status: 500
+    render json: { error: { code: 500, message: 'Something went wrong! Please try again.' } },
+           status: :internal_server_error
   end
 end

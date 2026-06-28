@@ -20,12 +20,8 @@ class ContestersController < ApplicationController
     @contester, contester_params = Contester.build_for_create(raw_params: params, actor: cuser)
     raise AccessError unless @contester.can_create?(cuser, contester_params)
 
-    if @contester.save
-      flash[:notice] = t(:contests_join)
-      redirect_to_teams_tab
-    else
-      flash.now[:error] = @contester.errors.full_messages.to_sentence.presence || t(:error)
-      render :new, status: :unprocessable_entity
+    save_and_respond(@contester, notice: :contests_join, location: teams_tab_location, template: :new) do
+      @contester.save
     end
   end
 
@@ -33,13 +29,8 @@ class ContestersController < ApplicationController
     raise AccessError unless @contester.can_update? cuser
 
     @contester.rebalance_ladder_rank!(params.dig(:contester, :score))
-
-    if @contester.update(Contester.params(params, cuser))
-      flash[:notice] = t(:contests_contester_update)
-      redirect_to_teams_tab
-    else
-      flash.now[:error] = @contester.errors.full_messages.to_sentence.presence || t(:error)
-      render :edit, status: :unprocessable_entity
+    save_and_respond(@contester, notice: :contests_contester_update, location: teams_tab_location, template: :edit) do
+      @contester.update(Contester.params(params, cuser))
     end
   end
 
@@ -66,6 +57,10 @@ class ContestersController < ApplicationController
   end
 
   def redirect_to_teams_tab
-    redirect_to edit_contest_path(@contester.contest_id, anchor: 'teams')
+    redirect_to teams_tab_location
+  end
+
+  def teams_tab_location
+    edit_contest_path(@contester.contest_id, anchor: 'teams')
   end
 end

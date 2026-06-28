@@ -17,7 +17,7 @@ class ShoutmsgsController < ApplicationController
 
   def create
     @shoutmsg = Shoutmsg.build_for_actor(params, cuser)
-    Rails.logger.debug "Shoutmsgs#create params=#{params[:shoutmsg].inspect} cuser_id=#{cuser&.id}"
+    Rails.logger.debug { "Shoutmsgs#create params=#{params[:shoutmsg].inspect} cuser_id=#{cuser&.id}" }
     raise AccessError unless @shoutmsg.can_create? cuser
 
     respond_to do |format|
@@ -41,23 +41,26 @@ class ShoutmsgsController < ApplicationController
 
   def render_shoutmsg_create_success(format)
     format.turbo_stream do
-      Rails.logger.debug "Shoutmsgs#create saved id=#{@shoutmsg.id} user_id=#{@shoutmsg.user_id}"
-      render turbo_stream: turbo_stream.replace("new_#{@shoutmsg.domain}", partial: 'shoutmsgs/new',
-                                                                           locals: { shoutmsg: @shoutmsg.reset_form_shout })
+      render turbo_stream: turbo_stream.replace(
+        "new_#{@shoutmsg.domain}",
+        partial: 'shoutmsgs/new',
+        locals: { shoutmsg: @shoutmsg.reset_form_shout }
+      )
     end
     format.html { redirect_to_back }
   end
 
   def render_shoutmsg_create_failure(format)
     format.turbo_stream do
-      Rails.logger.debug "Shoutmsgs#create save failed: #{@shoutmsg.errors.full_messages.join(', ')}"
       flash.now[:error] = @shoutmsg.validation_error_message(t(:invalid_message))
-      streams = []
-      streams << turbo_stream.replace("new_#{@shoutmsg.domain}", partial: 'shoutmsgs/new',
-                                                                 locals: { shoutmsg: @shoutmsg })
-      # Replace notification area so flash.now[:error] is shown to the user
-      streams << turbo_stream.replace('notification', partial: 'application/messages')
-      render turbo_stream: streams
+      render turbo_stream: [
+        turbo_stream.replace(
+          "new_#{@shoutmsg.domain}",
+          partial: 'shoutmsgs/new',
+          locals: { shoutmsg: @shoutmsg }
+        ),
+        turbo_stream.replace('notification', partial: 'application/messages')
+      ]
     end
     format.html do
       flash[:error] = t(:invalid_message)

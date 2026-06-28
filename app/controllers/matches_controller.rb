@@ -40,13 +40,9 @@ class MatchesController < ApplicationController
     @match = Match.new(Match.params(params, cuser))
     raise AccessError unless @match.can_create? cuser
 
-    if @match.save
-      flash[:notice] = t(:matches_create)
-      redirect_to edit_contest_path(@match.contest, contest: 'matches')
-    else
-      flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
-      render :new, status: :unprocessable_entity
-    end
+    save_and_respond(@match, notice: :matches_create,
+                             location: edit_contest_path(@match.contest, contest: 'matches'),
+                             template: :new) { @match.save }
   end
 
   def update
@@ -54,40 +50,22 @@ class MatchesController < ApplicationController
 
     Match.normalize_matchers_attributes!(params[:match])
 
-    if @match.update(Match.params(params, cuser))
-      respond_to do |format|
-        format.xml { head :ok }
-        format.html do
-          flash[:notice] = t(:matches_update)
-          if request.referer.present? && URI(request.referer).path.include?('admin')
-            redirect_to_back
-          else
-            redirect_to @match
-          end
-        end
-      end
-    else
-      flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
-      if request.referer.present? && URI(request.referer).path == ref_match_path(@match)
-        ref
-        render :ref, status: :unprocessable_entity
-      else
-        render :edit, status: :unprocessable_entity
-      end
-    end
+    return handle_match_update_success if @match.update(Match.params(params, cuser))
+
+    handle_match_update_failure
   end
 
-  def hltv
+  def hltv # rubocop:disable Metrics/AbcSize
     raise AccessError unless @match.can_update? cuser, [:hltv]
 
-    if params[:commit].include? t(:hltv_send)
-      @match.hltv_record params[:addr], params[:pwd]
+    if params[:commit].include?(t(:hltv_send))
+      @match.hltv_record(params[:addr], params[:pwd])
       flash[:notice] = t(:hltv_recording)
-    elsif params[:commit].include? t(:hltv_move)
+    elsif params[:commit].include?(t(:hltv_move))
       sleep(90) if params[:wait] == '1'
-      @match.hltv_move params[:addr], params[:pwd]
+      @match.hltv_move(params[:addr], params[:pwd])
       flash[:notice] = t(:hltv_moved)
-    elsif params[:commit].include? t(:hltv_stop)
+    elsif params[:commit].include?(t(:hltv_stop))
       sleep(90) if params[:wait] == '1'
       @match.hltv_stop
       flash[:notice] = t(:hltv_stopped)
@@ -107,5 +85,37 @@ class MatchesController < ApplicationController
 
   def load_match
     @match = Match.find params[:id]
+  end
+
+  def handle_match_update_success
+    respond_to do |format|
+      format.xml { head :ok }
+      format.html { redirect_after_match_update }
+    end
+  end
+
+  def handle_match_update_failure
+    flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
+    return render_ref_failure if ref_match_referer?
+
+    render :edit, status: :unprocessable_entity
+  end
+
+  def redirect_after_match_update
+    flash[:notice] = t(:matches_update)
+    admin_match_referer? ? redirect_to_back : redirect_to(@match)
+  end
+
+  def render_ref_failure
+    ref
+    render :ref, status: :unprocessable_entity
+  end
+
+  def admin_match_referer?
+    request.referer.present? && URI(request.referer).path.include?('admin')
+  end
+
+  def ref_match_referer?
+    request.referer.present? && URI(request.referer).path == ref_match_path(@match)
   end
 end
