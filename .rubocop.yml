@@ -1,10 +1,15 @@
 plugins:
+  # rubocop-rails adds Rails-specific cops that understand controller, model,
+  # and routing conventions better than the core Ruby cops alone.
   - rubocop-rails
 
 AllCops:
   NewCops: disable
   TargetRubyVersion: 3.4
-  SuggestExtensions: false
+  # Allow RuboCop to suggest optional extensions without auto-enabling them.
+  SuggestExtensions: true
+
+  # Not required for linting.
   Exclude:
     - 'bin/**/*'
     - 'db/schema.rb'
@@ -20,25 +25,39 @@ AllCops:
 # Controllers (and many Rails classes) read perfectly well above the
 # general-purpose Ruby defaults; these thresholds keep a guardrail without
 # forcing actions to be shattered into many tiny private methods.
+# The point is to keep methods understandable, not to optimize for a generic
+# Ruby style guide that is too strict for Rails controllers.
 Metrics/AbcSize:
   Max: 30
 
+# Rails actions often carry a moderate amount of branching and setup, so a
+# slightly higher limit avoids artificial method splitting.
 Metrics/MethodLength:
   Max: 18
 
+# Controllers commonly branch on request state, parameters, and feature flags;
+# this ceiling keeps the logic readable while still permitting practical actions.
 Metrics/CyclomaticComplexity:
   Max: 9
 
+# Perceived complexity is a better fit for readable Rails controller code than
+# the default conservative threshold.
 Metrics/PerceivedComplexity:
   Max: 10
 
+# Class-level size is allowed to be larger than the Ruby default because Rails
+# controllers, concerns, and service objects can accumulate coherent behavior.
 Metrics/ClassLength:
   Max: 200
 
 Metrics/BlockLength:
+  # Test files and DSL-heavy configuration files naturally contain long blocks
+  # that are meaningful and should not be micromanaged by this cop.
   Exclude:
     - 'spec/**/*'
+    # Routes files are declarative DSL, so large blocks there are expected.
     - 'config/routes.rb'
+    # Task definitions often need longer blocks for clarity and grouped setup.
     - 'lib/tasks/**/*'
 
 # Rails controllers and concerns are self-documenting by convention; a top-level
@@ -48,10 +67,14 @@ Style/Documentation:
 
 # before_action callbacks frequently target actions defined in included modules
 # or engines, which this cop cannot see; it produces false positives here.
+# Disabling it avoids warning on a common Rails pattern that is valid but hard
+# for static analysis to trace reliably.
 Rails/LexicallyScopedActionFilter:
   Enabled: false
 
 # API controllers intentionally subclass ActionController::API via their own base.
+# Excluding them prevents false positives where the base controller hierarchy is
+# intentionally different from the default Rails HTML stack.
 Rails/ApplicationController:
   Exclude:
     - 'app/controllers/api/**/*'
