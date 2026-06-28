@@ -247,7 +247,9 @@ RSpec.describe Shoutmsg, type: :model do
       msgs = Array.new(3) { instance_double(Shoutmsg, user: user) }
       allow(described_class).to receive(:of_object).with('Gather', 42).and_return(relation)
       allow(relation).to receive(:count).and_return(3)
-      allow(relation).to receive(:all).and_return(msgs)
+      recent_messages = double('RecentMessages')
+      allow(relation).to receive(:all).and_return(recent_messages)
+      allow(recent_messages).to receive(:find_each).and_yield(msgs[0]).and_yield(msgs[1]).and_yield(msgs[2])
 
       expect(described_class.flood?(user, 'Gather', 42)).to be true
     end
@@ -262,7 +264,9 @@ RSpec.describe Shoutmsg, type: :model do
       ]
       allow(described_class).to receive(:of_object).with('Gather', 42).and_return(relation)
       allow(relation).to receive(:count).and_return(3)
-      allow(relation).to receive(:all).and_return(msgs)
+      recent_messages = double('RecentMessages')
+      allow(relation).to receive(:all).and_return(recent_messages)
+      allow(recent_messages).to receive(:find_each).and_yield(msgs[0]).and_yield(msgs[1]).and_yield(msgs[2])
 
       expect(described_class.flood?(user, 'Gather', 42)).to be false
     end

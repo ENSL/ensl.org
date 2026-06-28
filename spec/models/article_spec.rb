@@ -45,10 +45,11 @@ RSpec.describe Article, type: :model do
 
     it 'notifies opted-in news readers' do
       recipient = create(:user)
-      profiles = [double(user: recipient), double(user: nil)]
+      profiles = double('ProfileRelation')
 
       expect(Profile).to receive(:includes).with(:user).and_return(Profile)
       expect(Profile).to receive(:where).with('notify_news = 1').and_return(profiles)
+      expect(profiles).to receive(:find_each).and_yield(double(user: recipient)).and_yield(double(user: nil))
       expect(Notifications).to receive(:news).with(recipient, article).once
 
       article.send_notifications
@@ -57,9 +58,11 @@ RSpec.describe Article, type: :model do
     it 'notifies opted-in article readers' do
       article.category = create(:category, domain: Category::DOMAIN_ARTICLES)
       recipient = create(:user)
+      profiles = double('ProfileRelation')
 
       expect(Profile).to receive(:includes).with(:user).and_return(Profile)
-      expect(Profile).to receive(:where).with('notify_articles = 1').and_return([double(user: recipient)])
+      expect(Profile).to receive(:where).with('notify_articles = 1').and_return(profiles)
+      expect(profiles).to receive(:find_each).and_yield(double(user: recipient))
       expect(Notifications).to receive(:article).with(recipient, article).once
 
       article.send_notifications

@@ -87,23 +87,17 @@ class Teamer < ApplicationRecord
     self.rank = RANK_JOINER unless rank
   end
 
-  around_destroy :handle_destroy
-
-  private
-
-  def handle_destroy
+  # rubocop:disable Rails/ActiveRecordOverride
+  # NOTE: This is a custom destroy method that preserves historical rows for non-joiners by marking them as removed instead of deleting them from the database.
+  def destroy
     transaction do
       user.update_column(:team_id, nil) if user && user.team_id == team_id
 
-      if rank == Teamer::RANK_JOINER
-        yield
-      else
-        update!(rank: Teamer::RANK_REMOVED)
-      end
+      return super if rank == Teamer::RANK_JOINER
+
+      update_attribute(:rank, Teamer::RANK_REMOVED)
     end
   end
-
-  public
 
   def can_create?(cuser, params)
     cuser and Verification.contain params, %i[user_id team_id]

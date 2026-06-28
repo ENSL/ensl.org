@@ -77,7 +77,8 @@ class Directory < ApplicationRecord
   after_create :make_path
   after_create :sync_inode_info
   after_save :update_timestamp
-  before_destroy :remove_files, unless: :preserve_files?
+  # Run before dependent cleanup so raw file rows are deleted before foreign keys are nulled.
+  before_destroy :remove_files, unless: :preserve_files?, prepend: true
   after_destroy :remove_path, unless: :skip_remove_path?
 
   def to_s
@@ -267,7 +268,8 @@ class Directory < ApplicationRecord
 
   def remove_files
     move_directory_to_trash if move_to_trash?
-    files.destroy_all
+    # Raw SQL fixtures bypass associations, so delete by directory_id directly here.
+    DataFile.where(directory_id: id).delete_all
     subdirs.each do |subdir|
       subdir.preserve_files = preserve_files? || move_to_trash?
       subdir.destroy
@@ -559,7 +561,7 @@ class Directory < ApplicationRecord
     return orphaned if orphaned
 
     # Fourth: match by file count (heuristic for moved directories)
-    find_by(file_count: subitem_path)
+    find_by_file_count(subitem_path)
   end
 
   # Find directory with same name that no longer exists on disk
