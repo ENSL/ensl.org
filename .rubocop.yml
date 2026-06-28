@@ -1,0 +1,57 @@
+plugins:
+  - rubocop-rails
+
+AllCops:
+  NewCops: disable
+  TargetRubyVersion: 3.4
+  SuggestExtensions: false
+  Exclude:
+    - 'bin/**/*'
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'coverage*/**/*'
+    - 'config/**/*'
+    - 'lib/plugins/**/*'
+
+# Controllers (and many Rails classes) read perfectly well above the
+# general-purpose Ruby defaults; these thresholds keep a guardrail without
+# forcing actions to be shattered into many tiny private methods.
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 18
+
+Metrics/CyclomaticComplexity:
+  Max: 9
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'config/routes.rb'
+    - 'lib/tasks/**/*'
+
+# Rails controllers and concerns are self-documenting by convention; a top-level
+# comment on every class/module is noise.
+Style/Documentation:
+  Enabled: false
+
+# before_action callbacks frequently target actions defined in included modules
+# or engines, which this cop cannot see; it produces false positives here.
+Rails/LexicallyScopedActionFilter:
+  Enabled: false
+
+# API controllers intentionally subclass ActionController::API via their own base.
+Rails/ApplicationController:
+  Exclude:
+    - 'app/controllers/api/**/*'
