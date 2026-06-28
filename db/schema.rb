@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_28_100000) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -141,6 +141,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.datetime "updated_at", precision: nil
     t.integer "win", default: 0, null: false
     t.index ["contest_id"], name: "index_contesters_on_contest_id"
+    t.index ["team_id", "contest_id"], name: "index_contesters_on_team_id_and_contest_id_unique", unique: true
     t.index ["team_id"], name: "index_contesters_on_team_id"
   end
 
@@ -181,7 +182,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.string "name"
     t.datetime "updated_at", precision: nil, null: false
     t.index ["article_id"], name: "index_custom_urls_on_article_id"
-    t.index ["name"], name: "index_custom_urls_on_name"
+    t.index ["name"], name: "index_custom_urls_on_name", unique: true
   end
 
   create_table "data_files", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
@@ -223,6 +224,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.integer "group_id"
     t.datetime "updated_at", precision: nil
     t.index ["forum_id"], name: "index_forumers_on_forum_id"
+    t.index ["group_id", "forum_id", "access"], name: "index_forumers_on_group_id_forum_id_access_unique", unique: true
     t.index ["group_id"], name: "index_forumers_on_group_id"
   end
 
@@ -266,6 +268,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.index ["gather_id", "pick_order"], name: "index_gatherers_on_gather_id_and_pick_order"
     t.index ["gather_id"], name: "index_gatherers_on_gather_id"
     t.index ["updated_at", "gather_id"], name: "index_gatherers_on_updated_at_and_gather_id"
+    t.index ["user_id", "gather_id"], name: "index_gatherers_on_user_id_and_gather_id_unique", unique: true
     t.index ["user_id"], name: "index_gatherers_on_user_id"
   end
 
@@ -308,6 +311,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.index ["group_id"], name: "index_groupers_on_group_id"
+    t.index ["user_id", "group_id"], name: "index_groupers_on_user_id_and_group_id_unique", unique: true
     t.index ["user_id"], name: "index_groupers_on_user_id"
   end
 
@@ -548,6 +552,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.integer "score2"
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
+    t.index ["match_id", "user_id"], name: "index_predictions_on_match_id_and_user_id_unique", unique: true
     t.index ["match_id"], name: "index_predictions_on_match_id"
     t.index ["user_id"], name: "index_predictions_on_user_id"
   end
@@ -864,6 +869,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_170000) do
     t.integer "votable_id"
     t.string "votable_type"
     t.index ["poll_id"], name: "index_votes_on_poll_id"
+    t.index ["user_id", "votable_id", "votable_type"], name: "index_votes_on_user_id_votable_unique", unique: true
     t.index ["user_id"], name: "index_votes_on_user_id"
     t.index ["votable_id", "votable_type"], name: "index_votes_on_votable_id_and_votable_type"
   end
