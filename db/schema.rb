@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_28_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_28_113000) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -809,17 +809,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_28_100000) do
     t.integer "user_id"
     t.index ["forum_id"], name: "index_topics_on_forum_id"
     t.index ["user_id"], name: "index_topics_on_user_id"
-  end
-
-  create_table "user_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
-    t.string "lastip"
-    t.string "steamid"
-    t.datetime "updated_at", precision: nil
-    t.integer "user_id"
-    t.string "username"
-    t.integer "version"
-    t.index ["steamid"], name: "index_user_versions_on_steamid"
-    t.index ["user_id"], name: "index_user_versions_on_user_id"
   end
 
   create_table "users", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|

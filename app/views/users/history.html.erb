@@ -9,12 +9,14 @@
     <th>Last IP</th>
     <th>Date</th>
   </tr>
-  <% @user.versions.each do |user| %>
+  <% @user.versions.reorder(created_at: :desc, id: :desc).each do |version| %>
+    <% user = version.reify %>
+    <% next unless user %>
     <tr>
       <td><%= h user.username %></td>
       <td><%= h user.steamid %></td>
       <td><%= h user.lastip %></td>
-      <td><%= shorttime user.updated_at %></td>
+      <td><%= shorttime version.created_at %></td>
     </tr>
   <% end %>
 </table>

@@ -195,20 +195,7 @@ class User < ApplicationRecord
 
   acts_as_reader
 
-  acts_as_versioned
-  non_versioned_columns << 'firstname'
-  non_versioned_columns << 'lastname'
-  non_versioned_columns << 'email'
-  non_versioned_columns << 'password'
-  non_versioned_columns << 'team_id'
-  non_versioned_columns << 'lastvisit'
-  non_versioned_columns << 'team_id'
-  non_versioned_columns << 'country'
-  non_versioned_columns << 'birthdate'
-  non_versioned_columns << 'time_zone'
-  non_versioned_columns << 'public_email'
-  non_versioned_columns << 'password_hash'
-  non_versioned_columns << 'created_at'
+  has_paper_trail on: [:update], only: %i[username steamid lastip email]
 
   def to_s
     username
@@ -719,10 +706,15 @@ class User < ApplicationRecord
   end
 
   def self.historic(steamid)
-    if (u = User.find_by_sql(['SELECT * FROM user_versions WHERE steamid = ? ORDER BY updated_at',
-                              steamid])) && u.length.positive?
-      User.find u[0]['user_id']
-    end
+    version = PaperTrail::Version
+              .where(item_type: 'User')
+              .where('object LIKE ?', "%\nsteamid: #{sanitize_sql_like(steamid.to_s)}\n%")
+              .order(created_at: :asc, id: :asc)
+              .first
+
+    return User.find_by(id: version.item_id) if version
+
+    find_by(steamid: steamid)
   end
 
   def self.search(search)
