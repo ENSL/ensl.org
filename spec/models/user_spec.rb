@@ -497,4 +497,31 @@ describe User do
       end
     end
   end
+
+  describe 'paper trail versioning' do
+    it 'tracks updates for username, steamid, lastip, and email' do
+      subject = create(:user, username: 'old_name', steamid: '0:1:100', lastip: '1.1.1.1', email: 'old@example.com')
+
+      expect do
+        subject.update!(username: 'new_name', steamid: '0:1:101', lastip: '2.2.2.2', email: 'new@example.com')
+      end.to change { subject.versions.count }.by(1)
+
+      version = subject.versions.order(:id).last
+      reified = version.reify
+
+      expect(version.event).to eq('update')
+      expect(reified.username).to eq('old_name')
+      expect(reified.steamid).to eq('0:1:100')
+      expect(reified.lastip).to eq('1.1.1.1')
+      expect(reified.email).to eq('old@example.com')
+    end
+
+    it 'finds a historic user by steamid from paper trail records' do
+      subject = create(:user, steamid: '0:1:777')
+      subject.update!(steamid: '0:1:888')
+
+      expect(User.historic('0:1:777')).to eq(subject)
+      expect(User.historic('0:1:888')).to eq(subject)
+    end
+  end
 end
