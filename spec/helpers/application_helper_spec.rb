@@ -103,7 +103,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       result = helper.directory_links(child)
 
-      expect(result).to eq("ROOT\n &raquo; \nCHILD\n")
+      expect(result).to eq("ROOT\n \u00BB \nCHILD\n")
       expect(result).to be_html_safe
     end
   end
@@ -125,7 +125,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
     it 'formats the time inside a span' do
       user = instance_double(User, time_zone: 'UTC')
-      helper.instance_variable_set(:@cuser, user)
+      helper.define_singleton_method(:cuser) { user }
       time = Time.zone.parse('2024-05-01 10:30:00 UTC')
 
       result = helper.printtime(time, '%d %b %y')
@@ -170,13 +170,13 @@ RSpec.describe ApplicationHelper, type: :helper do
       allow(comments).to receive(:ordered).and_return(ordered_comments)
       allow(ordered_comments).to receive(:with_userteam).and_return(%w[c1 c2])
       helper.define_singleton_method(:return_here) { nil }
-      allow(helper).to receive(:render).with(partial: 'comments/index').and_return('rendered comments')
+      allow(helper).to receive(:render)
+        .with(partial: 'comments/index', locals: { comment: new_comment, comments: %w[c1 c2] })
+        .and_return('rendered comments')
 
       result = helper.add_comments(object)
 
       expect(result).to eq('rendered comments')
-      expect(helper.instance_variable_get(:@comment)).to eq(new_comment)
-      expect(helper.instance_variable_get(:@comments)).to eq(%w[c1 c2])
     end
   end
 
@@ -267,13 +267,14 @@ RSpec.describe ApplicationHelper, type: :helper do
 
   describe '#timezone_offset' do
     it 'returns the current user timezone when available' do
-      helper.instance_variable_set(:@cuser, instance_double(User, time_zone: 'Europe/Helsinki'))
+      user = instance_double(User, time_zone: 'Europe/Helsinki')
+      helper.define_singleton_method(:cuser) { user }
 
       expect(helper.timezone_offset).to eq('Europe/Helsinki')
     end
 
     it 'falls back to the application timezone' do
-      helper.instance_variable_set(:@cuser, nil)
+      helper.define_singleton_method(:cuser) { nil }
       allow(Time.zone).to receive(:name).and_return('UTC')
 
       expect(helper.timezone_offset).to eq('UTC')

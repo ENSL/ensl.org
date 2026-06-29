@@ -106,8 +106,12 @@ class ServerMetadataSyncJob
 
     server.update!(updates) if updates.any?
 
-    Rails.logger.debug("[ServerMetadataSyncJob] #{server.id} #{server.addr} offline: #{error.class}: #{error.message}")
+    Rails.logger.debug(
+      "[ServerMetadataSyncJob] #{server.id} #{server.addr} offline: #{error.class}: #{error.message}"
+    )
   rescue StandardError => e
-    Rails.logger.error("[ServerMetadataSyncJob] Failed to mark server #{server.id} offline: #{e.class}: #{e.message}")
+    Rails.logger.error(
+      "[ServerMetadataSyncJob] Failed to mark server #{server.id} offline: #{e.class}: #{e.message}"
+    )
   end
 end

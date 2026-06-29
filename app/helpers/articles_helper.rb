@@ -8,7 +8,7 @@ module ArticlesHelper
                 sanitize(article.text_parsed)
               end
 
-    content = truncate(raw(strip_tags(content)), length: 200) unless full
+    content = truncate(strip_tags(content), length: 200) unless full
     content
   end
 end

@@ -106,8 +106,12 @@ class DirectoryReconciliationService
     candidates.each do |dir|
       @logger.info("Removed dir: #{dir.name} (ID: #{dir.id}, path: #{dir.path}, parent_id: #{dir.parent_id})")
       # Unlink children and files but keep their records around
-      dir.files.update_all(directory_id: nil)
-      dir.subdirs.update_all(parent_id: nil)
+      dir.files.find_each do |file|
+        file.update!(directory_id: nil)
+      end
+      dir.subdirs.find_each do |subdir|
+        subdir.update!(parent_id: nil)
+      end
       dir.preserve_files = true
       dir.destroy!
       removed_count += 1
@@ -120,7 +124,8 @@ class DirectoryReconciliationService
   def log_progress(stats)
     @logger.info(
       "Progress scanned=#{stats[:entries_scanned]} dirs=#{stats[:directories_scanned]} files=#{stats[:files_scanned]} " \
-      "db_dirs(new=#{stats[:directories_created]}, moved=#{stats[:directories_relinked]}, fixed=#{stats[:directories_fixed]}, renamed=#{stats[:directories_renamed]}) " \
+      "db_dirs(new=#{stats[:directories_created]}, moved=#{stats[:directories_relinked]}, " \
+      "fixed=#{stats[:directories_fixed]}, renamed=#{stats[:directories_renamed]}) " \
       "db_files(new=#{stats[:files_created]}, relinked=#{stats[:files_relinked]})"
     )
   end
@@ -128,7 +133,9 @@ class DirectoryReconciliationService
   def summary_line
     'Reconciliation summary: ' \
       "scanned(entries=#{@stats[:entries_scanned]}, dirs=#{@stats[:directories_scanned]}, files=#{@stats[:files_scanned]}) " \
-      "db(dirs:new=#{@stats[:directories_created]}, moved=#{@stats[:directories_relinked]}, fixed=#{@stats[:directories_fixed]}, renamed=#{@stats[:directories_renamed]}, removed=#{@stats[:directories_removed]}; " \
+      "db(dirs:new=#{@stats[:directories_created]}, moved=#{@stats[:directories_relinked]}, " \
+      "fixed=#{@stats[:directories_fixed]}, renamed=#{@stats[:directories_renamed]}, " \
+      "removed=#{@stats[:directories_removed]}; " \
       "files:new=#{@stats[:files_created]}, relinked=#{@stats[:files_relinked]})"
   end
 

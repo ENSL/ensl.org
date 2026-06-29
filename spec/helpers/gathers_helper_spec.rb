@@ -6,7 +6,7 @@ RSpec.describe GathersHelper, type: :helper do
   describe '#gather_current_user' do
     it 'prefers the gatherer user when present' do
       gather_user = instance_double(User)
-      helper.instance_variable_set(:@gatherer, instance_double(Gatherer, user: gather_user))
+      allow(helper).to receive(:gatherer_from_context).and_return(instance_double(Gatherer, user: gather_user))
       helper.define_singleton_method(:cuser) { instance_double(User) }
 
       expect(helper.gather_current_user).to eq(gather_user)
@@ -14,7 +14,7 @@ RSpec.describe GathersHelper, type: :helper do
 
     it 'falls back to the current user' do
       current_user = instance_double(User)
-      helper.instance_variable_set(:@gatherer, nil)
+      allow(helper).to receive(:gatherer_from_context).and_return(nil)
       helper.define_singleton_method(:cuser) { current_user }
 
       expect(helper.gather_current_user).to eq(current_user)
@@ -28,7 +28,8 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'renders the running partial for running gathers' do
-      helper.instance_variable_set(:@gather, instance_double(Gather, status: Gather::STATE_RUNNING))
+      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_RUNNING))
+      allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       expect(helper.render_gather).to eq('rendered')
       expect(helper.headers['Gather']).to eq('running')
@@ -40,8 +41,8 @@ RSpec.describe GathersHelper, type: :helper do
       gather = instance_double(Gather, status: Gather::STATE_VOTING, gatherer_votes: votes_relation)
       current_user = instance_double(User, id: 9)
 
-      helper.instance_variable_set(:@gather, gather)
-      helper.instance_variable_set(:@gatherer, instance_double(Gatherer))
+      allow(helper).to receive(:gather_from_context).and_return(gather)
+      allow(helper).to receive(:gatherer_from_context).and_return(instance_double(Gatherer))
       helper.define_singleton_method(:cuser) { current_user }
       allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double('FilteredVotes', any?: true))
 
@@ -56,8 +57,8 @@ RSpec.describe GathersHelper, type: :helper do
       gather = instance_double(Gather, status: Gather::STATE_VOTING, gatherer_votes: votes_relation)
       current_user = instance_double(User, id: 9)
 
-      helper.instance_variable_set(:@gather, gather)
-      helper.instance_variable_set(:@gatherer, nil)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
+      allow(helper).to receive(:gatherer_from_context).and_return(nil)
       helper.define_singleton_method(:cuser) { current_user }
       allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double('FilteredVotes',
                                                                                            any?: false))
@@ -68,7 +69,8 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'renders the picking partial for picking gathers' do
-      helper.instance_variable_set(:@gather, instance_double(Gather, status: Gather::STATE_PICKING))
+      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_PICKING))
+      allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       helper.render_gather
 
@@ -77,7 +79,8 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'renders the picking partial for finished gathers' do
-      helper.instance_variable_set(:@gather, instance_double(Gather, status: Gather::STATE_FINISHED))
+      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_FINISHED))
+      allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       helper.render_gather
 
@@ -105,16 +108,16 @@ RSpec.describe GathersHelper, type: :helper do
     let(:status) { Gather::STATE_VOTING }
 
     before do
-      helper.instance_variable_set(:@gather, gather)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
       allow(helper).to receive(:gather_current_user).and_return(user)
     end
 
     it 'returns false when the gather or user is missing' do
-      helper.instance_variable_set(:@gather, nil)
+      allow(helper).to receive(:gather_from_context).and_return(nil)
 
       expect(helper.gather_music_should_play?).to be(false)
 
-      helper.instance_variable_set(:@gather, gather)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
       allow(helper).to receive(:gather_current_user).and_return(nil)
 
       expect(helper.gather_music_should_play?).to be(false)

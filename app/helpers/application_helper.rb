@@ -51,12 +51,14 @@ module ApplicationHelper
   end
 
   def directory_links(directory)
-    output = +''
+    links = []
     Directory.directory_traverse(directory).reverse_each do |dir|
-      output << "#{namelink(dir)}\n"
-      output << " &raquo; \n" unless dir == directory
+      links << namelink(dir)
+      links << "\n"
+      links << " \u00BB \n" unless dir == directory
     end
-    output.html_safe
+
+    safe_join(links)
   end
 
   def shorten(str, length)
@@ -98,8 +100,7 @@ module ApplicationHelper
 
     out = list.map do |element|
       name = key = element
-      item = +''
-      result = +''
+      result_parts = []
 
       if element.instance_of?(Array)
         name = element[0]
@@ -126,34 +127,34 @@ module ApplicationHelper
 
       next if (str == '') || str.nil?
 
-      result << if model[key].instance_of?(Time) || model[key].instance_of?(ActiveSupport::TimeWithZone)
-                  # result << shorttime(str)
-                  model[key].to_formatted_s(:long_ordinal)
-                elsif element.instance_of?(Symbol)
-                  namelink(str)
-                elsif key.to_s.match(/^(.*)_b$/)
-                  str.bbcode_to_html
-                else
-                  h(str)
-                end
+      result_parts << if model[key].instance_of?(Time) || model[key].instance_of?(ActiveSupport::TimeWithZone)
+                        # result << shorttime(str)
+                        model[key].to_formatted_s(:long_ordinal)
+                      elsif element.instance_of?(Symbol)
+                        namelink(str)
+                      elsif key.to_s.match(/^(.*)_b$/)
+                        sanitize(str.bbcode_to_html.to_s)
+                      else
+                        h(str)
+                      end
 
-      item << content_tag(:dt) do
-        name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ').to_s.html_safe
-      end
-      item << content_tag(:dd) do
-        result.html_safe
-      end
-
-      item
+      safe_join([
+                  content_tag(:dt) do
+                    name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')
+                  end,
+                  content_tag(:dd) do
+                    safe_join(result_parts)
+                  end
+                ])
     end
 
     content_tag(:dl) do
-      out.join.html_safe
+      safe_join(out)
     end
   end
 
-  def match_lineup_display(match, lineup, team_class, reverse = false)
-    return ''.html_safe unless lineup.any?
+  def match_lineup_display(match, lineup, team_class, reverse: false)
+    return '' unless lineup.any?
 
     content_tag(:div, class: team_class) do
       content_tag(:ul) do
@@ -163,9 +164,9 @@ module ApplicationHelper
           if reverse
             items << flag(user.country)
             items << h(user.username)
-            items << (user == match.motm ? fa_icon('star') : ''.html_safe)
+            items << (user == match.motm ? fa_icon('star') : '')
           else
-            items << (user == match.motm ? fa_icon('star') : ''.html_safe)
+            items << (user == match.motm ? fa_icon('star') : '')
             items << h(user.username)
             items << flag(user.country)
           end
@@ -179,7 +180,7 @@ module ApplicationHelper
   end
 
   def match_lineups_display(match, team1_lineup, team2_lineup)
-    return ''.html_safe unless team1_lineup.any? || team2_lineup.any?
+    return '' unless team1_lineup.any? || team2_lineup.any?
 
     classes = ['lineups']
     classes << 'shift' unless team1_lineup.any?
@@ -187,7 +188,7 @@ module ApplicationHelper
     content_tag(:div, class: classes.join(' ')) do
       safe_join([
                   match_lineup_display(match, team1_lineup, 'team-1'),
-                  match_lineup_display(match, team2_lineup, 'team-2', true)
+                  match_lineup_display(match, team2_lineup, 'team-2', reverse: true)
                 ])
     end
   end
@@ -220,7 +221,7 @@ module ApplicationHelper
   end
 
   def abslink(text, url)
-    raw link_to text, url
+    link_to text, url
   end
 
   def emojify_aliases(text)
@@ -236,13 +237,13 @@ module ApplicationHelper
   end
 
   def add_comments(object)
-    return ''.html_safe unless object.respond_to?(:comments)
+    return safe_join([]) unless object.respond_to?(:comments)
 
-    @comment = Comment.new(commentable: object)
-    @comments = object.comments.ordered.with_userteam
+    comment = Comment.new(commentable: object)
+    comments = object.comments.ordered.with_userteam
 
     return_here
-    render partial: 'comments/index'
+    render partial: 'comments/index', locals: { comment: comment, comments: comments }
   end
 
   def bbcode
@@ -270,15 +271,20 @@ module ApplicationHelper
   end
 
   def timezone_offset
-    if @cuser
-      @cuser.time_zone
+    user = respond_to?(:cuser) ? cuser : nil
+
+    if user
+      user.time_zone
     else
       Time.zone.name
     end
   end
 
   def calendar
-    @calendar ||= GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset)
+    cache = request&.env
+    return GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset) unless cache
+
+    cache['application_helper.calendar'] ||= GoogleCalendar.new(ENV['GOOGLE_CALENDAR_ID'], timezone_offset)
   end
 
   def event_start_time(event)
