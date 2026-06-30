@@ -45,7 +45,7 @@ class DataFileSyncJob
 
       if nickname.blank? || host.blank? || username.blank? || password.blank?
         Rails.logger.error(
-          '[DataFileSyncJob] Invalid server config entry ' +
+          '[DataFileSyncJob] Invalid server config entry ' \
           '(nickname/host/username/password required); skipping'
         )
         next

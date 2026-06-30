@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :ci do
-  task :deploy do
+  task deploy: :environment do
     require 'rubygems'
     require 'capistrano/all'
     require 'capistrano/setup'

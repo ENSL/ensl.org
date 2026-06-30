@@ -57,7 +57,7 @@ Map.create!(name: 'ns_ensl_developer', category_id: Category.where(name: 'NS1').
 Map.create!(name: 'ns2_ensl_developer', category_id: Category.where(name: 'NS2').first.id)
 
 # Base Gather types for each Game
-Category.where(domain: Category::DOMAIN_GAMES).each do |game|
+Category.where(domain: Category::DOMAIN_GAMES).find_each do |game|
   Gather.create!(id: game.id, status: Gather::STATE_RUNNING, category_id: game.id)
 end
 
