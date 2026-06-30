@@ -15,7 +15,7 @@ RSpec.feature 'League contest integration', type: :feature do
     # Create maps and a week for the contest using factories
     map1 = create(:map)
     map2 = create(:map)
-    week = create(:week, contest: contest, name: 'Week 1', start_date: Date.today, map1: map1, map2: map2)
+    week = create(:week, contest: contest, name: 'Week 1', start_date: Time.zone.today, map1: map1, map2: map2)
 
     # Create 4 teams with leaders and join them to the contest via factories
     teams = []
@@ -32,7 +32,7 @@ RSpec.feature 'League contest integration', type: :feature do
     contesters = contest.contesters.to_a
     matches = []
     contesters.combination(2) do |c1, c2|
-      m = create(:match, contest: contest, contester1: c1, contester2: c2, week: week, match_time: Time.now)
+      m = create(:match, contest: contest, contester1: c1, contester2: c2, week: week, match_time: Time.zone.now)
       matches << m
     end
 

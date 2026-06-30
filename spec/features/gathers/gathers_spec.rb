@@ -120,10 +120,22 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
             turn_ready = safe_has_selector?(
               '#gather-stats',
               text: /It is your turn, please pick a player from the lobby!/i,
-              wait: 4
+              wait: 2
             )
 
+            unless turn_ready
+              visit_gather_with_retry(gather)
+              turn_ready = safe_has_selector?(
+                '#gather-stats',
+                text: /It is your turn, please pick a player from the lobby!/i,
+                wait: 4
+              )
+            end
+
             next unless turn_ready
+
+            visit_gather_with_retry(gather) unless safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 3)
+
             next unless safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
 
             safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }

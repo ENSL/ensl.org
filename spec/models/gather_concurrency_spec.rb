@@ -58,7 +58,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       # with_lock acquires an exclusive database lock (SELECT...FOR UPDATE)
       gather.with_lock do
         gather.increment!(:version)
-        expect(gather.version).to be > 0
+        expect(gather.version).to be_positive
       end
     end
   end

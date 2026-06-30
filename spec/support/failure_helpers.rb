@@ -9,7 +9,7 @@ RSpec.configure do |config|
     # Only attempt to save failure artifacts if a driver is available
     next unless Capybara.current_driver && Capybara.current_driver != Capybara.default_driver
 
-    failures_dir = Rails.root.join('tmp', 'rspec_failures')
+    failures_dir = Rails.root.join('tmp/rspec_failures')
     FileUtils.mkdir_p(failures_dir)
 
     name = example.full_description.gsub(/[^\w-]+/, '_')[0, 200]
@@ -64,7 +64,7 @@ RSpec.configure do |config|
 
     # Save tail of test.log
     begin
-      test_log = Rails.root.join('log', 'test.log')
+      test_log = Rails.root.join('log/test.log')
       if File.exist?(test_log)
         lines = File.readlines(test_log).last(500) || []
         File.open("#{base}.test.log", 'w') { |f| f.puts(lines) }

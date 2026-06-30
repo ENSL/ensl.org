@@ -118,7 +118,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
         post '/contests', params: {
           contest: {
             name: 'Created Contest',
-            start: Date.today,
+            start: Time.zone.today,
             end: 1.week.from_now.to_date,
             contest_type: Contest::TYPE_LADDER,
             status: Contest::STATUS_OPEN,
@@ -364,7 +364,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
           week: {
             contest_id: contest.id,
             name: 'Request Week',
-            start_date: Date.today,
+            start_date: Time.zone.today,
             map1_id: map1.id,
             map2_id: map2.id
           }
@@ -381,7 +381,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
         week: {
           contest_id: contest.id,
           name: '',
-          start_date: Date.today,
+          start_date: Time.zone.today,
           map1_id: map1.id,
           map2_id: nil
         }

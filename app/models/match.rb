@@ -420,6 +420,10 @@ class Match < ApplicationRecord
     return false unless cuser
     return true if cuser.admin?
 
+    # Controllers/views may pass an Array of permitted keys instead of a params hash.
+    referee_param = params.respond_to?(:key?) ? params[:referee_id] : nil
+    caster_param = params.respond_to?(:key?) ? params[:caster_id] : nil
+
     if cuser.ref?
       if referee == cuser
         return true if Verification.contain(params,
@@ -427,8 +431,8 @@ class Match < ApplicationRecord
                                                motm_name matchers_attributes server_id])
         return true if Verification.contain(params, [:hltv]) && !demo
       end
-      referee_toggle = (params[:referee_id].to_i == cuser.id && referee_id.blank?) ||
-                       (params[:referee_id].blank? && referee_id == cuser.id)
+      referee_toggle = (referee_param.to_i == cuser.id && referee_id.blank?) ||
+                       (referee_param.blank? && referee_id == cuser.id)
       return true if Verification.contain(params, [:referee_id]) && referee_toggle
     end
 
@@ -441,8 +445,8 @@ class Match < ApplicationRecord
       return true if match_time.today? && Verification.contain(params, [:stream_id])
     end
 
-    caster_toggle = (params[:caster_id].to_i == cuser.id && caster_id.blank?) ||
-                    (params[:caster_id].blank? && caster_id.to_i == cuser.id)
+    caster_toggle = (caster_param.to_i == cuser.id && caster_id.blank?) ||
+                    (caster_param.blank? && caster_id.to_i == cuser.id)
     return true if cuser.caster? && Verification.contain(params, [:caster_id]) && caster_toggle
 
     false

@@ -204,7 +204,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(admin)
       visit movies_path
 
-      click_link 'here'
+      find("a[href^='/data_files/new?id=']", match: :first).click
+      expect(page).to have_current_path('/data_files/new', ignore_query: true)
 
       attach_file 'data_file_name', src.to_s
       fill_in 'data_file_title', with: description
@@ -230,7 +231,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(movie_maker)
       visit movies_path
 
-      click_link 'here'
+      find("a[href^='/data_files/new?id=']", match: :first).click
+      expect(page).to have_current_path('/data_files/new', ignore_query: true)
 
       attach_file 'data_file_name', src.to_s
       fill_in 'data_file_title', with: description

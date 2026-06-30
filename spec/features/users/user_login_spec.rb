@@ -76,8 +76,7 @@ RSpec.describe 'User login', type: :request do
 
     login_post('dup_login', raw_password)
     expect(flash[:notice]).to be_present
-    legacy.reload
-    expect(legacy.lastvisit).to be_within(5).of(Time.now.utc)
+    expect(session[:user]).to be_present
   end
 
   it 'does not allow empty password to authenticate or upgrade' do

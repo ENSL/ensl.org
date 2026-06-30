@@ -19,8 +19,8 @@ RSpec.describe FileUploader do
 
   describe '#root' do
     it 'uses the default public files directory when the env var is missing' do
-      expect(uploader.root).to eq(File.join(Rails.root, 'public', 'files'))
-      expect(ENV['FILES_ROOT']).to eq(File.join(Rails.root, 'public', 'files'))
+      expect(uploader.root).to eq(Rails.root.join('public/files').to_s)
+      expect(ENV['FILES_ROOT']).to eq(Rails.root.join('public/files').to_s)
     end
 
     it 'reuses an explicit env var value' do

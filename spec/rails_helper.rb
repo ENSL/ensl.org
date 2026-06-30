@@ -20,14 +20,14 @@ require 'capybara/rspec'
 ActiveRecord::Migration.maintain_test_schema!
 
 # load support files
-Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.before(:suite) do
     FileUtils.rm_rf(ENV.fetch('FILES_ROOT'))
     FileUtils.mkdir_p(ENV.fetch('FILES_ROOT'))
 
-    log_file = Rails.root.join('log', 'test.log')
+    log_file = Rails.root.join('log/test.log')
     FileUtils.mkdir_p(log_file.dirname)
     File.write(log_file, '')
   end

@@ -24,7 +24,7 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
     fill_in 'week_name', with: 'Spec Week'
     select map1.name, from: 'week_map1_id'
     select map2.name, from: 'week_map2_id'
-    select (Date.today + 7).day.to_s, from: 'week_start_date_3i'
+    select (Time.zone.today + 7).day.to_s, from: 'week_start_date_3i'
 
     click_button 'Save Week'
 

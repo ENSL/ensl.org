@@ -22,7 +22,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
 
     # Get the cell select dropdowns
     selects = all('select[name*="cell"]').to_a
-    expect(selects.length).to be > 0
+    expect(selects.length).to be_positive
 
     # Find selects that have teams and matches available
     team_select = selects.find { |s| s.all('option[value*="contester_"]', wait: false).any? }
@@ -140,7 +140,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
 
     # Get all cell select dropdowns
     selects = all('select[name*="cell"]')
-    expect(selects.length).to be > 0
+    expect(selects.length).to be_positive
 
     # Randomly select up to 3 cells to modify
     selected_cells = selects.sample([3, selects.length].min)

@@ -13,10 +13,10 @@ module Features
       contents_js = contents.to_json
 
       wait = Capybara.default_max_wait_time
-      start = Time.now
+      start = Time.zone.now
 
       # Wait for TinyMCE to be available and set content on its editor
-      while Time.now - start < wait
+      while Time.zone.now - start < wait
         begin
           present = page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
         rescue StandardError

@@ -197,7 +197,7 @@ RSpec.describe Team, type: :model do
       other = create(:contester, contest: contest)
       create(:match, contest: contest, contester1: contester, contester2: other, score1: 1, score2: 0)
 
-      expect(team.matches.count).to be > 0
+      expect(team.matches.count).to be_positive
       team.destroy
       team.reload
       expect(team.active).to be false

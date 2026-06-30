@@ -123,13 +123,13 @@ FactoryBot.define do
         create(:bracket, contest: contest, name: evaluator.bracket_name, slots: evaluator.bracket_slots)
 
         # Create maps if specified
-        if evaluator.maps_count > 0
+        if evaluator.maps_count.positive?
           maps = create_list(:map, evaluator.maps_count)
           contest.maps << maps
         end
 
         # Create teams with members if specified
-        if evaluator.teams_count > 0
+        if evaluator.teams_count.positive?
           create_list(:team, evaluator.teams_count, :with_members)
             .each do |team|
             create(:contester, contest: contest, team: team)

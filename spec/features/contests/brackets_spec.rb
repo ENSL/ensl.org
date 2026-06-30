@@ -18,15 +18,15 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
     expect(page).to have_selector('table.brackets')
 
     # Verify all appointed teams are rendered by content
-    bracket.bracketers.where.not(team_id: nil).each do |bracketer|
+    bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
       team = bracketer.contester&.team
       expect(page).to have_content(team.name) if team
     end
 
     # Verify all appointed matches are rendered as links
-    if bracket.bracketers.where.not(match_id: nil).count > 0
+    if bracket.bracketers.where.not(match_id: nil).count.positive?
       match_links = all('a[href*="/matches/"]')
-      expect(match_links.length).to be > 0
+      expect(match_links.length).to be_positive
     end
   end
 
@@ -40,7 +40,7 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
     expect(page).to have_selector('table.brackets')
 
     # All bracketers should be teams, none should be matches
-    bracket.bracketers.where.not(team_id: nil).each do |bracketer|
+    bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
       team = bracketer.contester&.team
       expect(page).to have_content(team.name) if team
     end
@@ -63,13 +63,13 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
     expect(disabled_cells.length).to be >= 0 # May have 0 or more disabled cells
 
     # Verify appointed teams are rendered in the bracket
-    bracket.bracketers.where.not(team_id: nil).each do |bracketer|
+    bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
       team = bracketer.contester&.team
       expect(page).to have_content(team.name) if team
     end
 
     # Verify appointed matches are rendered in the bracket
-    expect(page).to have_selector('a[href*="/matches/"]') if bracket.bracketers.where.not(match_id: nil).count > 0
+    expect(page).to have_selector('a[href*="/matches/"]') if bracket.bracketers.where.not(match_id: nil).count.positive?
   end
 
   scenario 'Wild west bracket handles edge cases and orphans' do
@@ -82,14 +82,14 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
 
     # Bracket should have rendered cells even with orphans and mismatches
     all_cells = all('td.team')
-    expect(all_cells.length).to be > 0
+    expect(all_cells.length).to be_positive
 
     # Verify that disabled cells have the disabled class
     disabled_cells = all('td.team.disabled')
     expect(disabled_cells.length).to be >= 0 # May have 0 or more
 
     # Verify all team cells with content are rendered
-    bracket.bracketers.where.not(team_id: nil).each do |bracketer|
+    bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
       team = bracketer.contester&.team
       expect(page).to have_content(team.name) if team
     end
@@ -107,15 +107,15 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
       expect(page).to have_selector('table.brackets')
 
       # Verify all team cells and match cells are rendered by checking their content
-      bracket.bracketers.where.not(team_id: nil).each do |bracketer|
+      bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
         team = bracketer.contester&.team
         expect(page).to have_content(team.name) if team
       end
 
       # Verify matches are present if any exist
-      if bracket.bracketers.where.not(match_id: nil).count > 0
+      if bracket.bracketers.where.not(match_id: nil).count.positive?
         match_links = all('a[href*="/matches/"]')
-        expect(match_links.length).to be > 0
+        expect(match_links.length).to be_positive
       end
 
       sign_out
@@ -199,12 +199,12 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
     # CRITICAL: Check that siblings don't both have win1 (both green)
     # This is the "two green cells" issue mentioned by user
     # If we have win1 cells, verify count is reasonable (not more than half of team cells)
-    if total_result_cells > 0
+    if total_result_cells.positive?
       team_cells = all('td.team')
       expect(win1_cells.length).to be <= (team_cells.length / 2)
     else
       # No result classes is valid - just verify cells exist
-      expect(all('td.team').length).to be > 0
+      expect(all('td.team').length).to be_positive
     end
   end
 
@@ -222,7 +222,7 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
       # ensure bracket still renders rather than failing.
       expect(page).to have_selector('table.brackets')
     else
-      expect(connector_cells.length).to be > 0
+      expect(connector_cells.length).to be_positive
 
       # Connectors should be empty (no text content except whitespace)
       connector_cells.each do |cell|
@@ -241,7 +241,7 @@ RSpec.feature 'Bracket rendering', type: :feature, js: true do
 
     # Find empty cells
     empty_cells = all('td.empty')
-    expect(empty_cells.length).to be > 0
+    expect(empty_cells.length).to be_positive
 
     # Empty cells should have no content
     empty_cells.each do |cell|

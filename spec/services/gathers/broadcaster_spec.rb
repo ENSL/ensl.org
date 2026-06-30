@@ -43,7 +43,7 @@ describe Gathers::Broadcaster do
         gather
       }
       described_class.call(gather)
-      expect(called_count).to be > 0
+      expect(called_count).to be_positive
     end
 
     it 'bumps the gather version' do

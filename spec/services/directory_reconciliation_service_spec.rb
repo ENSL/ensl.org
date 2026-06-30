@@ -389,8 +389,8 @@ describe DirectoryReconciliationService do
       # Both branches should be represented in the database
       b1_dirs = Directory.all.select { |d| d.name.to_s.start_with?('b1') }
       b2_dirs = Directory.all.select { |d| d.name.to_s.start_with?('b2') }
-      expect(b1_dirs.count).to be > 0
-      expect(b2_dirs.count).to be > 0
+      expect(b1_dirs.count).to be_positive
+      expect(b2_dirs.count).to be_positive
     end
 
     it 'handles empty directories correctly' do
@@ -764,7 +764,7 @@ describe DirectoryReconciliationService do
       service.call
 
       # Everything from disk should now be in DB
-      expect(root_directory.subdirs.count).to be > 0
+      expect(root_directory.subdirs.count).to be_positive
       expect(DataFile.count).to eq(filesystem[:files].size)
     end
 
@@ -777,7 +777,7 @@ describe DirectoryReconciliationService do
       service.call
 
       # Verify all non-root directories have parents
-      Directory.where.not(id: Directory::ROOT).each do |dir|
+      Directory.where.not(id: Directory::ROOT).find_each do |dir|
         expect(dir.parent).not_to be_nil
         # Should be able to traverse to root
         current = dir

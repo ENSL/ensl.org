@@ -10,9 +10,9 @@ FactoryBot.define do
     end
 
     after(:create) do |gather, evaluator|
-      create_list(:map, evaluator.maps_count).each { |map| gather.maps << map } if evaluator.maps_count.to_i > 0
+      create_list(:map, evaluator.maps_count).each { |map| gather.maps << map } if evaluator.maps_count.to_i.positive?
 
-      if evaluator.servers_count.to_i > 0
+      if evaluator.servers_count.to_i.positive?
         create_list(:server, evaluator.servers_count).each { |server| gather.servers << server }
       end
     end

@@ -4,7 +4,7 @@ def ensure_test_assets_precompiled!
   return if ENV['SKIP_ASSET_PRECOMPILE'].present?
 
   # Propshaft writes public/assets/.manifest.json after assets:precompile
-  manifest = Rails.root.join('public', 'assets', '.manifest.json')
+  manifest = Rails.root.join('public/assets/.manifest.json')
   return if File.exist?(manifest)
 
   puts 'Precompiling assets for test environment...'

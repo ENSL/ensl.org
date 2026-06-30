@@ -44,7 +44,7 @@ RSpec.describe VideoProcessing, type: :service do
       duration = described_class.probe_duration_seconds!(input_path)
       expected_duration = test_video_expected_duration(fixture_name)
 
-      expect(duration).to be > 0
+      expect(duration).to be_positive
       expect(duration).to be_within(1.0).of(expected_duration)
     end
 
@@ -66,7 +66,7 @@ RSpec.describe VideoProcessing, type: :service do
       )
 
       expect(File.exist?(output_path)).to be true
-      expect(File.size(output_path)).to be > 0
+      expect(File.size(output_path)).to be_positive
     end
 
     it 'raises InvalidInput for missing source file' do
@@ -163,7 +163,7 @@ RSpec.describe VideoProcessing, type: :service do
 
       expect(result).to eq(output_path)
       expect(File.exist?(output_path)).to be true
-      expect(File.size(output_path)).to be > 0
+      expect(File.size(output_path)).to be_positive
 
       compat = described_class.probe_web_compat(output_path)
       expect(compat[:web_friendly]).to be true

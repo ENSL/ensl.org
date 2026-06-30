@@ -8,7 +8,7 @@ require 'uri'
 module Features
   module VideoSampleHelper
     # Configuration for test video samples
-    TEST_VIDEOS_DIR = Rails.root.join('spec', 'fixtures', 'files', 'videos').freeze
+    TEST_VIDEOS_DIR = Rails.root.join('spec/fixtures/files/videos').freeze
 
     REMOTE_VIDEO_LIST = [
       'AtomicNS.mp4',

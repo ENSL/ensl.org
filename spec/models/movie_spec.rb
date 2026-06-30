@@ -282,7 +282,7 @@ RSpec.describe Movie, type: :model do
       end
 
       it 'builds preview_url from preview_path when preview file exists on disk' do
-        preview_path = Rails.root.join('public', 'local', 'movie_preview_url_spec.mp4')
+        preview_path = Rails.root.join('public/local/movie_preview_url_spec.mp4')
         FileUtils.mkdir_p(File.dirname(preview_path))
         File.binwrite(preview_path, 'preview')
 

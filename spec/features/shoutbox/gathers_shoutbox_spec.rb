@@ -69,7 +69,7 @@ feature 'Gathers', js: true do
     end
 
     scenario 'creating shout while banned' do
-      Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.now + 10.days, user_name: user.username
+      Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.zone.now + 10.days, user_name: user.username
       visit root_path
       expect(find('#sidebar')).to have_content 'You have been muted.'
     end

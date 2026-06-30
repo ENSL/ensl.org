@@ -62,12 +62,12 @@ RSpec.describe Contest, type: :model do
 
     it 'returns a positive score when first player wins' do
       pos = contest.elo_score(2, 1, 10)
-      expect(pos).to be > 0
+      expect(pos).to be_positive
     end
 
     it 'returns a negative score when second player wins' do
       neg = contest.elo_score(1, 2, 10)
-      expect(neg).to be < 0
+      expect(neg).to be_negative
     end
 
     it 'is sensitive to rating difference' do

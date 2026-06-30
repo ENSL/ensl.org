@@ -441,7 +441,7 @@ RSpec.describe Group, type: :model do
     end
 
     it 'ignores unpermitted attributes' do
-      params = ActionController::Parameters.new(group: { name: 'A', founder_id: 99, created_at: Time.now })
+      params = ActionController::Parameters.new(group: { name: 'A', founder_id: 99, created_at: Time.zone.now })
       permitted = Group.params(params, nil)
       expect(permitted.key?(:founder_id)).to be false
       expect(permitted.key?(:created_at)).to be false

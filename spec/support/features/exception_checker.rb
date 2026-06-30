@@ -19,7 +19,7 @@ module Features
     # Check test.log for any ERROR/FATAL messages since test started
     def assert_no_log_errors(context = '')
       log_content = recent_log_content
-      return if log_content.nil? || log_content.empty?
+      return if log_content.blank?
 
       lines = log_content.lines
       match_index = lines.index do |line|
