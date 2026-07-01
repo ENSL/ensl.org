@@ -183,7 +183,7 @@ RSpec.describe Team, type: :model do
       team = create(:team)
       user = create(:user)
       # set team without invoking user validations
-      user.update_column(:team_id, team.id)
+      user.update!(team_id: team.id)
       team.destroy
       expect(user.reload.team_id).to be_nil
     end
@@ -284,7 +284,7 @@ RSpec.describe Team, type: :model do
 
     it 'recover sets active true' do
       team = create(:team)
-      team.update_attribute(:active, false)
+      team.update!(active: false)
       team.recover
       expect(team.active).to be true
     end

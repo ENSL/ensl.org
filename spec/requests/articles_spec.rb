@@ -42,7 +42,7 @@ RSpec.describe 'ArticlesController', type: :request do
       old_poll.options.build(option: 'Old A')
       old_poll.options.build(option: 'Old B')
       old_poll.save!
-      old_poll.update_column(:created_at, 2.days.ago)
+      old_poll.update!(created_at: 2.days.ago)
 
       newest_poll = Poll.new(question: 'Newest poll question')
       newest_poll.options.build(option: 'New A')

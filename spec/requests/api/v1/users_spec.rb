@@ -98,7 +98,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
     end
 
     it 'returns nil steam metadata for invalid steam community lookups' do
-      user.update_attribute(:steamid, '0:0:0')
+      user.update!(steamid: '0:0:0')
 
       get "/api/v1/users/#{user.id}", headers: json_headers
 

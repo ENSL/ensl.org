@@ -43,10 +43,10 @@ module GathersHelper
   end
 
   def gather_from_context
-    @gather
+    controller&.instance_variable_get(:@gather)
   end
 
   def gatherer_from_context
-    @gatherer
+    controller&.instance_variable_get(:@gatherer)
   end
 end

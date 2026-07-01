@@ -36,7 +36,7 @@ RSpec.describe Challenge, type: :model do
     end
 
     it 'skips default_time calculation when contest default time lacks hour support' do
-      contest.update_column(:default_time, nil)
+      contest.default_time = nil
       challenge = described_class.new(contester1: cont1, contester2: cont2, match_time: match_time)
 
       challenge.set_defaults

@@ -13,7 +13,7 @@ RSpec.describe 'User login', type: :request do
   it 'allows MD5 users to log in and upgrades password to scrypt' do
     # create a user and force MD5-stored password
     u = create(:user, username: username)
-    u.update_columns(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
+    u.update!(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
 
     # login using legacy password
     login_post(username, raw_password)
@@ -27,7 +27,7 @@ RSpec.describe 'User login', type: :request do
 
   it 'allows login again after upgrade using same raw password' do
     u = create(:user, username: username)
-    u.update_columns(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
+    u.update!(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
 
     # first login upgrades
     login_post(username, raw_password)
@@ -81,7 +81,7 @@ RSpec.describe 'User login', type: :request do
 
   it 'does not allow empty password to authenticate or upgrade' do
     u = create(:user, username: 'empty_pw')
-    u.update_columns(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
+    u.update!(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
 
     login_post('empty_pw', '')
     expect(flash[:error]).to be_present
@@ -91,7 +91,7 @@ RSpec.describe 'User login', type: :request do
 
   it 'does not authenticate with wrong password and does not upgrade' do
     u = create(:user, username: 'wrong_pw')
-    u.update_columns(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
+    u.update!(password_hash: User::PASSWORD_MD5, password: Digest::MD5.hexdigest(raw_password))
 
     login_post('wrong_pw', 'badpassword')
     expect(flash[:error]).to be_present

@@ -15,7 +15,7 @@ RSpec.describe 'Gathers version endpoint', type: :request do
   it 'updates user lastvisit on GET /gathers/:id/version' do
     login_as(user)
     stale_lastvisit = 3.hours.ago.change(usec: 0)
-    user.update_columns(lastvisit: stale_lastvisit)
+    user.update!(lastvisit: stale_lastvisit)
 
     get version_gather_path(gather), headers: { 'ACCEPT' => 'application/json' }
 
@@ -38,7 +38,7 @@ RSpec.describe 'Gathers version endpoint', type: :request do
   it 'updates user lastvisit on GET /gathers/:id (normal page request)' do
     login_as(user)
     stale_lastvisit = 3.hours.ago.change(usec: 0)
-    user.update_columns(lastvisit: stale_lastvisit)
+    user.update!(lastvisit: stale_lastvisit)
 
     get gather_path(gather)
 

@@ -393,19 +393,12 @@ describe Directory do
     describe 'before_destroy :remove_files' do
       it 'destroys all files in directory' do
         dir = create(:directory)
-        # Use raw SQL to insert data files without triggering callbacks
-        file1_id = ActiveRecord::Base.connection.insert(
-          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' \
-          "VALUES (#{dir.id}, '/tmp/file1.txt', 'abc123', 100, NOW(), NOW())"
-        )
-        file2_id = ActiveRecord::Base.connection.insert(
-          'INSERT INTO data_files (directory_id, path, md5, size, created_at, updated_at) ' \
-          "VALUES (#{dir.id}, '/tmp/file2.txt', 'def456', 200, NOW(), NOW())"
-        )
+        file1 = create(:data_file, directory: dir, name: 'file1.txt', path: '/tmp/file1.txt', md5: 'abc123', size: 100)
+        file2 = create(:data_file, directory: dir, name: 'file2.txt', path: '/tmp/file2.txt', md5: 'def456', size: 200)
 
         dir.destroy
-        expect(DataFile.exists?(file1_id)).to be false
-        expect(DataFile.exists?(file2_id)).to be false
+        expect(DataFile.exists?(file1.id)).to be false
+        expect(DataFile.exists?(file2.id)).to be false
       end
 
       it 'destroys all subdirectories' do

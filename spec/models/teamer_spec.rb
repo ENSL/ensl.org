@@ -26,7 +26,7 @@ RSpec.describe Teamer, type: :model do
     it 'destroys record if rank is JOINER and clears user team_id' do
       user = create(:user)
       team = create(:team)
-      user.update_column(:team_id, team.id)
+      user.update!(team_id: team.id)
       t = Teamer.create!(user: user, team: team, rank: Teamer::RANK_JOINER)
       t.destroy
       expect(Teamer.where(id: t.id)).to be_empty

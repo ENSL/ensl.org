@@ -179,7 +179,7 @@ RSpec.describe 'TeamsController', type: :request do
 
     it 'returns 403 when a non-admin tries to recover a team' do
       team = create(:team)
-      team.update_column(:active, false)
+      team.update!(active: false)
       login_as(user)
 
       get recover_team_path(team)

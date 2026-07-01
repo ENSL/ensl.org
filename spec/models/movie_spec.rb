@@ -174,21 +174,19 @@ RSpec.describe Movie, type: :model do
         File.binwrite(source_path, 'source-bytes')
 
         directory = Directory.create!(name: 'movietest', title: 'Movie Test', hidden: false, path: dir)
-        DataFile.insert_all!([
-                               {
-                                 directory_id: directory.id,
-                                 name: 'clip.mp4',
-                                 path: source_path,
-                                 size: File.size(source_path),
-                                 md5: Digest::MD5.file(source_path).hexdigest,
-                                 description: 'clip.mp4',
-                                 created_at: File.mtime(source_path),
-                                 updated_at: Time.current
-                               }
-                             ])
+        DataFile.create!(
+          directory_id: directory.id,
+          name: 'clip.mp4',
+          path: source_path,
+          size: File.size(source_path),
+          md5: Digest::MD5.file(source_path).hexdigest,
+          description: 'clip.mp4',
+          created_at: File.mtime(source_path),
+          updated_at: Time.current
+        )
 
         source_file = DataFile.find_by(path: source_path)
-        Movie.insert_all!([{ file_id: source_file.id, created_at: Time.current, updated_at: Time.current }])
+        Movie.create!(file_id: source_file.id)
         persisted_movie = Movie.find_by(file_id: source_file.id)
 
         allow(source_file).to receive(:location).and_return(source_path)

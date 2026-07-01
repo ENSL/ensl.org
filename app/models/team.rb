@@ -197,7 +197,7 @@ class Team < ApplicationRecord
 
       promoted_from_joiner = member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
       member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
-      member.user.update_column(:team_id, id) if promoted_from_joiner
+      member.user.update!(team_id: id) if promoted_from_joiner
     end
   end
 

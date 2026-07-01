@@ -28,12 +28,14 @@ RSpec.describe Gatherer, type: :model do
       no_pick_later = create(:gatherer, gather: gather, team: nil)
       other_team = create(:gatherer, gather: gather, team: nil)
 
-      first_pick_later.update_columns(team: 1, pick_order: 1, updated_at: 3.minutes.ago)
-      first_pick_earlier.update_columns(team: 1, pick_order: 1, updated_at: 4.minutes.ago)
-      second_pick.update_columns(team: 1, pick_order: 2, updated_at: 5.minutes.ago)
-      no_pick_earlier.update_columns(team: 1, pick_order: nil, updated_at: 2.minutes.ago)
-      no_pick_later.update_columns(team: 1, pick_order: nil, updated_at: 1.minute.ago)
-      other_team.update_columns(team: 2, pick_order: 1, updated_at: 6.minutes.ago)
+      first_pick_later.update!(team: 1, pick_order: 1, updated_at: 3.minutes.ago)
+      first_pick_earlier.update!(team: 1, pick_order: 1, updated_at: 4.minutes.ago)
+      second_pick.update!(team: 1, pick_order: 2, updated_at: 5.minutes.ago)
+      no_pick_earlier.update!(team: 1)
+      no_pick_later.update!(team: 1)
+      no_pick_earlier.update!(pick_order: nil, updated_at: 2.minutes.ago)
+      no_pick_later.update!(pick_order: nil, updated_at: 1.minute.ago)
+      other_team.update!(team: 2, pick_order: 1, updated_at: 6.minutes.ago)
 
       result_ids = gather.gatherers.for_pick_list(1).pluck(:id)
 

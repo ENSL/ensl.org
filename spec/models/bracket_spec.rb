@@ -91,7 +91,7 @@ RSpec.describe Bracket, type: :model do
     context 'without a name' do
       it 'returns a formatted string with the bracket ID' do
         bracket = create(:bracket, name: 'Test Bracket')
-        bracket.update_column(:name, nil) # Use update_column to bypass validation
+        bracket.name = nil
         expect(bracket.to_s).to eq("Bracket ##{bracket.id}")
       end
     end

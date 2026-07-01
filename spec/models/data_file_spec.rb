@@ -478,7 +478,7 @@ describe DataFile do
       # Create DataFile by uploading the existing file
       existing = create(:data_file)
       # Manually set the path to the test file location for find_existing to work
-      existing.update_column(:path, file_path)
+      existing.update!(path: file_path)
 
       result = DataFile.find_existing(file_path, 'findexist_123.txt')
       expect(result).to eq(existing)
@@ -672,7 +672,7 @@ describe DataFile do
                        path: '/tmp/test_dirs/source_clip_preview.mp4',
                        title: 'Preview Clip')
 
-      Movie.insert_all!([{ file_id: source.id, created_at: Time.current, updated_at: Time.current }])
+      Movie.create!(file_id: source.id)
       source_movie = Movie.find_by(file_id: source.id)
 
       source.reload.refresh_preview_links!

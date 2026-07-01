@@ -19,7 +19,7 @@ FactoryBot.define do
         Teamer.find_or_create_by!(user: team.founder, team: team) do |teamer|
           teamer.rank = Teamer::RANK_LEADER
         end
-        team.founder.update_column(:team_id, team.id) unless team.founder.team_id == team.id
+        team.founder.update!(team_id: team.id) unless team.founder.team_id == team.id
       end
     end
 

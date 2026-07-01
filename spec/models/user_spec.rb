@@ -118,7 +118,7 @@ describe User do
       subject = create(:user)
       team = create(:team)
       teamer = create(:teamer, user: subject, team: team, rank: Teamer::RANK_MEMBER)
-      subject.update_column(:team_id, team.id)
+      subject.update!(team_id: team.id)
       subject.reload
 
       expect(subject.current_teamer).to eq(teamer)
@@ -371,7 +371,7 @@ describe User do
       # Duplicate steamid is allowed to exist (legacy), but new users cannot take it
       existing = create(:user, steamid: '0:1:123')
       legacy_dup = create(:user)
-      legacy_dup.update_column(:steamid, existing.steamid)
+      legacy_dup.update!(steamid: existing.steamid)
       legacy_dup.reload
       legacy_dup.valid?
       expect(legacy_dup.errors[:steamid]).to be_empty

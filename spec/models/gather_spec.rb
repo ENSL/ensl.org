@@ -123,7 +123,7 @@ RSpec.describe Gather, type: :model do
 
     it 'switches to team 1 when team 2 has the next pick window' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 2)
+      gather.update!(status: Gather::STATE_PICKING, turn: 2)
       gather.reload
       stub_refresh_state(gather, team_one_count: 2, team_two_count: 3)
 
@@ -134,7 +134,7 @@ RSpec.describe Gather, type: :model do
 
     it 'switches to team 2 when team 1 reaches the 4-3 pick window' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
+      gather.update!(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
       stub_refresh_state(gather, team_one_count: 4, team_two_count: 3)
 
@@ -145,7 +145,7 @@ RSpec.describe Gather, type: :model do
 
     it 'switches back to team 1 when team 2 reaches the 5-4 pick window' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 2)
+      gather.update!(status: Gather::STATE_PICKING, turn: 2)
       gather.reload
       stub_refresh_state(gather, team_one_count: 4, team_two_count: 5)
 
@@ -156,7 +156,7 @@ RSpec.describe Gather, type: :model do
 
     it 'moves the last lobby player to team 2 in the 6-5 state' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
+      gather.update!(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
       lobby_member = instance_double(Gatherer)
       allow(lobby_member).to receive(:update!)
@@ -170,7 +170,7 @@ RSpec.describe Gather, type: :model do
 
     it 'handles the 6-5 state when there is no lobby member to move' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
+      gather.update!(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
       stub_refresh_state(gather, team_one_count: 6, team_two_count: 5, lobby_member: nil)
 
@@ -180,7 +180,7 @@ RSpec.describe Gather, type: :model do
 
     it 'does nothing when team counts are outside the transition windows' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_PICKING, turn: 1)
+      gather.update!(status: Gather::STATE_PICKING, turn: 1)
       gather.reload
       stub_refresh_state(gather, team_one_count: 1, team_two_count: 1)
 

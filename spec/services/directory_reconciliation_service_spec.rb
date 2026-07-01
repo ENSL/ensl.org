@@ -679,7 +679,7 @@ describe DirectoryReconciliationService do
         dir.hidden = false
         dir.parent_id = root_directory.id
       end
-      movies_dir.update_columns(path: movies_path, parent_id: root_directory.id, updated_at: Time.current)
+      movies_dir.update!(path: movies_path, parent_id: root_directory.id, updated_at: Time.current)
 
       source_path = File.join(movies_path, 'sample.mp4')
       preview_path = File.join(movies_path, 'sample_preview.mp4')
@@ -689,32 +689,30 @@ describe DirectoryReconciliationService do
       File.utime(aged_time, aged_time, source_path)
       File.utime(aged_time, aged_time, preview_path)
 
-      DataFile.insert_all!([
-                             {
-                               directory_id: movies_dir.id,
-                               name: 'sample.mp4',
-                               path: source_path,
-                               size: File.size(source_path),
-                               md5: Digest::MD5.file(source_path).hexdigest,
-                               description: 'sample.mp4',
-                               created_at: File.mtime(source_path),
-                               updated_at: Time.current
-                             },
-                             {
-                               directory_id: movies_dir.id,
-                               name: 'sample_preview.mp4',
-                               path: preview_path,
-                               size: File.size(preview_path),
-                               md5: Digest::MD5.file(preview_path).hexdigest,
-                               description: 'sample_preview.mp4',
-                               created_at: File.mtime(preview_path),
-                               updated_at: Time.current
-                             }
-                           ])
+      DataFile.create!(
+        directory_id: movies_dir.id,
+        name: 'sample.mp4',
+        path: source_path,
+        size: File.size(source_path),
+        md5: Digest::MD5.file(source_path).hexdigest,
+        description: 'sample.mp4',
+        created_at: File.mtime(source_path),
+        updated_at: Time.current
+      )
+      DataFile.create!(
+        directory_id: movies_dir.id,
+        name: 'sample_preview.mp4',
+        path: preview_path,
+        size: File.size(preview_path),
+        md5: Digest::MD5.file(preview_path).hexdigest,
+        description: 'sample_preview.mp4',
+        created_at: File.mtime(preview_path),
+        updated_at: Time.current
+      )
 
       source_file = DataFile.find_by(path: source_path)
       preview_file = DataFile.find_by(path: preview_path)
-      Movie.insert_all!([{ file_id: source_file.id, created_at: Time.current, updated_at: Time.current }])
+      Movie.create!(file_id: source_file.id)
       movie = Movie.find_by(file_id: source_file.id)
 
       service = DirectoryReconciliationService.new(root_directory)

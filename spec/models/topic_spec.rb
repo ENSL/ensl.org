@@ -118,7 +118,7 @@ describe Topic do
 
     it 'returns nil when forum is missing instead of raising' do
       topic = create(:topic, user: user, forum: forum)
-      topic.update_column(:forum_id, nil)
+      topic.forum = nil
 
       expect { topic.can_show?(nil) }.not_to raise_error
       expect(topic.can_show?(nil)).to be_nil
