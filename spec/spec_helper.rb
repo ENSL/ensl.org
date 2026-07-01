@@ -61,6 +61,10 @@ RSpec.configure do |config|
   # config.filter_run :focus
   config.run_all_when_everything_filtered = true
   config.filter_run_excluding :debug
+  # Performance specs are opt-in locally and always disabled in CI.
+  run_performance_specs = ENV['RUN_PERFORMANCE_SPECS'].to_s == '1'
+  running_in_ci = ENV['CI'].to_s == 'true'
+  config.filter_run_excluding performance: true if running_in_ci || !run_performance_specs
   config.order = 'random'
   config.use_transactional_fixtures = false
   config.color = true

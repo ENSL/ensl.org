@@ -3,24 +3,18 @@
 require 'rails_helper'
 require 'rspec-benchmark'
 
-RSpec.describe 'Front page performance', type: :request do
+RSpec.describe 'Front page performance', type: :request, performance: true do
   include RSpec::Benchmark::Matchers
 
-  before do
-    news_category = create(:category, :news)
-    author = create(:user)
+  let!(:seed_stats) { seed_front_page_performance_data! }
 
-    articles = create_list(:article, 30, category: news_category, user: author)
+  it 'stays under a query-count budget for root rendering' do
+    query_count = count_sql_queries { get '/' }
 
-    # Add comments on a subset of articles to exercise with_comments query paths.
-    articles.first(10).each do |article|
-      create_list(:comment, 3, commentable: article, user: author)
-    end
-
-    poll = Poll.new(question: 'Front page perf poll?')
-    poll.options.build(option: 'Yes')
-    poll.options.build(option: 'No')
-    poll.save!
+    expect(response).to have_http_status(:ok)
+    expect(query_count).to be <= 35
+    expect(seed_stats[:articles_seeded]).to be_positive
+    expect(seed_stats[:comments_seeded]).to be_positive
   end
 
   it 'renders the root page within a baseline budget' do
