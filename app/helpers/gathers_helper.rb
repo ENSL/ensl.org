@@ -6,6 +6,8 @@ module GathersHelper
   end
 
   def render_gather(gather = gather_from_context, gatherer = gatherer_from_context)
+    return unless gather
+
     if gather.status == Gather::STATE_RUNNING
       headers['Gather'] = 'running'
 
@@ -43,10 +45,10 @@ module GathersHelper
   end
 
   def gather_from_context
-    controller&.instance_variable_get(:@gather)
+    instance_variable_get(:@gather) || controller&.instance_variable_get(:@gather)
   end
 
   def gatherer_from_context
-    controller&.instance_variable_get(:@gatherer)
+    instance_variable_get(:@gatherer) || controller&.instance_variable_get(:@gatherer)
   end
 end

@@ -73,7 +73,11 @@ class DataFile < ApplicationRecord
   attr_accessor :skip_file_validation
 
   def skip_file_validation_or_update?
-    skip_file_validation || !new_record?
+    skip_file_validation || !new_record? || file_already_present_on_disk?
+  end
+
+  def file_already_present_on_disk?
+    path.present? && File.exist?(path)
   end
 
   # Callback chain for file processing (order matters)
@@ -282,31 +286,36 @@ class DataFile < ApplicationRecord
   end
 
   def preview_filename?
-    name.to_s.downcase.end_with?('_preview.mp4')
+    filename_for_matching.to_s.downcase.end_with?('_preview.mp4')
   end
 
   def source_basename
-    preview_filename? ? name.to_s.sub(/_preview\.mp4\z/i, '') : File.basename(name.to_s, File.extname(name.to_s))
+    filename = filename_for_matching.to_s
+    preview_filename? ? filename.sub(/_preview\.mp4\z/i, '') : File.basename(filename, File.extname(filename))
   end
 
   def find_source_for_preview
     base = source_basename
     return nil if base.blank?
 
-    DataFile.where(directory_id: directory_id)
-            .where('LOWER(name) = ?', "#{base.downcase}.mp4")
-            .where.not(id: id)
-            .first
+    find_in_directory_by_filename("#{base.downcase}.mp4")
   end
 
   def find_preview_for_source
     base = source_basename
     return nil if base.blank?
 
+    find_in_directory_by_filename("#{base.downcase}_preview.mp4")
+  end
+
+  def filename_for_matching
+    self[:name].presence || File.basename(path.to_s)
+  end
+
+  def find_in_directory_by_filename(target_filename)
     DataFile.where(directory_id: directory_id)
-            .where('LOWER(name) = ?', "#{base.downcase}_preview.mp4")
             .where.not(id: id)
-            .first
+            .find { |candidate| candidate.send(:filename_for_matching).to_s.downcase == target_filename }
   end
 
   def link_preview_to_source!(source, preview = self)
@@ -325,7 +334,8 @@ class DataFile < ApplicationRecord
     # rubocop:enable Rails/SkipsModelValidations
   end
   private :sync_preview_links, :in_movies_tree?, :preview_filename?, :source_basename,
-          :find_source_for_preview, :find_preview_for_source, :link_preview_to_source!
+          :find_source_for_preview, :find_preview_for_source, :filename_for_matching,
+          :find_in_directory_by_filename, :link_preview_to_source!
 
   # Update movie metadata if movie exists and file changed
   def update_movie_metadata

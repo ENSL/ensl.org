@@ -146,7 +146,7 @@ class User < ApplicationRecord
     where('lastvisit > ?', 30.days.ago.utc)
   }
 
-  before_validation :update_password
+  before_validation :update_password, if: :password_update_needed?
 
   # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :username, :email, uniqueness: { case_sensitive: false }
@@ -178,6 +178,7 @@ class User < ApplicationRecord
 
     # If updating and steamid didn't change, skip uniqueness check.
     return true unless steamid_changed?
+    return true if persisted?
 
     existing = User.where('LOWER(steamid) = ?', steamid.to_s.downcase).where.not(id: id)
     return true if existing.nil? || existing.count.zero?
@@ -498,11 +499,16 @@ class User < ApplicationRecord
   # FIXME: if team has been removed
   def validate_team
     return unless team && !active_teams.exists?({ id: team.id })
+    return if persisted? && will_save_change_to_team_id?
 
     # Attempts to fix team, gracefully
     self.team = nil
-    save
     errors.add :team
+  end
+
+  def password_update_needed?
+    (raw_password.to_s.length.positive? && !will_save_change_to_password?) ||
+      ((password_hash == User::PASSWORD_MD5) && !!password_force)
   end
 
   def init_variables
