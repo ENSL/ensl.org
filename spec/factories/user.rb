@@ -69,6 +69,14 @@ FactoryBot.define do
       end
     end
 
+    trait :front_page_state do
+      after(:create) do |user|
+        create(:profile, user: user)
+        create(:read_mark, reader: user, readable_type: 'Message', readable_id: nil)
+        Ban.where(user_id: user.id, ban_type: Ban::TYPE_MUTE).delete_all
+      end
+    end
+
     trait :chris do
       steamid '0:1:58097444'
     end

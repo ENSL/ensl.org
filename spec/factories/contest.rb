@@ -187,5 +187,53 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :front_page_dataset do
+      contest_type { Contest::TYPE_BRACKET }
+
+      transient do
+        author { create(:user) }
+        teams_count { 1000 }
+        contesters_count { 2000 }
+        matches_count { 1800 }
+        now { Time.current }
+      end
+
+      after(:create) do |contest, evaluator|
+        teams = create_list(:team, evaluator.teams_count, founder: evaluator.author)
+        next if teams.length < 2
+
+        contester_rows = teams.first(evaluator.contesters_count).each_with_index.map do |team, index|
+          {
+            team_id: team.id,
+            contest_id: contest.id,
+            score: index,
+            extra: 0,
+            trend: Contester::TREND_FLAT,
+            created_at: evaluator.now,
+            updated_at: evaluator.now
+          }
+        end
+        Contester.insert_all!(contester_rows) if contester_rows.any?
+
+        contester_ids = Contester.where(contest_id: contest.id).order(id: :desc).pluck(:id)
+        next if contester_ids.length < 2
+
+        max_matches = [evaluator.matches_count, contester_ids.length - 1].min
+        match_rows = Array.new(max_matches) do |index|
+          {
+            contest_id: contest.id,
+            contester1_id: contester_ids[index],
+            contester2_id: contester_ids[index + 1],
+            score1: index % 2,
+            score2: (index + 1) % 2,
+            match_time: evaluator.now,
+            created_at: evaluator.now,
+            updated_at: evaluator.now
+          }
+        end
+        Match.insert_all!(match_rows) if match_rows.any?
+      end
+    end
   end
 end
