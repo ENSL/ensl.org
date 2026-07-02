@@ -12,10 +12,20 @@ Capybara.register_driver :selenium do |_app|
 end
 
 # Playwright configuration
+#
+# Pin the Playwright CLI to the version the ruby client is compatible with.
+# Without this, the driver defaults to `npx playwright`, which resolves to the
+# latest Playwright and expects a browser revision that differs from the one
+# installed in CI (`npx playwright@COMPATIBLE_PLAYWRIGHT_VERSION install ...`),
+# causing "Executable doesn't exist at .../chromium_headless_shell-<rev>".
+PLAYWRIGHT_CLI_EXECUTABLE_PATH =
+  ENV.fetch('PLAYWRIGHT_CLI_EXECUTABLE_PATH', "npx playwright@#{Playwright::COMPATIBLE_PLAYWRIGHT_VERSION}")
+
 Capybara.register_driver :playwright_chrome do |app|
   Capybara::Playwright::Driver.new(
     app,
     browser_type: :chromium,
+    playwright_cli_executable_path: PLAYWRIGHT_CLI_EXECUTABLE_PATH,
     default_navigation_timeout: 120_000,
     headless: false,
     screen: { width: 1280, height: 1024 },
@@ -33,6 +43,7 @@ Capybara.register_driver :playwright_chrome_headless do |app|
   Capybara::Playwright::Driver.new(
     app,
     browser_type: :chromium,
+    playwright_cli_executable_path: PLAYWRIGHT_CLI_EXECUTABLE_PATH,
     default_navigation_timeout: 120_000,
     headless: true,
     screen: { width: 1280, height: 1024 },
