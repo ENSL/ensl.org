@@ -114,6 +114,7 @@ class User < ApplicationRecord
   has_many :sent_personal_messages, class_name: 'Message', as: 'sender', dependent: :destroy
   has_many :sent_team_messages, through: :active_teams, source: :sent_messages
   has_many :match_teams, -> { group('teams.id') }, through: :matchers, source: :teams
+  has_many :passkey_credentials, dependent: :destroy
 
   scope :active, -> { where(banned: false) }
   scope :with_age, lambda {
@@ -579,6 +580,14 @@ class User < ApplicationRecord
 
   def can_play?
     gathers.where('gathers.status > ?', Gather::STATE_RUNNING).count.positive? or created_at < 2.years.ago
+  end
+
+  def passkey_enabled?
+    passkey_credentials.exists?
+  end
+
+  def webauthn_user_handle
+    "user-#{id}"
   end
 
   # Records a successful login by stamping the user's last IP and visit time.

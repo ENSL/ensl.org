@@ -25,8 +25,29 @@ class SessionsController < ApplicationController
   end
 
   def login
-    process_login_attempt if params[:login]
+    if params[:login_otp]
+      verify_pending_otp
+    elsif params[:login]
+      process_login_attempt
+    end
     return_back
+  end
+
+  def passkey_options
+    options = passkey_login_service.challenge(username: params[:username])
+    render json: options
+  rescue Passkeys::Error => e
+    render json: { error: e.message }, status: e.status
+  end
+
+  def passkey_authenticate
+    user = passkey_login_service.authenticate(credential_params: passkey_credential_params)
+    login_user(user)
+
+    redirect_to = session.delete(:return_to).presence || root_path
+    render json: { redirect_to: redirect_to }
+  rescue Passkeys::Error => e
+    render json: { error: e.message }, status: e.status
   end
 
   def logout
@@ -76,11 +97,29 @@ class SessionsController < ApplicationController
 
     if (user = User.authenticate(params[:login]))
       Rails.logger.info("Login success user_id=#{user.id} username=#{user.username}")
-      login_user(user)
+      if user.passkey_enabled?
+        begin_password_login_otp(user)
+      else
+        login_user(user)
+      end
     else
       log_failed_login
       flash[:error] = t(:login_unsuccessful)
     end
+  end
+
+  def verify_pending_otp
+    user = otp_service.verify(code: params.dig(:login_otp, :code))
+    login_user(user)
+  rescue Passkeys::Error => e
+    flash[:error] = e.message
+  end
+
+  def begin_password_login_otp(user)
+    otp_service.challenge(user)
+    flash[:notice] = t(:login_otp_sent)
+  rescue Passkeys::Error => e
+    flash[:error] = e.message
   end
 
   def log_login_attempt
@@ -113,7 +152,20 @@ class SessionsController < ApplicationController
     return handle_banned_login if result[:banned]
 
     apply_login_notice(result, user)
+    otp_service.clear!
     save_session user
+  end
+
+  def passkey_credential_params
+    params.require(:credential).permit!.to_h
+  end
+
+  def passkey_login_service
+    @passkey_login_service ||= Passkeys::LoginService.new(session: session, request: request)
+  end
+
+  def otp_service
+    @otp_service ||= Passkeys::OtpService.new(session: session, request: request)
   end
 
   def handle_banned_login

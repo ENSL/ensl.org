@@ -125,6 +125,8 @@ Rails.application.routes.draw do
       match :login,  to: 'sessions#login',  via: %i[get post]
       match :logout, to: 'sessions#logout', via: %i[get post]
       match :forgot, to: 'sessions#forgot', via: %i[get post]
+      post :passkey_options, to: 'sessions#passkey_options'
+      post :passkey_authenticate, to: 'sessions#passkey_authenticate'
     end
     member do
       get :agenda
@@ -132,6 +134,10 @@ Rails.application.routes.draw do
       get :popup
     end
   end
+
+  post 'users/:id/passkeys/options', to: 'passkeys#options', as: :user_passkey_options
+  post 'users/:id/passkeys', to: 'passkeys#create', as: :user_passkeys
+  delete 'users/:id/passkeys/:credential_id', to: 'passkeys#destroy', as: :user_passkey
 
   # Legacy compatibility: allow /users/agenda/:id
   get 'users/agenda/:id', to: 'users#agenda', as: :legacy_agenda_user

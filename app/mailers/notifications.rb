@@ -11,6 +11,14 @@ class Notifications < ApplicationMailer
          content_type: 'multipart/alternative'
   end
 
+  def login_otp(user, code)
+    @user = user
+    @code = code
+    mail to: user.email,
+         subject: 'ENSL login verification code',
+         content_type: 'multipart/alternative'
+  end
+
   def pm(user, private_message)
     @user = user
     @pm = private_message

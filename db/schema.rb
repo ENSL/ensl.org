@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_28_113000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -510,6 +510,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_28_113000) do
     t.datetime "updated_at", precision: nil
     t.integer "votes", default: 0, null: false
     t.index ["poll_id"], name: "index_options_on_poll_id"
+  end
+
+  create_table "passkey_credentials", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.datetime "created_at", precision: nil
+    t.string "external_id", null: false
+    t.datetime "last_used_at", precision: nil
+    t.text "public_key", size: :medium, null: false
+    t.bigint "sign_count", default: 0, null: false
+    t.datetime "updated_at", precision: nil
+    t.integer "user_id", null: false
+    t.index ["external_id"], name: "index_passkey_credentials_on_external_id", unique: true
+    t.index ["user_id"], name: "index_passkey_credentials_on_user_id"
   end
 
   create_table "pcws", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|

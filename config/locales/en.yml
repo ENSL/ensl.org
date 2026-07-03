@@ -92,6 +92,19 @@ en:
   accounts_locked: "Account locked."
   login_successful: "Login Successful"
   login_unsuccessful: "Login Unsuccessful"
+  login_otp_sent: "Verification code sent to your email."
+  login_otp_invalid: "Verification code is invalid."
+  login_otp_expired: "Verification code has expired. Please log in again."
+  login_otp_session_missing: "No pending login verification found."
+  login_otp_send_failed: "Could not send verification code. Please try again."
+  passkey_enabled: "Passkey login is enabled for your account."
+  passkey_disabled: "Passkey login is currently disabled."
+  passkey_unavailable: "Passkey login is not available for this account."
+  passkey_invalid: "Passkey authentication failed."
+  passkey_expired: "Passkey request expired. Please try again."
+  passkey_registered: "Passkey registered successfully."
+  passkey_removed: "Passkey removed."
+  passkey_remove_confirm: "Remove this passkey?"
   login_out: "Logged out."
   login_status: "Logged in as"
   passwords_sent: "Password has been sent."
@@ -130,6 +143,10 @@ en:
   sessions:
     form:
       forgot_password: "Forgot password?"
+      otp_code: "Verification code"
+      verify_otp: "Verify code"
+      login_with_passkey: "Use passkey"
+      enable_passkey: "Enable passkey"
   errors:
     template:
       header: "Please review the following errors:"

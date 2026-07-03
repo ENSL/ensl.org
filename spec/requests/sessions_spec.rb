@@ -24,6 +24,46 @@ RSpec.describe 'SessionsController', type: :request do
       expect(response).to redirect_to('/')
       expect(flash[:error]).to be_present
     end
+
+    it 'requires OTP after password when passkeys are enabled' do
+      PasskeyCredential.create!(
+        user: user,
+        external_id: 'test-external-id',
+        public_key: 'test-public-key',
+        sign_count: 0
+      )
+
+      ActionMailer::Base.deliveries.clear
+
+      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+
+      expect(session[:user]).to be_nil
+      expect(session[:pending_login_otp]).to be_present
+      expect(ActionMailer::Base.deliveries.size).to eq(1)
+      expect(flash[:notice]).to eq(I18n.t(:login_otp_sent))
+    end
+
+    it 'logs in after valid OTP verification' do
+      PasskeyCredential.create!(
+        user: user,
+        external_id: 'test-external-id-2',
+        public_key: 'test-public-key',
+        sign_count: 0
+      )
+
+      ActionMailer::Base.deliveries.clear
+
+      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+
+      body = ActionMailer::Base.deliveries.last.body.to_s
+      otp = body[/\b\d{6}\b/]
+      expect(otp).to be_present
+
+      post '/users/login', params: { login_otp: { code: otp } }
+
+      expect(session[:user]).to eq(user.id)
+      expect(session[:pending_login_otp]).to be_nil
+    end
   end
 
   describe 'POST /users/logout' do

@@ -73,6 +73,7 @@ gem 'steam-id2'
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
+gem 'webauthn'
 
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"

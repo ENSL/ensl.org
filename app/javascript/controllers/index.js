@@ -4,6 +4,7 @@ import EmojiAutocompleteController from "controllers/emoji_autocomplete_controll
 import TwemojiController from "controllers/twemoji_controller"
 import ServerTableController from "controllers/server_table_controller"
 import GatherMusicController from "controllers/gather_music_controller"
+import PasskeyAuthController from "controllers/passkey_auth_controller"
 import "controllers/local"
 import "controllers/shoutbox"
 
@@ -12,3 +13,4 @@ application.register("emoji-autocomplete", EmojiAutocompleteController)
 application.register("twemoji", TwemojiController)
 application.register("server-table", ServerTableController)
 application.register("gather-music", GatherMusicController)
+application.register("passkey-auth", PasskeyAuthController)

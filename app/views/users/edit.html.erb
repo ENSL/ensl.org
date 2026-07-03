@@ -25,6 +25,34 @@
               <%= f.label :raw_password, "Password" %>
               <%= f.password_field :raw_password %>
             </div>
+            <% if cuser == @user %>
+              <div class="fields horizontal"
+                   data-controller="passkey-auth"
+                   data-passkey-auth-register-options-url-value="<%= user_passkey_options_path(@user) %>"
+                   data-passkey-auth-register-url-value="<%= user_passkeys_path(@user) %>">
+                <label>Passkeys</label>
+                <div class="inputs">
+                  <p>
+                    <%= @user.passkey_enabled? ? t(:passkey_enabled) : t(:passkey_disabled) %>
+                  </p>
+                  <%= button_tag t('sessions.form.enable_passkey'), type: 'button', data: { action: 'passkey-auth#register' } %>
+                  <% if @user.passkey_credentials.any? %>
+                    <ul>
+                      <% @user.passkey_credentials.each do |credential| %>
+                        <li>
+                          <%= credential.created_at.strftime('%Y-%m-%d') %>
+                          <%= link_to 'Remove',
+                                      user_passkey_path(@user, credential_id: credential.id),
+                                      method: :delete,
+                                      data: { confirm: t(:passkey_remove_confirm) } %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+                  <div data-passkey-auth-target="status"></div>
+                </div>
+              </div>
+            <% end %>
             <div class="fields horizontal">
               <%= f.label :email do %>
                 <p>Email</p>

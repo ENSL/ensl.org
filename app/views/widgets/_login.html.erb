@@ -1,4 +1,12 @@
-<%= form_tag(login_users_path, { class: 'dark' }) do %>
+<% otp_pending = session[:pending_login_otp].present? %>
+
+<%= form_tag(login_users_path,
+             { class: 'dark',
+               data: {
+                 controller: 'passkey-auth',
+                 passkey_auth_options_url_value: passkey_options_users_path,
+                 passkey_auth_authenticate_url_value: passkey_authenticate_users_path
+               } }) do %>
   <div class="fields">
     <div class="header-icons">
       <%= link_to '#', class: 'steam-login', rel: 'noopener', data: { submit_form: true, form_id: 'steam-auth-form' } do %>
@@ -11,10 +19,24 @@
 
     <%= text_field "login", "username", placeholder: "Username", autocomplete: "username" %>
     <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password" %>
+    <% if otp_pending %>
+      <%= text_field "login_otp", "code",
+                     placeholder: t('sessions.form.otp_code'),
+                     autocomplete: 'one-time-code',
+                     inputmode: 'numeric' %>
+    <% end %>
+    <div class="passkey-status" data-passkey-auth-target="status"></div>
   </div>
   <div class="buttons">
     <div class="login">
-      <%= submit_tag t('helpers.submit.user.login') %>
+      <% if otp_pending %>
+        <%= submit_tag t('sessions.form.verify_otp') %>
+      <% else %>
+        <%= submit_tag t('helpers.submit.user.login') %>
+        <%= button_tag t('sessions.form.login_with_passkey'),
+                       type: 'button',
+                       data: { action: 'passkey-auth#login' } %>
+      <% end %>
     </div>
     <div class="register">
       <%= link_to t('helpers.submit.user.create'), new_user_path %>

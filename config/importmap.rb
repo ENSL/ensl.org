@@ -9,6 +9,7 @@ pin '@rails/actioncable', to: 'actioncable.js'
 pin '@hotwired/stimulus', to: 'https://ga.jspm.io/npm:@hotwired/stimulus@3.2.2/dist/stimulus.js', preload: true
 pin '@fortawesome/fontawesome-free',
     to: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/js/all.min.js', preload: true
+pin '@simplewebauthn/browser', to: 'https://cdn.jsdelivr.net/npm/@simplewebauthn/browser@13.3.0/esm/index.js', preload: true
 pin 'tributejs', to: 'https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.esm.js', preload: true
 
 pin 'local-time' # @3.0.3
