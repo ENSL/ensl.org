@@ -512,7 +512,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
     t.index ["poll_id"], name: "index_options_on_poll_id"
   end
 
-  create_table "passkey_credentials", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "passkey_credentials", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.string "external_id", null: false
     t.datetime "last_used_at", precision: nil

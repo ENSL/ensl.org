@@ -2,7 +2,10 @@
 import "@hotwired/turbo-rails"
 import "@rails/actioncable"
 import "controllers"
-import "@fortawesome/fontawesome-free"
 import LocalTime from "local-time"
+
+// Do not block app boot if CDN-hosted icon script fails to load.
+import("@fortawesome/fontawesome-free").catch(() => {})
+
 LocalTime.start()
 document.addEventListener("turbo:morph", () => { LocalTime.run() })

@@ -30,7 +30,12 @@ RSpec.describe 'PasskeysController', type: :request do
         end
       end.new('challenge-token')
 
-      allow(WebAuthn::Credential).to receive(:options_for_get).and_return(options)
+      expect(WebAuthn::Credential).to receive(:options_for_get).with(
+        hash_including(
+          allow: ['credential-1'],
+          user_verification: 'preferred'
+        )
+      ).and_return(options)
 
       post '/users/passkey_options',
            params: { username: user.username },
@@ -85,6 +90,8 @@ RSpec.describe 'PasskeysController', type: :request do
 
   describe 'POST /users/:id/passkeys/options' do
     it 'prepares registration options for the signed-in account' do
+      user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
+
       options = Struct.new(:challenge) do
         def as_json(*)
           {
@@ -95,7 +102,11 @@ RSpec.describe 'PasskeysController', type: :request do
         end
       end.new('register-challenge')
 
-      allow(WebAuthn::Credential).to receive(:options_for_create).and_return(options)
+      expect(WebAuthn::Credential).to receive(:options_for_create).with(
+        hash_including(
+          exclude: ['credential-1']
+        )
+      ).and_return(options)
 
       post "/users/#{user.id}/passkeys/options",
            headers: {

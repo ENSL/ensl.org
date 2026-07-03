@@ -1,9 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import {
-  browserSupportsWebAuthn,
-  startAuthentication,
-  startRegistration
-} from "@simplewebauthn/browser"
 
 export default class extends Controller {
   static targets = ["status"]
@@ -17,7 +12,10 @@ export default class extends Controller {
   async login(event) {
     event.preventDefault()
 
-    if (!browserSupportsWebAuthn()) {
+    const webauthn = await this.webauthn()
+    if (!webauthn) return
+
+    if (!webauthn.browserSupportsWebAuthn()) {
       this.showStatus("Passkeys are not supported in this browser.")
       return
     }
@@ -32,7 +30,7 @@ export default class extends Controller {
 
     try {
       const options = await this.postJSON(this.optionsUrlValue, { username })
-      const credential = await startAuthentication({ optionsJSON: options })
+      const credential = await webauthn.startAuthentication({ optionsJSON: options })
       const result = await this.postJSON(this.authenticateUrlValue, { credential })
 
       if (result.redirect_to) {
@@ -48,18 +46,33 @@ export default class extends Controller {
   async register(event) {
     event.preventDefault()
 
-    if (!browserSupportsWebAuthn()) {
+    const webauthn = await this.webauthn()
+    if (!webauthn) return
+
+    if (!webauthn.browserSupportsWebAuthn()) {
       this.showStatus("Passkeys are not supported in this browser.")
       return
     }
 
     try {
       const options = await this.postJSON(this.registerOptionsUrlValue, {})
-      const credential = await startRegistration({ optionsJSON: options })
+      const credential = await webauthn.startRegistration({ optionsJSON: options })
       await this.postJSON(this.registerUrlValue, { credential })
       window.location.reload()
     } catch (error) {
       this.showStatus(error.message || "Passkey registration failed.")
+    }
+  }
+
+  async webauthn() {
+    if (this.webauthnLib) return this.webauthnLib
+
+    try {
+      this.webauthnLib = await import("@simplewebauthn/browser")
+      return this.webauthnLib
+    } catch (_error) {
+      this.showStatus("Passkey library failed to load. Please refresh and try again.")
+      return null
     }
   }
 

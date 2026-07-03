@@ -35,7 +35,7 @@
                   <p>
                     <%= @user.passkey_enabled? ? t(:passkey_enabled) : t(:passkey_disabled) %>
                   </p>
-                  <%= button_tag t('sessions.form.enable_passkey'), type: 'button', data: { action: 'passkey-auth#register' } %>
+                    <%= button_tag t('sessions.form.enable_passkey'), type: 'button', data: { action: 'click->passkey-auth#register' } %>
                   <% if @user.passkey_credentials.any? %>
                     <ul>
                       <% @user.passkey_credentials.each do |credential| %>

@@ -12,6 +12,20 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
     expect(page).to have_button('Use passkey')
   end
 
+  scenario 'clicking use passkey updates status when username is missing' do
+    visit root_path
+
+    within("form[data-controller*='passkey-auth']") do
+      click_button 'Use passkey'
+    end
+
+    expect(page).to have_css(
+      '.passkey-status',
+      text: /(enter your username before using a passkey\.|passkeys are not supported in this browser\.)/i,
+      wait: 10
+    )
+  end
+
   scenario 'password login on a passkey-enabled account sends an email OTP and then logs in' do
     passkey_user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
     ActionMailer::Base.deliveries.clear

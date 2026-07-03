@@ -35,7 +35,7 @@
         <%= submit_tag t('helpers.submit.user.login') %>
         <%= button_tag t('sessions.form.login_with_passkey'),
                        type: 'button',
-                       data: { action: 'passkey-auth#login' } %>
+                       data: { action: 'click->passkey-auth#login' } %>
       <% end %>
     </div>
     <div class="register">

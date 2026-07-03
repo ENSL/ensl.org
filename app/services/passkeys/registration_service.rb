@@ -2,8 +2,6 @@
 
 module Passkeys
   class RegistrationService
-    include Base64Url
-
     def initialize(session:, request:)
       @session = session
       @request = request
@@ -18,7 +16,7 @@ module Passkeys
           name: user.username,
           display_name: user.username
         },
-        exclude: user.passkey_credentials.map { |credential| decode_base64url(credential.external_id) },
+        exclude: user.passkey_credentials.map(&:external_id),
         authenticator_selection: {
           user_verification: 'preferred'
         }

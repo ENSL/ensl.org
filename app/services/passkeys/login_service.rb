@@ -2,8 +2,6 @@
 
 module Passkeys
   class LoginService
-    include Base64Url
-
     def initialize(session:, request:)
       @session = session
       @request = request
@@ -16,7 +14,7 @@ module Passkeys
       Webauthn.configure!(@request)
 
       options = WebAuthn::Credential.options_for_get(
-        allow: user.passkey_credentials.map { |credential| decode_base64url(credential.external_id) },
+        allow: user.passkey_credentials.map(&:external_id),
         user_verification: 'preferred'
       )
 
