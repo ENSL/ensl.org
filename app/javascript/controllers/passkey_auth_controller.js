@@ -1,12 +1,24 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["status"]
+  static targets = ["status", "loginButton"]
   static values = {
     optionsUrl: String,
     authenticateUrl: String,
     registerOptionsUrl: String,
     registerUrl: String
+  }
+
+  async connect() {
+    if (!this.hasLoginButtonTarget) return
+
+    const webauthn = await this.webauthn()
+    if (!webauthn || !webauthn.browserSupportsWebAuthn()) return
+
+    if (!(await this.supportsConditionalUI(webauthn))) return
+
+    this.loginButtonTarget.style.display = "none"
+    this.startConditionalLogin(webauthn)
   }
 
   async login(event) {
@@ -31,15 +43,44 @@ export default class extends Controller {
     try {
       const options = await this.postJSON(this.optionsUrlValue, { username })
       const credential = await webauthn.startAuthentication({ optionsJSON: options })
-      const result = await this.postJSON(this.authenticateUrlValue, { credential })
-
-      if (result.redirect_to) {
-        window.location.href = result.redirect_to
-      } else {
-        window.location.reload()
-      }
+      await this.finishLogin(credential)
     } catch (error) {
       this.showStatus(error.message || "Passkey authentication failed.")
+    }
+  }
+
+  async startConditionalLogin(webauthn) {
+    try {
+      const options = await this.postJSON(this.optionsUrlValue, {})
+      const credential = await webauthn.startAuthentication({
+        optionsJSON: options,
+        useBrowserAutofill: true,
+        verifyBrowserAutofillInput: false
+      })
+      await this.finishLogin(credential)
+    } catch (error) {
+      if (error?.name === "AbortError" || error?.name === "NotAllowedError") return
+      this.showStatus(error.message || "Passkey authentication failed.")
+    }
+  }
+
+  async finishLogin(credential) {
+    const result = await this.postJSON(this.authenticateUrlValue, { credential })
+
+    if (result.redirect_to) {
+      window.location.href = result.redirect_to
+    } else {
+      window.location.reload()
+    }
+  }
+
+  async supportsConditionalUI(webauthn) {
+    if (typeof webauthn.browserSupportsWebAuthnAutofill !== "function") return false
+
+    try {
+      return await webauthn.browserSupportsWebAuthnAutofill()
+    } catch (_error) {
+      return false
     }
   }
 

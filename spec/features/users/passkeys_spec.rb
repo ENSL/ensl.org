@@ -6,17 +6,18 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
   let(:password) { 'PasswordABC123!' }
   let(:passkey_user) { create(:user, username: 'passkey_user', raw_password: password) }
 
-  scenario 'the login form exposes passkey sign-in for browsers that support it' do
+  scenario 'the login form supports passkey autofill from the username field' do
     visit root_path
 
-    expect(page).to have_button('Use passkey')
+    username_input = find('#login_username', visible: :all)
+    expect(username_input[:autocomplete]).to include('webauthn')
   end
 
   scenario 'clicking use passkey updates status when username is missing' do
     visit root_path
 
     within("form[data-controller*='passkey-auth']") do
-      click_button 'Use passkey'
+      click_link 'Use passkey'
     end
 
     expect(page).to have_css(

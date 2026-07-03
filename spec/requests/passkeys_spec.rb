@@ -48,6 +48,34 @@ RSpec.describe 'PasskeysController', type: :request do
       expect(session[:passkey_login]).to be_present
       expect(session[:passkey_login][:user_id]).to eq(user.id)
     end
+
+    it 'supports discoverable passkey options when username is omitted' do
+      user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
+
+      options = Struct.new(:challenge) do
+        def as_json(*)
+          { challenge: challenge, allowCredentials: [] }
+        end
+      end.new('challenge-token')
+
+      expect(WebAuthn::Credential).to receive(:options_for_get).with(
+        hash_including(
+          allow: [],
+          user_verification: 'preferred'
+        )
+      ).and_return(options)
+
+      post '/users/passkey_options',
+           params: {},
+           headers: {
+             'rack.session' => session_store,
+             'rack.session.options' => { id: 'passkeys-session' }
+           }
+
+      expect(response).to have_http_status(:ok)
+      expect(session[:passkey_login]).to be_present
+      expect(session[:passkey_login][:user_id]).to be_nil
+    end
   end
 
   describe 'POST /users/passkey_authenticate' do
@@ -61,6 +89,42 @@ RSpec.describe 'PasskeysController', type: :request do
       }
 
       fake_credential = double('WebAuthn::Credential', id: 'credential-1', sign_count: 1)
+      allow(WebAuthn::Credential).to receive(:from_get).and_return(fake_credential)
+      allow(fake_credential).to receive(:verify).and_return(true)
+
+      post '/users/passkey_authenticate',
+           params: {
+             credential: {
+               id: 'credential-1',
+               rawId: 'AQIDBA',
+               type: 'public-key',
+               response: {
+                 authenticatorData: 'BQYH',
+                 clientDataJSON: 'CAkK',
+                 signature: 'CwwN'
+               }
+             }
+           },
+           headers: {
+             'rack.session' => session_store,
+             'rack.session.options' => { id: 'passkeys-session' }
+           }
+
+      expect(response).to have_http_status(:ok)
+      expect(session[:user]).to eq(user.id)
+      expect(session[:passkey_login]).to be_nil
+    end
+
+    it 'authenticates discoverable passkeys without a pre-selected user' do
+      user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
+
+      session_store[:passkey_login] = {
+        challenge: 'challenge-token',
+        user_id: nil,
+        expires_at: 5.minutes.from_now.to_i
+      }
+
+      fake_credential = double('WebAuthn::Credential', id: 'credential-1', sign_count: 2)
       allow(WebAuthn::Credential).to receive(:from_get).and_return(fake_credential)
       allow(fake_credential).to receive(:verify).and_return(true)
 
@@ -104,7 +168,11 @@ RSpec.describe 'PasskeysController', type: :request do
 
       expect(WebAuthn::Credential).to receive(:options_for_create).with(
         hash_including(
-          exclude: ['credential-1']
+          exclude: ['credential-1'],
+          authenticator_selection: hash_including(
+            resident_key: 'required',
+            user_verification: 'preferred'
+          )
         )
       ).and_return(options)
 

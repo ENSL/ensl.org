@@ -17,7 +17,7 @@
       <% end %>
     </div>
 
-    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username" %>
+    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username webauthn" %>
     <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password" %>
     <% if otp_pending %>
       <%= text_field "login_otp", "code",
@@ -30,12 +30,12 @@
   <div class="buttons">
     <div class="login">
       <% if otp_pending %>
-        <%= submit_tag t('sessions.form.verify_otp') %>
+        <%= submit_tag t('sessions.form.verify_otp'), class: 'login-action' %>
       <% else %>
-        <%= submit_tag t('helpers.submit.user.login') %>
-        <%= button_tag t('sessions.form.login_with_passkey'),
-                       type: 'button',
-                       data: { action: 'click->passkey-auth#login' } %>
+        <%= submit_tag t('helpers.submit.user.login'), class: 'login-action' %>
+        <%= link_to t('sessions.form.login_with_passkey'), '#',
+                    class: 'passkey-link login-action',
+                    data: { action: 'click->passkey-auth#login', passkey_auth_target: 'loginButton' } %>
       <% end %>
     </div>
     <div class="register">

@@ -44,10 +44,15 @@ header .banner {
       }
 
       .login {
-        input {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        .login-action {
           @include button;
-          float: right;
           margin-right: 0;
+          display: block;
+          text-align: right;
         }
       }
 

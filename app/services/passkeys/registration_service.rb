@@ -18,6 +18,7 @@ module Passkeys
         },
         exclude: user.passkey_credentials.map(&:external_id),
         authenticator_selection: {
+          resident_key: 'required',
           user_verification: 'preferred'
         }
       )

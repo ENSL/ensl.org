@@ -154,6 +154,9 @@ header .banner {
       .login {
         @include span-columns(5 of 12);
         @include shift(1.8);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
       }
 
       .register {
@@ -165,14 +168,18 @@ header .banner {
         }
       }
 
-      .login input {
+      .login .login-action {
         background: none;
         border: 0;
         font-family: $header-font-family;
         color: #73d5f7;
-        font-size: 14px;
+        font-size: 12px;
         padding: 0;
         text-transform: uppercase;
+        display: block;
+        text-align: right;
+        margin: 0;
+        line-height: 1.2;
       }
 
       .register a {
