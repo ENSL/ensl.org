@@ -182,6 +182,23 @@ header .banner {
         line-height: 1.2;
       }
 
+      .login .passkey-link,
+      .login .passkey-link:visited,
+      .login .passkey-link:hover,
+      .login .passkey-link:active {
+        background: none;
+        border: 0;
+        box-shadow: none;
+        text-decoration: none;
+        color: #73d5f7;
+        font-family: $header-font-family;
+        font-size: 12px;
+        text-transform: uppercase;
+        padding: 0;
+        margin: 0;
+        line-height: 1.2;
+      }
+
       .register a {
         float: right;
         display: block;
