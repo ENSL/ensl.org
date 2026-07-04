@@ -11,6 +11,13 @@ class SessionsController < ApplicationController
   skip_forgery_protection only: :callback
   prepend_before_action :reject_js_callback, only: :callback
 
+  # GET /auth/steam/callback
+  #
+  # callback is the endpoint that OmniAuth redirects to after a user has
+  # authenticated with Steam. It handles both new user registration and existing
+  # user login. If the user is new, it will render the new user registration form
+  # with the Steam-provided information pre-filled. If the user is existing, it will
+  # log them in and redirect them to the appropriate page.
   def callback
     return callback_failed('Steam callback: auth_hash is missing') unless auth_hash
 
@@ -24,6 +31,11 @@ class SessionsController < ApplicationController
     return_back
   end
 
+  # GET /login
+  # POST /login
+  # This action handles both displaying the login form and processing login attempts.
+  # If the request is a POST, it will attempt to authenticate the user with the provided
+  # credentials. If the request is a GET, it will simply render the login form.
   def login
     if params[:login_otp]
       verify_pending_otp
@@ -33,6 +45,11 @@ class SessionsController < ApplicationController
     return_back
   end
 
+  # GET /passkey_options
+  #
+  # This action is used to initiate a passkey login process. It generates a challenge for
+  # the user based on their username and returns it as a JSON response. If there is an error
+  # during this process, it will return an error message and status code.
   def passkey_options
     options = passkey_login_service.challenge(username: params[:username])
     render json: options
@@ -40,6 +57,11 @@ class SessionsController < ApplicationController
     render json: { error: e.message }, status: e.status
   end
 
+  # POST /passkey_authenticate
+  #
+  # This action is used to authenticate a user using a passkey. It takes the credential parameters
+  # from the request, attempts to authenticate the user, and logs them in if successful.
+  # If the authentication fails, it returns an error message and status code.
   def passkey_authenticate
     user = passkey_login_service.authenticate(credential_params: passkey_credential_params)
     login_user(user)
@@ -50,12 +72,21 @@ class SessionsController < ApplicationController
     render json: { error: e.message }, status: e.status
   end
 
+  # GET /logout
+  #
+  # This action logs the user out by clearing their session and redirecting them to the home page.
   def logout
     session[:user] = nil
     flash[:notice] = t(:login_out)
     redirect_to :root
   end
 
+  # GET /forgot
+  # POST /forgot
+  #
+  # This action handles password recovery. If the request is a POST, it will attempt to send a
+  # password reset email to the user based on the provided username and email. If successful,
+  # it will display a success message; otherwise, it will display an error message.
   def forgot
     return unless request.post?
 
@@ -82,6 +113,9 @@ class SessionsController < ApplicationController
     redirect_to_home
   end
 
+  # Cache the verified SteamID and user data in the session for later use. This is used to
+  # persist the verified SteamID across requests, and to store the user data for the duration of the session.
+  # The verified SteamID is used to ensure that the user is who they claim to be, and the cached user data is used to avoid repeated database lookups for the same user.
   def cache_callback_user(user)
     payload = user.callback_session_payload
     session[:verified_steamid] = payload[:verified_steamid]

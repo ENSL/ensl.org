@@ -39,6 +39,10 @@ class GathersController < ApplicationController
     redirect_to @gather
   end
 
+  # Desync failsafe for the Gatherer client. Updates are normally pushed live via
+  # Turbo Streams/ActionCable (see Gathers::Broadcaster), but the client also polls
+  # this endpoint every 5 seconds and reloads if the version has changed, in case a
+  # broadcast was missed (e.g. dropped cable connection).
   def version
     Rails.logger.silence do
       # Only the fields required by refresh + the version response are needed here.
