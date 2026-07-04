@@ -72,7 +72,7 @@ RSpec.configure do |config|
     # Skip per-user HTML renders in Broadcaster during feature specs.
     # N concurrent sessions each trigger O(n) partial renders on every join/vote/pick,
     # creating O(n²) render load that exhausts the DB pool under Playwright.
-    # The version bump still fires so gather_sync_controller.js reloads via polling.
+    # The version bump still fires so gather_sync.js reloads via polling.
     Gathers::Broadcaster.skip_broadcasts = true
     example.run
   ensure

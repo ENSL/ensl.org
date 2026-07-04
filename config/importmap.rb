@@ -15,3 +15,4 @@ pin 'tributejs', to: 'https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tri
 pin 'local-time' # @3.0.3
 
 pin_all_from 'app/javascript/controllers', under: 'controllers'
+pin_all_from 'app/javascript/legacy', under: 'legacy'

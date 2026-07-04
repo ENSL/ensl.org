@@ -1,6 +1,6 @@
-import { bindForumHandlers, QuoteText } from "controllers/local_forum"
-import { bindUserHandlers, findUser, HideUserPopup, ShowUserPopup } from "controllers/local_user"
-import { add_fields, bindFormHandlers, remove_fields } from "controllers/local_forms"
+import { bindForumHandlers, QuoteText } from "legacy/forum"
+import { bindUserHandlers, findUser, HideUserPopup, ShowUserPopup } from "legacy/user"
+import { add_fields, bindFormHandlers, remove_fields } from "legacy/forms"
 
 // Binds delegated jQuery handlers for legacy UI widgets across Turbo page changes.
 function bindLocalHandlers() {

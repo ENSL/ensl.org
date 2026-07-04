@@ -5,7 +5,7 @@ module Gathers
     include ActionView::RecordIdentifier
 
     # Set to true in feature specs to skip per-user HTML renders.
-    # Version bump still occurs so gather_sync_controller.js reloads via polling.
+    # Version bump still occurs so gather_sync.js reloads via polling.
     cattr_accessor :skip_broadcasts, default: false
 
     def self.call(gather, skip_user_ids: [])

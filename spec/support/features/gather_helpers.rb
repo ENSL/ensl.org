@@ -42,7 +42,7 @@ module Features
         return unless voting_time_left?(deadline)
 
         # No page re-visit: after joining, every session already has the gather
-        # page open. gather_sync_controller.js polls for version changes and
+        # page open. gather_sync.js polls for version changes and
         # reloads the frame automatically when the gather transitions to VOTING.
         return unless wait_for_voting_state(deadline: deadline)
         return unless voting_time_left?(deadline)
@@ -179,7 +179,7 @@ module Features
       frame_selector = "turbo-frame#gather_#{gather.id}_frame"
 
       # After removing page re-visits from vote helpers we must allow enough
-      # time for gather_sync_controller.js to poll (/version every 5 s in test)
+      # time for gather_sync.js to poll (/version every 5 s in test)
       # and reload the frame before we check for vote links.
       wait_for_content = 10
 
