@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  // Parse the current page and future DOM additions for emoji images.
   connect() {
     this.parseNode(document.body)
 
@@ -28,6 +29,7 @@ export default class extends Controller {
     }
   }
 
+  // Clean up the listeners and mutation observer on disconnect.
   disconnect() {
     document.removeEventListener("turbo:load", this.handleTurboLoad)
 
@@ -40,6 +42,7 @@ export default class extends Controller {
     }
   }
 
+  // Replace text emoji with Twemoji SVG markup inside the given node.
   parseNode(node) {
     if (typeof twemoji === "undefined" || !node) {
       return

@@ -4,6 +4,7 @@ export default class extends Controller {
   // Values are passed from the gather page via data-* attributes.
   static values = { gatherId: Number, version: Number, pollInterval: Number, deadReloadAfter: Number }
 
+  // Start polling the version endpoint and listen for visibility/online recovery.
   connect() {
     // Poll every few seconds, and also re-check when tab becomes visible/online.
     const interval = this.pollIntervalValue || 8000
@@ -28,6 +29,7 @@ export default class extends Controller {
     window.addEventListener("online", this.onOnline)
   }
 
+  // Stop timers and listeners when the controller disconnects.
   disconnect() {
     clearInterval(this.poll)
     this.clearDeadReloadTimer()
@@ -35,6 +37,7 @@ export default class extends Controller {
     window.removeEventListener("online", this.onOnline)
   }
 
+  // Ask the server whether the gather content version has changed.
   async checkVersion() {
     if (this.checkInFlight) return
 
@@ -67,12 +70,14 @@ export default class extends Controller {
     }
   }
 
+  // Clear the dead-connection state after any successful version check.
   markConnectionAlive() {
     // Any successful check means connection is healthy again.
     this.deadSinceAt = null
     this.clearDeadReloadTimer()
   }
 
+  // Track failed checks and escalate to a hard reload if the outage lasts too long.
   trackDeadConnection() {
     if (this.isReloading) return
 
@@ -89,6 +94,7 @@ export default class extends Controller {
     }
   }
 
+  // Arm the watchdog timer that eventually forces a reload after repeated failures.
   scheduleDeadReload() {
     // Force a hard reload if we stay disconnected for too long.
     this.clearDeadReloadTimer()
@@ -100,6 +106,7 @@ export default class extends Controller {
     }, threshold)
   }
 
+  // Cancel the watchdog timer when the connection comes back.
   clearDeadReloadTimer() {
     if (this.deadReloadTimer) {
       clearTimeout(this.deadReloadTimer)
@@ -107,6 +114,7 @@ export default class extends Controller {
     }
   }
 
+  // Broadcast a reload event and refresh the page when sync is considered dead.
   forceHardReload() {
     if (this.isReloading) return
 
@@ -121,6 +129,7 @@ export default class extends Controller {
     window.location.reload()
   }
 
+  // Read the version marker from the DOM so we can compare it with the server.
   currentDomVersion() {
     // Current version marker rendered in the page.
     const el = document.querySelector(`#gather_${this.gatherIdValue}_version`)
@@ -128,6 +137,7 @@ export default class extends Controller {
     return v ? parseInt(v, 10) : this.versionValue
   }
 
+  // Reload just the gather frame when possible, otherwise fall back to a full reload.
   reloadFrameOrPage() {
     // Prefer reloading only the gather frame; fallback to full page reload.
     const frame = document.getElementById(`gather_${this.gatherIdValue}_frame`)

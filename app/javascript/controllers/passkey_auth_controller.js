@@ -9,6 +9,7 @@ export default class extends Controller {
     registerUrl: String
   }
 
+  // Hide the plain login button when the browser can do passkey autofill directly.
   async connect() {
     if (!this.hasLoginButtonTarget) return
 
@@ -21,6 +22,7 @@ export default class extends Controller {
     this.startConditionalLogin(webauthn)
   }
 
+  // Run the explicit login flow after the user submits their username.
   async login(event) {
     event.preventDefault()
 
@@ -49,6 +51,7 @@ export default class extends Controller {
     }
   }
 
+  // Try the browser autofill passkey flow without requiring a button click.
   async startConditionalLogin(webauthn) {
     try {
       const options = await this.postJSON(this.optionsUrlValue, {})
@@ -64,6 +67,7 @@ export default class extends Controller {
     }
   }
 
+  // Send the signed credential to the server and follow any redirect it returns.
   async finishLogin(credential) {
     const result = await this.postJSON(this.authenticateUrlValue, { credential })
 
@@ -74,6 +78,7 @@ export default class extends Controller {
     }
   }
 
+  // Check whether the browser exposes the conditional UI autofill helper.
   async supportsConditionalUI(webauthn) {
     if (typeof webauthn.browserSupportsWebAuthnAutofill !== "function") return false
 
@@ -84,6 +89,7 @@ export default class extends Controller {
     }
   }
 
+  // Run the registration flow that creates a new passkey for the account.
   async register(event) {
     event.preventDefault()
 
@@ -105,6 +111,7 @@ export default class extends Controller {
     }
   }
 
+  // Lazy-load the WebAuthn library and surface a readable error if it fails.
   async webauthn() {
     if (this.webauthnLib) return this.webauthnLib
 
@@ -117,6 +124,7 @@ export default class extends Controller {
     }
   }
 
+  // POST JSON with the Rails CSRF token and return the parsed response body.
   async postJSON(url, payload) {
     const response = await fetch(url, {
       method: "POST",
@@ -136,11 +144,13 @@ export default class extends Controller {
     return json
   }
 
+  // Read the Rails CSRF token from the page head.
   csrfToken() {
     const meta = document.querySelector("meta[name='csrf-token']")
     return meta ? meta.content : ""
   }
 
+  // Show status text in the page, or fall back to an alert if no status area exists.
   showStatus(text) {
     if (this.hasStatusTarget) {
       this.statusTarget.textContent = text

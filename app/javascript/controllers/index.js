@@ -8,6 +8,7 @@ import PasskeyAuthController from "controllers/passkey_auth_controller"
 import "controllers/local"
 import "controllers/shoutbox"
 
+// Register the controller classes that the app wires up through data-controller.
 application.register("gather-sync", GatherSyncController)
 application.register("emoji-autocomplete", EmojiAutocompleteController)
 application.register("twemoji", TwemojiController)

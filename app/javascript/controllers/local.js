@@ -1,10 +1,12 @@
 let userInfoTimeout
 
+// Hide the hover popup immediately when the delayed timer fires.
 function HideUserPopupRunner() {
   const popup = document.getElementById("userPopup")
   if (popup) popup.style.visibility = "Hidden"
 }
 
+// Show the user popup near the hovered element and load its script payload.
 function ShowUserPopup(source, user) {
   clearInterval(userInfoTimeout)
 
@@ -22,10 +24,12 @@ function ShowUserPopup(source, user) {
   })
 }
 
+// Schedule the popup to hide a moment later so the pointer can move into it.
 function HideUserPopup() {
   userInfoTimeout = setTimeout(HideUserPopupRunner, 1000)
 }
 
+// Refresh the hidden authenticity token so legacy form submissions still pass CSRF checks.
 function refreshFormAuthenticityToken(form) {
   if (!form) return
 
@@ -44,6 +48,7 @@ function refreshFormAuthenticityToken(form) {
   tokenInput.value = csrfToken
 }
 
+// Bind the old jQuery-driven page interactions used across the legacy UI.
 function bindLocalHandlers() {
   $(document).off("click", ".fastReply")
   $(document).on("click", ".fastReply", function(e) {
@@ -177,6 +182,7 @@ function bindLocalHandlers() {
   })
 }
 
+// Open the user search popup in a small dedicated window.
 function findUser(source) {
   const findUserWindow = window.open(`/users/find?source=${source}`, "findUser", "height=400,width=400,menubar=false")
   if (window.focus && findUserWindow) {
@@ -188,6 +194,7 @@ function findUser(source) {
   return false
 }
 
+// Request the quote snippet for the given record and inject the returned script.
 function QuoteText(id, type) {
   const quoteType = type || "posts"
   $.ajax({
@@ -197,11 +204,13 @@ function QuoteText(id, type) {
   })
 }
 
+// Mark nested fields as removed and hide the matching form block.
 function remove_fields(link) {
   $(link).prev("input[type=hidden]").val("1")
   $(link).closest(".fields").hide()
 }
 
+// Clone a nested field template and replace its placeholder ID with a fresh one.
 function add_fields(link, association, content) {
   const newId = new Date().getTime()
   const regexp = new RegExp(`new_${association}`, "g")
@@ -216,6 +225,7 @@ window.QuoteText = QuoteText
 window.remove_fields = remove_fields
 window.add_fields = add_fields
 
+// Rebind the legacy handlers on initial load and on Turbo navigation events.
 document.addEventListener("DOMContentLoaded", bindLocalHandlers)
 document.addEventListener("turbo:load", bindLocalHandlers)
 document.addEventListener("turbo:render", bindLocalHandlers)

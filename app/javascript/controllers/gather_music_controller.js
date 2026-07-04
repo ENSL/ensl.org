@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ["audio", "muteButton"]
   static values = { shouldPlay: Boolean }
 
+  // Set up the audio state, remember mute preference, and try autoplay if requested.
   connect() {
     if (!this.hasAudioTarget) return
 
@@ -19,14 +20,17 @@ export default class extends Controller {
     }
   }
 
+  // Remove the document click hook when the controller disconnects.
   disconnect() {
     document.removeEventListener("click", this.onDocumentClick)
   }
 
+  // Stop the music when a vote link is clicked.
   handleDocumentClick(event) {
     if (event.target.closest(".vote-link")) this.stopOnVote()
   }
 
+  // Flip mute state, store it, and refresh the button label.
   toggleMute() {
     if (!this.hasAudioTarget) return
 
@@ -35,11 +39,13 @@ export default class extends Controller {
     this.updateMuteButton()
   }
 
+  // Pause playback so vote actions do not keep the song running.
   stopOnVote() {
     if (!this.hasAudioTarget) return
     this.audioTarget.pause()
   }
 
+  // Try to start playback, but leave the controls usable if autoplay is blocked.
   tryAutoplay() {
     if (!this.hasAudioTarget) return
 
@@ -55,6 +61,7 @@ export default class extends Controller {
     }
   }
 
+  // Restore the saved mute choice from localStorage, or fall back to unmuted.
   applyStoredMutePreference() {
     try {
       this.audioTarget.muted = localStorage.getItem(this.mutedStorageKey) === "1"
@@ -63,6 +70,7 @@ export default class extends Controller {
     }
   }
 
+  // Persist the user's mute choice so the next visit starts the same way.
   persistMutePreference(isMuted) {
     try {
       localStorage.setItem(this.mutedStorageKey, isMuted ? "1" : "0")
@@ -71,6 +79,7 @@ export default class extends Controller {
     }
   }
 
+  // Keep the mute button label aligned with the current audio state.
   updateMuteButton() {
     if (!this.hasMuteButtonTarget || !this.hasAudioTarget) return
 

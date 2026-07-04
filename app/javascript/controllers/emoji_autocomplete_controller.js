@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import Tribute from "tributejs"
 
 export default class extends Controller {
+  // Load emoji shortcodes, wire Tribute, and keep new inputs attached during Turbo updates.
   async connect() {
     this.attachedInputs = []
 
@@ -42,6 +43,7 @@ export default class extends Controller {
     this.observeDomChanges()
   }
 
+  // Tear down listeners, observers, and Tribute attachments when the controller goes away.
   disconnect() {
     if (this.handleTurboLoad) {
       document.removeEventListener("turbo:load", this.handleTurboLoad)
@@ -72,6 +74,7 @@ export default class extends Controller {
     this.attachedInputs = []
   }
 
+  // Fetch the emoji shortcode list from the server, or return an empty list on failure.
   async fetchEmojiValues() {
     try {
       const response = await fetch("/emoji/shortcodes", {
@@ -88,6 +91,7 @@ export default class extends Controller {
     }
   }
 
+  // Attach emoji autocomplete to any text inputs that have not been wired yet.
   attachToInputs() {
     if (!this.tribute) {
       return
@@ -108,6 +112,7 @@ export default class extends Controller {
     this.attachedInputs = this.attachedInputs.filter((input) => input.isConnected)
   }
 
+  // Guard Tribute's selection helper so it only runs when the current list still exists.
   hardenTributeSelection() {
     if (!this.tribute || typeof this.tribute.selectItemAtIndex !== "function") {
       return
@@ -127,6 +132,7 @@ export default class extends Controller {
     }
   }
 
+  // Watch the DOM for newly inserted shout inputs and wire them automatically.
   observeDomChanges() {
     if (this.mutationObserver) {
       this.mutationObserver.disconnect()
