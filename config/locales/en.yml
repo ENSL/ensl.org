@@ -45,8 +45,6 @@ en:
   issues_create: "Issue was successfully created."
   issues_update: "Issue was successfully updated."
   topics_locked: "Topic locked."
-  logevent_create: "LogEvent was successfully created."
-  logevent_update: "LogEvent was successfully updated."
   maps_create: "Map was successfully created."
   maps_update: "Map was successfully updated."
   matches_create: "Match was successfully created."

@@ -21,15 +21,15 @@ class LogFile < ActiveRecord::Base
   attr_accessor :path
   belongs_to :server
 
-  has_many :logs
-  has_many :rounds, :through => :logs
+  has_many :log_lines
+  has_many :rounds, :through => :log_lines
 
   def after_create
     Pathname(path).each_line do |line|
       if m = line.gsub(NON_ASCII, "").match(/\d{2}:\d{2}:\d{2}: (.*)/)
-        log = Log.new
+        log = LogLine.new
         log.server = server
-        log.domain = Log::DOMAIN_LOG
+        log.domain = LogLine::DOMAIN_LOG
         log.log_file = self
         log.text = m[1].strip
         next if log.text.match(/^Server cvar/)
@@ -61,7 +61,7 @@ class LogFile < ActiveRecord::Base
         r.destroy
       end
     end
-    Log.delete_all(["details IS NULL AND log_file_id = ?", self.id])
+    LogLine.delete_all(["details IS NULL AND log_file_id = ?", self.id])
   end
 
   def format path
@@ -85,7 +85,7 @@ class LogFile < ActiveRecord::Base
           lf.format file
           lf.server_id = dir
 
-          unless LogFile.first(:conditions => {:name => lf.name, :size => lf.size, :server_id => dir.to_i})
+          unless LogFile.find_by(name: lf.name, size: lf.size, server_id: dir.to_i)
             lf.save
           end
         end

@@ -37,8 +37,6 @@
   issues_create: "Ongelmaraportti on luotu."
   issues_update: "Ongelmaraportti on päivitetty."
   topics_locked: "Aihe on lukittu."
-  logevent_create: "Lokitapahtuma on luotu."
-  logevent_update: "Lokitapahtuma on päivitetty."
   maps_create: "Kartta on luotu."
   maps_update: "Kartta on päivitetty."
   matches_create: "Ottelu on luotu."

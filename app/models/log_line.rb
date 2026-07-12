@@ -2,7 +2,7 @@
 
 # == Schema Information
 #
-# Table name: logs
+# Table name: log_lines
 #
 #  id          :integer          not null, primary key
 #  server_id   :integer
@@ -18,7 +18,7 @@
 #  log_file_id :integer
 #
 
-class Log < ApplicationRecord
+class LogLine < ApplicationRecord
   include Extra
   attr_accessor :text
 
@@ -34,15 +34,17 @@ class Log < ApplicationRecord
     RE_PLAYER_NAME = /"(.*?)<\d*><STEAM_\d*:\d*:\d*><[a-z]*1team>"/
     RE_PLAYER_NAME_TEAM = /"(.*?)<\d*><STEAM_\d*:\d*:\d*><([a-z]*)1team>"/
 
-    scope :recent, :order => "id DESC", :limit => 5
-  scope :ordered, :order => "created_at ASC, id ASC"
+    scope :recent, -> { order(id: :desc).limit(5) }
+  scope :ordered, -> { order(:created_at, :id) }
   scope :with_details,
-    lambda { |details| {:conditions => ["details LIKE ?", details]} }
-  scope :unhandled, :conditions => {:details => nil}
+    ->(details) { where("details LIKE ?", details) }
+  scope :unhandled, -> { where(details: nil) }
   scope :stats,
-    :select => "id, details, COUNT(*) as num",
-    :group => "details",
-    :order => "details"
+    -> {
+      select("id, details, COUNT(*) as num")
+        .group("details")
+        .order("details")
+    }
 
   belongs_to :details, :class_name => "LogEvent"
   belongs_to :server
@@ -110,7 +112,7 @@ class Log < ApplicationRecord
             self.actor.round = vars[:round]
             self.actor.name = m[1]
             self.actor.steamid = m[2]
-            self.actor.user = User.first(:conditions => {:steamid => m[2]}) or User.historic(m[2])
+            self.actor.user = User.find_by(steamid: m[2]) or User.historic(m[2])
             self.actor.team = (m[3] == "marine" ? TEAM_MARINES : TEAM_ALIENS)
             if self.actor.user and t = Teamer.historic(actor.user, vars[:round].start).first
               self.actor.ensl_team = t.team

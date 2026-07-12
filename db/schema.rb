@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_11_120100) do
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
@@ -371,7 +371,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
     t.index ["server_id"], name: "index_log_files_on_server_id"
   end
 
-  create_table "logs", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
+  create_table "log_lines", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
     t.integer "actor_id"
     t.datetime "created_at", precision: nil
     t.string "details"
@@ -383,11 +383,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
     t.string "specifics2"
     t.integer "target_id"
     t.text "text"
-    t.index ["actor_id"], name: "index_logs_on_actor_id"
-    t.index ["log_file_id"], name: "index_logs_on_log_file_id"
-    t.index ["round_id"], name: "index_logs_on_round_id"
-    t.index ["server_id"], name: "index_logs_on_server_id"
-    t.index ["target_id"], name: "index_logs_on_target_id"
+    t.index ["actor_id"], name: "index_log_lines_on_actor_id"
+    t.index ["log_file_id"], name: "index_log_lines_on_log_file_id"
+    t.index ["round_id"], name: "index_log_lines_on_round_id"
+    t.index ["server_id"], name: "index_log_lines_on_server_id"
+    t.index ["target_id"], name: "index_log_lines_on_target_id"
   end
 
   create_table "maps", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|

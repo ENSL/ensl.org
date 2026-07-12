@@ -14,20 +14,20 @@
   </div>
 
   <div class="equal left center">
-    <% @round.logs.stats.each do |s| %>
+    <% @round.log_lines.stats.each do |s| %>
       <% next unless @round.marine_stats.include? s.details %>
       <b><%= @round.marine_stats[s.details] %></b>: <%= s.num %> <br />
     <% end %>
   </div>
   <div class="equal left center">
-    <% @round.logs.stats.each do |s| %>
+    <% @round.log_lines.stats.each do |s| %>
       <% next unless @round.alien_stats.include? s.details %>
       <b><%= @round.alien_stats[s.details] %></b>: <%= s.num %> <br />
     <% end %>
   </div>
 </div>
 
-<% {Log::TEAM_MARINES => "Marines", Log::TEAM_ALIENS => "Aliens"}.each do |team, name| %>
+<% {LogLine::TEAM_MARINES => "Marines", LogLine::TEAM_ALIENS => "Aliens"}.each do |team, name| %>
   <div class="wide box">
     <h2 class="center">
       <%= name %>
@@ -69,7 +69,7 @@
 
       <% alien_total = 0 %>
       <% consecutives = 0 %>
-      <% @round.logs.each do |log| %>
+      <% @round.log_lines.each do |log| %>
         <% next unless e = Round.alien_event(log.details) %>
         <% next if log.details == "kill" and (m = log.frag)[2] != "alien" %> 
         <% add = log.since*8 - alien_total %>
@@ -110,7 +110,7 @@
 
       <% marine_total = 0 %>
       <% consecutives = 0 %>
-      <% @round.logs.each do |log| %>
+      <% @round.log_lines.each do |log| %>
         <% next unless e = Round.marine_event(log.details) %>
         <% next if log.details == "kill" and (m = log.frag)[2] != "marine" %> 
         <% add = log.since*8 - marine_total %>

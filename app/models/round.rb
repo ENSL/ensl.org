@@ -16,17 +16,19 @@
 #
 
 class Round < ActiveRecord::Base
-  scope :basic, :include => [:commander, :map, :server, :team1, :team2], :order => "start DESC"
+  scope :basic, -> { includes(:commander, :map, :server, :team1, :team2).order("start DESC") }
   scope :team_stats,
-    :select => "team1_id AS team_id, COUNT(*) as rounds, AVG(winner) AS wlr, teams.name",
-    :joins => "LEFT JOIN teams ON teams.id = team1_id",
-    :group => "team_id",
-    :order => "rounds DESC",
-    :having => "rounds > 10 AND team_id IS NOT NULL",
-    :limit => 100
+    -> {
+      select("team1_id AS team_id, COUNT(*) as rounds, AVG(winner) AS wlr, teams.name")
+        .joins("LEFT JOIN teams ON teams.id = team1_id")
+        .group("team_id")
+        .order("rounds DESC")
+        .having("rounds > 10 AND team_id IS NOT NULL")
+        .limit(100)
+    }
 
   has_many :rounders, :dependent => :destroy
-  has_many :logs, :dependent => :destroy
+  has_many :log_lines, :dependent => :destroy
 
   belongs_to :team1, :class_name => "Team"
   belongs_to :team2, :class_name => "Team"

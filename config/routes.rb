@@ -51,7 +51,6 @@ Rails.application.routes.draw do
     resources :maps, only: %i[create destroy], module: :contests
   end
 
-  resources :log_events
   resources :categories do
     member do
       patch :up
@@ -165,7 +164,7 @@ Rails.application.routes.draw do
   end
 
   resources :maps
-  resources :logs
+  resources :log_lines
   resources :log_files
   resources :directories, except: [:index] do
     member do

@@ -12,7 +12,7 @@
 
 class LogEvent < ActiveRecord::Base
   def self.get search, team = nil
-    if f = first({:conditions => {:name => search}})
+    if f = find_by(name: search)
       return f
     else
       f = LogEvent.new

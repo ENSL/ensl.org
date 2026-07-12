@@ -84,7 +84,7 @@ class Server < ApplicationRecord
       .where('matches.hltv_id IS NULL')
   }
 
-  has_many :logs, dependent: :destroy
+  has_many :log_lines, dependent: :destroy
   has_many :matches, dependent: :nullify
   has_many :challenges, dependent: :nullify
   belongs_to :user, optional: true
