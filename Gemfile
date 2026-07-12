@@ -21,6 +21,11 @@ gem 'redis', '~> 4.8'
 gem 'sidekiq'
 gem 'sidekiq-cron'
 
+# Reads the Parquet files exported by the ensl_analysis Python pipeline
+# (embeds DuckDB; compiles a native extension on install, needs a C++
+# toolchain -- already provided by build-essential in the Dockerfile).
+gem 'duckdb'
+
 # Web server.
 # Faraday provides NET-HTTP functions
 gem 'faraday'
