@@ -13,7 +13,7 @@
 class CreateAnalysisResults < ActiveRecord::Migration[8.1]
   def change
     create_table :analysis_results, id: :integer, charset: 'utf8mb4', collation: 'utf8mb4_general_ci' do |t|
-      t.integer :batch_id, null: false
+      t.integer :batch_id
       t.string :steamid
       t.string :model, null: false
       t.string :metric, null: false
