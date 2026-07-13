@@ -8,33 +8,51 @@ ENV NVM_INSTALL_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install
 ENV GEM_HOME=/var/bundle
 ENV GEM_PATH=/var/bundle
 ENV PATH=/var/bundle/bin:/usr/local/bundle/bin:${PATH}
+ENV LD_LIBRARY_PATH=/opt/duckdb/lib:/usr/local/lib
 ENV BUNDLE_WITHOUT=
 ENV BUNDLE_WITH=
 ENV BUNDLER_VERSION=4.0.6
+ENV DUCKDB_VERSION=1.4.5
 
 RUN \
     # Add web
     adduser web --uid $WEB_UID --home /home/web --shell /bin/bash \
                 --disabled-password --gecos "" && \
     apt-get update && apt-get -y upgrade && \
-    # Dependencies
-    apt-get -y install --no-install-recommends --upgrade \
-      # General tools
-      curl build-essential \
-      # For Rust bindgen-based native gems (e.g. commonmarker)
-      clang libclang-dev \
-      # For MySQL/MariaDB
-      libmariadb-dev libmariadb-dev-compat \
-      # SSL libs
-      libssl-dev \
-      # zlib, readline and libyaml
-      zlib1g-dev libreadline-dev libyaml-dev \
-      # For nokogiri
-      libxslt1-dev libxml2-dev \
-      # For carrierwave/rmagick
-      imagemagick libmagickwand-dev \
-      # Tools for media processing and metadata
-      ffmpeg vlc screen libimage-exiftool-perl && \
+        # Dependencies
+        apt-get -y install --no-install-recommends --upgrade \
+            # General tools
+            curl unzip build-essential \
+            # For Rust bindgen-based native gems (e.g. commonmarker)
+            clang libclang-dev \
+            # For MySQL/MariaDB
+            libmariadb-dev libmariadb-dev-compat \
+            # SSL libs
+            libssl-dev \
+            # zlib, readline and libyaml
+            zlib1g-dev libreadline-dev libyaml-dev \
+            # For nokogiri
+            libxslt1-dev libxml2-dev \
+            # For carrierwave/rmagick
+            imagemagick libmagickwand-dev \
+            # Tools for media processing and metadata
+            ffmpeg vlc screen libimage-exiftool-perl && \
+        # Install DuckDB C API artifacts from GitHub releases (no CLI).
+        DUCKDB_ARCH='' && \
+        case "$(uname -m)" in \
+            x86_64|amd64) DUCKDB_ARCH=amd64 ;; \
+            aarch64|arm64) DUCKDB_ARCH=arm64 ;; \
+            *) echo "Unsupported architecture for DuckDB artifacts: $(uname -m)"; exit 1 ;; \
+        esac && \
+        curl -fsSL "https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-${DUCKDB_ARCH}.zip" \
+            -o /tmp/libduckdb.zip && \
+        mkdir -p /tmp/libduckdb /opt/duckdb/include /opt/duckdb/lib && \
+        unzip -o /tmp/libduckdb.zip -d /tmp/libduckdb && \
+        cp /tmp/libduckdb/duckdb.h /opt/duckdb/include/duckdb.h && \
+        cp /tmp/libduckdb/libduckdb.so /opt/duckdb/lib/libduckdb.so && \
+        ln -sf /opt/duckdb/lib/libduckdb.so /usr/local/lib/libduckdb.so && \
+        ldconfig && \
+        rm -rf /tmp/libduckdb /tmp/libduckdb.zip && \
     # Fix URI startup issue
     gem update --system && \
     # Install bundler and bundle path
@@ -67,6 +85,7 @@ COPY --chown=web Gemfile Gemfile.lock /var/www/
 
 RUN bundle config set github.https true && \
     bundle config set path '/var/bundle' && \
+    bundle config set build.duckdb '--with-duckdb-include=/opt/duckdb/include --with-duckdb-lib=/opt/duckdb/lib' && \
     bundle config unset without && \
     bundle config unset with && \
     bundle config set with 'test' && \

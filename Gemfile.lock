@@ -196,6 +196,8 @@ GEM
       dotenv (= 3.2.0)
       railties (>= 6.1)
     drb (2.2.3)
+    duckdb (1.5.4.0)
+      bigdecimal (>= 3.1.4)
     erb (6.0.4)
     erb2haml (0.1.5)
       html2haml
@@ -790,6 +792,7 @@ DEPENDENCIES
   database_cleaner-active_record
   debug
   dotenv-rails
+  duckdb
   erb2haml
   factory_bot_rails (= 4.10.0)
   faraday

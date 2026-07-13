@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_11_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_12_130000) do
+  create_table "analysis_results", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "batch_id"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "metric", null: false
+    t.integer "milestone"
+    t.string "model", null: false
+    t.string "steamid"
+    t.float "value", null: false
+    t.index ["batch_id", "model", "metric", "steamid", "milestone"], name: "index_analysis_results_on_batch_and_subject", unique: true
+    t.index ["batch_id"], name: "index_analysis_results_on_batch_id"
+    t.index ["model", "metric"], name: "index_analysis_results_on_model_and_metric"
+    t.index ["steamid"], name: "index_analysis_results_on_steamid"
+  end
+
   create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "article_id"
     t.datetime "created_at", precision: nil
