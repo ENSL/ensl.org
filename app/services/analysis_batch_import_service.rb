@@ -51,9 +51,10 @@ class AnalysisBatchImportService
     connection = database.connect
     imported_at = Time.current
 
+    parquet_glob, source = parquet_source
+
     result = connection.query(<<~SQL)
-      SELECT steamid, model, metric, value, milestone
-      FROM read_parquet('#{parquet_glob}')
+      #{read_sql_for(source, parquet_glob)}
     SQL
 
     result.map do |(steamid, model, metric, value, milestone)|
@@ -74,17 +75,48 @@ class AnalysisBatchImportService
 
   # Resolves and validates the batch directory, guarding against a batch_id
   # or exports_dir override that would resolve outside of @exports_dir.
-  def parquet_glob
-    batch_dir = File.expand_path(File.join(@exports_dir, @batch_id.to_s, 'analysis_results'))
+  #
+  # Current exporter writes metrics under:
+  #   <exports_dir>/<batch_id>/metrics/*.parquet
+  #
+  # Older WIP importer expected:
+  #   <exports_dir>/<batch_id>/analysis_results/*.parquet
+  #
+  # We support both to keep the importer forward/backward compatible.
+  def parquet_source
+    analysis_results_dir = File.expand_path(File.join(@exports_dir, @batch_id.to_s, 'analysis_results'))
+    metrics_dir = File.expand_path(File.join(@exports_dir, @batch_id.to_s, 'metrics'))
 
-    unless batch_dir.start_with?("#{@exports_dir}/")
-      raise Error, "Resolved batch path escapes exports dir: #{batch_dir}"
+    [analysis_results_dir, metrics_dir].each do |path|
+      unless path.start_with?("#{@exports_dir}/")
+        raise Error, "Resolved batch path escapes exports dir: #{path}"
+      end
     end
 
-    unless Dir.exist?(batch_dir)
-      raise Error, "No exported analysis_results found for batch #{@batch_id} at #{batch_dir}"
-    end
+    analysis_glob = File.join(analysis_results_dir, '*.parquet')
+    return [analysis_glob, :analysis_results] if Dir.exist?(analysis_results_dir) && Dir.glob(analysis_glob).any?
 
-    File.join(batch_dir, '*.parquet')
+    metrics_glob = File.join(metrics_dir, '*.parquet')
+    return [metrics_glob, :metrics] if Dir.exist?(metrics_dir) && Dir.glob(metrics_glob).any?
+
+    raise Error,
+          "No exported analysis results found for batch #{@batch_id}; checked #{analysis_results_dir} and #{metrics_dir}"
+  end
+
+  def read_sql_for(source, parquet_glob)
+    case source
+    when :analysis_results
+      <<~SQL.squish
+        SELECT steamid, model, metric, value, milestone
+        FROM read_parquet('#{parquet_glob}')
+      SQL
+    when :metrics
+      <<~SQL.squish
+        SELECT NULL::VARCHAR AS steamid, name AS model, metric, value, milestone
+        FROM read_parquet('#{parquet_glob}')
+      SQL
+    else
+      raise Error, "Unknown parquet source: #{source.inspect}"
+    end
   end
 end
