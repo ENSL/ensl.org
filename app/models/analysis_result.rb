@@ -25,8 +25,31 @@
 # (per-player skill/rating values plus per-model aggregate metrics). See the
 # CreateAnalysisResults migration for the full rationale.
 #
-# WIP: intentionally barebones. No validations/scopes/business logic yet --
-# the batch importer that will populate this table is written separately.
+# WIP: intentionally barebones.
 class AnalysisResult < ApplicationRecord
   belongs_to :user, primary_key: 'steamid', foreign_key: 'steamid', optional: true, inverse_of: false
+
+  # Reserved batch_id for overwritable "current state" snapshots (map
+  # balance, time-of-week activity, etc.) that aren't tied to a specific
+  # export batch and aren't per-player history. Real export batches always
+  # get their own (positive) batch_id from the Python exporter, so rows
+  # imported under this sentinel upsert in place via
+  # index_analysis_results_on_batch_and_subject on every re-import instead
+  # of accumulating like the rest of this table. See
+  # AnalysisBatchImportService for what gets imported under which scope.
+  CURRENT_SNAPSHOT_BATCH_ID = 0
+
+  # Sentinel values for the two other nullable columns in the unique index
+  # (index_analysis_results_on_batch_and_subject). NULL is deliberately never
+  # written for either: MySQL never treats two NULLs as equal for unique-index
+  # purposes, so rows with a real NULL here would silently bypass upsert
+  # dedup and accumulate duplicates on every re-import instead of being
+  # updated in place. AnalysisBatchImportService normalizes both before
+  # writing; use these same sentinels when querying "no subject"/"no
+  # milestone" rows (e.g. the model-level aggregates under `metrics`).
+  NO_STEAMID = ''
+  NO_MILESTONE = -1
+
+  scope :current_snapshot, -> { where(batch_id: CURRENT_SNAPSHOT_BATCH_ID) }
+  scope :historical, -> { where.not(batch_id: CURRENT_SNAPSHOT_BATCH_ID) }
 end
