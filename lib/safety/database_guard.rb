@@ -39,8 +39,18 @@ module Safety
     def self.abort_if_test_db_matches_development!(output: $stderr)
       return unless defined?(ActiveRecord::Base)
 
+      # NOTE: we intentionally do NOT resolve the "development" side via
+      # ActiveRecord::Base.configurations here. Each Rails env is meant to run
+      # in its own container with its own .env.<env> file (see compose.yml),
+      # so config/database.yml's `development:` section (which reads
+      # ENV['MYSQL_DATABASE']) only reflects whatever dotenv file the CURRENT
+      # process happens to have loaded. Inside the dedicated "test" container
+      # that's .env.test, which made "development" look identical to "test"
+      # even though .env.development declares a distinct database name and
+      # development never actually runs there. Reading the declared value
+      # straight from .env.development avoids that false positive.
       test_db = db_name_for(ActiveRecord::Base.configurations, 'test')
-      development_db = db_name_for(ActiveRecord::Base.configurations, 'development')
+      development_db = declared_env_value('MYSQL_DATABASE', 'development')
       return if test_db.nil? || development_db.nil?
       return unless test_db == development_db
 
@@ -66,7 +76,7 @@ module Safety
     private_class_method :rails_env
 
     def self.db_name_for(configurations, env_name)
-      config = configurations.configs_for(env_name: env_name, name: 'primary').first ||
+      config = configurations.configs_for(env_name: env_name, name: 'primary') ||
                configurations.configs_for(env_name: env_name).first
       return nil unless config
 
@@ -77,5 +87,24 @@ module Safety
       end
     end
     private_class_method :db_name_for
+
+    # Reads the literal value an environment's own .env.<rails_env> file
+    # declares for +key+, ignoring whatever the current process' ENV holds.
+    def self.declared_env_value(key, rails_env)
+      return nil unless defined?(Rails) && Rails.respond_to?(:root) && Rails.root
+
+      path = Rails.root.join(".env.#{rails_env}")
+      return nil unless path.exist?
+
+      File.foreach(path) do |line|
+        line = line.strip
+        next if line.empty? || line.start_with?('#')
+
+        k, v = line.split('=', 2)
+        return v.to_s.strip if k == key
+      end
+      nil
+    end
+    private_class_method :declared_env_value
   end
 end
