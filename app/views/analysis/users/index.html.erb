@@ -6,16 +6,38 @@
     Click a column header to sort.
   </p>
 
+  <%= form_with url: analysis_users_path, method: :get, local: true do %>
+    <p>
+      <%= label_tag :min_games, 'Minimum games:' %>
+      <%= select_tag :min_games,
+                     options_for_select(@min_games_options.map { |n| [n, n] }, @selected_min_games),
+                     onchange: 'this.form.requestSubmit()' %>
+    </p>
+  <% end %>
+
   <% if @rankings.empty? %>
     <p>No analysis results are available yet.</p>
   <% else %>
     <%
+      skill_display_multiplier = {
+        skill_dl: 10_000,
+        skill_mlt: 100,
+        skill_os_btf: 100
+      }
+
       format_number = lambda do |value, precision: 2|
         value.nil? ? '–' : number_with_precision(value, precision: precision)
       end
 
       skill_column = lambda do |key, label|
-        { key: key, label: label, type: :number, format: format_number }
+        multiplier = skill_display_multiplier.fetch(key, 1)
+        {
+          key: key,
+          label: label,
+          type: :number,
+          sort_value: ->(value) { value.nil? ? nil : (value * multiplier) },
+          format: ->(value) { value.nil? ? '–' : format_number.call(value * multiplier, precision: 0) }
+        }
       end
 
       columns = [
@@ -28,13 +50,16 @@
         },
         { key: :wins, label: 'Wins', type: :number, format: ->(value) { value&.to_i } },
         { key: :losses, label: 'Losses', type: :number, format: ->(value) { value&.to_i } },
-        { key: :win_ratio, label: 'Win ratio', type: :number, format: ->(value) { format_number.call(value, precision: 3) } },
-        skill_column.call(:skill_os, 'Skill (OS)'),
-        skill_column.call(:skill_dl, 'Skill (DL)'),
-        skill_column.call(:skill_mlt, 'Skill (MLT)'),
-        skill_column.call(:skill_os_btf, 'Skill (OS BTF)'),
-        skill_column.call(:skill_os_btp, 'Skill (OS BTP)'),
-        skill_column.call(:skill_os_tmf, 'Skill (OS TMF)')
+        {
+          key: :win_ratio,
+          label: 'Win ratio %',
+          type: :number,
+          sort_value: ->(value) { value.nil? ? nil : (value * 100) },
+          format: ->(value) { value.nil? ? '–' : format_number.call(value * 100, precision: 0) }
+        },
+        skill_column.call(:skill_dl, 'Skill (DL x10000)'),
+        skill_column.call(:skill_mlt, 'Skill (MLT x100)'),
+        skill_column.call(:skill_os_btf, 'Skill (OS BradleyTerryFull x100)')
       ]
     %>
 

@@ -17,6 +17,10 @@
 // app/javascript/controllers/sortable_table.js) -- generic, reusable
 // across any listing that opts in via data-controller="sortable-table".
 .sortable-table {
+  .sortable-table-number {
+    text-align: right;
+  }
+
   .sortable-table-header {
     cursor: pointer;
     user-select: none;

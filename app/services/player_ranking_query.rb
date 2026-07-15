@@ -10,13 +10,20 @@
 class PlayerRankingQuery
   # Skill rating models from ensl_analysis; each contributes its 'skill'
   # metric as a `:"skill_#{model}"` column on the returned rows.
-  SKILL_MODELS = %w[os dl mlt os_btf os_btp os_tmf].freeze
+  SKILL_MODELS = %w[dl mlt os_btf].freeze
 
   # Historical per-player stats, stored under model 'player_stats'.
   PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
 
-  def self.call
-    new.call
+  MIN_GAMES_OPTIONS = [25, 50, 100].freeze
+  DEFAULT_MIN_GAMES = MIN_GAMES_OPTIONS.first
+
+  def self.call(min_games: nil)
+    new(min_games: min_games).call
+  end
+
+  def initialize(min_games: nil)
+    @min_games = normalize_min_games(min_games)
   end
 
   # Returns an array of hashes: { steamid:, user:, wins:, losses:,
@@ -29,11 +36,15 @@ class PlayerRankingQuery
       user = users_by_steamid[steamid]
       next unless user
 
+      wins = metrics['player_stats.wins']
+      losses = metrics['player_stats.losses']
+      next if @min_games && (wins.to_f + losses.to_f) < @min_games
+
       {
         steamid: steamid,
         user: user,
-        wins: metrics['player_stats.wins'],
-        losses: metrics['player_stats.losses'],
+        wins: wins,
+        losses: losses,
         win_ratio: metrics['player_stats.win_ratio']
       }.merge(skill_columns(metrics))
     end
@@ -78,5 +89,13 @@ class PlayerRankingQuery
         memo[raw_steamid] = user if user
       end
     end
+  end
+
+  def normalize_min_games(value)
+    numeric = Integer(value, exception: false)
+    return DEFAULT_MIN_GAMES unless numeric
+    return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)
+
+    numeric
   end
 end

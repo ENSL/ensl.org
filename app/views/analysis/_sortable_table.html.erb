@@ -2,7 +2,8 @@
   <thead>
     <tr>
       <% columns.each do |column| %>
-        <th data-sort-type="<%= column[:type] || :string %>"><%= column[:label] %></th>
+        <% column_type = (column[:type] || :string).to_sym %>
+        <th class="<%= 'sortable-table-number' if column_type == :number %>" data-sort-type="<%= column_type %>"><%= column[:label] %></th>
       <% end %>
     </tr>
   </thead>
@@ -10,9 +11,10 @@
     <% rows.each do |row| %>
       <tr>
         <% columns.each do |column| %>
+          <% column_type = (column[:type] || :string).to_sym %>
           <% raw_value = row[column[:key]] %>
           <% sort_value = column[:sort_value] ? column[:sort_value].call(raw_value) : raw_value %>
-          <td data-sort-value="<%= sort_value %>">
+          <td class="<%= 'sortable-table-number' if column_type == :number %>" data-sort-value="<%= sort_value %>">
             <%= column[:format] ? column[:format].call(raw_value) : raw_value %>
           </td>
         <% end %>
