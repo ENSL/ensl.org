@@ -13,6 +13,26 @@
 
 .invisible { display: none !important; }
 
+// Client-side sortable tables (see AnalysisHelper#sortable_table and
+// app/javascript/controllers/sortable_table.js) -- generic, reusable
+// across any listing that opts in via data-controller="sortable-table".
+.sortable-table {
+  .sortable-table-header {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  .sortable-table-indicator {
+    display: inline-block;
+    width: 1em;
+    color: inherit;
+    opacity: 0.6;
+  }
+}
+
 @mixin fa-solid($unicode) {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;

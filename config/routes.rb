@@ -25,6 +25,13 @@ Rails.application.routes.draw do
     end
   end
 
+  # Read-only listings built on top of AnalysisResult (ensl_analysis pipeline
+  # output): player rankings first, with room for map balance / activity
+  # breakdowns etc. to be added the same way later.
+  namespace :analysis do
+    resources :users, only: [:index]
+  end
+
   root to: 'articles#news_index'
 
   resources :articles do

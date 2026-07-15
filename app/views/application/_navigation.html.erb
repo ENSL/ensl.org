@@ -14,7 +14,7 @@
         </ul>
       </li>
       <li class="dropdown icon">
-        <%= active_link_to({ controller: "contests", action: "current" }, class: 'contests') do %>
+        <%= active_link_to current_contests_path, class: 'contests' do %>
           Contests
         <% end %>
         <ul>
@@ -74,6 +74,7 @@
         <a href="#" class="league">League</a>
         <ul>
           <li><%= link_to "Users", users_path %></li>
+          <li><%= link_to "Rankings", analysis_users_path %></li>
           <li><%= link_to "Teams", teams_path %></li>
           <li><%= link_to "Staff", about_staff_path %></li>
           <li><%= link_to "Bans", bans_url %></li>

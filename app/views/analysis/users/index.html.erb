@@ -1,0 +1,43 @@
+<h1 class="title">Player rankings</h1>
+
+<div class="box wide">
+  <p>
+    Skill ratings and win/loss stats from the most recent analysis batch.
+    Click a column header to sort.
+  </p>
+
+  <% if @rankings.empty? %>
+    <p>No analysis results are available yet.</p>
+  <% else %>
+    <%
+      format_number = lambda do |value, precision: 2|
+        value.nil? ? '–' : number_with_precision(value, precision: precision)
+      end
+
+      skill_column = lambda do |key, label|
+        { key: key, label: label, type: :number, format: format_number }
+      end
+
+      columns = [
+        {
+          key: :user,
+          label: 'Player',
+          type: :string,
+          sort_value: ->(user) { user.to_s.downcase },
+          format: ->(user) { namelink(user) }
+        },
+        { key: :wins, label: 'Wins', type: :number, format: ->(value) { value&.to_i } },
+        { key: :losses, label: 'Losses', type: :number, format: ->(value) { value&.to_i } },
+        { key: :win_ratio, label: 'Win ratio', type: :number, format: ->(value) { format_number.call(value, precision: 3) } },
+        skill_column.call(:skill_os, 'Skill (OS)'),
+        skill_column.call(:skill_dl, 'Skill (DL)'),
+        skill_column.call(:skill_mlt, 'Skill (MLT)'),
+        skill_column.call(:skill_os_btf, 'Skill (OS BTF)'),
+        skill_column.call(:skill_os_btp, 'Skill (OS BTP)'),
+        skill_column.call(:skill_os_tmf, 'Skill (OS TMF)')
+      ]
+    %>
+
+    <%= sortable_table(columns: columns, rows: @rankings, id: 'player-rankings') %>
+  <% end %>
+</div>

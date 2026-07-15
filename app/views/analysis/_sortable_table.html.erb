@@ -1,0 +1,22 @@
+<table<%= %( id="#{id}").html_safe if id %> class="data sortable-table" data-controller="sortable-table">
+  <thead>
+    <tr>
+      <% columns.each do |column| %>
+        <th data-sort-type="<%= column[:type] || :string %>"><%= column[:label] %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% rows.each do |row| %>
+      <tr>
+        <% columns.each do |column| %>
+          <% raw_value = row[column[:key]] %>
+          <% sort_value = column[:sort_value] ? column[:sort_value].call(raw_value) : raw_value %>
+          <td data-sort-value="<%= sort_value %>">
+            <%= column[:format] ? column[:format].call(raw_value) : raw_value %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
