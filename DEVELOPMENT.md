@@ -59,6 +59,16 @@ Run one spec file:
 
     docker compose --profile test exec -u web test bundle exec rspec spec/controllers/shoutmsgs_controller_spec.rb
 
+Safety guardrails:
+
+- Specs are blocked unless `RAILS_ENV=test` (override only if intentional with `ALLOW_NON_TEST_SPECS=1`).
+- Destructive db tasks in development (for example `db:drop`, `db:reset`, `db:schema:load`) are blocked by default.
+- To intentionally run a destructive db task in development, set `ALLOW_DESTRUCTIVE_DB_TASKS=1` for that command only.
+
+Example intentional reset in development:
+
+    ALLOW_DESTRUCTIVE_DB_TASKS=1 bin/rails db:reset
+
 Open shell in test container:
 
     docker compose --profile test exec -u web test /bin/bash

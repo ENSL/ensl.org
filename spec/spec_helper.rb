@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 ENV['RAILS_ENV'] ||= 'test'
+require File.expand_path('../lib/safety/database_guard', __dir__)
+Safety::DatabaseGuard.abort_unless_test_env_for_specs!(env: ENV)
 
 require 'dotenv'
 Dotenv.load(".env.#{ENV['RAILS_ENV']}.local", '.env.local', ".env.#{ENV['RAILS_ENV']}", '.env')

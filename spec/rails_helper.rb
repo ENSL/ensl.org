@@ -8,6 +8,7 @@ require 'tmpdir'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
+Safety::DatabaseGuard.abort_if_test_db_matches_development!
 
 # CI can inject FILES_ROOT values that are not writable by the test process.
 # Force a test-local writable root for all specs unless a spec overrides it.

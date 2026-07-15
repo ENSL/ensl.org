@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require 'logger'
+require_relative '../lib/safety/database_guard'
+
+Safety::DatabaseGuard.abort_if_dangerous_db_task!(argv: ARGV, env: ENV)
+
 require_relative 'boot'
 require 'securerandom'
 require 'rails/all'
