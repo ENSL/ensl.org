@@ -25,18 +25,25 @@
         skill_os_btf: 100
       }
 
+      skill_display_offset = {
+        skill_dl: 1_000,
+        skill_mlt: 2_500,
+        skill_os_btf: 1_000
+      }
+
       format_number = lambda do |value, precision: 2|
         value.nil? ? '–' : number_with_precision(value, precision: precision)
       end
 
       skill_column = lambda do |key, label|
         multiplier = skill_display_multiplier.fetch(key, 1)
+        offset = skill_display_offset.fetch(key, 0)
         {
           key: key,
           label: label,
           type: :number,
-          sort_value: ->(value) { value.nil? ? nil : (value * multiplier) },
-          format: ->(value) { value.nil? ? '–' : format_number.call(value * multiplier, precision: 0) }
+          sort_value: ->(value) { value.nil? ? nil : ((value * multiplier) + offset) },
+          format: ->(value) { value.nil? ? '–' : format_number.call((value * multiplier) + offset, precision: 0) }
         }
       end
 
@@ -57,9 +64,9 @@
           sort_value: ->(value) { value.nil? ? nil : (value * 100) },
           format: ->(value) { value.nil? ? '–' : format_number.call(value * 100, precision: 0) }
         },
-        skill_column.call(:skill_dl, 'Skill (DL x10000)'),
-        skill_column.call(:skill_mlt, 'Skill (MLT x100)'),
-        skill_column.call(:skill_os_btf, 'Skill (OS BradleyTerryFull x100)')
+        skill_column.call(:skill_dl, 'DL Model'),
+        skill_column.call(:skill_mlt, 'Moulton Model'),
+        skill_column.call(:skill_os_btf, 'OpenSkill BT Model')
       ]
     %>
 
