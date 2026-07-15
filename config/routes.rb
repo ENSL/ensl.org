@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   # breakdowns etc. to be added the same way later.
   namespace :analysis do
     resources :users, only: [:index]
+    resources :maps, only: [:index]
   end
 
   root to: 'articles#news_index'

@@ -6,6 +6,7 @@ import ServerTableController from "controllers/server_table"
 import GatherMusicController from "controllers/gather_music"
 import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
+import MapBalanceChartController from "controllers/map_balance_chart"
 import "legacy/local"
 import "legacy/shoutbox"
 
@@ -17,3 +18,4 @@ application.register("server-table", ServerTableController)
 application.register("gather-music", GatherMusicController)
 application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
+application.register("map-balance-chart", MapBalanceChartController)

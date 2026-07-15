@@ -1,0 +1,40 @@
+<h1 class="title">Map balance</h1>
+
+<div class="box wide">
+  <p>
+    Marine vs alien win rates from the current map balance snapshot. Each bar
+    shows the marine/alien win share for that map; the dashed line marks a
+    perfect 50/50 split. Click a table column header to sort.
+  </p>
+
+  <% if @map_balances.empty? %>
+    <p>No map balance data is available yet.</p>
+  <% else %>
+    <div
+      data-controller="map-balance-chart"
+      data-map-balance-chart-maps-value="<%= @map_balances.to_json %>"
+      style="height: <%= [@map_balances.size * 32 + 60, 160].max %>px;"
+    >
+      <canvas data-map-balance-chart-target="canvas"></canvas>
+    </div>
+
+    <%
+      format_percent = lambda do |value|
+        value.nil? ? '–' : number_with_precision(value, precision: 1) + '%'
+      end
+    %>
+
+    <%= sortable_table(
+      id: 'map-balance',
+      columns: [
+        { key: :map_name, label: 'Map', type: :string },
+        { key: :total_games, label: 'Games', type: :number, format: ->(value) { value.to_i } },
+        { key: :marine_wins, label: 'Marine wins', type: :number, format: ->(value) { value.to_i } },
+        { key: :alien_wins, label: 'Alien wins', type: :number, format: ->(value) { value.to_i } },
+        { key: :marine_win_percentage, label: 'Marine win %', type: :number, format: format_percent },
+        { key: :alien_win_percentage, label: 'Alien win %', type: :number, format: format_percent }
+      ],
+      rows: @map_balances
+    ) %>
+  <% end %>
+</div>
