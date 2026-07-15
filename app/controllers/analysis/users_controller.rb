@@ -8,6 +8,7 @@ module Analysis
   class UsersController < Analysis::BaseController
     def index
       @rankings = PlayerRankingQuery.call
+      render layout: 'full'
     end
   end
 end
