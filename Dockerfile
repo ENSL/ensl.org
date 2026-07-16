@@ -107,12 +107,21 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 
 # Install Playwright's own Chromium and its system dependencies
 # (apt chromium is not used — Playwright manages its own browser binaries)
-RUN npx playwright install-deps chromium
+#
+# Pin the npx-resolved `playwright` CLI/npm package to the version the
+# playwright-ruby-client gem was built against. Without this, npx installs
+# whatever the *latest* Playwright release is, which frequently ships a
+# different Chromium revision than the one the Ruby driver requests at
+# runtime, causing "Executable doesn't exist at .../chromium-<rev>" failures
+# in specs (spec/support/capybara.rb pins the CLI the same way).
+RUN PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
+    npx -y "playwright@$PLAYWRIGHT_VERSION" install-deps chromium
 
 USER web
 
 # Install Playwright browsers via Node CLI (independent of Ruby gem)
-RUN npx playwright install chromium
+RUN PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
+    npx -y "playwright@$PLAYWRIGHT_VERSION" install chromium chromium-headless-shell
 
 #
 # Production
