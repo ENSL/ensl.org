@@ -6,19 +6,23 @@ export default class extends Controller {
     optionsUrl: String,
     authenticateUrl: String,
     registerOptionsUrl: String,
-    registerUrl: String
+    registerUrl: String,
+    disableAutofill: Boolean
   }
 
   // Hide the plain login button when the browser can do passkey autofill directly.
   async connect() {
     if (!this.hasLoginButtonTarget) return
+    if (this.disableAutofillValue) return
+
+    // Avoid background WebAuthn autofill flows in browser automation (Capybara/Playwright).
+    if (navigator.webdriver) return
 
     const webauthn = await this.webauthn()
     if (!webauthn || !webauthn.browserSupportsWebAuthn()) return
 
     if (!(await this.supportsConditionalUI(webauthn))) return
 
-    this.loginButtonTarget.style.display = "none"
     this.startConditionalLogin(webauthn)
   }
 

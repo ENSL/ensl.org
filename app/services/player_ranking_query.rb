@@ -10,7 +10,7 @@
 class PlayerRankingQuery
   # Skill rating models from ensl_analysis; each contributes its 'skill'
   # metric as a `:"skill_#{model}"` column on the returned rows.
-  SKILL_MODELS = %w[dl mlt os_btf].freeze
+  SKILL_MODELS = %w[dl mlt os os_btf].freeze
 
   # Historical per-player stats, stored under model 'player_stats'.
   PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
@@ -38,7 +38,7 @@ class PlayerRankingQuery
 
       wins = metrics['player_stats.wins']
       losses = metrics['player_stats.losses']
-      next if @min_games && (wins.to_f + losses.to_f) < @min_games
+      next if @min_games && wins.present? && losses.present? && ((wins.to_f + losses.to_f) < @min_games)
 
       {
         steamid: steamid,
@@ -53,9 +53,14 @@ class PlayerRankingQuery
   private
 
   def skill_columns(metrics)
-    SKILL_MODELS.each_with_object({}) do |model, columns|
-      columns[:"skill_#{model}"] = metrics["#{model}.skill"]
+    columns = SKILL_MODELS.each_with_object({}) do |model, memo|
+      memo[:"skill_#{model}"] = metrics["#{model}.skill"]
     end
+
+    # Keep displaying OpenSkill BT even when data still arrives as legacy `os`.
+    columns[:skill_os_btf] = columns[:skill_os] if columns[:skill_os_btf].nil?
+
+    columns
   end
 
   def latest_batch_id
@@ -92,6 +97,8 @@ class PlayerRankingQuery
   end
 
   def normalize_min_games(value)
+    return nil if value.nil?
+
     numeric = Integer(value, exception: false)
     return DEFAULT_MIN_GAMES unless numeric
     return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)

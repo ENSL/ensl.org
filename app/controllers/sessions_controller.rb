@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   respond_to :html, :js
 
   # OmniAuth callback is a cross-origin GET from the provider; skip CSRF checks here.
-  skip_forgery_protection only: :callback
+  skip_forgery_protection only: %i[callback passkey_options]
   prepend_before_action :reject_js_callback, only: :callback
 
   # GET /auth/steam/callback

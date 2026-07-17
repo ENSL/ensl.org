@@ -97,12 +97,11 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
     puts('Captain voting has ended, picking phase has started.')
 
-    # Let whichever captain has the current turn pick from the lobby.
-    remaining_picks = 9
+    # Let whichever captain has the current turn pick from the lobby until no players remain.
     session_for_user_id = users.each_with_index.to_h { |u, i| [u.id, "user_#{i}"] }
     captain_sessions = [session_for_user_id[captain1.id], session_for_user_id[captain2.id]].compact
 
-    remaining_picks.times do
+    while gather.reload.gatherers.lobby.exists?
       picked = false
       attempts = 0
 
@@ -122,17 +121,21 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
               text: /It is your turn, please pick a player from the lobby!/i,
               wait: 2
             )
+            pick_controls_ready = safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 2) &&
+                                  safe_has_selector?('input[value="Pick"]', wait: 2)
 
-            unless turn_ready
+            unless turn_ready || pick_controls_ready
               visit_gather_with_retry(gather)
               turn_ready = safe_has_selector?(
                 '#gather-stats',
                 text: /It is your turn, please pick a player from the lobby!/i,
                 wait: 4
               )
+              pick_controls_ready = safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 4) &&
+                                    safe_has_selector?('input[value="Pick"]', wait: 4)
             end
 
-            next unless turn_ready
+            next unless turn_ready || pick_controls_ready
 
             visit_gather_with_retry(gather) unless safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 3)
 

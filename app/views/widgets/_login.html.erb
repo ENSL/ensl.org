@@ -5,7 +5,8 @@
                data: {
                  controller: 'passkey-auth',
                  passkey_auth_options_url_value: passkey_options_users_path,
-                 passkey_auth_authenticate_url_value: passkey_authenticate_users_path
+                 passkey_auth_authenticate_url_value: passkey_authenticate_users_path,
+                 passkey_auth_disable_autofill_value: Rails.env.test?
                } }) do %>
   <div class="fields">
     <div class="header-icons">

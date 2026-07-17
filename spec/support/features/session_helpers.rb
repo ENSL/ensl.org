@@ -13,6 +13,11 @@ module Features
       visit root_path
 
       expected_name = /#{Regexp.escape(user.username)}/i
+      return if page.has_selector?('#current_user', text: expected_name, visible: :all, wait: 4)
+
+      # Fallback for rare Playwright cookie propagation races in multi-session specs.
+      sign_in_as(user)
+      visit root_path
       expect(page).to have_selector('#current_user', text: expected_name, visible: :all)
     end
 

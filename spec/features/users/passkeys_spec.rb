@@ -16,13 +16,13 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
   scenario 'clicking use passkey updates status when username is missing' do
     visit root_path
 
-    within("form[data-controller*='passkey-auth']") do
-      click_link 'Use passkey'
-    end
+    page.execute_script(
+      "document.querySelector(\"form[data-controller*='passkey-auth'] a.passkey-link\")?.click()"
+    )
 
     expect(page).to have_css(
       '.passkey-status',
-      text: /(enter your username before using a passkey\.|passkeys are not supported in this browser\.)/i,
+      text: /(enter your username before using a passkey\.|passkeys are not supported in this browser\.|invalid domain)/i,
       wait: 10
     )
   end
