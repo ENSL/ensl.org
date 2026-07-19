@@ -14,7 +14,7 @@
 #  team_id  :integer
 #
 
-class Rounder < ActiveRecord::Base
+class Rounder < ApplicationRecord
   attr_accessor :lifeform
 
   scope :team, ->(team) { where(team: team) }

@@ -10,16 +10,14 @@
 #  updated_at  :datetime
 #
 
-class LogEvent < ActiveRecord::Base
-  def self.get search, team = nil
-    if f = find_by(name: search)
-      return f
-    else
+class LogEvent < ApplicationRecord
+  def self.get(search, team = nil)
+    unless (f = find_by(name: search))
       f = LogEvent.new
-      f.name = "get"
+      f.name = 'get'
       f.team = team if team
       f.save
-      return f
     end
+    f
   end
 end

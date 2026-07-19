@@ -303,7 +303,7 @@ RSpec.describe Match, type: :model do
       allow(match).to receive(:hltv).and_return(hltv)
 
       expect { match.hltv_record('addr', 'pwd') }
-        .to raise_error(Match::Error, I18n.t(:hltv_already) + 'hltv.example')
+        .to raise_error(Match::Error, "#{I18n.t(:hltv_already)}hltv.example")
     end
 
     it 'raises when no hltv server is available' do

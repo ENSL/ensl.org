@@ -15,7 +15,7 @@
 #  map_id       :integer
 #
 
-class Round < ActiveRecord::Base
+class Round < ApplicationRecord
   scope :basic, -> { includes(:commander, :map, :server, :team1, :team2).order('start DESC') }
 
   has_many :rounders, dependent: :destroy
