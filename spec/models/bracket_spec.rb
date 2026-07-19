@@ -149,6 +149,14 @@ RSpec.describe Bracket, type: :model do
       end
     end
 
+    context 'when bracketer is disabled' do
+      it 'returns disabled sentinel value' do
+        create(:bracketer, bracket:, row: 1, column: 1, disabled: true)
+
+        expect(bracket.default(1, 1)).to eq('disabled')
+      end
+    end
+
     context 'when bracketer is linked to a match' do
       it 'returns match reference string' do
         create(:bracketer, bracket:, row: 1, column: 1, match_id: 42, team_id: nil)
@@ -172,6 +180,10 @@ RSpec.describe Bracket, type: :model do
   end
 
   describe '#update_cells' do
+    it 'returns true for blank payloads' do
+      expect(bracket.update_cells(nil)).to be(true)
+    end
+
     it 'updates bracketer with match_id and clears team_id' do
       bracketer = bracket.get_bracketer(1, 1)
       cells = { '1' => { '1' => 'match_42' } }
@@ -224,6 +236,42 @@ RSpec.describe Bracket, type: :model do
       expect(bracketer.reload.match_id).to be_nil
       expect(bracketer.reload.team_id).to be_nil
     end
+
+    it 'supports empty and disabled control values' do
+      bracketer = bracket.get_bracketer(3, 3)
+      bracketer.update!(match_id: 1, team_id: 2, disabled: false)
+
+      bracket.update_cells({ '3' => { '3' => 'empty' } })
+      expect(bracketer.reload.match_id).to be_nil
+      expect(bracketer.reload.team_id).to be_nil
+      expect(bracketer.disabled).to be(false)
+
+      bracket.update_cells({ '3' => { '3' => 'disabled' } })
+      expect(bracketer.reload.disabled).to be(true)
+    end
+  end
+
+  describe '#update_custom_text and #update_with_cells' do
+    it 'returns true for blank custom text payloads' do
+      expect(bracket.update_custom_text(nil)).to be(true)
+    end
+
+    it 'stores nil custom_text when blank strings are provided' do
+      bracketer = bracket.get_bracketer(4, 4)
+      bracketer.update!(custom_text: 'Existing')
+
+      bracket.update_custom_text({ '4' => { '4' => '' } })
+
+      expect(bracketer.reload.custom_text).to be_nil
+    end
+
+    it 'returns false when base bracket update fails in update_with_cells' do
+      allow(bracket).to receive(:update).and_return(false)
+
+      result = bracket.update_with_cells(ActionController::Parameters.new(bracket: { name: 'Nope' }), nil)
+
+      expect(result).to be(false)
+    end
   end
 
   describe '#parse_cell_value' do
@@ -265,9 +313,16 @@ RSpec.describe Bracket, type: :model do
     let(:admin_user) { instance_double('User', admin?: true) }
     let(:regular_user) { instance_double('User', admin?: false) }
 
-    # NOTE: Permission methods (can_create?, can_update?, can_destroy?) are private,
-    # so we test them indirectly through the public interface or via send for testing.
-    # These tests are informational and not executed as part of the spec.
+    it 'allows admin users and rejects non-admin users for create/update/destroy' do
+      expect(bracket.can_create?(admin_user)).to be(true)
+      expect(bracket.can_update?(admin_user)).to be(true)
+      expect(bracket.can_destroy?(admin_user)).to be(true)
+
+      expect(bracket.can_create?(regular_user)).to be(false)
+      expect(bracket.can_update?(regular_user)).to be(false)
+      expect(bracket.can_destroy?(regular_user)).to be(false)
+      expect(bracket.can_create?(nil)).to be_nil
+    end
   end
 
   describe '.params' do

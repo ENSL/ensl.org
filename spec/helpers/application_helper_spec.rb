@@ -226,6 +226,38 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       expect(result).to include(timestamp.to_formatted_s(:long_ordinal))
     end
+
+    it 'uses hash-style access when method access is unavailable' do
+      model = Class.new do
+        def respond_to_missing?(name, include_private = false)
+          return false if name == :nickname
+
+          super
+        end
+
+        def [](_key)
+          'From hash accessor'
+        end
+      end.new
+
+      result = helper.cascade(model, [%i[nickname nickname]])
+
+      expect(result).to include('From hash accessor')
+    end
+
+    it 'skips keys that cannot be read via method or hash access' do
+      model = Class.new do
+        def [](key)
+          return nil if key == :missing
+
+          'present'
+        end
+      end.new
+
+      result = helper.cascade(model, [%i[missing_label missing]])
+
+      expect(result).to eq('<dl></dl>')
+    end
   end
 
   describe 'matches list helpers' do
@@ -247,8 +279,24 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(helper.match_list_opponent_team(match, nil)).to eq(away_team)
     end
 
+    it 'returns away team when one side is missing' do
+      one_sided = instance_double(Match, contester1: nil, contester2: away_contester)
+
+      expect(helper.match_list_opponent_team(one_sided, home_team)).to eq(away_team)
+    end
+
+    it 'returns away team when friendly is home team' do
+      expect(helper.match_list_opponent_team(match, home_team)).to eq(away_team)
+    end
+
     it 'returns home team as opponent when friendly is away' do
       expect(helper.match_list_opponent_team(match, away_team)).to eq(home_team)
+    end
+
+    it 'falls back to away team when friendly team is not in the match' do
+      other_team = build_stubbed(:team, name: 'Other Team')
+
+      expect(helper.match_list_opponent_team(match, other_team)).to eq(away_team)
     end
 
     it 'returns home-based score color and text' do
@@ -262,6 +310,68 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       expect(helper.match_list_score_color(losing_match)).to eq('red')
       expect(helper.match_list_score_color(draw_match)).to eq('yellow')
+    end
+
+    it 'returns black when score is incomplete' do
+      pending_match = instance_double(Match, score1: nil, score2: 2)
+
+      expect(helper.match_list_score_color(pending_match)).to eq('black')
+    end
+  end
+
+  describe 'lineup rendering helpers' do
+    let(:motm) { instance_double(User, username: 'MOTM', country: 'FI') }
+    let(:other_user) { instance_double(User, username: 'Player2', country: 'SE') }
+    let(:teamer1) { instance_double('Teamer', user: motm) }
+    let(:teamer2) { instance_double('Teamer', user: other_user) }
+    let(:match) { instance_double(Match, motm: motm) }
+
+    before do
+      allow(helper).to receive(:fa_icon).with('star').and_return('<i class="star"></i>'.html_safe)
+    end
+
+    it 'renders normal lineup order with star marker for motm' do
+      html = helper.match_lineup_display(match, [teamer1], 'team-1')
+
+      expect(html).to include('team-1')
+      expect(html).to include('MOTM')
+      expect(html).to include('star')
+    end
+
+    it 'renders reversed lineup order' do
+      html = helper.match_lineup_display(match, [teamer2], 'team-2', reverse: true)
+
+      expect(html).to include('team-2')
+      expect(html).to include('Player2')
+      expect(html).to include('flag-se')
+    end
+
+    it 'returns empty string when lineup is empty' do
+      expect(helper.match_lineup_display(match, [], 'team-1')).to eq('')
+    end
+
+    it 'adds shift class when only team2 lineup exists' do
+      html = helper.match_lineups_display(match, [], [teamer2])
+
+      expect(html).to include('lineups shift')
+      expect(html).to include('team-2')
+    end
+
+    it 'does not add shift class when team1 lineup exists' do
+      html = helper.match_lineups_display(match, [teamer1], [teamer2])
+
+      expect(html).to include('lineups')
+      expect(html).not_to include('lineups shift')
+    end
+
+    it 'does not include a star for non-motm in reverse lineup' do
+      html = helper.match_lineup_display(match, [teamer2], 'team-2', reverse: true)
+
+      expect(html).not_to include('star')
+    end
+
+    it 'returns empty string when both lineups are empty' do
+      expect(helper.match_lineups_display(match, [], [])).to eq('')
     end
   end
 
@@ -361,6 +471,83 @@ RSpec.describe ApplicationHelper, type: :helper do
       helper.sortable('name', 'Display Name')
 
       expect(helper).to have_received(:link_to).with('Display Name', { sort: 'name', direction: 'asc' }, { class: nil })
+    end
+  end
+
+  describe '#abslink and #bbcode' do
+    it 'delegates abslink through link_to' do
+      allow(helper).to receive(:link_to).and_return('linked')
+
+      expect(helper.abslink('Docs', '/docs')).to eq('linked')
+      expect(helper).to have_received(:link_to).with('Docs', '/docs')
+    end
+
+    it 'builds the bbcode help link' do
+      result = helper.bbcode
+
+      expect(result).to include('(BBCode)')
+      expect(result).to include('/articles/536')
+    end
+  end
+
+  describe '#link_to_remove_fields' do
+    it 'renders hidden destroy field and remove link' do
+      builder = instance_double('FormBuilder')
+      allow(builder).to receive(:hidden_field).with(:_destroy).and_return('<input type="hidden">')
+      allow(helper).to receive(:link_to).and_return('<a href="#">Remove</a>')
+
+      html = helper.link_to_remove_fields('Remove', builder)
+
+      expect(html).to include('hidden')
+      expect(html).to include('Remove')
+    end
+  end
+
+  describe '#calendar' do
+    around do |example|
+      original = ENV['GOOGLE_CALENDAR_ID']
+      ENV['GOOGLE_CALENDAR_ID'] = 'calendar-id'
+      example.run
+    ensure
+      ENV['GOOGLE_CALENDAR_ID'] = original
+    end
+
+    it 'instantiates without cache when no request env is present' do
+      calendar = instance_double(GoogleCalendar)
+      allow(helper).to receive(:request).and_return(nil)
+      allow(helper).to receive(:timezone_offset).and_return('UTC')
+      allow(GoogleCalendar).to receive(:new).and_return(calendar)
+
+      expect(helper.calendar).to eq(calendar)
+      expect(GoogleCalendar).to have_received(:new).with('calendar-id', 'UTC')
+    end
+
+    it 'memoizes calendar in request env cache' do
+      env = {}
+      request = instance_double(ActionDispatch::Request, env: env)
+      calendar = instance_double(GoogleCalendar)
+      allow(helper).to receive(:request).and_return(request)
+      allow(helper).to receive(:timezone_offset).and_return('UTC')
+      allow(GoogleCalendar).to receive(:new).and_return(calendar)
+
+      first = helper.calendar
+      second = helper.calendar
+
+      expect(first).to eq(calendar)
+      expect(second).to eq(calendar)
+      expect(GoogleCalendar).to have_received(:new).once
+    end
+  end
+
+  describe '#event_start_time' do
+    it 'converts event start into current helper timezone' do
+      datetime = DateTime.parse('2026-02-03T12:00:00+00:00')
+      event = instance_double('Event', start: instance_double('Start', date_time: datetime))
+      allow(helper).to receive(:timezone_offset).and_return('Europe/Helsinki')
+
+      result = helper.event_start_time(event)
+
+      expect(result.time_zone.name).to eq('Europe/Helsinki')
     end
   end
 end

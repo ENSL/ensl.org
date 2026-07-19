@@ -76,6 +76,23 @@ describe Gathers::CastVote do
       result = described_class.call(actor: voter, params: vote_params)
       expect(result.vote.votable).to eq(votable)
     end
+
+    it 'creates a vote when votable does not respond to gather' do
+      no_gather_votable = double('NoGatherVotable')
+      allow(Vote).to receive(:new).and_wrap_original do |original, *args|
+        vote = original.call(*args)
+        allow(vote).to receive(:votable).and_return(no_gather_votable)
+        allow(vote).to receive(:can_create?).and_return(true)
+        allow(vote).to receive(:save!).and_return(true)
+        vote
+      end
+
+      result = described_class.call(actor: voter, params: vote_params)
+
+      expect(result.success?).to be(true)
+      expect(result.gather).to be_nil
+      expect(Gathers::Broadcaster).not_to have_received(:call)
+    end
   end
 
   describe 'error handling' do
@@ -115,6 +132,23 @@ describe Gathers::CastVote do
 
       expect(result.success?).to be(false)
       expect(result.error.to_s).to match(/gather is busy|try again/i)
+    end
+
+    it 'returns access error when vote cannot be created without gather locking' do
+      no_gather_votable = double('NoGatherVotable')
+      allow(Vote).to receive(:new).and_wrap_original do |original, *args|
+        vote = original.call(*args)
+        allow(vote).to receive(:votable).and_return(no_gather_votable)
+        allow(vote).to receive(:can_create?).and_return(false)
+        allow(vote).to receive(:save!).and_return(true)
+        vote
+      end
+
+      result = described_class.call(actor: voter, params: vote_params)
+
+      expect(result.success?).to be(false)
+      expect(result.error).to be_a(Exceptions::AccessError)
+      expect(Gathers::Broadcaster).not_to have_received(:call)
     end
   end
 

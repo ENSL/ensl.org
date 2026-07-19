@@ -103,6 +103,40 @@ RSpec.describe Contest, type: :model do
 
       expect(contest.can_join?(cuser)).to be false
     end
+
+    it 'denies users when contest is not joinable anymore' do
+      contest.update!(status: Contest::STATUS_CLOSED)
+      cuser = double('user')
+      allow(cuser).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
+      allow(cuser).to receive_message_chain(:lead_teams, :not_in_contest, :exists?).and_return(true)
+
+      expect(contest.can_join?(cuser)).to be(false)
+    end
+  end
+
+  describe '#scores_page_state' do
+    it 'uses first contester and defaults when optional params are absent' do
+      contester = create(:contester, contest: contest)
+
+      state = contest.scores_page_state
+
+      expect(state[:friendly]).to eq(contester)
+      expect(state[:modulus_base]).to eq(contest.modulus_base || 30)
+      expect(state[:weight]).to eq(contest.weight)
+    end
+
+    it 'applies round overrides and explicit weight from params' do
+      c1 = create(:contester, contest: contest)
+      c2 = create(:contester, contest: contest)
+      rounds_param = { '0' => '1.1', '1' => '2.2', '2' => '3.3' }
+
+      state = contest.scores_page_state(friendly_id: c2.id, rounds_param: rounds_param, weight_param: '42.5')
+
+      expect(state[:friendly]).to eq(c2)
+      expect(state[:rounds]).to eq([1.1, 2.2, 3.3])
+      expect(state[:weight]).to eq(42.5)
+      expect(c1).to be_present
+    end
   end
 
   describe '.params' do
@@ -146,6 +180,15 @@ RSpec.describe Contest, type: :model do
     it 'returns false when map id is missing' do
       expect(contest.add_map_by_id(0)).to be false
       expect(contest.remove_map_by_id(0)).to be false
+    end
+
+    it 'does not duplicate a map already attached to the contest' do
+      map = create(:map)
+      contest.maps << map
+
+      expect do
+        contest.add_map_by_id(map.id)
+      end.not_to(change { contest.maps.reload.count })
     end
   end
 

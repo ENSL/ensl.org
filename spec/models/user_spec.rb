@@ -524,4 +524,145 @@ describe User do
       expect(User.historic('0:1:888')).to eq(subject)
     end
   end
+
+  describe 'additional branch coverage helpers' do
+    it 'returns nil when normalize_steamid receives invalid parsed steam objects' do
+      invalid_sid = double('SteamID', valid?: false)
+      allow(invalid_sid).to receive(:id).and_return('STEAM_0:1:123')
+      allow(SteamID).to receive(:from_string).and_return(invalid_sid)
+
+      expect(User.normalize_steamid('STEAM_0:1:123')).to be_nil
+    end
+
+    it 'returns nil when normalized legacy format does not match expected pattern' do
+      bad_sid = double('SteamID', valid?: true, id: 'NOT_A_STEAMID')
+      allow(SteamID).to receive(:from_string).and_return(bad_sid)
+
+      expect(User.normalize_steamid('steam_weird')).to be_nil
+    end
+
+    it 'returns nil avatar_url when user has no profile avatar' do
+      subject = create(:user)
+      subject.profile.update!(avatar: nil)
+
+      expect(subject.avatar_url).to eq('/images/icons/noavatar.png')
+    end
+
+    it 'returns nil steam payload when user has no steamid' do
+      subject = create(:user, steamid: nil)
+
+      payload = subject.api_v1_payload
+
+      expect(payload[:steam]).to be_nil
+    end
+
+    it 'decrements age when birthday has not yet occurred this year' do
+      subject = build(:user, birthdate: Date.new(2000, 12, 31))
+      allow(Time.zone).to receive(:today).and_return(Date.new(2026, 1, 1))
+
+      expect(subject.age).to eq(25)
+    end
+
+    it 'returns false when touch_last_visit_if_stale! is called for recent visits' do
+      subject = create(:user, lastvisit: 30.seconds.ago)
+
+      expect(subject.touch_last_visit_if_stale!).to be(false)
+    end
+
+    it 'writes can_play flag as 0 in plugin_verified_buffer when user cannot play' do
+      subject = create(:user, steamid: '0:1:456')
+      allow(subject).to receive(:can_play?).and_return(false)
+
+      buffer = subject.plugin_verified_buffer(channel: 'pub')
+
+      expect(buffer.last).to eq('0')
+    end
+
+    it 'does not change password fields when update_password has no eligible source input' do
+      subject = build(:user, password_hash: User::PASSWORD_SCRYPT)
+      subject.raw_password = nil
+      original_hash = subject.password_hash
+
+      subject.update_password
+
+      expect(subject.password_hash).to eq(original_hash)
+    end
+
+    it 'still appends a suffix in fix_attributes with no explicit username errors' do
+      subject = build(:user, username: "clean_name_#{SecureRandom.hex(4)}")
+      original = subject.username
+
+      subject.fix_attributes
+
+      expect(subject.username).to eq("#{original}2")
+    end
+
+    it 'returns false for can_change_name? and can_destroy? for non-admin actors' do
+      subject = create(:user)
+      actor = create(:user)
+
+      expect(subject.can_change_name?(actor)).to be(false)
+      expect(subject.can_destroy?(actor)).to be(false)
+      expect(subject.can_change_name?(nil)).to be_nil
+      expect(subject.can_destroy?(nil)).to be_nil
+    end
+
+    it 'returns nil for md5_scrypt users when password mismatches' do
+      username = 'md5scrypt_mismatch'
+      user = User.new(username: username, email: 'mismatch@example.com')
+      user.password_hash = User::PASSWORD_MD5_SCRYPT
+      user.password = SCrypt::Password.create(Digest::MD5.hexdigest('goodpass'))
+      user.save!(validate: false)
+
+      expect(User.authenticate(username: username, password: 'badpass')).to be_nil
+    end
+
+    it 'returns nil for unknown find_for_api format' do
+      subject = create(:user)
+
+      expect(User.find_for_api(subject.id, 'unknown')).to be_nil
+    end
+
+    it 'returns banned plugin response when server ban is active' do
+      ban = instance_double(Ban, expiry: 1.day.from_now, reason: 'abuse')
+      allow(Ban).to receive(:active_server_ban_for).with('0:1:555').and_return(ban)
+
+      response = User.plugin_response(steamid: '0:1:555', channel: 'pub')
+
+      expect(response[0]).to eq('#USER#')
+      expect(response[1]).to eq('BANNED')
+      expect(response[3]).to eq('abuse')
+    end
+
+    it 'returns the record from User.get when id is present' do
+      subject = create(:user)
+
+      expect(User.get(subject.id)).to eq(subject)
+    end
+
+    it 'returns nil from find_or_build without provider or without steam uid' do
+      expect(User.find_or_build(nil, '1.1.1.1')).to be_nil
+      expect(User.find_or_build({ provider: 'steam' }, '1.1.1.1')).to be_nil
+    end
+
+    it 'returns an existing user from find_or_build for known steam uid' do
+      subject = create(:user, steamid: '0:1:321')
+      auth_hash = { provider: 'steam', uid: 'STEAM_0:1:321', info: { nickname: 'Nick', name: 'Nick Name' } }
+
+      expect(User.find_or_build(auth_hash, '9.9.9.9')).to eq(subject)
+    end
+
+    it 'builds a new user from steam auth when steam uid is unknown' do
+      auth_hash = { provider: 'steam', uid: 'STEAM_0:1:654', info: { nickname: 'FreshNick', name: 'Fresh User' } }
+
+      result = User.find_or_build(auth_hash, '8.8.8.8')
+
+      expect(result).to be_a(User)
+      expect(result).to be_new_record
+      expect(result.username).to start_with('FreshNick')
+      expect(result.lastip).to eq('8.8.8.8')
+      expect(result.steamid).to eq('0:1:654')
+      expect(result.profile).to be_present
+    end
+  end
 end

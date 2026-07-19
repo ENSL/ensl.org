@@ -257,6 +257,16 @@ RSpec.describe Movie, type: :model do
         movie.user_name = ''
         expect { movie.assign_user_from_user_name }.not_to raise_error
       end
+
+      it 'keeps existing user when username lookup misses' do
+        movie.user = nil
+        allow(User).to receive(:find_by).with(username: 'missing').and_return(nil)
+        movie.user_name = 'missing'
+
+        movie.assign_user_from_user_name
+
+        expect(movie.user).to be_nil
+      end
     end
 
     context 'preview_path and preview_url' do
@@ -271,6 +281,19 @@ RSpec.describe Movie, type: :model do
         movie.file = data_file
 
         expect(movie.preview_path).to be_nil
+      end
+
+      it 'reloads file when preview_path is called on a new record' do
+        fresh_movie = described_class.new
+        file_with_reload = instance_double('DataFile', location: '/tmp/new_movie.mp4')
+        allow(file_with_reload).to receive(:respond_to?).with(:reload).and_return(true)
+        allow(file_with_reload).to receive(:reload)
+        allow(file_with_reload).to receive(:location).and_return('/tmp/new_movie.mp4')
+        fresh_movie.file = file_with_reload
+
+        fresh_movie.preview_path
+
+        expect(file_with_reload).to have_received(:reload)
       end
 
       it 'returns preview.url if preview file exists' do
@@ -406,6 +429,46 @@ RSpec.describe Movie, type: :model do
         allow(Process).to receive(:spawn).and_raise(StandardError, 'spawn failed')
 
         expect(movie.send(:make_stream)).to be_nil
+      end
+    end
+
+    context 'private helpers and permissions' do
+      it 'creates snapshot directory when missing before writing snapshot' do
+        movie.file = data_file
+        dir = File.dirname(movie.snapshot_path)
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with(dir).and_return(false)
+        allow(File).to receive(:exist?).with(movie.snapshot_path).and_return(false)
+
+        expect(FileUtils).to receive(:mkdir_p).with(dir)
+        movie.make_snapshot
+      end
+
+      it 'returns nil from fallback preview helper when source is blank' do
+        allow(data_file).to receive(:location).and_return(nil)
+        movie.file = data_file
+
+        expect(movie.send(:make_preview_fallback_for_test)).to be_nil
+      end
+
+      it 'supports filtering by non-numeric author usernames' do
+        author = create(:user, username: 'movie_author')
+        category = create(:category)
+        file = create(:data_file, :movie)
+        create(:movie, user: author, category: category, file: file)
+
+        relation = described_class.filter_or_all('date', nil, nil, 'movie_author')
+
+        expect(relation).to be_a(ActiveRecord::Relation)
+      end
+
+      it 'rejects updates and destroy for unrelated regular users' do
+        owner = create(:user)
+        outsider = create(:user)
+        record = create(:movie, user: owner)
+
+        expect(record.can_update?(outsider)).to be(false)
+        expect(record.can_destroy?(outsider)).to be(false)
       end
     end
 

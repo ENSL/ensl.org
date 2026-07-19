@@ -554,6 +554,86 @@ describe Directory do
     end
   end
 
+  describe 'fallback and rescue branches' do
+    it 'falls back to FILES_ROOT/name when path is blank and directory is not root' do
+      dir = build(:directory, id: Directory::ROOT + 500, parent: nil, name: 'LooseDir', path: nil)
+
+      expect(dir.full_path).to eq(File.join(@test_root, 'loosedir'))
+    end
+
+    it 'raises RecordInvalid when make_path encounters a filesystem error', :skip_log_error_check do
+      dir = build(:directory, name: 'cannotcreate')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(dir.full_path).and_return(false)
+      allow(FileUtils).to receive(:mkdir_p).and_call_original
+      allow(FileUtils).to receive(:mkdir_p).with(dir.full_path).and_raise(StandardError, 'disk full')
+
+      expect { dir.send(:make_path) }.to raise_error(ActiveRecord::RecordInvalid)
+      expect(dir.errors[:base].join).to include('Cannot create directory')
+    end
+
+    it 'swallows update_timestamp errors and keeps execution going', :skip_log_error_check do
+      dir = create(:directory, name: 'timestampwarn')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(dir.full_path).and_return(true)
+      allow(dir).to receive(:update_column).and_raise(StandardError, 'mtime failed')
+
+      expect { dir.send(:update_timestamp) }.not_to raise_error
+    end
+
+    it 'swallows sync_inode_info errors and keeps execution going', :skip_log_error_check do
+      dir = create(:directory, name: 'inodewarn')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(dir.full_path).and_return(true)
+      allow(File).to receive(:stat).with(dir.full_path).and_raise(StandardError, 'stat failed')
+
+      expect { dir.send(:sync_inode_info) }.not_to raise_error
+    end
+
+    it 'swallows remove_path unlink errors and keeps execution going', :skip_log_error_check do
+      dir = create(:directory, name: 'unlinkwarn')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(dir.full_path).and_return(true)
+      allow(Dir).to receive(:empty?).with(dir.full_path).and_return(true)
+      allow(Dir).to receive(:unlink).with(dir.full_path).and_raise(StandardError, 'unlink failed')
+
+      expect { dir.send(:remove_path) }.not_to raise_error
+    end
+
+    it 'uses sibling .trash when default trash path points inside source directory' do
+      dir = create(:directory, name: 'trashrootcase')
+      allow(dir).to receive(:trash_root).and_return(File.join(dir.full_path, '.trash'))
+
+      trash_root = dir.send(:trash_root_for, dir.full_path)
+
+      expect(trash_root).to eq(File.join(File.dirname(dir.full_path), '.trash'))
+    end
+
+    it 'adds a unique suffix when next_trash_path candidate already exists' do
+      dir = create(:directory, name: 'collisiondir')
+      trash_root = File.join(@test_root, '.trash_collision')
+      FileUtils.mkdir_p(trash_root)
+      fixed_now = Time.utc(2026, 7, 17, 0, 0, 0)
+      allow(Time).to receive(:now).and_return(fixed_now)
+      allow(SecureRandom).to receive(:hex).with(4).and_return('abcd1234')
+
+      existing_candidate = File.join(trash_root, "#{File.basename(dir.full_path)}_#{dir.id}_20260717000000")
+      FileUtils.touch(existing_candidate)
+
+      path = dir.send(:next_trash_path, trash_root)
+
+      expect(path).to eq(File.join(trash_root, "#{File.basename(dir.full_path)}_#{dir.id}_20260717000000_abcd1234"))
+    end
+
+    it 'returns nil when find_by_inode_and_verify hits an unexpected error', :skip_log_error_check do
+      allow(Directory).to receive(:find_by_inode).and_raise(StandardError, 'boom')
+
+      result = Directory.find_by_inode_and_verify('/tmp/does-not-matter', 1, 2)
+
+      expect(result).to be_nil
+    end
+  end
+
   describe 'private reconciliation helpers' do
     it 'fixes blank subdir attributes and records the repair' do
       root = create(:directory, :root, path: @test_root)

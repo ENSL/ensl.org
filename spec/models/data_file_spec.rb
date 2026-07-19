@@ -522,6 +522,137 @@ describe DataFile do
     end
   end
 
+  describe 'validation and file presence helpers' do
+    it 'uses skip flags and persistence state for file validation bypass' do
+      file = build(:data_file)
+      file.skip_file_validation = true
+      expect(file.skip_file_validation_or_update?).to be true
+
+      file.skip_file_validation = false
+      allow(file).to receive(:new_record?).and_return(false)
+      expect(file.skip_file_validation_or_update?).to be true
+    end
+
+    it 'detects files already present on disk' do
+      existing_path = '/tmp/test_dirs/already_present.txt'
+      File.write(existing_path, 'present')
+      file = build(:data_file, path: existing_path)
+
+      expect(file.file_already_present_on_disk?).to be true
+    end
+  end
+
+  describe '#manual_upload and redirect target' do
+    it 'assigns uploaded file through manual_upload' do
+      src = '/tmp/test_dirs/manual_upload.txt'
+      File.write(src, 'manual content')
+      file = build(:data_file)
+
+      file.manual_upload(src)
+
+      expect(file.name).to be_present
+    end
+
+    it 'resolves redirect target in article, movie, fallback-movie, self order' do
+      file = create(:data_file)
+      article = create(:article)
+      movie = create(:movie, file: file)
+
+      file.article = article
+      expect(file.redirect_target_after_create).to eq(article)
+
+      file.article = nil
+      expect(file.redirect_target_after_create).to eq(movie)
+
+      allow(file).to receive(:movie).and_return(nil)
+      allow(Movie).to receive(:find_by).with(file_id: file.id).and_return(movie)
+      expect(file.redirect_target_after_create).to eq(movie)
+
+      allow(Movie).to receive(:find_by).with(file_id: file.id).and_return(nil)
+      expect(file.redirect_target_after_create).to eq(file)
+    end
+  end
+
+  describe 'private move/cache helpers' do
+    it 'moves file between directories and updates cached path' do
+      old_path = '/tmp/test_dirs/move_from.txt'
+      new_path = '/tmp/test_dirs/moved/move_to.txt'
+      FileUtils.mkdir_p(File.dirname(old_path))
+      File.write(old_path, 'move me')
+
+      file = build(:data_file, path: old_path)
+      allow(file).to receive(:location).and_return(old_path)
+      allow(file).to receive(:directory).and_return(instance_double(Directory, full_path: '/tmp/test_dirs/moved'))
+      allow(file).to receive(:carrierwave_store_absolute_path).and_return(new_path)
+      allow(file).to receive(:name).and_return(instance_double('Uploader', identifier: nil))
+
+      file.send(:move_file_between_directories)
+
+      expect(file.path).to eq(new_path)
+      expect(File.exist?(new_path)).to be true
+    end
+
+    it 'raises RecordInvalid when file move fails', :skip_log_error_check do
+      old_path = '/tmp/test_dirs/move_fail_from.txt'
+      FileUtils.mkdir_p(File.dirname(old_path))
+      File.write(old_path, 'move me')
+
+      file = build(:data_file, path: old_path)
+      allow(file).to receive(:location).and_return(old_path)
+      allow(file).to receive(:directory).and_return(instance_double(Directory, full_path: '/tmp/test_dirs/moved'))
+      allow(file).to receive(:carrierwave_store_absolute_path).and_return('/tmp/test_dirs/moved/move_fail_to.txt')
+      allow(file).to receive(:name).and_return(instance_double('Uploader', identifier: nil))
+      allow(FileUtils).to receive(:mv).and_raise(StandardError, 'cannot move')
+
+      expect { file.send(:move_file_between_directories) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'updates cached path from uploader when path changes' do
+      current_path = '/tmp/test_dirs/cache_path_target.txt'
+      File.write(current_path, 'cache me')
+      file = build(:data_file, path: '/tmp/test_dirs/old_cache_path.txt')
+      allow(file).to receive(:location).and_return(current_path)
+      allow(file).to receive(:update_column)
+
+      file.send(:cache_path_from_uploader)
+
+      expect(file).to have_received(:update_column).with(:path, current_path)
+    end
+  end
+
+  describe 'preview helper branches' do
+    it 'recognizes preview filenames and source basenames' do
+      file = build(:data_file, path: '/tmp/test_dirs/source_preview.mp4')
+      file[:name] = 'source_preview.mp4'
+
+      expect(file.send(:preview_filename?)).to be true
+      expect(file.send(:source_basename)).to eq('source')
+    end
+
+    it 'returns nil source/preview lookup when basename is blank' do
+      file = build(:data_file, path: nil)
+      file[:name] = ''
+
+      expect(file.send(:find_source_for_preview)).to be_nil
+      expect(file.send(:find_preview_for_source)).to be_nil
+    end
+
+    it 'safely exits link_preview_to_source! when source or preview is missing' do
+      file = build(:data_file)
+
+      expect { file.send(:link_preview_to_source!, nil, file) }.not_to raise_error
+      expect { file.send(:link_preview_to_source!, file, nil) }.not_to raise_error
+    end
+  end
+
+  describe '.find_existing rescue path' do
+    it 'returns nil when file lookup raises unexpectedly', :skip_log_error_check do
+      allow(File).to receive(:exist?).and_raise(StandardError, 'exploded')
+
+      expect(described_class.find_existing('/tmp/whatever', 'whatever')).to be_nil
+    end
+  end
+
   describe '.sync_download_plan' do
     around do |example|
       Dir.mktmpdir('data_file_sync_plan_spec') do |tmp_dir|

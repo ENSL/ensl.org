@@ -59,5 +59,41 @@ describe PlayerRankingQuery do
 
       expect(described_class.call).to eq([])
     end
+
+    it 'filters players below the configured min_games threshold' do
+      user = create(:user, steamid: '0:1:77777')
+      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 5)
+      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 10)
+      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'os', metric: 'skill', value: 12.5)
+
+      expect(described_class.call(min_games: 25)).to eq([])
+    end
+
+    it 'keeps explicit os_btf skill instead of backfilling from os' do
+      user = create(:user, steamid: '0:1:88888')
+      create(:analysis_result, batch_id: 11, steamid: user.steamid, model: 'os', metric: 'skill', value: 50.0)
+      create(:analysis_result, batch_id: 11, steamid: user.steamid, model: 'os_btf', metric: 'skill', value: 40.0)
+
+      ranking = described_class.call.find { |row| row[:user] == user }
+
+      expect(ranking[:skill_os]).to eq(50.0)
+      expect(ranking[:skill_os_btf]).to eq(40.0)
+    end
+
+    it 'skips rows with un-normalizable steamids' do
+      create(:analysis_result, batch_id: 12, steamid: 'not-a-steamid', model: 'os', metric: 'skill', value: 1.0)
+
+      expect(described_class.call).to eq([])
+    end
+
+    it 'falls back to default min_games for invalid values' do
+      user = create(:user, steamid: '0:1:99998')
+      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 20)
+      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 10)
+      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'os', metric: 'skill', value: 2.0)
+
+      expect(described_class.call(min_games: 'invalid').map { |row| row[:user] }).to include(user)
+      expect(described_class.call(min_games: 13).map { |row| row[:user] }).to include(user)
+    end
   end
 end

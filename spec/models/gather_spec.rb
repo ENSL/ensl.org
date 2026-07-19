@@ -24,6 +24,14 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       expect(gather.pick_strategy).to eq(Gather::PICK_STRATEGY_DEFAULT)
     end
+
+    it 'returns player count for a game category when present' do
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      create_list(:gatherer, 3, gather: gather)
+
+      expect(described_class.player_count_for_game('ns2')).to eq(3)
+    end
   end
 
   describe 'pick_strategy' do
@@ -190,6 +198,80 @@ RSpec.describe Gather, type: :model do
 
       expect(gather.reload.turn).to eq(1)
       expect(gather.status).to eq(Gather::STATE_PICKING)
+    end
+  end
+
+  describe 'status and timeout helpers' do
+    it 'skips check_status work when status is not changing' do
+      gather = create(:gather)
+      allow(gather).to receive(:will_save_change_to_status?).and_return(false)
+
+      expect(gather.gatherers).not_to receive(:most_voted)
+      gather.send(:check_status)
+    end
+
+    it 'assigns only map1 when exactly one gather map exists' do
+      gather = create(:gather)
+      map = create(:map)
+      gather.gather_maps.destroy_all
+      gather.gather_servers.destroy_all
+      gather.gather_maps.create!(map: map)
+      gather.status = Gather::STATE_PICKING
+      gather.captain1 = nil
+
+      allow(gather).to receive(:will_save_change_to_status?).and_return(true)
+      allow(gather.gatherers).to receive(:most_voted).and_return([nil, nil])
+
+      gather.send(:check_status)
+
+      expect(gather.map1).to eq(gather.gather_maps.ordered.first)
+      expect(gather.map2).to be_nil
+    end
+
+    it 'uses default voting timeout outside test environment' do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
+
+      expect(create(:gather).voting_timeout).to eq(Gather::VOTING_TIMEOUT_SECONDS)
+    end
+
+    it 'returns nil voting start time outside voting and picking states' do
+      gather = create(:gather, status: Gather::STATE_RUNNING)
+
+      expect(gather.voting_start_time).to be_nil
+    end
+
+    it 'returns zero voting time remaining when gather is not voting' do
+      gather = create(:gather, status: Gather::STATE_PICKING)
+
+      expect(gather.voting_time_remaining).to eq(0)
+    end
+  end
+
+  describe '#add_maps_and_server' do
+    it 'uses HLDS servers for category 44' do
+      gather = create(:gather)
+      gather.category_id = 44
+
+      category = instance_double(Category)
+      maps_scope = double('maps_scope')
+      servers_scope = double('servers_scope')
+      hlds_scope = double('hlds_scope')
+      active_scope = double('active_scope')
+      ordered_scope = [build_stubbed(:server)]
+
+      allow(gather).to receive(:category).and_return(category)
+      allow(gather).to receive(:maps).and_return([])
+      allow(gather).to receive(:servers).and_return([])
+      allow(category).to receive(:maps).and_return(maps_scope)
+      allow(maps_scope).to receive(:basic).and_return(maps_scope)
+      allow(maps_scope).to receive(:classic).and_return([])
+      allow(category).to receive(:servers).and_return(servers_scope)
+      allow(servers_scope).to receive(:hlds).and_return(hlds_scope)
+      allow(hlds_scope).to receive(:active).and_return(active_scope)
+      allow(active_scope).to receive(:ordered).and_return(ordered_scope)
+
+      expect(servers_scope).not_to receive(:active)
+      gather.send(:add_maps_and_server)
     end
   end
 end

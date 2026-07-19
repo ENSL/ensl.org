@@ -230,4 +230,58 @@ RSpec.describe Gatherer, type: :model do
       end
     end
   end
+
+  describe 'guard and fallback branches' do
+    it 'adds an error when username does not match any user' do
+      gatherer = build(:gatherer, username: 'not_a_real_user_123')
+      gatherer.define_singleton_method(:t) { |_key| 'Wrong username' }
+
+      gatherer.validate_username
+
+      expect(gatherer.errors[:username]).to be_present
+    end
+
+    it 'does not change status when start_gather runs on an already voting gather' do
+      gather = create(:gather, status: Gather::STATE_VOTING)
+      create_list(:gatherer, Gather::FULL, gather: gather)
+      gatherer = gather.gatherers.first
+
+      expect { gatherer.start_gather }.not_to(change { gather.reload.status })
+    end
+
+    it 'skips notifications for profiles that opted out of PM notifications' do
+      gather = create(:gather)
+      opted_out = create(:user)
+      create(:profile, user: opted_out, notify_gather: 1, notify_pms: false)
+      allow(Notifications).to receive(:gather)
+
+      gatherer = create(:gatherer, gather: gather, user: create(:user))
+      allow(gather.gatherers).to receive(:count).and_return(Gather::NOTIFY)
+
+      gatherer.notify_gatherers
+
+      expect(Notifications).not_to have_received(:gather).with(opted_out, gather)
+    end
+
+    it 'returns false for username updates by non-admin and non-moderator users' do
+      gather = create(:gather)
+      gatherer = create(:gatherer, gather: gather, user: create(:user))
+      actor = create(:user)
+
+      expect(gatherer.can_update?(actor, { 'username' => 'new_name' })).to be(false)
+    end
+
+    it 'returns false for captain picks in the restricted 2-<3 composition' do
+      gather = create(:gather, turn: 1)
+      captain_user = create(:user)
+      captain = create(:gatherer, gather: gather, user: captain_user, team: 1)
+      gather.update!(captain1: captain)
+
+      target = create(:gatherer, gather: gather, user: create(:user), team: nil)
+      create_list(:gatherer, 1, gather: gather, team: 1)
+      create_list(:gatherer, 2, gather: gather, team: 2)
+
+      expect(target.can_update?(captain_user, {})).to be(false)
+    end
+  end
 end

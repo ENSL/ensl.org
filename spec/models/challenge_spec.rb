@@ -35,6 +35,37 @@ RSpec.describe Challenge, type: :model do
       expect(challenge.contester1).to eq(cont1)
     end
 
+    it 'builds defaults for new challenge form data' do
+      cont1
+
+      challenge = described_class.build_for_new(user: user1, contester2: cont2)
+
+      expect(challenge.user).to eq(user1)
+      expect(challenge.contester2).to eq(cont2)
+      expect(challenge.contester1).to eq(cont1)
+      expect(challenge.match_time).to be_within(5.seconds).of(2.days.from_now)
+    end
+
+    it 'maps commit labels into status values and preserves status for unknown commit labels' do
+      challenge = described_class.new(status: described_class::STATUS_PENDING)
+
+      challenge.apply_commit_status('Accept')
+      expect(challenge.status).to eq(described_class::STATUS_ACCEPTED)
+
+      challenge.apply_commit_status('Default time')
+      expect(challenge.status).to eq(described_class::STATUS_DEFAULT)
+
+      challenge.apply_commit_status('Forfeit')
+      expect(challenge.status).to eq(described_class::STATUS_FORFEIT)
+
+      challenge.apply_commit_status('Decline')
+      expect(challenge.status).to eq(described_class::STATUS_DECLINED)
+
+      challenge.status = described_class::STATUS_PENDING
+      challenge.apply_commit_status('Something else')
+      expect(challenge.status).to eq(described_class::STATUS_PENDING)
+    end
+
     it 'skips default_time calculation when contest default time lacks hour support' do
       contest.default_time = nil
       challenge = described_class.new(contester1: cont1, contester2: cont2, match_time: match_time)
@@ -65,6 +96,16 @@ RSpec.describe Challenge, type: :model do
       expect(closed_challenge.errors[:base]).not_to be_empty
     end
 
+    it 'adds inactive-contester error when challenger contester is inactive' do
+      inactive_cont1 = create(:contester, team: user1.team, contest: contest)
+      inactive_cont1.update_column(:active, false)
+      challenge = described_class.new(contester1: inactive_cont1, contester2: cont2, match_time: match_time)
+
+      challenge.send(:validate_teams)
+
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_inactive))
+    end
+
     it 'rejects non-ladder contests without an attached match' do
       league_contest = create(:contest, contest_type: Contest::TYPE_LEAGUE)
       league_cont1 = create(:contester, team: user1.team, contest: league_contest)
@@ -90,6 +131,29 @@ RSpec.describe Challenge, type: :model do
       expect(challenge.errors[:base]).not_to be_empty
     end
 
+    it 'adds mandatory conflict errors when pending/default-time constraints already exist' do
+      challenge = described_class.new(
+        contester1: cont1,
+        contester2: cont2,
+        match_time: match_time,
+        default_time: match_time.end_of_week.change(hour: 20, min: 30),
+        mandatory: true
+      )
+
+      allow(Challenge).to receive_message_chain(:pending, :where, :where, :exists?).and_return(true)
+      allow(Match).to receive_message_chain(:of_contester, :on_week, :exists?).and_return(true)
+      allow(Challenge).to receive_message_chain(:of_contester, :mandatory, :on_week, :exists?).and_return(true)
+      allow(Match).to receive_message_chain(:of_contester, :around, :exists?).and_return(true)
+
+      challenge.send(:validate_mandatory)
+
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_mandatory_handled))
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_opponent_week))
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_opponent_mandatory_week))
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_opponent_mandatory_week_defaulttime))
+      expect(challenge.errors[:base]).to include(I18n.t(:challenges_opponent_defaulttime))
+    end
+
     it 'rejects match times that are too soon and after contest end' do
       contest.update!(end: 2.days.from_now)
       challenge = described_class.new(contester1: cont1, contester2: cont2, match_time: 1.day.from_now, mandatory: true)
@@ -97,6 +161,15 @@ RSpec.describe Challenge, type: :model do
       challenge.send(:validate_match_time)
 
       expect(challenge.errors[:base].size).to be >= 1
+    end
+
+    it 'adds contests_end error when requested time is after contest end' do
+      contest.update!(end: 1.day.from_now)
+      challenge = described_class.new(contester1: cont1, contester2: cont2, match_time: 2.days.from_now)
+
+      challenge.send(:validate_match_time)
+
+      expect(challenge.errors[:base]).to include(I18n.t(:contests_end))
     end
 
     it 'rejects conflicting pending challenges and matches around the selected time' do
@@ -132,6 +205,19 @@ RSpec.describe Challenge, type: :model do
       expect(unavailable.errors[:base]).not_to be_empty
     end
 
+    it 'adds default-time server availability error when specific time is free but default time is not' do
+      server = create(:server, official: true)
+      default_time = match_time.end_of_week.change(hour: 20, min: 30)
+      allow(server).to receive(:is_free).with(match_time).and_return(true)
+      allow(server).to receive(:is_free).with(default_time).and_return(false)
+
+      challenge = described_class.new(contester1: cont1, contester2: cont2, match_time: match_time,
+                                      default_time: default_time, server: server)
+      challenge.send(:validate_server)
+
+      expect(challenge.errors[:base]).to include(I18n.t(:servers_notfree_defaulttime))
+    end
+
     it 'validates contest map membership only when maps are present' do
       allowed_map = create(:map)
       contest.maps << allowed_map
@@ -142,6 +228,15 @@ RSpec.describe Challenge, type: :model do
       challenge.send(:validate_map2)
 
       expect(challenge.errors[:base].size).to eq(1)
+    end
+
+    it 'adds map1 validation error when map1 is outside contest map pool' do
+      disallowed_map = create(:map)
+      challenge = described_class.new(contester1: cont1, contester2: cont2, map1: disallowed_map)
+
+      challenge.send(:validate_map1)
+
+      expect(challenge.errors[:base]).to include(I18n.t(:contests_map_notavailable))
     end
 
     it 'rejects invalid status changes and non-mandatory status values outside the map' do

@@ -70,6 +70,12 @@ RSpec.describe 'DataFilesController', type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'returns 403 when not logged in' do
+      get '/data_files/admin'
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'GET /data_files/new' do
@@ -228,6 +234,17 @@ RSpec.describe 'DataFilesController', type: :request do
 
       expect(response).to redirect_to(directory_path(directory))
     end
+
+    it 'returns 403 when not logged in' do
+      directory = create(:directory, parent: ensure_root_directory)
+      file = create(:data_file, directory: directory)
+
+      expect do
+        delete "/data_files/#{file.id}"
+      end.not_to change(DataFile, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe 'GET /data_files/trash' do
@@ -254,6 +271,12 @@ RSpec.describe 'DataFilesController', type: :request do
     it 'returns 403 for non-admin users' do
       login_as(user)
 
+      get '/data_files/trash'
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'returns 403 when not logged in' do
       get '/data_files/trash'
 
       expect(response).to have_http_status(:forbidden)

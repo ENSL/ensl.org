@@ -127,6 +127,10 @@ RSpec.describe Match, type: :model do
 
       match.friendly = team2
       expect(match.score_color).to eq('green')
+
+      match.score1 = 4
+      match.score2 = 1
+      expect(match.score_color).to eq('red')
     end
 
     it 'returns friendly and opponent details' do
@@ -145,6 +149,22 @@ RSpec.describe Match, type: :model do
       expect(match.get_opponent(:score)).to eq(1)
       expect(match.get_friendly(:points)).to eq(2)
       expect(match.get_opponent(:points)).to eq(0)
+
+      match.friendly = team2
+      expect(match.get_friendly).to eq(cont2)
+      expect(match.get_opponent).to eq(cont1)
+      expect(match.get_friendly(:score)).to eq(1)
+      expect(match.get_opponent(:score)).to eq(4)
+      expect(match.get_friendly(:points)).to eq(0)
+      expect(match.get_opponent(:points)).to eq(2)
+    end
+
+    it 'builds a sanitized demo file name' do
+      match = create(:match)
+      allow(Verification).to receive(:uncrap).and_return('safe-demo-name')
+
+      expect(match.demo_name).to eq('safe-demo-name')
+      expect(Verification).to have_received(:uncrap).with(include(match.id.to_s))
     end
 
     it 'returns the opposing team' do
@@ -203,6 +223,10 @@ RSpec.describe Match, type: :model do
       expect(match.can_destroy?(admin)).to be true
     end
 
+    it 'denies updates for nil users' do
+      expect(match.can_update?(nil, {})).to be false
+    end
+
     it 'allows the assigned referee to update result fields and hltv requests' do
       referee = create(:user)
       allow(referee).to receive_messages(admin?: false, ref?: true, caster?: false)
@@ -258,6 +282,75 @@ RSpec.describe Match, type: :model do
       expect(match.user_in_match?(leader)).to be true
       expect(match.user_in_match?(outsider)).to be false
     end
+
+    it 'returns false for can_make_proposal? when user is nil' do
+      expect(match.can_make_proposal?(nil)).to be false
+    end
+  end
+
+  describe 'hltv controls' do
+    let(:match) { build(:match, match_time: Time.now.utc) }
+
+    it 'raises when requesting record too far from match time' do
+      match.match_time = Time.now.utc + (Match::MATCH_LENGTH * 11)
+
+      expect { match.hltv_record('addr', 'pwd') }
+        .to raise_error(Match::Error, I18n.t('hltv_request_20'))
+    end
+
+    it 'raises when hltv server is already recording' do
+      hltv = instance_double(Server, recording: true, addr: 'hltv.example')
+      allow(match).to receive(:hltv).and_return(hltv)
+
+      expect { match.hltv_record('addr', 'pwd') }
+        .to raise_error(Match::Error, I18n.t(:hltv_already) + 'hltv.example')
+    end
+
+    it 'raises when no hltv server is available' do
+      allow(match).to receive(:hltv).and_return(nil)
+      allow(match).to receive(:ensure_hltv).and_return(nil)
+
+      expect { match.hltv_record('addr', 'pwd') }
+        .to raise_error(Match::Error, I18n.t(:hltv_notavailable))
+    end
+
+    it 'stores reservation details when recording is possible' do
+      hltv = instance_double(Server, recording: nil)
+      allow(match).to receive(:hltv).and_return(hltv)
+      allow(match).to receive(:ensure_hltv).and_return(hltv)
+      allow(match).to receive(:save!).and_return(true)
+      allow(hltv).to receive(:reservation=).with('addr')
+      allow(hltv).to receive(:pwd=).with('pwd')
+      allow(hltv).to receive(:recordable=).with(match)
+      allow(hltv).to receive(:save!).and_return(true)
+
+      match.hltv_record('addr', 'pwd')
+
+      expect(hltv).to have_received(:reservation=).with('addr')
+      expect(hltv).to have_received(:pwd=).with('pwd')
+      expect(hltv).to have_received(:recordable=).with(match)
+      expect(hltv).to have_received(:save!)
+    end
+
+    it 'raises when moving without active hltv recording' do
+      allow(match).to receive(:hltv).and_return(nil)
+
+      expect { match.hltv_move('addr', 'pwd') }
+        .to raise_error(Match::Error, I18n.t(:hltv_notset))
+    end
+
+    it 'moves and stops active hltv reservations' do
+      hltv = instance_double(Server, recording: true, reservation: 'current-reservation')
+      allow(match).to receive(:hltv).and_return(hltv)
+      allow(Server).to receive(:move)
+      allow(Server).to receive(:stop)
+
+      match.hltv_move('new-address', 'secret')
+      match.hltv_stop
+
+      expect(Server).to have_received(:move).with('current-reservation', 'new-address', 'secret')
+      expect(Server).to have_received(:stop).with('current-reservation')
+    end
   end
 
   describe '#confirmed_proposal?' do
@@ -275,6 +368,103 @@ RSpec.describe Match, type: :model do
 
     it 'is false when the match has no proposals' do
       expect(match.confirmed_proposal?).to be false
+    end
+  end
+
+  describe 'score bookkeeping branches' do
+    let(:contest) { instance_double(Contest, contest_type: Contest::TYPE_LEAGUE) }
+    let(:team1) { instance_double(Team) }
+    let(:team2) { instance_double(Team) }
+    let(:contester1) { instance_double(Contester, team: team1, active: true) }
+    let(:contester2) { instance_double(Contester, team: team2, active: true) }
+    let(:match) { build(:match) }
+
+    before do
+      allow(match).to receive(:contest).and_return(contest)
+      allow(match).to receive(:contester1).and_return(contester1)
+      allow(match).to receive(:contester2).and_return(contester2)
+
+      allow(contester1).to receive_messages(draw: 2, win: 3, loss: 4, score: 10, trend: nil)
+      allow(contester2).to receive_messages(draw: 5, win: 6, loss: 7, score: 11, trend: nil)
+
+      allow(contester1).to receive(:draw=)
+      allow(contester2).to receive(:draw=)
+      allow(contester1).to receive(:win=)
+      allow(contester2).to receive(:win=)
+      allow(contester1).to receive(:loss=)
+      allow(contester2).to receive(:loss=)
+      allow(contester1).to receive(:score=)
+      allow(contester2).to receive(:score=)
+      allow(contester1).to receive(:trend=)
+      allow(contester2).to receive(:trend=)
+      allow(contester1).to receive(:save!).and_return(true)
+      allow(contester2).to receive(:save!).and_return(true)
+    end
+
+    it 'recalculate updates draw counts and trends on draw' do
+      match.score1 = 2
+      match.score2 = 2
+
+      match.recalculate
+
+      expect(contester1).to have_received(:draw=).with(3)
+      expect(contester2).to have_received(:draw=).with(6)
+      expect(contester1).to have_received(:trend=).with(Contester::TREND_FLAT)
+      expect(contester2).to have_received(:trend=).with(Contester::TREND_FLAT)
+    end
+
+    it 'recalculate updates win and loss counts when contester1 wins' do
+      match.score1 = 4
+      match.score2 = 1
+
+      match.recalculate
+
+      expect(contester1).to have_received(:win=).with(4)
+      expect(contester2).to have_received(:loss=).with(8)
+      expect(contester1).to have_received(:trend=).with(Contester::TREND_UP)
+      expect(contester2).to have_received(:trend=).with(Contester::TREND_DOWN)
+    end
+
+    it 'recalculate updates win and loss counts when contester2 wins' do
+      match.score1 = 1
+      match.score2 = 3
+
+      match.recalculate
+
+      expect(contester1).to have_received(:loss=).with(5)
+      expect(contester2).to have_received(:win=).with(7)
+      expect(contester1).to have_received(:trend=).with(Contester::TREND_DOWN)
+      expect(contester2).to have_received(:trend=).with(Contester::TREND_UP)
+    end
+
+    it 'reset_contest decrements draw records when prior score was draw' do
+      allow(match).to receive(:score1_was).and_return(2)
+      allow(match).to receive(:score2_was).and_return(2)
+
+      match.reset_contest
+
+      expect(contester1).to have_received(:draw=).with(1)
+      expect(contester2).to have_received(:draw=).with(4)
+    end
+
+    it 'reset_contest decrements win and loss records when prior score favored contester1' do
+      allow(match).to receive(:score1_was).and_return(3)
+      allow(match).to receive(:score2_was).and_return(1)
+
+      match.reset_contest
+
+      expect(contester1).to have_received(:win=).with(2)
+      expect(contester2).to have_received(:loss=).with(6)
+    end
+
+    it 'reset_contest decrements win and loss records when prior score favored contester2' do
+      allow(match).to receive(:score1_was).and_return(1)
+      allow(match).to receive(:score2_was).and_return(3)
+
+      match.reset_contest
+
+      expect(contester1).to have_received(:loss=).with(3)
+      expect(contester2).to have_received(:win=).with(5)
     end
   end
 end

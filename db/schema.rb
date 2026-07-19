@@ -25,18 +25,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_12_130000) do
     t.index ["steamid"], name: "index_analysis_results_on_steamid"
   end
 
-  create_table "article_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "article_id"
-    t.datetime "created_at", precision: nil
-    t.text "text", size: :long
-    t.integer "text_coding", default: 0, null: false
-    t.text "text_parsed", size: :long
-    t.string "title"
-    t.datetime "updated_at", precision: nil
-    t.integer "version"
-    t.index ["article_id"], name: "index_article_versions_on_article_id"
-  end
-
   create_table "articles", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "category_id"
     t.datetime "created_at", precision: nil
