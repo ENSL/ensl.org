@@ -22,7 +22,11 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
 
     expect(page).to have_css(
       '.passkey-status',
-      text: /(enter your username before using a passkey\.|passkeys are not supported in this browser\.|invalid domain)/i,
+      text: /(
+        enter\ your\ username\ before\ using\ a\ passkey\.|
+        passkeys\ are\ not\ supported\ in\ this\ browser\.|
+        invalid\ domain
+      )/ix,
       wait: 10
     )
   end

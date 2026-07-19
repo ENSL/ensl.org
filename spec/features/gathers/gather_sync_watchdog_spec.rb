@@ -46,7 +46,9 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     expect(page).to have_selector('#gather-stats .gather-controls #mute.button', text: 'Mute', wait: 5)
     expect(page).to have_selector('#gather-stats .gather-controls a.admin.button', text: 'Admin Page', wait: 5)
 
-    controls_order = evaluate_script("Array.from(document.querySelectorAll('#gather-stats .gather-controls > *')).map((el) => el.id || el.className)")
+    controls_order = evaluate_script(
+      "Array.from(document.querySelectorAll('#gather-stats .gather-controls > *')).map((el) => el.id || el.className)"
+    )
     expect(controls_order.first).to eq('gather-music')
   end
 

@@ -63,10 +63,11 @@ module Features
       select value.to_s.rjust(2, '0'), from: select_id
     end
 
-    # Helper for selecting datetime values in Rails datetime_select fields with optional field name parameter
+    # Helper for selecting datetime values in Rails datetime_select fields with optional field name parameter.
     # @param datetime [Time, DateTime, ActiveSupport::TimeWithZone] The datetime to select
     # @param options [Hash] Options hash
-    # @option options [String] :from The base name of the datetime field (e.g., 'Proposed time' or 'match_proposal_proposed_time')
+    # @option options [String] :from The base name of the datetime field
+    #   (e.g., 'Proposed time' or 'match_proposal_proposed_time')
     def select_datetime(datetime, options = {})
       base_id = options[:from] || ''
 

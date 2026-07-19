@@ -128,7 +128,8 @@ describe GithubReleaseAssetSyncJob do
         status: 200,
         body: [{ 'name' => 'one' }].to_json,
         headers: {
-          'link' => '<https://api.github.com/repos/owner/repo/tags?per_page=100&page=2>; rel="next", <https://api.github.com/repos/owner/repo/tags?per_page=100&page=2>; rel="last"'
+          'link' => '<https://api.github.com/repos/owner/repo/tags?per_page=100&page=2>; rel="next", ' \
+                    '<https://api.github.com/repos/owner/repo/tags?per_page=100&page=2>; rel="last"'
         }
       )
       response_page_two = instance_double(
@@ -139,8 +140,14 @@ describe GithubReleaseAssetSyncJob do
         headers: {}
       )
 
-      expect(connection).to receive(:get).with('/repos/owner/repo/tags?per_page=100').and_yield(double(headers: {})).and_return(response_page_one)
-      expect(connection).to receive(:get).with('https://api.github.com/repos/owner/repo/tags?per_page=100&page=2').and_yield(double(headers: {})).and_return(response_page_two)
+      expect(connection).to receive(:get)
+        .with('/repos/owner/repo/tags?per_page=100')
+        .and_yield(double(headers: {}))
+        .and_return(response_page_one)
+      expect(connection).to receive(:get)
+        .with('https://api.github.com/repos/owner/repo/tags?per_page=100&page=2')
+        .and_yield(double(headers: {}))
+        .and_return(response_page_two)
 
       expect(job.send(:github_paginated_get, '/repos/owner/repo/tags?per_page=100')).to eq(
         [{ 'name' => 'one' }, { 'name' => 'two' }]
@@ -156,14 +163,22 @@ describe GithubReleaseAssetSyncJob do
         headers: {}
       )
 
-      expect(connection).to receive(:get).with('/repos/owner/repo/releases/latest').and_yield(double(headers: {})).and_return(response)
+      expect(connection).to receive(:get)
+        .with('/repos/owner/repo/releases/latest')
+        .and_yield(double(headers: {}))
+        .and_return(response)
 
-      expect(job.send(:github_paginated_get, '/repos/owner/repo/releases/latest')).to eq([{ 'tag_name' => 'v1.0.0' }])
+      expect(job.send(:github_paginated_get, '/repos/owner/repo/releases/latest')).to eq(
+        [{ 'tag_name' => 'v1.0.0' }]
+      )
     end
 
     it 'raises when a github request fails' do
       response = instance_double(Faraday::Response, success?: false, status: 500, headers: {}, body: '{}')
-      expect(connection).to receive(:get).with('/repos/owner/repo/tags?per_page=100').and_yield(double(headers: {})).and_return(response)
+      expect(connection).to receive(:get)
+        .with('/repos/owner/repo/tags?per_page=100')
+        .and_yield(double(headers: {}))
+        .and_return(response)
 
       expect { job.send(:github_paginated_get, '/repos/owner/repo/tags?per_page=100') }
         .to raise_error(RuntimeError, 'GitHub request failed (500) for /repos/owner/repo/tags?per_page=100')

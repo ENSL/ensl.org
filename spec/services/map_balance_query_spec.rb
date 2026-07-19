@@ -36,7 +36,8 @@ RSpec.describe MapBalanceQuery do
 
     it 'ignores rows with nil or sentinel steamid values' do
       create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: AnalysisResult::NO_STEAMID, model: 'map_balance', metric: 'total_games', value: 50)
+                               steamid: AnalysisResult::NO_STEAMID, model: 'map_balance',
+                               metric: 'total_games', value: 50)
       create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
                                steamid: nil, model: 'map_balance', metric: 'total_games', value: 20)
 

@@ -39,7 +39,10 @@ FactoryBot.define do
         end
         Article.insert_all!(article_rows) if article_rows.any?
 
-        article_ids = Article.where(category_id: evaluator.news_category.id).order(id: :desc).limit(evaluator.articles_count).pluck(:id)
+        article_ids = Article.where(category_id: evaluator.news_category.id)
+                             .order(id: :desc)
+                             .limit(evaluator.articles_count)
+                             .pluck(:id)
         next if article_ids.empty? || evaluator.comments_count.zero?
 
         comment_rows = Array.new(evaluator.comments_count) do |index|

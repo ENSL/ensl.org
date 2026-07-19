@@ -181,13 +181,17 @@ RSpec.describe Challenge, type: :model do
       allow(unavailable_server).to receive(:is_free).with(match_time.end_of_week.change(hour: 20,
                                                                                         min: 30)).and_return(true)
 
-      unofficial = described_class.new(contester1: cont1, contester2: cont2, match_time: match_time,
-                                       default_time: match_time.end_of_week.change(hour: 20, min: 30), server: unofficial_server)
+      unofficial = described_class.new(
+        contester1: cont1, contester2: cont2, match_time: match_time,
+        default_time: match_time.end_of_week.change(hour: 20, min: 30), server: unofficial_server
+      )
       unofficial.send(:validate_server)
       expect(unofficial.errors[:base]).not_to be_empty
 
-      unavailable = described_class.new(contester1: cont1, contester2: cont2, match_time: match_time,
-                                        default_time: match_time.end_of_week.change(hour: 20, min: 30), server: unavailable_server)
+      unavailable = described_class.new(
+        contester1: cont1, contester2: cont2, match_time: match_time,
+        default_time: match_time.end_of_week.change(hour: 20, min: 30), server: unavailable_server
+      )
       unavailable.send(:validate_server)
       expect(unavailable.errors[:base]).not_to be_empty
     end

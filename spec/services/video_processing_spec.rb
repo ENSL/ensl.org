@@ -312,7 +312,9 @@ RSpec.describe VideoProcessing, type: :service do
                                          })
 
       expect(ok).to be(false)
-      expect(reasons).to include(%r{Container is not MP4/ISO BMFF}.match?(reasons.first) ? reasons.first : a_string_matching(%r{Container is not MP4/ISO BMFF}))
+      expect(reasons).to include(
+        %r{Container is not MP4/ISO BMFF}.match?(reasons.first) ? reasons.first : a_string_matching(%r{Container is not MP4/ISO BMFF})
+      )
       expect(reasons).to include('No video stream found')
       expect(reasons).to include('No audio stream (OK for silent video, but some UX expects audio)')
     end

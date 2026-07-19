@@ -81,8 +81,12 @@ feature 'Gathers', js: true do
       visit gather_path(gather)
       expect(page).to have_selector("#{gather_selector} .shoutmsg", minimum: 1)
 
-      overflow_y = page.evaluate_script("window.getComputedStyle(document.querySelector('#{gather_selector}')).overflowY")
-      max_height = page.evaluate_script("window.getComputedStyle(document.querySelector('#{gather_selector}')).maxHeight")
+      overflow_y = page.evaluate_script(
+        "window.getComputedStyle(document.querySelector('#{gather_selector}')).overflowY"
+      )
+      max_height = page.evaluate_script(
+        "window.getComputedStyle(document.querySelector('#{gather_selector}')).maxHeight"
+      )
       expect(overflow_y).to eq('auto')
       expect(max_height).to eq('240px')
 
@@ -96,7 +100,10 @@ feature 'Gathers', js: true do
       expect(last_text).to include("#{prefix}-11")
 
       scroll_top = page.evaluate_script("document.querySelector('#{gather_selector}').scrollTop")
-      max_scroll = page.evaluate_script("(function(){ const el = document.querySelector('#{gather_selector}'); return el.scrollHeight - el.clientHeight; })()")
+      max_scroll = page.evaluate_script(
+        "(function(){ const el = document.querySelector('#{gather_selector}'); " \
+        'return el.scrollHeight - el.clientHeight; })()'
+      )
       expect(scroll_top).to be >= [max_scroll - 10, 0].max
     end
   end

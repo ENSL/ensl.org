@@ -576,7 +576,8 @@ describe DirectoryReconciliationService do
 
       # CRITICAL: No directories lost
       expect(Directory.count).to eq(initial_dir_count),
-                                 "Directory count should not change: expected #{initial_dir_count}, got #{Directory.count}"
+                                 "Directory count should not change: expected #{initial_dir_count}, " \
+                                 "got #{Directory.count}"
 
       # Verify tracked files still exist with same IDs (not duplicated)
       tracked_files.each do |tracked|

@@ -37,7 +37,10 @@ RSpec.describe Movie, type: :model do
     it { is_expected.to validate_length_of(:content).is_at_most(200).allow_blank }
     it { is_expected.to validate_length_of(:format).is_at_most(200).allow_blank }
     it {
-      is_expected.to validate_numericality_of(:length).only_integer.is_greater_than_or_equal_to(0).is_less_than_or_equal_to(50_000).allow_nil
+      is_expected.to validate_numericality_of(:length).only_integer
+                                                      .is_greater_than_or_equal_to(0)
+                                                      .is_less_than_or_equal_to(50_000)
+                                                      .allow_nil
     }
     it 'allows file to be blank' do
       m = described_class.new

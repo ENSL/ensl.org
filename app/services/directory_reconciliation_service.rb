@@ -123,16 +123,19 @@ class DirectoryReconciliationService
 
   def log_progress(stats)
     @logger.info(
-      "Progress scanned=#{stats[:entries_scanned]} dirs=#{stats[:directories_scanned]} files=#{stats[:files_scanned]} " \
+      "Progress scanned=#{stats[:entries_scanned]} dirs=#{stats[:directories_scanned]} " \
+      "files=#{stats[:files_scanned]} " \
       "db_dirs(new=#{stats[:directories_created]}, moved=#{stats[:directories_relinked]}, " \
       "fixed=#{stats[:directories_fixed]}, renamed=#{stats[:directories_renamed]}) " \
-      "db_files(new=#{stats[:files_created]}, relinked=#{stats[:files_relinked]})"
+      "db_files(new=#{stats[:files_created]}, " \
+      "relinked=#{stats[:files_relinked]})"
     )
   end
 
   def summary_line
     'Reconciliation summary: ' \
-      "scanned(entries=#{@stats[:entries_scanned]}, dirs=#{@stats[:directories_scanned]}, files=#{@stats[:files_scanned]}) " \
+      "scanned(entries=#{@stats[:entries_scanned]}, dirs=#{@stats[:directories_scanned]}, " \
+      "files=#{@stats[:files_scanned]}) " \
       "db(dirs:new=#{@stats[:directories_created]}, moved=#{@stats[:directories_relinked]}, " \
       "fixed=#{@stats[:directories_fixed]}, renamed=#{@stats[:directories_renamed]}, " \
       "removed=#{@stats[:directories_removed]}; " \

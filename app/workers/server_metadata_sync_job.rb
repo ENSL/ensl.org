@@ -28,7 +28,8 @@ class ServerMetadataSyncJob
     end
 
     Rails.logger.info(
-      "[ServerMetadataSyncJob] total=#{total} hlds=#{hlds_total} ns2=#{ns2_total} responded=#{responded} updated=#{updated} offline=#{offline}"
+      "[ServerMetadataSyncJob] total=#{total} hlds=#{hlds_total} ns2=#{ns2_total} " \
+      "responded=#{responded} updated=#{updated} offline=#{offline}"
     )
   end
 

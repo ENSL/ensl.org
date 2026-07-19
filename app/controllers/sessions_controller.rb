@@ -115,7 +115,8 @@ class SessionsController < ApplicationController
 
   # Cache the verified SteamID and user data in the session for later use. This is used to
   # persist the verified SteamID across requests, and to store the user data for the duration of the session.
-  # The verified SteamID is used to ensure that the user is who they claim to be, and the cached user data is used to avoid repeated database lookups for the same user.
+  # The verified SteamID is used to ensure that the user is who they claim to be, and the cached user data is
+  # used to avoid repeated database lookups for the same user.
   def cache_callback_user(user)
     payload = user.callback_session_payload
     session[:verified_steamid] = payload[:verified_steamid]

@@ -25,7 +25,10 @@ module MovieTestHelper
 
   def create_movie_with_file(attributes = {})
     fixture_name = attributes.delete(:fixture_name) || 'sample_h264_aac.mp4'
-    file_title = attributes.delete(:file_title) || attributes.delete(:file_description) || attributes[:name] || 'Movie File'
+    file_title = attributes.delete(:file_title) ||
+                 attributes.delete(:file_description) ||
+                 attributes[:name] ||
+                 'Movie File'
 
     # Extract rating_score if present (transient attribute for :with_rating trait)
     rating_score = attributes.delete(:rating_score)
