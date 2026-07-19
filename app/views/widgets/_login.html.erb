@@ -1,11 +1,11 @@
 <% otp_pending = session[:pending_login_otp].present? %>
 
-<%= form_tag(login_users_path,
+<%= form_tag(login_sessions_path,
              { class: 'dark',
                data: {
                  controller: 'passkey-auth',
-                 passkey_auth_options_url_value: passkey_options_users_path,
-                 passkey_auth_authenticate_url_value: passkey_authenticate_users_path,
+                 passkey_auth_options_url_value: passkey_options_sessions_path,
+                 passkey_auth_authenticate_url_value: passkey_authenticate_sessions_path,
                  passkey_auth_disable_autofill_value: Rails.env.test?
                } }) do %>
   <div class="fields">
@@ -41,7 +41,7 @@
     </div>
     <div class="register">
       <%= link_to t('helpers.submit.user.create'), new_user_path %>
-      <%= link_to t('sessions.form.forgot_password'), forgot_users_path, class: "password-reset" %>
+      <%= link_to t('sessions.form.forgot_password'), forgot_sessions_path, class: "password-reset" %>
     </div>
   </div>
 <% end %>

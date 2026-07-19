@@ -123,6 +123,16 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :sessions, only: [] do
+    collection do
+      match :login,  via: %i[get post]
+      match :logout, via: %i[get post]
+      match :forgot, via: %i[get post]
+      post :passkey_options
+      post :passkey_authenticate
+    end
+  end
+
   # Users: resourceful + extra member/collection actions
   resources :users do
     collection do
@@ -132,8 +142,6 @@ Rails.application.routes.draw do
       match :login,  to: 'sessions#login',  via: %i[get post]
       match :logout, to: 'sessions#logout', via: %i[get post]
       match :forgot, to: 'sessions#forgot', via: %i[get post]
-      post :passkey_options, to: 'sessions#passkey_options'
-      post :passkey_authenticate, to: 'sessions#passkey_authenticate'
     end
     member do
       get :agenda
@@ -173,7 +181,7 @@ Rails.application.routes.draw do
 
   resources :maps
   resources :log_lines
-  resources :log_files
+  # resources :log_files
   resources :directories, except: [:index] do
     member do
       post :reconcile

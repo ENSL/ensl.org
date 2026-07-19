@@ -7,7 +7,7 @@ RSpec.describe 'User login', type: :request do
   let(:raw_password) { 'OldPass123!' }
 
   def login_post(username, password)
-    post '/users/login', params: { login: { username: username, password: password } }
+    post '/sessions/login', params: { login: { username: username, password: password } }
   end
 
   it 'allows MD5 users to log in and upgrades password to scrypt' do
@@ -51,7 +51,7 @@ RSpec.describe 'User login', type: :request do
     session_store.id = 'test-session'
     session_store[:return_to] = '/404'
 
-    post '/users/login',
+    post '/sessions/login',
          params: { login: { username: u.username, password: raw_password } },
          headers: {
            'rack.session' => session_store,
@@ -103,7 +103,7 @@ RSpec.describe 'User login', type: :request do
     u = create(:user, username: 'reset_me', email: 'reset@example.com')
     ActionMailer::Base.deliveries.clear
 
-    post '/users/forgot', params: { username: u.username, email: u.email }
+    post '/sessions/forgot', params: { username: u.username, email: u.email }
     expect(flash[:notice]).to be_present
 
     # Mail was enqueued/sent via Notifications.password
@@ -125,7 +125,7 @@ RSpec.describe 'User login', type: :request do
     u = create(:user, username: 'no_email', email: 'nope@example.com')
     ActionMailer::Base.deliveries.clear
 
-    post '/users/forgot', params: { username: u.username, email: 'wrong@example.com' }
+    post '/sessions/forgot', params: { username: u.username, email: 'wrong@example.com' }
     expect(flash[:error]).to be_present
     expect(ActionMailer::Base.deliveries).to be_empty
   end

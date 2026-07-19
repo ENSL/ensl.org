@@ -54,6 +54,6 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
   private
 
   def submit_login_form
-    page.execute_script("document.querySelector(\"form[action='/users/login']\").requestSubmit()")
+    page.execute_script("document.querySelector(\"form[action='/sessions/login']\").requestSubmit()")
   end
 end

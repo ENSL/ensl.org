@@ -40,7 +40,7 @@ module Features
       # The logout link is implemented as a JS-backed form submit in the UI.
       # In test drivers without JS the click won't submit — navigate to the
       # logout path directly which is available as a GET for compatibility.
-      visit logout_users_path
+      visit logout_sessions_path
       # Expect either the flash or the login link to confirm logout succeeded
       expect(page).to(have_content(I18n.t('login_out')).or(have_content(I18n.t('helpers.submit.user.login'))))
     end

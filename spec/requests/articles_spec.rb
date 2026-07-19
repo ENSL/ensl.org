@@ -11,7 +11,7 @@ RSpec.describe 'ArticlesController', type: :request do
   let!(:article) { create(:article, category: category, user: admin) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'GET /articles' do

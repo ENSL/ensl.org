@@ -7,7 +7,7 @@ RSpec.describe 'GroupsController', type: :request do
   let(:user) { create(:user) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'GET /groups' do

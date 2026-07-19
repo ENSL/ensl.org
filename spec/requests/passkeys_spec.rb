@@ -20,7 +20,7 @@ RSpec.describe 'PasskeysController', type: :request do
     session_store[:user] = user.id
   end
 
-  describe 'POST /users/passkey_options' do
+  describe 'POST /sessions/passkey_options' do
     it 'stores a challenge for the active login session' do
       user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
 
@@ -37,7 +37,7 @@ RSpec.describe 'PasskeysController', type: :request do
         )
       ).and_return(options)
 
-      post '/users/passkey_options',
+      post '/sessions/passkey_options',
            params: { username: user.username },
            headers: {
              'rack.session' => session_store,
@@ -65,7 +65,7 @@ RSpec.describe 'PasskeysController', type: :request do
         )
       ).and_return(options)
 
-      post '/users/passkey_options',
+      post '/sessions/passkey_options',
            params: {},
            headers: {
              'rack.session' => session_store,
@@ -78,7 +78,7 @@ RSpec.describe 'PasskeysController', type: :request do
     end
   end
 
-  describe 'POST /users/passkey_authenticate' do
+  describe 'POST /sessions/passkey_authenticate' do
     it 'logs the user in with a verified passkey assertion' do
       user.passkey_credentials.create!(external_id: 'credential-1', public_key: 'public-key', sign_count: 0)
 
@@ -92,7 +92,7 @@ RSpec.describe 'PasskeysController', type: :request do
       allow(WebAuthn::Credential).to receive(:from_get).and_return(fake_credential)
       allow(fake_credential).to receive(:verify).and_return(true)
 
-      post '/users/passkey_authenticate',
+      post '/sessions/passkey_authenticate',
            params: {
              credential: {
                id: 'credential-1',
@@ -128,7 +128,7 @@ RSpec.describe 'PasskeysController', type: :request do
       allow(WebAuthn::Credential).to receive(:from_get).and_return(fake_credential)
       allow(fake_credential).to receive(:verify).and_return(true)
 
-      post '/users/passkey_authenticate',
+      post '/sessions/passkey_authenticate',
            params: {
              credential: {
                id: 'credential-1',

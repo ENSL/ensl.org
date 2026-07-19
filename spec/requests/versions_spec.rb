@@ -9,7 +9,7 @@ RSpec.describe 'VersionsController', type: :request do
   let!(:admin) { create(:user, :admin) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'GET /articles/:article_id/versions' do

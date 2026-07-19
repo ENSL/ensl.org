@@ -28,7 +28,7 @@ RSpec.describe 'MoviesController', type: :request do
   end
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'GET /movies/admin' do

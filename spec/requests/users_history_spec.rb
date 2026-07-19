@@ -7,7 +7,7 @@ RSpec.describe 'Users history', type: :request do
   let!(:member) { create(:user) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'GET /users/:id/history' do

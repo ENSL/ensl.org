@@ -8,7 +8,7 @@ RSpec.describe 'GroupersController', type: :request do
   let(:group) { create(:group) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
   describe 'POST /groupers' do

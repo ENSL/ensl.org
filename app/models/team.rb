@@ -104,13 +104,7 @@ class Team < ApplicationRecord
   end
 
   def api_v1_members_payload
-    teamers.active.map do |teamer|
-      {
-        id: teamer.user.id,
-        username: teamer.user.username,
-        steamid: teamer.user.steamid
-      }
-    end
+    teamers.active.includes(:user).map(&:api_v1_member_payload)
   end
 
   def leaders_s

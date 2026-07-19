@@ -59,6 +59,14 @@ class Teamer < ApplicationRecord
 
   delegate :to_s, to: :user
 
+  def api_v1_member_payload
+    {
+      id: user.id,
+      username: user.username,
+      steamid: user.steamid
+    }
+  end
+
   def ranks
     { RANK_JOINER => 'Joining', RANK_MEMBER => 'Member', RANK_DEPUTEE => 'Deputee', RANK_LEADER => 'Leader' }
   end

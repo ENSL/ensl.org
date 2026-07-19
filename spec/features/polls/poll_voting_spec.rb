@@ -34,7 +34,7 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
     user = FactoryBot.create(:user)
 
     # login
-    visit '/users/login'
+    visit '/sessions/login'
     fill_in 'login[username]', with: user.username
     fill_in 'login[password]', with: user.raw_password
     click_button 'Login'

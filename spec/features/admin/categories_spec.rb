@@ -245,7 +245,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
 
     scenario 'non-admin cannot create categories' do
       # Log out and log in as regular user
-      visit logout_users_path
+      visit logout_sessions_path
       expect(page).to have_content(I18n.t('login_out')).or have_content(I18n.t('helpers.submit.user.login'))
 
       # Try to visit new category page as non-admin

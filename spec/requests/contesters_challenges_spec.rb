@@ -6,7 +6,7 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
   let(:admin) { create(:user, :admin) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
     follow_redirect! if response.redirect?
     expect(flash[:notice]).to be_present
   end

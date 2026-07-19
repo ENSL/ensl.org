@@ -7,7 +7,7 @@ RSpec.describe 'PollsController', type: :request do
   let(:user) { create(:user) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
     follow_redirect! if response.redirect?
     expect(flash[:notice]).to be_present
   end
@@ -40,6 +40,7 @@ RSpec.describe 'PollsController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Older poll?')
       expect(response.body).to include('Newer poll?')
+      expect(response.body).to match(/Newer poll\?.*Older poll\?/m)
     end
   end
 

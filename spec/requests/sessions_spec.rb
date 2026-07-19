@@ -6,19 +6,19 @@ RSpec.describe 'SessionsController', type: :request do
   let(:user) { create(:user) }
 
   def login_as(account)
-    post '/users/login', params: { login: { username: account.username, password: account.raw_password } }
+    post '/sessions/login', params: { login: { username: account.username, password: account.raw_password } }
   end
 
-  describe 'POST /users/login' do
+  describe 'POST /sessions/login' do
     it 'sets the session on success' do
-      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+      post '/sessions/login', params: { login: { username: user.username, password: user.raw_password } }
 
       expect(session[:user]).to eq(user.id)
       expect(response).to redirect_to('/')
     end
 
     it 'keeps the session empty and sets a flash error on failure' do
-      post '/users/login', params: { login: { username: user.username, password: 'wrong-password' } }
+      post '/sessions/login', params: { login: { username: user.username, password: 'wrong-password' } }
 
       expect(session[:user]).to be_nil
       expect(response).to redirect_to('/')
@@ -35,7 +35,7 @@ RSpec.describe 'SessionsController', type: :request do
 
       ActionMailer::Base.deliveries.clear
 
-      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+      post '/sessions/login', params: { login: { username: user.username, password: user.raw_password } }
 
       expect(session[:user]).to be_nil
       expect(session[:pending_login_otp]).to be_present
@@ -53,24 +53,24 @@ RSpec.describe 'SessionsController', type: :request do
 
       ActionMailer::Base.deliveries.clear
 
-      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+      post '/sessions/login', params: { login: { username: user.username, password: user.raw_password } }
 
       body = ActionMailer::Base.deliveries.last.body.to_s
       otp = body[/\b\d{6}\b/]
       expect(otp).to be_present
 
-      post '/users/login', params: { login_otp: { code: otp } }
+      post '/sessions/login', params: { login_otp: { code: otp } }
 
       expect(session[:user]).to eq(user.id)
       expect(session[:pending_login_otp]).to be_nil
     end
   end
 
-  describe 'POST /users/logout' do
+  describe 'POST /sessions/logout' do
     it 'clears the current session' do
       login_as(user)
 
-      post '/users/logout'
+      post '/sessions/logout'
 
       expect(session[:user]).to be_nil
       expect(response).to redirect_to('/')
@@ -78,21 +78,51 @@ RSpec.describe 'SessionsController', type: :request do
     end
   end
 
-  describe 'POST /users/forgot' do
+  describe 'POST /sessions/forgot' do
     it 'sets a success flash when the matching user can be reset' do
       allow_any_instance_of(User).to receive(:send_new_password).and_return(true)
 
-      post '/users/forgot', params: { username: user.username, email: user.email }
+      post '/sessions/forgot', params: { username: user.username, email: user.email }
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to be_present
     end
 
     it 'sets an error flash when the user lookup fails' do
-      post '/users/forgot', params: { username: user.username, email: 'wrong@example.com' }
+      post '/sessions/forgot', params: { username: user.username, email: 'wrong@example.com' }
 
       expect(response).to have_http_status(:ok)
       expect(flash[:error]).to be_present
+    end
+  end
+
+  describe 'POST /users/login' do
+    it 'keeps the legacy compatibility route working' do
+      post '/users/login', params: { login: { username: user.username, password: user.raw_password } }
+
+      expect(session[:user]).to eq(user.id)
+    end
+  end
+
+  describe 'POST /users/logout' do
+    it 'keeps the legacy compatibility route working' do
+      login_as(user)
+
+      post '/users/logout'
+
+      expect(session[:user]).to be_nil
+      expect(response).to redirect_to('/')
+    end
+  end
+
+  describe 'POST /users/forgot' do
+    it 'keeps the legacy compatibility route working' do
+      allow_any_instance_of(User).to receive(:send_new_password).and_return(true)
+
+      post '/users/forgot', params: { username: user.username, email: user.email }
+
+      expect(response).to have_http_status(:ok)
+      expect(flash[:notice]).to be_present
     end
   end
 end

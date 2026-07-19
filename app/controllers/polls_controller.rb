@@ -4,7 +4,7 @@ class PollsController < ApplicationController
   before_action :load_poll, except: %i[index new create]
 
   def index
-    @polls = Poll.all
+    @polls = Poll.recent
   end
 
   def show; end

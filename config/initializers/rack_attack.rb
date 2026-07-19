@@ -2,6 +2,8 @@
 
 module Rack
   class Attack
+    LOGIN_PATHS = %w[/sessions/login /users/login].freeze
+
     # Cache backend
     cache.store = ActiveSupport::Cache::MemoryStore.new # Use Redis cache store in production
 
@@ -15,13 +17,13 @@ module Rack
     # Throttle login attempts
     # Limit to 20 requests per 20 minutes per IP
     throttle('logins/ip', limit: 20, period: 20.minutes) do |req|
-      req.ip if req.path == '/users/login' && req.post?
+      req.ip if LOGIN_PATHS.include?(req.path) && req.post?
     end
 
     # Throttle login attempts per username
     # Limit to 20 requests per 20 minutes per username
     throttle('logins/username', limit: 20, period: 20.minutes) do |req|
-      req.params['login']['username'].presence if req.path == '/users/login' && req.post?
+      req.params['login']['username'].presence if LOGIN_PATHS.include?(req.path) && req.post?
     end
 
     # Throttle API requests
