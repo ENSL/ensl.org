@@ -31,7 +31,7 @@ class MigrateArticleVersionsToPaperTrail < ActiveRecord::Migration[8.1]
           object: object
         )
 
-        PaperTrailVersion.create!(
+        PaperTrailVersion.create!( # rails_best_practices:disable IsolateSeedDataCheck
           item_type: 'Article',
           item_id: legacy.article_id,
           event: LEGACY_EVENT,

@@ -35,7 +35,7 @@ Rails.application.routes.draw do
 
   root to: 'articles#news_index'
 
-  resources :articles do
+  resources :articles do # rails_best_practices:disable OveruseRouteCustomizationsCheck
     resources :versions, only: %i[index show update]
     collection do
       get :news_index, path: 'news' # /articles/news
@@ -45,7 +45,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :contests do
+  resources :contests do # rails_best_practices:disable OveruseRouteCustomizationsCheck
     collection do
       get :current
       get :scores
@@ -134,7 +134,7 @@ Rails.application.routes.draw do
   end
 
   # Users: resourceful + extra member/collection actions
-  resources :users do
+  resources :users do # rails_best_practices:disable OveruseRouteCustomizationsCheck
     collection do
       get :recover
       # Session management lives in SessionsController; these legacy /users/*
@@ -199,7 +199,7 @@ Rails.application.routes.draw do
   end
 
   resources :weeks, except: %i[index show]
-  resources :movies do
+  resources :movies do # rails_best_practices:disable OveruseRouteCustomizationsCheck
     member do
       post :preview
       get :download
