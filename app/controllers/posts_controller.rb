@@ -34,7 +34,10 @@ class PostsController < ApplicationController
         # For AJAX/fast reply, render errors as JSON/JS
         @newpost = @post
         format.js { render :create_error }
-        format.html { render :new }
+        format.html do
+          flash.now[:alert] = t(:please_fix_errors, default: 'Please fix the errors below.')
+          render :new, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -46,7 +49,8 @@ class PostsController < ApplicationController
       flash[:notice] = t(:posts_update)
       redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}")
     else
-      render :edit
+      flash.now[:alert] = t(:please_fix_errors, default: 'Please fix the errors below.')
+      render :edit, status: :unprocessable_entity
     end
   end
 

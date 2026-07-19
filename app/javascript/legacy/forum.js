@@ -9,14 +9,30 @@ export function bindForumHandlers() {
       $(".fastReply").addClass("invisible")
     })
   })
+
+  $(document).off("click", "[data-on='click'][data-call]")
+  $(document).on("click", "[data-on='click'][data-call]", function(e) {
+    const fn = window[$(this).data("call")]
+    if (typeof fn !== "function") return
+
+    e.preventDefault()
+    const args = String($(this).data("args") || "")
+      .split(",")
+      .map((arg) => arg.trim().replace(/^['\"]|['\"]$/g, ""))
+      .filter((arg) => arg.length > 0)
+
+    fn(...args)
+  })
 }
 
 // Legacy global helper: requests quote JS for a post/comment and executes response.
 export function QuoteText(id, type) {
   const quoteType = type || "posts"
+  const url = quoteType === "posts" ? `/posts/${id}/quote.js` : `/${quoteType}/quote.js?id=${id}`
+
   $.ajax({
     type: "GET",
-    url: `/${quoteType}/quote/${id}.js`,
+    url,
     dataType: "script"
   })
 }

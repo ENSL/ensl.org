@@ -40,23 +40,22 @@ feature 'User manages forum posts', js: true do
       end
 
       it 'displays validation errors when text is empty' do
-        skip 'Validation error display requires form validation setup'
         visit new_post_path(id: topic.id)
         click_button 'Save Post'
 
         expect(page).to have_css('.errors-block', wait: 5)
+        expect(page).to have_content('Text is too short')
       end
 
       it 'respects character limit (max 10,000 chars)' do
-        skip 'Validation error display requires form validation setup'
         visit new_post_path(id: topic.id)
         long_text = 'a' * 10_001
         textarea = find('#post_text')
-        textarea.native.clear
         textarea.set(long_text)
         click_button 'Save Post'
 
         expect(page).to have_css('.errors-block', wait: 5)
+        expect(page).to have_content('Text is too long')
       end
     end
 
@@ -172,9 +171,14 @@ feature 'User manages forum posts', js: true do
       end
 
       it 'includes quoted text with quote tags' do
-        # After clicking quote, text should appear as [quote=username]...[/quote]
-        # This requires JS execution to test properly
-        skip 'Requires JavaScript execution in test'
+        visit topic_path(topic)
+        click_button 'Fast Reply'
+
+        within("div#post_#{existing_post.id}.post") do
+          click_link 'Quote'
+        end
+
+        expect(page).to have_field('post_text', with: "[quote=#{user}]Original post text[/quote]\n", wait: 5)
       end
     end
 

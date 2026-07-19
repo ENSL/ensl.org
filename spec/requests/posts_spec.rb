@@ -92,7 +92,7 @@ RSpec.describe 'PostsController', type: :request do
         post '/posts', params: { post: { topic_id: topic.id, text: '' } }
       end.not_to change(Post, :count)
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
 
@@ -149,7 +149,7 @@ RSpec.describe 'PostsController', type: :request do
 
       patch "/posts/#{post_record.id}", params: { post: { text: '', topic_id: topic.id } }
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(post_record.reload.text).to eq('Before')
     end
