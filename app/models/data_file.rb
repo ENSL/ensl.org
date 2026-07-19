@@ -332,9 +332,8 @@ class DataFile < ApplicationRecord
     source_movie.update_columns(preview_id: preview.id, updated_at: Time.current)
     # rubocop:enable Rails/SkipsModelValidations
   end
-  private :sync_preview_links, :in_movies_tree?, :preview_filename?, :source_basename,
-          :find_source_for_preview, :find_preview_for_source, :filename_for_matching,
-          :find_in_directory_by_filename, :link_preview_to_source!
+
+  public
 
   def should_create_movie?
     directory_id == Directory::MOVIES && !location.to_s.include?('_preview.mp4') && movie.nil?
@@ -361,6 +360,8 @@ class DataFile < ApplicationRecord
   def refresh_preview_links!
     sync_preview_links
   end
+
+  private
 
   # Class methods
 
@@ -487,6 +488,8 @@ class DataFile < ApplicationRecord
   end
   # rubocop:enable Lint/IneffectiveAccessModifier
 
+  public
+
   # Permission checks
 
   def can_create?(cuser)
@@ -516,9 +519,7 @@ class DataFile < ApplicationRecord
     cuser.admin? || article&.can_create?(cuser)
   end
 
-  # rubocop:disable Lint/IneffectiveAccessModifier
   def self.params(params, _cuser)
     params.require(:data_file).permit(:title, :description, :name, :article_id, :related_id, :directory_id)
   end
-  # rubocop:enable Lint/IneffectiveAccessModifier
 end

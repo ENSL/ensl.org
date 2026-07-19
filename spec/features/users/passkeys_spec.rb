@@ -46,7 +46,7 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
     expect(page).to have_field('login_otp_code', wait: 10)
     expect(ActionMailer::Base.deliveries.size).to eq(1)
 
-    otp_code = ActionMailer::Base.deliveries.last.body.to_s[/\b\d{6}\b/]
+    otp_code = delivered_email_body(ActionMailer::Base.deliveries.last)[/\b\d{6}\b/]
     expect(otp_code).to be_present
 
     fill_in 'login_otp_code', with: otp_code

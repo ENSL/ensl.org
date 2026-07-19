@@ -55,7 +55,7 @@ RSpec.describe 'SessionsController', type: :request do
 
       post '/sessions/login', params: { login: { username: user.username, password: user.raw_password } }
 
-      body = ActionMailer::Base.deliveries.last.body.to_s
+      body = delivered_email_body(ActionMailer::Base.deliveries.last)
       otp = body[/\b\d{6}\b/]
       expect(otp).to be_present
 
