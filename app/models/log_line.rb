@@ -56,7 +56,7 @@ class LogLine < ApplicationRecord
   end
 
   def time
-    format('%02d:%02d', since / 60, since % 60)
+    format('%<minutes>02d:%<seconds>02d', minutes: since / 60, seconds: since % 60)
   end
 
   def frag

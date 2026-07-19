@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: rounds
@@ -29,7 +31,8 @@ class Round < ApplicationRecord
   belongs_to :map
 
   def length
-    format('%02d:%02d', (self.end - start).to_i / 60, (self.end - start).to_i % 60)
+    total_seconds = (self.end - start).to_i
+    format('%<minutes>02d:%<seconds>02d', minutes: total_seconds / 60, seconds: total_seconds % 60)
   end
 
   def winner_s

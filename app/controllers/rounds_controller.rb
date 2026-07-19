@@ -1,13 +1,17 @@
+# frozen_string_literal: true
+
 class RoundsController < ApplicationController
+  SORT_COLUMNS = {
+    'start' => 'start',
+    'server' => 'server_id',
+    'team1' => 'team1_id',
+    'team2' => 'team2_id',
+    'map' => 'map_name',
+    'commander' => 'commander_id'
+  }.freeze
+
   def index
-    sort = case params['sort']
-           when 'start' then 'start'
-           when 'server' then 'server_id'
-           when 'team1'  then 'team1_id'
-           when 'team2' then 'team2_id'
-           when 'map' then 'map_name'
-           when 'commander' then 'commander_id'
-           end
+    sort = SORT_COLUMNS[params['sort']]
 
     @rounds = Round.basic.paginate \
       order: sort,

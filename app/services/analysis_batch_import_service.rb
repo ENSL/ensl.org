@@ -73,7 +73,10 @@ class AnalysisBatchImportService
       # raises if you pass it) and instead upserts against whichever unique
       # index the row collides with -- here that's
       # index_analysis_results_on_batch_and_subject.
+      # rubocop:disable Rails/SkipsModelValidations -- bulk import of already-validated
+      # analysis output; per-row callbacks/validations would be prohibitively slow here.
       AnalysisResult.upsert_all(slice, record_timestamps: false)
+      # rubocop:enable Rails/SkipsModelValidations
     end
 
     Rails.logger.info("[AnalysisBatchImportService] Imported #{rows.size} rows for batch #{@batch_id}")

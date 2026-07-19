@@ -21,6 +21,13 @@ AllCops:
     - 'coverage*/**/*'
     - 'config/**/*'
     - 'lib/plugins/**/*'
+    # LogFile#NON_ASCII is a legacy byte-range regex (`/[\x80-\xff]/`) combined
+    # with an `# encoding: US-ASCII` magic comment. `ruby -c` confirms this
+    # parses fine under Ruby 3.4 -- this is RuboCop's own `parser` gem
+    # misreporting a valid regex as an invalid multibyte escape (Lint/Syntax
+    # can't be selectively disabled per-cop, so the whole legacy/WIP file is
+    # excluded here instead of rewriting otherwise-working parsing).
+    - 'app/models/log_file.rb'
 
 # Controllers (and many Rails classes) read perfectly well above the
 # general-purpose Ruby defaults; these thresholds keep a guardrail without
@@ -78,3 +85,31 @@ Rails/LexicallyScopedActionFilter:
 Rails/ApplicationController:
   Exclude:
     - 'app/controllers/api/**/*'
+
+# LogLine is part of the legacy/WIP log-ingestion subsystem (along with
+# LogFile and Round/Rounder) that predates the validation conventions used
+# elsewhere in the app; its update_attribute calls are intentional shortcuts,
+# not oversights. spec/factories bulk-insert with insert_all! for performance
+# (large fixture datasets), and challenge_spec uses update_column to bypass
+# callbacks when arranging test state -- both are deliberate, not missed
+# validations.
+Rails/SkipsModelValidations:
+  Exclude:
+    - 'app/models/log_line.rb'
+    - 'spec/factories/**/*'
+    - 'spec/models/challenge_spec.rb'
+
+# Rounder#ensl_team is part of the same legacy/WIP round-tracking subsystem as
+# Round and LogLine. Team intentionally has no reciprocal `has_many :rounders`,
+# so there is no association to point `inverse_of` at.
+Rails/InverseOf:
+  Exclude:
+    - 'app/models/rounder.rb'
+
+# Safety::DatabaseGuard intentionally hard-stops the boot/rake/spec process
+# with exit() to block destructive db tasks or misconfigured environments
+# before Rails finishes loading. That's a deliberate CLI safety measure, not
+# the mid-request server exit this cop is meant to guard against.
+Rails/Exit:
+  Exclude:
+    - 'lib/safety/database_guard.rb'

@@ -370,6 +370,10 @@ class DataFile < ApplicationRecord
   # - :download [Boolean]
   # - :destination_path [String]
   # - :reason [Symbol]
+  # NOTE: the `private` above (for instance methods) does not affect `def self.x`
+  # singleton methods -- these class methods are intentionally public API, called
+  # from controllers, workers, other models, and specs.
+  # rubocop:disable Lint/IneffectiveAccessModifier
   def self.sync_download_plan(nickname:, filename:, remote_size: nil, remote_mtime: nil, now: Time.current)
     kind = Directory.sync_kind_for_filename(filename)
     return nil if kind.blank?
@@ -453,8 +457,10 @@ class DataFile < ApplicationRecord
   private_class_method :sync_download_required?, :sync_destination_year, :sync_resolve_destination_path,
                        :sync_fresh_for_overwrite?, :sync_duplicate_destination_path,
                        :sync_split_filename_for_duplicate_suffix
+  # rubocop:enable Lint/IneffectiveAccessModifier
 
   # Find existing file record by path, then checksum (disk-authoritative lookup)
+  # rubocop:disable Lint/IneffectiveAccessModifier
   def self.find_existing(subitem_path, _subitem_name)
     return nil unless File.exist?(subitem_path)
 
@@ -479,6 +485,7 @@ class DataFile < ApplicationRecord
     Rails.logger.warn("Could not compute hash for #{file_path}: #{e.message}")
     nil
   end
+  # rubocop:enable Lint/IneffectiveAccessModifier
 
   # Permission checks
 
@@ -509,7 +516,9 @@ class DataFile < ApplicationRecord
     cuser.admin? || article&.can_create?(cuser)
   end
 
+  # rubocop:disable Lint/IneffectiveAccessModifier
   def self.params(params, _cuser)
     params.require(:data_file).permit(:title, :description, :name, :article_id, :related_id, :directory_id)
   end
+  # rubocop:enable Lint/IneffectiveAccessModifier
 end
