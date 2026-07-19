@@ -39,13 +39,6 @@ class Topic < ApplicationRecord
 
   scope :basic, -> { includes([:latest, { forum: :forumer }, :user]) }
   scope :ordered, -> { order('state DESC, posts.id DESC') }
-  scope :ordered_by_state_and_last_post, lambda {
-    left_outer_joins(:posts)
-      .select('topics.*, MAX(posts.created_at) AS last_post_at')
-      .group('topics.id')
-      .order(state: :desc)
-      .order(Arel.sql('last_post_at DESC'))
-  }
   scope :for_forum_overview, lambda { |forum|
     where(forum_id: forum.id)
       .joins(posts: :user)

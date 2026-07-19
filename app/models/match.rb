@@ -90,9 +90,7 @@ class Match < ApplicationRecord
   scope :ordered, -> { order('match_time DESC') }
   scope :chrono, -> { order('match_time ASC') }
   scope :recent, -> { limit(8) }
-  scope :bigrecent, -> { limit(50) }
   scope :active, -> { where(contest_id: Contest.active.select(:id)) }
-  scope :on_day, ->(day) { where('match_time > ? and match_time < ?', day.beginning_of_day, day.end_of_day) }
   scope :on_week, ->(time) { where('match_time > ? and match_time < ?', time.beginning_of_week, time.end_of_week) }
   scope :of_contester, ->(contester) { where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id) }
   scope :of_user, ->(user) { includes(:matchers).where(matchers: { user_id: user.id }) }
@@ -106,7 +104,6 @@ class Match < ApplicationRecord
   scope :of_userteam, lambda { |user, team|
     includes({ matchers: { contester: :team } }).where(teams: { id: team.id }, matchers: { user_id: user.id })
   }
-  scope :within_time, ->(from, to) { where('match_time > ? AND match_time < ?', from.utc, to.utc) }
   scope :around, lambda { |time|
     where('match_time > ? AND match_time < ?', (time - MATCH_LENGTH).utc, (time + MATCH_LENGTH).utc)
   }

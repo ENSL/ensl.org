@@ -29,7 +29,6 @@ class Map < ApplicationRecord
   scope :basic, -> { where(deleted: false).order('name') }
   scope :with_name, ->(name) { where(name: name) }
   scope :classic, -> { where("name LIKE 'ns_%'") }
-  scope :of_category, ->(category) { where(category_id: category.id) }
 
   validates :name, length: { maximum: 20 }
   validates :download, length: { maximum: 100 }

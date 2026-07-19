@@ -16,23 +16,10 @@ RSpec.describe Challenge, type: :model do
       mandatory = described_class.new(mandatory: true, match_time: match_time)
 
       expect(voluntary.margin).to eq(described_class::CHALLENGE_BEFORE_VOLUNTARY)
-      expect(voluntary.deadline).to eq(described_class::ACCEPT_BEFORE_VOLUNTARY)
       expect(voluntary.autodefault).to eq(match_time - described_class::ACCEPT_BEFORE_VOLUNTARY)
 
       expect(mandatory.margin).to eq(described_class::CHALLENGE_BEFORE_MANDATORY)
-      expect(mandatory.deadline).to eq(described_class::ACCEPT_BEFORE_MANDATORY)
       expect(mandatory.autodefault).to eq(match_time - described_class::ACCEPT_BEFORE_MANDATORY)
-    end
-
-    it 'sets contester1 from the acting user contest entry' do
-      cont1
-      other_contest = create(:contest)
-      create(:contester, team: user1.team, contest: other_contest)
-      challenge = described_class.new(user: user1, contester2: cont2)
-
-      challenge.set_contester1
-
-      expect(challenge.contester1).to eq(cont1)
     end
 
     it 'builds defaults for new challenge form data' do

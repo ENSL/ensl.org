@@ -141,51 +141,6 @@ RSpec.describe Group, type: :model do
     end
   end
 
-  describe 'protected and reserved groups' do
-    describe '.protected_groups' do
-      it 'returns all reserved/core system group IDs' do
-        pg = Group.protected_groups
-        expect(pg).to include(Group::ADMINS)
-        expect(pg).to include(Group::CASTERS)
-        expect(pg).to include(Group::REFEREES)
-        expect(pg.size).to eq 11 # All reserved groups
-      end
-
-      it 'prevents all core system groups from being destroyed' do
-        # Test a few key system groups
-        admin_group = Group.find_or_create_by(id: Group::ADMINS)
-        caster_group = Group.find_or_create_by(id: Group::CASTERS)
-        ref_group = Group.find_or_create_by(id: Group::REFEREES)
-        admin_user = double('admin', admin?: true)
-
-        expect(admin_group.can_destroy?(admin_user)).to be false
-        expect(caster_group.can_destroy?(admin_user)).to be false
-        expect(ref_group.can_destroy?(admin_user)).to be false
-      end
-    end
-
-    describe '.reserved_groups' do
-      it 'returns all core system group IDs' do
-        rg = Group.reserved_groups
-        expect(rg).to include(Group::ADMINS)
-        expect(rg).to include(Group::CASTERS)
-        expect(rg).to include(Group::REFEREES)
-        expect(rg).to include(Group::DONORS)
-        expect(rg).to include(Group::MOVIEMAKERS)
-        expect(rg).to include(Group::MOVIES)
-        expect(rg).to include(Group::PREDICTORS)
-        expect(rg).to include(Group::STAFF)
-        expect(rg).to include(Group::GATHER_MODERATORS)
-        expect(rg).to include(Group::CONTRIBUTORS)
-        expect(rg).to include(Group::CHAMPIONS)
-      end
-
-      it 'has correct count of reserved groups' do
-        expect(Group.reserved_groups.size).to eq 11
-      end
-    end
-  end
-
   describe 'class helpers for group member retrieval' do
     before do
       # Create/find groups with their constant IDs

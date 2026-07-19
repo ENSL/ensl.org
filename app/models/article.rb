@@ -159,11 +159,6 @@ class Article < ApplicationRecord
     self
   end
 
-  # FIXME
-  def remove_readings
-    Reading.delete_all ["readable_type = 'Category' AND readable_id = ?", category_id]
-  end
-
   def can_show?(cuser)
     status != STATUS_DRAFT or (cuser and (user == cuser or cuser.admin?))
   end

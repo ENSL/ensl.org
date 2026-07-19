@@ -52,12 +52,6 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    describe '.active_streams' do
-      it 'returns movies where status > 0' do
-        expect(described_class).to respond_to(:active_streams)
-      end
-    end
-
     describe '.submitter_options' do
       it 'delegates to User join and returns username/id pairs' do
         expect(User).to receive_message_chain(:joins, :distinct, :order, :pluck)

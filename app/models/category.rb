@@ -43,7 +43,6 @@ class Category < ApplicationRecord
   scope :ordered, -> { order('sort ASC, created_at DESC') }
   scope :domain, ->(domain) { where(domain: domain) }
   scope :nospecial, -> { where.not(name: 'Special') }
-  scope :newest, -> { includes(:articles).order('articles.created_at DESC') }
   # scope :page, lambda { |page| {:limit => "#{(page-1)*PER_PAGE}, #{(page-1)*PER_PAGE+PER_PAGE}"} }
   scope :of_user, ->(user) { where(articles: { user: user }).includes(:articles) }
 

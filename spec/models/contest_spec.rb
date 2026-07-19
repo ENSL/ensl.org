@@ -37,21 +37,6 @@ RSpec.describe Contest, type: :model do
     it 'returns name for to_s' do
       expect(contest.to_s).to eq contest.name
     end
-
-    it 'returns a status string' do
-      expect(contest.status_s).to be_a String
-      expect(contest.statuses[contest.status]).to eq contest.status_s
-    end
-
-    it 'returns a default_s starting with a weekday' do
-      weekdays_present = Date::DAYNAMES.any? { |d| contest.default_s.include?(d) }
-      expect(weekdays_present).to be true
-    end
-
-    it 'returns an empty default_s when no default time is set' do
-      contest.default_time = nil
-      expect(contest.default_s).to eq('')
-    end
   end
 
   describe '#elo_score' do
@@ -212,16 +197,6 @@ RSpec.describe Contest, type: :model do
       expect(cont1.score).to eq(0)
       expect(cont1.trend).to eq(Contester::TREND_UP)
       expect([cont2.score, cont3.score]).to eq([1, 2])
-    end
-
-    it 'reports whether ladder ranks are unique' do
-      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
-      create(:contester, contest: ladder, score: 0)
-      create(:contester, contest: ladder, score: 1)
-      expect(ladder.ladder_ranks_unique?).to be true
-
-      create(:contester, contest: ladder, score: 1)
-      expect(ladder.ladder_ranks_unique?).to be false
     end
 
     it 'recalculates contest standings from finished matches' do

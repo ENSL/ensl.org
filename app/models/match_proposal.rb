@@ -36,9 +36,7 @@ class MatchProposal < ApplicationRecord
   after_create :notify_new_proposal
   after_update :notify_status_change, if: :saved_change_to_status?
 
-  scope :of_match, ->(match) { where('match_id = ?', match.id) }
   scope :confirmed_for_match, ->(match) { where('match_id = ? AND status = ?', match.id, STATUS_CONFIRMED) }
-  scope :confirmed_upcoming, -> { where('status = ? AND proposed_time > UTC_TIMESTAMP()', STATUS_CONFIRMED) }
   scope :confirmed_for_contest, lambda { |contest|
     includes(:match).where(matches: { contest_id: contest.id }, status: STATUS_CONFIRMED)
   }

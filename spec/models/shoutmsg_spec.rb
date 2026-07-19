@@ -79,12 +79,6 @@ RSpec.describe Shoutmsg, type: :model do
       result_ids = described_class.where(id: [a.id, b.id, c.id]).ordered.pluck(:id)
       expect(result_ids).to eq([a.id, b.id, c.id].sort)
     end
-
-    it '.last500 relation has expected limit and descending order by id' do
-      relation = described_class.last500
-      expect(relation.limit_value).to eq(500)
-      expect(relation.to_sql).to include('ORDER BY id DESC')
-    end
   end
 
   describe '#domain' do
@@ -230,45 +224,6 @@ RSpec.describe Shoutmsg, type: :model do
 
       expect(logger).to receive(:error).with(/Shoutmsg broadcast failed: StandardError: render-failed/)
       expect { shout.send(:broadcast_shoutmsg) }.not_to raise_error
-    end
-  end
-
-  describe '.flood?' do
-    it 'returns false when fewer than three messages exist in the scope' do
-      relation = double('relation')
-      allow(described_class).to receive(:of_object).with('Gather', 42).and_return(relation)
-      allow(relation).to receive(:count).and_return(2)
-
-      expect(described_class.flood?(user, 'Gather', 42)).to be false
-    end
-
-    it 'returns true when recent messages are all from the same user' do
-      relation = double('relation')
-      msgs = Array.new(3) { instance_double(Shoutmsg, user: user) }
-      allow(described_class).to receive(:of_object).with('Gather', 42).and_return(relation)
-      allow(relation).to receive(:count).and_return(3)
-      recent_messages = double('RecentMessages')
-      allow(relation).to receive(:all).and_return(recent_messages)
-      allow(recent_messages).to receive(:find_each).and_yield(msgs[0]).and_yield(msgs[1]).and_yield(msgs[2])
-
-      expect(described_class.flood?(user, 'Gather', 42)).to be true
-    end
-
-    it 'returns false when at least one recent message is from another user' do
-      other_user = create(:user)
-      relation = double('relation')
-      msgs = [
-        instance_double(Shoutmsg, user: user),
-        instance_double(Shoutmsg, user: other_user),
-        instance_double(Shoutmsg, user: user)
-      ]
-      allow(described_class).to receive(:of_object).with('Gather', 42).and_return(relation)
-      allow(relation).to receive(:count).and_return(3)
-      recent_messages = double('RecentMessages')
-      allow(relation).to receive(:all).and_return(recent_messages)
-      allow(recent_messages).to receive(:find_each).and_yield(msgs[0]).and_yield(msgs[1]).and_yield(msgs[2])
-
-      expect(described_class.flood?(user, 'Gather', 42)).to be false
     end
   end
 

@@ -44,34 +44,7 @@ class Gatherer < ApplicationRecord
   scope :team, ->(team) { where(team: team) }
   scope :of_user, ->(user) { where(user_id: user.id) }
   scope :lobby, -> { where(team: nil) }
-  scope :best,
-        lambda { |gather|
-          {
-            select: 'u.id, u.username, ' \
-                    '(COUNT(*) / (SELECT COUNT(*) FROM gatherers g3 WHERE g3.user_id = u.id)) AS skill, g4.id',
-            from: 'gathers g1',
-            joins: "LEFT JOIN gatherers g2 ON g1.captain1_id = g2.id OR g1.captain2_id = g2.id
-  LEFT JOIN users u ON g2.user_id = u.id
-  LEFT JOIN gatherers g4 ON u.id = g4.user_id AND g4.gather_id = #{gather.id}",
-            group: 'u.id',
-            having: 'g4.id IS NOT NULL',
-            order: 'skill DESC',
-            limit: 15
-          }
-        }
-  scope :with_kpd, lambda {
-    select('gatherers.*, SUM(kills)/SUM(deaths) as kpd, COUNT(rounders.id) as rounds')
-      .joins('LEFT JOIN rounders ON rounders.user_id = gatherers.user_id')
-      .group('rounders.user_id')
-      .order('kpd DESC')
-  }
-  scope :lobby_team, lambda { |team|
-    where('gatherers.team IS NULL OR gatherers.team = ?', team)
-      .order('gatherers.team')
-  }
   scope :most_voted, -> { order('votes DESC, created_at DESC') }
-  scope :not_user, ->(user) { where('user_id != ?', user.id) }
-  scope :eject_order, -> { order('votes ASC') }
   scope :ordered, lambda {
     joins('LEFT JOIN gathers ON captain1_id = gatherers.id OR captain2_id = gatherers.id')
       .order('captain1_id, captain2_id, gatherers.id')
@@ -189,10 +162,6 @@ class Gatherer < ApplicationRecord
     gather.map_votes.where(user_id: user_id).destroy_all
     gather.server_votes.where(user_id: user_id).destroy_all
     gather.gatherer_votes.where(user_id: user_id).destroy_all
-  end
-
-  def votes_needed?
-    5
   end
 
   def captain?

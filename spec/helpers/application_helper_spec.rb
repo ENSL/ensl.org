@@ -413,20 +413,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe '#gathers_url' do
-    it 'returns the production gathers host in production' do
-      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
-
-      expect(helper.gathers_url).to eq('https://gathers.ensl.org')
-    end
-
-    it 'returns the staging gathers host outside production' do
-      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('development'))
-
-      expect(helper.gathers_url).to eq('https://gathers.staging.ensl.org')
-    end
-  end
-
   describe '#upcoming_nsltv' do
     around do |example|
       original = ENV['GOOGLE_CALENDAR']
@@ -446,60 +432,6 @@ RSpec.describe ApplicationHelper, type: :helper do
       ENV['GOOGLE_CALENDAR'] = 'enabled'
 
       expect(helper.upcoming_nsltv).to eq([])
-    end
-  end
-
-  describe '#sortable' do
-    before do
-      allow(helper).to receive(:link_to).and_return('sorted')
-    end
-
-    it 'marks the current ascending column and flips to descending' do
-      helper.define_singleton_method(:sort_column) { 'name' }
-      helper.define_singleton_method(:sort_direction) { 'asc' }
-
-      helper.sortable('name')
-
-      expect(helper).to have_received(:link_to).with('Name', { sort: 'name', direction: 'desc' },
-                                                     { class: 'current asc' })
-    end
-
-    it 'leaves other columns unmarked and sorts ascending' do
-      helper.define_singleton_method(:sort_column) { 'created_at' }
-      helper.define_singleton_method(:sort_direction) { 'desc' }
-
-      helper.sortable('name', 'Display Name')
-
-      expect(helper).to have_received(:link_to).with('Display Name', { sort: 'name', direction: 'asc' }, { class: nil })
-    end
-  end
-
-  describe '#abslink and #bbcode' do
-    it 'delegates abslink through link_to' do
-      allow(helper).to receive(:link_to).and_return('linked')
-
-      expect(helper.abslink('Docs', '/docs')).to eq('linked')
-      expect(helper).to have_received(:link_to).with('Docs', '/docs')
-    end
-
-    it 'builds the bbcode help link' do
-      result = helper.bbcode
-
-      expect(result).to include('(BBCode)')
-      expect(result).to include('/articles/536')
-    end
-  end
-
-  describe '#link_to_remove_fields' do
-    it 'renders hidden destroy field and remove link' do
-      builder = instance_double('FormBuilder')
-      allow(builder).to receive(:hidden_field).with(:_destroy).and_return('<input type="hidden">')
-      allow(helper).to receive(:link_to).and_return('<a href="#">Remove</a>')
-
-      html = helper.link_to_remove_fields('Remove', builder)
-
-      expect(html).to include('hidden')
-      expect(html).to include('Remove')
     end
   end
 

@@ -62,8 +62,6 @@ class Issue < ApplicationRecord
 
   before_validation :init_variables, if: proc(&:new_record?)
   before_save :parse_text
-  # FIXME
-  # after_save :remove_readings
 
   acts_as_readable on: :created_at
 

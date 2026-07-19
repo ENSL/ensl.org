@@ -17,10 +17,6 @@ class TeamsController < ApplicationController
     raise AccessError unless @team.can_create? cuser
   end
 
-  def replace_teamer
-    redirect_to_back
-  end
-
   def edit
     raise AccessError unless @team.can_update? cuser
   end

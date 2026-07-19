@@ -72,10 +72,6 @@ class LogFile < ActiveRecord::Base
     self.path = path
   end
 
-  def deal
-    # TODO
-  end
-
   def self.process
     Dir.glob("#{LOGS}/*").each do |entry|
       dir = File.basename(entry).to_i

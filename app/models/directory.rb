@@ -61,7 +61,6 @@ class Directory < ApplicationRecord
   scope :ordered, ->  { order('name ASC') }
   scope :path_sorted, -> { order('path ASC') }
   scope :filtered, -> { where(hidden: false) }
-  scope :of_parent, ->(parent) { where(parent_id: parent.id) }
 
   validates :name, presence: true, length: { in: 1..255 }, format: { with: /\A[A-Za-z0-9]{1,20}\z/, on: :create }
   validates :path, presence: true, length: { in: 1..255 }

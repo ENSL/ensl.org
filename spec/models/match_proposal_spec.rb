@@ -68,14 +68,6 @@ RSpec.describe MatchProposal, type: :model do
     let!(:other_match) { create(:match, contest: contest) }
     let!(:proposal2) { create(:match_proposal, match: other_match, team: team1, proposed_time: 1.day.from_now) }
 
-    describe '.of_match' do
-      it 'returns proposals for specific match' do
-        results = MatchProposal.of_match(match)
-        expect(results).to include(proposal1)
-        expect(results).not_to include(proposal2)
-      end
-    end
-
     describe '.confirmed_for_match' do
       let!(:confirmed_proposal) do
         create(:match_proposal, match: match, team: team1,
@@ -90,28 +82,6 @@ RSpec.describe MatchProposal, type: :model do
         results = MatchProposal.confirmed_for_match(match)
         expect(results).to include(confirmed_proposal)
         expect(results).not_to include(pending_proposal)
-      end
-    end
-
-    describe '.confirmed_upcoming' do
-      let!(:confirmed_future) do
-        create(:match_proposal, match: match, team: team1,
-                                proposed_time: 2.hours.from_now, status: MatchProposal::STATUS_CONFIRMED)
-      end
-      let!(:confirmed_past) do
-        create(:match_proposal, match: other_match, team: team1,
-                                proposed_time: 1.hour.ago, status: MatchProposal::STATUS_CONFIRMED)
-      end
-      let!(:pending_future) do
-        create(:match_proposal, match: match, team: team2,
-                                proposed_time: 3.hours.from_now, status: MatchProposal::STATUS_PENDING)
-      end
-
-      it 'returns only confirmed future proposals' do
-        results = MatchProposal.confirmed_upcoming
-        expect(results).to include(confirmed_future)
-        expect(results).not_to include(confirmed_past)
-        expect(results).not_to include(pending_future)
       end
     end
 

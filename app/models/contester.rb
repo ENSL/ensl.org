@@ -86,33 +86,6 @@ class Contester < ApplicationRecord
     lineup.distinct.ordered
   end
 
-  def contest_matches
-    contest.matches.where('contester1_id = ? OR contester2_id = ?', id, id)
-  end
-
-  def matches_for_contester
-    contest_matches
-  end
-
-  alias get_matches matches_for_contester
-
-  def stats_from_matches(matches_scope = nil)
-    matches = matches_scope || contest_matches.realfinished
-    stats = { win: 0, loss: 0, draw: 0 }
-
-    matches.each do |match|
-      if match.score1 == match.score2
-        stats[:draw] += 1
-      elsif match.contester1_id == id
-        match.score1 > match.score2 ? stats[:win] += 1 : stats[:loss] += 1
-      else
-        match.score2 > match.score1 ? stats[:win] += 1 : stats[:loss] += 1
-      end
-    end
-
-    stats
-  end
-
   def assign_ladder_join_score!
     return unless contest&.contest_type == Contest::TYPE_LADDER
 

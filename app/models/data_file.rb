@@ -84,7 +84,6 @@ class DataFile < ApplicationRecord
   before_save :sync_file_metadata, if: -> { location.present? && File.exist?(location) }
   before_save :move_file_between_directories, if: -> { directory_id_changed? && !new_record? }
   before_validation :auto_generate_title, if: -> { title.blank? }
-  # after_save :update_movie_metadata, if: -> { !new_record? && movie && saved_change_to_md5? }
   after_create :create_movie, if: :should_create_movie?
   after_save :update_relations, if: :should_update_relations?
   after_commit :sync_preview_links, on: %i[create update]
@@ -337,13 +336,6 @@ class DataFile < ApplicationRecord
           :find_source_for_preview, :find_preview_for_source, :filename_for_matching,
           :find_in_directory_by_filename, :link_preview_to_source!
 
-  # Update movie metadata if movie exists and file changed
-  def update_movie_metadata
-    movie.probe_metadata
-  end
-
-  public
-
   def should_create_movie?
     directory_id == Directory::MOVIES && !location.to_s.include?('_preview.mp4') && movie.nil?
   end
@@ -364,10 +356,6 @@ class DataFile < ApplicationRecord
       new_related = rf.id == related_id ? nil : related
       rf.update(related: new_related)
     end
-  end
-
-  def rateable?(user)
-    user && !rated_by?(user)
   end
 
   def refresh_preview_links!

@@ -24,8 +24,6 @@ class Forumer < ApplicationRecord
 
   include Extra
 
-  scope :access, ->(level) { where('access >= ?', level) }
-
   validates :group_id, uniqueness: { scope: %i[forum_id access] }
   validates :group_id, :forum_id, presence: true
   validates :access, inclusion: { in: 0..2 }

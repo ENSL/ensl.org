@@ -19,39 +19,23 @@ class Rounder < ActiveRecord::Base
 
   scope :team, ->(team) { where(team: team) }
   scope :match, ->(steamid) { where(steamid: steamid) }
-  scope :ordered, -> { order("kills DESC, deaths ASC") }
+  scope :ordered, -> { order('kills DESC, deaths ASC') }
   scope :stats,
-    -> {
-      select("id, team_id, COUNT(*) as num")
-        .group("team_id")
-        .order("num DESC")
-        .having("num > 3")
-    }
-  scope :player_stats,
-    -> {
-      select("id, user_id, SUM(kills)/SUM(deaths) as kpd, COUNT(*) as rounds")
-        .group("user_id")
-        .order("kpd DESC")
-        .having("rounds > 30 AND kpd > 0 AND user_id IS NOT NULL")
-        .limit(100)
-    }
-  scope :team_stats,
-    -> {
-      select("id, team_id, SUM(kills)/SUM(deaths) as kpd, COUNT(DISTINCT round_id) as rounds")
-        .group("team_id")
-        .order("kpd DESC")
-        .having("rounds > 30 AND kpd > 0 AND team_id IS NOT NULL")
-        .limit(100)
-    }
+        lambda {
+          select('id, team_id, COUNT(*) as num')
+            .group('team_id')
+            .order('num DESC')
+            .having('num > 3')
+        }
   scope :extras, -> { includes(:round, :user) }
   scope :within,
-    ->(from, to) { where("created_at > ? AND created_at < ?", from.utc, to.utc) }
+        ->(from, to) { where('created_at > ? AND created_at < ?', from.utc, to.utc) }
 
-    belongs_to :round
-    belongs_to :user
-    belongs_to :ensl_team, :class_name => "Team", :foreign_key => "team_id"
+  belongs_to :round
+  belongs_to :user
+  belongs_to :ensl_team, class_name: 'Team', foreign_key: 'team_id'
 
-    def to_s
-      user ? user.username : name
-    end
+  def to_s
+    user ? user.username : name
+  end
 end

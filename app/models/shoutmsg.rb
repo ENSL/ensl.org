@@ -32,7 +32,6 @@ class Shoutmsg < ApplicationRecord
   scope :recent, -> { includes(:user).order('id DESC').limit(8) }
   scope :box, -> { where(shoutable_type: nil, shoutable_id: nil).limit(8) }
   scope :typebox, -> { where(shoutable_type: nil, shoutable_id: nil) }
-  scope :last500, -> { includes(:user).order('id DESC').limit(500) }
   scope :of_object, ->(object, id) { where(shoutable_type: object, shoutable_id: id) }
   scope :ordered, -> { order('id') }
 
@@ -49,15 +48,6 @@ class Shoutmsg < ApplicationRecord
 
   def can_destroy?(cuser)
     cuser&.admin?
-  end
-
-  def self.flood?(cuser, type = nil, id = nil)
-    return false if of_object(type, id).count < 3
-
-    of_object(type, id).all(order: 'created_at DESC', limit: 10).find_each do |msg|
-      return false if cuser != msg.user
-    end
-    true
   end
 
   def self.params(params, _cuser)

@@ -68,7 +68,6 @@ class Challenge < ApplicationRecord
   scope :of_contester, lambda { |contester|
     where('contester1_id = ? OR contester2_id = ?', contester.id, contester.id)
   }
-  scope :within_time, ->(from, to) { where('match_time > ? AND match_time < ?', from.utc, to.utc) }
   scope :around, lambda { |time|
     where('match_time > ? AND match_time < ?', time.ago(MATCH_LENGTH).utc, time.ago(-MATCH_LENGTH).utc)
   }
@@ -107,14 +106,6 @@ class Challenge < ApplicationRecord
 
   def margin
     mandatory ? CHALLENGE_BEFORE_MANDATORY : CHALLENGE_BEFORE_VOLUNTARY
-  end
-
-  def deadline
-    mandatory ? ACCEPT_BEFORE_MANDATORY : ACCEPT_BEFORE_VOLUNTARY
-  end
-
-  def set_contester1
-    self.contester1 = user.active_contesters.of_contest(contester2.contest).first
   end
 
   def self.build_for_new(user:, contester2:)

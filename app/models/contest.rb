@@ -48,7 +48,6 @@ class Contest < ApplicationRecord
     arel = arel_table
     where(arel[:status].eq(STATUS_OPEN).and(arel[:end].gt(Time.now.utc)))
   }
-  scope :with_contesters, -> { includes(:contesters) }
   scope :ordered, -> { order('start DESC') }
   scope :nsls1, -> { where('name LIKE ?', 'NSL S1:%') }
   scope :nsls2, -> { where('name LIKE ?', 'NSL S2:%') }
@@ -85,14 +84,6 @@ class Contest < ApplicationRecord
 
   def to_s
     name
-  end
-
-  def status_s
-    statuses[status]
-  end
-
-  def default_s
-    default_time ? default_time.strftime('%A %H:%M') : ''
   end
 
   def statuses
@@ -204,11 +195,6 @@ class Contest < ApplicationRecord
       contester.trend = Contester::TREND_UP
     end
     contester.score = new_rank
-  end
-
-  def ladder_ranks_unique?
-    c = Contester.where({ contest_id: id })
-    c.distinct.pluck(:score).count == c.count
   end
 
   def can_join?(cuser)

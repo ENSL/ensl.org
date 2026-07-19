@@ -100,16 +100,6 @@ class Group < ApplicationRecord
       all_extras = predictors_users + staff_users
       all_extras.group_by(&:user_id).values.map(&:first)
     end
-
-    # Returns protected group IDs that cannot be destroyed
-    def protected_groups
-      PROTECTED_GROUP_IDS
-    end
-
-    # Returns all reserved/core system group IDs
-    def reserved_groups
-      RESERVED_GROUP_IDS
-    end
   end
 
   def self.params(params, _cuser)

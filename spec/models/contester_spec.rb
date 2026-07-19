@@ -40,25 +40,6 @@ RSpec.describe Contester, type: :model do
       allow(contester.contest).to receive(:status).and_return(Contest::STATUS_CLOSED)
       expect(contester.lineup).to eq(closed_relation)
     end
-
-    it 'computes stats from finished matches for either side of the pairing' do
-      match_as_contester1 = instance_double(Match, score1: 4, score2: 2, contester1_id: contester.id)
-      draw_match = instance_double(Match, score1: 1, score2: 1, contester1_id: contester.id)
-      match_as_contester2 = instance_double(Match, score1: 1, score2: 3, contester1_id: contester.id + 100)
-
-      stats = contester.stats_from_matches([match_as_contester1, draw_match, match_as_contester2])
-
-      expect(stats).to eq(win: 2, loss: 0, draw: 1)
-    end
-
-    it 'counts losses when the contester loses as either side of the match' do
-      loss_as_contester1 = instance_double(Match, score1: 1, score2: 3, contester1_id: contester.id)
-      loss_as_contester2 = instance_double(Match, score1: 4, score2: 2, contester1_id: contester.id + 100)
-
-      stats = contester.stats_from_matches([loss_as_contester1, loss_as_contester2])
-
-      expect(stats).to eq(win: 0, loss: 2, draw: 0)
-    end
   end
 
   describe 'validation helpers' do
@@ -169,15 +150,6 @@ RSpec.describe Contester, type: :model do
   end
 
   describe 'relations and destructive helpers' do
-    it 'delegates matches_for_contester to contest.matches.where' do
-      contester = create(:contester)
-      matches_rel = double('Relation')
-      allow(contester.contest).to receive(:matches).and_return(matches_rel)
-      expect(matches_rel).to receive(:where).with('contester1_id = ? OR contester2_id = ?', contester.id,
-                                                  contester.id).and_return(:found)
-      expect(contester.matches_for_contester).to eq :found
-    end
-
     it 'calls update! on destroy' do
       contester = build(:contester)
       expect(contester).to receive(:update!).with(active: false)

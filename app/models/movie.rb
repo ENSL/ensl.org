@@ -56,7 +56,6 @@ class Movie < ApplicationRecord
              LEFT JOIN rates ON ratings.rate_id = rates.id")
       .group('movies.id')
   }
-  scope :active_streams, -> { where('status > 0') }
 
   belongs_to :user, optional: true
   belongs_to :file, class_name: 'DataFile', optional: true

@@ -69,9 +69,6 @@ class Server < ApplicationRecord
   scope :ns2, -> { where('domain = ?', DOMAIN_NS2) }
   scope :hltvs, -> { where('domain = ?', DOMAIN_HLTV) }
   scope :active, -> { where('active = 1') }
-  scope :with_players, -> { where('players > 0') }
-  scope :reserved, -> { where('reservation IS NOT NULL') }
-  scope :unreserved_now, -> { where('reservation IS NULL') }
   scope :unreserved_hltv_around, lambda { |time|
     start_time = time.ago(Match::MATCH_LENGTH).utc
     end_time = time.ago(-Match::MATCH_LENGTH).utc

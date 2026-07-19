@@ -136,10 +136,6 @@ class User < ApplicationRecord
       .group('users.id')
       .order('num DESC')
   }
-  scope :banned, lambda {
-    joins('LEFT JOIN bans ON bans.user_id = users.id AND expiry > UTC_TIMESTAMP()')
-      .where('bans.id IS NOT NULL')
-  }
   scope :idle, lambda {
     where('lastvisit < ?', 30.minutes.ago.utc)
   }
@@ -482,15 +478,6 @@ class User < ApplicationRecord
 
   def past_matches
     past_team_matches.unfinished.ordered | past_ref_matches.unfinished.ordered
-  end
-
-  def unread_issues
-    issues.unread_by(self)
-  end
-
-  def duplicates
-    # TODO: user arel
-    User.where('lower(username) = ? AND users.id != ?', username.downcase, id)
   end
 
   def correct_steamid_universe

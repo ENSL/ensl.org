@@ -144,19 +144,6 @@ describe Directory do
         expect(result).not_to include(hidden)
       end
     end
-
-    describe '.of_parent' do
-      it 'returns directories with specified parent' do
-        parent = create(:directory)
-        child1 = create(:directory, parent: parent)
-        child2 = create(:directory, parent: parent)
-        other = create(:directory)
-
-        result = Directory.of_parent(parent)
-        expect(result).to include(child1, child2)
-        expect(result).not_to include(other)
-      end
-    end
   end
 
   describe 'constants' do

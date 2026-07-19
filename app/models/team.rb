@@ -40,14 +40,6 @@ class Team < ApplicationRecord
   validates :country, format: { with: /\A[A-Z]{2}\z/, allow_blank: true }
   validates(*%i[comment recruiting], length: { in: 0..75, allow_blank: true })
 
-  scope :with_teamers_num, lambda { |num|
-    select('teams.*, COUNT(T.id) AS teamers_num')
-      .joins("LEFT JOIN teamers T ON T.team_id = teams.id AND T.rank >= #{Teamer::RANK_MEMBER}")
-      .group('teams.id')
-      .having('teamers_num >= ?', num)
-  }
-  scope :non_empty_teams, -> { joins(:teamers).where("teamers.rank >= #{Teamer::RANK_MEMBER}").distinct }
-  scope :with_teamers, -> { includes(:teamers) }
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
   scope :ordered, -> { order('name') }
@@ -105,10 +97,6 @@ class Team < ApplicationRecord
 
   def api_v1_members_payload
     teamers.active.includes(:user).map(&:api_v1_member_payload)
-  end
-
-  def leaders_s
-    leaders.join(', ')
   end
 
   def init_variables

@@ -103,16 +103,8 @@ class Gather < ApplicationRecord
     end
   end
 
-  def demo_name
-    Verification.uncrap("gather-#{id}")
-  end
-
   def states
     { STATE_RUNNING => 'Running', STATE_PICKING => 'Picking', STATE_FINISHED => 'Finished' }
-  end
-
-  def votes_needed?
-    5
   end
 
   def first

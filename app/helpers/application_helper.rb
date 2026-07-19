@@ -220,10 +220,6 @@ module ApplicationHelper
     "#{match.score1} - #{match.score2}"
   end
 
-  def abslink(text, url)
-    link_to text, url
-  end
-
   def emojify_aliases(text)
     EmojiParser.parse(text.to_s, &:raw)
   end
@@ -244,21 +240,6 @@ module ApplicationHelper
 
     return_here
     render partial: 'comments/index', locals: { comment: comment, comments: comments }
-  end
-
-  def bbcode
-    link_to '(BBCode)', article_url(id: 536)
-  end
-
-  def sortable(column, title = nil)
-    title ||= column.titleize
-    css_class = column == sort_column ? "current #{sort_direction}" : nil
-    direction = column == sort_column && sort_direction == 'asc' ? 'desc' : 'asc'
-    link_to title, { sort: column, direction: direction }, { class: css_class }
-  end
-
-  def link_to_remove_fields(name, form_builder)
-    form_builder.hidden_field(:_destroy) + link_to(name, '#', onclick: 'remove_fields(this); return false;')
   end
 
   # FIXME: this won't work.
@@ -297,13 +278,5 @@ module ApplicationHelper
 
   def upcoming_nsltv
     ENV['GOOGLE_CALENDAR'] == 'disabled' ? (calendar.upcoming || []) : []
-  end
-
-  def gathers_url
-    if Rails.env.production?
-      'https://gathers.ensl.org'
-    else
-      'https://gathers.staging.ensl.org'
-    end
   end
 end
