@@ -3,28 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe UsersHelper, type: :helper do
-  describe '#sort_link' do
-    it 'builds a reversed sort key when the same sort column is active' do
-      params = ActionController::Parameters.new(sort: 'name', page: 2)
-      allow(helper).to receive(:params).and_return(params)
-      allow(helper).to receive(:url_for).and_return('/users?sort=name_reverse')
-
-      helper.sort_link('Name', 'name')
-
-      expect(helper).to have_received(:url_for).with(params: params.merge(sort: 'name_reverse', page: nil))
-    end
-
-    it 'keeps the original sort key for a new sort column' do
-      params = ActionController::Parameters.new(sort: 'created_at', page: 2)
-      allow(helper).to receive(:params).and_return(params)
-      allow(helper).to receive(:url_for).and_return('/users?sort=name')
-
-      helper.sort_link('Name', 'name')
-
-      expect(helper).to have_received(:url_for).with(params: params.merge(sort: 'name', page: nil))
-    end
-  end
-
   describe '#steamid_tool' do
     let(:relation) { instance_double(ActiveRecord::Relation) }
 

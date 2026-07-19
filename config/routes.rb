@@ -111,7 +111,7 @@ Rails.application.routes.draw do
   end
 
   resources :groups
-  resources :groupers
+  resources :groupers, only: %i[create update destroy]
   resources :forumers, only: %i[create destroy update]
   resources :topics
   resources :matches

@@ -1,0 +1,8 @@
+There are is a new match on ENSL: https://www.ensl.org/matches/<%= @match.id %>
+
+Contest: <%= @match.contest %> (https://www.ensl.org/contests/<%= @match.contest.id %>)
+Teams: <%= @match.to_s %>
+Date: <%= @match.match_time.strftime("%d %B %y %H:%M") %>
+<% if @match.hltv %>
+HLTV: <%= @match.hltv.addr %> (<%= @match.hltv %> - https://www.ensl.org/servers/<%= @match.hltv.id %>)
+<% end %>

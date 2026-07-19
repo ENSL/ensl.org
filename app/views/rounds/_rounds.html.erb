@@ -1,11 +1,21 @@
+<% sort_link = lambda do |param|
+  key = param
+  key += '_reverse' if params[:sort] == param
+
+  {
+    title: 'Sort by this field',
+    href: url_for(params: params.merge({ sort: key, page: nil }))
+  }
+end %>
+
 <table class="data">
   <tr>
-    <th><%= sort_link "Date", :start %></th>
-    <th><%= sort_link "Server", :server %></th>
-    <th><%= sort_link "Team 1", :team1 %></th>
-    <th><%= sort_link "Team 2", :team2 %></th>
-    <th><%= sort_link "Map", :map %></th>
-    <th><%= sort_link "commander", :commander %></th>
+    <th><%= sort_link.call(:start) %></th>
+    <th><%= sort_link.call(:server) %></th>
+    <th><%= sort_link.call(:team1) %></th>
+    <th><%= sort_link.call(:team2) %></th>
+    <th><%= sort_link.call(:map) %></th>
+    <th><%= sort_link.call(:commander) %></th>
   </tr>
 
   <% rounds.each do |round| %>

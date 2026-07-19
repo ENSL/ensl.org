@@ -10,10 +10,10 @@ require 'rails_helper'
 # referenced (round <-> commander) fixture for rendering only.
 RSpec.describe 'rounds/index', type: :view do
   before do
-    # `sort_link` (used by rounds/_rounds) calls `params.merge(...)` and passes the
-    # result straight into `url_for`. The default view-spec params object is an
-    # unpermitted ActionController::Parameters, which blows up on that conversion -
-    # permit everything here so we can exercise the actual rendering path.
+    # rounds/_rounds passes merged params straight into `url_for`. The default
+    # view-spec params object is an unpermitted ActionController::Parameters,
+    # which blows up on that conversion - permit everything here so we can
+    # exercise the actual rendering path.
     allow(view).to receive(:params).and_return(ActionController::Parameters.new({}).permit!)
   end
 
