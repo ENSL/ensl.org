@@ -47,7 +47,7 @@
       <dd><%= user.email_s %></dd>
     <% end %>
 
-    <% if profile.steam_profile and profile.steam_profile != "" %>
+    <% if profile.steam_profile? %>
       <dt>Steam</dt>
       <dd>
         <% if profile.steam_profile.match(/\A[0-9]*\z/) %>

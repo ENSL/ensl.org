@@ -4,7 +4,7 @@
   <div class="contents">
     <h4>Server Votes</h4>
 
-    <% active_gather_servers = @gather.gather_servers.joins(:server).merge(Server.active).includes(:server).ordered %>
+    <% active_gather_servers = gather.gather_servers.joins(:server).merge(Server.active).includes(:server).ordered %>
 
     <ul class="votes" id="server-votes">
       <% active_gather_servers.each do |server| %>
@@ -41,7 +41,7 @@
     <h4>Map Votes</h4>
 
     <ul class="votes" id="map-votes">
-      <% @gather.gather_maps.ordered.each do |map| %>
+      <% gather.gather_maps.ordered.each do |map| %>
         <li>
           <span><%= map.votes %></span>
           <% if map.real_votes.build(user: gather_current_user).can_create? gather_current_user %>

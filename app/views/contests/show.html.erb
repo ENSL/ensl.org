@@ -50,7 +50,7 @@
   <% elsif @contest.contest_type == Contest::TYPE_LADDER %>
     <%= render "contesters/ladder", actions: true, contest: @contest %>
   <% else %>
-    <%= render "normal" %>
+    <%= render "normal", contest: @contest, friendly: @friendly %>
   <% end %>
 </div>
 

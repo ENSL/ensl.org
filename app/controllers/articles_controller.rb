@@ -10,7 +10,6 @@ class ArticlesController < ApplicationController
   def news_index
     @news = Article.with_comments.ordered.nodrafts.onlynews.limit(10)
     @categories = Category.ordered.domain(Category::DOMAIN_NEWS)
-    @sidebar_poll = Poll.recent.first
   end
 
   def news_archive

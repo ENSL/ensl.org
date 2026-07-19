@@ -1,11 +1,10 @@
 <div class="gather-columns">
   <div class="data">
     <div class="contents">
-      <% gather = @gather %>
-      <% current_gatherer = @gatherer %>
+      <% current_gatherer = gatherer %>
       <% gatherers = gather.gatherers.most_voted %>
       <h4>Vote Captains</h4>
-      <%= render partial: 'gathers/progress' %>
+      <%= render partial: 'gathers/progress', locals: { gather: gather } %>
 
       <table id="gatherers">
         <% gatherers.each do |gatherer| %>
@@ -31,7 +30,7 @@
     </div>
   </div>
 
-  <%= render partial: 'gathers/votes' %>
+  <%= render partial: 'gathers/votes', locals: { gather: gather } %>
 </div>
 
-<%= render partial: 'gathers/status', locals: { gather: @gather, gatherer: @gatherer } %>
+<%= render partial: 'gathers/status', locals: { gather: gather, gatherer: current_gatherer } %>

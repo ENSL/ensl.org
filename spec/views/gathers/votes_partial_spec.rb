@@ -24,10 +24,7 @@ RSpec.describe 'gathers/_votes', type: :view do
     gather_server.update!(votes: 3)
     gather_map.update!(votes: 5)
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/votes', locals: { gather: gather.reload }
 
     expect(rendered).to include('Server Votes')
     expect(rendered).to include('VoteServerName')
@@ -44,10 +41,7 @@ RSpec.describe 'gathers/_votes', type: :view do
     gather.servers << active_server
     gather.servers << inactive_server
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/votes', locals: { gather: gather.reload }
 
     expect(rendered).to include('ActiveVoteServer')
     expect(rendered).not_to include('InactiveVoteServer')
@@ -65,10 +59,12 @@ RSpec.describe 'gathers/_votes', type: :view do
       gatherer = create(:gatherer, gather: gather, user: voter_user)
       gather.update_column(:status, Gather::STATE_VOTING)
 
-      assign(:gather, gather.reload)
+      # gather_current_user's default arg (gatherer_from_context) still reads
+      # @gatherer directly off the view/controller rather than a local, so it
+      # needs to be assigned here even though `gather` itself is now a local.
       assign(:gatherer, gatherer)
 
-      render
+      render partial: 'gathers/votes', locals: { gather: gather.reload }
 
       expect(rendered).to include('vote-link')
       expect(rendered).to include('Click to vote')

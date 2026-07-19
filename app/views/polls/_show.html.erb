@@ -1,5 +1,5 @@
 <div class="widget-content-wrapper">
-  <% poll = local_assigns[:poll] || @poll %>
+  <% poll = local_assigns.fetch(:poll) %>
   <% return unless poll %>
 
   <div class="question">

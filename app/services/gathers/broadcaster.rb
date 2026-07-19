@@ -54,7 +54,12 @@ module Gathers
 
       renderer.render(
         partial: 'gathers/frame',
-        assigns: { gather: @gather, gatherer: gatherer, cuser: user }
+        # `assigns:` sets @gather/@gatherer/@cuser on the renderer's controller so
+        # helpers deeper in the render tree (gather_current_user, render_gather's
+        # default args) that fall back to instance_variable_get keep working.
+        # `locals:` is what gathers/_frame.html.erb itself actually reads.
+        assigns: { gather: @gather, gatherer: gatherer, cuser: user },
+        locals: { gather: @gather, gatherer: gatherer }
       )
     end
   end

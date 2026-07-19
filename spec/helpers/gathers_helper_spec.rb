@@ -28,28 +28,34 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'renders the running partial for running gathers' do
-      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_RUNNING))
+      gather = instance_double(Gather, status: Gather::STATE_RUNNING)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
       allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       expect(helper.render_gather).to eq('rendered')
       expect(helper.headers['Gather']).to eq('running')
-      expect(helper).to have_received(:render).with(partial: 'gathers/running', layout: false)
+      expect(helper).to have_received(:render).with(
+        partial: 'gathers/running', layout: false, locals: { gather: gather, gatherer: nil }
+      )
     end
 
     it 'marks voting gathers as voted when the current user has voted' do
       votes_relation = instance_double('VotesRelation')
       gather = instance_double(Gather, status: Gather::STATE_VOTING, gatherer_votes: votes_relation)
       current_user = instance_double(User, id: 9)
+      gatherer = instance_double(Gatherer)
 
       allow(helper).to receive(:gather_from_context).and_return(gather)
-      allow(helper).to receive(:gatherer_from_context).and_return(instance_double(Gatherer))
+      allow(helper).to receive(:gatherer_from_context).and_return(gatherer)
       helper.define_singleton_method(:cuser) { current_user }
       allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double('FilteredVotes', any?: true))
 
       helper.render_gather
 
       expect(helper.headers['Gather']).to eq('voted')
-      expect(helper).to have_received(:render).with(partial: 'gathers/voting', layout: false)
+      expect(helper).to have_received(:render).with(
+        partial: 'gathers/voting', layout: false, locals: { gather: gather, gatherer: gatherer }
+      )
     end
 
     it 'marks voting gathers as voting when the current user has not voted' do
@@ -69,23 +75,29 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'renders the picking partial for picking gathers' do
-      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_PICKING))
+      gather = instance_double(Gather, status: Gather::STATE_PICKING)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
       allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       helper.render_gather
 
       expect(helper.headers['Gather']).to eq('picking')
-      expect(helper).to have_received(:render).with(partial: 'gathers/picking', layout: false)
+      expect(helper).to have_received(:render).with(
+        partial: 'gathers/picking', layout: false, locals: { gather: gather, gatherer: nil }
+      )
     end
 
     it 'renders the picking partial for finished gathers' do
-      allow(helper).to receive(:gather_from_context).and_return(instance_double(Gather, status: Gather::STATE_FINISHED))
+      gather = instance_double(Gather, status: Gather::STATE_FINISHED)
+      allow(helper).to receive(:gather_from_context).and_return(gather)
       allow(helper).to receive(:gatherer_from_context).and_return(nil)
 
       helper.render_gather
 
       expect(helper.headers['Gather']).to eq('picking')
-      expect(helper).to have_received(:render).with(partial: 'gathers/picking', layout: false)
+      expect(helper).to have_received(:render).with(
+        partial: 'gathers/picking', layout: false, locals: { gather: gather, gatherer: nil }
+      )
     end
   end
 

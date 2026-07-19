@@ -4,12 +4,11 @@ require 'rails_helper'
 
 # Regression safety net for app/views/comments/_index.html.erb
 #
-# This partial was recently refactored to read `@comments`/`@comment` through
-# `local_assigns.fetch(...)` instead of the instance variables directly. That
-# kind of refactor is easy to get subtly wrong (e.g. an `<%=` accidentally
-# turned into a `<%`) and Rails will NOT raise an error when that happens -
-# the output silently disappears. These specs assert on the actual rendered
-# content so a silent regression like that gets caught.
+# `comments`/`comment` are required locals (always passed by
+# ApplicationHelper#add_comments). A future edit that drops an `<%=` or
+# breaks that local wiring would fail silently in the browser - Rails
+# raises no error for a stray `<%` - so these specs assert on the actual
+# rendered content.
 RSpec.describe 'comments/_index', type: :view do
   let(:article) { create(:article) }
   let(:user) { create(:user) }
@@ -25,28 +24,13 @@ RSpec.describe 'comments/_index', type: :view do
     expect(rendered).to include('Comments')
   end
 
-  context 'when comments are provided as locals' do
-    it 'renders each comment body and author' do
-      comment = create(:comment, user: user, commentable: article, text: 'Locals comment body')
+  it 'renders each comment body and author' do
+    comment = create(:comment, user: user, commentable: article, text: 'Locals comment body')
 
-      render partial: 'comments/index', locals: { comment: Comment.new(commentable: article), comments: [comment] }
+    render partial: 'comments/index', locals: { comment: Comment.new(commentable: article), comments: [comment] }
 
-      expect(rendered).to include(user.username)
-      expect(rendered).to include('Locals comment body')
-    end
-  end
-
-  context 'when falling back to @comments/@comment instance variables' do
-    it 'renders each comment body and author' do
-      comment = create(:comment, user: user, commentable: article, text: 'Ivar fallback comment body')
-      assign(:comments, [comment])
-      assign(:comment, Comment.new(commentable: article))
-
-      render
-
-      expect(rendered).to include(user.username)
-      expect(rendered).to include('Ivar fallback comment body')
-    end
+    expect(rendered).to include(user.username)
+    expect(rendered).to include('Locals comment body')
   end
 
   it 'renders the new comment form so visitors can post a reply' do

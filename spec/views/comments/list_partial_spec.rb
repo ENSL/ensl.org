@@ -19,15 +19,4 @@ RSpec.describe 'comments/_list', type: :view do
     expect(rendered).to include('Newer comment body')
     expect(rendered.index('Newer comment body')).to be < rendered.index('Older comment body')
   end
-
-  context 'when falling back to the @comments instance variable' do
-    it 'still renders the comment body' do
-      comment = create(:comment, user: user, commentable: article, text: 'Ivar fallback list comment')
-      assign(:comments, [comment])
-
-      render
-
-      expect(rendered).to include('Ivar fallback list comment')
-    end
-  end
 end

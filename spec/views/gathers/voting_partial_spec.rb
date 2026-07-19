@@ -25,10 +25,7 @@ RSpec.describe 'gathers/_voting', type: :view do
     low_user = create(:user, username: 'LowVotedPlayer')
     create(:gatherer, gather: gather, user: low_user, votes: 1)
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/voting', locals: { gather: gather.reload, gatherer: nil }
 
     expect(rendered).to include('Vote Captains')
     expect(rendered).to include('TopVotedPlayer')
@@ -47,10 +44,12 @@ RSpec.describe 'gathers/_voting', type: :view do
       voter_user = create(:user)
       voter_gatherer = create(:gatherer, gather: gather, user: voter_user)
 
-      assign(:gather, gather.reload)
+      # gather_current_user's default arg (gatherer_from_context) still reads
+      # @gatherer directly off the view/controller rather than a local, so it
+      # needs to be assigned here even though `gather`/`gatherer` are now locals.
       assign(:gatherer, voter_gatherer)
 
-      render
+      render partial: 'gathers/voting', locals: { gather: gather.reload, gatherer: voter_gatherer }
 
       expect(rendered).to include('vote-link')
       expect(rendered).to include('Click to vote for captain.')
@@ -62,10 +61,7 @@ RSpec.describe 'gathers/_voting', type: :view do
     server = create(:server, :active, name: 'VotingServerName')
     gather.servers << server
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/voting', locals: { gather: gather.reload, gatherer: nil }
 
     expect(rendered).to include('Server Votes')
     expect(rendered).to include('VotingServerName')

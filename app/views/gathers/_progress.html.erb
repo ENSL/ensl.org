@@ -5,22 +5,22 @@
   progress_total = Gather::FULL
   progress_value_text = ''
 
-  case @gather.status
+  case gather.status
   when Gather::STATE_RUNNING
     progress_title = 'Signed Up'
-    progress_current = @gather.gatherers.count
+    progress_current = gather.gatherers.count
     progress_total = Gather::FULL
     progress_value_text = "#{progress_current}/#{progress_total}"
   when Gather::STATE_VOTING
     progress_title = 'Voting Time Left'
     progress_icon = 'clock-o'
-    progress_total = @gather.voting_timeout
-    progress_current = @gather.voting_time_remaining
+    progress_total = gather.voting_timeout
+    progress_current = gather.voting_time_remaining
     progress_value_text = "#{progress_current}s"
   when Gather::STATE_PICKING
     progress_title = 'Players Picked'
     progress_icon = 'users'
-    players_left = @gather.gatherers.lobby.count
+    players_left = gather.gatherers.lobby.count
     progress_total = Gather::FULL
     progress_current = progress_total - players_left
     progress_value_text = "#{players_left} left"
@@ -35,11 +35,11 @@
   progress_total = 1 if progress_total.to_i <= 0
   progress_current = [[progress_current.to_i, 0].max, progress_total.to_i].min
   progress_percent = ((progress_current.to_f / progress_total.to_f) * 100).round
-  voting_progress_id = "gather-progress-voting-#{@gather.id}"
+  voting_progress_id = "gather-progress-voting-#{gather.id}"
 %>
 
 <div class="gather-progress mt-3 mb-4"
-     <% if @gather.status == Gather::STATE_VOTING %>
+     <% if gather.status == Gather::STATE_VOTING %>
        id="<%= voting_progress_id %>"
        data-remaining="<%= progress_current %>"
        data-total="<%= progress_total %>"
@@ -57,7 +57,7 @@
   </div>
 </div>
 
-<% if @gather.status == Gather::STATE_VOTING %>
+<% if gather.status == Gather::STATE_VOTING %>
   <script>
     (function() {
       const progressEl = document.getElementById('<%= voting_progress_id %>');

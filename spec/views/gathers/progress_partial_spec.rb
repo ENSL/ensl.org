@@ -12,10 +12,7 @@ RSpec.describe 'gathers/_progress', type: :view do
     gather = create(:gather, :running)
     create_list(:gatherer, 5, gather: gather)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/progress', locals: { gather: gather }
 
     expect(rendered).to include('Signed Up')
     expect(rendered).to include('5/12')
@@ -26,10 +23,7 @@ RSpec.describe 'gathers/_progress', type: :view do
     create_list(:gatherer, 12, gather: gather)
     gather.update_column(:status, Gather::STATE_VOTING)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/progress', locals: { gather: gather }
 
     expect(rendered).to include('Voting Time Left')
     expect(rendered).to include('gather-progress-voting')
@@ -42,10 +36,7 @@ RSpec.describe 'gathers/_progress', type: :view do
     create_list(:gatherer, 8, gather: gather, team: nil)
     gather.update_column(:status, Gather::STATE_PICKING)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/progress', locals: { gather: gather }
 
     expect(rendered).to include('Players Picked')
     expect(rendered).to include('8 left')
@@ -55,10 +46,7 @@ RSpec.describe 'gathers/_progress', type: :view do
     gather = create(:gather)
     gather.update_column(:status, Gather::STATE_FINISHED)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/progress', locals: { gather: gather }
 
     expect(rendered).to include('Teams Ready')
     expect(rendered).to include('Complete')

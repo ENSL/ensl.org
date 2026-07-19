@@ -29,10 +29,7 @@ RSpec.describe 'gathers/_picking', type: :view do
     lobby_user = create(:user, username: 'LobbyPlayer')
     create(:gatherer, gather: gather, user: lobby_user, team: nil)
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/picking', locals: { gather: gather.reload, gatherer: nil }
 
     expect(rendered).to include('Lobby')
     expect(rendered).to include('Marines')
@@ -47,10 +44,7 @@ RSpec.describe 'gathers/_picking', type: :view do
     gather = create(:gather)
     gather.update_column(:status, Gather::STATE_PICKING)
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/picking', locals: { gather: gather.reload, gatherer: nil }
 
     expect(rendered).to include('Players Picked')
   end

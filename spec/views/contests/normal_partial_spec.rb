@@ -16,10 +16,7 @@ RSpec.describe 'contests/_normal', type: :view do
     create(:contester, contest: contest, team: bottom_team, score: 1, win: 1)
     create(:contester, contest: contest, team: top_team, score: 10, win: 5)
 
-    assign(:contest, contest)
-    assign(:friendly, nil)
-
-    render
+    render partial: 'contests/normal', locals: { contest: contest, friendly: nil }
 
     expect(rendered).to include('Top Team')
     expect(rendered).to include('Bottom Team')
@@ -33,10 +30,7 @@ RSpec.describe 'contests/_normal', type: :view do
     create(:contester, contest: contest, team: active_team)
     create(:contester, contest: contest, team: inactive_team).update!(active: false)
 
-    assign(:contest, contest)
-    assign(:friendly, nil)
-
-    render
+    render partial: 'contests/normal', locals: { contest: contest, friendly: nil }
 
     expect(rendered).to include('Active Team')
     expect(rendered).not_to include('Inactive Team')

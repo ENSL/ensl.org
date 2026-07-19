@@ -48,15 +48,4 @@ RSpec.describe 'polls/_show', type: :view do
       expect(rendered).to include('vote-link')
     end
   end
-
-  context 'when using the @poll instance variable fallback' do
-    it 'still renders the question' do
-      poll = build_poll(question: 'Ivar fallback question?')
-      assign(:poll, poll)
-
-      render
-
-      expect(rendered).to include('Ivar fallback question?')
-    end
-  end
 end

@@ -25,10 +25,11 @@ RSpec.describe 'gatherers/_list', type: :view do
     candidate_user = create(:user, username: 'PickableCandidate')
     create(:gatherer, gather: gather, user: candidate_user, team: nil)
 
-    assign(:gather, gather.reload)
+    # gather_current_user's default arg (gatherer_from_context) still reads
+    # @gatherer directly off the view/controller rather than a local.
     assign(:gatherer, captain_gatherer)
 
-    render partial: 'gatherers/list', locals: { team: nil }
+    render partial: 'gatherers/list', locals: { team: nil, gather: gather.reload, gatherer: captain_gatherer }
 
     expect(rendered).to include('PickableCandidate')
     expect(rendered).to include('type="radio"')
@@ -47,10 +48,9 @@ RSpec.describe 'gatherers/_list', type: :view do
     viewer_user = create(:user, username: 'SpectatorViewer')
     viewer_gatherer = create(:gatherer, gather: gather, user: viewer_user, team: nil)
 
-    assign(:gather, gather.reload)
     assign(:gatherer, viewer_gatherer)
 
-    render partial: 'gatherers/list', locals: { team: 1 }
+    render partial: 'gatherers/list', locals: { team: 1, gather: gather.reload, gatherer: viewer_gatherer }
 
     expect(rendered).to include('TeamRosterPlayer')
     expect(rendered).not_to include('type="radio"')
@@ -63,10 +63,7 @@ RSpec.describe 'gatherers/_list', type: :view do
     captain_gatherer = create(:gatherer, gather: gather, user: captain_user, team: 1, pick_order: 1)
     gather.update_columns(captain1_id: captain_gatherer.id, turn: 1)
 
-    assign(:gather, gather.reload)
-    assign(:gatherer, nil)
-
-    render partial: 'gatherers/list', locals: { team: 1 }
+    render partial: 'gatherers/list', locals: { team: 1, gather: gather.reload, gatherer: nil }
 
     expect(rendered).to include('StarCaptain')
     expect(rendered).to include('captain')

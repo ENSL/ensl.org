@@ -2,6 +2,7 @@
   <div class="widget poll">
     <h4><%= t('widget.poll') %></h4>
 
-    <%= render(partial: "polls/show", locals: { poll: @sidebar_poll }) if @sidebar_poll %>
+    <% poll = Poll.recent.first %>
+    <%= render(partial: "polls/show", locals: { poll: poll }) if poll %>
   </div>
 <% end %>

@@ -1,21 +1,20 @@
-<% captain = team == 1 ? @gather.captain1 : @gather.captain2 %>
+<% captain = team == 1 ? gather.captain1 : gather.captain2 %>
 <% pick = false %>
-<% gatherers = @gather.gatherers.for_pick_list(team) %>
-<% current_gatherer = @gatherer %>
+<% gatherers = gather.gatherers.for_pick_list(team) %>
+<% current_gatherer = gatherer %>
 
 <%= form_tag(pick_gatherers_path, authenticity_token: false, data: { turbo_stream: true }) do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% gatherers.each_with_index do |gatherer, index| %>
       <% user = gatherer.user %>
-      <% gather = gatherer.gather %>
       <% turn = gather.turn %>
       <% team_pick_position = team.nil? ? nil : (index + 1) %>
       <li>
-          <% if @gatherer and gatherer.can_update? gather_current_user, { team: @gatherer.team } %>
+          <% if current_gatherer and gatherer.can_update? gather_current_user, { team: current_gatherer.team } %>
           <% pick = true %>
           <%= radio_button_tag :player, gatherer.id %>
           <%= flag user.country %>
-          <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <% captain_flag = if gatherer == gather.captain1 then 1 elsif gatherer == gather.captain2 then 2 end %>
           <% if team_pick_position %>
             <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
           <% end %>
@@ -24,11 +23,11 @@
         <% else %>
           <%= flag(user&.country) %>
 
-          <% captain_flag = if gatherer == @gather.captain1 then 1 elsif gatherer == @gather.captain2 then 2 end %>
+          <% captain_flag = if gatherer == gather.captain1 then 1 elsif gatherer == gather.captain2 then 2 end %>
           <% if team_pick_position %>
             <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
           <% end %>
-          <% if @gather.status != Gather::STATE_FINISHED && gatherer == captain and gatherer.team == turn %>
+          <% if gather.status != Gather::STATE_FINISHED && gatherer == captain and gatherer.team == turn %>
             <%= fa_icon 'chevron-right' %>
           <% end %>
           <%= link_to user.to_s, user, class: 'user', data: (captain_flag ? { captain: captain_flag, turbo_frame: '_top' } : { turbo_frame: '_top' }) %>

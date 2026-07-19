@@ -8,22 +8,20 @@ module GathersHelper
   def render_gather(gather = gather_from_context, gatherer = gatherer_from_context)
     return unless gather
 
+    locals = { gather: gather, gatherer: gatherer }
+
     if gather.status == Gather::STATE_RUNNING
       headers['Gather'] = 'running'
 
-      render partial: 'gathers/running', layout: false
+      render partial: 'gathers/running', layout: false, locals: locals
     elsif gather.status == Gather::STATE_VOTING
-      headers['Gather'] = if gatherer && cuser&.id && gather.gatherer_votes.where(user_id: cuser.id).any?
-                            'voted'
-                          else
-                            'voting'
-                          end
+      headers['Gather'] = gather_voting_header(gather, gatherer)
 
-      render partial: 'gathers/voting', layout: false
+      render partial: 'gathers/voting', layout: false, locals: locals
     elsif [Gather::STATE_PICKING, Gather::STATE_FINISHED].include?(gather.status)
       headers['Gather'] = 'picking'
 
-      render partial: 'gathers/picking', layout: false
+      render partial: 'gathers/picking', layout: false, locals: locals
     end
   end
 
@@ -50,5 +48,14 @@ module GathersHelper
 
   def gatherer_from_context
     instance_variable_get(:@gatherer) || controller&.instance_variable_get(:@gatherer)
+  end
+
+  private
+
+  def gather_voting_header(gather, gatherer)
+    return 'voting' unless gatherer && cuser&.id
+    return 'voting' unless gather.gatherer_votes.where(user_id: cuser.id).any?
+
+    'voted'
   end
 end

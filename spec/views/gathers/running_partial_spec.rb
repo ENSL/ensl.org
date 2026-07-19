@@ -13,10 +13,7 @@ RSpec.describe 'gathers/_running', type: :view do
     player = create(:user, username: 'RunningGatherPlayer')
     create(:gatherer, gather: gather, user: player)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/running', locals: { gather: gather, gatherer: nil }
 
     expect(rendered).to include('Signed Up')
     expect(rendered).to include('RunningGatherPlayer')
@@ -27,10 +24,7 @@ RSpec.describe 'gathers/_running', type: :view do
     player = create(:user, username: 'AwayPlayer')
     create(:gatherer, gather: gather, user: player, status: Gatherer::STATE_AWAY)
 
-    assign(:gather, gather)
-    assign(:gatherer, nil)
-
-    render
+    render partial: 'gathers/running', locals: { gather: gather, gatherer: nil }
 
     expect(rendered).to include('AwayPlayer')
     expect(rendered).to include('class="away"')
@@ -40,16 +34,13 @@ RSpec.describe 'gathers/_running', type: :view do
     it 'renders a delete link for that gatherer' do
       gather = create(:gather, :running)
       player = create(:user, username: 'RemovablePlayer')
-      gatherer = create(:gatherer, gather: gather, user: player)
+      removable_gatherer = create(:gatherer, gather: gather, user: player)
       signed_in_user = player
       view.define_singleton_method(:cuser) { signed_in_user }
 
-      assign(:gather, gather)
-      assign(:gatherer, nil)
+      render partial: 'gathers/running', locals: { gather: gather, gatherer: nil }
 
-      render
-
-      expect(rendered).to include("delete_gatherer_#{gatherer.id}")
+      expect(rendered).to include("delete_gatherer_#{removable_gatherer.id}")
     end
   end
 end
