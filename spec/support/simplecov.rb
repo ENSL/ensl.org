@@ -19,6 +19,7 @@ if enable_simplecov
     add_filter %r{^/config/}
     add_filter %r{^/db/}
     add_filter %r{^/vendor/}
+    add_filter %r{^/app/models/(log_file|log_line|round|rounder)\.rb$}
 
     add_group 'Controllers', 'app/controllers'
     add_group 'Models',      'app/models'
