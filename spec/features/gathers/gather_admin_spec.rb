@@ -109,6 +109,6 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     end
 
     joiner = FactoryBot.create(:user, raw_password: 'password123')
-    sign_in_and_join('joiner', joiner, new_gather)
+    sign_in_and_join_gather('joiner', joiner, new_gather)
   end
 end

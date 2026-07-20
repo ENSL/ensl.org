@@ -226,11 +226,6 @@ module Features
       end
     end
 
-    # Alias for backward compatibility
-    def sign_in_and_join(session_name, user, gather_arg = nil)
-      sign_in_and_join_gather(session_name, user, gather_arg)
-    end
-
     private
 
     # Keep gather navigation on Capybara's visit path so Playwright driver
