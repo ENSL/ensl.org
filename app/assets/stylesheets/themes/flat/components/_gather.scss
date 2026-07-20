@@ -81,6 +81,8 @@
 
 form.new-shout[id^="new_shout_Gather_"] {
   @include span-columns(12);
+  float: none;
+  clear: both;
   margin: 20px 0;
 
   .shout_input {
@@ -257,6 +259,186 @@ form.new-shout[id^="new_shout_Gather_"] {
 
   p {
     @include clearfix;
+  }
+}
+
+.gather-mobile-nav,
+.gather-mobile-topbar {
+  display: none;
+}
+
+/*
+  Mobile layout
+
+  The 3-column pick grid and the info boxes get too cramped to read on
+  phones, so below the tablet breakpoint (matches Tailwind's `md`) gather
+  switches to a single stacked column with bigger touch targets.
+*/
+@media (max-width: 767px) {
+  #gather {
+    .previous a,
+    .next a {
+      height: 40px;
+      line-height: 40px;
+      padding: 0 14px;
+    }
+  }
+
+  #gather-info {
+    padding-left: 0;
+
+    .info {
+      @include span-columns(12);
+      margin-bottom: 20px;
+
+      &:nth-child(3) {
+        @include reset-display;
+      }
+    }
+  }
+
+  .gather-mobile-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0 24px;
+
+    a {
+      flex: 1 1 auto;
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      background: color.adjust($light-gray, $lightness: 5%);
+      font-weight: bold;
+    }
+  }
+
+  #gather-area {
+    .gather-columns {
+      width: auto;
+      margin-left: 0;
+      display: block;
+    }
+
+    .data {
+      @include span-columns(12);
+      @include omega;
+      margin-bottom: 20px;
+      font-size: 1.05em;
+
+      &:nth-child(3) {
+        @include reset-display;
+      }
+
+      h4 {
+        font-size: 1.2em;
+      }
+    }
+
+    .players li,
+    .data li {
+      padding: 10px 0;
+      font-size: 1em;
+      line-height: 1.5;
+      border-bottom: 1px solid $light-gray;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .players {
+      .pick-order-badge {
+        min-width: 26px;
+        height: 26px;
+        line-height: 26px;
+        font-size: 13px;
+      }
+
+      .delete {
+        padding: 0 14px;
+      }
+    }
+  }
+
+  #gather-stats {
+    // Primary calls to action (join/leave/archive) become roomy, full-width
+    // tap targets. Utility controls below (mute/admin) stay their normal
+    // compact size so they don't look oversized.
+    .button:not(.tiny) {
+      display: block;
+      float: none;
+      width: 100%;
+      box-sizing: border-box;
+      height: auto;
+      line-height: 1.3;
+      padding: 14px;
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: 1.05em;
+    }
+
+    .gather-controls {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      width: 100%;
+
+      .button {
+        display: inline-block;
+        float: none;
+        width: auto;
+        height: 35px;
+        line-height: 35px;
+        padding: 0 17.5px;
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+
+    #gather-music,
+    .admin {
+      max-width: none;
+    }
+  }
+
+  // The sitewide header/nav (banner + dropdown menu) and the extensive
+  // footer aren't mobile friendly and eat most of the screen, so they're
+  // replaced with small "back home" bars on this page only.
+  body:has(#gather) {
+    header,
+    #menu,
+    footer.footer {
+      display: none;
+    }
+
+    #content.full {
+      margin: 15px 0;
+    }
+  }
+
+  .gather-mobile-topbar {
+    display: flex;
+    align-items: center;
+    clear: both;
+    margin: 0 0 20px;
+
+    &.bottom {
+      margin: 24px 0 20px;
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: $base-border-radius;
+      background: color.adjust($light-gray, $lightness: 5%);
+      font-weight: bold;
+    }
   }
 }
 

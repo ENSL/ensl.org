@@ -8,6 +8,13 @@
   <% else %>
     <%= turbo_stream_from @gather %>
   <% end %>
+
+  <div class="gather-mobile-topbar">
+    <%= link_to root_path do %>
+      <%= fa_icon 'home' %> Home
+    <% end %>
+  </div>
+
   <h1 class="fancy">
     <span>
       <%= link_to @gather do %>
@@ -78,3 +85,9 @@
 </div>
 
 <%= render partial: 'shoutmsgs/index', locals: { object: @gather } %>
+
+<div class="gather-mobile-topbar bottom">
+  <%= link_to root_path do %>
+    <%= fa_icon 'home' %> Home
+  <% end %>
+</div>
