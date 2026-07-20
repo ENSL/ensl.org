@@ -8,6 +8,8 @@ references:
       BUNDLE_RETRY: '3'
       BUNDLE_PATH: vendor/bundle
       BUNDLER_VERSION: '4.0.6'
+      DUCKDB_VERSION: '1.5.4'
+      LD_LIBRARY_PATH: /opt/duckdb/lib:/usr/local/lib
       RACK_ENV: test
       RAILS_ENV: test
       MYSQL_HOST: '127.0.0.1'
@@ -51,10 +53,30 @@ jobs:
               libmariadb-dev \
               libmariadb-dev-compat \
               libmagickwand-dev \
+              curl \
+              unzip \
               imagemagick
+            DUCKDB_ARCH=''
+            case "$(uname -m)" in
+              x86_64|amd64) DUCKDB_ARCH=amd64 ;;
+              aarch64|arm64) DUCKDB_ARCH=arm64 ;;
+              *) echo "Unsupported architecture for DuckDB artifacts: $(uname -m)"; exit 1 ;;
+            esac
+            curl -fsSL "https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-${DUCKDB_ARCH}.zip" \
+              -o /tmp/libduckdb.zip
+            unzip -o /tmp/libduckdb.zip -d /tmp/libduckdb
+            sudo mkdir -p /opt/duckdb/include /opt/duckdb/lib
+            sudo cp /tmp/libduckdb/duckdb.h /opt/duckdb/include/duckdb.h
+            sudo cp /tmp/libduckdb/libduckdb.so /opt/duckdb/lib/libduckdb.so
+            sudo ln -sf /opt/duckdb/lib/libduckdb.so /usr/local/lib/libduckdb.so
+            sudo ldconfig
+            rm -rf /tmp/libduckdb /tmp/libduckdb.zip
       - run:
           name: Install Bundler
           command: gem install bundler -v "$BUNDLER_VERSION"
+      - run:
+          name: Configure native gem builds
+          command: bundle config set build.duckdb '--with-duckdb-include=/opt/duckdb/include --with-duckdb-lib=/opt/duckdb/lib'
       - restore_cache:
           keys:
             - ensl-bundle-v4-{{ arch }}-{{ checksum "Gemfile.lock" }}
