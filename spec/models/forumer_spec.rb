@@ -21,7 +21,9 @@ require 'rails_helper'
 
 describe Forumer do
   describe 'create' do
-    let(:forumer) { build :forumer }
+    let(:forum) { create :forum }
+    let(:group) { create :group }
+    let(:forumer) { build :forumer, forum: forum, group: group }
 
     it 'creates a new forumer' do
       expect(forumer.valid?).to eq(true)
@@ -105,7 +107,7 @@ describe Forumer do
     end
 
     it 'validates access is in range 0..2' do
-      forumer = build(:forumer, access: -1)
+      forumer = build(:forumer, forum: forum, group: group, access: -1)
       expect(forumer).not_to be_valid
 
       forumer.access = 3

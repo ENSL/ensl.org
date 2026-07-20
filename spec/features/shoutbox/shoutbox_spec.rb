@@ -59,7 +59,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     expect(Shoutmsg.count).to eq(before_count)
     expect(page).to have_no_content(invalid_shout, wait: 2)
 
-    fill_in 'shoutbox_text', with: valid_shout
+    safe_click { find_field('shoutbox_text').set(valid_shout) }
     click_button 'Shout!'
 
     within('#shoutbox') do

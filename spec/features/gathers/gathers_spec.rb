@@ -33,10 +33,12 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     Capybara.using_session('user_0') do
       # With 12 concurrent sessions, this client can observe either the live
       # voting UI or the immediate transition to the picking phase.
-      vote_phase_visible = safe_has_selector?('body', text: /Vote Captains/i, wait: 5)
-      next if vote_phase_visible
+      with_gather_session_recovery(users[0], gather) do
+        vote_phase_visible = safe_has_selector?('body', text: /Vote Captains/i, wait: 5)
+        next if vote_phase_visible
 
-      safe_expect_text('Captains are picking the teams', wait: 5)
+        safe_expect_text('Captains are picking the teams', wait: 5)
+      end
     end
 
     # Track voting duration to ensure it lasts at least the configured timeout.
@@ -64,15 +66,17 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     # Wait for voting phase to finish. In heavily concurrent headless runs,
     # background tab timers can lag, so do one explicit refresh fallback.
     Capybara.using_session('user_0') do
-      picking_visible = safe_has_selector?(
-        'body',
-        text: /Captains are picking the teams/i,
-        wait: gather.voting_timeout + 5
-      )
+      with_gather_session_recovery(users[0], gather) do
+        picking_visible = safe_has_selector?(
+          'body',
+          text: /Captains are picking the teams/i,
+          wait: gather.voting_timeout + 5
+        )
 
-      unless picking_visible
-        visit_gather_with_retry(gather)
-        safe_expect_text('Captains are picking the teams', wait: 8)
+        unless picking_visible
+          visit_gather_with_retry(gather)
+          safe_expect_text('Captains are picking the teams', wait: 8)
+        end
       end
     end
 
@@ -177,7 +181,9 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
     # Should say "Gather finished" after last pick to anyone
     Capybara.using_session('user_0') do
-      safe_expect_text('Gather finished', wait: 5)
+      with_gather_session_recovery(users[0], gather) do
+        safe_expect_text('Gather finished', wait: 5)
+      end
     end
   end
 end

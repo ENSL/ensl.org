@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :profile do
-    web 'ensl.org'
+    web { 'ensl.org' }
   end
 end

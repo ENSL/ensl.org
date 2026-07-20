@@ -8,11 +8,11 @@ FactoryBot.define do
     sequence(:port) { |n| (1000 + n).to_s }
 
     trait :active do
-      active true
+      active { true }
     end
 
     trait :inactive do
-      active false
+      active { false }
     end
   end
 end

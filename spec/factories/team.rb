@@ -5,10 +5,10 @@ FactoryBot.define do
     sequence(:name) { |n| "Team #{n}-#{Time.now.to_i}" }
     sequence(:tag) { |n| "[T#{n}]" }
 
-    irc '#team'
-    web 'http://team.com'
-    country 'EU'
-    comment 'We are a team'
+    irc { '#team' }
+    web { 'http://team.com' }
+    country { 'EU' }
+    comment { 'We are a team' }
 
     trait :with_leader do
       association :founder, factory: :user

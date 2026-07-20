@@ -200,13 +200,15 @@ module Features
       Capybara.using_session(session_name) do
         gather_page = gather_arg || gather
 
-        # Reuse the stable session sign-in path used across feature specs.
-        # The lower-level cookie shortcut is faster but proved brittle with
-        # many concurrent Playwright sessions.
-        sign_in_via_session(user)
+        with_playwright_page_crash_retry do
+          # Reuse the stable session sign-in path used across feature specs.
+          # The lower-level cookie shortcut is faster but proved brittle with
+          # many concurrent Playwright sessions.
+          sign_in_via_session(user)
 
-        # Visit the gather page with authenticated session
-        visit_gather_with_retry(gather_page)
+          # Visit the gather page with authenticated session
+          visit_gather_with_retry(gather_page)
+        end
 
         if page.has_button?('Click to join gather!', wait: 5)
           safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
@@ -234,7 +236,51 @@ module Features
     # Keep gather navigation on Capybara's visit path so Playwright driver
     # state remains consistent across sessions.
     def visit_gather_with_retry(gather_page)
-      visit gather_path(gather_page)
+      attempts = 0
+
+      begin
+        visit gather_path(gather_page)
+      rescue Playwright::Error => e
+        attempts += 1
+        raise unless playwright_page_crash?(e) && attempts <= 2
+
+        sleep(0.1)
+        retry
+      end
+    end
+
+    def with_playwright_page_crash_retry
+      attempts = 0
+
+      begin
+        yield
+      rescue Playwright::Error => e
+        attempts += 1
+        raise unless playwright_page_crash?(e) && attempts <= 2
+
+        page.driver.reset!
+        retry
+      end
+    end
+
+    def with_gather_session_recovery(user, gather_page)
+      attempts = 0
+
+      begin
+        yield
+      rescue Playwright::Error => e
+        attempts += 1
+        raise unless playwright_page_crash?(e) && attempts <= 2
+
+        page.driver.reset!
+        sign_in_via_session(user)
+        visit_gather_with_retry(gather_page)
+        retry
+      end
+    end
+
+    def playwright_page_crash?(error)
+      error.message.match?(/Page crashed|Target crashed/i)
     end
   end
 end

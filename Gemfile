@@ -8,7 +8,7 @@ ruby '3.4.8'
 
 # Rails core
 gem 'msgpack', '>= 1.7.0'
-gem 'rails', '~> 8.1.2'
+gem 'rails', '~> 8.1.3'
 gem 'rake'
 
 # Dotenv
@@ -237,7 +237,7 @@ group :development, :test do
   gem 'rails_best_practices'
 
   # Used both in development and test for generating realistic data
-  gem 'factory_bot_rails', '4.10.0'
+  gem 'factory_bot_rails'
 
   # gem 'spring'
   # gem 'ruby-debug-ide'

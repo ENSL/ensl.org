@@ -34,47 +34,47 @@ RSpec.describe Bracket, type: :model do
 
     describe 'name' do
       it 'is required' do
-        bracket = build(:bracket, name: nil)
+        bracket = build(:bracket, contest: contest, name: nil)
         expect(bracket).not_to be_valid
         expect(bracket.errors[:name]).not_to be_empty
       end
 
       it 'must not be blank' do
-        bracket = build(:bracket, name: '')
+        bracket = build(:bracket, contest: contest, name: '')
         expect(bracket).not_to be_valid
       end
 
       it 'is valid with a name' do
-        bracket = build(:bracket, name: 'Tournament')
+        bracket = build(:bracket, contest: contest, name: 'Tournament')
         expect(bracket).to be_valid
       end
     end
 
     describe 'slots' do
       it 'is required' do
-        bracket = build(:bracket, slots: nil)
+        bracket = build(:bracket, contest: contest, slots: nil)
         expect(bracket).not_to be_valid
         expect(bracket.errors[:slots]).to include("can't be blank")
       end
 
       it 'must be an integer' do
-        bracket = build(:bracket, slots: 2.5)
+        bracket = build(:bracket, contest: contest, slots: 2.5)
         expect(bracket).not_to be_valid
       end
 
       it 'must be greater than 0' do
-        bracket = build(:bracket, slots: 0)
+        bracket = build(:bracket, contest: contest, slots: 0)
         expect(bracket).not_to be_valid
         expect(bracket.errors[:slots]).to include('must be greater than 0')
       end
 
       it 'rejects negative slots' do
-        bracket = build(:bracket, slots: -1)
+        bracket = build(:bracket, contest: contest, slots: -1)
         expect(bracket).not_to be_valid
       end
 
       it 'is valid with a positive integer' do
-        bracket = build(:bracket, slots: 16)
+        bracket = build(:bracket, contest: contest, slots: 16)
         expect(bracket).to be_valid
       end
     end

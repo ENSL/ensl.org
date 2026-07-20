@@ -6,10 +6,10 @@ FactoryBot.define do
     sequence(:email)    { |_n| "player#{SecureRandom.hex(8)}@ensl.org" }
     sequence(:steamid)  { |n| "0:1:#{Time.now.to_i * 1000 + n + SecureRandom.random_bytes(4).unpack1('N')}" }
 
-    firstname 'ENSL'
-    lastname 'Player'
-    country 'EU'
-    raw_password 'PasswordABC123'
+    firstname { 'ENSL' }
+    lastname { 'Player' }
+    country { 'EU' }
+    raw_password { 'PasswordABC123' }
     # lastvisit "Sun, 15 Mar 2020 13:31:06 +0000"
 
     trait :admin do
@@ -78,7 +78,7 @@ FactoryBot.define do
     end
 
     trait :chris do
-      steamid '0:1:58097444'
+      steamid { '0:1:58097444' }
     end
 
     factory :user_with_team do
