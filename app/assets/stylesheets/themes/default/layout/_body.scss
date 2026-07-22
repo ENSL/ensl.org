@@ -36,16 +36,13 @@ body#tinymce {
   }
 }
 
-.wrapper {
-  @include outer-container;
-
-  &.body {
-    z-index: 10;
-  }
-}
+/*
+  Grid: `.wrapper` centering and the #content 12-column split (#main/#sidebar)
+  are now handled by Tailwind utility classes directly in the views
+  (layouts/application.html.erb, application/_header.html.erb, etc.)
+*/
 
 #content {
-  @include span-columns(12);
   box-shadow: $content-shadow;
   margin-top: -35px;
   padding: 10px $container-padding $container-padding $container-padding;
@@ -63,18 +60,8 @@ body#tinymce {
   }
 }
 
-#forums {
-  @include span-columns(12);
-}
-
 #main {
-  @include span-columns(9 of 12);
   padding: 20px 25px 20px 0px;
-}
-
-#sidebar {
-  @include span-columns(3 of 12);
-  @include omega();
 }
 
 /*

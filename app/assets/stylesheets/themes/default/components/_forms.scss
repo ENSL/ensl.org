@@ -59,7 +59,7 @@ form {
       max-width: 100%;
 
       select {
-        @include appearance(none);
+        appearance: none;
         font-size: $input-font-size;
         font-family: $sans-serif;
         float: left;
@@ -160,7 +160,7 @@ form {
       overflow: hidden;
 
       &:before {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         content: "";
         display: block;
         border-radius: $input-border-radius;
@@ -216,34 +216,23 @@ form {
 }
 
 form.square {
-  @include span-columns(12);
   margin: 20px 0;
 
   .horizontal {
-    @include span-columns(12);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
     margin-bottom: 20px;
-
-    &.small {
-      @include span-columns(6);
-    }
-
-    &.medium {
-      @include span-columns(9);
-    }
-
-    &.large {
-      @include span-columns(12);
-    }
 
     > .field_with_errors:first-child,
     > label,
     > .label {
-      @include span-columns(3);
+      flex: 0 0 25%;
       padding: 9px 0;
       line-height: $input-font-size;
 
       &.checkbox {
-        width: $input-height;
+        flex-basis: $input-height;
         padding: 0;
       }
     }
@@ -252,11 +241,13 @@ form.square {
     input[type=password],
     input[type=email],  
     textarea {
-      @include span-columns(9);
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .inputs {
-      @include span-columns(9);
+      flex: 1 1 auto;
+      min-width: 0;
 
       input[type=text],
       input[type=password],
@@ -266,6 +257,8 @@ form.square {
     }
 
     &.wide {
+      flex-direction: column;
+      align-items: stretch;
 
       > .field_with_errors {
         width: 100%;
@@ -283,8 +276,8 @@ form.square {
   }
 
   .controls {
-    @include span-columns(9);
-    @include shift(3);
+    width: 75%;
+    margin-left: 25%;
     font-weight: 400;
 
     &.inline {
@@ -321,24 +314,3 @@ form.dark {
   }
 }
 
-form.search {
-  margin-bottom: 10px;
-
-  .query {
-    @include span-columns(7 of 9);
-
-    input {
-      width: 100%;
-    }
-  }
-
-  .controls {
-    @include span-columns(2 of 9);
-    @include shift(0);
-    @include omega;
-
-    input {
-      width: 100%;
-    }
-  }
-}

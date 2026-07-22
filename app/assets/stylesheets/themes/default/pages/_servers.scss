@@ -3,11 +3,9 @@
 */
 
 #servers {
-  @include span-columns(12);
   margin-bottom: 20px;
 
   div.server {
-    @include span-columns(12);
     margin-bottom: 20px;
     padding-bottom: 20px;
     border-bottom: 3px solid $medium-gray;
@@ -93,18 +91,19 @@
 form.server {
 
   .inputs {
-    @include span-columns(12);
+    display: flex;
+    gap: 10px;
 
     input {
       max-width: 100%;
     }
 
     .ip {
-      @include span-columns(9);
+      flex: 1 1 auto;
     }
 
     .port {
-      @include span-columns(3);
+      flex: 0 0 auto;
     }
   }
 }

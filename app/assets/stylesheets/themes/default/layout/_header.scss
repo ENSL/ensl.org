@@ -7,8 +7,6 @@ header .banner {
   height: 180px;
 
   #authentication {
-    @include span-columns(6 of 12);
-    @include shift(6);
     padding: 30px 0;
     padding-top: 50px;
     color: white;
@@ -50,12 +48,8 @@ header .banner {
       }
     }
 
-    .fields { 
-      @include span-columns(12);
-
+    .fields {
       .header-icons {
-        @include span-columns(3 of 12);
-
         img {
           padding-top: 0px;
           padding-right: 5px;
@@ -86,7 +80,6 @@ header .banner {
       }
 
       input {
-        @include span-columns(4 of 12);
         margin-bottom: 10px;
       }
     }
@@ -96,12 +89,10 @@ header .banner {
       text-align: right;
 
       input {
-        @include span-columns(12);
         margin-bottom: 10px;
       }
 
       a {
-        @include span-columns(12);
         text-align: left;
       }
     }
@@ -145,24 +136,20 @@ header .banner {
     }
 
     .buttons {
-      @include span-columns(12 of 12);
+      display: flex;
+      justify-content: space-between;
       font-family: $header-font-family;
       text-align: right;
       text-transform: uppercase;
       font-size: 12px;
 
       .login {
-        @include span-columns(5 of 12);
-        @include shift(1.8);
         display: flex;
         flex-direction: column;
         align-items: flex-end;
       }
 
       .register {
-        @include span-columns(4 of 12);
-        @include shift(0.1);
-
         .password-reset {
           float: right;
         }
@@ -210,8 +197,6 @@ header .banner {
   &.authenticated {
 
     #authentication {
-      @include span-columns(3 of 12);
-      @include shift(9);
       padding: 30px 0;
     }
   }

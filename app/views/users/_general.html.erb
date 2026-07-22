@@ -1,4 +1,5 @@
-<div class="group">
+<div class="flex gap-x-5">
+  <div class="group">
   <h4>General information</h4>
   <% profile = user.profile %>
   <% groups = user.groups %>
@@ -69,9 +70,9 @@
   <% if cuser && Message.new.can_create?(cuser) && user != cuser %>
     <%= link_to "Send PM", { controller: "messages", action: "new", id: "User", id2: user }, { class: 'button tiny' } %>
   <% end %>
-</div>
+  </div>
 
-<div class="group">
+  <div class="group">
   <h4>Statistics</h4>
 
   <dl>
@@ -105,4 +106,5 @@
       <% end %>
     <% end %>
   </dl>
+  </div>
 </div>

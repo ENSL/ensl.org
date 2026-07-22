@@ -6,7 +6,6 @@
 
   .actions,
   .files-list {
-    @include span-columns(12);
     margin: 20px 0;
   }
 
@@ -28,7 +27,6 @@
 #files {
 
   .file {
-    @include span-columns(12);
     padding-top: 20px;
     margin-bottom: 20px;
     position: relative;
@@ -50,7 +48,6 @@
   }
 
   .controls {
-    @include span-columns(12);
     margin-top: 20px;
   }
 }
@@ -62,7 +59,6 @@
 #movies {
 
   .filters {
-    @include span-columns(12);
     margin-bottom: 20px;
   }
 }
@@ -70,7 +66,6 @@
 table.movie {
 
   .controls {
-    @include span-columns(12);
     margin: 20px 0;
   }
 }

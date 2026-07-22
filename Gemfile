@@ -117,9 +117,7 @@ gem 'tinymce-rails'
 gem 'twemoji-rails'
 
 # CSS
-gem 'bourbon', '~> 3.1.8' # Upgrading will cause issues
 gem 'dartsass-rails'
-gem 'neat', '~> 1.6.0' # Upgrading will cause issues
 gem 'tailwindcss-rails'
 
 # Provides il8n and respond functions

@@ -1,7 +1,7 @@
 <header data-turbo="false">
   <div class="banner <%= 'authenticated' if cuser %>">
-    <div class="wrapper">
-      <div id="authentication" class="<%= 'admin' if cuser && cuser.admin? %>">
+    <div class="mx-auto max-w-[1020px]">
+      <div id="authentication" class="ml-auto <%= cuser ? 'w-1/4' : 'w-1/2' %> <%= 'admin' if cuser && cuser.admin? %>">
         <% if cuser %>
           <%= render partial: "widgets/logged" %>
         <% else %>

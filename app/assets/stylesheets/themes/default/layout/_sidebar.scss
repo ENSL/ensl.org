@@ -1,7 +1,6 @@
 #sidebar {
 
   .widget {
-    @include span-columns(12);
     margin-bottom: $container-padding;
     font-family: $base-font-family;
     color: white;
@@ -39,7 +38,6 @@
     }
 
     .widget-content-wrapper {
-      @include span-columns(12);
       font-size: 12px;
     }
 
@@ -142,7 +140,6 @@
     }
 
     input {
-      @include span-columns(12);
       margin-bottom: 10px;
     }
   }
@@ -169,7 +166,6 @@
 
   .poll {
     .question {
-      @include span-columns(12);
       margin-bottom: 20px;
 
       h5 {

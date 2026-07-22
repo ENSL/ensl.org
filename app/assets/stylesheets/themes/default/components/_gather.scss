@@ -3,7 +3,6 @@
 */
 
 #gather {
-  @include span-columns(12);
 
   .previous a,
   .next a {
@@ -17,16 +16,12 @@
   }
 
   .previous {
-    @include span-columns(6);
-
     i {
       margin-right: 10px;
     }
   }
 
   .next {
-    @include span-columns(6);
-    @include omega;
     text-align: right;
 
     i {
@@ -49,7 +44,6 @@
   }
 
   .new-shout {
-    @include span-columns(12);
     margin: 20px 0;
 
     .shout_input {
@@ -88,7 +82,6 @@
 }
 
 form.new-shout[id^="new_shout_Gather_"] {
-  @include span-columns(12);
   float: none;
   clear: both;
   margin: 20px 0;
@@ -113,19 +106,15 @@ form.new-shout[id^="new_shout_Gather_"] {
 }
 
 #gather-info {
-  @include span-columns(12);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
   margin: 20px 0;
   border-bottom: 2px solid $medium-gray;
 
   .info {
-    @include span-columns(3);
-
     h6 {
       margin-bottom: 10px;
-    }
-
-    &:nth-child(3) {
-      @include omega;
     }
   }
 
@@ -138,7 +127,7 @@ form.new-shout[id^="new_shout_Gather_"] {
   }
 
   .hide {
-    @include span-columns(12);
+    grid-column: 1 / -1;
     padding: 20px 0;
     text-align: center;
 
@@ -154,21 +143,18 @@ form.new-shout[id^="new_shout_Gather_"] {
 }
 
 #gather-area {
-  @include span-columns(12);
 
   $column-border-width: 10px;
   $column-border-radius: 5px;
 
   .gather-columns {
-    @include span-columns(12);
-    @include row(table);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .data {
-    @include span-columns(4);
-    @include pad;
+    padding: 20px;
     border-radius: $column-border-width + $column-border-radius;
-    padding-bottom: 20px;
     position: relative;
     z-index: 100;
     background: rgba(0, 0, 0, 0.2);
@@ -178,11 +164,6 @@ form.new-shout[id^="new_shout_Gather_"] {
     h4 {
       padding-bottom: 20px;
       text-align: center;
-    }
-
-    &:nth-child(3) {
-      @include reset-display;
-      @include omega;
     }
 
     ul {
@@ -228,7 +209,6 @@ form.new-shout[id^="new_shout_Gather_"] {
 }
 
 #gather-stats {
-  @include span-columns(12);
   display: block;
   clear: both;
   padding: 20px 0;
@@ -260,7 +240,11 @@ form.new-shout[id^="new_shout_Gather_"] {
   }
 
   p {
-    @include clearfix;
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
   }
 }
 
@@ -287,15 +271,11 @@ form.new-shout[id^="new_shout_Gather_"] {
   }
 
   #gather-info {
+    grid-template-columns: 1fr;
     padding-left: 0;
 
     .info {
-      @include span-columns(12);
       margin-bottom: 20px;
-
-      &:nth-child(3) {
-        @include reset-display;
-      }
     }
   }
 
@@ -323,14 +303,8 @@ form.new-shout[id^="new_shout_Gather_"] {
     }
 
     .data {
-      @include span-columns(12);
-      @include omega;
       margin-bottom: 20px;
       font-size: 1.05em;
-
-      &:nth-child(3) {
-        @include reset-display;
-      }
 
       h4 {
         font-size: 1.2em;
@@ -470,10 +444,6 @@ table.gathers {
 /*
   Player List
 */
-
-ul.gatherers {
-  @include span-columns(12);
-}
 
 ul#gatherers {
   li.away a {

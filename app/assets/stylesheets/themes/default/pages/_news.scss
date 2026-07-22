@@ -7,7 +7,6 @@
 }
 
 div.article {
-  @include span-columns(12);
   border-bottom: 3px solid $medium-gray;
   padding-bottom: 20px;
 
@@ -16,7 +15,6 @@ div.article {
   }
 
   .content {
-    @include span-columns(12);
     margin-bottom: 40px;
 
     ul {
@@ -25,7 +23,7 @@ div.article {
   }
 
   .author {
-    @include span-columns(6);
+    width: 50%;
 
     a {
       font-weight: 400;
@@ -33,8 +31,6 @@ div.article {
   }
 
   .comments {
-    @include span-columns(6);
-    @include omega;
     text-align: right;
 
     .fa {
@@ -43,14 +39,12 @@ div.article {
   }
 
   .actions {
-    @include span-columns(12);
-    @include omega;
     margin-top: 10px;
   }
 
   &.preview {
-    @include span-columns(12);
-    @include omega;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.25);
     padding: 20px;
     margin-bottom: 20px;
@@ -60,7 +54,13 @@ div.article {
       margin-bottom: 10px;
     }
 
+    .author-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
     .author {
+      width: auto;
       color: #8f8f8f;
     }
 
@@ -77,19 +77,16 @@ div.article {
 }
 
 div.article-links {
-  @include span-columns(12);
+  display: flex;
+  justify-content: space-between;
 
   .previous {
-    @include span-columns(6);
-
     .fa {
       padding-right: 10px;
     }
   }
 
   .next {
-    @include span-columns(6);
-    @include omega;
     text-align: right;
 
     .fa {
@@ -131,7 +128,6 @@ form.article {
   }
 
   form {
-    @include span-columns(12);
     margin: 20px 0;
 
     .fields {
@@ -145,15 +141,14 @@ form.article {
 */
 
 #articles {
-  @include span-columns(12);
 
   h3 {
-    @include span-columns(12);
     margin-top: 1em;
   }
 
   .article-list {
-    @include span-columns(12);
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 10px;
 
     .new {
@@ -161,13 +156,7 @@ form.article {
       margin-right: 10px;
     }
 
-    .title {
-      @include span-columns(6);
-    }
-
     .meta {
-      @include span-columns(6);
-      @include omega;
       text-align: right;
     }
   }

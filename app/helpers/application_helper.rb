@@ -186,10 +186,12 @@ module ApplicationHelper
     classes << 'shift' unless team1_lineup.any?
 
     content_tag(:div, class: classes.join(' ')) do
-      safe_join([
-                  match_lineup_display(match, team1_lineup, 'team-1'),
-                  match_lineup_display(match, team2_lineup, 'team-2', reverse: true)
-                ])
+      content_tag(:div, class: 'lineup-teams') do
+        safe_join([
+                    match_lineup_display(match, team1_lineup, 'team-1'),
+                    match_lineup_display(match, team2_lineup, 'team-2', reverse: true)
+                  ])
+      end
     end
   end
 

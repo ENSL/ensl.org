@@ -5,7 +5,6 @@
 @use "sass:color";
 
 div#matches {
-  @include span-columns(12);
   margin: 20px 0;
 }
 
@@ -85,10 +84,6 @@ div.widget.contest {
 /*
   Standings
 */
-
-div.standings {
-  @include span-columns(12);
-}
 
 /*
   Brackets
@@ -325,10 +320,8 @@ table.brackets {
 */
 
 #contests {
-  @include span-columns(12);
 
   div.current {
-    @include span-columns(12);
     margin-bottom: 20px;
 
     table {
@@ -353,7 +346,6 @@ table.brackets {
   }
 
   div.previous {
-    @include span-columns(12);
     margin-bottom: 20px;
 
     table {

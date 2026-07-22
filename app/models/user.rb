@@ -328,7 +328,7 @@ class User < ApplicationRecord
   end
 
   def current_layout
-    profile.layout || 'default'
+    'default'
   end
 
   def joined

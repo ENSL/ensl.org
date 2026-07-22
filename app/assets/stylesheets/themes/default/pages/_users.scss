@@ -32,7 +32,6 @@
 */
 
 #user {
-  @include span-columns(12);
 
   .tabbed-contents {
     margin-bottom: 20px;
@@ -41,10 +40,6 @@
 
 #profile {
   
-  .controls {
-    @include shift(0);
-  }
-
   .tab {
 
     h4 {
@@ -60,7 +55,6 @@
 #user-profile {
 
   .photo {
-    @include span-columns(12);
     margin: 20px 0;
     text-align: center;
 
@@ -72,7 +66,6 @@
   }
 
   #user-data {
-    @include span-columns(12);
     margin-bottom: 20px;
 
     #user-movies-grid {
@@ -94,7 +87,8 @@
     }
 
     .group {
-      @include span-columns(6);
+      flex: 1 1 0;
+      min-width: 0;
 
       dd a {
         float: none;
@@ -148,7 +142,6 @@
   }
 
   form {
-    @include span-columns(12);
     margin-bottom: 20px;
 
     &.inline {
@@ -189,7 +182,6 @@
   }
 
   .message {
-    @include span-columns(12);
     margin-bottom: 20px;
 
     .subject {

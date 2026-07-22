@@ -29,14 +29,15 @@ table.polls {
 
 #poll {
   .inputs {
+    display: flex;
+    gap: 10px;
 
     .question {
-      @include span-columns(9);
+      flex: 1 1 auto;
     }
 
     .destroy {
-      @include span-columns(3);
-      @include omega;
+      flex: 0 0 auto;
 
       .checkbox {
         float: left;

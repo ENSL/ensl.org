@@ -5,13 +5,15 @@
     <%= preview_text(article, full) %>
   </div>
 
-  <div class="author">
-    <%= namelink(article.user) %> on <%= longertime article.created_at %>
-  </div>
+  <div class="author-row">
+    <div class="author">
+      <%= namelink(article.user) %> on <%= longertime article.created_at %>
+    </div>
 
-  <div class="comments">
-    <%= link_to article do %>
-      <%= fa_icon 'comments' %> Comments (<%= article.comments.count %>)
-    <% end %>
+    <div class="comments">
+      <%= link_to article do %>
+        <%= fa_icon 'comments' %> Comments (<%= article.comments.count %>)
+      <% end %>
+    </div>
   </div>
 </div>

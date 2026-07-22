@@ -3,7 +3,6 @@
 */
 
 #teams {
-  @include span-columns(12);
   
   table {
     table-layout: auto;
@@ -31,7 +30,6 @@
   }
 
   &.edit {
-    @include span-columns(12);
 
     h1 {
       margin-bottom: 1em;
@@ -50,7 +48,6 @@
 #team-profile {
 
   .logo {
-    @include span-columns(12);
     margin: 20px 0;
     text-align: center;
 
@@ -62,7 +59,6 @@
   }
 
   .controls {
-    @include span-columns(12);
     margin: 20px 0;
   }
 }

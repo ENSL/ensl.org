@@ -31,7 +31,11 @@
 div#categories {
 
   .category {
-    @include clearfix;
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
     margin: 20px 0;
   }
 
@@ -203,7 +207,6 @@ div#categories {
   }
 
   #reply {
-    @include span-columns(12);
     padding: 20px;
     margin-bottom: 20px;
     display: none;
@@ -226,10 +229,10 @@ div#categories {
 */
 
 #posts {
-  @include span-columns(12);
 
   .post {
-    @include span-columns(12);
+    display: flex;
+    gap: 20px;
     margin-bottom: 20px;
     border-radius: $base-border-radius;
     background: white;
@@ -238,7 +241,7 @@ div#categories {
     position: relative;
 
     .avatar {
-      @include span-columns(3);
+      flex: 0 0 23.5%;
 
       h5 {
         text-align: center;
@@ -247,7 +250,6 @@ div#categories {
 
       .image,
       .team {
-        @include span-columns(12);
         text-align: center;
         margin-bottom: 10px;
       }
@@ -258,12 +260,11 @@ div#categories {
     }
 
     .content {
-      @include span-columns(9);
-      @include omega;
+      flex: 1 1 auto;
+      min-width: 0;
 
       .text,
       .signature {
-        @include span-columns(12);
         padding: 20px 0;
       }
 
@@ -278,14 +279,10 @@ div#categories {
     }
 
     .header {
-      @include span-columns(12);
-
-      .time {
-        @include span-columns(6);
-      }
+      display: flex;
+      justify-content: space-between;
 
       .posts {
-        @include span-columns(6);
         text-align: right;
       }
     }
@@ -301,17 +298,18 @@ div#categories {
     }
 
     .base {
-      @include span-columns(12);
+      display: flex;
+      gap: 20px;
       padding-top: 20px;
       border-top: 1px solid $light-gray;
 
       .user {
-        @include span-columns(3);
+        flex: 0 0 23.5%;
       }
 
       .signature {
-        @include span-columns(9);
-        @include omega;
+        flex: 1 1 auto;
+        min-width: 0;
       }
     }
   }

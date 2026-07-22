@@ -6,12 +6,12 @@
       <%= render "messages" %>
       <%= render "header" %>
       <%= render "navigation" %>
-      <div class="body wrapper">
-        <div id="content" class="<%= yield :main_class %>">
-          <div id="main">
+      <div class="relative z-10 mx-auto max-w-[1020px]">
+        <div id="content" class="grid grid-cols-12 gap-x-5 <%= yield :main_class %>">
+          <div id="main" class="col-span-9">
             <%= yield %>
           </div>
-          <div id="sidebar">
+          <div id="sidebar" class="col-span-3">
             <%= yield :sidebar %>
             <% ['shoutbox', 'posts', 'poll'].each do |widget| %>
               <%= render "widgets/#{widget}" %>

@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
-# Keep legacy SCSS themes compiling with Dart Sass while migrating away from
-# Bourbon/Neat over time.
+# Compiles the legacy theme SCSS with Dart Sass. Being migrated to Tailwind
+# utility classes; Bourbon/Neat have been fully removed.
 Rails.application.config.dartsass.builds = {
   'themes/default/theme.css.scss' => 'themes/default/theme.css',
-  'themes/default/errors.css.scss' => 'themes/default/errors.css',
-  'themes/flat/theme.css.scss' => 'themes/flat/theme.css',
-  'themes/flat/errors.css.scss' => 'themes/flat/errors.css'
+  'themes/default/errors.css.scss' => 'themes/default/errors.css'
 }
-
-Rails.application.config.dartsass.build_options << '--quiet-deps'

@@ -32,18 +32,10 @@ table#matches {
 div#match {
   $title-height: 100px;
 
-  @include span-columns(12);
   border-bottom: 3px solid $medium-gray;
 
-  .contesters,
-  .details,
-  .referee,
-  .predictions,
-  .report {
-    @include span-columns(12);
-  }
-
   .contesters {
+    display: flex;
     margin-bottom: 20px;
 
     .vs {
@@ -71,19 +63,19 @@ div#match {
     }
 
     .team-1 {
-      @include span-columns(5);
+      flex: 0 0 41.6667%;
       line-height: $title-height;
       text-align: right;
     }
 
     .team-2 {
-      @include span-columns(5);
+      flex: 0 0 41.6667%;
       line-height: $title-height;
       text-align: left;
     }
 
     .versus {
-      @include span-columns(2);
+      flex: 0 0 16.6667%;
       position: relative;
       font-weight: 400;
 
@@ -143,7 +135,6 @@ div#match {
   }
 
   .lineups {
-    @include span-columns(12);
     margin: 20px 0 40px;
 
     h3 {
@@ -155,13 +146,19 @@ div#match {
       color: $gold;
     }
 
+    .lineup-teams {
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
     .team-1,
     .team-2 {
       position: relative;
       margin-bottom: 20px;
+      flex: 0 0 calc(50% - 10px);
 
       .player {
-        @include span-columns(12);
         line-height: 40px;
         margin-bottom: 10px;
       }
@@ -176,7 +173,6 @@ div#match {
     }
 
     .team-1 {
-      @include span-columns(6);
       text-align: right;
 
       .flag {
@@ -190,21 +186,13 @@ div#match {
     }
 
     .team-2 {
-      @include span-columns(6);
-      @include omega;
-
       label.checkbox {
         float: left;
         margin-right: 1em;
       }
     }
 
-    &.shift .team-2 {
-      @include shift(6);
-    }
-
     .mercenaries {
-      @include span-columns(12);
 
       input {
         margin: 0;
@@ -217,7 +205,6 @@ div#match {
   }
 
   .scoring {
-    @include span-columns(12);
     border-top: 3px solid $light-gray;
 
     h3 {
@@ -244,7 +231,6 @@ div#match {
     }
 
     .add {
-      @include span-columns(12);
       text-align: center;
 
       input {
@@ -253,8 +239,13 @@ div#match {
       }
     }
 
+    .fields {
+      display: flex;
+      gap: 20px;
+    }
+
     .team-1 {
-      @include span-columns(6);
+      flex: 1 1 0;
       text-align: right;
 
       .highlight {
@@ -263,8 +254,7 @@ div#match {
     }
 
     .team-2 {
-      @include span-columns(6);
-      @include omega;
+      flex: 1 1 0;
       text-align: left;
 
       .highlight {
@@ -297,7 +287,6 @@ div#match {
 div#map {
 
   .preview {
-    @include span-columns(12);
     text-align: center;
 
     img {

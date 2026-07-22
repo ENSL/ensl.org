@@ -3,7 +3,6 @@
 */
 
 .flash {
-  @include span-columns(12);
   margin-bottom: 20px;
   font-weight: bold;
 
@@ -45,17 +44,13 @@ div#errors,
 div.errors-block {
   @extend .flash;
   @extend .error;
-  @include span-columns(12);
   margin-bottom: 20px;
 
   strong {
-    @include span-columns(12);
     margin-bottom: 10px;
   }
 
   ul.errors {
-    @include span-columns(12);
-
     li {
       margin-bottom: 0;
 

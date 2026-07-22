@@ -23,18 +23,20 @@
     </span>
   </h1>
 
-  <div class="previous">
-    <%= link_to @gather.previous_gather, class: 'button tiny' do %>
-      <%= fa_icon 'chevron-left' %> Previous
-    <% end %>
-  </div>
-
-  <div class="next">
-    <% if @gather.next_gather %>
-      <%= link_to @gather.next_gather, class: 'button tiny' do %>
-        Next <%= fa_icon 'chevron-right' %>
+  <div class="flex justify-between">
+    <div class="previous">
+      <%= link_to @gather.previous_gather, class: 'button tiny' do %>
+        <%= fa_icon 'chevron-left' %> Previous
       <% end %>
-    <% end %>
+    </div>
+
+    <div class="next">
+      <% if @gather.next_gather %>
+        <%= link_to @gather.next_gather, class: 'button tiny' do %>
+          Next <%= fa_icon 'chevron-right' %>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 
   <% if @gather and @gather.status != Gather::STATE_FINISHED %>

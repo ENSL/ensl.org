@@ -72,13 +72,15 @@
         </div>
       <% end %>
     <% else %>
-      <div class="team-1">
-        <%= contester1.team if contester1 %>
-        <div class="highlight"><%= match.preds(1) %>%</div>
-      </div>
-      <div class="team-2">
-        <div class="highlight"><%= match.preds(2) %>%</div>
-        <%= contester2.team if contester2 %>
+      <div class="flex justify-between">
+        <div class="team-1">
+          <%= contester1.team if contester1 %>
+          <div class="highlight"><%= match.preds(1) %>%</div>
+        </div>
+        <div class="team-2">
+          <div class="highlight"><%= match.preds(2) %>%</div>
+          <%= contester2.team if contester2 %>
+        </div>
       </div>
     <% end %>
 

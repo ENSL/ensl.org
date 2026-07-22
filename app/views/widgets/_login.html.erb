@@ -8,8 +8,8 @@
                  passkey_auth_authenticate_url_value: passkey_authenticate_sessions_path,
                  passkey_auth_disable_autofill_value: Rails.env.test?
                } }) do %>
-  <div class="fields">
-    <div class="header-icons">
+  <div class="fields flex items-center gap-x-3">
+    <div class="header-icons shrink-0">
       <%= link_to '#', class: 'steam-login', rel: 'noopener', data: { submit_form: true, form_id: 'steam-auth-form' } do %>
         <%= image_tag '/images/icons/steam_login.png' %>
       <% end %>
@@ -18,13 +18,14 @@
       <% end %>
     </div>
 
-    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username webauthn" %>
-    <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password" %>
+    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username webauthn", class: "flex-1 min-w-0" %>
+    <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password", class: "flex-1 min-w-0" %>
     <% if otp_pending %>
       <%= text_field "login_otp", "code",
                      placeholder: t('sessions.form.otp_code'),
                      autocomplete: 'one-time-code',
-                     inputmode: 'numeric' %>
+                     inputmode: 'numeric',
+                     class: "flex-1 min-w-0" %>
     <% end %>
     <div class="passkey-status" data-passkey-auth-target="status"></div>
   </div>
