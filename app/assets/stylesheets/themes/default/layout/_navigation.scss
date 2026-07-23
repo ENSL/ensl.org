@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 $navigation-height: 50px;
 
@@ -109,12 +110,12 @@ ul.navigation {
       }
       
       &:before {
-        background-image: unquote("linear-gradient(to bottom, #{#54585b}, #{#15181a})");
+        background-image: linear-gradient(to bottom, #{#54585b}, #{#15181a});
         left: 0;
       }
 
       &:after {
-        background-image: unquote("linear-gradient(to bottom, #{#54585b}, #{#15181a})");
+        background-image: linear-gradient(to bottom, #{#54585b}, #{#15181a});
         right: -1px;
       }
 
@@ -125,7 +126,7 @@ ul.navigation {
 
         &:before,
         &:after {
-          background-image: unquote("linear-gradient(to bottom, #{#266d98}, #{#15181a})");
+          background-image: linear-gradient(to bottom, #{#266d98}, #{#15181a});
           z-index: 100;
         }
       }

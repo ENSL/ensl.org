@@ -3,6 +3,7 @@
 */
 
 @use "sass:math";
+@use "../variables" as *;
 
 table#matches {
   width: 100%;

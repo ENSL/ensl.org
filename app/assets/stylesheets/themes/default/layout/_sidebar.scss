@@ -1,3 +1,5 @@
+@use "../variables" as *;
+
 #sidebar {
 
   .widget {
@@ -79,7 +81,7 @@
 
     .button,
     .controls input {
-      background-image: unquote("linear-gradient(to bottom, #{#585858}, #{#585858})");
+      background-image: linear-gradient(to bottom, #{#585858}, #{#585858});
       font-family: $header-font-family;
       font-weight: normal;
       color: white;

@@ -1,3 +1,5 @@
+@use "themes/default/variables" as *;
+
 // Accessibility utilities — generic, reusable across the app
 .visually-hidden {
   position: absolute !important;

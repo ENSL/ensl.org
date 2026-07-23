@@ -4,6 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "../variables" as *;
 
 table {
   border-collapse: collapse;

@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 .tabbed {
   $tabs-border-width: 1px;
@@ -22,7 +23,7 @@
       display: block;
 
       a {
-        background-image: unquote("linear-gradient(to bottom, #{$blue}, #{$dark-blue})");
+        background-image: linear-gradient(to bottom, #{$blue}, #{$dark-blue});
         background-color: $blue;
         border: $tabs-border-width solid $tabs-border-colour;
         border-right: 0;
@@ -51,7 +52,7 @@
         z-index: 100;
 
         a {
-          background-image: unquote("linear-gradient(to bottom, #{$light-blue}, #{$blue})");
+          background-image: linear-gradient(to bottom, #{$light-blue}, #{$blue});
           background-color: $light-blue;
         }
       }

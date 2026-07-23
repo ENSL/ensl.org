@@ -2,61 +2,59 @@
   Libraries & Configuration
 */
 
-@import "variables";
-
-@import "general";
+@use "general";
 
 /*
   Mixins
 */
 
-@import "mixins/buttons";
-@import "mixins/flashes";
+@use "mixins/buttons";
+@use "mixins/flashes" as mixin-flashes;
 
 /*
   Layout
 */
 
-@import "layout/hacks";
-@import "layout/body";
-@import "layout/typography";
-@import "layout/header";
-@import "layout/navigation";
-@import "layout/sidebar";
-@import "layout/footer";
-@import "layout/helpers";
+@use "layout/hacks";
+@use "layout/body";
+@use "layout/typography";
+@use "layout/header";
+@use "layout/navigation";
+@use "layout/sidebar";
+@use "layout/footer";
+@use "layout/helpers";
 
 /*
   Components
 */
 
-@import "components/lists";
-@import "components/tables";
-@import "components/forms";
-@import "components/flashes";
-@import "components/comments";
-@import "components/gather";
-@import "components/breadcrumbs";
-@import "components/pagination";
-@import "components/tabs";
-@import "components/shoutbox";
-@import "components/flags";
+@use "components/lists";
+@use "components/tables";
+@use "components/forms";
+@use "components/flashes";
+@use "components/comments";
+@use "components/gather";
+@use "components/breadcrumbs";
+@use "components/pagination";
+@use "components/tabs";
+@use "components/shoutbox";
+@use "components/flags";
 
 /*
   Pages
 */
 
-@import "pages/news";
-@import "pages/categories";
-@import "pages/contests";
-@import "pages/forums";
-@import "pages/teams";
-@import "pages/users";
-@import "pages/matches";
-@import "pages/files";
-@import "pages/bans";
-@import "pages/polls";
-@import "pages/issues";
-@import "pages/servers";
-@import "pages/groups";
-@import "pages/custom_urls";
+@use "pages/news";
+@use "pages/categories";
+@use "pages/contests";
+@use "pages/forums";
+@use "pages/teams";
+@use "pages/users";
+@use "pages/matches";
+@use "pages/files";
+@use "pages/bans";
+@use "pages/polls";
+@use "pages/issues";
+@use "pages/servers";
+@use "pages/groups";
+@use "pages/custom_urls";

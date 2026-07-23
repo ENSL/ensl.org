@@ -2,14 +2,14 @@
   Libraries & Configuration
 */
 
-@import "variables";
+@use "variables" as *;
 
 /*
   Layout
 */
 
-@import "layout/body";
-@import "layout/typography";
+@use "layout/body";
+@use "layout/typography";
 
 /*
   Error Page
@@ -21,7 +21,7 @@ body {
 }
 
 html {
-  background-image: unquote("linear-gradient(to bottom, #{$dark-blue}, #{$deep-blue})");
+  background-image: linear-gradient(to bottom, #{$dark-blue}, #{$deep-blue});
 }
 
 body {

@@ -12,6 +12,8 @@ $theme-path: "themes/#{$theme-name}";
 */
 
 $max-width: 1020px;
+$container-padding: 2em;
+$input-height: 35px;
 
 /*
   Typography
@@ -19,7 +21,6 @@ $max-width: 1020px;
 
 $open-sans: 'Open Sans', sans-serif;
 $russo-one: 'Russo One', sans-serif;
-$fontawesome: 'FontAwesome';
 $sans-serif: $open-sans;
 
 $base-font-family: $open-sans;

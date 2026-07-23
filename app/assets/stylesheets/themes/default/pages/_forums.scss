@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 #forums {
   position: relative;
@@ -53,7 +54,7 @@ div#categories {
     border: 0;
 
     thead th {
-      background-image: unquote("linear-gradient(to bottom, #{#15181b}, #{#0d1011})");
+      background-image: linear-gradient(to bottom, #{#15181b}, #{#0d1011});
       padding-top: 0.75em;
       padding-bottom: 0.75em;
       font-family: $header-font-family;
@@ -141,12 +142,12 @@ div#categories {
     color: $red;
   }
 
-  thead th {
-    background-image: unquote("linear-gradient(to bottom, #{#15181b}, #{#0d1011})");
-    padding-top: 0.75em;
-    padding-bottom: 0.75em;
-    font-family: $header-font-family;
-    font-size: 16px;
+    thead th {
+      background-image: linear-gradient(to bottom, #{#15181b}, #{#0d1011});
+      padding-top: 0.75em;
+      padding-bottom: 0.75em;
+      font-family: $header-font-family;
+      font-size: 16px;
     color: white;
     text-transform: uppercase;
     font-weight:normal;

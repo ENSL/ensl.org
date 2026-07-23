@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 #comments-thread {
   h3 {

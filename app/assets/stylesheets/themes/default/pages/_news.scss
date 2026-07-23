@@ -2,6 +2,10 @@
   Articles
 */
 
+@use "../variables" as *;
+@use "../layout/body";
+@use "../mixins/flashes";
+
 #news {
   margin-left: -20px;
 }

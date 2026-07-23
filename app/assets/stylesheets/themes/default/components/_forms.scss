@@ -4,8 +4,9 @@
 
 @use "sass:color";
 @use "sass:math";
-
-$input-height: 35px;
+@use "../variables" as *;
+@use "general" as *;
+@use "../mixins/buttons" as *;
 
 form {
 

@@ -2,7 +2,7 @@
   Main Containers
 */
 
-$container-padding: 2em;
+@use "../variables" as *;
 
 html {
   background: {

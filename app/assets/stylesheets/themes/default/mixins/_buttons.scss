@@ -4,11 +4,12 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "../variables" as *;
 
 @mixin button($background: $button-primary, $text: $button-text) {
   $button-height: 35px;
 
-  background-image: unquote("linear-gradient(to bottom, #{$blue}, #{$dark-blue})");
+  background-image: linear-gradient(to bottom, #{$blue}, #{$dark-blue});
   border-radius: $base-border-radius;
   font-family: $header-font-family;
   font-size: 14px;
@@ -34,7 +35,7 @@ a.button,
   @include button;
 
   &.tiny {
-    background-image: unquote("linear-gradient(to bottom, #{$light-blue}, #{$blue})");
+    background-image: linear-gradient(to bottom, #{$light-blue}, #{$blue});
     background-color: transparent;
     border-radius: 14px;
     line-height: 25px;

@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 div#matches {
   margin: 20px 0;
@@ -139,7 +140,7 @@ table.brackets {
     border-right: 1px solid $light-blue;
     border-bottom: 1px solid $light-blue;
     border-left: 1px solid $light-blue;
-    background-image: unquote("linear-gradient(to bottom, #{$light-blue}, #{$blue})");
+    background-image: linear-gradient(to bottom, #{$light-blue}, #{$blue});
     background-color: $light-blue;
     color: white;
     font-weight: bold;
@@ -154,7 +155,7 @@ table.brackets {
     }
 
     &.win1 {
-      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#1b5e20, $lightness: 15%)}, #{#1b5e20})");
+      background-image: linear-gradient(to bottom, #{color.adjust(#1b5e20, $lightness: 15%)}, #{#1b5e20});
       background-color: #1b5e20;
       color: white;
 
@@ -165,7 +166,7 @@ table.brackets {
     }
 
     &.win2 {
-      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#b71c1c, $lightness: 15%)}, #{#b71c1c})");
+      background-image: linear-gradient(to bottom, #{color.adjust(#b71c1c, $lightness: 15%)}, #{#b71c1c});
       background-color: #b71c1c;
       color: white;
 
@@ -176,7 +177,7 @@ table.brackets {
     }
 
     &.tie {
-      background-image: unquote("linear-gradient(to bottom, #{color.adjust(#f57f17, $lightness: 15%)}, #{#f57f17})");
+      background-image: linear-gradient(to bottom, #{color.adjust(#f57f17, $lightness: 15%)}, #{#f57f17});
       background-color: #f57f17;
       color: white;
 

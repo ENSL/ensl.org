@@ -2,6 +2,9 @@
   Flash Messages
 */
 
+@use "../variables" as *;
+@use "../mixins/flashes" as *;
+
 .flash {
   margin-bottom: 20px;
   font-weight: bold;

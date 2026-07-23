@@ -3,6 +3,7 @@
 */
 
 @use "sass:color";
+@use "../variables" as *;
 
 @mixin flash($background: $flash-notice, $text: $flash-text) {
   $flash-height: 35px;
@@ -16,7 +17,7 @@
   &:before {    
     box-sizing: border-box;
     border-radius: $base-border-radius 0 0 $base-border-radius;
-    font-family: FontAwesome;
+    font-family: "Font Awesome 6 Free";
     font-style: normal;
     font-weight: normal;
     content: "\f05a";
