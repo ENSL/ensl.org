@@ -7,13 +7,13 @@
     <table class="categories striped">
       <tr>
         <th class="name">Name</th>
-        <th class="actions"></th>
+        <th class="actions w-1/5 text-right"></th>
       </tr>
       <% @categories.each do |category| %>
         <% if category.domain == key %>
           <tr>
             <td><%=h category.name %></td>
-            <td class="actions">
+            <td class="actions w-1/5 text-right">
               <%= link_to fa_icon('chevron-up'), up_category_path(category), method: :patch %>
               <%= link_to fa_icon('chevron-down'), down_category_path(category), method: :patch %>
               <%= link_to fa_icon('pencil'), edit_category_path(category) %>

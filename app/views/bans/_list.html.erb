@@ -1,11 +1,11 @@
 <table class="bans striped">
   <tr>
     <th class="user">User</th>
-    <th class="type">Type</th>
-    <th class="expiry">Expiry</th>
+    <th class="type w-[20%]">Type</th>
+    <th class="expiry w-[20%]">Expiry</th>
     <th class="reason">Reason</th>
     <% if cuser and cuser.allowed_to_ban? %>
-      <th class="actions"></th>
+      <th class="actions w-[10%] text-right"></th>
     <% end %>
   </tr>
 
@@ -22,7 +22,7 @@
       <td><%= shorttime ban.expiry %></td>
       <td><%= shorten ban.reason, 30 %></td>
       <% if cuser and cuser.allowed_to_ban? %>
-        <td class="actions">
+        <td class="actions w-[10%] text-right">
           <% if ban.can_update? cuser %>
             <%= link_to fa_icon('pencil'), edit_ban_path(ban) %>
           <% end %>

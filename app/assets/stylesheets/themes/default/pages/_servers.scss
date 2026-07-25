@@ -29,24 +29,6 @@
 
 .servers-index {
   table.servers-table {
-    table-layout: auto;
-
-    th.players-col,
-    td.players-col {
-      text-align: right;
-      white-space: nowrap;
-      width: 7rem;
-    }
-
-    th.actions-col,
-    td.actions {
-      white-space: nowrap;
-      width: 10.5rem;
-    }
-
-    td.actions {
-      text-align: right;
-    }
 
     .server-connect {
       display: inline-block;
@@ -62,17 +44,8 @@
       min-width: 0;
     }
 
-    .server-main strong {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
     .cell-subtle {
       margin-left: 1.55rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .server-detail-meta {

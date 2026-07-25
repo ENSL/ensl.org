@@ -2,12 +2,12 @@
 
 <table class="polls striped">
   <tr>
-    <th class="question">Question</th>
-    <th class="date">End date</th>
-    <th class="votes">Votes</th>
-    <th class="user">User</th>
+    <th class="question w-[30%]">Question</th>
+    <th class="date w-[30%]">End date</th>
+    <th class="votes w-[15%]">Votes</th>
+    <th class="user w-[15%]">User</th>
     <% if cuser and cuser.admin? %>
-      <th class="actions"></th>
+      <th class="actions w-[10%] text-right"></th>
     <% end %>
   </tr>
 
@@ -18,7 +18,7 @@
       <td><%=h poll.votes %></td>
       <td><%=h poll.user %></td>
       <% if cuser and cuser.admin? %>
-        <td class="actions">
+        <td class="actions w-[10%] text-right">
           <%= link_to fa_icon('pencil'), edit_poll_path(poll) %>
           <a href="#" onclick="if(!confirm('Are you sure?')) return false;" data-submit-form="true" data-form-id="delete_poll_<%= poll.id %>"><%= fa_icon('times') %></a>
           <%= form_tag poll_path(poll), method: :post, id: "delete_poll_#{poll.id}", style: 'display:none;' do %>

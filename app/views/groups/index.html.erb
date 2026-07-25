@@ -2,10 +2,10 @@
 
 <table class="groups striped">
   <tr>
-    <th class="name">Name</th>
-    <th class="created">Created</th>
-    <th class="founder">Founder</th>
-    <th class="actions"></th>
+    <th class="name w-1/2">Name</th>
+    <th class="created w-1/5">Created</th>
+    <th class="founder w-1/5">Founder</th>
+    <th class="actions w-[10%] text-right"></th>
   </tr>
 
   <% @groups.each do |group| %>
@@ -15,7 +15,7 @@
       <td><%= link_to (h group.name), group %></td>
       <td><%= h created_at.strftime("%d %B %y") %></td>
       <td><%= link_to (h founder.username), founder %></td>
-      <td class="actions">
+      <td class="actions w-[10%] text-right">
         <%= link_to fa_icon('pencil'), edit_group_path(group) %>
         <% if group.can_destroy? cuser %>
           <%= link_to fa_icon('times'), group, confirm: 'Are you sure?', method: :delete %>

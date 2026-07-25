@@ -5,11 +5,11 @@
 
 <p>Search for users by name or Steam ID:</p>
 
-<%= form_tag(users_path, method: 'get', class: 'square search') do %>
+<%= form_tag(users_path, method: 'get', class: 'square search flex items-start gap-x-2') do %>
   <%= hidden_field_tag :direction, params[:direction] %>
   <%= hidden_field_tag :sort, params[:sort] %>
-  <div class="fields query">
-    <%= text_field_tag :search, params[:search] %>
+  <div class="fields query flex-1">
+    <%= text_field_tag :search, params[:search], class: 'w-full' %>
   </div>
   <div class="controls">
     <%= submit_tag "Search", name: nil %>
@@ -18,15 +18,15 @@
 
 <%= will_paginate @users %>
 
-<table id="users" class="striped">
+<table id="users" class="striped table-auto">
   <tr>
-    <th class="country"></th>
-    <th class="username">Username</th>
-    <th class="name">Name</th>
-    <th class="steamid">Steam ID</th>
-    <th class="age">Age</th>
+    <th class="country w-[7%]"></th>
+    <th class="username w-[30%]">Username</th>
+    <th class="name w-[30%]">Name</th>
+    <th class="steamid w-1/5">Steam ID</th>
+    <th class="age w-[5%]">Age</th>
     <% if cuser and cuser.admin? %>
-      <th class="actions"></th>
+      <th class="actions text-right"></th>
     <% end %>
   </tr>
 
@@ -38,7 +38,7 @@
       <td><%= h user.steamid %></td>
       <td><%= user.age %></td>
       <% if cuser and cuser.admin? %>
-        <td class="actions">
+        <td class="actions text-right">
           <%= link_to edit_user_path(user) do %>
             <%= fa_icon 'pencil' %>
           <% end %>

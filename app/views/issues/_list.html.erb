@@ -1,10 +1,10 @@
 <table class="issues striped">
   <tr>
-    <th class="date">Created</th>
-    <th class="title">Title</th>
-    <th class="assinged">Assigned</th>
-    <th class="author">Author</th>
-    <th class="actions"></th>
+    <th class="date w-1/4">Created</th>
+    <th class="title w-[35%]">Title</th>
+    <th class="assigned w-[15%]">Assigned</th>
+    <th class="author w-[15%]">Author</th>
+    <th class="actions w-[10%] text-right"></th>
   </tr>
 
   <% issues.each do |issue| %>
@@ -13,7 +13,7 @@
       <td><%= namelink issue %></td>
       <td><%= namelink issue.assigned %></td>
       <td><%= namelink issue.author %></td>
-      <td class="actions">
+      <td class="actions w-[10%] text-right">
         <% if issue.can_update? cuser %>
           <%= link_to fa_icon('pencil'), edit_issue_path(issue) %>
         <% end %>

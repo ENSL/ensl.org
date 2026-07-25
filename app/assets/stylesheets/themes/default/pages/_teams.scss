@@ -3,31 +3,6 @@
 */
 
 #teams {
-  
-  table {
-    table-layout: auto;
-  }
-  
-  .country {
-    width: 7%;
-  }
-
-  .name {
-    width: 45%;
-  }
-
-  .irc {
-    width: 25%;
-  }
-
-  .members {
-    width: 10%;
-  }
-
-  .actions {
-    width: 15%;
-    text-align: right;
-  }
 
   &.edit {
 

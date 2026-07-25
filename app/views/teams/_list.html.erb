@@ -1,11 +1,11 @@
-<table class="striped">
+<table class="striped table-auto">
   <tr>
-    <th class="country"></th>
-    <th class="name">Name</th>
-    <th class="irc">IRC</th>
-    <th class="members">Members</th>
+    <th class="country w-[7%]"></th>
+    <th class="name w-[45%]">Name</th>
+    <th class="irc w-[25%]">IRC</th>
+    <th class="members w-[10%]">Members</th>
     <% if cuser and cuser.admin? %>
-      <th class="actions"></th>
+      <th class="actions w-[15%] text-right"></th>
     <% end %>
   </tr>
 
@@ -16,7 +16,7 @@
         <td><%= h team.irc if team.irc %></td>
         <td><%= h team.teamers.count %></td>
         <% if cuser and cuser.admin? %>
-          <td class="actions">
+          <td class="actions w-[15%] text-right">
             <%= link_to edit_team_path(team) do %>
               <%= fa_icon 'pencil' %>
             <% end %>

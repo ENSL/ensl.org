@@ -1,9 +1,9 @@
-<table class="striped expandable roomy servers-table">
+<table class="striped expandable roomy servers-table table-auto">
   <thead>
     <tr>
       <th>Server</th>
-      <th class="players-col">Players</th>
-      <th class="actions actions-col">Actions</th>
+      <th class="players-col text-right whitespace-nowrap w-28">Players</th>
+      <th class="actions actions-col whitespace-nowrap w-[10.5rem]">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -15,17 +15,17 @@
             <div class="server-main">
               <span class="expand-toggle" data-expand-icon><%= fa_icon('chevron-right') %></span>
               <%= fa_icon('server', class: server.online? ? 'text-green-600' : 'text-red-600') %>
-              <strong><%= h server.name %></strong>
+              <strong class="truncate"><%= h server.name %></strong>
               <% if cuser&.admin? %>
                 <span class="admin-edit" data-no-toggle>
                   <%= link_to fa_icon('pencil'), edit_server_path(server), title: 'Edit server' %>
                 </span>
               <% end %>
             </div>
-            <div class="cell-subtle"><%= h(server.dns.presence || server.addr) %> • <%= server_status_label(server) %></div>
+            <div class="cell-subtle truncate"><%= h(server.dns.presence || server.addr) %> • <%= server_status_label(server) %></div>
           </td>
-          <td class="players-col"><%= server.players || 0 %><%= server.max_players.present? ? "/#{server.max_players}" : '' %></td>
-          <td class="actions" data-no-toggle>
+          <td class="players-col text-right whitespace-nowrap w-28"><%= server.players || 0 %><%= server.max_players.present? ? "/#{server.max_players}" : '' %></td>
+          <td class="actions whitespace-nowrap w-[10.5rem] text-right" data-no-toggle>
             <%= link_to 'Connect', "steam://run/4920//connect #{server.ip} #{server.password}", class: 'button tiny server-connect' %>
           </td>
         </tr>
