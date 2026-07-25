@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rspec:
+    # Runs on the self-hosted runner registered on the app server.
+    runs-on: [self-hosted]
+    env:
+      # Force a project name distinct from whatever production/staging use,
+      # so this never attaches to (or tears down) their db/redis containers,
+      # networks, or volumes — regardless of what directory this checks out into.
+      COMPOSE_PROJECT_NAME: ensl_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build test image
+        run: docker compose --profile test build test
+
+      - name: Run test suite
+        run: |
+          mkdir -p tmp/test-results
+          docker compose --profile test run --rm test bash -c '
+            for i in $(seq 1 30); do
+              bundle exec bin/rails db:prepare && break
+              echo "Waiting for database... ($i/30)"
+              sleep 2
+            done
+            bundle exec rspec --force-color --format progress --format RspecJunitFormatter --out tmp/test-results/rspec.xml
+          '
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: RSpec Results
+          path: tmp/test-results/rspec.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+      - name: Tear down containers
+        if: always()
+        run: docker compose --profile test down -v --remove-orphans

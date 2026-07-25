@@ -202,8 +202,8 @@ group :test do
   # Flaky tests
   # gem 'rspec-flaky'
 
-  # For CircleCI
-  # gem 'rspec_junit_formatter'
+  # JUnit XML output, consumed by GitHub Actions test-reporting steps
+  gem 'rspec_junit_formatter'
 
   # Old drivers not used atm.
   # gem 'selenium'
