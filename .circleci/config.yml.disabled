@@ -1,3 +1,7 @@
+# DISABLED: renamed from config.yml so CircleCI no longer picks this up
+# (CircleCI only reads .circleci/config.yml). Kept here for reference while
+# migrating to a self-hosted Docker test run + GitHub Actions results upload.
+# To re-enable: `git mv .circleci/config.yml.disabled .circleci/config.yml`.
 version: 2.1
 
 references:
