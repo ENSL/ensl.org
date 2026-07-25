@@ -1,0 +1,12 @@
+{
+  "name": "ensl",
+  "private": true,
+  "scripts": {
+    "lint:css": "stylelint \"app/assets/stylesheets/**/*.scss\"",
+    "lint:css:fix": "stylelint \"app/assets/stylesheets/**/*.scss\" --fix"
+  },
+  "devDependencies": {
+    "stylelint": "^17.14.1",
+    "stylelint-config-standard-scss": "^17.0.0"
+  }
+}

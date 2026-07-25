@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# frozen_string_literal: true
+
+# Lints the legacy SCSS theme (app/assets/stylesheets). Config: .stylelintrc.json
+# Usage: bin/stylelint [--fix] [glob...]
+
+set -e
+cd "$(dirname "$0")/.."
+
+if [ "$#" -eq 0 ]; then
+  exec npx stylelint "app/assets/stylesheets/**/*.scss"
+else
+  exec npx stylelint "$@"
+fi
