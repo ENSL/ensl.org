@@ -5,13 +5,6 @@
 @use "general";
 
 /*
-  Mixins
-*/
-
-@use "mixins/buttons";
-@use "mixins/flashes" as mixin-flashes;
-
-/*
   Layout
 */
 
@@ -31,9 +24,9 @@
 @use "components/lists";
 @use "components/tables";
 @use "components/forms";
+@use "components/buttons";
 @use "components/flashes";
 @use "components/comments";
-@use "components/gather";
 @use "components/breadcrumbs";
 @use "components/pagination";
 @use "components/tabs";
@@ -48,6 +41,7 @@
 @use "pages/categories";
 @use "pages/contests";
 @use "pages/forums";
+@use "pages/gather";
 @use "pages/teams";
 @use "pages/users";
 @use "pages/matches";

@@ -4,7 +4,7 @@
 
 @use "../variables" as *;
 @use "../layout/body";
-@use "../mixins/flashes";
+@use "../components/flashes";
 
 #news {
   margin-left: -20px;

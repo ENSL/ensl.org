@@ -1,0 +1,22 @@
+/*
+  Buttons
+*/
+
+@use "../variables" as *;
+@use "../mixins/buttons" as *;
+
+button,
+a.button,
+.button {
+  @include button;
+
+  &.tiny {
+    background-image: linear-gradient(to bottom, #{$light-blue}, #{$blue});
+    background-color: transparent;
+    border-radius: 14px;
+    line-height: 25px;
+    height: 25px;
+    padding: 0 12px;
+    margin: 0 10px 0 0;
+  }
+}
