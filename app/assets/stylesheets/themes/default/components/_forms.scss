@@ -201,9 +201,16 @@ form {
   .controls {
     margin-bottom: 20px;
 
-    button,
+    // input[type=submit] isn't covered by the sitewide `button, a.button,
+    // .button` base style (that selector only matches real <button>/.button
+    // elements), so it needs the base look included explicitly here. Plain
+    // <button> already gets that base look for free via the sitewide rule.
     input[type="submit"] {
       @include button($button-primary);
+    }
+
+    button,
+    input[type="submit"] {
       border-radius: $input-border-radius;
       border: $input-border-width solid $button-primary;
       margin-bottom: 0;
