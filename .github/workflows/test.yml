@@ -12,8 +12,9 @@ concurrency:
 
 jobs:
   rspec:
-    # Runs on the self-hosted runner registered on the app server.
-    runs-on: [self-hosted]
+    # Runs on the self-hosted runner (containerized, Docker-outside-of-Docker)
+    # registered on the app server.
+    runs-on: [self-hosted, docker]
     env:
       # Force a project name distinct from whatever production/staging use,
       # so this never attaches to (or tears down) their db/redis containers,
