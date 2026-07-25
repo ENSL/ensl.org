@@ -45,7 +45,7 @@ body#tinymce {
 #content {
   box-shadow: $content-shadow;
   margin-top: -35px;
-  padding: 10px $container-padding $container-padding $container-padding;
+  padding: 10px $container-padding $container-padding;
   background: url("layout/body-background.png") top center repeat-y;
 
   &.full {
@@ -61,7 +61,7 @@ body#tinymce {
 }
 
 #main {
-  padding: 20px 25px 20px 0px;
+  padding: 20px 25px 20px 0;
 }
 
 /*
@@ -79,7 +79,7 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
     position: relative;
 
-    &:before {
+    &::before {
       content: "";
       display: block;
       width: 100%;

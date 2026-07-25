@@ -14,7 +14,7 @@
   position: relative;
   border-radius: $base-border-radius;
 
-  &:before {    
+  &::before {    
     box-sizing: border-box;
     border-radius: $base-border-radius 0 0 $base-border-radius;
     font-family: "Font Awesome 6 Free";

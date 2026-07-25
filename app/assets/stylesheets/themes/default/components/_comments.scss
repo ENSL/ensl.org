@@ -60,8 +60,7 @@
     position: relative;
 
     .comment-body {
-      word-break: break-word;
-      word-wrap: break-word;
+      overflow-wrap: anywhere;
     }
 
     h1 {

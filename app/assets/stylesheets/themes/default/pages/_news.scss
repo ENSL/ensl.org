@@ -49,7 +49,7 @@ div.article {
   &.preview {
     display: flex;
     flex-direction: column;
-    box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 15px 15px -10px rgb(0 0 0 / 25%);
     padding: 20px;
     margin-bottom: 20px;
     border: 0;
@@ -73,7 +73,7 @@ div.article {
     }
 
     h2 {
-      margin: 0 0 .5em 0;
+      margin: 0 0 .5em;
       font-family: $header-font-family;
       font-weight: normal;
     }

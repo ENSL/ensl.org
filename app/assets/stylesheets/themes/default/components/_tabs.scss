@@ -61,7 +61,7 @@
 
   .tabbed-contents {
     border: $tabs-border-width solid $tabs-border-colour;
-    border-radius: 0 $base-border-radius $base-border-radius $base-border-radius;
+    border-radius: 0 $base-border-radius $base-border-radius;
     background: color.adjust($light-gray, $lightness: 10%);
     box-shadow: $light-shadow;
     padding: 20px;

@@ -6,8 +6,8 @@
 @use "sass:math";
 @use "../variables" as *;
 
-@import url(https://fonts.googleapis.com/css?family=Russo+One);
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+@import "https://fonts.googleapis.com/css?family=Russo+One";
+@import "https://fonts.googleapis.com/css?family=Open+Sans";
 
 body {
   color: $base-font-color;
@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   opacity: 0.99;
   clear: both;
-  text-rendering: optimizeLegibility; // Fix the character spacing for headings
+  text-rendering: optimizelegibility; // Fix the character spacing for headings
   font-weight: normal;
 
   a {
@@ -119,7 +119,7 @@ cite {
   color: color.adjust($base-font-color, $lightness: 25%);
   font-style: italic;
 
-  &:before {
+  &::before {
     content: '\2014 \00A0';
   }
 }

@@ -9,7 +9,7 @@
     padding-top: 20px;
     position: relative;
     
-    &:before {
+    &::before {
       content: '';
       position: absolute;
       width: 265px;
@@ -20,7 +20,7 @@
     }
 
     &:first-child {
-      &:before {
+      &::before {
         display: none;
       }
     }
@@ -36,7 +36,7 @@
     }
   
     h4:first-child {
-      margin-top: 0px;
+      margin-top: 0;
     }
 
     .widget-content-wrapper {
@@ -65,7 +65,7 @@
       }
     }
 
-    input[type=text] {
+    input[type="text"] {
       background: #0e1010;
       border: 1px solid #494949;
       color: white;
@@ -90,7 +90,7 @@
       border: 0;
       line-height: 30px;
       height: 30px;
-      padding: 1px 0px 0px 5px;
+      padding: 1px 0 0 5px;
       width: 175px;
       margin-left: auto;
       margin-right: auto;

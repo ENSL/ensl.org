@@ -17,7 +17,6 @@
     th,
     td {
       overflow-wrap: anywhere;
-      word-break: break-word;
     }
   }
 }
@@ -82,7 +81,7 @@ table.movie {
     display: block;
     position: relative;
     width: 100%;
-    height: 0px;
+    height: 0;
     padding-bottom: 56%;
     padding-top: 50px;
     margin-bottom: 20px;

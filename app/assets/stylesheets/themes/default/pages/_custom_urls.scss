@@ -11,7 +11,7 @@
   }
 
   td.name {
-    input[type=text].edit-field {
+    input[type="text"].edit-field {
       width: 100%;
       box-sizing: border-box;
       margin-right: 0;
@@ -56,7 +56,7 @@
         opacity: 1 !important;
       }
 
-      &:after {
+      &::after {
         content: "";
         position: absolute;
         top: 50%;

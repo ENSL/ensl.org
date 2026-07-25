@@ -80,7 +80,7 @@ div#match {
       position: relative;
       font-weight: 400;
 
-      &.split:before {
+      &.split::before {
         content: "";
         display: block;
         position: absolute;
@@ -213,7 +213,6 @@ div#match {
     }
 
     .scores input {
-      width: auto;
       margin-left: 0;
       text-align: center;
       width: 40px;
@@ -236,7 +235,7 @@ div#match {
 
       input {
         float: none;
-        margin: 20px 0 0 0;
+        margin: 20px 0 0;
       }
     }
 

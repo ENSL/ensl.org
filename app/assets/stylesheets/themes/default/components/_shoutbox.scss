@@ -43,8 +43,7 @@
     display: block;
 
     .contents {
-      word-break: break-word;
-      word-wrap: break-word;
+      overflow-wrap: anywhere;
       position: relative;
       display: block;
       padding: 0 10px;

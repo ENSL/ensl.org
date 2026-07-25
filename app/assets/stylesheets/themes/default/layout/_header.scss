@@ -16,8 +16,8 @@ header .banner {
     text-transform: uppercase;
 
     .fields {
-      input[type=text],
-      input[type=password] {
+      input[type="text"],
+      input[type="password"] {
         text-align: right;
         margin-bottom: 3px;
       }
@@ -52,14 +52,14 @@ header .banner {
     .fields {
       .header-icons {
         img {
-          padding-top: 0px;
+          padding-top: 0;
           padding-right: 5px;
           width: 40px;
           float: right;
         }
 
         img.discord {
-          padding-top: 0px;
+          padding-top: 0;
           padding-right: 10px;
           width: 40px;
           float: right;
@@ -123,9 +123,6 @@ header .banner {
       border: 1px solid #61beff;
       text-align: center;
       vertical-align: middle;
-      position: relative;
-      float: left;
-      height: 0;
       background-size: cover;
       position: absolute;
       right: 0;

@@ -16,7 +16,7 @@
   &.success {
     @include flash($flash-success);
     
-    &:before {
+    &::before {
       content: "\f00c";
     }
   }
@@ -24,7 +24,7 @@
   &.error {
     @include flash($flash-error);
 
-    &:before {
+    &::before {
       content: "\f00d";
     }
   }
@@ -33,7 +33,7 @@
   &.alert {
     @include flash($flash-warning);
 
-    &:before {
+    &::before {
       content: "\f071";
     }
   }
@@ -88,7 +88,7 @@ div.errors-block {
     padding: 0 100px;
     z-index: 2;
 
-    &:before {
+    &::before {
       background: url("layout/flash-notice-icon.png");
       content: '';
       display: block;
@@ -104,7 +104,7 @@ div.errors-block {
     &.alert {
       background: url("layout/flash-error-background.png");
 
-      &:before {
+      &::before {
         background: url("layout/flash-error-icon.png");
       }
     }

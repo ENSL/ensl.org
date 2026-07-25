@@ -159,7 +159,7 @@ form.new-shout[id^="new_shout_Gather_"] {
     border-radius: $column-border-width + $column-border-radius;
     position: relative;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgb(0 0 0 / 20%);
     border: 10px solid transparent;
     background-clip: padding-box;
 
@@ -174,8 +174,7 @@ form.new-shout[id^="new_shout_Gather_"] {
 
     ul#map-votes {
       max-height: 15.00rem;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden auto;
       padding-right: 8px;
     }
   }
@@ -262,7 +261,7 @@ form.new-shout[id^="new_shout_Gather_"] {
   phones, so below the tablet breakpoint (matches Tailwind's `md`) gather
   switches to a single stacked column with bigger touch targets.
 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   #gather {
     .previous a,
     .next a {
@@ -292,7 +291,7 @@ form.new-shout[id^="new_shout_Gather_"] {
       text-align: center;
       padding: 10px;
       border-radius: 6px;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgb(0 0 0 / 20%);
       font-weight: bold;
     }
   }
@@ -318,7 +317,7 @@ form.new-shout[id^="new_shout_Gather_"] {
       padding: 10px 0;
       font-size: 1em;
       line-height: 1.5;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      border-bottom: 1px solid rgb(255 255 255 / 15%);
 
       &:last-child {
         border-bottom: none;
@@ -421,7 +420,7 @@ form.new-shout[id^="new_shout_Gather_"] {
       gap: 8px;
       padding: 10px 14px;
       border-radius: 6px;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgb(0 0 0 / 20%);
       font-weight: bold;
     }
   }
