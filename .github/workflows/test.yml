@@ -30,20 +30,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fix workspace ownership
-        # The self-hosted runner container checks out the repo as root, but
-        # the app containers run as uid 1000 (web:web, see compose.yml). Any
-        # git-tracked placeholder dirs (log/, tmp/, public/assets/, etc.) end
-        # up root-owned otherwise, causing EACCES when Rails boots. Fix it via
-        # a throwaway root container against the same Docker daemon — same
-        # idiom as the `perms` Makefile target, just scoped to CI.
-        run: docker run --rm -v "$PWD:/workspace" alpine:3.22 chown -R 1000:1000 /workspace
+        # The runner checks out as uid 1001, while app containers run as uid
+        # 1000 (web:web). Prepare outputs before handing the tree to the app.
+        run: |
+          docker run --rm -v "$PWD:/workspace" alpine:3.22 sh -c '
+            mkdir -p /workspace/tmp/test-results /workspace/coverage
+            chown -R 1000:1000 /workspace
+          '
 
       - name: Build test image
         run: docker compose --profile test build test
 
       - name: Run test suite
         run: |
-          mkdir -p tmp/test-results
           docker compose --profile test run --rm test bash -c '
             for i in $(seq 1 30); do
               bundle exec bin/rails db:prepare && break
