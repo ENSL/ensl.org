@@ -2,11 +2,25 @@
   Shoutbox Messages
 */
 
-#shoutbox {
+// Shared scrollable message-list container: #shoutbox is the sidebar widget
+// (rendered on every page, see widgets/_shoutbox.html.erb); .shoutbox-messages
+// is the generic per-object shout list (see shoutmsgs/_index.html.erb, used
+// for gathers and other "shoutable" objects).
+#shoutbox,
+.shoutbox-messages {
   display: block;
   max-height: 240px;
   overflow-y: auto;
   padding-right: 8px; /* room for scrollbar */
+
+  .user {
+    display: inline;
+  }
+
+  .timestamp {
+    float: right;
+    margin: 0 5px 5px;
+  }
 }
 
 .shoutmsg {

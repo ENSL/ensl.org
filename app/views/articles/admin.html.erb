@@ -6,11 +6,11 @@
 
     <table class="striped">
       <tr>
-        <th class="title">Title</th>
-        <th class="category">Category</th>
-        <th class="created">Created</th>
-        <th class="author">Author</th>
-        <th class="actions"></th>
+        <th class="title w-[40%]">Title</th>
+        <th class="category w-[20%]">Category</th>
+        <th class="created w-[20%]">Created</th>
+        <th class="author w-[10%]">Author</th>
+        <th class="actions w-[10%] text-right"></th>
       </tr>
 
       <% for article in articles %>
@@ -19,7 +19,7 @@
           <td><%= h article.category %></td>
           <td><%= shorttime article.created_at %></td>
           <td><%= namelink article.user %></td>
-          <td class="actions">
+          <td class="actions w-[10%] text-right">
             <%= link_to fa_icon('pencil'), edit_article_path(article) %>
             <%= link_to fa_icon('times'), article, confirm: 'Are you sure?', method: :delete %>
           </td>

@@ -6,25 +6,25 @@
     <% next if forums.length == 0 %>
 
     <div class="category">
-      <table class="category striped">
+      <table class="category striped table-auto">
         <thead>
           <tr>
             <th colspan="2" class="category"><%=h cat.name %></th>
-            <th class="actions"></th>
-            <th class="topics">Topics</th>
-            <th class="posts">Posts</th>
-            <th class="last">Last Post</th>
+            <th class="actions w-[10%] text-center"></th>
+            <th class="topics w-[10%]">Topics</th>
+            <th class="posts w-[10%]">Posts</th>
+            <th class="last w-[15%]">Last Post</th>
           </tr>
         </thead>
 
         <% forums.each do |forum| %>
           <tr>
-            <td class="bullet <%= 'updated' if cuser and !cuser.have_read?(forum) %>"></td>
-            <td class="forum">
+            <td class="bullet w-[10%] <%= 'updated' if cuser and !cuser.have_read?(forum) %>"></td>
+            <td class="forum w-[45%] pr-[10px]">
               <h5><%= namelink(forum) %></h5>
               <%= forum.description %>
             </td>
-            <td class="actions">
+            <td class="actions w-[10%] text-center">
               <% if forum.can_update? cuser %>
                 <%= link_to up_forum_path(forum), method: :patch do %>
                   <% fa_icon 'arrow-up' %>
@@ -34,9 +34,9 @@
                 <% end %>
               <% end %>
             </td>
-            <td class="topics"><%= forum.topics.count %></td>
-            <td class="posts"><%= forum.posts.count %></td>
-            <td class="last">
+            <td class="topics w-[10%]"><%= forum.topics.count %></td>
+            <td class="posts w-[10%]"><%= forum.posts.count %></td>
+            <td class="last w-[15%]">
               <% if forum.posts.last %>
                 <%= link_to lastpost(forum.posts.last.topic) do %>
                   <%=h forum.posts.last.user %><br>

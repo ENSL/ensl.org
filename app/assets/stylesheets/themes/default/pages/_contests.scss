@@ -43,32 +43,9 @@ table.contest {
     }
 
     &.actions {
-      text-align: right;
-
       i {
         padding-left: 5px;
       }
-    }
-  }
-
-  thead {
-
-    .movement,
-    .flag,
-    .awards {
-      width: 5%;
-    }
-
-    .team {
-      width: 35%;
-    }
-
-    .score,
-    .win,
-    .loss,
-    .draw,
-    .actions {
-      width: 10%;
     }
   }
 }

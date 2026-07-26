@@ -99,21 +99,6 @@ div.article-links {
   }
 }
 
-table.articles.archive {
-
-  .title {
-    width: 50%;
-  }
-
-  .date {
-    width: 20%;
-  }
-
-  .author {
-    width: 20%;
-  }
-}
-
 /*
   Article Form
 */
@@ -173,27 +158,3 @@ form.article {
 /*
   Admin Articles Page
 */
-
-div.admin.articles {
-
-  .title {
-    width: 40%;
-  }
-
-  .category {
-    width: 20%;
-  }
-
-  .created {
-    width: 20%;
-  }
-
-  .author {
-    width: 10%;
-  }
-
-  .actions {
-    width: 10%;
-    text-align: right;
-  }
-}

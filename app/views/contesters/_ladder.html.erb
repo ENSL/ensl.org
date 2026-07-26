@@ -2,15 +2,15 @@
   <thead>
     <tr>
       <th class="rank">Rank</th>
-      <th class="movement"></th>
-      <th class="flag"></th>
-      <th class="team">Team</th>
-      <th class="awards"></th>
-      <th class="win">Win</th>
-      <th class="loss">Loss</th>
-      <th class="draw">Draw</th>
+      <th class="movement w-[5%]"></th>
+      <th class="flag w-[5%]"></th>
+      <th class="team w-[35%]">Team</th>
+      <th class="awards w-[5%]"></th>
+      <th class="win w-[10%]">Win</th>
+      <th class="loss w-[10%]">Loss</th>
+      <th class="draw w-[10%]">Draw</th>
       <% if actions and cuser %>
-        <th class="actions"></th>
+        <th class="actions w-[10%]"></th>
       <% end %>
     </tr>
   </thead>
@@ -38,7 +38,7 @@
       <td><%= h contester.loss %></td>
       <td><%= h contester.draw %></td>
       <% if actions and cuser%>
-        <td class="actions">
+        <td class="actions w-[10%] text-right">
           <% current = cuser.active_contesters.of_contest(contest).first %>
           <% if current %>
             <% challenge = Challenge.new

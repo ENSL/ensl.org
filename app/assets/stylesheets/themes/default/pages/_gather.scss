@@ -67,22 +67,6 @@
   }
 }
 
-.shoutbox-messages {
-  display: block;
-  max-height: 240px;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  .user {
-    display: inline;
-  }
-
-  .timestamp {
-    float: right;
-    margin: 0 5px 5px;
-  }
-}
-
 form.new-shout[id^="new_shout_Gather_"] {
   float: none;
   clear: both;

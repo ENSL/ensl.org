@@ -45,7 +45,6 @@ div#categories {
   */
 
   table.category {
-    table-layout: auto;
     margin: 0;
     background: white;
     padding: 20px;
@@ -82,8 +81,6 @@ div#categories {
   }
 
   .bullet {
-    width: 10%;
-
     background: {
       image: url("layout/forum-category.png");
       position: center center;
@@ -94,25 +91,6 @@ div#categories {
       background-image: url("layout/forum-category-highlight.png");
     }
   }
-
-  .forum {
-    width: 45%;
-    padding-right: 10px;
-  }
-
-  .actions {
-    width: 10%;
-    text-align: center;
-  }
-
-  .topics,
-  .posts {
-    width: 10%;
-  }
-  
-  .last {
-    width: 15%;
-  }
 }
 
 /*
@@ -120,7 +98,6 @@ div#categories {
 */
 
 #topics {
-  table-layout: auto;
   margin-bottom: 20px;
   background: white;
   padding: 20px;
@@ -163,24 +140,6 @@ div#categories {
 
   td h5 {
     font-family: $base-font-family;
-  }
-
-
-  .topic {
-    width: 55%;
-  }
-
-  .author {
-    width: 10%;
-  }
-
-  .replies,
-  .views {
-    width: 10%;
-  }
-
-  .last {
-    width: 15%;
   }
 }
 

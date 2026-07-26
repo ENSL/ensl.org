@@ -1,14 +1,6 @@
 @use "../variables" as *;
 
 #custom-urls-panel {
-  th {
-    font-weight: bold;
-  }
-
-  #custom-urls {
-    width: 100%;
-    table-layout: auto;
-  }
 
   td.name {
     input[type="text"].edit-field {
@@ -90,10 +82,6 @@
       color: inherit;
       text-decoration: none;
     }
-  }
-
-  .hidden {
-    display: none;
   }
 
   .custom-url-new-form {
