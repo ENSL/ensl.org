@@ -19,7 +19,7 @@ jobs:
   rspec:
     # Runs on the self-hosted runner (containerized, Docker-outside-of-Docker)
     # registered on the app server.
-    runs-on: [self-hosted, docker]
+    runs-on: [self-hosted, linux, x64]
     env:
       # Force a project name distinct from whatever production/staging use,
       # so this never attaches to (or tears down) their db/redis containers,
