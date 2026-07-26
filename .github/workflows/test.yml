@@ -30,13 +30,31 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fix workspace ownership
-        # The runner checks out as uid 1001, while app containers run as uid
-        # 1000 (web:web). Prepare outputs before handing the tree to the app.
+        # Keep the checkout and .git owned by the runner (uid 1001). Only
+        # runtime paths need to be writable by the app (uid 1000) or MariaDB.
         run: |
           docker run --rm -v "$PWD:/workspace" alpine:3.22 sh -c '
-            mkdir -p /workspace/tmp/test-results /workspace/coverage
-            chown -R 1000:1000 /workspace
+            mkdir -p \
+              /workspace/log \
+              /workspace/tmp/test-results \
+              /workspace/coverage \
+              /workspace/public/assets \
+              /workspace/public/local \
+              /workspace/public/files \
+              /workspace/app/assets/builds \
+              /workspace/db/data
+            chown -R 1000:1000 \
+              /workspace/log \
+              /workspace/tmp \
+              /workspace/coverage \
+              /workspace/public/assets \
+              /workspace/public/local \
+              /workspace/public/files \
+              /workspace/app/assets/builds
           '
+          docker run --rm -u root \
+            -v "$PWD/db/data:/var/lib/mysql" \
+            mariadb:10.7 sh -c 'chown -R mysql:mysql /var/lib/mysql'
 
       - name: Build test image
         run: docker compose --profile test build test
@@ -54,7 +72,7 @@ jobs:
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
-        if: always()
+        if: ${{ always() && hashFiles('tmp/test-results/rspec.xml') != '' }}
         with:
           name: RSpec Results
           path: tmp/test-results/rspec.xml
@@ -62,7 +80,7 @@ jobs:
           fail-on-error: true
 
       - name: Upload coverage report
-        if: always()
+        if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -70,7 +88,7 @@ jobs:
           retention-days: 14
 
       - name: Publish coverage to Qlty
-        if: always()
+        if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
         uses: qltysh/qlty-action/coverage@v2
         with:
           oidc: true
@@ -79,3 +97,8 @@ jobs:
       - name: Tear down containers
         if: always()
         run: docker compose --profile test down -v --remove-orphans
+
+      - name: Restore runner ownership
+        if: always()
+        # Leave the persistent checkout writable for the next checkout/clean.
+        run: docker run --rm -v "$PWD:/workspace" alpine:3.22 chown -R 1001:121 /workspace
