@@ -53,7 +53,7 @@
 
   <%= will_paginate @posts %>
 
-  <div>
+  <div class="topic-footer-controls">
     <% if @newpost.can_create? cuser %>
       <button class="button fastReply" type="button">Fast Reply</button>
       <%= link_to 'Reply', new_post_path(@newpost, id: @topic), class: 'button' %>

@@ -63,7 +63,7 @@
 </div>
 
 <% if Forum.new.can_create? cuser %>
-  <p>
+  <p class="forum-index-controls">
     <%= link_to 'New Forum', new_forum_path, class: 'button' %>
   </p>
 <% end %>

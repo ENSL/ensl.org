@@ -5,6 +5,7 @@
 @use "../variables" as *;
 
 .breadcrumbs {
+  clear: both;
   margin-bottom: 20px;
 
   a {
