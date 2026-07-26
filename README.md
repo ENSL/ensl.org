@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/ENSL/ensl.org.svg?style=svg)](https://circleci.com/gh/ENSL/ensl.org)
+[![Test](https://github.com/ENSL/ensl.org/actions/workflows/test.yml/badge.svg)](https://github.com/ENSL/ensl.org/actions/workflows/test.yml)
 [![Maintainability](https://qlty.sh/gh/ENSL/projects/ensl.org/maintainability.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
 [![Code Coverage](https://qlty.sh/gh/ENSL/projects/ensl.org/coverage.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
 

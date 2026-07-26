@@ -13,6 +13,7 @@ concurrency:
 permissions:
   contents: read
   checks: write
+  id-token: write # Required for Qlty OIDC coverage upload
 
 jobs:
   rspec:
@@ -59,6 +60,13 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 14
+
+      - name: Publish coverage to Qlty
+        if: always()
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          oidc: true
+          files: coverage/coverage.json
 
       - name: Tear down containers
         if: always()
