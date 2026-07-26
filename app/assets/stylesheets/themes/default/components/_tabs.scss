@@ -74,6 +74,12 @@
      default for non-fragment navigation. */
   .tab {
     display: none;
+
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
   }
 
   .tab:first-child {

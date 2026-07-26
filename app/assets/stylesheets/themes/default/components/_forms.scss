@@ -199,6 +199,7 @@ form {
   }
 
   .controls {
+    display: flow-root;
     margin-bottom: 20px;
 
     // input[type=submit] isn't covered by the sitewide `button, a.button,
@@ -233,7 +234,7 @@ form.square {
     > .field_with_errors:first-child,
     > label,
     > .label {
-      flex: 0 0 25%;
+      flex: 0 0 calc(25% - 20px);
       padding: 9px 0;
       line-height: $input-font-size;
 

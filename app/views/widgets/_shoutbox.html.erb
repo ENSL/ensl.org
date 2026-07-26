@@ -6,6 +6,5 @@
       <%= render partial: "shoutmsgs/shoutmsg", collection: Shoutmsg.recent.box, locals: { popup: "$('shoutbox')" } %>
     </div>
   </div>
-  <%= render partial: "shoutmsgs/new", locals: { shoutmsg: Shoutmsg.new } %>
-  <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES) %>
+  <%= render partial: "shoutmsgs/new", locals: { shoutmsg: Shoutmsg.new, show_rules_link: true } %>
 </div>

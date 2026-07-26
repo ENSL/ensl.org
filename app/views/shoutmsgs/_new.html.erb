@@ -1,3 +1,4 @@
+<% rules_link_rendered = false %>
 <% if cuser %>
   <% if cuser.banned? Ban::TYPE_MUTE %>
     You have been muted.
@@ -13,9 +14,17 @@
       </div>
       <div class="controls">
         <%= button_tag "Shout!", type: 'submit', class: 'shout-submit' %>
+        <% if local_assigns[:show_rules_link] %>
+          <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES), class: 'shoutbox-rules' %>
+          <% rules_link_rendered = true %>
+        <% end %>
       </div>
     <% end %>
   <% end %>
+<% end %>
+
+<% if local_assigns[:show_rules_link] && !rules_link_rendered %>
+  <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES), class: 'shoutbox-rules' %>
 <% end %>
 
 <script type="text/javascript">
