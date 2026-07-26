@@ -298,6 +298,20 @@ form.square {
   }
 }
 
+form.search {
+  width: 100%;
+  margin-bottom: 10px;
+
+  .query {
+    min-width: 0;
+  }
+
+  .controls {
+    width: auto;
+    margin-left: 0;
+  }
+}
+
 /*
   Dark Forms
 */

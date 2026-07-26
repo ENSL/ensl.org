@@ -113,6 +113,8 @@
   }
 
   form {
+    display: flow-root;
+    width: 100%;
     margin-bottom: 20px;
 
     &.inline {
@@ -129,6 +131,11 @@
   }
 
   #teams {
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
 
     table {
       margin-bottom: 40px;

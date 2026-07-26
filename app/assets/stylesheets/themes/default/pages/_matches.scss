@@ -33,6 +33,8 @@ table#matches {
 div#match {
   $title-height: 100px;
 
+  display: flow-root;
+  width: 100%;
   border-bottom: 3px solid $medium-gray;
 
   .contesters {

@@ -15,6 +15,10 @@ $navigation-height: 50px;
   position: relative;
   z-index: 25;
 
+  > div {
+    height: 60px;
+  }
+
   #logo {
     position: absolute;
     bottom: -15px;

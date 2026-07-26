@@ -28,6 +28,8 @@
 #files {
 
   .file {
+    display: flow-root;
+    width: 100%;
     padding-top: 20px;
     margin-bottom: 20px;
     position: relative;
@@ -49,6 +51,8 @@
   }
 
   .controls {
+    display: flow-root;
+    width: 100%;
     margin-top: 20px;
   }
 }
