@@ -8,6 +8,9 @@ fi
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
+# Use dynamic propshaft to avoid caching issues with assets　in development
+rm -f public/assets/.manifest.json
+
 # Let the debug gem allow remote connections,
 # but avoid loading until `debugger` is called
 export RUBY_DEBUG_OPEN="true"
