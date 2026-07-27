@@ -184,7 +184,7 @@ class Directory < ApplicationRecord
       File.join(parent.full_path, name.to_s.downcase)
     elsif root?
       # Root directory always uses ENV, not stored path
-      ENV['FILES_ROOT']
+      ENV['FILES_ROOT'] || Rails.root.join('public/files').to_s
     elsif path.present?
       path
     else
@@ -210,7 +210,7 @@ class Directory < ApplicationRecord
       self.path = full_path
     elsif root?
       # Root directory path is managed via ENV['FILES_ROOT']
-      self.path = ENV['FILES_ROOT']
+      self.path = ENV['FILES_ROOT'] || Rails.root.join('public/files').to_s
     elsif path.blank?
       self.path = File.join(ENV['FILES_ROOT'], name.to_s.downcase)
     end

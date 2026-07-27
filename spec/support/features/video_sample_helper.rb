@@ -8,7 +8,9 @@ require 'uri'
 module Features
   module VideoSampleHelper
     # Configuration for test video samples
-    TEST_VIDEOS_DIR = Rails.root.join('spec/fixtures/files/videos').freeze
+    TEST_VIDEOS_DIR = Pathname.new(ENV.fetch('TEST_VIDEOS_DIR', Rails.root.join('spec/fixtures/files/videos').to_s)).freeze
+    TEST_VIDEO_URL = ENV['TEST_VIDEO_URL'].to_s.strip.freeze
+    TEST_VIDEO_FILENAME = ENV.fetch('TEST_VIDEO_FILENAME', 'test_video.mp4').to_s.strip.freeze
 
     REMOTE_VIDEO_LIST = [
       'AtomicNS.mp4',
@@ -99,6 +101,12 @@ module Features
         generate_video_fixture(spec, local_path)
       end
 
+      if TEST_VIDEO_URL.present?
+        local_path = TEST_VIDEOS_DIR.join(TEST_VIDEO_FILENAME)
+        download_and_sample_video(TEST_VIDEO_FILENAME, local_path, remote_url: TEST_VIDEO_URL) unless File.exist?(local_path)
+        return
+      end
+
       return if running_on_circleci?
 
       REMOTE_VIDEO_LIST.each do |filename|
@@ -110,10 +118,10 @@ module Features
     end
 
     # Download a single video from production domain and create a sample
-    def download_and_sample_video(filename, local_path)
+    def download_and_sample_video(filename, local_path, remote_url: nil)
       production_domain = ENV['PRODUCTION_DOMAIN'] || 'https://www.ensl.org'
       production_domain = "https://#{production_domain}" unless production_domain.to_s.match?(%r{\Ahttps?://}i)
-      remote_url = "#{production_domain}/files/videos/#{filename}"
+      remote_url ||= "#{production_domain}/files/videos/#{filename}"
 
       temp_full_path = TEST_VIDEOS_DIR.join("temp_#{filename}")
 
@@ -250,6 +258,7 @@ module Features
     def all_video_specs
       generated = GENERATED_VIDEO_SPECS.map { |s| { filename: s[:filename], expected_duration: s[:duration] } }
       remote = REMOTE_VIDEO_LIST.map { |name| { filename: name, expected_duration: MAX_SAMPLE_DURATION.to_f } }
+      remote << { filename: TEST_VIDEO_FILENAME, expected_duration: MAX_SAMPLE_DURATION.to_f } if TEST_VIDEO_URL.present?
       generated + remote
     end
 
