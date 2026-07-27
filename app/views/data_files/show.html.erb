@@ -13,8 +13,8 @@
     </div>
     <% end %>
 
-    <%= link_to "Download", safe_url_for(@file.url), class: 'button' %>
-    <%= link_to "Back to directory", directory_url(@file.directory), class: 'button' %>
+    <%= link_to "Download", safe_url_for(@file.url), class: 'button tiny' %>
+    <%= link_to "Back to directory", directory_url(@file.directory), class: 'button tiny' %>
 
     <h4>Description</h4>
     <%= simple_format(h(@file.description.to_s)) %>
