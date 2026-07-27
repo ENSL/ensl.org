@@ -134,11 +134,6 @@ group :production do
 end
 
 group :development do
-  # static code analyzers
-  gem 'brakeman', require: false
-  gem 'bundler-audit', require: false
-  gem 'rubocop-rails', require: false
-
   # annotate models
   # Does not support AR 8 yet
   # gem 'annotate'
@@ -232,7 +227,12 @@ group :development, :test do
   gem 'awesome_print'
 
   # Static analysis / code quality
+  # In both envs for convenience.
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
   gem 'rails_best_practices'
+  gem 'rubocop'
+  gem 'rubocop-rails', require: false
 
   # Used both in development and test for generating realistic data
   gem 'factory_bot_rails'
