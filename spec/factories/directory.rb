@@ -19,7 +19,7 @@ FactoryBot.define do
       id { Directory::ROOT }
       name { 'root' }
       parent { nil }
-      # path will be set to ENV['FILES_ROOT'] by ensure_path_cached
+      # path will be set to Directory.files_root by ensure_path_cached
     end
 
     trait :movies do

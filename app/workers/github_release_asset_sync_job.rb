@@ -18,7 +18,7 @@ class GithubReleaseAssetSyncJob
   def perform(options = {})
     opts = options.is_a?(Hash) ? options : {}
     repo = opts['repo'].presence || opts[:repo].presence || DEFAULT_REPO
-    destination_root = File.join(ENV['FILES_ROOT'], 'client')
+    destination_root = File.join(Directory.files_root, 'client')
     FileUtils.mkdir_p(destination_root)
 
     fetch_tags(repo).each do |tag|

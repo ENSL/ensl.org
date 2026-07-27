@@ -34,6 +34,7 @@ describe Directory do
 
   before do
     # Set up test root environment
+    # Direct ENV assignment is required to override the helper's configured root.
     ENV['FILES_ROOT'] = @test_root
   end
 

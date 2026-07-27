@@ -10,6 +10,7 @@ RSpec.describe FileUploader do
   let(:directory) { instance_double('Directory', relative_path: relative_path) }
 
   around do |example|
+    # This spec manipulates ENV directly to verify Directory.files_root's fallback and override behavior.
     original = ENV['FILES_ROOT']
     ENV.delete('FILES_ROOT')
     example.run

@@ -23,7 +23,7 @@ FactoryBot.define do
       data_file[:name] = filename
 
       # Ensure path is set
-      data_file.path ||= File.join(ENV['FILES_ROOT'] || '/tmp/test_dirs', filename)
+      data_file.path ||= File.join(Directory.files_root, filename)
     end
 
     trait :with_directory do
@@ -63,7 +63,7 @@ FactoryBot.define do
 
       after(:build) do |data_file|
         data_file[:name] = 'test_demo.dem'
-        data_file.path ||= File.join(ENV['FILES_ROOT'] || '/tmp/test_dirs', 'test_demo.dem')
+        data_file.path ||= File.join(Directory.files_root, 'test_demo.dem')
       end
     end
   end

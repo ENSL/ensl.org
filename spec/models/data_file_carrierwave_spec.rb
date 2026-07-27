@@ -10,6 +10,7 @@ RSpec.describe DataFile do
   before do
     FileUtils.rm_rf(@test_root)
     FileUtils.mkdir_p(@test_root)
+    # This spec must override the process-level root to exercise CarrierWave storage.
     ENV['FILES_ROOT'] = @test_root
   end
 

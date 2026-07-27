@@ -28,15 +28,16 @@ RSpec.describe 'DataFilesController', type: :request do
   end
 
   before do
+    # Request specs replace the process-level root to isolate filesystem side effects.
     ENV['FILES_ROOT'] = File.join(Dir.tmpdir, 'ensl_data_files_request_spec')
-    FileUtils.rm_rf(ENV['FILES_ROOT'])
-    FileUtils.mkdir_p(ENV['FILES_ROOT'])
+    FileUtils.rm_rf(Directory.files_root)
+    FileUtils.mkdir_p(Directory.files_root)
     ensure_root_directory
     ensure_movies_directory
   end
 
   after do
-    FileUtils.rm_rf(ENV['FILES_ROOT']) if Dir.exist?(ENV['FILES_ROOT'])
+    FileUtils.rm_rf(Directory.files_root) if Dir.exist?(Directory.files_root)
   end
 
   describe 'GET /data_files/admin' do

@@ -27,8 +27,6 @@ require 'fileutils'
 require 'pathname'
 require 'digest/md5'
 
-ENV['FILES_ROOT'] ||= Rails.root.join('public/files').to_s
-
 class Directory < ApplicationRecord
   include Extra
 
@@ -134,6 +132,10 @@ class Directory < ApplicationRecord
     directory_traverse(directory.parent, list)
   end
 
+  def self.files_root
+    ENV['FILES_ROOT'] ||= Rails.root.join('public/files').to_s
+  end
+
   def self.sync_download_root(kind:, nickname:, year: nil)
     base_root = sync_download_base_root(kind)
     segment = sanitize_sync_segment(nickname)
@@ -166,10 +168,10 @@ class Directory < ApplicationRecord
 
     case normalized_kind
     when SYNC_KIND_DEMOS
-      find_by(id: DEMOS)&.full_path || File.join(ENV['FILES_ROOT'], SYNC_KIND_DEMOS)
+      find_by(id: DEMOS)&.full_path || File.join(files_root, SYNC_KIND_DEMOS)
     when SYNC_KIND_LOGS
       logs_directory = where(parent_id: ROOT).find_by('LOWER(name) = ?', SYNC_KIND_LOGS)
-      logs_directory&.full_path || File.join(ENV['FILES_ROOT'], SYNC_KIND_LOGS)
+      logs_directory&.full_path || File.join(files_root, SYNC_KIND_LOGS)
     end
   end
 
@@ -183,12 +185,12 @@ class Directory < ApplicationRecord
     if parent
       File.join(parent.full_path, name.to_s.downcase)
     elsif root?
-      # Root directory always uses ENV, not stored path
-      ENV['FILES_ROOT'] || Rails.root.join('public/files').to_s
+      # Root directory always uses the configured files root, not stored path
+      Directory.files_root
     elsif path.present?
       path
     else
-      File.join(ENV['FILES_ROOT'], name.to_s.downcase)
+      File.join(Directory.files_root, name.to_s.downcase)
     end
   end
 
@@ -209,10 +211,9 @@ class Directory < ApplicationRecord
     if parent
       self.path = full_path
     elsif root?
-      # Root directory path is managed via ENV['FILES_ROOT']
-      self.path = ENV['FILES_ROOT'] || Rails.root.join('public/files').to_s
+      self.path = Directory.files_root
     elsif path.blank?
-      self.path = File.join(ENV['FILES_ROOT'], name.to_s.downcase)
+      self.path = File.join(Directory.files_root, name.to_s.downcase)
     end
   end
 
@@ -309,7 +310,7 @@ class Directory < ApplicationRecord
   end
 
   def trash_root
-    File.join(ENV['FILES_ROOT'], '.trash')
+    File.join(Directory.files_root, '.trash')
   end
 
   def trash_root_for(source_path)
@@ -581,7 +582,7 @@ class Directory < ApplicationRecord
   def ignored_reconciliation_path?(absolute_path)
     return false if absolute_path.blank?
 
-    root = Pathname.new(ENV['FILES_ROOT'].to_s)
+    root = Pathname.new(Directory.files_root)
     path = Pathname.new(absolute_path.to_s)
     relative_path = path.relative_path_from(root).to_s
     return false if relative_path.blank? || relative_path == '.'

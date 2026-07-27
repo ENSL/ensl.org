@@ -10,7 +10,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
       dir.name = 'root'
       dir.title = 'Root'
       dir.hidden = false
-      dir.path = ENV['FILES_ROOT']
+      dir.path = Directory.files_root
       dir.parent = nil
     end
   end

@@ -10,8 +10,8 @@ require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 Safety::DatabaseGuard.abort_if_test_db_matches_development!
 
-# CI can inject FILES_ROOT values that are not writable by the test process.
-# Force a test-local writable root for all specs unless a spec overrides it.
+# This runs before specs load their isolated roots, so the process-level ENV must
+# be initialized directly instead of going through Directory.files_root.
 ENV['FILES_ROOT'] = File.join(Dir.tmpdir, 'ensl_test_files')
 FileUtils.mkdir_p(ENV.fetch('FILES_ROOT'))
 

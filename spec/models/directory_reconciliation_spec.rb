@@ -13,6 +13,7 @@ describe 'Directory reconciliation behavior' do
   end
 
   before do
+    # This spec must override the process-level root for isolated reconciliation behavior.
     ENV['FILES_ROOT'] = @test_root
     FileUtils.mkdir_p(@test_root)
 

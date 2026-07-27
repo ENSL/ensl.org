@@ -14,6 +14,7 @@ describe GithubReleaseAssetSyncJob do
     around do |example|
       Dir.mktmpdir('github_release_asset_sync_job_spec') do |tmp_dir|
         @tmp_dir = tmp_dir
+        # The job must run against a temporary process-level root for isolation.
         original_files_root = ENV['FILES_ROOT']
         ENV['FILES_ROOT'] = tmp_dir
         example.run

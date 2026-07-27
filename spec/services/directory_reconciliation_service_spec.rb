@@ -13,6 +13,7 @@ describe DirectoryReconciliationService do
   end
 
   before do
+    # This spec must override the process-level root for isolated reconciliation behavior.
     ENV['FILES_ROOT'] = @test_root
     FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
     FileUtils.mkdir_p(@test_root)
@@ -798,6 +799,7 @@ describe DirectoryReconciliationService do
       @det_test_root = '/tmp/test_deterministic_reconciliation'
       FileUtils.rm_rf(@det_test_root)
       FileUtils.mkdir_p(@det_test_root)
+      # This example switches roots to exercise deterministic move detection.
       ENV['FILES_ROOT'] = @det_test_root
     end
 

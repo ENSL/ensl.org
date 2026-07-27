@@ -13,6 +13,7 @@ describe 'DataFile CarrierWave integration behavior' do
   end
 
   before do
+    # This spec must override the process-level root for isolated filesystem behavior.
     ENV['FILES_ROOT'] = @test_root
     FileUtils.mkdir_p(@test_root)
 
