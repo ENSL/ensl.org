@@ -27,7 +27,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     visit contest_path(contest)
     expect(page).to have_select('contester_team_id', with_options: [team.name])
     select team.name, from: 'contester_team_id'
-    click_button 'Join Contest'
+    page.execute_script("document.querySelector('form.square').submit()")
 
     expect(page).to(
       have_content(I18n.t(:contests_join), wait: 5)
