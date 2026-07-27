@@ -27,8 +27,10 @@ Rails.application.routes.draw do
 
   # Read-only listings built on top of AnalysisResult (ensl_analysis pipeline
   # output): player rankings first, with room for map balance / activity
-  # breakdowns etc. to be added the same way later.
+  # breakdowns etc. to be added the same way later. `analysis_root_path` is
+  # the "Stats" hub page linking out to each individual listing below.
   namespace :analysis do
+    root to: 'home#index'
     resources :users, only: [:index]
     resources :maps, only: [:index]
   end
