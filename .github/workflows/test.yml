@@ -41,6 +41,7 @@ jobs:
               /workspace/public/assets \
               /workspace/public/local \
               /workspace/public/files \
+              /workspace/spec/fixtures/files/videos \
               /workspace/app/assets/builds \
               /workspace/db/data
             chown -R 1000:1000 \
@@ -50,6 +51,7 @@ jobs:
               /workspace/public/assets \
               /workspace/public/local \
               /workspace/public/files \
+              /workspace/spec/fixtures/files/videos \
               /workspace/app/assets/builds
           '
           docker run --rm -u root \
