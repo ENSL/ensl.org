@@ -34,7 +34,7 @@ RSpec.describe 'Votes CSRF protection', type: :request do
          params: invalid_vote_params,
          headers: { 'ACCEPT' => Mime[:turbo_stream].to_s }
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
     expect(response.body).to include('turbo-stream')
     expect(response.body).to include('target="notification"')

@@ -36,7 +36,7 @@ class PostsController < ApplicationController
         format.js { render :create_error }
         format.html do
           flash.now[:alert] = t(:please_fix_errors, default: 'Please fix the errors below.')
-          render :new, status: :unprocessable_entity
+          render :new, status: :unprocessable_content
         end
       end
     end
@@ -50,7 +50,7 @@ class PostsController < ApplicationController
       redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}")
     else
       flash.now[:alert] = t(:please_fix_errors, default: 'Please fix the errors below.')
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

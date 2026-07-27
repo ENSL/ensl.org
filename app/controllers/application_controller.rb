@@ -140,13 +140,13 @@ class ApplicationController < ActionController::Base
       format.turbo_stream do
         flash.now[:error] = error_message
         render turbo_stream: turbo_stream.replace('notification', partial: 'application/messages'),
-               status: :unprocessable_entity
+               status: :unprocessable_content
       end
       format.html do
         flash[:error] = error_message
         redirect_back fallback_location: root_path
       end
-      format.any { head :unprocessable_entity }
+      format.any { head :unprocessable_content }
     end
   end
 
@@ -193,9 +193,9 @@ class ApplicationController < ActionController::Base
             locals: { messages: record.errors.full_messages, container_id: error_container_id_for(record) }
           ),
           turbo_stream.replace('notification', partial: 'application/messages')
-        ], status: :unprocessable_entity
+        ], status: :unprocessable_content
       end
-      format.html { render template, status: :unprocessable_entity }
+      format.html { render template, status: :unprocessable_content }
     end
   end
 

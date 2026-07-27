@@ -76,7 +76,7 @@ RSpec.describe 'WeeksController', type: :request do
         post '/weeks', params: { week: valid_params[:week].merge(name: '') }
       end.not_to change(Week, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
       expect(flash.now[:error]).to be_present
     end
@@ -110,7 +110,7 @@ RSpec.describe 'WeeksController', type: :request do
       patch "/weeks/#{week.id}",
             params: { week: { name: '', contest_id: contest.id, map1_id: week.map1_id, map2_id: week.map2_id } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(week.reload.name).not_to eq('')
       expect(flash.now[:error]).to be_present

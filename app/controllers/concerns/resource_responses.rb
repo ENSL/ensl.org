@@ -20,7 +20,7 @@ module ResourceResponses
       redirect_to location
     else
       flash.now[:error] = record.errors.full_messages.to_sentence.presence || t(:error)
-      render template, status: :unprocessable_entity, **render_options
+      render template, status: :unprocessable_content, **render_options
     end
   end
 

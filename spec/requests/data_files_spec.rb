@@ -162,7 +162,7 @@ RSpec.describe 'DataFilesController', type: :request do
     it 're-renders new when validation fails' do
       post '/data_files', params: { data_file: { directory_id: directory.id, title: 'a' * 256 } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
 
@@ -207,7 +207,7 @@ RSpec.describe 'DataFilesController', type: :request do
     it 're-renders edit when validation fails' do
       patch "/data_files/#{file.id}", params: { data_file: { title: 'a' * 256 } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(file.reload.title).to eq('Original title')
     end

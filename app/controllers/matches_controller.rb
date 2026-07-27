@@ -98,7 +98,7 @@ class MatchesController < ApplicationController
     flash.now[:error] = @match.errors.full_messages.to_sentence.presence || t(:error)
     return render_ref_failure if ref_match_referer?
 
-    render :edit, status: :unprocessable_entity
+    render :edit, status: :unprocessable_content
   end
 
   def redirect_after_match_update
@@ -108,7 +108,7 @@ class MatchesController < ApplicationController
 
   def render_ref_failure
     ref
-    render :ref, status: :unprocessable_entity
+    render :ref, status: :unprocessable_content
   end
 
   def admin_match_referer?

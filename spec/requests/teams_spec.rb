@@ -75,7 +75,7 @@ RSpec.describe 'TeamsController', type: :request do
         post teams_path, params: { team: { name: '', tag: '' } }
       end.not_to change(Team, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
       expect(response.body).to include('Please fix the errors below.')
     end
@@ -98,7 +98,7 @@ RSpec.describe 'TeamsController', type: :request do
 
       patch team_path(team), params: { team: { name: '', tag: '' } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(team.reload.name).to eq('Valid Team')
     end

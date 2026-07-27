@@ -61,7 +61,7 @@ class ContestsController < ApplicationController
       flash[:notice] = t(:contests_create)
       redirect_to @contest
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -72,7 +72,7 @@ class ContestsController < ApplicationController
       flash[:notice] = t(:contests_update)
       redirect_to @contest
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

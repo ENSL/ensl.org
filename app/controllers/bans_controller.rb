@@ -28,7 +28,7 @@ class BansController < ApplicationController
       flash[:notice] = t(:bans_create)
       redirect_to(@ban)
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -39,7 +39,7 @@ class BansController < ApplicationController
       flash[:notice] = t(:bans_update)
       redirect_to(@ban)
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
