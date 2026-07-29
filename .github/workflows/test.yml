@@ -64,12 +64,13 @@ jobs:
       - name: Run test suite
         run: |
           docker compose --profile test run --rm test bash -c '
+            rm -rf coverage
             for i in $(seq 1 30); do
               bundle exec bin/rails db:prepare && break
               echo "Waiting for database... ($i/30)"
               sleep 2
             done
-            bundle exec rspec --force-color --format progress --format RspecJunitFormatter --out tmp/test-results/rspec.xml
+            SIMPLECOV=1 bundle exec rspec --force-color --format progress --format RspecJunitFormatter --out tmp/test-results/rspec.xml
           '
 
       - name: Publish test results
