@@ -106,6 +106,21 @@ RSpec.describe Teamer, type: :model do
       t.destroy
       expect(t.reload.rank).to eq Teamer::RANK_REMOVED
     end
+
+    it 'clears user team without running full user validations' do
+      member = create(:user, username: 'MemberOne')
+      duplicate = create(:user, username: 'MemberTwo')
+      duplicate.update_column(:username, member.username.downcase)
+
+      team = create(:team)
+      member.update_column(:team_id, team.id)
+      teamer = create(:teamer, user: member, team: team, rank: Teamer::RANK_MEMBER)
+
+      expect { member.update!(team_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { teamer.destroy }.not_to raise_error
+      expect(member.reload.team_id).to be_nil
+      expect(teamer.reload.rank).to eq(Teamer::RANK_REMOVED)
+    end
   end
 
   describe 'permissions' do

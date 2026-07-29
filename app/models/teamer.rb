@@ -100,7 +100,7 @@ class Teamer < ApplicationRecord
   # them as removed instead of deleting them from the database.
   def destroy
     transaction do
-      user.update!(team_id: nil) if user && user.team_id == team_id
+      user.update_columns(team_id: nil, updated_at: Time.current) if user && user.team_id == team_id
 
       return super if rank == Teamer::RANK_JOINER
 
