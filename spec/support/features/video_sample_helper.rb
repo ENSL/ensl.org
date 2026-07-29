@@ -8,7 +8,8 @@ require 'uri'
 module Features
   module VideoSampleHelper
     # Configuration for test video samples
-    TEST_VIDEOS_DIR = Pathname.new(ENV.fetch('TEST_VIDEOS_DIR', Rails.root.join('spec/fixtures/files/videos').to_s)).freeze
+    TEST_VIDEOS_DIR = Pathname.new(ENV.fetch('TEST_VIDEOS_DIR',
+                                             Rails.root.join('spec/fixtures/files/videos').to_s)).freeze
     TEST_VIDEO_URL = ENV['TEST_VIDEO_URL'].to_s.strip.freeze
     TEST_VIDEO_FILENAME = ENV.fetch('TEST_VIDEO_FILENAME', 'test_video.mp4').to_s.strip.freeze
 
@@ -103,7 +104,8 @@ module Features
 
       if TEST_VIDEO_URL.present?
         local_path = TEST_VIDEOS_DIR.join(TEST_VIDEO_FILENAME)
-        download_and_sample_video(TEST_VIDEO_FILENAME, local_path, remote_url: TEST_VIDEO_URL) unless File.exist?(local_path)
+        download_and_sample_video(TEST_VIDEO_FILENAME, local_path,
+                                  remote_url: TEST_VIDEO_URL) unless File.exist?(local_path)
         return
       end
 
@@ -258,7 +260,8 @@ module Features
     def all_video_specs
       generated = GENERATED_VIDEO_SPECS.map { |s| { filename: s[:filename], expected_duration: s[:duration] } }
       remote = REMOTE_VIDEO_LIST.map { |name| { filename: name, expected_duration: MAX_SAMPLE_DURATION.to_f } }
-      remote << { filename: TEST_VIDEO_FILENAME, expected_duration: MAX_SAMPLE_DURATION.to_f } if TEST_VIDEO_URL.present?
+      remote << { filename: TEST_VIDEO_FILENAME,
+                  expected_duration: MAX_SAMPLE_DURATION.to_f } if TEST_VIDEO_URL.present?
       generated + remote
     end
 

@@ -14,9 +14,9 @@ do
   fi
   
   echo "Loading env vars from: $FILE"
-  ARGS=$(cat $FILE |grep -vE '^[[:space:]]*(#.*)*$')
+  ARGS=$(cat "$FILE" |grep -vE '^[[:space:]]*(#.*)*$')
 
-  export $(echo $ARGS|xargs)
+  export $(echo "$ARGS"|xargs)
   echo "$ARGS"
   echo
 done

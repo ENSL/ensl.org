@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE=`echo -n $1 | sed -e 's/\.\w\{3\}$//gi'`
+FILE=$(echo -n "$1" | sed -e 's/\.\w\{3\}$//gi')
 
 if [ -e "$FILE"_preview.mp4 ]; then
 	exit 0
