@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # use source script/env.sh
 
 args=("$@")
@@ -6,7 +8,7 @@ if [[ $# -eq 1 ]]; then
   args+=(.env)
 fi
 
-for FILE in "$@"
+for FILE in "${args[@]}"
 do
   # Check if file exists
   if [ ! -f "$FILE" ]; then 
@@ -14,10 +16,11 @@ do
   fi
   
   echo "Loading env vars from: $FILE"
-  ARGS=$(cat "$FILE" |grep -vE '^[[:space:]]*(#.*)*$')
-
-  export $(echo "$ARGS"|xargs)
-  echo "$ARGS"
+  set -a
+  # shellcheck disable=SC1090
+  . "$FILE"
+  set +a
+  grep -vE '^[[:space:]]*(#.*)*$' "$FILE"
   echo
 done
 

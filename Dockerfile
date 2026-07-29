@@ -1,10 +1,10 @@
 FROM ruby:3.4.8 AS ensl_base
+ARG TARGETARCH
 
 ENV APP_PATH=/var/www
 ENV WEB_UID=1000
 ENV WEB_GID=1000
 ENV NVM_DIR=/usr/local/nvm
-ENV NVM_INSTALL_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh
 ENV GEM_HOME=/var/bundle
 ENV GEM_PATH=/var/bundle
 ENV PATH=/var/bundle/bin:/usr/local/bundle/bin:${PATH}
@@ -14,15 +14,20 @@ ENV BUNDLE_WITH=
 ENV BUNDLER_VERSION=4.0.6
 ENV DUCKDB_VERSION=1.4.5
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ADD https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-${TARGETARCH}.zip /tmp/libduckdb.zip
+ADD https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh /tmp/nvm-install.sh
+
 RUN \
     # Add web
-    adduser web --uid $WEB_UID --home /home/web --shell /bin/bash \
+    adduser web --uid "$WEB_UID" --home /home/web --shell /bin/bash \
                 --disabled-password --gecos "" && \
     apt-get update && apt-get -y upgrade && \
         # Dependencies
         apt-get -y install --no-install-recommends --upgrade \
             # General tools
-            curl unzip build-essential \
+            build-essential curl unzip \
             # For Rust bindgen-based native gems (e.g. commonmarker)
             clang libclang-dev \
             # For MySQL/MariaDB
@@ -30,22 +35,19 @@ RUN \
             # SSL libs
             libssl-dev \
             # zlib, readline and libyaml
-            zlib1g-dev libreadline-dev libyaml-dev \
+            libreadline-dev libyaml-dev zlib1g-dev \
             # For nokogiri
-            libxslt1-dev libxml2-dev \
+            libxml2-dev libxslt1-dev \
             # For carrierwave/rmagick
             imagemagick libmagickwand-dev \
             # Tools for media processing and metadata
-            ffmpeg vlc screen libimage-exiftool-perl && \
+            ffmpeg libimage-exiftool-perl screen vlc && \
+        rm -rf /var/lib/apt/lists/* && \
         # Install DuckDB C API artifacts from GitHub releases (no CLI).
-        DUCKDB_ARCH='' && \
-        case "$(uname -m)" in \
-            x86_64|amd64) DUCKDB_ARCH=amd64 ;; \
-            aarch64|arm64) DUCKDB_ARCH=arm64 ;; \
-            *) echo "Unsupported architecture for DuckDB artifacts: $(uname -m)"; exit 1 ;; \
-        esac && \
-        curl -fsSL "https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-${DUCKDB_ARCH}.zip" \
-            -o /tmp/libduckdb.zip && \
+        DUCKDB_ARCH="${TARGETARCH:-}" && \
+        if [[ "$DUCKDB_ARCH" != "amd64" && "$DUCKDB_ARCH" != "arm64" ]]; then \
+            echo "Unsupported architecture for DuckDB artifacts: $DUCKDB_ARCH"; exit 1; \
+        fi && \
         mkdir -p /tmp/libduckdb /opt/duckdb/include /opt/duckdb/lib && \
         unzip -o /tmp/libduckdb.zip -d /tmp/libduckdb && \
         cp /tmp/libduckdb/duckdb.h /opt/duckdb/include/duckdb.h && \
@@ -56,25 +58,25 @@ RUN \
     # Fix URI startup issue
     gem update --system && \
     # Install bundler and bundle path
-    gem install bundler -v $BUNDLER_VERSION && \
+    gem install bundler -v "$BUNDLER_VERSION" && \
     mkdir -p /var/bundle /usr/local/bundle && chown -R web:web /var/bundle /usr/local/bundle && \
     # Install nvm, Node (LTS) and yarn (installed via npm global)
-    mkdir -p $NVM_DIR && \
-    curl -fsSL "$NVM_INSTALL_URL" | bash && \
+    mkdir -p "$NVM_DIR" && \
+    bash /tmp/nvm-install.sh && rm -f /tmp/nvm-install.sh && \
     # Make nvm available in this shell, install Node LTS and set default
-    . $NVM_DIR/nvm.sh && \
+    . "$NVM_DIR/nvm.sh" && \
     nvm install --lts && nvm alias default 'lts/*' && \
-    NODE_VERSION=$(ls -1 $NVM_DIR/versions/node | tail -n 1) && \
-    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/local/bin/node && \
-    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/local/bin/npm && \
-    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/npx /usr/local/bin/npx && \
+    NODE_VERSION=$(ls -1 "$NVM_DIR/versions/node" | tail -n 1) && \
+    ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/node" /usr/local/bin/node && \
+    ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/npm" /usr/local/bin/npm && \
+    ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/npx" /usr/local/bin/npx && \
     # Make nvm available for all users/shells
     echo "export NVM_DIR=$NVM_DIR" > /etc/profile.d/nvm.sh && \
     echo "[ -s $NVM_DIR/nvm.sh ] && . $NVM_DIR/nvm.sh" >> /etc/profile.d/nvm.sh && \
-    chown -R web:web $NVM_DIR && \
+    chown -R web:web "$NVM_DIR" && \
     # Install yarn
-    npm install -g yarn && \
-    ln -s $NVM_DIR/versions/node/$NODE_VERSION/bin/yarn /usr/local/bin/yarn
+    npm install -g yarn@1.22.22 && \
+    ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/yarn" /usr/local/bin/yarn
     # Clean up
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
 
@@ -103,18 +105,10 @@ ENV RAILS_ENV=development
 USER root
 RUN apt-get update && apt-get -y install --no-install-recommends \
       # For timing test runs
-      time
-
-# Install Playwright's own Chromium and its system dependencies
-# (apt chromium is not used — Playwright manages its own browser binaries)
-#
-# Pin the npx-resolved `playwright` CLI/npm package to the version the
-# playwright-ruby-client gem was built against. Without this, npx installs
-# whatever the *latest* Playwright release is, which frequently ships a
-# different Chromium revision than the one the Ruby driver requests at
-# runtime, causing "Executable doesn't exist at .../chromium-<rev>" failures
-# in specs (spec/support/capybara.rb pins the CLI the same way).
-RUN PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
+    time && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Install Playwright's own Chromium system dependencies.
+    PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
     npx -y "playwright@$PLAYWRIGHT_VERSION" install-deps chromium
 
 USER web

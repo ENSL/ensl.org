@@ -27,7 +27,9 @@ jobs:
       COMPOSE_PROJECT_NAME: ensl_ci
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Fix workspace ownership
         # Keep the checkout and .git owned by the runner (uid 1001). Only
@@ -74,7 +76,7 @@ jobs:
           '
 
       - name: Publish test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@3eeb9fc888e82e8be2fb356bbeec2750231672bc # v1
         if: ${{ always() && hashFiles('tmp/test-results/rspec.xml') != '' }}
         with:
           name: RSpec Results
@@ -84,7 +86,7 @@ jobs:
 
       - name: Upload coverage report
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-report
           path: coverage/
@@ -92,7 +94,7 @@ jobs:
 
       - name: Install Qlty CLI
         if: ${{ always() }}
-        uses: qltysh/qlty-action/install@v2
+        uses: qltysh/qlty-action/install@08a0a862c159eae9b9003081da6663d96efef637 # v2
 
       - name: Run Qlty check
         if: ${{ always() }}
@@ -100,7 +102,7 @@ jobs:
 
       - name: Publish coverage to Qlty
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
-        uses: qltysh/qlty-action/coverage@v2
+        uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2
         with:
           oidc: true
           files: coverage/coverage.json
