@@ -111,7 +111,7 @@ class Team < ApplicationRecord
     transaction do
       teamer = Teamer.create!(user: founder, team: self, rank: Teamer::RANK_LEADER)
       # set founder's team_id without invoking validations that may block assignment
-      founder.update!(team_id: id)
+      founder.update_columns(team_id: id, updated_at: Time.current)
       teamer
     end
   end
@@ -179,7 +179,7 @@ class Team < ApplicationRecord
 
       promoted_from_joiner = member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
       member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
-      member.user.update!(team_id: id) if promoted_from_joiner
+      member.user.update_columns(team_id: id, updated_at: Time.current) if promoted_from_joiner
     end
   end
 

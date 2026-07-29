@@ -75,6 +75,31 @@ RSpec.describe Team, type: :model do
     end
   end
 
+  describe '#apply_member_rank_updates!' do
+    it 'promotes joiners and persists comment without running full user validations' do
+      leader = create(:user)
+      team = create(:team, founder: leader)
+      joiner = create(:user, username: 'JoinerOne')
+      duplicate = create(:user, username: 'JoinerTwo')
+      duplicate.update_column(:username, joiner.username.downcase)
+      member = create(:teamer, team: team, user: joiner, rank: Teamer::RANK_JOINER)
+
+      expect { joiner.update!(team_id: team.id) }.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect do
+        team.apply_member_rank_updates!(
+          actor: leader,
+          rank_params: { member.id.to_s => Teamer::RANK_MEMBER.to_s },
+          comment_params: { member.id.to_s => 'Good player' }
+        )
+      end.not_to raise_error
+
+      expect(member.reload.rank).to eq(Teamer::RANK_MEMBER)
+      expect(member.comment).to eq('Good player')
+      expect(joiner.reload.team_id).to eq(team.id)
+    end
+  end
+
   describe '.search' do
     it 'finds by name case-insensitively' do
       t = create(:team, name: 'Alpha Team')
