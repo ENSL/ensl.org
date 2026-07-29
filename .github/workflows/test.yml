@@ -90,6 +90,14 @@ jobs:
           path: coverage/
           retention-days: 14
 
+      - name: Install Qlty CLI
+        if: ${{ always() }}
+        uses: qltysh/qlty-action/install@v2
+
+      - name: Run Qlty check
+        if: ${{ always() }}
+        run: qlty check --all
+
       - name: Publish coverage to Qlty
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
         uses: qltysh/qlty-action/coverage@v2
