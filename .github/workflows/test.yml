@@ -92,15 +92,6 @@ jobs:
           path: coverage/
           retention-days: 14
 
-      - name: Run Qlty check
-        if: ${{ always() }}
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace" \
-            -w /workspace \
-            qltysh/qlty \
-            qlty check --all
-
       - name: Publish coverage to Qlty
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
         uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2
@@ -116,3 +107,17 @@ jobs:
         if: always()
         # Leave the persistent checkout writable for the next checkout/clean.
         run: docker run --rm -v "$PWD:/workspace" alpine:3.22 chown -R 1001:121 /workspace
+
+  qlty_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Install Qlty CLI
+        uses: qltysh/qlty-action/install@08a0a862c159eae9b9003081da6663d96efef637 # v2
+
+      - name: Run Qlty check
+        run: qlty check --all
