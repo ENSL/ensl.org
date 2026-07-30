@@ -5,6 +5,7 @@ ENV APP_PATH=/var/www
 ENV WEB_UID=1000
 ENV WEB_GID=1000
 ENV NVM_DIR=/usr/local/nvm
+ENV NVM_VERSION=0.39.6
 ENV GEM_HOME=/var/bundle
 ENV GEM_PATH=/var/bundle
 ENV PATH=/var/bundle/bin:/usr/local/bundle/bin:${PATH}
@@ -13,11 +14,12 @@ ENV BUNDLE_WITHOUT=
 ENV BUNDLE_WITH=
 ENV BUNDLER_VERSION=4.0.6
 ENV DUCKDB_VERSION=1.4.5
+ENV YARN_VERSION=1.22.22
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ADD https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-${TARGETARCH}.zip /tmp/libduckdb.zip
-ADD https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh /tmp/nvm-install.sh
+ADD https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh /tmp/nvm-install.sh
 
 RUN \
     # Add web
@@ -26,22 +28,33 @@ RUN \
     apt-get update && apt-get -y upgrade && \
         # Dependencies
         apt-get -y install --no-install-recommends --upgrade \
-            # General tools
-            build-essential curl unzip \
-            # For Rust bindgen-based native gems (e.g. commonmarker)
-            clang libclang-dev \
-            # For MySQL/MariaDB
-            libmariadb-dev libmariadb-dev-compat \
-            # SSL libs
-            libssl-dev \
-            # zlib, readline and libyaml
-            libreadline-dev libyaml-dev zlib1g-dev \
-            # For nokogiri
-            libxml2-dev libxslt1-dev \
-            # For carrierwave/rmagick
-            imagemagick libmagickwand-dev \
-            # Tools for media processing and metadata
-            ffmpeg libimage-exiftool-perl screen vlc && \
+            # Package rationale (kept alphabetically sorted for linting):
+            # - build-essential, clang, libclang-dev:
+            #   toolchain + clang headers for native gem extensions (notably commonmarker/CBindgen workflows).
+            # - curl:
+            #   general fetch/debug utility retained for runtime/admin scripts.
+            # - ffmpeg:
+            #   required by app/services/video_processing.rb and app/models/movie.rb for transcode/thumbnail work.
+            # - imagemagick, libmagickwand-dev:
+            #   required by carrierwave + rmagick (app/uploaders/image_uploader.rb includes CarrierWave::RMagick).
+            # - libimage-exiftool-perl:
+            #   file/media metadata extraction utility used by upload/media workflows.
+            # - libmariadb-dev, libmariadb-dev-compat:
+            #   required to compile and link the mysql2 gem.
+            # - libreadline-dev, libssl-dev, libyaml-dev, zlib1g-dev:
+            #   native build/runtime libs commonly required by Ruby and C-extension gems.
+            # - libxml2-dev, libxslt1-dev:
+            #   XML/XSLT native libs for nokogiri-family dependencies in the Rails stack.
+            # - screen:
+            #   runtime terminal multiplexer for long-running/manual admin sessions.
+            # - unzip:
+            #   required to unpack the downloaded DuckDB C API archive.
+            # - vlc:
+            #   required by app/models/movie.rb (VLC binary invocation for legacy conversion paths).
+            build-essential clang curl ffmpeg imagemagick libclang-dev \
+            libimage-exiftool-perl libmariadb-dev libmariadb-dev-compat \
+            libmagickwand-dev libreadline-dev libssl-dev libxml2-dev \
+            libxslt1-dev libyaml-dev screen unzip vlc zlib1g-dev && \
         rm -rf /var/lib/apt/lists/* && \
         # Install DuckDB C API artifacts from GitHub releases (no CLI).
         DUCKDB_ARCH="${TARGETARCH:-}" && \
@@ -66,7 +79,7 @@ RUN \
     # Make nvm available in this shell, install Node LTS and set default
     . "$NVM_DIR/nvm.sh" && \
     nvm install --lts && nvm alias default 'lts/*' && \
-    NODE_VERSION=$(ls -1 "$NVM_DIR/versions/node" | tail -n 1) && \
+    NODE_VERSION=$(find "$NVM_DIR/versions/node" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V | tail -n 1) && \
     ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/node" /usr/local/bin/node && \
     ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/npm" /usr/local/bin/npm && \
     ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/npx" /usr/local/bin/npx && \
@@ -75,7 +88,7 @@ RUN \
     echo "[ -s $NVM_DIR/nvm.sh ] && . $NVM_DIR/nvm.sh" >> /etc/profile.d/nvm.sh && \
     chown -R web:web "$NVM_DIR" && \
     # Install yarn
-    npm install -g yarn@1.22.22 && \
+    npm install -g "yarn@${YARN_VERSION}" && \
     ln -s "$NVM_DIR/versions/node/$NODE_VERSION/bin/yarn" /usr/local/bin/yarn
     # Clean up
     # apt-get --purge autoremove && rm -rf /var/apt/lists/*
@@ -107,13 +120,15 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
       # For timing test runs
     time && \
     rm -rf /var/lib/apt/lists/* && \
-    # Install Playwright's own Chromium system dependencies.
+    # Install Linux system dependencies required by Playwright-managed browsers.
+    # This does NOT download browser binaries.
     PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
-    npx -y "playwright@$PLAYWRIGHT_VERSION" install-deps chromium
+    npx -y "playwright@$PLAYWRIGHT_VERSION" install-deps
 
 USER web
 
-# Install Playwright browsers via Node CLI (independent of Ruby gem)
+# Download browser binaries via Node CLI (independent of Ruby gem).
+# Chromium is downloaded once here; headless-shell is kept for CI/headless runs.
 RUN PLAYWRIGHT_VERSION=$(bundle exec ruby -e 'require "playwright"; print Playwright::COMPATIBLE_PLAYWRIGHT_VERSION') && \
     npx -y "playwright@$PLAYWRIGHT_VERSION" install chromium chromium-headless-shell
 
