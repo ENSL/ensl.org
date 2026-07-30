@@ -92,13 +92,14 @@ jobs:
           path: coverage/
           retention-days: 14
 
-      - name: Install Qlty CLI
-        if: ${{ always() }}
-        uses: qltysh/qlty-action/install@08a0a862c159eae9b9003081da6663d96efef637 # v2
-
       - name: Run Qlty check
         if: ${{ always() }}
-        run: qlty check --all
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            qltysh/qlty \
+            qlty check --all
 
       - name: Publish coverage to Qlty
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
