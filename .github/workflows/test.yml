@@ -98,16 +98,6 @@ jobs:
           test -f coverage/coverage.json
           ls -lah coverage
 
-      - name: Publish coverage to Qlty
-        if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
-        uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2
-        with:
-          oidc: true
-          files: coverage/coverage.json
-          format: simplecov
-          verbose: true
-          skip-errors: false
-
       - name: Tear down containers
         if: always()
         run: docker compose --profile test down -v --remove-orphans
@@ -132,3 +122,28 @@ jobs:
       - name: Run Qlty check
         continue-on-error: true
         run: qlty check --all
+
+  qlty_coverage:
+    runs-on: ubuntu-latest
+    needs: rspec
+    if: ${{ needs.rspec.result == 'success' }}
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+
+      - name: Verify downloaded coverage file exists
+        run: |
+          test -f coverage/coverage.json
+          ls -lah coverage
+
+      - name: Publish coverage to Qlty
+        uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2
+        with:
+          oidc: true
+          files: coverage/coverage.json
+          format: simplecov
+          verbose: true
+          skip-errors: false
