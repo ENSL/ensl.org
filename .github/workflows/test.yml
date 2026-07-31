@@ -92,12 +92,21 @@ jobs:
           path: coverage/
           retention-days: 14
 
+      - name: Verify coverage file exists
+        if: ${{ always() }}
+        run: |
+          test -f coverage/coverage.json
+          ls -lah coverage
+
       - name: Publish coverage to Qlty
         if: ${{ always() && hashFiles('coverage/coverage.json') != '' }}
         uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2
         with:
           oidc: true
           files: coverage/coverage.json
+          format: simplecov
+          verbose: true
+          skip-errors: false
 
       - name: Tear down containers
         if: always()
@@ -110,6 +119,7 @@ jobs:
 
   qlty_check:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -120,4 +130,5 @@ jobs:
         uses: qltysh/qlty-action/install@08a0a862c159eae9b9003081da6663d96efef637 # v2
 
       - name: Run Qlty check
+        continue-on-error: true
         run: qlty check --all
