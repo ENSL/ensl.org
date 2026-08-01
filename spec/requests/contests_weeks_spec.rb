@@ -75,7 +75,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       contest = create(:contest)
       user_team = create(:team)
       opponent_team = create(:team)
-      create(:teamer, user: user, team: user_team, rank: Teamer::RANK_DEPUTEE)
+      create(:teamer, user: user, team: user_team, rank: Teamer::RANK_LEADER)
       create(:contester, contest: contest, team: user_team)
       opponent = create(:contester, contest: contest, team: opponent_team)
 
@@ -84,7 +84,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
       get "/contests/#{contest.id}"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("/challenges/new/#{opponent.id}")
+      expect(response.body).to include(new_challenge_path(id: opponent.id))
     end
   end
 
