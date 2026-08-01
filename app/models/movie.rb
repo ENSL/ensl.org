@@ -122,13 +122,11 @@ class Movie < ApplicationRecord
     @user_double || super
   end
 
-  # TODO: Perhaps create DurationType < ActiveRecord::Type::Integer
   def length_s
     return unless length
 
-    minutes = length / 60
-    seconds = length % 60
-    "#{minutes}:#{Kernel.format('%02d', seconds)}"
+    minutes, seconds = length.divmod(60)
+    Kernel.format('%<minutes>d:%<seconds>02d', minutes: minutes, seconds: seconds)
   end
 
   def all_files

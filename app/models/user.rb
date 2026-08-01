@@ -544,7 +544,6 @@ class User < ApplicationRecord
     generate_password unless raw_password&.length.to_i.positive?
     save!
 
-    # TODO: consider moving these two to callbacks
     send_password_message
     Notifications.password(self, raw_password).deliver
   end

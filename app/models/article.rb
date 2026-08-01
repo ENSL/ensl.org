@@ -81,7 +81,7 @@ class Article < ApplicationRecord
   after_save :send_notifications
 
   # has_view_count
-  # FIXME: consider migrating to updated_at to allow
+  # TODO: consider migrating to updated_at to allow
   #        read marks to update on edit
   acts_as_readable on: :created_at
   has_paper_trail on: [:update], only: %i[title text text_parsed text_coding]
