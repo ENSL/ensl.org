@@ -11,7 +11,7 @@
     <% end %>
   </tr>
 
-  <% @polls.reverse_each do |poll| %>
+  <% @polls.each do |poll| %>
     <tr>
       <td><%= link_to (h poll.question), poll %></td>
       <td><%= longtime poll.end_date %></td>

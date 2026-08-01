@@ -20,7 +20,7 @@
 class Poll < ApplicationRecord
   include Extra
 
-  scope :recent, -> { order(created_at: :desc) }
+  scope :recent, -> { order(created_at: :desc, id: :desc) }
 
   # attr_protected :id, :updated_at, :created_at, :votes, :user_id
 
