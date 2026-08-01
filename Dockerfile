@@ -117,7 +117,9 @@ ENV RAILS_ENV=development
 # Test-only system packages
 USER root
 RUN apt-get update && apt-get -y install --no-install-recommends \
-      # For timing test runs
+    # Required by VS Code terminal command sandboxing
+    bubblewrap socat \
+    # For timing test runs
     time && \
     rm -rf /var/lib/apt/lists/* && \
     # Install Linux system dependencies required by Playwright-managed browsers.
@@ -166,3 +168,6 @@ ENV RAILS_ENV=staging
 
 # ENTRYPOINT ["/bin/bash"]
 # CMD ["/var/www/bin/script/entry.sh"]
+
+# Default target for local tooling and Dev Containers.
+FROM ensl_development AS ensl_devcontainer

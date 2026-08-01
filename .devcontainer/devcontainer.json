@@ -5,6 +5,8 @@
     "context": ".."
   },
 
+  "runArgs": ["--security-opt=seccomp=unconfined"],
+
   // Optional but usually correct if your container user is 'web'
   "remoteUser": "web",
 
