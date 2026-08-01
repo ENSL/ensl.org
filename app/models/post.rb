@@ -77,7 +77,6 @@ class Post < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this
     params.require(:post).permit(:text, :topic_id)
   end
 

@@ -22,8 +22,6 @@ gem 'sidekiq'
 gem 'sidekiq-cron'
 
 # Reads the Parquet files exported by the ensl_analysis Python pipeline
-# (embeds DuckDB; compiles a native extension on install, needs a C++
-# toolchain -- already provided by build-essential in the Dockerfile).
 gem 'duckdb'
 
 # Web server.
@@ -85,9 +83,6 @@ gem 'webauthn'
 
 #
 # View and view helper gems
-
-# FIXME
-# gem 'rails_csrf_protection'
 
 # Pagination
 gem 'will_paginate'

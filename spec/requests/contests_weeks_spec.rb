@@ -70,6 +70,22 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it 'shows challenge actions for the current user contester on ladder contests' do
+      contest = create(:contest)
+      user_team = create(:team)
+      opponent_team = create(:team)
+      create(:teamer, user: user, team: user_team, rank: Teamer::RANK_DEPUTEE)
+      create(:contester, contest: contest, team: user_team)
+      opponent = create(:contester, contest: contest, team: opponent_team)
+
+      login_as(user)
+
+      get "/contests/#{contest.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("/challenges/new/#{opponent.id}")
+    end
   end
 
   describe 'GET /contests/new' do

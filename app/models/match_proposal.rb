@@ -27,7 +27,6 @@ class MatchProposal < ApplicationRecord
   belongs_to :match, optional: true
   belongs_to :team, optional: true
   # has_many :confirmed_by, class_name: 'Team', uniq: true
-  # FIXME: attr_accessible :proposed_time, :status
 
   validates :match, :team, :proposed_time, presence: true
 

@@ -18,8 +18,7 @@ class ContestsController < ApplicationController
   end
 
   def show
-    # TODO
-    # @friendly = cuser.active_contesters.of_contest(@contest).active.first if cuser
+    @friendly = cuser&.active_contesters&.of_contest(@contest)&.first
   end
 
   def scores

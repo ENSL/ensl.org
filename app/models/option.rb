@@ -31,7 +31,6 @@ class Option < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this
     params.require(:option).permit(:option, :votes, :poll_id)
   end
 end

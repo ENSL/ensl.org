@@ -466,13 +466,15 @@ class Match < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this
     params.require(:match).permit(:diff, :forfeit, :match_time, :points1, :points2, :report, :score1, :score2,
                                   :caster_id, :challenge_id, :contest_id, :contester1_id, :contester2_id,
                                   :demo_id, :hltv_id, :map1_id, :map2_id, :motm_id, :referee_id,
                                   :server_id, :week_id)
   end
 
+  # This method normalizes the matchers_attributes hash in the match_params hash.
+  # It ensures that the _destroy attribute is set correctly and that user_id values
+  # are valid. It modifies the match_params hash in place.
   def self.normalize_matchers_attributes!(match_params)
     return unless match_params
 

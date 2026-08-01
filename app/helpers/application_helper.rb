@@ -244,7 +244,6 @@ module ApplicationHelper
     render partial: 'comments/index', locals: { comment: comment, comments: comments }
   end
 
-  # FIXME: this won't work.
   def link_to_add_fields(name, form_builder, association)
     new_object = form_builder.object.class.reflect_on_association(association).klass.new
     fields = form_builder.fields_for(association, new_object, child_index: "new_#{association}") do |builder|

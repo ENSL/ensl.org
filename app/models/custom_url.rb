@@ -21,7 +21,6 @@ class CustomUrl < ApplicationRecord
   MENU_LINKED_NAMES = %w[compmod halloffame rules tutorials].freeze
 
   belongs_to :article, optional: true
-  # FIXME: attr_accessible :name
 
   before_validation :normalize_name
   before_destroy :ensure_not_menu_linked

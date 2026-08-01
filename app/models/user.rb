@@ -225,7 +225,6 @@ class User < ApplicationRecord
     return unless fullname
 
     if fullname.include?(' ')
-      # TODO: check this
       self.firstname = fullname.match(/(?:^|(?:\.\s))(\w+)/)[1]
       self.lastname = fullname.match(/\s(\w+)$/)[1]
     else
@@ -644,7 +643,6 @@ class User < ApplicationRecord
 
     case user.password_hash
     when User::PASSWORD_SCRYPT
-      # FIXME: If exception occurs here, user cannot log in
       begin
         pass = SCrypt::Password.new(user.password)
       rescue StandardError

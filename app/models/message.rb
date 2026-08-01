@@ -32,15 +32,6 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { order('created_at DESC') }
 
-  # FIXME: check before removing, provided by unread
-  # scope :read_by,
-  #  lambda { |user| {:include => :readings, :conditions => ["readings.user_id = ?", user.id]} }
-  # scope :unread_by,
-  #  lambda { |user| {
-  # :joins => "LEFT JOIN readings ON readable_type = 'Message' " \
-  #           "AND readable_id = messages.id AND readings.user_id = #{user.id}",
-  # :conditions => "readings.user_id IS NULL"} }
-
   belongs_to :sender, polymorphic: true, optional: true
   belongs_to :recipient, polymorphic: true, optional: true
 
@@ -115,7 +106,6 @@ class Message < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this
     params.require(:message).permit(:recipient_type, :sender_type, :title, :text, :recipient_id, :sender_id,
                                     :sender_raw)
   end
