@@ -8,12 +8,12 @@ class ArticlesController < ApplicationController
   end
 
   def news_index
-    @news = Article.with_comments.ordered.nodrafts.onlynews.limit(10)
+    @news = Article.with_comments.ordered.nodrafts.news.limit(10)
     @categories = Category.ordered.domain(Category::DOMAIN_NEWS)
   end
 
   def news_archive
-    @news = Article.with_comments.ordered.nodrafts.onlynews
+    @news = Article.with_comments.ordered.nodrafts.news
   end
 
   def admin
