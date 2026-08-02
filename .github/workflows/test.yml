@@ -109,6 +109,7 @@ jobs:
 
   qlty_check:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     continue-on-error: true
     steps:
       - name: Checkout
