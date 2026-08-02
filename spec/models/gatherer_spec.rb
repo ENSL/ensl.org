@@ -269,12 +269,11 @@ RSpec.describe Gatherer, type: :model do
       expect(gatherer.errors[:username]).to be_present
     end
 
-    it 'does not change status when start_gather runs on an already voting gather' do
+    it 'does not restart an already voting gather' do
       gather = create(:gather, status: Gather::STATE_VOTING)
       create_list(:gatherer, Gather::FULL, gather: gather)
-      gatherer = gather.gatherers.first
 
-      expect { gatherer.start_gather }.not_to(change { gather.reload.status })
+      expect { gather.start_voting_if_full! }.not_to(change { gather.reload.status })
     end
 
     it 'skips notifications for profiles that opted out of PM notifications' do
@@ -283,10 +282,10 @@ RSpec.describe Gatherer, type: :model do
       create(:profile, user: opted_out, notify_gather: 1, notify_pms: false)
       allow(Notifications).to receive(:gather)
 
-      gatherer = create(:gatherer, gather: gather, user: create(:user))
+      create(:gatherer, gather: gather, user: create(:user))
       allow(gather.gatherers).to receive(:count).and_return(Gather::NOTIFY)
 
-      gatherer.notify_gatherers
+      gather.notify_interested_users_if_threshold_reached!
 
       expect(Notifications).not_to have_received(:gather).with(opted_out, gather)
     end

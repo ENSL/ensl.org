@@ -133,6 +133,22 @@ class Gather < ApplicationRecord
     end
   end
 
+  def start_voting_if_full!
+    with_lock do
+      update!(status: STATE_VOTING) if gatherers.count >= FULL && status == STATE_RUNNING
+    end
+  end
+
+  def notify_interested_users_if_threshold_reached!
+    with_lock do
+      return unless gatherers.count >= NOTIFY
+    end
+
+    Profile.where(notify_gather: 1).includes(:user).find_each do |profile|
+      Notifications.gather(profile.user, self) if profile.user&.profile&.notify_pms
+    end
+  end
+
   def add_maps_and_server
     category.maps.basic.classic.each do |m|
       maps << m
@@ -247,13 +263,25 @@ class Gather < ApplicationRecord
     Gathers::Broadcaster.call(self) if status != previous_status
   end
 
-  def advance_picking!(team1_count:, team2_count:)
-    apply_picking_transition(picking_transition(turn, team1_count, team2_count))
+  def advance_picking_after_pick!
+    with_lock do
+      team1_count = gatherers.team(1).count
+      team2_count = gatherers.team(2).count
+      apply_picking_transition(picking_transition(turn, team1_count, team2_count))
+    end
   end
 
-  def picking_slot_available?(team1_count:, team2_count:)
+  def picking_slot_available?
+    team1_count = gatherers.team(1).count
+    team2_count = gatherers.team(2).count
     completed_picks = [team1_count - 1, 0].max + [team2_count - 1, 0].max
     numbered_picking_teams[completed_picks] == turn
+  end
+
+  def remove_votes_by(user_id)
+    map_votes.where(user_id: user_id).destroy_all
+    server_votes.where(user_id: user_id).destroy_all
+    gatherer_votes.where(user_id: user_id).destroy_all
   end
 
   def can_create?(cuser)
