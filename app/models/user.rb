@@ -103,7 +103,7 @@ class User < ApplicationRecord
   has_many :challenges_received, through: :active_contesters, source: 'challenges_received'
   has_many :challenges_sent, through: :active_contesters, source: 'challenges_sent'
   has_many :upcoming_team_matches, -> { where('match_time > UTC_TIMESTAMP()') },
-           through: :active_teams, source: 'matches'
+           through: :active_contesters, source: 'matches'
   has_many :upcoming_ref_matches, -> { where('match_time > UTC_TIMESTAMP()') },
            class_name: 'Match', foreign_key: 'referee_id', dependent: :nullify, inverse_of: :referee
   has_many :past_team_matches, -> { where('match_time < UTC_TIMESTAMP()') },

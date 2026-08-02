@@ -184,6 +184,60 @@ describe User do
     end
   end
 
+  describe 'agenda matches' do
+    let(:team) { create(:team) }
+    let(:contest) { create(:contest) }
+    let(:team_contester) { create(:contester, team: team, contest: contest) }
+
+    before do
+      create(:teamer, user: user, team: team, rank: Teamer::RANK_MEMBER)
+    end
+
+    it 'includes upcoming matches for active team members and referees without duplicates' do
+      team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
+      referee_match = create(:match, referee: user, match_time: 2.days.from_now)
+      shared_match = create(
+        :match,
+        contest: contest,
+        contester1: team_contester,
+        referee: user,
+        match_time: 3.days.from_now
+      )
+      create(:match, contest: contest, contester1: team_contester, match_time: 1.day.ago)
+
+      expect(user.upcoming_matches).to contain_exactly(team_match, referee_match, shared_match)
+    end
+
+    it 'excludes team matches when the user is only waiting to join' do
+      user.teamers.update_all(rank: Teamer::RANK_JOINER)
+      team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
+
+      expect(user.reload.upcoming_matches).not_to include(team_match)
+    end
+
+    it 'excludes upcoming matches for withdrawn contest entries' do
+      team_contester.update!(active: false)
+      team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
+
+      expect(user.upcoming_matches).not_to include(team_match)
+    end
+
+    it 'includes only unfinished past matches for team members and referees' do
+      team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.ago)
+      referee_match = create(:match, referee: user, match_time: 2.days.ago)
+      scored_match = create(
+        :match,
+        :scored,
+        contest: contest,
+        contester1: team_contester,
+        match_time: 3.days.ago
+      )
+
+      expect(user.past_matches).to contain_exactly(team_match, referee_match)
+      expect(user.past_matches).not_to include(scored_match)
+    end
+  end
+
   describe 'password and profile behavior' do
     it 'builds and saves profile on create' do
       u = create(:user)

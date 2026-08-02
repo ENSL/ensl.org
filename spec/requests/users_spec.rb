@@ -178,6 +178,29 @@ RSpec.describe 'UsersController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("/data_files/new?id=#{Directory::MOVIES}")
     end
+
+    it 'renders upcoming matches involving one of the users active teams' do
+      team = create(:team)
+      create(:teamer, user: user, team: team, rank: Teamer::RANK_MEMBER)
+      contest = create(:contest)
+      team_contester = create(:contester, team: team, contest: contest)
+      opponent = create(:contester, contest: contest)
+      create(
+        :match,
+        contest: contest,
+        contester1: team_contester,
+        contester2: opponent,
+        match_time: 1.day.from_now
+      )
+      login_as(user)
+
+      get "/users/#{user.id}/agenda"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Upcoming matches for your concern')
+      expect(response.body).to include(team.name)
+      expect(response.body).to include(opponent.team.name)
+    end
   end
 
   describe 'GET /users/:id/history' do
