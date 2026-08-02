@@ -152,11 +152,7 @@ ENV RAILS_ENV=production
 # Generate rake secret
 # RUN rake secret && rails credentials:edit --environment production
 
-# Assets are only compiled for production
-#RUN bundle exec rake assets:precompile && \
-    # FIXME: Temporary fix for assets
-    # Move assets to a temp dir here and move them back in entry script
-#    cp -r /var/www/public/assets /home/web/assets
+# Assets could be compiled here. Not used atm.
 
 #
 # Staging

@@ -23,15 +23,9 @@ bundle exec rake db:migrate || {
 # Precompile assets when needed. Don't assume the ENV
 if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   echo "Precompiling assets..."
-  # FIXME: disabled for now because of issues
-  # if [[ -z "$ASSETS_PATH" ]] && [ -d "$ASSETS_PATH"]; then
-  #   rm -rf "${APP_PATH}/public/assets"
-  #   mv "$ASSETS_PATH" "${APP_PATH}/public/assets"
-  # fi
   bundle exec rake assets:clean
   bundle exec rails dartsass:build
   bundle exec rails tailwindcss:build
-  bundle exec rails assets:precompile
   bundle exec rails assets:precompile
   # chown -R web:web $APP_PATH
 fi
