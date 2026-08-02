@@ -139,7 +139,7 @@ class Gatherer < ApplicationRecord
   end
 
   def can_create?(cuser, _params = {})
-    joining_actor?(cuser) && gather_open? && gather.gatherers.of_user(cuser).none?
+    joining_actor?(cuser) && gather.open_for_join? && gather.gatherers.of_user(cuser).none?
   end
 
   def can_update?(cuser, params = {})
@@ -190,17 +190,15 @@ class Gatherer < ApplicationRecord
   end
 
   def remove_gather_votes
-    gather.remove_votes_by(user_id)
+    gather.map_votes.where(user_id: user_id).destroy_all
+    gather.server_votes.where(user_id: user_id).destroy_all
+    gather.gatherer_votes.where(user_id: user_id).destroy_all
   end
 
   def joining_actor?(cuser)
     return false unless cuser
 
     user == cuser && !cuser.banned?(Ban::TYPE_GATHER)
-  end
-
-  def gather_open?
-    gather.status == Gather::STATE_RUNNING && gather.gatherers.count < Gather::FULL
   end
 
   def privileged?(cuser)

@@ -82,6 +82,27 @@ RSpec.describe Gatherer, type: :model do
     end
   end
 
+  describe 'vote cleanup' do
+    it "removes the departing user's gather votes and preserves other users' votes" do
+      gather = create(:gather)
+      departing = create(:gatherer, gather: gather)
+      candidate = create(:gatherer, gather: gather)
+      gather_map = GatherMap.create!(gather: gather, map: create(:map), votes: 0)
+      gather_server = GatherServer.create!(gather: gather, server: create(:server), votes: 0)
+      other_user = create(:user)
+
+      departing_vote_ids = [candidate, gather_map, gather_server].map do |votable|
+        Vote.create!(user: departing.user, votable: votable).id
+      end
+      other_vote = Vote.create!(user: other_user, votable: candidate)
+
+      departing.destroy!
+
+      expect(Vote.where(id: departing_vote_ids)).to be_empty
+      expect(Vote.exists?(other_vote.id)).to be true
+    end
+  end
+
   describe 'change_turn' do
     it 'switches turns after the first pick in the default strategy' do
       gather = create(:gather, status: Gather::STATE_PICKING, turn: 1)

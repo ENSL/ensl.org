@@ -133,6 +133,10 @@ class Gather < ApplicationRecord
     end
   end
 
+  def open_for_join?
+    status == STATE_RUNNING && gatherers.count < FULL
+  end
+
   def start_voting_if_full!
     with_lock do
       update!(status: STATE_VOTING) if gatherers.count >= FULL && status == STATE_RUNNING
@@ -276,12 +280,6 @@ class Gather < ApplicationRecord
     team2_count = gatherers.team(2).count
     completed_picks = [team1_count - 1, 0].max + [team2_count - 1, 0].max
     numbered_picking_teams[completed_picks] == turn
-  end
-
-  def remove_votes_by(user_id)
-    map_votes.where(user_id: user_id).destroy_all
-    server_votes.where(user_id: user_id).destroy_all
-    gatherer_votes.where(user_id: user_id).destroy_all
   end
 
   def can_create?(cuser)
