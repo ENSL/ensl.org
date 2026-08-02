@@ -62,7 +62,7 @@ class Contester < ApplicationRecord
   validates(*%i[score win loss draw extra], inclusion: { in: 0..9999, allow_nil: true })
   validates :team_id, uniqueness: { scope: :contest_id, message: "You can't join same contest twice." }
 
-  # validate_on_create:validate_member_participation
+  validate :validate_member_participation, on: :create
   validate :validate_contest, on: :create
   # validate_on_create:validate_playernumber
 
@@ -119,14 +119,21 @@ class Contester < ApplicationRecord
   end
 
   def validate_member_participation
-    # FIXME: some bug here
-    #		for member in team.teamers.present do
-    #			for team in member.user.active_teams do
-    #				if team.contesters.active.exists?(:contest_id => contest_id)
-    #					errors.add_to_base "Member #{member.user} is already participating with team #{team.name}"
-    #				end
-    #			end
-    #		end
+    return unless team && contest
+
+    conflicting_membership = Teamer.active
+                                   .joins(team: :contesters)
+                                   .includes(:user, :team)
+                                   .where(user_id: team.teamers.active.select(:user_id))
+                                   .where(teams: { active: true })
+                                   .where(contesters: { contest_id: contest_id, active: true })
+                                   .where.not(team_id: team_id)
+                                   .first
+    return unless conflicting_membership
+
+    errors.add :base,
+               "Member #{conflicting_membership.user} is already participating with team " \
+               "#{conflicting_membership.team.name}"
   end
 
   def validate_contest

@@ -59,6 +59,89 @@ RSpec.describe Contester, type: :model do
       expect(contester.errors[:base]).to include 'Cannot join contest! Signups are closed!'
     end
 
+    describe 'member participation' do
+      let(:contest) { create(:contest) }
+      let(:previous_team) { create(:team) }
+      let(:joining_team) { create(:team) }
+      let(:player) { create(:user) }
+
+      def add_member(user, team, rank = Teamer::RANK_MEMBER)
+        create(:teamer, user: user, team: team, rank: rank)
+      end
+
+      it 'rejects a team when an active member already represents another team in the contest' do
+        add_member(player, previous_team)
+        add_member(player, joining_team)
+        create(:contester, contest: contest, team: previous_team)
+
+        contester = build(:contester, contest: contest, team: joining_team)
+
+        expect(contester).not_to be_valid
+        expect(contester.errors[:base]).to include(
+          "Member #{player} is already participating with team #{previous_team.name}"
+        )
+      end
+
+      it 'allows a team whose active members do not represent another team in the contest' do
+        add_member(create(:user), previous_team)
+        add_member(player, joining_team)
+        create(:contester, contest: contest, team: previous_team)
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'allows a team with no members to join' do
+        create(:contester, contest: contest, team: previous_team)
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'allows the same player to represent teams in different contests' do
+        other_contest = create(:contest)
+        add_member(player, previous_team)
+        add_member(player, joining_team)
+        create(:contester, contest: other_contest, team: previous_team)
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'allows a player who switched teams after leaving the previous team' do
+        previous_membership = add_member(player, previous_team)
+        create(:contester, contest: contest, team: previous_team)
+        previous_membership.destroy
+        add_member(player, joining_team)
+
+        expect(previous_membership.reload.rank).to eq(Teamer::RANK_REMOVED)
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'ignores pending applications to another participating team' do
+        add_member(player, previous_team, Teamer::RANK_JOINER)
+        add_member(player, joining_team)
+        create(:contester, contest: contest, team: previous_team)
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'ignores inactive participation by another team' do
+        add_member(player, previous_team)
+        add_member(player, joining_team)
+        previous_contester = create(:contester, contest: contest, team: previous_team)
+        previous_contester.destroy
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+
+      it 'ignores former members of the joining team' do
+        add_member(player, previous_team)
+        former_membership = add_member(player, joining_team)
+        former_membership.destroy
+        create(:contester, contest: contest, team: previous_team)
+
+        expect(build(:contester, contest: contest, team: joining_team)).to be_valid
+      end
+    end
+
     it 'requires at least six active players' do
       contester = build(:contester)
       allow(contester.team).to receive_message_chain(:teamers, :active, :unique_by_team, :count).and_return(5)
