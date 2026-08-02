@@ -108,8 +108,6 @@ class Profile < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this, add user_id
-    # TEST
-    params.require(:profile).except!(:id, :updated_at).permit!
+    params.require(:profile).except!(:id, :user_id, :updated_at).permit!
   end
 end
