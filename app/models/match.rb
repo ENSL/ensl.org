@@ -406,36 +406,9 @@ class Match < ApplicationRecord
     return false unless cuser
     return true if cuser.admin?
 
-    # Controllers/views may pass an Array of permitted keys instead of a params hash.
-    referee_param = params.respond_to?(:key?) ? params[:referee_id] : nil
-    caster_param = params.respond_to?(:key?) ? params[:caster_id] : nil
-
-    if cuser.ref?
-      if referee == cuser
-        return true if Verification.contain(params,
-                                            %i[score1 score2 forfeit report demo_id
-                                               motm_name matchers_attributes server_id])
-        return true if Verification.contain(params, [:hltv]) && !demo
-      end
-      referee_toggle = (referee_param.to_i == cuser.id && referee_id.blank?) ||
-                       (referee_param.blank? && referee_id == cuser.id)
-      return true if Verification.contain(params, [:referee_id]) && referee_toggle
-    end
-
-    if contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser)
-      if match_time.past?
-        return true if Verification.contain(params, %i[score1 score2]) &&
-                       !score1 && !score2 && !forfeit
-        return true if Verification.contain(params, [:matchers_attributes])
-      end
-      return true if match_time.today? && Verification.contain(params, [:stream_id])
-    end
-
-    caster_toggle = (caster_param.to_i == cuser.id && caster_id.blank?) ||
-                    (caster_param.blank? && caster_id.to_i == cuser.id)
-    return true if cuser.caster? && Verification.contain(params, [:caster_id]) && caster_toggle
-
-    false
+    referee_can_update?(cuser, params) ||
+      team_leader_can_update?(cuser, params) ||
+      caster_can_update?(cuser, params)
   end
 
   def can_destroy?(cuser)
@@ -472,7 +445,7 @@ class Match < ApplicationRecord
 
     matchers_attributes.each_key do |key|
       matcher = matchers_attributes[key]
-      next unless matcher.respond_to?(:[])
+      next unless matcher.respond_to?(:keys)
 
       destroy_value = matcher[:_destroy] || matcher['_destroy']
       matcher['_destroy'] = destroy_value != 'keep' if matcher.respond_to?(:[]=)
@@ -488,5 +461,52 @@ class Match < ApplicationRecord
       user = User.find_by(username: user_id)
       matcher['user_id'] = user.id if user
     end
+  end
+
+  private
+
+  def referee_can_update?(cuser, params)
+    return false unless cuser.ref?
+
+    if referee == cuser
+      result_fields = %i[score1 score2 forfeit report demo_id motm_name matchers_attributes server_id]
+      return true if Verification.contain(params, result_fields)
+      return true if Verification.contain(params, [:hltv]) && !demo
+    end
+
+    Verification.contain(params, [:referee_id]) &&
+      self_assignment_change?(assigned_id: referee_id, requested_id: params[:referee_id], user_id: cuser.id)
+  end
+
+  def team_leader_can_update?(cuser, params)
+    return false unless team_leader?(cuser)
+
+    leader_result_update?(params) || leader_stream_update?(params)
+  end
+
+  def team_leader?(cuser)
+    contester1.team.is_leader?(cuser) || contester2.team.is_leader?(cuser)
+  end
+
+  def leader_result_update?(params)
+    return false unless match_time.past?
+    return true if Verification.contain(params, %i[score1 score2]) && [score1, score2, forfeit].none?
+
+    Verification.contain(params, [:matchers_attributes])
+  end
+
+  def leader_stream_update?(params)
+    match_time.today? && Verification.contain(params, [:stream_id])
+  end
+
+  def caster_can_update?(cuser, params)
+    cuser.caster? && Verification.contain(params, [:caster_id]) &&
+      self_assignment_change?(assigned_id: caster_id, requested_id: params[:caster_id], user_id: cuser.id)
+  end
+
+  def self_assignment_change?(assigned_id:, requested_id:, user_id:)
+    return requested_id.to_i == user_id if assigned_id.blank?
+
+    assigned_id.to_i == user_id && requested_id.blank?
   end
 end

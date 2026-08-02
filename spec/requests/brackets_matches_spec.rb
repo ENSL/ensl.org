@@ -286,6 +286,17 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
       expect(match_record.reload.report).to eq('Updated normally')
     end
 
+    it 'rejects an update before normalizing or persisting unauthorized params' do
+      login_as(user)
+
+      patch "/matches/#{match_record.id}", params: {
+        match: { report: 'Unauthorized', unpermitted: 'ignored' }
+      }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(match_record.reload.report).not_to eq('Unauthorized')
+    end
+
     it 'updates through the xml response branch' do
       login_as(admin)
 

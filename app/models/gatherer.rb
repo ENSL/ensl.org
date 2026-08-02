@@ -118,24 +118,13 @@ class Gatherer < ApplicationRecord
   end
 
   def change_turn
-    return unless (respond_to?(:saved_change_to_team?) ? saved_change_to_team? : team_changed?) && !team.nil?
+    return unless saved_change_to_team? && !team.nil?
 
     # Perform all related state updates under a DB lock to avoid races
     gather.with_lock do
-      new_turn = (team == 1 ? 2 : 1)
-      if (team == 2) && [2, 4].include?(gather.gatherers.team(2).count.to_i)
-        new_turn = 2
-      elsif (team == 1) && [3, 5].include?(gather.gatherers.team(1).count.to_i)
-        new_turn = 1
-      end
-      gather.update!(turn: new_turn)
-
-      if gather.gatherers.lobby.count == 1
-        g = gather.gatherers.lobby.first
-        g.update!(team: (team == 1 ? 2 : 1))
-      end
-
-      gather.update!(status: Gather::STATE_FINISHED) if gather.gatherers.lobby.count.zero?
+      team1_count = gather.gatherers.team(1).count
+      team2_count = gather.gatherers.team(2).count
+      gather.advance_picking!(team1_count: team1_count, team2_count: team2_count)
     end
   end
 
@@ -207,40 +196,54 @@ class Gatherer < ApplicationRecord
 
   def can_create?(cuser, _params = {})
     # and check_params(params, [:user_id, :gather_id])
-    cuser \
-      and user == cuser \
-      and !cuser.banned?(Ban::TYPE_GATHER) \
-      and gather.status == Gather::STATE_RUNNING \
-      and gather.gatherers.count < Gather::FULL \
-      and !gather.gatherers.of_user(cuser).first
+    joining_actor?(cuser) && gather_open? && gather.gatherers.of_user(cuser).none?
   end
 
   def can_update?(cuser, params = {})
     return false unless cuser
+    return cuser.admin? || cuser.gather_moderator? if params.key?('username')
+    return false unless team.nil? && captains_turn?(cuser)
 
-    if params.keys.include? 'username'
-      return true if cuser.admin? || cuser.gather_moderator?
-
-      return false
-
-    end
-    captain_turn = ((gather.captain1&.user == cuser) && (gather.turn == 1)) ||
-                   ((gather.captain2&.user == cuser) && (gather.turn == 2))
-    return false unless team.nil? && captain_turn
-    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 2) && (gather.gatherers.team(2).count < 3)
-    return false if (gather.turn == 2) && (gather.gatherers.team(1).count < 4) && (gather.gatherers.team(2).count == 3)
-    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 4) && (gather.gatherers.team(2).count < 5)
-    return false if (gather.turn == 2) && (gather.gatherers.team(1).count < 6) && (gather.gatherers.team(2).count == 5)
-    return false if (gather.turn == 1) && (gather.gatherers.team(1).count == 6)
-
-    true
+    picking_slot_available?
   end
 
   def can_destroy?(cuser)
-    cuser and ((user == cuser or cuser.admin? or cuser.gather_moderator?) and gather.status == Gather::STATE_RUNNING)
+    return false unless cuser && gather.status == Gather::STATE_RUNNING
+
+    user == cuser || privileged?(cuser)
   end
 
   def self.params(params, _cuser)
     params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes, :confirm)
+  end
+
+  private
+
+  def joining_actor?(cuser)
+    return false unless cuser
+
+    user == cuser && !cuser.banned?(Ban::TYPE_GATHER)
+  end
+
+  def gather_open?
+    gather.status == Gather::STATE_RUNNING && gather.gatherers.count < Gather::FULL
+  end
+
+  def privileged?(cuser)
+    cuser.admin? || cuser.gather_moderator?
+  end
+
+  def captains_turn?(cuser)
+    captain = case gather.turn
+              when 1 then gather.captain1
+              when 2 then gather.captain2
+              end
+    captain&.user == cuser
+  end
+
+  def picking_slot_available?
+    team1_count = gather.gatherers.team(1).count
+    team2_count = gather.gatherers.team(2).count
+    gather.picking_slot_available?(team1_count: team1_count, team2_count: team2_count)
   end
 end

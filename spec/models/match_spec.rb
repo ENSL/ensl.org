@@ -46,6 +46,15 @@ RSpec.describe Match, type: :model do
       expect(match_params[:matchers_attributes]['2']['user_id']).to eq('missing_user')
       expect(match_params[:matchers_attributes]['2']['_destroy']).to be true
     end
+
+    it 'ignores missing and malformed matcher payloads' do
+      expect(Match.normalize_matchers_attributes!(nil)).to be_nil
+      expect(Match.normalize_matchers_attributes!({ report: 'none' })).to be_nil
+
+      payload = { matchers_attributes: { '0' => 'not-a-hash' } }
+      expect { Match.normalize_matchers_attributes!(payload) }.not_to raise_error
+      expect(payload[:matchers_attributes]['0']).to eq('not-a-hash')
+    end
   end
 
   describe 'set_hltv guard' do
@@ -260,6 +269,47 @@ RSpec.describe Match, type: :model do
 
       match.caster_id = caster.id
       expect(match.can_update?(caster, { caster_id: '' })).to be true
+    end
+
+    it 'only lets referees claim or release their own assignment' do
+      referee = create(:user)
+      other_referee = create(:user)
+      allow(referee).to receive_messages(admin?: false, ref?: true, caster?: false)
+      allow(other_referee).to receive_messages(admin?: false, ref?: true, caster?: false)
+
+      expect(match.can_update?(referee, { referee_id: referee.id.to_s })).to be true
+      expect(match.can_update?(referee, { referee_id: other_referee.id.to_s })).to be false
+
+      match.referee = referee
+      expect(match.can_update?(referee, { referee_id: '' })).to be true
+      expect(match.can_update?(other_referee, { referee_id: '' })).to be false
+    end
+
+    it 'rejects role assignment mixed with unrelated fields' do
+      caster = create(:user)
+      allow(caster).to receive_messages(admin?: false, ref?: false, caster?: true)
+
+      expect(match.can_update?(caster, { caster_id: caster.id, report: 'extra' })).to be false
+    end
+
+    it 'denies users without an applicable match role' do
+      user = create(:user)
+      allow(user).to receive_messages(admin?: false, ref?: false, caster?: false)
+      allow(match.contester1.team).to receive(:is_leader?).with(user).and_return(false)
+      allow(match.contester2.team).to receive(:is_leader?).with(user).and_return(false)
+
+      expect(match.can_update?(user, { report: 'no' })).to be false
+      expect(match.can_create?(user)).to be false
+      expect(match.can_destroy?(user)).to be false
+    end
+
+    it 'denies score changes after a result or forfeit already exists' do
+      leader = create(:user)
+      allow(match.contester1.team).to receive(:is_leader?).with(leader).and_return(true)
+      allow(match.contester2.team).to receive(:is_leader?).with(leader).and_return(false)
+      match.score1 = 1
+
+      expect(match.can_update?(leader, { score1: 2, score2: 0 })).to be false
     end
 
     it 'answers proposal and membership helpers' do

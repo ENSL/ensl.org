@@ -42,6 +42,31 @@ RSpec.describe Gather, type: :model do
       expect(gather).to be_invalid
       expect(gather.errors[:pick_strategy]).to include('cannot be changed')
     end
+
+    it 'derives the default turn boundaries from its numbered segments' do
+      gather = build(:gather, pick_strategy: Gather::PICK_STRATEGY_DEFAULT)
+
+      expect(gather.send(:picking_transition, 1, 2, 1)).to eq(:team_two)
+      expect(gather.send(:picking_transition, 2, 2, 2)).to be_nil
+      expect(gather.send(:picking_transition, 2, 2, 3)).to eq(:team_one)
+      expect(gather.send(:picking_transition, 1, 6, 5)).to eq(:fill_team_two)
+    end
+
+    it 'repeats a shorter numbered strategy until every player has a turn' do
+      gather = build(:gather, pick_strategy: '1-1-1-1')
+
+      expect(gather.send(:picking_transition, 1, 2, 1)).to eq(:team_two)
+      expect(gather.send(:picking_transition, 2, 2, 2)).to eq(:team_one)
+      expect(gather.send(:picking_transition, 1, 3, 2)).to eq(:team_two)
+      expect(gather.send(:picking_transition, 1, 6, 5)).to eq(:fill_team_two)
+    end
+
+    it 'uses the default numbered schedule for strategies not yet implemented' do
+      gather = build(:gather, pick_strategy: 'random')
+
+      expect(gather.send(:picking_transition, 2, 2, 2)).to be_nil
+      expect(gather.send(:picking_transition, 2, 2, 3)).to eq(:team_one)
+    end
   end
 
   describe '#admin_update' do
@@ -244,6 +269,47 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather, status: Gather::STATE_PICKING)
 
       expect(gather.voting_time_remaining).to eq(0)
+    end
+
+    it 'reports remaining voting time and clamps expired voting to zero' do
+      gather = create(:gather)
+      gather.update_columns(status: Gather::STATE_VOTING)
+      allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
+      allow(gather).to receive(:voting_timeout).and_return(10)
+
+      expect(gather.voting_time_remaining).to be_between(4, 5)
+
+      allow(gather).to receive(:voting_start_time).and_return(20.seconds.ago)
+      expect(gather.voting_time_remaining).to eq(0)
+    end
+
+    it 'broadcasts only when refresh changes the status' do
+      gather = create(:gather, status: Gather::STATE_RUNNING)
+      allow(Gathers::Broadcaster).to receive(:call)
+      allow(gather).to receive(:refresh)
+
+      gather.refresh_and_broadcast_if_status_changed!
+      expect(Gathers::Broadcaster).not_to have_received(:call)
+
+      allow(gather).to receive(:refresh) { gather.status = Gather::STATE_PICKING }
+      gather.refresh_and_broadcast_if_status_changed!
+      expect(Gathers::Broadcaster).to have_received(:call).with(gather)
+    end
+  end
+
+  describe 'authorization helpers' do
+    it 'allows admins and gather moderators to create and update gathers' do
+      admin = instance_double(User, admin?: true, gather_moderator?: false)
+      moderator = instance_double(User, admin?: false, gather_moderator?: true)
+      user = instance_double(User, admin?: false, gather_moderator?: false)
+      gather = build(:gather)
+
+      expect(gather.can_create?(admin)).to be true
+      expect(gather.can_create?(moderator)).to be true
+      expect(gather.can_create?(user)).to be_nil
+      expect(gather.can_update?(admin)).to be true
+      expect(gather.can_update?(moderator)).to be true
+      expect(gather.can_update?(user)).to be_nil
     end
   end
 

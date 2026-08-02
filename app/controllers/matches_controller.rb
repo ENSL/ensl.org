@@ -27,13 +27,13 @@ class MatchesController < ApplicationController
   def extra; end
 
   def ref
-    raise AccessError unless @match.can_update? cuser, [:report]
+    raise AccessError unless @match.can_update? cuser, { report: nil }
 
     @n = 0
   end
 
   def edit
-    raise AccessError unless @match.can_update? cuser, [:contester1_id]
+    raise AccessError unless @match.can_update? cuser, { contester1_id: nil }
   end
 
   def create
@@ -46,17 +46,18 @@ class MatchesController < ApplicationController
   end
 
   def update
-    raise AccessError unless @match.can_update? cuser, params[:match]
+    match_params = Match.params(params, cuser)
+    raise AccessError unless @match.can_update? cuser, match_params
 
-    Match.normalize_matchers_attributes!(params[:match])
+    Match.normalize_matchers_attributes!(match_params)
 
-    return handle_match_update_success if @match.update(Match.params(params, cuser))
+    return handle_match_update_success if @match.update(match_params)
 
     handle_match_update_failure
   end
 
   def hltv
-    raise AccessError unless @match.can_update? cuser, [:hltv]
+    raise AccessError unless @match.can_update? cuser, { hltv: true }
 
     if params[:commit].include?(t(:hltv_send))
       @match.hltv_record(params[:addr], params[:pwd])

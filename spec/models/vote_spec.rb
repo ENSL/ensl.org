@@ -48,6 +48,12 @@ RSpec.describe Vote, type: :model do
       expect(vote.can_create?(user)).to be(true)
     end
 
+    it 'allows votable types without a specialized policy' do
+      vote = build_vote(votable_type: 'Article', votable: double)
+
+      expect(vote.can_create?(user)).to be(true)
+    end
+
     it 'blocks gather votes for users outside the gather' do
       users = double(exists?: false)
       gather = double(users: users)
@@ -246,6 +252,34 @@ RSpec.describe Vote, type: :model do
       vote.valid?
 
       expect(vote.errors[:base]).to be_empty
+    end
+
+    it 'does not add errors when the user or gather interface is unavailable' do
+      vote_without_user = described_class.new(votable_type: 'GatherMap')
+      allow(vote_without_user).to receive(:votable).and_return(double(respond_to?: false))
+
+      vote_without_user.valid?
+
+      expect(vote_without_user.errors[:base]).to be_empty
+    end
+  end
+
+  describe 'vote counter callbacks' do
+    it 'updates both the option and its poll counters' do
+      poll_class = class_double(Poll, increment_counter: nil, decrement_counter: nil)
+      option_class = class_double(Option, increment_counter: nil, decrement_counter: nil)
+      poll = double(id: 10, class: poll_class)
+      option = double(id: 20, poll: poll, class: option_class)
+      vote = described_class.new(votable_type: 'Option')
+      allow(vote).to receive(:votable).and_return(option)
+
+      vote.increase_votes
+      vote.decrease_votes
+
+      expect(poll_class).to have_received(:increment_counter).with(:votes, 10)
+      expect(poll_class).to have_received(:decrement_counter).with(:votes, 10)
+      expect(option_class).to have_received(:increment_counter).with(:votes, 20)
+      expect(option_class).to have_received(:decrement_counter).with(:votes, 20)
     end
   end
 

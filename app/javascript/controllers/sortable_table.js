@@ -54,16 +54,30 @@ export default class extends Controller {
   compareCells(cellA, cellB, type, direction) {
     const rawA = cellA?.dataset.sortValue ?? ""
     const rawB = cellB?.dataset.sortValue ?? ""
-    const ascending = direction === "ascending"
+    const blankOrder = this.compareBlankValues(rawA, rawB)
 
-    if (type === "number") {
-      const numA = rawA === "" ? null : parseFloat(rawA)
-      const numB = rawB === "" ? null : parseFloat(rawB)
-      if (numA === null || numB === null) return numA === numB ? 0 : numA === null ? 1 : -1
-      return ascending ? numA - numB : numB - numA
-    }
+    if (blankOrder !== null) return blankOrder
+    if (type === "number") return this.compareNumbers(rawA, rawB, direction)
 
-    if (rawA === "" || rawB === "") return rawA === rawB ? 0 : rawA === "" ? 1 : -1
-    return ascending ? rawA.localeCompare(rawB) : rawB.localeCompare(rawA)
+    return this.compareStrings(rawA, rawB, direction)
+  }
+
+  compareBlankValues(rawA, rawB) {
+    if (rawA === "" && rawB === "") return 0
+    if (rawA === "") return 1
+    if (rawB === "") return -1
+
+    return null
+  }
+
+  compareNumbers(rawA, rawB, direction) {
+    const numberA = parseFloat(rawA)
+    const numberB = parseFloat(rawB)
+
+    return direction === "ascending" ? numberA - numberB : numberB - numberA
+  }
+
+  compareStrings(rawA, rawB, direction) {
+    return direction === "ascending" ? rawA.localeCompare(rawB) : rawB.localeCompare(rawA)
   }
 }

@@ -229,32 +229,13 @@ class Gather < ApplicationRecord
       # acquire the write lock when a transition actually appears necessary.
       t1 = gatherers.team(1).count
       t2 = gatherers.team(2).count
-      cur_turn = turn
 
-      needs_check = (t1 == 6 && t2 == 6) ||
-                    (cur_turn == 1 && t1 == 2 && t2 == 1) ||
-                    (cur_turn == 2 && t2 == 3 && t1 == 2) ||
-                    (cur_turn == 1 && t1 == 4 && t2 == 3) ||
-                    (cur_turn == 2 && t2 == 5 && t1 == 4) ||
-                    (cur_turn == 1 && t1 == 6 && t2 == 5)
-
-      if needs_check
+      if picking_transition(turn, t1, t2)
         with_lock do
           # Re-read inside the lock (with_lock reloads the record)
-          if (gatherers.team(1).count == 6) && (gatherers.team(2).count == 6)
-            update!(status: STATE_FINISHED)
-          elsif (turn == 1) && (gatherers.team(1).count == 2) && (gatherers.team(2).count == 1)
-            update!(turn: 2)
-          elsif (turn == 2) && (gatherers.team(2).count == 3) && (gatherers.team(1).count == 2)
-            update!(turn: 1)
-          elsif (turn == 1) && (gatherers.team(1).count == 4) && (gatherers.team(2).count == 3)
-            update!(turn: 2)
-          elsif (turn == 2) && (gatherers.team(2).count == 5) && (gatherers.team(1).count == 4)
-            update!(turn: 1)
-          elsif (turn == 1) && (gatherers.team(1).count == 6) && (gatherers.team(2).count == 5)
-            gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
-            update!(turn: 2)
-          end
+          team1_count = gatherers.team(1).count
+          team2_count = gatherers.team(2).count
+          apply_picking_transition(picking_transition(turn, team1_count, team2_count))
         end
       end
     end
@@ -264,6 +245,15 @@ class Gather < ApplicationRecord
     previous_status = status
     refresh(nil)
     Gathers::Broadcaster.call(self) if status != previous_status
+  end
+
+  def advance_picking!(team1_count:, team2_count:)
+    apply_picking_transition(picking_transition(turn, team1_count, team2_count))
+  end
+
+  def picking_slot_available?(team1_count:, team2_count:)
+    completed_picks = [team1_count - 1, 0].max + [team2_count - 1, 0].max
+    numbered_picking_teams[completed_picks] == turn
   end
 
   def can_create?(cuser)
@@ -317,5 +307,66 @@ class Gather < ApplicationRecord
 
   def self.params(params, _cuser)
     params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
+  end
+
+  private
+
+  def picking_transition(current_turn, team1_count, team2_count)
+    return :finish if team1_count == 6 && team2_count == 6
+
+    numbered_picking_transitions[[current_turn, team1_count, team2_count]]
+  end
+
+  def numbered_picking_transitions
+    remaining_picks = FULL - 2
+    team_counts = [1, 1]
+    picking_team = 1
+
+    numbered_pick_sizes.cycle.each_with_object({}) do |pick_size, transitions|
+      picks = [pick_size, remaining_picks].min
+      team_counts[picking_team - 1] += picks
+      remaining_picks -= picks
+      break transitions if remaining_picks.zero?
+
+      next_team = picking_team == 1 ? 2 : 1
+      transition = if remaining_picks == 1
+                     :fill_team_two
+                   else
+                     "team_#{next_team == 1 ? 'one' : 'two'}".to_sym
+                   end
+      transitions[[picking_team, *team_counts]] = transition
+      picking_team = next_team
+    end
+  end
+
+  def numbered_picking_teams
+    numbered_pick_sizes.cycle.each_with_object([]) do |pick_size, teams|
+      picking_team = if teams.empty?
+                       1
+                     else
+                       teams.last == 1 ? 2 : 1
+                     end
+      teams.concat([picking_team] * [pick_size, FULL - 2 - teams.length].min)
+      break teams if teams.length == FULL - 2
+    end
+  end
+
+  def numbered_pick_sizes
+    strategy = pick_strategy.match?(/\A\d+(?:-\d+)*\z/) ? pick_strategy : PICK_STRATEGY_DEFAULT
+    strategy.split('-').map(&:to_i)
+  end
+
+  def apply_picking_transition(transition)
+    case transition
+    when :finish
+      update!(status: STATE_FINISHED)
+    when :team_one
+      update!(turn: 1)
+    when :team_two
+      update!(turn: 2)
+    when :fill_team_two
+      gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
+      update!(turn: 2)
+    end
   end
 end

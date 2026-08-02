@@ -48,32 +48,11 @@ class Vote < ApplicationRecord
   def can_create?(cuser)
     return false unless cuser
 
-    if votable_type == 'Option'
-      return false if votable.poll.voted?(cuser)
-    elsif %w[Gatherer GatherMap GatherServer].include?(votable_type)
-      return false unless votable.gather.users.exists? cuser.id
-
-      case votable_type
-      when 'Gatherer'
-        return false if votable.gather.status != Gather::STATE_VOTING
-        return false if votable.gather.gatherer_votes.where(user_id: cuser.id, votable_id: votable.id).exists?
-        return false if votable.gather.gatherer_votes.where(user_id: cuser.id).count >= 2
-      when 'GatherMap'
-        return false if votable.gather.status == Gather::STATE_FINISHED
-        # Do not let user vote for same map twice
-        return false if votable.gather.map_votes.where(user_id: cuser.id, votable_id: votable.id).count.positive?
-        # Limit total map votes per user per gather to 2
-        return false if votable.gather.map_votes.where(user_id: cuser.id).count >= 2
-      when 'GatherServer'
-        return false if votable.gather.status == Gather::STATE_FINISHED
-        # Do not let user vote for same server twice
-        return false if votable.gather.server_votes.where(user_id: cuser.id, votable_id: votable.id).exists?
-        # Allow up to two server votes per user
-        return false if votable.gather.server_votes.where(user_id: cuser.id).count >= 2
-      end
+    case votable_type
+    when 'Option' then !votable.poll.voted?(cuser)
+    when 'Gatherer', 'GatherMap', 'GatherServer' then gather_vote_allowed?(cuser)
+    else true
     end
-
-    true
   end
 
   def self.params(params, _cuser)
@@ -83,6 +62,43 @@ class Vote < ApplicationRecord
   validate :validate_gather_vote_limits, on: :create
 
   private
+
+  def gather_vote_allowed?(cuser)
+    return false unless votable.gather.users.exists?(cuser.id)
+
+    case votable_type
+    when 'Gatherer' then gatherer_vote_allowed?(cuser)
+    when 'GatherMap' then map_vote_allowed?(cuser)
+    when 'GatherServer' then server_vote_allowed?(cuser)
+    end
+  end
+
+  def gatherer_vote_allowed?(cuser)
+    return false unless votable.gather.status == Gather::STATE_VOTING
+
+    votes = votable.gather.gatherer_votes
+    return false if votes.where(user_id: cuser.id, votable_id: votable.id).exists?
+
+    votes.where(user_id: cuser.id).count < 2
+  end
+
+  def map_vote_allowed?(cuser)
+    return false if votable.gather.status == Gather::STATE_FINISHED
+
+    votes = votable.gather.map_votes
+    return false if votes.where(user_id: cuser.id, votable_id: votable.id).count.positive?
+
+    votes.where(user_id: cuser.id).count < 2
+  end
+
+  def server_vote_allowed?(cuser)
+    return false if votable.gather.status == Gather::STATE_FINISHED
+
+    votes = votable.gather.server_votes
+    return false if votes.where(user_id: cuser.id, votable_id: votable.id).exists?
+
+    votes.where(user_id: cuser.id).count < 2
+  end
 
   def validate_gather_vote_limits
     return unless %w[GatherMap GatherServer].include?(votable_type)

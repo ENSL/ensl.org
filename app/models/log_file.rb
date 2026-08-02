@@ -15,8 +15,12 @@
 require 'digest/md5'
 
 class LogFile < ActiveRecord::Base
-  NON_ASCII = /[\x80-\xff]/
-    LOGS = File.join(Rails.root, "tmp", "logs")
+  NON_ASCII = /[\x80-\xff]/n
+  LOGS = File.join(Rails.root, "tmp", "logs")
+  DETAIL_MATCHERS = %i[
+    match_end match_join match_kill match_say match_built match_destroyed
+    match_research_start match_research_cancel match_role
+  ].freeze
 
   attr_accessor :path
   belongs_to :server
@@ -40,15 +44,7 @@ class LogFile < ActiveRecord::Base
         vars = {}
         log.match_map vars or log.match_start vars
         if vars[:round] and !log.details
-          log.match_end vars \
-            or log.match_join vars \
-            or log.match_kill vars \
-            or log.match_say vars \
-            or log.match_built vars \
-            or log.match_destroyed vars \
-            or log.match_research_start vars \
-            or log.match_research_cancel vars \
-            or log.match_role vars \
+          match_details(log, vars)
         end
         if log.details
           log.round = vars[:round] if vars[:round]
@@ -87,5 +83,11 @@ class LogFile < ActiveRecord::Base
         end
       end
     end
+  end
+
+  private
+
+  def match_details(log, vars)
+    DETAIL_MATCHERS.any? { |matcher| log.public_send(matcher, vars) }
   end
 end

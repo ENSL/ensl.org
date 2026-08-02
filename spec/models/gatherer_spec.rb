@@ -83,26 +83,54 @@ RSpec.describe Gatherer, type: :model do
   end
 
   describe 'change_turn' do
-    it 'updates gather.turn when a gatherer gets a team' do
-      gather = create(:gather)
-      g1 = gather.gatherers.create!(user: create(:user))
-      expect(gather.turn).to be_nil
-      g1.update!(team: 1)
-      gather.reload
-      expect(gather.turn).to eq(2)
+    it 'switches turns after the first pick in the default strategy' do
+      gather = create(:gather, status: Gather::STATE_PICKING, turn: 1)
+      captain1 = create(:gatherer, gather: gather)
+      captain2 = create(:gatherer, gather: gather)
+      player = create(:gatherer, gather: gather)
+      captain1.update_columns(team: 1, pick_order: 1)
+      captain2.update_columns(team: 2, pick_order: 2)
+      gather.update_columns(captain1_id: captain1.id, captain2_id: captain2.id)
+
+      player.update!(team: 1)
+
+      expect(gather.reload.turn).to eq(2)
     end
 
-    it 'moves lone lobby member to other team when applicable' do
-      gather = create(:gather)
-      # create initial team members
-      t1 = gather.gatherers.create!(user: create(:user), team: 1)
-      gather.gatherers.create!(user: create(:user), team: 2)
-      lobby = gather.gatherers.create!(user: create(:user), team: nil)
+    it 'keeps and then switches turns across a two-pick segment' do
+      gather = create(:gather, status: Gather::STATE_PICKING, turn: 2)
+      captain1 = create(:gatherer, gather: gather)
+      captain2 = create(:gatherer, gather: gather)
+      first_team1_pick = create(:gatherer, gather: gather)
+      first_team2_pick = create(:gatherer, gather: gather)
+      second_team2_pick = create(:gatherer, gather: gather)
+      captain1.update_columns(team: 1, pick_order: 1)
+      captain2.update_columns(team: 2, pick_order: 2)
+      first_team1_pick.update_columns(team: 1, pick_order: 3)
+      gather.update_columns(captain1_id: captain1.id, captain2_id: captain2.id)
 
-      # change t1's team to trigger change_turn
-      t1.update!(team: 2)
-      lobby.reload
-      expect([1, 2]).to include(lobby.team)
+      first_team2_pick.update!(team: 2)
+      expect(gather.reload.turn).to eq(2)
+
+      second_team2_pick.update!(team: 2)
+      expect(gather.reload.turn).to eq(1)
+    end
+
+    it 'switches after every pick for the 1-1-1-1 strategy' do
+      gather = create(:gather, pick_strategy: '1-1-1-1', status: Gather::STATE_PICKING, turn: 1)
+      captain1 = create(:gatherer, gather: gather)
+      captain2 = create(:gatherer, gather: gather)
+      team1_pick = create(:gatherer, gather: gather)
+      team2_pick = create(:gatherer, gather: gather)
+      captain1.update_columns(team: 1, pick_order: 1)
+      captain2.update_columns(team: 2, pick_order: 2)
+      gather.update_columns(captain1_id: captain1.id, captain2_id: captain2.id)
+
+      team1_pick.update!(team: 1)
+      expect(gather.reload.turn).to eq(2)
+
+      team2_pick.update!(team: 2)
+      expect(gather.reload.turn).to eq(1)
     end
 
     it 'assigns linear pick_order when picked' do
@@ -282,6 +310,51 @@ RSpec.describe Gatherer, type: :model do
       create_list(:gatherer, 2, gather: gather, team: 2)
 
       expect(target.can_update?(captain_user, {})).to be(false)
+    end
+
+    it 'checks join ownership, bans, capacity, and duplicate membership' do
+      gather = create(:gather, status: Gather::STATE_RUNNING)
+      user = create(:user)
+      gatherer = build(:gatherer, gather: gather, user: user)
+      allow(user).to receive(:banned?).with(Ban::TYPE_GATHER).and_return(false)
+
+      expect(gatherer.can_create?(user)).to be true
+      expect(gatherer.can_create?(nil)).to be false
+      expect(gatherer.can_create?(create(:user))).to be false
+
+      create(:gatherer, gather: gather, user: user)
+      expect(gatherer.can_create?(user)).to be false
+    end
+
+    it 'allows owners and privileged users to leave only running gathers' do
+      gather = create(:gather, status: Gather::STATE_RUNNING)
+      owner = create(:user)
+      gatherer = create(:gatherer, gather: gather, user: owner)
+      admin = create(:user, :admin)
+      moderator = create(:user, :gather_moderator)
+
+      expect(gatherer.can_destroy?(owner)).to be true
+      expect(gatherer.can_destroy?(admin)).to be true
+      expect(gatherer.can_destroy?(moderator)).to be true
+      expect(gatherer.can_destroy?(nil)).to be false
+
+      gather.update_columns(status: Gather::STATE_FINISHED)
+      expect(gatherer.can_destroy?(owner)).to be false
+    end
+
+    it "recognizes either captain only on that captain's turn" do
+      gather = create(:gather, status: Gather::STATE_PICKING, turn: 2)
+      captain1 = create(:gatherer, gather: gather, team: 1)
+      captain2 = create(:gatherer, gather: gather, team: 2)
+      create_list(:gatherer, 2, gather: gather, team: 1)
+      target = create(:gatherer, gather: gather, team: nil)
+      gather.update_columns(captain1_id: captain1.id, captain2_id: captain2.id)
+
+      expect(target.can_update?(captain1.user)).to be false
+      expect(target.can_update?(captain2.user)).to be true
+
+      gather.update_columns(turn: nil)
+      expect(target.can_update?(captain2.user)).to be false
     end
   end
 end

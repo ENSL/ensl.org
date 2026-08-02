@@ -37,40 +37,17 @@ class Bracketer < ApplicationRecord
   def result_class
     return nil if disabled
 
-    # Determine who this cell represents (contester_id)
     advancing_id = effective_contester_id
     return nil unless advancing_id
 
-    # Find the cell in the next round that this cell feeds into
     next_cell = next_round_cell
-    return nil unless next_cell
-    return nil if next_cell.disabled
+    return nil if next_cell.nil? || next_cell.disabled
 
     if next_cell.team_id
-      # Next cell has a team - direct comparison
-      # Same team = won (green), different team = lost (red)
       next_cell.team_id == advancing_id ? 'win1' : 'win2'
     elsif next_cell.match_id
-      # Next cell has a match - check if our team is in it and what the result is
-      next_match = Match.find_by(id: next_cell.match_id)
-      return nil unless next_match
-      return nil if next_match.score1.nil? || next_match.score2.nil?
-
-      if next_match.contester1_id == advancing_id
-        return 'win1' if next_match.score1 > next_match.score2
-        return 'win2' if next_match.score1 < next_match.score2
-
-        return 'tie'
-      elsif next_match.contester2_id == advancing_id
-        return 'win1' if next_match.score2 > next_match.score1
-        return 'win2' if next_match.score2 < next_match.score1
-
-        return 'tie'
-      end
-      # Team not in next match - no color
-      nil
+      result_from_match(next_cell.match_id, advancing_id)
     end
-    # Next cell is empty (no team_id or match_id) - no result yet
   end
 
   def to_s
@@ -80,6 +57,30 @@ class Bracketer < ApplicationRecord
   end
 
   private
+
+  def result_from_match(match_id, advancing_id)
+    next_match = Match.find_by(id: match_id)
+    return nil unless next_match&.score1 && next_match.score2
+
+    scores = scores_for(next_match, advancing_id)
+    score_result(*scores) if scores
+  end
+
+  def scores_for(next_match, advancing_id)
+    if next_match.contester1_id == advancing_id
+      [next_match.score1, next_match.score2]
+    elsif next_match.contester2_id == advancing_id
+      [next_match.score2, next_match.score1]
+    end
+  end
+
+  def score_result(advancing_score, opposing_score)
+    case advancing_score <=> opposing_score
+    when 1 then 'win1'
+    when -1 then 'win2'
+    else 'tie'
+    end
+  end
 
   # Returns the contester ID that this cell effectively represents.
   # For team cells: the team_id (which is actually a contester_id).

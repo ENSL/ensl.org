@@ -67,6 +67,9 @@ Metrics/BlockLength:
     # Task definitions often need longer blocks for clarity and grouped setup.
     - 'lib/tasks/**/*'
 
+Metrics:
+  Enabled: false
+
 # Rails controllers and concerns are self-documenting by convention; a top-level
 # comment on every class/module is noise.
 Style/Documentation:

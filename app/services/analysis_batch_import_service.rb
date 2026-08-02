@@ -156,17 +156,9 @@ class AnalysisBatchImportService
     users_glob = existing_glob('users')
     return [] unless users_glob
 
-    PLAYER_STAT_METRICS.flat_map do |metric|
-      sql = <<~SQL.squish
-        SELECT steam_id, #{metric}
-        FROM read_parquet('#{users_glob}')
-        WHERE #{metric} IS NOT NULL
-      SQL
-
-      connection.query(sql).map do |(steamid, value)|
-        historical_row(imported_at, steamid: steamid, model: 'player_stats', metric: metric, value: value,
-                                    milestone: nil)
-      end
+    read_metric_columns(connection, users_glob, 'steam_id', PLAYER_STAT_METRICS) do |steamid, metric, value|
+      historical_row(imported_at, steamid: steamid, model: 'player_stats', metric: metric, value: value,
+                                  milestone: nil)
     end
   end
 
@@ -177,16 +169,22 @@ class AnalysisBatchImportService
     glob = existing_glob('map_balance')
     return [] unless glob
 
-    MAP_BALANCE_METRICS.flat_map do |metric|
+    read_metric_columns(connection, glob, 'map_name', MAP_BALANCE_METRICS) do |map_name, metric, value|
+      current_snapshot_row(imported_at, steamid: map_name, model: 'map_balance', metric: metric, value: value,
+                                        milestone: nil)
+    end
+  end
+
+  def read_metric_columns(connection, glob, subject_column, metrics)
+    metrics.flat_map do |metric|
       sql = <<~SQL.squish
-        SELECT map_name, #{metric}
+        SELECT #{subject_column}, #{metric}
         FROM read_parquet('#{glob}')
         WHERE #{metric} IS NOT NULL
       SQL
 
-      connection.query(sql).map do |(map_name, value)|
-        current_snapshot_row(imported_at, steamid: map_name, model: 'map_balance', metric: metric, value: value,
-                                          milestone: nil)
+      connection.query(sql).map do |(subject, value)|
+        yield(subject, metric, value)
       end
     end
   end
