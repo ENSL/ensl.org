@@ -170,9 +170,6 @@ class Server < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    # FIXME: check this, add user_id
-    # TEST
-    params.require(:server).except(:id, :created_at, :user_id, :map, :players, :maxplayers, :ping, :version,
-                                   :updated_at, :status).permit!
+    params.require(:server).permit(:dns, :ip, :port, :password, :name, :description, :domain, :official, :disabled)
   end
 end

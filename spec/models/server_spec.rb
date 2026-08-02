@@ -74,6 +74,34 @@ describe Server do
     end
   end
 
+  describe '.params' do
+    it 'permits fields editable by server owners and admins' do
+      params = ActionController::Parameters.new(server: {
+                                                  dns: 'server.example.com', ip: '127.0.0.1', port: '27015',
+                                                  password: 'secret', name: 'Server', description: 'Description',
+                                                  domain: Server::DOMAIN_NS2, official: true, disabled: true
+                                                })
+
+      expect(described_class.params(params, nil).to_h.keys).to contain_exactly(
+        'dns', 'ip', 'port', 'password', 'name', 'description', 'domain', 'official', 'disabled'
+      )
+    end
+
+    it 'rejects ownership, association, and operational fields' do
+      params = ActionController::Parameters.new(server: {
+                                                  id: 1, user_id: 2, category_id: 3, default_id: 4,
+                                                  recordable_id: 5, recordable_type: 'Match', active: false,
+                                                  status: Server::STATUS_ONLINE, map: 'ns_veil', players: 12,
+                                                  max_players: 24, ping: '10', version: 1,
+                                                  reservation: '127.0.0.1:27015',
+                                                  recording: 'demo', idle: Time.current, created_at: Time.current,
+                                                  updated_at: Time.current
+                                                })
+
+      expect(described_class.params(params, nil)).to be_empty
+    end
+  end
+
   describe 'Permissions' do
     let!(:user) { create :user }
     let!(:admin) { create :user, :admin }

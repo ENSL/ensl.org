@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# FIXME: this is very stupid, use PKI
+# This is just a legacy verification function, it is not secure
+# It is only used for legacy reasons and should be removed in the future.
 module Verification
   def self.verify(input)
     md5 = Digest::MD5.hexdigest("9WvcZ9hX#{input}KF7L4luQ").upcase.split(//)
