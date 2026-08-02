@@ -191,17 +191,6 @@ class Match < ApplicationRecord
   end
 
   # FIXME: this is a view helper and doesn't belong here
-  def get_friendly(param = nil)
-    if param.nil?
-      friendly == contester1.team ? contester1 : contester2
-    elsif param == :score
-      friendly == contester1.team ? score1 : score2
-    elsif param == :points
-      friendly == contester1.team ? points1 : points2
-    end
-  end
-
-  # FIXME: this is a view helper and doesn't belong here
   def get_opponent(param = nil)
     if param.nil?
       friendly == contester1.team ? contester2 : contester1
