@@ -17,4 +17,13 @@ RSpec.describe 'Exception checker', type: :request, order: :defined do
     # Should not fail: no new log entries are written in this example.
     expect(true).to be(true)
   end
+
+  it 'ignores messages processed after a WebSocket closes' do
+    log_file = Rails.root.join('log/test.log')
+    File.open(log_file, 'a') do |file|
+      file.puts('ERROR -- : Ignoring message processed after the WebSocket was closed: subscription')
+    end
+
+    expect { assert_no_log_errors }.not_to raise_error
+  end
 end

@@ -5,6 +5,7 @@ module Features
     BENIGN_LOG_ERROR_PATTERNS = [
       /WebSocket error occurred: Broken pipe/i,
       /WebSocket error occurred:.*(broken pipe|stream closed|closed stream)/i,
+      /Ignoring message processed after the WebSocket was closed/i,
       /Error occurred while closing stream/i,
       /IOError: stream closed/i,
       /Errno::EPIPE/i
