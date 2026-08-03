@@ -18,9 +18,7 @@ class GathersController < ApplicationController
     redirect_to @gather
   end
 
-  def edit
-    @gather.admin = true
-  end
+  def edit; end
 
   def create
     @gather = Gather.new(category_id: params.dig(:gather, :category_id))

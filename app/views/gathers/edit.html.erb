@@ -6,8 +6,6 @@
     <%= form_for(@gather, html: { class: 'square' }) do |f| %>
     <%= render 'shared/errors', messages: @gather.errors.full_messages %>
 
-    <%= f.hidden_field :admin %>
-
     <div class="fields horizontal">
         <%= f.label :captain1 %>
         <%= f.select :captain1_id, @gather.gatherers.collect{|c| [c, c.id]} %>

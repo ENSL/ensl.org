@@ -37,17 +37,8 @@ class Gather < ApplicationRecord
   FULL = 12
   SERVERS = [3, 5, 23, 21, 22].freeze
   VOTING_TIMEOUT_SECONDS = 60
-  PICK_STRATEGY_DEFAULT = '1-2-2-2-2-1'
-  PICK_STRATEGIES = [
-    PICK_STRATEGY_DEFAULT,
-    '1-1-1-1',
-    'team_pick',
-    'random',
-    'gather_rank',
-    'ml_rank'
-  ].freeze
-
-  attr_accessor :admin
+  PICK_STRATEGY_DEFAULT = Gathers::PickPlan::DEFAULT_STRATEGY
+  PICK_STRATEGIES = Gathers::PickPlan::STRATEGIES.keys.freeze
 
   attr_readonly :pick_strategy
 
@@ -80,27 +71,30 @@ class Gather < ApplicationRecord
   validates :pick_strategy, inclusion: { in: PICK_STRATEGIES }
   validate :pick_strategy_immutable, on: :update
 
-  before_create :init_variables
-  after_create :add_maps_and_server
-  before_save :check_status
-  after_save :check_captains
+  before_create :initialize_state
+  after_create :populate_maps_and_servers
+
+  class << self
+    def find_game(name)
+      Category.where(name: name, domain: Category::DOMAIN_GAMES).first
+    end
+
+    def player_count_for_game(name)
+      game = find_game(name)
+      game ? game.gathers.ordered.first.gatherers.count : 0
+    end
+
+    def last(name = 'NS2')
+      find_game(name)&.gathers&.ordered&.first
+    end
+
+    def params(params, _cuser)
+      params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
+    end
+  end
 
   def to_s
     "Gather_#{id}"
-  end
-
-  def self.find_game(name)
-    Category.where(name: name, domain: Category::DOMAIN_GAMES).first
-  end
-
-  def self.player_count_for_game(name)
-    game = find_game(name)
-
-    if game && (players = game.gathers.ordered.first.gatherers.count)
-      players
-    else
-      0
-    end
   end
 
   def states
@@ -123,16 +117,6 @@ class Gather < ApplicationRecord
     Category.find(category_id).gathers.ordered.first
   end
 
-  def init_variables
-    self.status = STATE_RUNNING
-  end
-
-  def bump_version!
-    with_lock do
-      update!(version: version.to_i + 1)
-    end
-  end
-
   def open_for_join?
     status == STATE_RUNNING && gatherers.count < FULL
   end
@@ -153,111 +137,29 @@ class Gather < ApplicationRecord
     end
   end
 
-  def add_maps_and_server
-    category.maps.basic.classic.each do |m|
-      maps << m
-    end
+  def voting_timeout
+    return VOTING_TIMEOUT_SECONDS unless Rails.env.test?
 
-    (category_id == 44 ? category.servers.hlds.active.ordered : category.servers.active.ordered).each do |s|
-      servers << s
-    end
+    Integer(ENV.fetch('GATHER_VOTING_TIMEOUT_TEST', 10))
   end
 
-  def check_status
-    changed = respond_to?(:will_save_change_to_status?) ? will_save_change_to_status? : status_changed?
-    return unless changed && (status == STATE_PICKING) && !captain1
+  def voting_start_time
+    return nil unless [STATE_VOTING, STATE_PICKING, STATE_FINISHED].include?(status)
 
-    category&.with_lock do
-      Gather.create!(category: category) unless Gather.where(category_id: category_id).where('id > ?', id).exists?
-    end
-
-    self.captain1 = gatherers.most_voted[1]
-    self.captain2 = gatherers.most_voted[0]
-    if gather_maps.count > 1
-      self.map1 = gather_maps.ordered[0]
-      self.map2 = gather_maps.ordered[1]
-    elsif gather_maps.count.positive?
-      self.map1 = gather_maps.ordered[0]
-    end
-    return unless gather_servers.count.positive?
-
-    self.server = gather_servers.ordered[0].server
+    gatherers.order('created_at ASC').limit(1).offset(FULL - 1).first&.created_at
   end
 
-  def check_captains
-    changed = if respond_to?(:saved_change_to_captain1_id?)
-                saved_change_to_captain1_id? || saved_change_to_captain2_id?
-              else
-                captain1_id_changed? || captain2_id_changed?
-              end
-    return unless changed
+  def voting_time_remaining
+    return 0 unless status == STATE_VOTING
+    return 0 unless (start_time = voting_start_time)
 
-    # Ensure attributes persisted before locking and updating other records
-    reload
-    if admin
-      # Use update_columns to avoid triggering callbacks again (preventing infinite loop)
-      # rubocop:disable Rails/SkipsModelValidations
-      update_columns(turn: 1, status: STATE_PICKING, updated_at: Time.current)
-      # rubocop:enable Rails/SkipsModelValidations
-    elsif changed
-      self.turn = 1
-      self.status = STATE_PICKING
-      save!
-    end
-
-    # Lock gather to avoid concurrent updates to gatherers
-    with_lock do
-      captain1&.update!(team: 1, pick_order: 1, skip_callbacks: true)
-      captain2&.update!(team: 2, pick_order: 2, skip_callbacks: true)
-
-      gatherers.each do |gatherer|
-        next if gatherer.id == captain1_id || gatherer.id == captain2_id
-
-        gatherer.update!(team: nil, pick_order: nil, skip_callbacks: true)
-      end
-    end
-  end
-
-  def pick_strategy_immutable
-    changed = if respond_to?(:will_save_change_to_pick_strategy?)
-                will_save_change_to_pick_strategy?
-              else
-                pick_strategy_changed?
-              end
-    errors.add(:pick_strategy, 'cannot be changed') if changed
+    [voting_timeout - (Time.current - start_time).to_i, 0].max
   end
 
   def refresh(_cuser)
     case status
-    when STATE_RUNNING
-      # DISABLED: gatherers.idle.destroy_all
-    when STATE_VOTING
-      # Check if voting timeout has passed based on when voting actually started
-      # Use with_lock to prevent concurrent transitions from causing optimistic locking conflicts
-      if voting_start_time && Time.current > voting_start_time + voting_timeout.seconds
-        with_lock do
-          # Re-check after acquiring lock to avoid TOCTOU race
-          if status == STATE_VOTING && Time.current > voting_start_time + voting_timeout.seconds
-            update!(status: STATE_PICKING)
-          end
-        end
-      end
-    when STATE_PICKING
-      # Read counts outside the lock first. The version endpoint is polled by
-      # every browser session concurrently; unconditionally taking with_lock
-      # serialised all 12 callers even when nothing needed to change. Only
-      # acquire the write lock when a transition actually appears necessary.
-      t1 = gatherers.team(1).count
-      t2 = gatherers.team(2).count
-
-      if picking_transition(turn, t1, t2)
-        with_lock do
-          # Re-read inside the lock (with_lock reloads the record)
-          team1_count = gatherers.team(1).count
-          team2_count = gatherers.team(2).count
-          apply_picking_transition(picking_transition(turn, team1_count, team2_count))
-        end
-      end
+    when STATE_VOTING then refresh_voting
+    when STATE_PICKING then refresh_picking
     end
   end
 
@@ -271,115 +173,134 @@ class Gather < ApplicationRecord
     with_lock do
       team1_count = gatherers.team(1).count
       team2_count = gatherers.team(2).count
-      apply_picking_transition(picking_transition(turn, team1_count, team2_count))
+      transition = pick_plan.transition(
+        current_turn: turn,
+        team1_count: team1_count,
+        team2_count: team2_count
+      )
+      apply_picking_transition(transition)
     end
   end
 
   def picking_slot_available?
     team1_count = gatherers.team(1).count
     team2_count = gatherers.team(2).count
-    completed_picks = [team1_count - 1, 0].max + [team2_count - 1, 0].max
-    numbered_picking_teams[completed_picks] == turn
+    pick_plan.slot_available?(turn: turn, team1_count: team1_count, team2_count: team2_count)
+  end
+
+  def bump_version!
+    with_lock do
+      update!(version: version.to_i + 1)
+    end
   end
 
   def can_create?(cuser)
     true if cuser.admin? || cuser.gather_moderator?
   end
 
-  def voting_timeout
-    return VOTING_TIMEOUT_SECONDS unless Rails.env.test?
-
-    Integer(ENV.fetch('GATHER_VOTING_TIMEOUT_TEST', 10))
-  end
-
-  def voting_start_time
-    # Get the time when the last (12th) gatherer joined to start voting
-    return nil unless [STATE_VOTING, STATE_PICKING, STATE_FINISHED].include?(status)
-
-    gatherers.order('created_at ASC').limit(1).offset(FULL - 1).first&.created_at
-  end
-
-  def voting_time_remaining
-    return 0 unless status == STATE_VOTING
-    return 0 unless (start_time = voting_start_time)
-
-    elapsed = Time.current - start_time
-    remaining = voting_timeout - elapsed.to_i
-    [remaining, 0].max
-  end
-
   def can_update?(cuser)
     true if cuser.admin? || cuser.gather_moderator?
   end
 
-  # Admin/moderator edit performed from the gather edit form. The transaction and
-  # broadcast belong here rather than in the controller so the persistence rules
-  # travel with the model.
   def admin_update(attributes)
-    self.admin = true
-    transaction do
-      next false unless update(attributes)
+    updated = with_lock do
+      admin_attributes = prepare_admin_attributes(attributes)
+      next false unless update(admin_attributes)
 
-      Gathers::Broadcaster.call(self)
+      assign_captain_teams if saved_change_to_captain1_id? || saved_change_to_captain2_id?
       true
     end
-  end
-
-  def self.last(name = 'NS2')
-    return unless (game = find_game(name))
-
-    game.gathers.ordered.first
-  end
-
-  def self.params(params, _cuser)
-    params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
+    Gathers::Broadcaster.call(self) if updated
+    updated
   end
 
   private
 
-  def picking_transition(current_turn, team1_count, team2_count)
-    return :finish if team1_count == 6 && team2_count == 6
-
-    numbered_picking_transitions[[current_turn, team1_count, team2_count]]
+  def initialize_state
+    self.status = STATE_RUNNING
   end
 
-  def numbered_picking_transitions
-    remaining_picks = FULL - 2
-    team_counts = [1, 1]
-    picking_team = 1
+  def populate_maps_and_servers
+    category.maps.basic.classic.each { |map| maps << map }
 
-    numbered_pick_sizes.cycle.each_with_object({}) do |pick_size, transitions|
-      picks = [pick_size, remaining_picks].min
-      team_counts[picking_team - 1] += picks
-      remaining_picks -= picks
-      break transitions if remaining_picks.zero?
+    available_servers = category_id == 44 ? category.servers.hlds.active.ordered : category.servers.active.ordered
+    available_servers.each { |available_server| servers << available_server }
+  end
 
-      next_team = picking_team == 1 ? 2 : 1
-      transition = if remaining_picks == 1
-                     :fill_team_two
-                   else
-                     "team_#{next_team == 1 ? 'one' : 'two'}".to_sym
-                   end
-      transitions[[picking_team, *team_counts]] = transition
-      picking_team = next_team
+  def pick_strategy_immutable
+    changed = if respond_to?(:will_save_change_to_pick_strategy?)
+                will_save_change_to_pick_strategy?
+              else
+                pick_strategy_changed?
+              end
+    errors.add(:pick_strategy, 'cannot be changed') if changed
+  end
+
+  def refresh_voting
+    return unless voting_expired?
+
+    with_lock do
+      complete_voting! if status == STATE_VOTING && voting_expired?
     end
   end
 
-  def numbered_picking_teams
-    numbered_pick_sizes.cycle.each_with_object([]) do |pick_size, teams|
-      picking_team = if teams.empty?
-                       1
-                     else
-                       teams.last == 1 ? 2 : 1
-                     end
-      teams.concat([picking_team] * [pick_size, FULL - 2 - teams.length].min)
-      break teams if teams.length == FULL - 2
+  def voting_expired?
+    voting_start_time && Time.current > voting_start_time + voting_timeout.seconds
+  end
+
+  def complete_voting!
+    create_follow_up_gather
+    ordered_maps = gather_maps.ordered.limit(2).to_a
+    update!(
+      picking_state_attributes.merge(
+        captain1: gatherers.most_voted[1],
+        captain2: gatherers.most_voted[0],
+        map1: ordered_maps[0],
+        map2: ordered_maps[1],
+        server: gather_servers.ordered.first&.server
+      )
+    )
+    assign_captain_teams
+  end
+
+  def create_follow_up_gather
+    category&.with_lock do
+      Gather.create!(category: category) unless Gather.where(category_id: category_id).where('id > ?', id).exists?
     end
   end
 
-  def numbered_pick_sizes
-    strategy = pick_strategy.match?(/\A\d+(?:-\d+)*\z/) ? pick_strategy : PICK_STRATEGY_DEFAULT
-    strategy.split('-').map(&:to_i)
+  def assign_captain_teams
+    captain1&.update!(team: 1, pick_order: 1, skip_callbacks: true)
+    captain2&.update!(team: 2, pick_order: 2, skip_callbacks: true)
+
+    gatherers.where.not(id: [captain1_id, captain2_id]).find_each do |gatherer|
+      gatherer.update!(team: nil, pick_order: nil, skip_callbacks: true)
+    end
+  end
+
+  def picking_state_attributes
+    { status: STATE_PICKING, turn: 1 }
+  end
+
+  def refresh_picking
+    team1_count = gatherers.team(1).count
+    team2_count = gatherers.team(2).count
+    return unless pick_plan.transition(current_turn: turn, team1_count: team1_count, team2_count: team2_count)
+
+    with_lock do
+      team1_count = gatherers.team(1).count
+      team2_count = gatherers.team(2).count
+      transition = pick_plan.transition(
+        current_turn: turn,
+        team1_count: team1_count,
+        team2_count: team2_count
+      )
+      apply_picking_transition(transition)
+    end
+  end
+
+  def pick_plan
+    Gathers::PickPlan.new(strategy: pick_strategy, team_size: FULL / 2)
   end
 
   def apply_picking_transition(transition)
@@ -394,5 +315,16 @@ class Gather < ApplicationRecord
       gatherers.lobby.first&.update!(team: 2, skip_callbacks: true)
       update!(turn: 2)
     end
+  end
+
+  # Prepares admin attributes for updating the gather, ensuring that if
+  # captains are changed, the picking state is also updated.
+  def prepare_admin_attributes(attributes)
+    attributes = attributes.to_h.symbolize_keys
+    captain_changed = %i[captain1_id captain2_id].any? do |key|
+      attributes.key?(key) && attributes[key].to_i != public_send(key).to_i
+    end
+    attributes.merge!(picking_state_attributes) if captain_changed
+    attributes
   end
 end

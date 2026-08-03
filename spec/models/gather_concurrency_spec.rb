@@ -187,8 +187,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       captain1 = gatherers[0]
       captain2 = gatherers[1]
 
-      # This triggers check_captains callback which uses with_lock
-      gather.update!(captain1_id: captain1.id, captain2_id: captain2.id)
+      gather.admin_update(captain1_id: captain1.id, captain2_id: captain2.id)
 
       gather.reload
       captain1.reload

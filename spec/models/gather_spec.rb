@@ -16,7 +16,7 @@ RSpec.describe Gather, type: :model do
   describe 'initialization' do
     it 'sets status to STATE_RUNNING on init' do
       g = Gather.new
-      g.send(:init_variables)
+      g.send(:initialize_state)
       expect(g.status).to eq(Gather::STATE_RUNNING)
     end
 
@@ -42,41 +42,15 @@ RSpec.describe Gather, type: :model do
       expect(gather).to be_invalid
       expect(gather.errors[:pick_strategy]).to include('cannot be changed')
     end
-
-    it 'derives the default turn boundaries from its numbered segments' do
-      gather = build(:gather, pick_strategy: Gather::PICK_STRATEGY_DEFAULT)
-
-      expect(gather.send(:picking_transition, 1, 2, 1)).to eq(:team_two)
-      expect(gather.send(:picking_transition, 2, 2, 2)).to be_nil
-      expect(gather.send(:picking_transition, 2, 2, 3)).to eq(:team_one)
-      expect(gather.send(:picking_transition, 1, 6, 5)).to eq(:fill_team_two)
-    end
-
-    it 'repeats a shorter numbered strategy until every player has a turn' do
-      gather = build(:gather, pick_strategy: '1-1-1-1')
-
-      expect(gather.send(:picking_transition, 1, 2, 1)).to eq(:team_two)
-      expect(gather.send(:picking_transition, 2, 2, 2)).to eq(:team_one)
-      expect(gather.send(:picking_transition, 1, 3, 2)).to eq(:team_two)
-      expect(gather.send(:picking_transition, 1, 6, 5)).to eq(:fill_team_two)
-    end
-
-    it 'uses the default numbered schedule for strategies not yet implemented' do
-      gather = build(:gather, pick_strategy: 'random')
-
-      expect(gather.send(:picking_transition, 2, 2, 2)).to be_nil
-      expect(gather.send(:picking_transition, 2, 2, 3)).to eq(:team_one)
-    end
   end
 
   describe '#admin_update' do
-    it 'updates the gather, flags admin and broadcasts on success' do
+    it 'updates the gather and broadcasts on success' do
       gather = create(:gather)
       allow(Gathers::Broadcaster).to receive(:call)
 
       expect(gather.admin_update(turn: 1)).to be true
       expect(gather.reload.turn).to eq(1)
-      expect(gather.admin).to be true
       expect(Gathers::Broadcaster).to have_received(:call).with(gather)
     end
 
@@ -90,14 +64,14 @@ RSpec.describe Gather, type: :model do
     end
   end
 
-  describe 'check_captains' do
+  describe 'captain team assignment' do
     it 'assigns turn/status and updates gatherers teams when captains change' do
       gather = create(:gather)
       ga = gather.gatherers.create!(user: create(:user))
       gb = gather.gatherers.create!(user: create(:user))
       gx = gather.gatherers.create!(user: create(:user))
 
-      gather.update!(captain1_id: ga.id, captain2_id: gb.id)
+      gather.admin_update(captain1_id: ga.id, captain2_id: gb.id)
       gather.reload
       expect(gather.turn).to eq(1)
       expect(gather.status).to eq(Gather::STATE_PICKING)
@@ -110,7 +84,7 @@ RSpec.describe Gather, type: :model do
     end
   end
 
-  describe 'check_status' do
+  describe 'picking preparation' do
     it 'creates only one follow-up gather for concurrent stale transitions' do
       gather = create(:gather)
       create_list(:gatherer, 12, gather: gather)
@@ -119,8 +93,8 @@ RSpec.describe Gather, type: :model do
       stale_copy_two = Gather.find(gather.id)
 
       expect do
-        stale_copy_one.update!(status: Gather::STATE_PICKING)
-        stale_copy_two.update!(status: Gather::STATE_PICKING)
+        stale_copy_one.send(:complete_voting!)
+        stale_copy_two.send(:complete_voting!)
       end.to change { Gather.where(category_id: gather.category_id).count }.by(1)
     end
   end
@@ -227,27 +201,15 @@ RSpec.describe Gather, type: :model do
   end
 
   describe 'status and timeout helpers' do
-    it 'skips check_status work when status is not changing' do
-      gather = create(:gather)
-      allow(gather).to receive(:will_save_change_to_status?).and_return(false)
-
-      expect(gather.gatherers).not_to receive(:most_voted)
-      gather.send(:check_status)
-    end
-
     it 'assigns only map1 when exactly one gather map exists' do
       gather = create(:gather)
       map = create(:map)
       gather.gather_maps.destroy_all
       gather.gather_servers.destroy_all
       gather.gather_maps.create!(map: map)
-      gather.status = Gather::STATE_PICKING
-      gather.captain1 = nil
-
-      allow(gather).to receive(:will_save_change_to_status?).and_return(true)
       allow(gather.gatherers).to receive(:most_voted).and_return([nil, nil])
 
-      gather.send(:check_status)
+      gather.send(:complete_voting!)
 
       expect(gather.map1).to eq(gather.gather_maps.ordered.first)
       expect(gather.map2).to be_nil
@@ -273,7 +235,7 @@ RSpec.describe Gather, type: :model do
 
     it 'reports remaining voting time and clamps expired voting to zero' do
       gather = create(:gather)
-      gather.update_columns(status: Gather::STATE_VOTING)
+      gather.update!(status: Gather::STATE_VOTING)
       allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
       allow(gather).to receive(:voting_timeout).and_return(10)
 
@@ -313,7 +275,7 @@ RSpec.describe Gather, type: :model do
     end
   end
 
-  describe '#add_maps_and_server' do
+  describe '#populate_maps_and_servers' do
     it 'uses HLDS servers for category 44' do
       gather = create(:gather)
       gather.category_id = 44
@@ -337,7 +299,7 @@ RSpec.describe Gather, type: :model do
       allow(active_scope).to receive(:ordered).and_return(ordered_scope)
 
       expect(servers_scope).not_to receive(:active)
-      gather.send(:add_maps_and_server)
+      gather.send(:populate_maps_and_servers)
     end
   end
 end
