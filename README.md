@@ -1,6 +1,11 @@
 [![Test](https://github.com/ENSL/ensl.org/actions/workflows/test.yml/badge.svg)](https://github.com/ENSL/ensl.org/actions/workflows/test.yml)
 [![Maintainability](https://qlty.sh/gh/ENSL/projects/ensl.org/maintainability.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
 [![Code Coverage](https://qlty.sh/gh/ENSL/projects/ensl.org/coverage.svg)](https://qlty.sh/gh/ENSL/projects/ensl.org)
+[![Brakeman](https://img.shields.io/badge/Brakeman-enabled-0A66C2)](https://github.com/presidentbeef/brakeman)
+
+[![Ruby](https://img.shields.io/badge/Ruby-3.4.8-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/)
+[![Rails](https://img.shields.io/badge/Rails-8.1.x-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 # ENSL Website
 
@@ -8,22 +13,22 @@ This is the source code of ENSL website. Currently deployed on [ensl.org](https:
 
 ## Documentation
 
-See [[INSTALL.md]] how to install and [[DEVELOPMENT.md]] how to develop it.
+See [INSTALL.md](INSTALL.md) how to install and [DEVELOPMENT.md](DEVELOPMENT.md) how to develop it.
 
 ## Features
 
 - Articles
 - Commenting feature for most objects
-- Movie database 
+- Movie database
 - File database
 - ENSL Plugin API
 - Forums, usual forum features and ACL
 - Contest management
-    - Teams and team member management
-    - Brackets
-    - Tournaments
-    - Match database
-    - Challenging system
+  - Teams and team member management
+  - Brackets
+  - Tournaments
+  - Match database
+  - Challenging system
 - Instant webchat (shoutbox)
 - Private messages
 - Issue management
