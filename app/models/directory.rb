@@ -136,6 +136,28 @@ class Directory < ApplicationRecord
     ENV['FILES_ROOT'] ||= Rails.root.join('public/files').to_s
   end
 
+  def self.safe_files_root_path(*segments)
+    root = File.expand_path(files_root.to_s)
+    candidate = File.expand_path(File.join(root, *segments.flatten.compact.map(&:to_s)))
+    return nil unless path_within_root?(candidate, root)
+
+    candidate
+  rescue StandardError
+    nil
+  end
+
+  def self.path_within_files_root?(path)
+    path_within_root?(path, files_root)
+  end
+
+  def self.path_within_root?(path, root_path)
+    candidate = File.expand_path(path.to_s)
+    root = File.expand_path(root_path.to_s)
+    candidate == root || candidate.start_with?("#{root}#{File::SEPARATOR}")
+  rescue StandardError
+    false
+  end
+
   def self.sync_download_root(kind:, nickname:, year: nil)
     base_root = sync_download_base_root(kind)
     segment = sanitize_sync_segment(nickname)
@@ -582,14 +604,16 @@ class Directory < ApplicationRecord
   def ignored_reconciliation_path?(absolute_path)
     return false if absolute_path.blank?
 
-    root = Pathname.new(Directory.files_root)
-    path = Pathname.new(absolute_path.to_s)
-    relative_path = path.relative_path_from(root).to_s
-    return false if relative_path.blank? || relative_path == '.'
+    root = File.expand_path(Directory.files_root.to_s)
+    path = File.expand_path(absolute_path.to_s)
+    return false unless Directory.path_within_root?(path, root)
+
+    relative_path = path.delete_prefix("#{root}#{File::SEPARATOR}")
+    return false if relative_path.blank? || relative_path == path
 
     root_segment = relative_path.split(File::SEPARATOR).first
     IGNORED_RECONCILIATION_ROOT_DIRS.include?(root_segment)
-  rescue ArgumentError
+  rescue StandardError
     false
   end
 

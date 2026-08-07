@@ -36,7 +36,7 @@ class PasskeysController < ApplicationController
   end
 
   def credential_params
-    params.require(:credential).permit!.to_h
+    permitted_webauthn_credential_params
   end
 
   def registration_service

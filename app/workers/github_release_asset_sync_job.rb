@@ -18,7 +18,9 @@ class GithubReleaseAssetSyncJob
   def perform(options = {})
     opts = options.is_a?(Hash) ? options : {}
     repo = opts['repo'].presence || opts[:repo].presence || DEFAULT_REPO
-    destination_root = File.join(Directory.files_root, 'client')
+    destination_root = Directory.safe_files_root_path('client')
+    return if destination_root.blank?
+
     FileUtils.mkdir_p(destination_root)
 
     fetch_tags(repo).each do |tag|
@@ -91,7 +93,8 @@ class GithubReleaseAssetSyncJob
 
   def download_asset(destination_root, asset_url, prefix: nil)
     filename = filename_for(asset_url, prefix)
-    destination_path = File.join(destination_root, filename)
+    destination_path = safe_destination_path(destination_root, filename)
+    return if destination_path.blank?
 
     if filename.present? && DataFile.exists?(name: filename)
       Rails.logger.info("[GithubReleaseAssetSyncJob] Skipping existing DB file #{filename}")
@@ -132,5 +135,17 @@ class GithubReleaseAssetSyncJob
 
   def safe_name(value)
     value.to_s.gsub(/[^A-Za-z0-9._-]/, '_').downcase
+  end
+
+  def safe_destination_path(destination_root, filename)
+    return nil if filename.blank?
+
+    root = File.expand_path(destination_root.to_s)
+    destination_path = File.expand_path(File.join(root, filename.to_s))
+    return nil unless Directory.path_within_root?(destination_path, root)
+
+    destination_path
+  rescue StandardError
+    nil
   end
 end

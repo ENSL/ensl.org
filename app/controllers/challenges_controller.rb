@@ -47,7 +47,7 @@ class ChallengesController < ApplicationController
     @challenge.destroy
 
     respond_to do |format|
-      format.html { redirect_to contest, notice: t(:challenges_cleared) }
+      format.html { redirect_to contest_path(contest), notice: t(:challenges_cleared) }
       format.any { render plain: t(:challenges_cleared) }
     end
   end

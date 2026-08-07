@@ -35,7 +35,7 @@
         </td>
         <td>
           <% if movie.preview_exists? %>
-            <%= link_to fa_icon('eye', class: "green"), movie.preview_url, target: '_blank', title: 'View preview' %>
+            <%= link_to fa_icon('eye', class: "green"), safe_url_for(movie.preview_url), target: '_blank', rel: 'noopener noreferrer', title: 'View preview' %>
           <% else %>
             <%= link_to "Make Preview", preview_movie_path(movie), method: :post, title: 'Make preview', form: { style: 'display:inline;margin:0;' } %>
           <% end %>

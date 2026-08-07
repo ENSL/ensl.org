@@ -32,7 +32,7 @@ class DataFilesController < ApplicationController
 
     if @file.save
       flash[:notice] = t(:files_create)
-      redirect_to @file.redirect_target_after_create
+      redirect_to redirect_target_after_create_path(@file)
     else
       respond_with_validation_errors(@file, template: :new)
     end
@@ -86,5 +86,18 @@ class DataFilesController < ApplicationController
   def safe_return_to
     return_to = params[:return_to].to_s
     return_to if return_to.start_with?('/') && !return_to.start_with?('//')
+  end
+
+  def redirect_target_after_create_path(file)
+    case (target = file.redirect_target_after_create)
+    when Article
+      article_path(target)
+    when Movie
+      movie_path(target)
+    when DataFile
+      data_file_path(target)
+    else
+      data_file_path(file)
+    end
   end
 end

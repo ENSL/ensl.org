@@ -30,6 +30,7 @@
 
 require 'open3'
 require 'digest/md5'
+require 'ipaddr'
 
 class Movie < ApplicationRecord
   include Extra
@@ -335,11 +336,11 @@ class Movie < ApplicationRecord
   private :ensure_preview_data_file!
 
   def make_stream
-    ip = stream_ip.to_s[/\b(?:\d{1,3}\.){3}\d{1,3}\b/]
-    port = stream_port.to_s[/\d{1,5}/]
-    return unless ip.present? && port.present? && file&.full_path
+    ip = sanitized_stream_ip
+    port = sanitized_stream_port
+    dst_file = sanitized_stream_destination_path
+    return unless ip.present? && port.present? && dst_file.present?
 
-    dst_file = file.full_path.to_s
     sout = "#duplicate{dst=std{access=file,mux=mp4,dst=#{dst_file}},dst=std{access=http,mux=ts,dst=#{LOCAL}}}"
     src = "http://#{ip}:#{port}"
 
@@ -353,6 +354,33 @@ class Movie < ApplicationRecord
   rescue StandardError
     nil
   end
+
+  def sanitized_stream_ip
+    candidate = stream_ip.to_s.strip
+    return nil if candidate.blank?
+
+    parsed = IPAddr.new(candidate)
+    parsed.ipv4? ? parsed.to_s : nil
+  rescue IPAddr::InvalidAddressError
+    nil
+  end
+  private :sanitized_stream_ip
+
+  def sanitized_stream_port
+    candidate = Integer(stream_port, exception: false)
+    return nil unless candidate&.between?(1, 65_535)
+
+    candidate.to_s
+  end
+  private :sanitized_stream_port
+
+  def sanitized_stream_destination_path
+    candidate = file&.full_path.to_s
+    return nil if candidate.blank? || candidate.match?(/[{}\r\n]/)
+
+    candidate
+  end
+  private :sanitized_stream_destination_path
 
   # Supports stacked filters: rating (numeric), size ('short'|'long'), author
   def self.filter_or_all(order_param, rating_param = nil, size_param = nil, author_param = nil)

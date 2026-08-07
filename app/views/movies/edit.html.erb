@@ -44,7 +44,7 @@
         <div class="status">
           <% if @movie.preview_exists? %>
             <span class="icon success"><%= fa_icon('check') %></span>
-            <span class="status-text"><%= link_to 'Preview exists', @movie.preview_url, target: '_blank' %></span>
+            <span class="status-text"><%= link_to 'Preview exists', safe_url_for(@movie.preview_url), target: '_blank', rel: 'noopener noreferrer' %></span>
           <% else %>
             <span class="icon muted"><%= fa_icon('times') %></span>
             <span class="status-text muted">Preview doesn&apos;t exist</span>

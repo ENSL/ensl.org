@@ -383,8 +383,13 @@ class DataFile < ApplicationRecord
     destination_root = Directory.sync_download_root(kind: kind, nickname: nickname, year: year)
     return nil if destination_root.blank?
 
+    destination_root = File.expand_path(destination_root.to_s)
     FileUtils.mkdir_p(destination_root)
-    destination_path = File.join(destination_root, File.basename(filename))
+    destination_filename = sync_download_filename(filename)
+    return nil if destination_filename.blank?
+
+    destination_path = File.expand_path(File.join(destination_root, destination_filename))
+    return nil unless Directory.path_within_root?(destination_path, destination_root)
 
     unless sync_download_required?(destination_path, remote_size, remote_mtime)
       return { download: false, destination_path: destination_path, reason: :up_to_date }
@@ -416,6 +421,15 @@ class DataFile < ApplicationRecord
     return nil unless kind.to_s == Directory::SYNC_KIND_LOGS
 
     (remote_mtime || now).year
+  end
+
+  def self.sync_download_filename(filename)
+    basename = File.basename(filename.to_s)
+    return nil if basename.blank? || %w[. ..].include?(basename)
+
+    basename
+  rescue StandardError
+    nil
   end
 
   def self.sync_resolve_destination_path(destination_path, remote_mtime, now: Time.current)

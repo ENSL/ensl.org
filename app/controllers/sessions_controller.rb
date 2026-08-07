@@ -192,7 +192,7 @@ class SessionsController < ApplicationController
   end
 
   def passkey_credential_params
-    params.require(:credential).permit!.to_h
+    permitted_webauthn_credential_params
   end
 
   def passkey_login_service

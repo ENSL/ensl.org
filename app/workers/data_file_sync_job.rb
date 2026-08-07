@@ -114,9 +114,13 @@ class DataFileSyncJob
             next
           end
 
-          download_path = plan[:destination_path]
+          download_path = validated_download_path(plan[:destination_path])
+          next if download_path.blank?
+
           FileUtils.mkdir_p(File.dirname(download_path))
           temp_path = "#{download_path}.part-#{Process.pid}-#{SecureRandom.hex(4)}"
+          next unless Directory.path_within_root?(temp_path, File.dirname(download_path))
+
           ftp.getbinaryfile(filename, temp_path)
           FileUtils.mv(temp_path, download_path, force: true)
           if remote_mtime
@@ -149,6 +153,14 @@ class DataFileSyncJob
     return ENV[text.delete_prefix('env:')] if text.start_with?('env:')
 
     text
+  end
+
+  def validated_download_path(path)
+    expanded_path = File.expand_path(path.to_s)
+    return nil if expanded_path.blank?
+    return nil if expanded_path.match?(/[\r\n]/)
+
+    expanded_path
   end
 
   def run_directory_reconciliation

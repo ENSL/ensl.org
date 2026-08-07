@@ -113,6 +113,26 @@ class ApplicationController < ActionController::Base
     SafeUrl.sanitize(url)
   end
 
+  def permitted_webauthn_credential_params
+    params.require(:credential).permit(
+      :id,
+      :rawId,
+      :type,
+      :authenticatorAttachment,
+      clientExtensionResults: {},
+      response: [
+        :attestationObject,
+        :authenticatorData,
+        :clientDataJSON,
+        :publicKey,
+        :publicKeyAlgorithm,
+        :signature,
+        :userHandle,
+        { transports: [] }
+      ]
+    ).to_h
+  end
+
   rescue_from AccessError do |_exception|
     render 'errors/403', status: :forbidden, layout: 'errors'
   end

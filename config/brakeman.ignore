@@ -1,0 +1,111 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "14c12647ddc785acebd2099f4a57020e2cdf8a71d6fbd5fc8e31d002dd9f1294",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/data_file.rb",
+      "line": 387,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.expand_path(Directory.sync_download_root(:kind => Directory.sync_kind_for_filename(filename), :nickname => nickname, :year => sync_destination_year(Directory.sync_kind_for_filename(filename), remote_mtime, :now => now)).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFile",
+        "method": "DataFile.sync_download_plan"
+      },
+      "user_input": "Directory.sync_download_root(:kind => Directory.sync_kind_for_filename(filename), :nickname => nickname, :year => sync_destination_year(Directory.sync_kind_for_filename(filename), remote_mtime, :now => now)).to_s",
+      "confidence": "Weak",
+      "cwe_id": [22],
+      "note": "sync_download_root sanitizes kind and nickname, sync_download_plan constrains the final filename to File.basename, and the destination path is expanded and checked to stay within the computed destination root before use."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "937a68acdf2ec1730972614a103076a99461539f1ffcd9e1c36eda81e02207aa",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/workers/github_release_asset_sync_job.rb",
+      "line": 24,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(Directory.safe_files_root_path(\"client\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GithubReleaseAssetSyncJob",
+        "method": "perform"
+      },
+      "user_input": "Directory.safe_files_root_path(\"client\")",
+      "confidence": "Medium",
+      "cwe_id": [22],
+      "note": "The path is built from the configured FILES_ROOT plus a fixed literal segment and is normalized by Directory.safe_files_root_path before mkdir_p is called."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "b88cf20ea4a7650a32a778429356b03c2a00de7058a09f12a7a11f064f84cb81",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/workers/data_file_sync_job.rb",
+      "line": 125,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mv(\"#{validated_download_path(DataFile.sync_download_plan(:nickname => server_config[:nickname], :filename => filename, :remote_size => (begin\n  ftp.size(filename)\nrescue StandardError\n  nil\nend), :remote_mtime => (begin\n  ftp.mtime(filename)\nrescue StandardError\n  nil\nend))[:destination_path])}.part-#{Process.pid}-#{SecureRandom.hex(4)}\", validated_download_path(DataFile.sync_download_plan(:nickname => server_config[:nickname], :filename => filename, :remote_size => (begin\n  ftp.size(filename)\nrescue StandardError\n  nil\nend), :remote_mtime => (begin\n  ftp.mtime(filename)\nrescue StandardError\n  nil\nend))[:destination_path]), :force => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFileSyncJob",
+        "method": "sync_server"
+      },
+      "user_input": "DataFile.sync_download_plan(:nickname => server_config[:nickname], :filename => filename, :remote_size => (begin\n  ftp.size(filename)\nrescue StandardError\n  nil\nend), :remote_mtime => (begin\n  ftp.mtime(filename)\nrescue StandardError\n  nil\nend))[:destination_path]",
+      "confidence": "Weak",
+      "cwe_id": [22],
+      "note": "The worker only uses planner output after path normalization, newline rejection, basename enforcement in sync_download_plan, and destination-root confinement for the temporary file path."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ce23f0f31b8228eac8185562d9d7159a0104a1d6a031194a167b53aadea54aff",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/workers/data_file_sync_job.rb",
+      "line": 120,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(validated_download_path(DataFile.sync_download_plan(:nickname => server_config[:nickname], :filename => filename, :remote_size => (begin\n  ftp.size(filename)\nrescue StandardError\n  nil\nend), :remote_mtime => (begin\n  ftp.mtime(filename)\nrescue StandardError\n  nil\nend))[:destination_path])))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFileSyncJob",
+        "method": "sync_server"
+      },
+      "user_input": "DataFile.sync_download_plan(:nickname => server_config[:nickname], :filename => filename, :remote_size => (begin\n  ftp.size(filename)\nrescue StandardError\n  nil\nend), :remote_mtime => (begin\n  ftp.mtime(filename)\nrescue StandardError\n  nil\nend))[:destination_path]",
+      "confidence": "Weak",
+      "cwe_id": [22],
+      "note": "This directory creation uses the same planner output and validation path as the subsequent move, with the final filename reduced to File.basename and the resolved path normalized before use."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "dd3f8aed6c49cc19c6d8fe558c907c987b902538f03a4b7df22c23142d693747",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/models/movie.rb",
+      "line": 348,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Process.spawn(\"/usr/bin/vlc\", \"http://#{sanitized_stream_ip}:#{sanitized_stream_port}\", \"--sout\", \"#duplicate{dst=std{access=file,mux=mp4,dst=#{sanitized_stream_destination_path}},dst=std{access=http,mux=ts,dst=#{\"78.46.36.107:29100\"}}}\", \"vlc://quit\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Movie",
+        "method": "make_stream"
+      },
+      "user_input": "sanitized_stream_ip",
+      "confidence": "Medium",
+      "cwe_id": [77],
+      "note": "The spawn call passes discrete argv elements without invoking a shell. The host is normalized through IPAddr, the port is reduced to an integer in 1..65535, and the destination path rejects control characters and VLC sout metacharacters used to alter the option grammar."
+    }
+  ],
+  "updated": "2026-08-05 21:02:00 +0000",
+  "brakeman_version": "8.0.5"
+}
