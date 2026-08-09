@@ -98,7 +98,7 @@ RSpec.feature 'Matches management', type: :feature, js: true do
       end
     end
 
-    expect(page).to have_content(I18n.t('matches_destroy'))
+    expect(page).to have_content(I18n.t('flash.actions.destroy.notice', resource_name: Match.model_name.human))
     expect(page).to have_current_path(edit_contest_path(contest))
   end
 

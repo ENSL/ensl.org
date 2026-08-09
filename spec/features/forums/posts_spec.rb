@@ -34,7 +34,7 @@ feature 'User manages forum posts', js: true do
 
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t(:posts_create)
+        expect(page).to have_content I18n.t('flash.actions.create.notice', resource_name: Post.model_name.human)
         expect(Post.count).to eq(initial_count + 1)
         expect(Post.order(:id).last.text).to eq 'This is my test post'
       end
@@ -126,7 +126,7 @@ feature 'User manages forum posts', js: true do
         textarea.set('Updated text')
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t(:posts_update)
+        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         expect(post.reload.text).to eq 'Updated text'
       end
 
@@ -137,7 +137,7 @@ feature 'User manages forum posts', js: true do
         click_button 'Save Post'
 
         # Should redirect to topic with flash message
-        expect(page).to have_content I18n.t(:posts_update)
+        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         # Check we're on the topic page
         expect(current_path).to eq(topic_path(post.topic))
       end
@@ -149,7 +149,7 @@ feature 'User manages forum posts', js: true do
         click_button 'Save Post'
 
         # Wait for redirect
-        expect(page).to have_content I18n.t(:posts_update)
+        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         # Check we're on topic page with the updated post visible
         expect(current_path).to eq(topic_path(post.topic))
         within("#post_#{post.id}") do
@@ -363,7 +363,8 @@ feature 'User manages forum posts', js: true do
         end
 
         # Wait for redirect/page update to complete
-        expect(page).to have_content I18n.t(:posts_destroy), wait: 5
+        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human),
+                                     wait: 5
         # Verify post is deleted
         expect(Post.find_by(id: post.id)).to be_nil
       end
@@ -376,7 +377,7 @@ feature 'User manages forum posts', js: true do
           end
         end
 
-        expect(page).to have_content I18n.t(:posts_destroy)
+        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
       end
 
       it 'redirects to forum when deleting the last post of a topic' do
@@ -392,7 +393,7 @@ feature 'User manages forum posts', js: true do
         end
 
         # Flash message should appear
-        expect(page).to have_content I18n.t(:posts_destroy)
+        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
         # Post should be deleted
         expect(Post.find_by(id: only_post.id)).to be_nil
       end
@@ -403,7 +404,7 @@ feature 'User manages forum posts', js: true do
         textarea.set('Admin edited text')
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t(:posts_update)
+        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         expect(post.reload.text).to eq 'Admin edited text'
       end
     end

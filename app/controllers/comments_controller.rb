@@ -24,10 +24,10 @@ class CommentsController < ApplicationController
 
     respond_to do |format|
       if @comment.save
-        flash[:notice] = t(:comments_create)
+        flash[:notice] = flash_action_message(:create, @comment)
         format.js { render }
       else
-        flash[:error] = t(:comments_invalid) + @comment.errors.full_messages.to_s
+        flash[:error] = "#{t('comments.invalid')} #{@comment.errors.full_messages.to_sentence}".strip
         format.html { redirect_back fallback_location: root_path }
       end
     end
@@ -37,7 +37,7 @@ class CommentsController < ApplicationController
     raise AccessError unless @comment.can_update? cuser
 
     if @comment.update(Comment.params(params, cuser))
-      flash[:notice] = t(:comments_update)
+      flash[:notice] = flash_action_message(:update, @comment)
       return_to
     else
       render :edit

@@ -27,7 +27,7 @@ class TeamsController < ApplicationController
     raise AccessError unless @team.can_create? cuser
 
     if @team.save
-      flash[:notice] = t(:teams_create)
+      flash[:notice] = flash_action_message(:create, @team)
       redirect_to @team
     else
       respond_with_validation_errors(@team, template: :new)
@@ -39,7 +39,7 @@ class TeamsController < ApplicationController
 
     if @team.update(Team.params(params, cuser))
       @team.apply_member_rank_updates!(actor: cuser, rank_params: params[:rank], comment_params: params[:comment])
-      flash[:notice] = t(:teams_update)
+      flash[:notice] = flash_action_message(:update, @team)
       redirect_to edit_team_path(@team)
     else
       respond_with_validation_errors(@team, template: :edit)

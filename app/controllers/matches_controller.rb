@@ -40,7 +40,7 @@ class MatchesController < ApplicationController
     @match = Match.new(Match.params(params, cuser))
     raise AccessError unless @match.can_create? cuser
 
-    save_and_respond(@match, notice: :matches_create,
+    save_and_respond(@match, notice: [:create, @match],
                              location: edit_contest_path(@match.contest, contest: 'matches'),
                              template: :new) { @match.save }
   end
@@ -78,7 +78,7 @@ class MatchesController < ApplicationController
     raise AccessError unless @match.can_destroy? cuser
 
     @match.destroy
-    flash[:notice] = t(:matches_destroy)
+    flash[:notice] = flash_action_message(:destroy, @match)
     redirect_to edit_contest_path(@match.contest, anchor: 'matches')
   end
 
@@ -103,7 +103,7 @@ class MatchesController < ApplicationController
   end
 
   def redirect_after_match_update
-    flash[:notice] = t(:matches_update)
+    flash[:notice] = flash_action_message(:update, @match)
     admin_match_referer? ? redirect_to_back : redirect_to(@match)
   end
 

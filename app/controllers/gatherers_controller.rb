@@ -60,7 +60,7 @@ class GatherersController < ApplicationController
 
   def apply_join_flash(join_result)
     if join_result.success?
-      flash[:notice] = t(:gathers_join)
+      flash[:notice] = t('gathers.join')
     else
       flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || join_result.error.to_s
     end
@@ -68,7 +68,7 @@ class GatherersController < ApplicationController
 
   def apply_pick_flash(result)
     if result.success?
-      flash[:notice] = t(:gathers_user_pick)
+      flash[:notice] = t('gathers.user_pick')
     else
       flash[:error] = result.error.to_s
     end
@@ -76,7 +76,7 @@ class GatherersController < ApplicationController
 
   def apply_gatherer_update_flash(update_result)
     if update_result.updated
-      flash[:notice] = t(:gatherers_update)
+      flash[:notice] = t('gatherers.update')
     else
       flash[:error] = update_result.errors.full_messages.to_sentence
     end
@@ -90,7 +90,7 @@ class GatherersController < ApplicationController
 
   def apply_gatherer_destroy_flash(result)
     if result.success?
-      flash[:notice] = t(:gatherers_update)
+      flash[:notice] = t('gatherers.update')
     else
       flash[:error] = result.error.to_s
     end

@@ -6,7 +6,7 @@ class GroupersController < ApplicationController
     raise AccessError unless @grouper.can_create? cuser
 
     if @grouper.save
-      flash[:notice] = t(:groups_user_add)
+      flash[:notice] = t('groups.users.add')
       redirect_to edit_group_url(@grouper.group, anchor: 'members')
     else
       prepare_group_edit(@grouper, new_grouper: @grouper)
@@ -19,7 +19,7 @@ class GroupersController < ApplicationController
     raise AccessError unless @grouper.can_update? cuser
 
     if @grouper.update(Grouper.params(params, cuser))
-      flash[:notice] = t(:groups_user_update)
+      flash[:notice] = t('groups.users.update')
       redirect_to edit_group_url(@grouper.group, anchor: 'members')
     else
       prepare_group_edit(@grouper)
@@ -32,7 +32,7 @@ class GroupersController < ApplicationController
     raise AccessError unless @grouper.can_destroy? cuser
 
     @grouper.destroy
-    flash[:notice] = t(:groups_user_remove)
+    flash[:notice] = t('groups.users.remove')
     redirect_to edit_group_url(@grouper.group, anchor: 'members')
   end
 

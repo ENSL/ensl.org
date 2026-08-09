@@ -22,7 +22,7 @@ feature 'User creates new article', js: true do
         fill_tinymce 'article_text', article[:text]
         click_button I18n.t('helpers.submit.post.create')
 
-        expect(page).to have_content(I18n.t('articles_create'))
+        expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
       end
 
       it 'creates an article with a text length greater than 65535 bytes' do
@@ -32,7 +32,7 @@ feature 'User creates new article', js: true do
         fill_tinymce 'article_text', long_text
         click_button I18n.t('helpers.submit.post.create')
 
-        expect(page).to have_content(I18n.t('articles_create'))
+        expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
       end
 
       # TODO: add more fancier formatting tests (images, links, etc)

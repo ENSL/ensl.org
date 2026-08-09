@@ -33,7 +33,7 @@
                 <label>Passkeys</label>
                 <div class="inputs">
                   <p>
-                    <%= @user.passkey_enabled? ? t(:passkey_enabled) : t(:passkey_disabled) %>
+                    <%= @user.passkey_enabled? ? t('passkeys.status.enabled') : t('passkeys.status.disabled') %>
                   </p>
                     <%= button_tag t('sessions.form.enable_passkey'), type: 'button', data: { action: 'click->passkey-auth#register' } %>
                   <% if @user.passkey_credentials.any? %>
@@ -44,7 +44,7 @@
                           <%= link_to 'Remove',
                                       user_passkey_path(@user, credential_id: credential.id),
                                       method: :delete,
-                                      data: { confirm: t(:passkey_remove_confirm) } %>
+                                      data: { confirm: t('passkeys.destroy.confirm') } %>
                         </li>
                       <% end %>
                     </ul>

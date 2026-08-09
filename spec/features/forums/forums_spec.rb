@@ -14,7 +14,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
     find_field('login_username').set(admin.username)
     fill_in 'login_password', with: admin.raw_password
     find('#authentication input[name="commit"]').click
-    expect(page).to have_content(I18n.t('login_successful'))
+    expect(page).to have_content(I18n.t('sessions.create.success'))
   end
 
   feature 'Editing forums' do
@@ -33,7 +33,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
       fill_in 'forum_description', with: 'Updated forum description'
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t(:forums_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Forum.model_name.human))
       expect(page).to have_content('Updated Forum Title')
     end
   end
@@ -49,7 +49,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       # Verify the group appears in the access list
       within('#acl') do
@@ -67,7 +67,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       within('#acl') do
         expect(page).to have_content(group1.name)
@@ -84,7 +84,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       within('#acl') do
         expect(page).to have_content(group1.name)
@@ -104,7 +104,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_link 'Update'
       end
 
-      expect(page).to have_content(I18n.t(:groups_acl_update))
+      expect(page).to have_content(I18n.t('groups.acl.update'))
 
       # Verify the access was updated
       forumer.reload
@@ -146,7 +146,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       # Add second group with topic access
       within('.add-acl') do
@@ -155,7 +155,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       # Verify both groups appear in the list
       within('#acl') do
@@ -187,7 +187,7 @@ RSpec.feature 'Forums Management', type: :feature, js: true do
         click_button 'Add'
       end
 
-      expect(page).to have_content(I18n.t(:groups_added))
+      expect(page).to have_content(I18n.t('groups.added'))
 
       # Check the dropdown in the edit form for the added group using XPath
       within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do

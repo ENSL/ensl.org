@@ -89,10 +89,10 @@ class UsersController < ApplicationController
     end
 
     if @user.update(@user.filtered_update_attributes(params, cuser))
-      flash[:notice] = t(:user_updated)
+      flash[:notice] = flash_action_message(:update, @user)
       redirect_back(fallback_location: user_path(@user))
     else
-      flash[:error] = t(:user_update_failed)
+      flash[:error] = t('users.update.failure')
       render :edit
     end
   end

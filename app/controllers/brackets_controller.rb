@@ -17,14 +17,14 @@ class BracketsController < ApplicationController
     @bracket = Bracket.new(Bracket.params(params, cuser))
     raise AccessError unless @bracket.can_create? cuser
 
-    save_and_flash(@bracket, notice: :brackets_create) { @bracket.save }
+    save_and_flash(@bracket, notice: [:create, @bracket]) { @bracket.save }
     redirect_to edit_contest_path(@bracket.contest)
   end
 
   def update
     raise AccessError unless @bracket.can_update? cuser
 
-    save_and_respond(@bracket, notice: :brackets_update,
+    save_and_respond(@bracket, notice: [:update, @bracket],
                                location: edit_bracket_path(@bracket),
                                template: :edit, layout: 'full') do
       @bracket.update_with_cells(params, cuser)

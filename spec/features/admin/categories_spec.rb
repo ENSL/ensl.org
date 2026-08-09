@@ -11,7 +11,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     find_field('login_username').set(admin.username)
     fill_in 'login_password', with: admin.raw_password
     find('#authentication input[name="commit"]').click
-    expect(page).to have_content(I18n.t('login_successful'))
+    expect(page).to have_content(I18n.t('sessions.create.success'))
   end
 
   feature 'Navigation' do
@@ -40,7 +40,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       select 'News', from: 'category_domain'
       click_button 'Create Category'
 
-      expect(page).to have_content(I18n.t(:articles_category))
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Category.model_name.human))
       expect(page).to have_content('Breaking News')
     end
 
@@ -93,7 +93,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       fill_in 'category_name', with: 'Updated News'
       click_button 'Update Category'
 
-      expect(page).to have_content(I18n.t(:articles_category_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Category.model_name.human))
       expect(page).to have_content('Updated News')
       expect(page).not_to have_content('Original News')
     end
@@ -246,7 +246,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     scenario 'non-admin cannot create categories' do
       # Log out and log in as regular user
       visit logout_sessions_path
-      expect(page).to have_content(I18n.t('login_out')).or have_content(I18n.t('helpers.submit.user.login'))
+      expect(page).to have_content(I18n.t('sessions.destroy.success')).or have_content(I18n.t('helpers.submit.user.login'))
 
       # Try to visit new category page as non-admin
       visit new_category_path

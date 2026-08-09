@@ -30,7 +30,7 @@ class CustomUrlsController < ApplicationController
 
   def update
     success = @custom_url.update(CustomUrl.params(params))
-    message = success ? t(:custom_urls_update) : @custom_url.errors.full_messages.to_sentence
+    message = success ? t('custom_urls.update.success') : @custom_url.errors.full_messages.to_sentence
 
     respond_to do |format|
       format.turbo_stream do
@@ -44,7 +44,7 @@ class CustomUrlsController < ApplicationController
   def destroy
     @destroyed = @custom_url.destroy
     message = if @destroyed
-                t(:custom_urls_destroy,
+                t('custom_urls.destroy.success',
                   name: @custom_url.name)
               else
                 @custom_url.errors.full_messages.to_sentence

@@ -5,7 +5,7 @@ class PredictionsController < ApplicationController
     @prediction = Prediction.build_for_actor(params, cuser)
     raise AccessError unless @prediction.can_create? cuser
 
-    save_and_flash(@prediction, notice: :predictions_create) { @prediction.save }
+    save_and_flash(@prediction, notice: [:create, @prediction]) { @prediction.save }
     redirect_to @prediction.match
   end
 end

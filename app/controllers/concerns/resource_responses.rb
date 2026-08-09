@@ -38,6 +38,32 @@ module ResourceResponses
   end
 
   def flash_message(message)
-    message.is_a?(Symbol) ? t(message) : message
+    case message
+    when Symbol
+      t(message)
+    when String
+      I18n.exists?(message) ? t(message) : message
+    when Array
+      action, resource, type = message
+      flash_action_message(action, resource, type: type || :notice)
+    when Hash
+      flash_action_message(message.fetch(:action), message.fetch(:resource), type: message.fetch(:type, :notice))
+    else
+      message
+    end
+  end
+
+  def flash_action_message(action, resource, type: :notice)
+    t("flash.actions.#{action}.#{type}", resource_name: human_resource_name(resource))
+  end
+
+  def human_resource_name(resource)
+    if resource.is_a?(Class) && resource.respond_to?(:model_name)
+      resource.model_name.human
+    elsif resource.class.respond_to?(:model_name)
+      resource.class.model_name.human
+    else
+      resource.to_s.humanize
+    end
   end
 end

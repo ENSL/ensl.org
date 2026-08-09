@@ -25,7 +25,7 @@ class BansController < ApplicationController
     @ban.creator = cuser
 
     if @ban.save
-      flash[:notice] = t(:bans_create)
+      flash[:notice] = flash_action_message(:create, @ban)
       redirect_to(@ban)
     else
       render :new, status: :unprocessable_content
@@ -36,7 +36,7 @@ class BansController < ApplicationController
     raise AccessError unless @ban.can_update? cuser
 
     if @ban.update(Ban.params(params, cuser))
-      flash[:notice] = t(:bans_update)
+      flash[:notice] = flash_action_message(:update, @ban)
       redirect_to(@ban)
     else
       render :edit, status: :unprocessable_content

@@ -26,7 +26,7 @@ class ServersController < ApplicationController
     raise AccessError unless @server.can_create? cuser
 
     if @server.save
-      flash[:notice] = t(:server_create)
+      flash[:notice] = flash_action_message(:create, @server)
       redirect_to @server
     else
       respond_with_validation_errors(@server, template: :new)
@@ -37,7 +37,7 @@ class ServersController < ApplicationController
     raise AccessError unless @server.can_update? cuser
 
     if @server.update(Server.params(params, cuser))
-      flash[:notice] = t(:server_update)
+      flash[:notice] = flash_action_message(:update, @server)
       redirect_to @server
     else
       respond_with_validation_errors(@server, template: :edit)
@@ -49,7 +49,7 @@ class ServersController < ApplicationController
 
     return unless @server.destroy
 
-    flash[:notice] = t(:server_destroy)
+    flash[:notice] = flash_action_message(:destroy, @server)
     redirect_to servers_url
   end
 

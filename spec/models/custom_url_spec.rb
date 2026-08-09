@@ -18,7 +18,7 @@ RSpec.describe CustomUrl, type: :model do
       custom_url = described_class.create!(name: 'rules', article: article)
 
       expect(custom_url.destroy).to be(false)
-      expect(custom_url.errors.full_messages).to include(I18n.t(:custom_urls_destroy_menu_linked, name: 'rules'))
+      expect(custom_url.errors.full_messages).to include(I18n.t('custom_urls.destroy.menu_linked', name: 'rules'))
       expect(described_class.exists?(custom_url.id)).to be(true)
     end
   end

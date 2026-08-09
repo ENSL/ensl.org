@@ -32,7 +32,7 @@ module Passkeys
       options
     rescue StandardError => e
       Rails.logger.warn("Passkey registration options failed for user_id=#{user.id}: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_unavailable), status: :unprocessable_content)
+      raise Error.new(I18n.t('passkeys.status.unavailable'), status: :unprocessable_content)
     end
 
     def create(user:, credential_params:)
@@ -52,24 +52,27 @@ module Passkeys
 
       @session.delete(:passkey_registration)
     rescue ActiveRecord::RecordNotUnique
-      raise Error.new(I18n.t(:passkey_unavailable), status: :unprocessable_content)
+      raise Error.new(I18n.t('passkeys.status.unavailable'), status: :unprocessable_content)
     rescue WebAuthn::Error => e
       Rails.logger.info("Passkey registration verify failed for user_id=#{user.id}: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_invalid), status: :unauthorized)
+      raise Error.new(I18n.t('passkeys.status.invalid'), status: :unauthorized)
     rescue StandardError => e
       Rails.logger.warn("Passkey registration failed for user_id=#{user.id}: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_unavailable), status: :unprocessable_content)
+      raise Error.new(I18n.t('passkeys.status.unavailable'), status: :unprocessable_content)
     end
 
     private
 
     def pending_state(user)
       data = @session[:passkey_registration]
-      raise Error.new(I18n.t(:passkey_expired), status: :unauthorized) unless data.is_a?(Hash)
+      raise Error.new(I18n.t('passkeys.status.expired'), status: :unauthorized) unless data.is_a?(Hash)
 
       state = data.with_indifferent_access
-      raise Error.new(I18n.t(:passkey_expired), status: :unauthorized) if state[:user_id].to_i != user.id
-      raise Error.new(I18n.t(:passkey_expired), status: :unauthorized) if state[:expires_at].to_i < Time.current.to_i
+      raise Error.new(I18n.t('passkeys.status.expired'), status: :unauthorized) if state[:user_id].to_i != user.id
+      if state[:expires_at].to_i < Time.current.to_i
+        raise Error.new(I18n.t('passkeys.status.expired'),
+                        status: :unauthorized)
+      end
 
       state
     end

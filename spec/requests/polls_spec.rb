@@ -89,7 +89,7 @@ RSpec.describe 'PollsController', type: :request do
       expect(response).to redirect_to(poll_path(created_poll))
       expect(created_poll.user).to eq(admin)
       expect(created_poll.options.map(&:option)).to contain_exactly('Train', 'Nuke')
-      expect(flash[:notice]).to eq(I18n.t(:polls_create))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.create.notice', resource_name: Poll.model_name.human))
     end
 
     it 're-renders the form for invalid admin input' do
@@ -152,7 +152,7 @@ RSpec.describe 'PollsController', type: :request do
       expect(response).to redirect_to(poll_path(poll))
       expect(poll.reload.question).to eq('New question?')
       expect(poll.options.order(:id).pluck(:option)).to eq(['Updated 0', 'Updated 1'])
-      expect(flash[:notice]).to eq(I18n.t(:polls_update))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.update.notice', resource_name: Poll.model_name.human))
     end
 
     it 're-renders the edit form for invalid admin input' do

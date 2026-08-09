@@ -101,7 +101,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
 
       # submit the new gather form, wait for the flash notification, then assert DB change
       find('form.new_gather input[type=submit]').click
-      expect(page).to have_selector('#notification .message', text: I18n.t('gather_create'))
+      expect(page).to have_selector('#notification .message', text: I18n.t('gathers.create'))
       expect(Gather.count).to eq(gather_count + 1)
 
       new_gather = Gather.where(category: gather.category).order('id DESC').first

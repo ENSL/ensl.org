@@ -32,7 +32,7 @@ class ForumsController < ApplicationController
     raise AccessError unless @forum.can_create? cuser
 
     if @forum.save
-      flash[:notice] = t(:forums_create)
+      flash[:notice] = flash_action_message(:create, @forum)
       redirect_to(@forum)
     else
       render :new
@@ -43,7 +43,7 @@ class ForumsController < ApplicationController
     raise AccessError unless @forum.can_update? cuser
 
     if @forum.update(Forum.params(params, cuser))
-      flash[:notice] = t(:forums_update)
+      flash[:notice] = flash_action_message(:update, @forum)
       redirect_to(@forum)
     else
       render :edit

@@ -104,7 +104,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     end
 
     expect(page).to have_current_path(edit_contest_path(contest))
-    expect(page).to have_text(I18n.t(:contests_contester_destroy))
+    expect(page).to have_text(I18n.t('contests.contester.destroy'))
     contester.reload
     expect(contester.active).to be(false)
     expect(Contester.active.exists?(contester.id)).to be(false)

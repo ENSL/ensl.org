@@ -60,7 +60,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
     select replacement_article.title, from: "custom_url_#{custom_url.id}_form_article_id"
     find("tr#custom_url_#{custom_url.id} a[title='Save custom URL']").click
 
-    expect(page).to have_css('#notification .message.notice', text: I18n.t(:custom_urls_update))
+    expect(page).to have_css('#notification .message.notice', text: I18n.t('custom_urls.update.success'))
     expect(page).to have_field("custom_url_#{custom_url.id}_form_name", with: 'new-slug')
     expect(page).to have_select("custom_url_#{custom_url.id}_form_article_id", selected: replacement_article.title)
 

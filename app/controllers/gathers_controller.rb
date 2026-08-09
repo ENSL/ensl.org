@@ -24,7 +24,7 @@ class GathersController < ApplicationController
     @gather = Gather.new(category_id: params.dig(:gather, :category_id))
     raise AccessError unless @gather.can_create? cuser
 
-    flash[:notice] = t(:gather_create) if @gather.save
+    flash[:notice] = t('gathers.create') if @gather.save
 
     redirect_to_back
   end

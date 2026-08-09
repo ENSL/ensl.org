@@ -31,7 +31,7 @@ class DataFilesController < ApplicationController
     raise AccessError unless @file.can_create? cuser
 
     if @file.save
-      flash[:notice] = t(:files_create)
+      flash[:notice] = flash_action_message(:create, @file)
       redirect_to redirect_target_after_create_path(@file)
     else
       respond_with_validation_errors(@file, template: :new)
@@ -42,7 +42,7 @@ class DataFilesController < ApplicationController
     raise AccessError unless @file.can_update? cuser
 
     if @file.update(DataFile.params(params, cuser))
-      flash[:notice] = t(:files_update)
+      flash[:notice] = flash_action_message(:update, @file)
       redirect_to(safe_return_to || @file)
     else
       respond_with_validation_errors(@file, template: :edit)

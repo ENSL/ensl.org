@@ -23,7 +23,7 @@ class MapsController < ApplicationController
     raise AccessError unless @map.can_create? cuser
 
     if @map.save
-      flash[:notice] = t(:maps_create)
+      flash[:notice] = flash_action_message(:create, @map)
       redirect_to @map
     else
       render :new
@@ -34,7 +34,7 @@ class MapsController < ApplicationController
     raise AccessError unless @map.can_update? cuser
 
     if @map.update(Map.params(params, cuser))
-      flash[:notice] = t(:maps_update)
+      flash[:notice] = flash_action_message(:update, @map)
       redirect_to @map
     else
       render :edit

@@ -10,7 +10,7 @@ module Passkeys
     def challenge(username:)
       user = User.where('BINARY username = ?', username.to_s).first if username.present?
       if username.present? && !user&.passkey_enabled?
-        raise Error.new(I18n.t(:passkey_unavailable),
+        raise Error.new(I18n.t('passkeys.status.unavailable'),
                         status: :unprocessable_content)
       end
 
@@ -32,17 +32,17 @@ module Passkeys
       raise
     rescue StandardError => e
       Rails.logger.warn("Passkey options failed: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_unavailable), status: :unprocessable_content)
+      raise Error.new(I18n.t('passkeys.status.unavailable'), status: :unprocessable_content)
     end
 
     def authenticate(credential_params:)
-      state = pending_state(@session[:passkey_login], :passkey_expired)
+      state = pending_state(@session[:passkey_login], 'passkeys.status.expired')
 
       Webauthn.configure!(@request)
 
       credential = WebAuthn::Credential.from_get(credential_params)
       stored, user = resolve_credential_owner(state: state, credential: credential)
-      raise Error.new(I18n.t(:passkey_invalid), status: :unauthorized) unless stored
+      raise Error.new(I18n.t('passkeys.status.invalid'), status: :unauthorized) unless stored
 
       credential.verify(
         state[:challenge],
@@ -57,10 +57,10 @@ module Passkeys
       raise
     rescue WebAuthn::Error => e
       Rails.logger.info("Passkey authentication failed: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_invalid), status: :unauthorized)
+      raise Error.new(I18n.t('passkeys.status.invalid'), status: :unauthorized)
     rescue StandardError => e
       Rails.logger.warn("Passkey authentication error: #{e.class}: #{e.message}")
-      raise Error.new(I18n.t(:passkey_unavailable), status: :unprocessable_content)
+      raise Error.new(I18n.t('passkeys.status.unavailable'), status: :unprocessable_content)
     end
 
     private
@@ -79,7 +79,7 @@ module Passkeys
     end
 
     def pending_state(data, error_key)
-      raise Error.new(I18n.t(:login_otp_session_missing), status: :unauthorized) unless data.is_a?(Hash)
+      raise Error.new(I18n.t('sessions.otp.session_missing'), status: :unauthorized) unless data.is_a?(Hash)
 
       state = data.with_indifferent_access
       return state if state[:expires_at].to_i >= Time.current.to_i

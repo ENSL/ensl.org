@@ -60,7 +60,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     fill_in 'directory_description', with: 'Created from feature spec'
     click_button 'Create Directory'
 
-    expect(page).to have_content(I18n.t(:directories_create))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Directory.model_name.human))
 
     created = Directory.find_by(name: name)
     expect(created).to be_present
@@ -86,7 +86,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     fill_in 'directory_description', with: 'After description'
     click_button 'Update Directory'
 
-    expect(page).to have_content(I18n.t(:directories_update))
+    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
 
     directory.reload
     expect(directory.title).to eq('After Title')
@@ -125,7 +125,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
 
     click_link 'Recreate Root'
 
-    expect(page).to have_content(I18n.t(:directories_update))
+    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
     expect(page).to have_content('Reconciled from feature spec')
     expect(DirectoryReconciliationService).to have_received(:new).with(root)
   end

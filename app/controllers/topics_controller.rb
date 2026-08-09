@@ -40,7 +40,7 @@ class TopicsController < ApplicationController
     raise AccessError unless @topic.can_create? cuser
 
     if @topic.save
-      flash[:notice] = t(:topics_create)
+      flash[:notice] = flash_action_message(:create, @topic)
       redirect_to(@topic)
     else
       render :new
@@ -51,7 +51,7 @@ class TopicsController < ApplicationController
     raise AccessError unless @topic.can_update? cuser
 
     if @topic.update(Topic.params(params, cuser))
-      flash[:notice] = t(:topics_update)
+      flash[:notice] = flash_action_message(:update, @topic)
       redirect_to(@topic)
     else
       render :edit

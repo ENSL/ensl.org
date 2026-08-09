@@ -27,7 +27,7 @@ class PostsController < ApplicationController
 
     respond_to do |format|
       if @post.save
-        flash[:notice] = t(:posts_create)
+        flash[:notice] = flash_action_message(:create, @post)
         format.js
         format.html { redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}") }
       else
@@ -46,7 +46,7 @@ class PostsController < ApplicationController
     raise AccessError unless @post.can_update? cuser, params[:post]
 
     if @post.update(Post.params(params, cuser))
-      flash[:notice] = t(:posts_update)
+      flash[:notice] = flash_action_message(:update, @post)
       redirect_to topic_path(@post.topic, anchor: "post_#{@post.id}")
     else
       flash.now[:alert] = t(:please_fix_errors, default: 'Please fix the errors below.')
@@ -71,7 +71,7 @@ class PostsController < ApplicationController
     raise AccessError unless @post.can_destroy? cuser
 
     @post.destroy
-    flash[:notice] = t(:posts_destroy)
+    flash[:notice] = flash_action_message(:destroy, @post)
     path = if @post.topic&.persisted?
              polymorphic_path(@post.topic)
            else

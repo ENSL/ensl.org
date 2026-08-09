@@ -121,7 +121,7 @@ RSpec.describe 'ForumsController', type: :request do
       end.to change(Forum, :count).by(1)
 
       expect(response).to redirect_to(forum_path(Forum.last))
-      expect(flash[:notice]).to eq(I18n.t(:forums_create))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.create.notice', resource_name: Forum.model_name.human))
     end
 
     it 're-renders the form for invalid admin input' do
@@ -178,7 +178,7 @@ RSpec.describe 'ForumsController', type: :request do
 
       expect(response).to redirect_to(forum_path(forum))
       expect(forum.reload.title).to eq('New Title')
-      expect(flash[:notice]).to eq(I18n.t(:forums_update))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.update.notice', resource_name: Forum.model_name.human))
     end
 
     it 're-renders the edit form for invalid admin input' do

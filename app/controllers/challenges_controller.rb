@@ -22,7 +22,7 @@ class ChallengesController < ApplicationController
     raise AccessError unless @challenge.can_create? cuser
 
     if @challenge.valid? && @challenge.save
-      flash[:notice] = t(:challenges_create)
+      flash[:notice] = flash_action_message(:create, @challenge)
       redirect_to @challenge
     else
       render :new
@@ -34,7 +34,7 @@ class ChallengesController < ApplicationController
 
     @challenge.apply_commit_status(params[:commit])
 
-    flash[:notice] = t(:challenges_update) if @challenge.update(Challenge.params(params, cuser))
+    flash[:notice] = flash_action_message(:update, @challenge) if @challenge.update(Challenge.params(params, cuser))
 
     @challenge.reload if @challenge.persisted?
     render :show

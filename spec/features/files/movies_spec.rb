@@ -213,7 +213,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Create File'
 
-      expect(page).to have_content(I18n.t(:files_create))
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
 
       uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
@@ -240,7 +240,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Create File'
 
-      expect(page).to have_content(I18n.t(:files_create))
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
 
       uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
@@ -268,7 +268,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t(:movies_create))
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
       expect(page).to have_content('Created in feature spec')
       created = Movie.find_by(content: 'Created in feature spec')
       expect(created).to be_present
@@ -288,7 +288,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t(:movies_create))
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
       expect(Movie.where(user_id: movie_maker.id).count).to be >= 1
     end
   end
@@ -340,7 +340,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t(:movies_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
       expect(page).to have_content('Updated content')
       expect(movie.reload.content).to eq('Updated content')
     end
@@ -384,7 +384,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       fill_in 'movie_content', with: 'Updated by maker'
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t(:movies_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
       expect(page).to have_content('Updated by maker')
       expect(movie.reload.content).to eq('Updated by maker')
     end

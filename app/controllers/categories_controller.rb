@@ -29,7 +29,7 @@ class CategoriesController < ApplicationController
     raise AccessError unless @category.can_create? cuser
 
     if @category.save
-      flash[:notice] = t(:articles_category)
+      flash[:notice] = flash_action_message(:create, @category)
       redirect_to :categories
     else
       respond_with_validation_errors(@category, template: :new)
@@ -40,7 +40,7 @@ class CategoriesController < ApplicationController
     raise AccessError unless @category.can_update? cuser
 
     if @category.update Category.params(params, cuser)
-      flash[:notice] = t(:articles_category_update)
+      flash[:notice] = flash_action_message(:update, @category)
       redirect_to :categories
     else
       respond_with_validation_errors(@category, template: :edit)

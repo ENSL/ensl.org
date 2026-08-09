@@ -21,7 +21,7 @@ feature 'XSS Protection in Articles', js: true do
 
     click_button I18n.t('helpers.submit.post.create')
 
-    expect(page).to have_content(I18n.t('articles_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
     expect(page).to have_content('Safe content')
 
     # Verify script tag is not present in the rendered HTML
@@ -47,7 +47,7 @@ feature 'XSS Protection in Articles', js: true do
 
     click_button I18n.t('helpers.submit.post.create')
 
-    expect(page).to have_content(I18n.t('articles_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
     expect(page).to have_content('Safe content')
 
     # Verify script tag is not present in the rendered HTML
@@ -69,7 +69,7 @@ feature 'XSS Protection in Articles', js: true do
 
     click_button I18n.t('helpers.submit.post.create')
 
-    expect(page).to have_content(I18n.t('articles_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
 
     # Verify iframe is not present
     expect(page).not_to have_selector('iframe', visible: :all)
@@ -90,7 +90,7 @@ feature 'XSS Protection in Articles', js: true do
 
     click_button I18n.t('helpers.submit.post.create')
 
-    expect(page).to have_content(I18n.t('articles_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
 
     # Verify event handler is not present
     expect(page.html).not_to include('onerror=')

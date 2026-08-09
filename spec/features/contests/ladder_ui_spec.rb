@@ -116,7 +116,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     select map1.name, from: 'challenge_map1_id'
     fill_in 'challenge_details', with: "Challenge from #{teams[0].name}"
     click_button 'Create'
-    expect(page).to have_content(I18n.t(:challenges_create))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
 
     accepted_challenge = Challenge.where(contester1: contesters[0], contester2: contesters[1]).last
     expect(accepted_challenge).to be_present
@@ -141,7 +141,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     select map1.name, from: 'challenge_map1_id'
     fill_in 'challenge_details', with: "Challenge from #{teams[2].name}"
     click_button 'Create'
-    expect(page).to have_content(I18n.t(:challenges_create))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
 
     declined_challenge = Challenge.where(contester1: contesters[2], contester2: contesters[3]).last
     expect(declined_challenge).to be_present
@@ -180,7 +180,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     fill_in 'match_score1', with: '4'
     fill_in 'match_score2', with: '2'
     click_button 'Save Scoring'
-    expect(page).to have_content(I18n.t(:matches_update), wait: 5)
+    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human), wait: 5)
 
     match.reload
     expect(match.score1).to eq(4)

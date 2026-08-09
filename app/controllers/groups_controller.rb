@@ -26,7 +26,7 @@ class GroupsController < ApplicationController
     raise AccessError unless @group.can_create? cuser
 
     if @group.save
-      flash[:notice] = t(:groups_create)
+      flash[:notice] = flash_action_message(:create, @group)
       redirect_to @group
     else
       respond_with_validation_errors(@group, template: :new)
@@ -37,7 +37,7 @@ class GroupsController < ApplicationController
     raise AccessError unless @group.can_update? cuser
 
     if @group.update(Group.params(params, cuser))
-      flash[:notice] = t(:groups_update)
+      flash[:notice] = flash_action_message(:update, @group)
       redirect_to @group
     else
       prepare_edit_dependencies

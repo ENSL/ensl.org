@@ -57,7 +57,7 @@ class ContestsController < ApplicationController
     raise AccessError unless @contest.can_create? cuser
 
     if @contest.save
-      flash[:notice] = t(:contests_create)
+      flash[:notice] = flash_action_message(:create, @contest)
       redirect_to @contest
     else
       render :new, status: :unprocessable_content
@@ -68,7 +68,7 @@ class ContestsController < ApplicationController
     raise AccessError unless @contest.can_update? cuser
 
     if @contest.update(Contest.params(params, cuser))
-      flash[:notice] = t(:contests_update)
+      flash[:notice] = flash_action_message(:update, @contest)
       redirect_to @contest
     else
       render :edit, status: :unprocessable_content

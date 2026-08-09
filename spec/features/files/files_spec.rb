@@ -44,7 +44,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       fill_in 'data_file_description', with: 'New long description for this file'
       click_button 'Update'
 
-      expect(page).to have_content(I18n.t(:files_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
 
       file.reload
       expect(file.title).to eq('NewTitle')
@@ -230,7 +230,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       select 'Candidate', from: 'add_related_candidate_id'
       click_button 'Add'
 
-      expect(page).to have_content(I18n.t(:files_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
       expect(candidate.reload.related).to eq(main_file)
     end
 
@@ -248,7 +248,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
         end
       end
 
-      expect(page).to have_content(I18n.t(:files_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
       expect(related_file.reload.related).to be_nil
     end
   end

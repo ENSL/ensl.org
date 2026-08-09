@@ -141,7 +141,7 @@ RSpec.describe 'DataFilesController', type: :request do
            params: { data_file: { directory_id: directory.id, article_id: article.id, title: 'Article file' } }
 
       expect(response).to redirect_to(article_path(article))
-      expect(flash[:notice]).to eq(I18n.t(:files_create))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
     end
 
     it 'redirects to the created movie when the file is saved in the movies directory' do

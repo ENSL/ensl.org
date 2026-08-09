@@ -38,7 +38,7 @@ class IssuesController < ApplicationController
     end
 
     if @issue.save
-      flash[:notice] = t(:issues_create)
+      flash[:notice] = flash_action_message(:create, @issue)
       if cuser
         redirect_to(@issue)
       else
@@ -53,7 +53,7 @@ class IssuesController < ApplicationController
     raise AccessError unless @issue.can_update?(cuser, params[:issue])
 
     if @issue.update(Issue.params(params, cuser))
-      flash[:notice] = t(:issues_update)
+      flash[:notice] = flash_action_message(:update, @issue)
       redirect_to(@issue)
     else
       render :edit

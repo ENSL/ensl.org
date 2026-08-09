@@ -8,7 +8,7 @@ module Contests
       raise AccessError unless @contest.can_update? cuser
 
       if @contest.add_map_by_id(params[:map])
-        flash[:notice] = t(:maps_update)
+        flash[:notice] = t('contests.maps.added')
       else
         flash[:error] = t(:error)
       end
@@ -20,7 +20,7 @@ module Contests
       raise AccessError unless @contest.can_update? cuser
 
       if @contest.remove_map_by_id(params[:id])
-        flash[:notice] = t(:maps_destroy)
+        flash[:notice] = t('contests.maps.removed')
       else
         flash[:error] = t(:error)
       end

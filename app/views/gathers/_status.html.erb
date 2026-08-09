@@ -6,7 +6,7 @@
   <% map2 = gather.map2 %>
 
   <% if gatherer && gatherer.created_at && gatherer.created_at > 10.seconds.ago %>
-    <div class="message notice"><%= t(:gathers_join) %></div>
+    <div class="message notice"><%= t('gathers.join') %></div>
   <% end %>
 
   <% if gather.status == Gather::STATE_RUNNING %>

@@ -190,7 +190,7 @@ RSpec.describe 'CustomUrlsController', type: :request do
       end.not_to change(CustomUrl, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t(:custom_urls_destroy_menu_linked, name: 'rules'))
+      expect(response.body).to include(I18n.t('custom_urls.destroy.menu_linked', name: 'rules'))
     end
 
     it 'destroys a custom url for admins over turbo stream' do

@@ -14,7 +14,8 @@ RSpec.feature 'Issues reCAPTCHA', type: :feature, js: true do
     fill_in 'Text', with: 'This is a test issue body'
     expect do
       click_button 'Submit'
-      expect(page).to have_content(I18n.t('issues_create'), wait: 5)
+      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Issue.model_name.human),
+                                   wait: 5)
     end.to change { Issue.count }.by(1)
   end
 

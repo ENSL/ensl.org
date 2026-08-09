@@ -40,7 +40,7 @@ RSpec.describe 'SessionsController', type: :request do
       expect(session[:user]).to be_nil
       expect(session[:pending_login_otp]).to be_present
       expect(ActionMailer::Base.deliveries.size).to eq(1)
-      expect(flash[:notice]).to eq(I18n.t(:login_otp_sent))
+      expect(flash[:notice]).to eq(I18n.t('sessions.otp.sent'))
     end
 
     it 'logs in after valid OTP verification' do

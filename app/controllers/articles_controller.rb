@@ -48,7 +48,7 @@ class ArticlesController < ApplicationController
     raise AccessError unless @article.can_create? cuser
 
     if @article.save
-      flash[:notice] = t(:articles_create)
+      flash[:notice] = flash_action_message(:create, @article)
       redirect_to @article
     else
       respond_with_validation_errors(@article, template: :new)
@@ -59,7 +59,7 @@ class ArticlesController < ApplicationController
     raise AccessError unless @article.can_update?(cuser, Article.article_params(params, cuser))
 
     if @article.update(Article.article_params(params, cuser))
-      flash[:notice] = t(:articles_update)
+      flash[:notice] = flash_action_message(:update, @article)
       redirect_to @article
     else
       respond_with_validation_errors(@article, template: :edit)

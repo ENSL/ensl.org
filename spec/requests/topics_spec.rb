@@ -103,7 +103,7 @@ RSpec.describe 'TopicsController', type: :request do
 
       expect(response).to redirect_to(topic_path(Topic.last))
       expect(Topic.last.user).to eq(user)
-      expect(flash[:notice]).to eq(I18n.t(:topics_create))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.create.notice', resource_name: Topic.model_name.human))
     end
 
     it 're-renders the form for invalid input' do
@@ -157,7 +157,7 @@ RSpec.describe 'TopicsController', type: :request do
       expect(response).to redirect_to(topic_path(topic))
       expect(topic.reload.title).to eq('New Title')
       expect(topic.state).to eq(Topic::STATE_STICKY)
-      expect(flash[:notice]).to eq(I18n.t(:topics_update))
+      expect(flash[:notice]).to eq(I18n.t('flash.actions.update.notice', resource_name: Topic.model_name.human))
     end
 
     it 're-renders the edit form for invalid admin input' do

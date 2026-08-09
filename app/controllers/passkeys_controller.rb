@@ -13,7 +13,7 @@ class PasskeysController < ApplicationController
 
   def create
     registration_service.create(user: @user, credential_params: credential_params)
-    render json: { message: t(:passkey_registered) }
+    render json: { message: t('passkeys.create.success') }
   rescue Passkeys::Error => e
     render json: { error: e.message }, status: e.status
   end
@@ -21,7 +21,7 @@ class PasskeysController < ApplicationController
   def destroy
     credential = @user.passkey_credentials.find(params[:credential_id])
     credential.destroy!
-    flash[:notice] = t(:passkey_removed)
+    flash[:notice] = t('passkeys.destroy.success')
     redirect_back fallback_location: edit_user_path(@user)
   end
 

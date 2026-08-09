@@ -77,7 +77,7 @@ class SessionsController < ApplicationController
   # This action logs the user out by clearing their session and redirecting them to the home page.
   def logout
     session[:user] = nil
-    flash[:notice] = t(:login_out)
+    flash[:notice] = t('sessions.destroy.success')
     redirect_to :root
   end
 
@@ -91,7 +91,7 @@ class SessionsController < ApplicationController
     return unless request.post?
 
     if User.reset_password_for_identity(username: params[:username], email: params[:email])
-      flash[:notice] = t(:passwords_sent)
+      flash[:notice] = t('passwords.sent')
     else
       flash[:error] = t(:incorrect_information)
     end
@@ -108,7 +108,7 @@ class SessionsController < ApplicationController
   end
 
   def callback_failed(warning = nil)
-    flash[:error] = t(:users_callback_fail)
+    flash[:error] = t('users.callback_fail')
     Rails.logger.warn(warning) if warning
     redirect_to_home
   end
@@ -139,7 +139,7 @@ class SessionsController < ApplicationController
       end
     else
       log_failed_login
-      flash[:error] = t(:login_unsuccessful)
+      flash[:error] = t('sessions.create.failure')
     end
   end
 
@@ -152,7 +152,7 @@ class SessionsController < ApplicationController
 
   def begin_password_login_otp(user)
     otp_service.challenge(user)
-    flash[:notice] = t(:login_otp_sent)
+    flash[:notice] = t('sessions.otp.sent')
   rescue Passkeys::Error => e
     flash[:error] = e.message
   end
@@ -204,22 +204,22 @@ class SessionsController < ApplicationController
   end
 
   def handle_banned_login
-    flash[:error] = t(:accounts_locked)
+    flash[:error] = t('sessions.create.locked')
   end
 
   def apply_login_notice(result, user)
-    flash[:notice] = t(:login_successful)
+    flash[:notice] = t('sessions.create.success')
     append_password_upgrade_notice if result[:password_upgraded]
     apply_steamid_update_notice(user) if result[:steamid_updated]
   end
 
   def append_password_upgrade_notice
-    flash[:notice] << " \n#{I18n.t(:password_md5_scrypt)}"
+    flash[:notice] << " \n#{I18n.t('passwords.upgraded')}"
   end
 
   def apply_steamid_update_notice(user)
     session[:return_to] = edit_user_path(user)
-    flash[:notice] << format(t(:users_steamid_update), user.steamid)
+    flash[:notice] << format(t('users.steamid_update'), user.steamid)
     session.delete :verified_steamid
   end
 

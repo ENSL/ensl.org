@@ -25,7 +25,7 @@ class PollsController < ApplicationController
     raise AccessError unless @poll.can_create? cuser
 
     if @poll.save
-      flash[:notice] = t(:polls_create)
+      flash[:notice] = flash_action_message(:create, @poll)
       redirect_to @poll
     else
       render :new
@@ -36,7 +36,7 @@ class PollsController < ApplicationController
     raise AccessError unless @poll.can_update? cuser
 
     if @poll.update(Poll.params(params, cuser))
-      flash[:notice] = t(:polls_update)
+      flash[:notice] = flash_action_message(:update, @poll)
       redirect_to @poll
     else
       render :edit

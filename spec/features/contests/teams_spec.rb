@@ -84,7 +84,8 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     # perform recovery directly to avoid driver/ujs timing issues
     visit recover_team_path(team)
 
-    expect(page).to have_content(I18n.t('teams_update').to_s).or have_content(team.name)
+    expect(page).to have_content(I18n.t('flash.actions.update.notice',
+                                        resource_name: Team.model_name.human).to_s).or have_content(team.name)
   end
 
   scenario 'Leader accepts joiners, updates role/comment and can kick members' do

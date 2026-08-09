@@ -136,7 +136,7 @@ RSpec.describe ContestersController, type: :controller do
       get :recover, params: { id: '1' }
 
       expect(response).to redirect_to(edit_contest_path(1, anchor: 'teams'))
-      expect(flash[:notice]).to eq(I18n.t(:contests_contester_recovered))
+      expect(flash[:notice]).to eq(I18n.t('contests.contester.recovered'))
     end
 
     it 'returns 403 when the user cannot recover the contester' do

@@ -20,7 +20,7 @@ feature 'User Stream Information', js: true do
       fill_in 'user_profile_attributes_stream', with: stream_url
       click_button 'Update Profile'
 
-      expect(page).to have_content(I18n.t(:users_update))
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: User.model_name.human))
 
       visit user_path(user)
       expect(page.html).to include('<dt>Stream</dt>')

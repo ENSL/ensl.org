@@ -59,7 +59,7 @@ class CustomUrl < ApplicationRecord
   def ensure_not_menu_linked
     return unless menu_linked?
 
-    errors.add(:base, I18n.t(:custom_urls_destroy_menu_linked, name: name))
+    errors.add(:base, I18n.t('custom_urls.destroy.menu_linked', name: name))
     throw :abort
   end
 end

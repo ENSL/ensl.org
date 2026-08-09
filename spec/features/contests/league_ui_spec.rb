@@ -170,7 +170,8 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
       # Submit the form
       click_button 'Save Scoring'
-      expect(page).to have_content(I18n.t(:matches_update), wait: 5)
+      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human),
+                                   wait: 5)
 
       # Reload the match to verify scores were saved
       match.reload

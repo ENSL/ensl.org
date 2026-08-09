@@ -33,7 +33,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Verify success message and redirect
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(page).to have_current_path(match_path(match))
 
     # Verify prediction was created
@@ -109,7 +109,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score1', with: '3'
     fill_in 'prediction_score2', with: '2'
     click_button 'Add Prediction'
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
 
     # User 2 predicts
     sign_out
@@ -118,7 +118,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score1', with: '2'
     fill_in 'prediction_score2', with: '1'
     click_button 'Add Prediction'
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
 
     # Verify both predictions exist
     expect(Prediction.where(match: match).count).to eq(2)
@@ -236,7 +236,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score2', with: '0'
     click_button 'Add Prediction'
 
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(Prediction.find_by(user: user1, match: match).score1).to eq(0)
     expect(Prediction.find_by(user: user1, match: match).score2).to eq(0)
 
@@ -256,7 +256,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score2', with: '99'
     click_button 'Add Prediction'
 
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(Prediction.find_by(user: user1, match: match2).score1).to eq(99)
     expect(Prediction.find_by(user: user1, match: match2).score2).to eq(99)
   end
@@ -273,7 +273,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Verify the page indicates success
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(page).to have_current_path(match_path(match))
 
     # Verify in database
@@ -299,7 +299,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
 
     # Non-numeric strings are cast to 0 by Rails, which is valid
     # This creates a prediction with score1=0, score2=1
-    expect(page).to have_content(I18n.t('predictions_create'))
+    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     pred = Prediction.find_by(user: user1, match: match)
     expect(pred.score1).to eq(0) # 'abc' is converted to 0
     expect(pred.score2).to eq(1)

@@ -49,7 +49,7 @@ class MoviesController < ApplicationController
     raise AccessError unless @movie.can_create? cuser
 
     if @movie.save
-      flash[:notice] = t(:movies_create)
+      flash[:notice] = flash_action_message(:create, @movie)
       redirect_to(@movie)
     else
       respond_with_validation_errors(@movie, template: :new)
@@ -60,7 +60,7 @@ class MoviesController < ApplicationController
     raise AccessError unless @movie.can_update? cuser
 
     if @movie.update(filtered_movie_params)
-      flash[:notice] = t(:movies_update)
+      flash[:notice] = flash_action_message(:update, @movie)
       redirect_to(@movie)
     else
       respond_with_validation_errors(@movie, template: :edit)

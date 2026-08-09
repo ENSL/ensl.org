@@ -28,7 +28,7 @@ class VersionsController < ApplicationController
     version_number = @version_history.version_number_for(@version)
     @nobody = true
 
-    flash[:notice] = t(:articles_revert, version: version_number) if @version_history.revert_to!(@version)
+    flash[:notice] = t('articles.revert', version: version_number) if @version_history.revert_to!(@version)
 
     redirect_to @article
   end

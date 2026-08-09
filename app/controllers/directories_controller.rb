@@ -41,7 +41,7 @@ class DirectoriesController < ApplicationController
     raise AccessError unless @directory.can_create? cuser
 
     if @directory.save
-      flash[:notice] = t(:directories_create)
+      flash[:notice] = flash_action_message(:create, @directory)
       redirect_to(@directory)
     else
       respond_with_validation_errors(@directory, template: :new)
@@ -52,7 +52,7 @@ class DirectoriesController < ApplicationController
     raise AccessError unless @directory.can_update? cuser
 
     if @directory.update(Directory.params(params, cuser))
-      flash[:notice] = t(:directories_update)
+      flash[:notice] = flash_action_message(:update, @directory)
       redirect_to @directory
     else
       respond_with_validation_errors(@directory, template: :edit)

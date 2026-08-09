@@ -7,14 +7,14 @@ class ForumersController < ApplicationController
     @forumer = Forumer.new(Forumer.params(params, cuser))
     raise AccessError unless @forumer.can_create? cuser
 
-    save_and_flash(@forumer, notice: :groups_added) { @forumer.save }
+    save_and_flash(@forumer, notice: 'groups.added') { @forumer.save }
     redirect_to_back
   end
 
   def update
     raise AccessError unless @forumer.can_update? cuser
 
-    save_and_flash(@forumer, notice: :groups_acl_update) { @forumer.update(Forumer.params(params, cuser)) }
+    save_and_flash(@forumer, notice: 'groups.acl.update') { @forumer.update(Forumer.params(params, cuser)) }
     redirect_to_back
   end
 

@@ -28,7 +28,7 @@ class MessagesController < ApplicationController
     raise AccessError unless @message.can_create? cuser
 
     if @message.save
-      flash[:notice] = t(:message_create)
+      flash[:notice] = t('messages.create.success')
       redirect_to(@message)
     else
       render :new
