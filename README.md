@@ -9,35 +9,39 @@
 
 # ENSL Website
 
-This is the source code of ENSL website. Currently deployed on [ensl.org](https://www.ensl.org).
+Source code for [ensl.org](https://www.ensl.org), built with Ruby on Rails.
+
+## Stack
+
+- Ruby 3.4
+- Rails 8.1
+- MariaDB
+- Redis + Sidekiq
+- Turbo, Importmap and Tailwind CSS
 
 ## Documentation
 
-See [INSTALL.md](INSTALL.md) how to install and [DEVELOPMENT.md](DEVELOPMENT.md) how to develop it.
+See [INSTALL.md](INSTALL.md) for installation and [DEVELOPMENT.md](DEVELOPMENT.md) for day-to-day development.
 
 ## Features
 
-- Articles
-- Commenting feature for most objects
-- Movie database
-- File database
-- ENSL Plugin API
-- Forums, usual forum features and ACL
-- Contest management
-  - Teams and team member management
-  - Brackets
-  - Tournaments
-  - Match database
-  - Challenging system
-- Instant webchat (shoutbox)
-- Private messages
-- Issue management
-- Very popular AJAX-based pick-up system
-- Map database
-- Votable polls
-- Twitter feed
-- Server database
-- Log file parsing (partially complete)
+- Articles and comments
+- Forums, topics, private messages and shoutbox
+- User accounts, detailed profiles, ACL, teams
+- Contest system with weekly map schedules
+  - Match with referee and details
+  - Ladder for ELO-based ranking
+  - League for traditional points-based tournament
+  - Brackets for bracket-style tournaments
+  - Team challenge system with score reporting
+  - Match predictions with scored leaderboards
+- Gather pick-up system with captain picks, map voting and server voting
+  - Mobile-friendly
+- File and directory library for demos, movies and uploads
+- Map, movie and server databases
+- Passkey authentication, 2FA, scrypt etc. for security
+- Polls, voting, issue tracking and ENSL plugin API
+- Gaming data analysis and rankings display
 
 ## Contributors
 
