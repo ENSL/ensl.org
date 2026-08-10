@@ -12,7 +12,19 @@ cd "$APP_PATH" || exit
 # Create dirs
 mkdir -p tmp/pids tmp/sockets tmp/sessions tmp/cache log
 
-bundle install
+# Keep Bundler from mutating the mounted app tree at runtime. Production images
+# should already have gems installed during the image build.
+export BUNDLE_PATH=/var/bundle
+
+if [[ "$RAILS_ENV" == "development" ]]; then
+  bundle install
+else
+  export BUNDLE_FROZEN=1
+  if ! bundle check >/dev/null 2>&1; then
+    echo "Bundler gems are missing or inconsistent for $RAILS_ENV; rebuild the image or run bundle install in a writable environment."
+    exit 1
+  fi
+fi
 
 # Run migrations and run sleep loop on failure
 echo "Running database migrations..."
