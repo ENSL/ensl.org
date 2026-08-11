@@ -59,7 +59,15 @@ class SessionBloatGuard
     return unless session.respond_to?(:keys)
 
     purge_known_junk(session, purge_handshake: purge_handshake)
-    session.clear if oversized?(session)
+
+    bytesize = session_bytesize(session)
+    return unless bytesize && bytesize > MAX_SAFE_BYTES
+
+    Rails.logger.warn(
+      "SessionBloatGuard: session still #{bytesize} bytes after pruning known keys " \
+      "(keys=#{session.keys.inspect}); wiping it entirely to avoid CookieOverflow"
+    )
+    session.clear
   end
 
   def purge_known_junk(session, purge_handshake:)
@@ -76,9 +84,9 @@ class SessionBloatGuard
     session.delete('verified_steamid')
   end
 
-  def oversized?(session)
-    session.to_hash.to_json.bytesize > MAX_SAFE_BYTES
+  def session_bytesize(session)
+    session.to_hash.to_json.bytesize
   rescue StandardError
-    false
+    nil
   end
 end

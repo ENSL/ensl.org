@@ -79,6 +79,15 @@ RSpec.describe SessionBloatGuard do
     expect(session).to be_empty
   end
 
+  it 'logs a warning when it has to wipe an oversized session' do
+    session = build_session(logged_in: false)
+    session['some_other_unknown_bloat'] = 'x' * 6000
+
+    expect(Rails.logger).to receive(:warn).with(/SessionBloatGuard.*wiping it entirely/)
+
+    middleware.call('rack.session' => session)
+  end
+
   it 'leaves a normally sized session untouched' do
     session = { 'user' => 176, 'return_to' => '/halloffame' }
 
