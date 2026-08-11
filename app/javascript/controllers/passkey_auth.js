@@ -46,12 +46,18 @@ export default class extends Controller {
       return
     }
 
+    // Cancel any background autofill ceremony from connect() before starting this one, so the
+    // browser has the options round-trip below to actually release it (calling
+    // startAuthentication() again would abort it too, but only right as the new request
+    // starts, which isn't always enough lead time to avoid a "request already pending" error).
+    webauthn.WebAuthnAbortService.cancelCeremony()
+
     try {
       const options = await this.postJSON(this.optionsUrlValue, { username })
       const credential = await webauthn.startAuthentication({ optionsJSON: options })
       await this.finishLogin(credential)
     } catch (error) {
-      this.showStatus(error.message || "Passkey authentication failed.")
+      this.showStatus(this.describeAuthenticationError(error))
     }
   }
 
@@ -69,6 +75,15 @@ export default class extends Controller {
       if (error?.name === "AbortError" || error?.name === "NotAllowedError") return
       this.showStatus(error.message || "Passkey authentication failed.")
     }
+  }
+
+  // Translate a failed navigator.credentials.get() call into a message worth showing.
+  describeAuthenticationError(error) {
+    if (error?.name === "NotAllowedError" && /pending/i.test(error.message || "")) {
+      return "Still finishing a previous passkey request. Please try again."
+    }
+
+    return error?.message || "Passkey authentication failed."
   }
 
   // Send the signed credential to the server and follow any redirect it returns.

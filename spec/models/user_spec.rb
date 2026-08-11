@@ -550,6 +550,43 @@ describe User do
         expect(subject.reload.steamid).to eq('0:1:123')
       end
     end
+
+    describe '#ensure_profile!' do
+      # Regression: build_profile on a has_one dependent: :destroy association destroys the
+      # existing row on replace. ensure_profile! used to call profile.present? then
+      # build_profile, so any stale/false-negative read of that association silently wiped a
+      # real profile. It must never be able to destroy an existing row, no matter what.
+      it 'never touches an existing profile, even one with real data' do
+        subject = create(:user)
+        subject.profile.update!(web: 'https://example.com', town: 'Helsinki', signature: 'o7')
+        original_profile_id = subject.profile.id
+
+        result = subject.ensure_profile!
+
+        expect(result).to be false
+        subject.reload
+        expect(subject.profile.id).to eq(original_profile_id)
+        expect(subject.profile.web).to eq('https://example.com')
+        expect(subject.profile.town).to eq('Helsinki')
+        expect(subject.profile.signature).to eq('o7')
+      end
+
+      it 'creates a profile when one genuinely does not exist' do
+        subject = create(:user)
+        subject.profile.destroy
+
+        result = subject.ensure_profile!
+
+        expect(result).to be true
+        expect(subject.reload.profile).to be_present
+      end
+
+      it 'does not create a second profile when one already exists' do
+        subject = create(:user)
+
+        expect { subject.ensure_profile! }.not_to change(Profile, :count)
+      end
+    end
   end
 
   describe 'paper trail versioning' do

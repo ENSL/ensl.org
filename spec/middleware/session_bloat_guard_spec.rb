@@ -103,4 +103,46 @@ RSpec.describe SessionBloatGuard do
 
     expect(session.keys).to contain_exactly('cached_user', 'verified_steamid', 'passkey_login', 'return_to', 'user')
   end
+
+  # rack-openid (see OpenID::Consumer.new(session, store) in rack-openid) uses the Rack
+  # session itself as its discovery store across exactly two requests: GET /auth/steam
+  # writes the 'OpenID::*'/'omniauth.*' keys, and GET /auth/steam/callback reads them back.
+  # Pruning those keys on either side of that pair breaks Steam login outright, which is
+  # exactly the regression this guards against.
+  context 'during the Steam OmniAuth handshake' do
+    it 'preserves discovery keys written during the begin request so they reach the browser' do
+      inner_app_that_discovers = lambda do |env|
+        env['rack.session'].merge!(build_session(logged_in: false))
+        [302, {}, ['redirecting to steam']]
+      end
+      middleware = described_class.new(inner_app_that_discovers)
+      session = {}
+
+      middleware.call('rack.session' => session, 'PATH_INFO' => '/auth/steam')
+
+      expect(session.keys).to include('OpenID::Consumer::last_requested_endpoint', 'omniauth.origin')
+    end
+
+    it 'preserves discovery keys already in the session so the callback request can read them' do
+      session = build_session(logged_in: false)
+      read_keys = nil
+      inner_app_that_reads_discovery = lambda do |env|
+        read_keys = env['rack.session'].keys
+        [200, {}, ['ok']]
+      end
+      middleware = described_class.new(inner_app_that_reads_discovery)
+
+      middleware.call('rack.session' => session, 'PATH_INFO' => '/auth/steam/callback')
+
+      expect(read_keys).to include('OpenID::Consumer::last_requested_endpoint', 'omniauth.origin')
+    end
+
+    it 'still prunes discovery keys once the callback request completes' do
+      session = build_session(logged_in: false)
+
+      middleware.call('rack.session' => session, 'PATH_INFO' => '/auth/steam/callback')
+
+      expect(session.keys).not_to include('OpenID::Consumer::last_requested_endpoint', 'omniauth.origin')
+    end
+  end
 end

@@ -349,10 +349,15 @@ class User < ApplicationRecord
   end
 
   def ensure_profile!
-    return false if profile.present?
+    # Query the DB directly rather than trusting the (possibly stale/cached) association,
+    # and never go through build_profile here: has_one dependent: :destroy would destroy an
+    # already-existing row on replace, wiping real profile data if this ever ran while a
+    # profile genuinely still existed.
+    return false if Profile.exists?(user_id: id)
 
-    build_profile
-    save
+    Profile.create!(user_id: id)
+    association(:profile).reset
+    true
   end
 
   def plugin_rank_and_icon

@@ -247,6 +247,25 @@ RSpec.describe ApplicationController, type: :controller do
       expect(flash[:notice]).to eq('Your profile has been removed and recreated.')
     end
 
+    # Regression: a real profile (with real data) was silently destroyed and replaced with a
+    # blank one on a normal authenticated request, because ensure_profile! used to trust
+    # profile.present? and then call build_profile, which destroys the existing row on
+    # replace (has_one dependent: :destroy). This must never happen while a profile exists.
+    it 'never wipes an existing profile with real data on an ordinary request' do
+      user = create(:user)
+      user.profile.update!(web: 'https://example.com', town: 'Helsinki', signature: 'o7')
+      session[:user] = user.id
+
+      get :index
+
+      expect(response.body).to eq(user.username)
+      expect(flash[:notice]).to be_nil
+      user.reload
+      expect(user.profile.web).to eq('https://example.com')
+      expect(user.profile.town).to eq('Helsinki')
+      expect(user.profile.signature).to eq('o7')
+    end
+
     it 'logs site-banned users out during the request' do
       user = create(:user)
       create(:ban, :site, user: user)
