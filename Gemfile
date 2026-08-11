@@ -11,10 +11,10 @@ gem 'msgpack', '>= 1.7.0'
 gem 'rails', '~> 8.1.3'
 gem 'rake'
 
-# Dotenv
+# Dotenv for loading env vars from .env files.
 gem 'dotenv-rails'
 
-# DB and caching
+# DB and caching. Sidekiq for background jobs.
 # Redis is pinned to 4 version
 gem 'mysql2'
 gem 'redis', '~> 4.8'
@@ -24,7 +24,7 @@ gem 'sidekiq-cron'
 # Reads the Parquet files exported by the ensl_analysis Python pipeline
 gem 'duckdb'
 
-# Web server.
+# Puma for Web server.
 # Faraday provides NET-HTTP functions
 gem 'faraday'
 gem 'net-ftp'
@@ -33,9 +33,6 @@ gem 'puma'
 
 # Rack-attack to stop spamming
 gem 'rack-attack'
-
-# CORS for external API's, not really used.
-gem 'rack-cors'
 
 # Logging. Add JSON logs with nice data.
 # Objective: catch errors, easily parsable
@@ -57,22 +54,23 @@ gem 'unread'
 gem 'bbcoder'
 gem 'commonmarker'
 gem 'gemoji-parser'
-# File attachments
+# File attachments. RMagick for image manipulation, avatars
 gem 'carrierwave'
-# Image manipulation, avatars
 gem 'rmagick'
-# Union for AR
+# Union for AR. Certain models need this.
 gem 'active_record_union'
 # Auditing/version tracking
 gem 'paper_trail'
 
-# External APIs.
-# Steam condenders for querying Steam API and last to help with StemaIDs
+# External APIs. Google for calendar.
+# Steam condensers for querying Steam API and last to help with SteamIDs
+# CORS for external API's, not really used.
 gem 'google-api-client'
+gem 'rack-cors'
 gem 'steam-condenser', github: 'koraktor/steam-condenser-ruby'
 gem 'steam-id2'
 
-# Auth
+# Auth. Omniauth for Steam login, WebAuthn for passkeys.
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
@@ -87,7 +85,7 @@ gem 'webauthn'
 # Pagination
 gem 'will_paginate'
 
-# Navigation
+# Higlighted navigation links
 gem 'active_link_to'
 
 # Form helpers
@@ -98,41 +96,36 @@ gem 'country_select'
 # Captcha
 gem 'recaptcha', require: 'recaptcha/rails'
 
-# Provides URL parsing to links for customer content.
+# Provides URL parsing to links for user content.
 gem 'rails_autolink'
 
 #
 # Assets, JS and CSS
 
-# Javascript
+# Asset pipeline. Importmap for Rails. JS management without nodejs.
+gem 'importmap-rails', '~> 2.2'
+gem 'propshaft'
+
+# Javascript.
 gem 'i18n-js'
 gem 'jquery-rails'
 gem 'local_time', '~> 3.0'
 gem 'tinymce-rails'
 gem 'twemoji-rails'
 
-# CSS
+# CSS. DartSass for SCSS, TailwindCSS for utility classes.
 gem 'dartsass-rails'
 gem 'tailwindcss-rails'
 
 # Provides il8n and respond functions
 gem 'responders'
 
-# Importmap for Rails. JS management without nodejs.
-# Asset pipeline
-gem 'importmap-rails', '~> 2.2'
-gem 'propshaft'
-
 group :production do
-  # gem 'newrelic_rpm'
+  # Puma worker killer to restart workers when memory usage is high
   gem 'puma_worker_killer'
 end
 
 group :development do
-  # annotate models
-  # Does not support AR 8 yet
-  # gem 'annotate'
-
   # Error message and console in browser
   gem 'better_errors'
   gem 'binding_of_caller'
@@ -140,11 +133,14 @@ group :development do
 
   # For converting erb to haml when needed
   gem 'erb2haml'
+
+  # annotate models
+  # Does not support AR 8 yet
+  # gem 'annotate'
 end
 
 group :test do
-  gem 'ostruct'
-
+  # rspec for testing
   gem 'rspec-benchmark'
   gem 'rspec-core'
   gem 'rspec-expectations'
@@ -169,6 +165,12 @@ group :test do
   # Coverage
   gem 'simplecov', require: false
 
+  # JUnit XML output, consumed by GitHub Actions test-reporting steps
+  gem 'rspec_junit_formatter'
+
+  # Gem to build test data. Used in factories.
+  gem 'ostruct'
+
   # Time helpers for testing time-dependent features
   gem 'timecop'
 
@@ -192,9 +194,6 @@ group :test do
   # Flaky tests
   # gem 'rspec-flaky'
 
-  # JUnit XML output, consumed by GitHub Actions test-reporting steps
-  gem 'rspec_junit_formatter'
-
   # Old drivers not used atm.
   # gem 'selenium'
   # gem 'selenium-webdriver'
@@ -206,6 +205,9 @@ group :test do
 end
 
 group :development, :test do
+  # Used both in development and test for generating realistic data
+  gem 'factory_bot_rails'
+
   # Debugging
   gem 'debug'
 
@@ -229,13 +231,10 @@ group :development, :test do
   gem 'rubocop'
   gem 'rubocop-rails', require: false
 
-  # Used both in development and test for generating realistic data
-  gem 'factory_bot_rails'
+  # For n+1 query detection
+  # gem 'bullet'
 
   # gem 'spring'
   # gem 'ruby-debug-ide'
   # gem 'debase'
-
-  # For n+1 query detection
-  # gem 'bullet'
 end
