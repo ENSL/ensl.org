@@ -4,15 +4,14 @@ class ApplicationController < ActionController::Base
   include Exceptions
   include ActionView::RecordIdentifier
   include ResourceResponses
+  include Authentication
+  include SessionHygiene
+  include SafeRedirects
 
   helper :all
-  helper_method :cuser, :strip, :return_here
+  helper_method :strip
   helper_method :error_container_id_for, :error_wrapper_id_for
 
-  helper_method :safe_url_for
-
-  before_action :update_user
-  before_action :purge_stale_session_data
   before_action :set_controller_and_action_names
   before_action :set_paper_trail_whodunnit
 
@@ -34,104 +33,6 @@ class ApplicationController < ActionController::Base
     end
 
     render json: entries
-  end
-
-  def cuser
-    return @cuser if defined?(@cuser) && @cuser
-
-    user_id = nil
-    begin
-      user_id = session[:user]
-    rescue StandardError
-      user_id = nil
-    end
-
-    @cuser = User.find(user_id) if user_id
-    @cuser
-  rescue StandardError
-    @cuser = nil
-  end
-
-  def return_here
-    return unless request.get? && request.format.html?
-
-    session[:return_to] = request.url
-  end
-
-  def return_to
-    addr = session[:return_to]
-    session[:return_to] = nil
-    safe_redirect_to(addr)
-  end
-
-  def return_back
-    if session[:return_to]
-      return_to
-    else
-      redirect_back fallback_location: '/'
-    end
-  rescue StandardError
-    redirect_to '/'
-  end
-
-  def redirect_to_back
-    redirect_back fallback_location: '/'
-  rescue StandardError
-    redirect_to '/'
-  end
-
-  def redirect_to_home
-    redirect_to controller: 'articles', action: 'news_index'
-  end
-
-  # Safe redirect helper: only allow redirects to same-host or relative paths.
-  def safe_redirect_to(addr)
-    return redirect_to('/') if addr.blank?
-
-    uri = URI.parse(addr)
-    return redirect_to('/') unless uri.host.nil? || uri.host == request.host
-
-    redirect_to_recognized_path(uri.request_uri)
-  rescue StandardError
-    redirect_to('/')
-  end
-
-  # Resolve a same-host path through the router, refusing error pages.
-  def redirect_to_recognized_path(path)
-    route = Rails.application.routes.recognize_path(path)
-    if route[:controller] == 'errors' || path.match?(%r{\A/(403|404|422|500)\b})
-      redirect_to('/')
-    else
-      redirect_to path
-    end
-  rescue StandardError
-    flash[:notice] = t(:invalid_message) if respond_to?(:flash)
-    redirect_to('/')
-  end
-
-  # Return a safe URL (allow only http(s) or relative paths). Returns '#' if unsafe.
-  def safe_url_for(url)
-    SafeUrl.sanitize(url)
-  end
-
-  def permitted_webauthn_credential_params
-    params.require(:credential).permit(
-      :id,
-      :rawId,
-      :type,
-      :authenticatorAttachment,
-      clientExtensionResults: {},
-      response: [
-        :attestationObject,
-        :authenticatorData,
-        :clientDataJSON,
-        :publicKey,
-        :publicKeyAlgorithm,
-        :signature,
-        :userHandle,
-        { transports: [] }
-      ]
-    ).to_h
   end
 
   rescue_from AccessError do |_exception|
@@ -220,40 +121,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def update_user
-    user = cuser
-    return unless user
-
-    Time.zone = user.time_zone
-    user.touch_last_visit_if_stale!
-
-    flash[:notice] = 'Your profile has been removed and recreated.' if user.ensure_profile!
-
-    return unless user.banned? Ban::TYPE_SITE
-
-    session[:user] = nil
-    @cuser = nil
-  end
-
   def set_controller_and_action_names
     @current_controller = controller_name
     @current_action     = action_name
-  end
-
-  # The omniauth-openid strategy writes its OpenID discovery/handshake state straight into
-  # the rack session (keys like "OpenID::..." and "omniauth.*"), and never cleans it up.
-  # Left unchecked that debris (plus the Steam sign-up cache once a user is actually logged
-  # in) sits in the cookie-backed session forever, growing on every login attempt until the
-  # cookie tips over Rails' 4KB limit (ActionDispatch::Cookies::CookieOverflow). Strip it on
-  # every request so an already-bloated cookie self-heals instead of staying broken forever.
-  def purge_stale_session_data
-    session.keys.each do |key|
-      session.delete(key) if key.to_s.start_with?('OpenID::', 'omniauth.')
-    end
-    return unless cuser
-
-    session.delete(:cached_user)
-    session.delete(:verified_steamid)
   end
 
   def user_for_paper_trail

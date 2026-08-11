@@ -6,6 +6,47 @@
 module Authentication
   extend ActiveSupport::Concern
 
+  included do
+    helper_method :cuser
+    before_action :update_user
+  end
+
+  def cuser
+    return @cuser if defined?(@cuser) && @cuser
+
+    user_id = nil
+    begin
+      user_id = session[:user]
+    rescue StandardError
+      user_id = nil
+    end
+
+    @cuser = User.find(user_id) if user_id
+    @cuser
+  rescue StandardError
+    @cuser = nil
+  end
+
+  def permitted_webauthn_credential_params
+    params.require(:credential).permit(
+      :id,
+      :rawId,
+      :type,
+      :authenticatorAttachment,
+      clientExtensionResults: {},
+      response: [
+        :attestationObject,
+        :authenticatorData,
+        :clientDataJSON,
+        :publicKey,
+        :publicKeyAlgorithm,
+        :signature,
+        :userHandle,
+        { transports: [] }
+      ]
+    ).to_h
+  end
+
   private
 
   def save_session(user)
@@ -25,5 +66,22 @@ module Authentication
     flash[:notice] = 'You are already logged in.'
     redirect_to edit_user_path(cuser)
     true
+  end
+
+  # Refresh the logged-in user's timezone/last-visit, self-heal a missing profile, and log
+  # out anyone who has since been banned.
+  def update_user
+    user = cuser
+    return unless user
+
+    Time.zone = user.time_zone
+    user.touch_last_visit_if_stale!
+
+    flash[:notice] = 'Your profile has been removed and recreated.' if user.ensure_profile!
+
+    return unless user.banned? Ban::TYPE_SITE
+
+    session[:user] = nil
+    @cuser = nil
   end
 end
