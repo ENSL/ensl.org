@@ -21,7 +21,7 @@ Source code for [ensl.org](https://www.ensl.org), built with Ruby on Rails.
 
 ## Documentation
 
-See [INSTALL.md](INSTALL.md) for installation and [DEVELOPMENT.md](DEVELOPMENT.md) for day-to-day development.
+See [INSTALL.md](docs/INSTALL.md) for installation and [DEVELOPMENT.md](docs/DEVELOPMENT.md) for day-to-day development.
 
 ## Features
 
