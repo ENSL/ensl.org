@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["status", "loginButton"]
+  static targets = ["loginButton"]
   static values = {
     optionsUrl: String,
     authenticateUrl: String,
@@ -10,18 +10,25 @@ export default class extends Controller {
     disableAutofill: Boolean
   }
 
-  // Hide the plain login button when the browser can do passkey autofill directly.
+  // The passkey button starts hidden (see the `hidden` attribute in the view) and is only
+  // revealed once we know the browser can actually run a passkey ceremony, since there's no way
+  // to ask in advance whether this site has a credential stored.
   async connect() {
     if (!this.hasLoginButtonTarget) return
-    if (this.disableAutofillValue) return
 
-    // Avoid background WebAuthn autofill flows in browser automation (Capybara/Playwright).
-    if (navigator.webdriver) return
+    // Automated tests/browsers can't complete a real WebAuthn ceremony; keep the button visible
+    // so it can still be exercised, without attempting background autofill.
+    if (this.disableAutofillValue || navigator.webdriver) {
+      this.loginButtonTarget.hidden = false
+      return
+    }
 
     const webauthn = await this.webauthn()
-    if (!webauthn || !webauthn.browserSupportsWebAuthn()) return
+    const supported = !!webauthn && webauthn.browserSupportsWebAuthn() &&
+      (await this.supportsConditionalUI(webauthn))
 
-    if (!(await this.supportsConditionalUI(webauthn))) return
+    this.loginButtonTarget.hidden = !supported
+    if (!supported) return
 
     this.startConditionalLogin(webauthn)
   }
@@ -61,19 +68,32 @@ export default class extends Controller {
     }
   }
 
-  // Try the browser autofill passkey flow without requiring a button click.
+  // Try the browser autofill passkey flow without requiring a button click. Getting the
+  // options or running the ceremony itself happens automatically on page load, so those
+  // failures are only logged - the user never asked for this attempt. But once the user
+  // has actually picked a credential from the browser's autofill dropdown and completed
+  // it, a rejection from our server (e.g. the credential was since removed) is a direct
+  // result of something they just did, so that failure is always shown.
   async startConditionalLogin(webauthn) {
+    let credential
+
     try {
       const options = await this.postJSON(this.optionsUrlValue, {})
-      const credential = await webauthn.startAuthentication({
+      credential = await webauthn.startAuthentication({
         optionsJSON: options,
         useBrowserAutofill: true,
         verifyBrowserAutofillInput: false
       })
-      await this.finishLogin(credential)
     } catch (error) {
       if (error?.name === "AbortError" || error?.name === "NotAllowedError") return
-      this.showStatus(error.message || "Passkey authentication failed.")
+      console.warn("Passkey autofill unavailable:", error)
+      return
+    }
+
+    try {
+      await this.finishLogin(credential)
+    } catch (error) {
+      this.showStatus(this.describeAuthenticationError(error))
     }
   }
 
@@ -169,13 +189,37 @@ export default class extends Controller {
     return meta ? meta.content : ""
   }
 
-  // Show status text in the page, or fall back to an alert if no status area exists.
+  // Show an error using the shared flash banner (like a failed password login) instead of a
+  // local status box, so it doesn't squeeze the login fields when the message wraps.
   showStatus(text) {
-    if (this.hasStatusTarget) {
-      this.statusTarget.textContent = text
+    const notification = document.getElementById("notification")
+    if (!notification) {
+      window.alert(text)
       return
     }
 
-    window.alert(text)
+    notification.innerHTML = ""
+    const message = document.createElement("div")
+    message.className = "message error"
+    message.textContent = text
+    notification.appendChild(message)
+    notification.style.display = "block"
+    notification.style.opacity = "1"
+
+    this.scheduleFlashFade(notification)
+  }
+
+  // Mirror the same auto-fade behavior the server-rendered flash uses.
+  scheduleFlashFade(notification) {
+    if (document.body.dataset.disableFlashFade === "true") return
+
+    window.clearTimeout(this.flashFadeTimeout)
+    this.flashFadeTimeout = window.setTimeout(() => {
+      if (window.jQuery) {
+        window.jQuery(notification).fadeOut()
+      } else {
+        notification.style.display = "none"
+      }
+    }, 3000)
   }
 }

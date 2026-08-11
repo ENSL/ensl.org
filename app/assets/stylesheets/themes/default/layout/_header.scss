@@ -50,21 +50,34 @@ header .banner {
     }
 
     .fields {
+      // A row of same-sized icon buttons for Steam/passkey/Discord, kept visually
+      // separate from the username/password pill next to it.
       .header-icons {
+        gap: 4px;
+
         img {
-          padding-top: 0;
-          padding-right: 5px;
-          width: 40px;
-          float: right;
+          width: 28px;
+          display: block;
         }
 
         img.discord {
-          padding-top: 0;
-          padding-right: 10px;
-          width: 40px;
-          float: right;
           -webkit-filter: brightness(0) invert(1);
           filter: brightness(0) invert(1);
+        }
+
+        a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: $base-border-radius;
+          transition: background-color 0.15s ease;
+
+          &:hover,
+          &:focus-visible {
+            background-color: rgb(255 255 255 / 10%);
+          }
         }
 
         .steam-login-form {
@@ -78,10 +91,68 @@ header .banner {
             display: inline-block;
           }
         }
+
+        .passkey-link,
+        .passkey-link:visited,
+        .passkey-link:hover,
+        .passkey-link:active {
+          font-size: 18px;
+          color: white;
+          text-decoration: none;
+
+          &:hover,
+          &:focus-visible {
+            color: #73d5f7;
+          }
+        }
+
+        .passkey-link[hidden] {
+          display: none;
+        }
       }
 
-      input {
-        margin-bottom: 10px;
+      // Groups username/password/submit into a single bordered control instead of
+      // three separate-looking pieces.
+      .login-pill {
+        background: rgb(0 0 0 / 35%);
+        border: 1px solid rgb(90 141 163 / 50%);
+        border-radius: $input-border-radius;
+
+        input[type="text"],
+        input[type="password"] {
+          background: none;
+          border: 0;
+          box-shadow: none;
+          margin-bottom: 0;
+
+          &:not(:first-child) {
+            border-left: 1px solid rgb(90 141 163 / 35%);
+          }
+        }
+      }
+
+      // Matches the 35px input height so it sits flush inside the pill.
+      .login-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: $input-height;
+        background: none;
+        border: 0;
+        box-shadow: none;
+        color: #73d5f7;
+        font-size: 16px;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+
+        &:hover,
+        &:focus-visible {
+          color: white;
+          background-color: rgb(255 255 255 / 10%);
+        }
       }
     }
 
@@ -135,59 +206,31 @@ header .banner {
 
     .buttons {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 6px;
       font-family: $header-font-family;
       text-align: right;
       text-transform: uppercase;
       font-size: 12px;
 
-      .login {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
+      .login-action {
+        background: none;
+        border: 0;
+        font-family: $header-font-family;
+        color: #73d5f7;
+        font-size: 12px;
+        padding: 0;
+        text-transform: uppercase;
+        margin: 0;
+        line-height: 1.2;
       }
 
       .register {
-        .password-reset {
-          float: right;
-        }
-      }
-
-      .login .login-action {
-        background: none;
-        border: 0;
-        font-family: $header-font-family;
-        color: #73d5f7;
-        font-size: 12px;
-        padding: 0;
-        text-transform: uppercase;
-        display: block;
-        text-align: right;
-        margin: 0;
-        line-height: 1.2;
-      }
-
-      .login .passkey-link,
-      .login .passkey-link:visited,
-      .login .passkey-link:hover,
-      .login .passkey-link:active {
-        background: none;
-        border: 0;
-        box-shadow: none;
-        text-decoration: none;
-        color: #73d5f7;
-        font-family: $header-font-family;
-        font-size: 12px;
-        text-transform: uppercase;
-        padding: 0;
-        margin: 0;
-        line-height: 1.2;
-      }
-
-      .register a {
-        float: right;
-        display: block;
-        clear: both;
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
     }
   }
@@ -202,7 +245,6 @@ header .banner {
 
 /* Strong selector to ensure the discord image filter applies in all builds */
 header .banner #authentication .fields .header-icons img.discord {
-  padding-right: 10px;
   -webkit-filter: brightness(0) invert(1);
   filter: brightness(0) invert(1);
 }

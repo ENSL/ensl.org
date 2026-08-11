@@ -75,6 +75,17 @@ RSpec.describe Passkeys::LoginService do
         .to raise_error(Passkeys::Error) { |error| expect(error.status).to eq(:unauthorized) }
     end
 
+    # Reproduces a user removing their passkey from their profile, then a stale
+    # browser-side credential (e.g. autofill) still getting offered for login.
+    it 'returns invalid for a discoverable credential that no longer exists' do
+      session[:passkey_login] = { challenge: 'c', user_id: nil, expires_at: 5.minutes.from_now.to_i }
+      credential = double('WebAuthnCredential', id: 'removed-credential', sign_count: 1)
+      allow(WebAuthn::Credential).to receive(:from_get).and_return(credential)
+
+      expect { service.authenticate(credential_params: { id: 'removed-credential' }) }
+        .to raise_error(Passkeys::Error) { |error| expect(error.status).to eq(:unauthorized) }
+    end
+
     it 'authenticates and updates sign_count for discoverable credentials' do
       user = create(:user)
       stored = user.passkey_credentials.create!(external_id: 'cred-2', public_key: 'pk2', sign_count: 1)

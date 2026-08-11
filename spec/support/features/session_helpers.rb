@@ -28,7 +28,7 @@ module Features
       fill_in 'login_password', with: user.raw_password
 
       # Apparently poltergeist does not suppor this
-      find('#authentication input[name="commit"]').click
+      find('#authentication [name="commit"]').click
       # click_button I18n.t("helpers.submit.user.login")
 
       expect(page).to have_content(I18n.t('sessions.create.success'))

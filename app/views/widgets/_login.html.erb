@@ -9,39 +9,46 @@
                  passkey_auth_disable_autofill_value: Rails.env.test?
                } }) do %>
   <div class="fields flex items-center gap-x-3">
-    <div class="header-icons shrink-0">
+    <div class="header-icons shrink-0 flex items-center">
       <%= link_to '#', class: 'steam-login', rel: 'noopener', data: { submit_form: true, form_id: 'steam-auth-form' } do %>
         <%= image_tag '/images/icons/steam_login.png' %>
+      <% end %>
+      <%= link_to '#', class: 'passkey-link', hidden: true,
+                  title: t('sessions.form.login_with_passkey'),
+                  data: { action: 'click->passkey-auth#login', passkey_auth_target: 'loginButton' } do %>
+        <i class="fa-solid fa-fingerprint" aria-hidden="true"></i>
+        <span class="sr-only"><%= t('sessions.form.login_with_passkey') %></span>
       <% end %>
       <%= link_to ENV['DISCORD_URL'], target: '_blank', rel: 'noopener noreferrer' do %>
         <%= image_tag 'shared/discord.png', class: 'discord', alt: 'Go to ENSL Discord!' %>
       <% end %>
     </div>
 
-    <%= text_field "login", "username", placeholder: "Username", autocomplete: "username webauthn", class: "flex-1 min-w-0" %>
-    <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password", class: "flex-1 min-w-0" %>
-    <% if otp_pending %>
-      <%= text_field "login_otp", "code",
-                     placeholder: t('sessions.form.otp_code'),
-                     autocomplete: 'one-time-code',
-                     inputmode: 'numeric',
-                     class: "flex-1 min-w-0" %>
-    <% end %>
-    <div class="passkey-status" data-passkey-auth-target="status"></div>
-  </div>
-  <div class="buttons">
-    <div class="login">
+    <div class="login-pill flex items-center flex-1 min-w-0">
+      <%= text_field "login", "username", placeholder: "Username", autocomplete: "username webauthn", class: "flex-1 min-w-0" %>
+      <%= password_field "login", "password", placeholder: "Password", autocomplete: "current-password", class: "flex-1 min-w-0" %>
       <% if otp_pending %>
-        <%= submit_tag t('sessions.form.verify_otp'), class: 'login-action' %>
+        <%= text_field "login_otp", "code",
+                       placeholder: t('sessions.form.otp_code'),
+                       autocomplete: 'one-time-code',
+                       inputmode: 'numeric',
+                       class: "flex-1 min-w-0" %>
       <% else %>
-        <%= submit_tag t('helpers.submit.user.login'), class: 'login-action' %>
-        <%= link_to t('sessions.form.login_with_passkey'), '#',
-                    class: 'passkey-link login-action',
-                    data: { action: 'click->passkey-auth#login', passkey_auth_target: 'loginButton' } %>
+        <%= button_tag type: 'submit', name: 'commit', class: 'login-action shrink-0',
+                       title: t('helpers.submit.user.login') do %>
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+          <span class="sr-only"><%= t('helpers.submit.user.login') %></span>
+        <% end %>
       <% end %>
     </div>
+  </div>
+  <div class="buttons">
+    <% if otp_pending %>
+      <%= submit_tag t('sessions.form.verify_otp'), class: 'login-action' %>
+    <% end %>
     <div class="register">
       <%= link_to t('helpers.submit.user.create'), new_user_path %>
+      <span aria-hidden="true">&middot;</span>
       <%= link_to t('sessions.form.forgot_password'), forgot_sessions_path, class: "password-reset" %>
     </div>
   </div>

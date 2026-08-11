@@ -10,7 +10,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     visit root_path
     find_field('login_username').set(admin.username)
     fill_in 'login_password', with: admin.raw_password
-    find('#authentication input[name="commit"]').click
+    find('#authentication [name="commit"]').click
     expect(page).to have_content(I18n.t('sessions.create.success'))
   end
 

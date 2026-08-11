@@ -21,7 +21,7 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
     )
 
     expect(page).to have_css(
-      '.passkey-status',
+      '#notification .message.error',
       text: /(
         enter\ your\ username\ before\ using\ a\ passkey\.|
         passkeys\ are\ not\ supported\ in\ this\ browser\.|
