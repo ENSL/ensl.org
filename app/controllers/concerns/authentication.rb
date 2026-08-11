@@ -9,6 +9,12 @@ module Authentication
   private
 
   def save_session(user)
+    return_to = session[:return_to]
+    # Drop any leftover auth-handshake data (OpenID discovery, passkey/OTP challenges,
+    # cached_user, etc.) that accumulated in the session before login, and rotate the
+    # session id to guard against session fixation.
+    reset_session
+    session[:return_to] = return_to
     session[:user] = user.id
     user.record_login!(request.ip)
   end

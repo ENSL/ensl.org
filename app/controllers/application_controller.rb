@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
   helper_method :safe_url_for
 
   before_action :update_user
+  before_action :purge_stale_session_data
   before_action :set_controller_and_action_names
   before_action :set_paper_trail_whodunnit
 
@@ -237,6 +238,22 @@ class ApplicationController < ActionController::Base
   def set_controller_and_action_names
     @current_controller = controller_name
     @current_action     = action_name
+  end
+
+  # The omniauth-openid strategy writes its OpenID discovery/handshake state straight into
+  # the rack session (keys like "OpenID::..." and "omniauth.*"), and never cleans it up.
+  # Left unchecked that debris (plus the Steam sign-up cache once a user is actually logged
+  # in) sits in the cookie-backed session forever, growing on every login attempt until the
+  # cookie tips over Rails' 4KB limit (ActionDispatch::Cookies::CookieOverflow). Strip it on
+  # every request so an already-bloated cookie self-heals instead of staying broken forever.
+  def purge_stale_session_data
+    session.keys.each do |key|
+      session.delete(key) if key.to_s.start_with?('OpenID::', 'omniauth.')
+    end
+    return unless cuser
+
+    session.delete(:cached_user)
+    session.delete(:verified_steamid)
   end
 
   def user_for_paper_trail

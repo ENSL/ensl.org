@@ -117,10 +117,15 @@ class SessionsController < ApplicationController
   # persist the verified SteamID across requests, and to store the user data for the duration of the session.
   # The verified SteamID is used to ensure that the user is who they claim to be, and the cached user data is
   # used to avoid repeated database lookups for the same user.
+  #
+  # Only cache the full serialized user for brand new (unsaved) accounts, since that's the only
+  # case where UsersController#new needs it to hydrate the registration form. Serializing an
+  # existing, fully populated user on every login needlessly bloats the cookie-backed session and
+  # can push it past the 4KB cookie size limit (ActionDispatch::Cookies::CookieOverflow).
   def cache_callback_user(user)
     payload = user.callback_session_payload
     session[:verified_steamid] = payload[:verified_steamid]
-    session[:cached_user] = payload[:cached_user]
+    session[:cached_user] = payload[:cached_user] if user.new_record?
   end
 
   def callback_user?(user)
@@ -186,9 +191,10 @@ class SessionsController < ApplicationController
 
     return handle_banned_login if result[:banned]
 
-    apply_login_notice(result, user)
-    otp_service.clear!
+    # Reset the session (dropping auth-handshake leftovers) before setting flash/return_to,
+    # since reset_session would otherwise wipe them out again.
     save_session user
+    apply_login_notice(result, user)
   end
 
   def passkey_credential_params
