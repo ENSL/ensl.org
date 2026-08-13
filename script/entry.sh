@@ -5,7 +5,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Runtime path; QLTY does not pass this dependency to ShellCheck.
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR"/../../script/env.sh .env .env."$RAILS_ENV" .env.local .env."$RAILS_ENV".local 
+source "$SCRIPT_DIR"/env.sh .env .env."$RAILS_ENV" .env.local .env."$RAILS_ENV".local 
 
 cd "$APP_PATH" || exit
 

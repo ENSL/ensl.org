@@ -3,7 +3,7 @@
 
 # Loads 11 users to most recent gather for dev env.
 
-require_relative '../../config/environment'
+require_relative '../config/environment'
 
 raise 'gather_fill is only intended for development environment' unless Rails.env.development?
 

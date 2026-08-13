@@ -20,7 +20,7 @@ Install steps are in [[INSTALL.md]].
 
     docker compose --profile development up --build development sidekiq
 
-The app container runs `bin/script/entry.sh`, which loads env files, runs `bundle install`, runs migrations, and starts Puma (`bin/dev` in development).
+The app container runs `script/entry.sh`, which loads env files, runs `bundle install`, runs migrations, and starts Puma (`bin/dev` in development).
 
 ## Common commands
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../../config/environment'
+require_relative '../config/environment'
 
 scope = Movie.includes(:file, :preview).order(:id)
 total = scope.count

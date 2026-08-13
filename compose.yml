@@ -1,5 +1,5 @@
 x-app: &app
-  command: /var/www/bin/script/entry.sh
+  command: /var/www/script/entry.sh
   tty: true
   stdin_open: true
   user: "web:web"

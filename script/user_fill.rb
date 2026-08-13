@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../../config/environment'
+require_relative '../config/environment'
 
 def unique_email_for(base, exclude_id = nil)
   local, domain = base.split('@', 2)

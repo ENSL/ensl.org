@@ -4,9 +4,9 @@
 # Loads a complete bracket contest with randomized data for dev env.
 # Creates contest, brackets, teams, and matches with realistic bracket structures.
 # Uses factories to generate realistic, varied bracket data.
-# Usage: bundle exec bin/script/contest_fill.rb
+# Usage: bundle exec script/bracket_fill.rb
 
-require_relative '../../config/environment'
+require_relative '../config/environment'
 
 module BracketFill
   extend FactoryBot::Syntax::Methods

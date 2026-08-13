@@ -163,7 +163,7 @@ FROM ensl_production AS ensl_staging
 ENV RAILS_ENV=staging
 
 # ENTRYPOINT ["/bin/bash"]
-# CMD ["/var/www/bin/script/entry.sh"]
+# CMD ["/var/www/script/entry.sh"]
 
 # Default target for local tooling and Dev Containers.
 FROM ensl_development AS ensl_devcontainer
