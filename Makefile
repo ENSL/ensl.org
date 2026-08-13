@@ -93,7 +93,3 @@ restart_prod_all:
 	    --pull always \
 	    --remove-orphans\
 	'
-
-test: build
-	fig run web ./env/test.sh ./test.sh
-
