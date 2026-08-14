@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     root to: 'home#index'
     resources :users, only: [:index]
     resources :maps, only: [:index]
+    resources :pick_orders, only: [:index]
   end
 
   root to: 'articles#news_index'

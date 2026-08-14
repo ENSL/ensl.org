@@ -19,6 +19,12 @@ module Analysis
         description: 'Marine vs alien win rates for every map currently in rotation.',
         icon: 'map',
         path_helper: :analysis_maps_path
+      },
+      {
+        title: 'NS1 pick order',
+        description: 'How fast NS1 players usually get picked when gather teams are drafted.',
+        icon: 'sort-numeric-down',
+        path_helper: :analysis_pick_orders_path
       }
     ].freeze
 

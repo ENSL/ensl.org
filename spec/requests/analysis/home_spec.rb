@@ -11,6 +11,7 @@ RSpec.describe 'Analysis::HomeController', type: :request do
       expect(response.body).to include('Stats')
       expect(response.body).to include(analysis_users_path)
       expect(response.body).to include(analysis_maps_path)
+      expect(response.body).to include(analysis_pick_orders_path)
     end
   end
 end

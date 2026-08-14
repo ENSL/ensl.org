@@ -1,0 +1,44 @@
+<h1 class="title">NS1 pick order rankings</h1>
+
+<div class="box wide">
+  <p>
+    How fast each player usually gets picked when NS1 gather teams are drafted &mdash;
+    lower average pick number means picked sooner. Captain appearances are excluded from a
+    player's average, since captains are voted in rather than skill-picked; this doesn't
+    affect a captain's own ranking otherwise. Click a column header to sort.
+  </p>
+
+  <%= form_with url: analysis_pick_orders_path, method: :get, local: true do %>
+    <p>
+      <%= label_tag :min_picks, 'Minimum picks:' %>
+      <%= select_tag :min_picks,
+                     options_for_select(@min_picks_options.map { |n| [n, n] }, @selected_min_picks),
+                     onchange: 'this.form.requestSubmit()' %>
+    </p>
+  <% end %>
+
+  <% if @rankings.empty? %>
+    <p>No NS1 pick data is available yet.</p>
+  <% else %>
+    <%
+      columns = [
+        {
+          key: :user,
+          label: 'Player',
+          type: :string,
+          sort_value: ->(user) { user.to_s.downcase },
+          format: ->(user) { namelink(user) }
+        },
+        {
+          key: :average_pick_order,
+          label: 'Average pick #',
+          type: :number,
+          format: ->(value) { number_with_precision(value, precision: 2) }
+        },
+        { key: :picks_count, label: 'Picks', type: :number, format: ->(value) { value.to_i } }
+      ]
+    %>
+
+    <%= sortable_table(columns: columns, rows: @rankings, id: 'pick-order-rankings') %>
+  <% end %>
+</div>
