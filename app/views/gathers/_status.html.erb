@@ -13,7 +13,7 @@
 
     <% if gatherer and gatherer.can_destroy? current_user %>
       <p>Gather running, <%= Gather::FULL - gatherers_count %> more needed.</p>
-      <%= button_to 'Leave Gather', gatherer, method: :delete, form: { data: { turbo: false }, class: 'inline' }, class: 'button', data: { confirm: 'Are you sure?' } %>
+      <%= button_to 'Leave Gather', gatherer, method: :delete, form: { data: { turbo: false } }, class: 'button', data: { confirm: 'Are you sure?' } %>
 
     <% elsif (g = Gatherer.new(gather: gather, user: current_user)).can_create?(current_user) %>
       <%= form_for g, url: gatherers_path, authenticity_token: false, html: { id: "new_gatherer_#{gather.id}", data: { turbo_stream: true } } do |f| %>

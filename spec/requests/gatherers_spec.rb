@@ -65,6 +65,20 @@ RSpec.describe 'GatherersController', type: :request do
       expect(response.media_type).to eq('text/vnd.turbo-stream.html')
     end
 
+    it 'does not render duplicate flash markup inside the gather frame after a successful join' do
+      login_as(user)
+      gatherer = create(:gatherer, gather: gather, user: user)
+      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: gather, error: nil)
+      allow(Gathers::Join).to receive(:call).and_return(result)
+
+      post '/gatherers',
+           params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } },
+           headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response.body).to include('id="notification"')
+      expect(response.body).not_to include('id="gather-notification"')
+    end
+
     it 'uses the gather from the returned gatherer in turbo-stream responses' do
       login_as(user)
       gatherer = create(:gatherer, gather: gather, user: user)

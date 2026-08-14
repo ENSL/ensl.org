@@ -202,6 +202,24 @@ form.new-shout[id^="new_shout_Gather_"] {
   border-bottom: 2px solid $medium-gray;
   position: relative;
 
+  form.inline,
+  form[action*="/gatherers/"] {
+    float: none;
+    display: block;
+    width: auto;
+    margin: 0;
+  }
+
+  .button,
+  button,
+  input[type="submit"],
+  form button,
+  form input[type="submit"] {
+    float: none;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
   .gather-controls {
     top: 20px;
     right: 0;
