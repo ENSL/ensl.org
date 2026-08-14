@@ -42,7 +42,11 @@ module Features
       # logout path directly which is available as a GET for compatibility.
       visit logout_sessions_path
       # Expect either the flash or the login link to confirm logout succeeded
-      expect(page).to(have_content(I18n.t('sessions.destroy.success')).or(have_content(I18n.t('helpers.submit.user.login'))))
+      expect(page).to(
+        have_content(I18n.t('sessions.destroy.success')).or(
+          have_content(I18n.t('helpers.submit.user.login'))
+        )
+      )
     end
 
     def change_timezone_for(user, timezone)

@@ -146,10 +146,6 @@ class Directory < ApplicationRecord
     nil
   end
 
-  def self.path_within_files_root?(path)
-    path_within_root?(path, files_root)
-  end
-
   def self.path_within_root?(path, root_path)
     candidate = File.expand_path(path.to_s)
     root = File.expand_path(root_path.to_s)

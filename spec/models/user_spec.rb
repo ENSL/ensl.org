@@ -209,7 +209,7 @@ describe User do
     end
 
     it 'excludes team matches when the user is only waiting to join' do
-      user.teamers.update_all(rank: Teamer::RANK_JOINER)
+      user.teamers.each { |teamer| teamer.update!(rank: Teamer::RANK_JOINER) }
       team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
 
       expect(user.reload.upcoming_matches).not_to include(team_match)

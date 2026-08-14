@@ -5,7 +5,7 @@ require_relative '../config/environment'
 
 scope = Movie.includes(:file, :preview).order(:id)
 total = scope.count
-started_at = Time.now
+started_at = Time.zone.now
 tick = (ENV['PROGRESS_EVERY'] || 25).to_i
 tick = 25 if tick <= 0
 
@@ -19,7 +19,8 @@ scope.find_each.with_index(1) do |movie, i|
   unless source
     stats[:skipped_missing_file] += 1
     if (i % tick).zero? || i == total
-      puts "[#{i}/#{total}] snap=#{stats[:snapshots]} prev=#{stats[:previews]} skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
+      puts "[#{i}/#{total}] snap=#{stats[:snapshots]} prev=#{stats[:previews]} " \
+           "skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
     end
     next
   end
@@ -27,7 +28,7 @@ scope.find_each.with_index(1) do |movie, i|
   begin
     movie.probe_metadata
     movie.probe_length
-    movie.update_columns(
+    movie.update!(
       metadata: movie.metadata,
       web_friendly: movie.web_friendly,
       format: movie.format,
@@ -58,9 +59,12 @@ scope.find_each.with_index(1) do |movie, i|
   end
 
   if (i % tick).zero? || i == total
-    puts "[#{i}/#{total}] probe=#{stats[:probed]} snap=#{stats[:snapshots]} prev=#{stats[:previews]} skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
+    puts "[#{i}/#{total}] probe=#{stats[:probed]} snap=#{stats[:snapshots]} " \
+         "prev=#{stats[:previews]} skip=#{stats[:skipped_missing_file]} fail=#{stats[:failed]}"
   end
 end
 
-elapsed = (Time.now - started_at).round
-puts "Done in #{elapsed}s | probed=#{stats[:probed]} snapshots=#{stats[:snapshots]} previews=#{stats[:previews]} skipped_missing_file=#{stats[:skipped_missing_file]} failed=#{stats[:failed]}"
+elapsed = (Time.zone.now - started_at).round
+puts "Done in #{elapsed}s | probed=#{stats[:probed]} snapshots=#{stats[:snapshots]} " \
+     "previews=#{stats[:previews]} skipped_missing_file=#{stats[:skipped_missing_file]} " \
+     "failed=#{stats[:failed]}"

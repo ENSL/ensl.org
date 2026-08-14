@@ -35,7 +35,7 @@ RSpec.describe 'PollsController', type: :request do
     let!(:newer_poll) { create_poll(question: 'Newer poll?') }
 
     it 'lists polls for guests' do
-      Poll.where(id: [older_poll.id, newer_poll.id]).update_all(created_at: Time.current)
+      [older_poll, newer_poll].each { |poll| poll.update!(created_at: Time.current) }
 
       get polls_path
 

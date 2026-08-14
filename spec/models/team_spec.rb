@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Rails/SkipsModelValidations
 require 'rails_helper'
 
 RSpec.describe Team, type: :model do
@@ -230,6 +231,7 @@ RSpec.describe Team, type: :model do
     end
   end
 end
+# rubocop:enable Rails/SkipsModelValidations
 
 RSpec.describe Team, type: :model do
   describe 'basic methods' do

@@ -81,12 +81,11 @@
 
     .button,
     .controls input {
-      background-image: linear-gradient(to bottom, #{#585858}, #{#585858});
       font-family: $header-font-family;
       font-weight: normal;
       color: white;
       border-radius: 10px;
-      background: #585858;
+      background: linear-gradient(to bottom, #585858, #585858);
       border: 0;
       line-height: 30px;
       height: 30px;

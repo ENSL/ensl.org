@@ -111,7 +111,9 @@ class Team < ApplicationRecord
     transaction do
       teamer = Teamer.create!(user: founder, team: self, rank: Teamer::RANK_LEADER)
       # set founder's team_id without invoking validations that may block assignment
+      # rubocop:disable Rails/SkipsModelValidations
       founder.update_columns(team_id: id, updated_at: Time.current)
+      # rubocop:enable Rails/SkipsModelValidations
       teamer
     end
   end
@@ -179,7 +181,9 @@ class Team < ApplicationRecord
 
       promoted_from_joiner = member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
       member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
+      # rubocop:disable Rails/SkipsModelValidations
       member.user.update_columns(team_id: id, updated_at: Time.current) if promoted_from_joiner
+      # rubocop:enable Rails/SkipsModelValidations
     end
   end
 

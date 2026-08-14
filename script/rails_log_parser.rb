@@ -12,20 +12,48 @@ module RailsLog
       while (line = input.gets)
         if waiting_for_time
           if line[0..11] == 'Completed in'
-            if line =~ /^Completed\s*in\s*([^\s]+)\s*\(View:\s*(\d+),\s*DB:\s*(\d+)\)\s*\|\s*(\d+)\s*\w+\s*\[([^\]]+)\]/i
-              info.merge!({ processing_time: ::Regexp.last_match(1), view_time: ::Regexp.last_match(2),
-                            db_time: ::Regexp.last_match(3), status: ::Regexp.last_match(4), url: ::Regexp.last_match(5) })
+            completed_view_regex = /
+              ^Completed\s*in\s*([^\s]+)
+              \s*\(View:\s*(\d+),\s*DB:\s*(\d+)\)
+              \s*\|\s*(\d+)\s*\w+\s*\[([^\]]+)\]
+            /ix
+            completed_render_regex = /
+              Completed\s*in\s*([^\s]+)
+              \s*\([^)]+\)\s*\|\s*Rendering:\s*([\d.]+)
+              \s*\([^)]+\)\s*\|\s*DB:\s*([\d.]+)
+              \s*\([^)]+\)\s*\|\s*(\d+)\s*\w+\s*\[([^\]]+)\]
+            /ix
+
+            if line =~ completed_view_regex
+              info.merge!(
+                processing_time: ::Regexp.last_match(1),
+                view_time: ::Regexp.last_match(2),
+                db_time: ::Regexp.last_match(3),
+                status: ::Regexp.last_match(4),
+                url: ::Regexp.last_match(5)
+              )
               summary["#{info[:controller]}##{info[:action]}"] << info[:processing_time].to_i
-            elsif line =~ /Completed\s*in\s*([^\s]+)\s*\([^)]+\)\s*\|\s*Rendering:\s*([\d.]+)\s*\([^)]+\)\s*\|\s*DB:\s*([\d.]+)\s*\([^)]+\)\s*\|\s*(\d+)\s*\w+\s*\[([^\]]+)\]/i
-              info.merge!({ processing_time: (::Regexp.last_match(1).to_f * 100).to_i, view_time: (::Regexp.last_match(2).to_f * 100).to_i,
-                            db_time: (::Regexp.last_match(3).to_f * 100).to_i, status: ::Regexp.last_match(4), url: ::Regexp.last_match(5) })
+            elsif line =~ completed_render_regex
+              info.merge!(
+                processing_time: (::Regexp.last_match(1).to_f * 100).to_i,
+                view_time: (::Regexp.last_match(2).to_f * 100).to_i,
+                db_time: (::Regexp.last_match(3).to_f * 100).to_i,
+                status: ::Regexp.last_match(4),
+                url: ::Regexp.last_match(5)
+              )
               summary["#{info[:controller]}##{info[:action]}"] << info[:processing_time].to_i
             end
             waiting_for_time = false
           end
-        elsif (line[0..9] == 'Processing') && (line =~ /^Processing\s*([^#]+)#([^\s]+)\s*\(for\s*([^\s]+)\s*at\s*([^)]+)\)\s*\[(\w+)\]/i)
-          info = { controller: ::Regexp.last_match(1), action: ::Regexp.last_match(2), ip: ::Regexp.last_match(3),
-                   datetime: ::Regexp.last_match(4), method: ::Regexp.last_match(4) }
+        elsif (line[0..9] == 'Processing') &&
+              (line =~ /^Processing\s*([^#]+)#([^\s]+)\s*\(for\s*([^\s]+)\s*at\s*([^)]+)\)\s*\[(\w+)\]/i)
+          info = {
+            controller: ::Regexp.last_match(1),
+            action: ::Regexp.last_match(2),
+            ip: ::Regexp.last_match(3),
+            datetime: ::Regexp.last_match(4),
+            method: ::Regexp.last_match(4)
+          }
           waiting_for_time = true
         end
       end
@@ -89,12 +117,13 @@ module RailsLog
     stats_array = []
     sort_by_key = 'median' unless !sort_by_key.nil? && stats[0].respond_to?(sort_by_key)
     stats.sort_by { |s| s.send(sort_by_key) }.reverse.each do |s|
-      # puts "#{s.uri} - count:#{s.count} - sum:#{s.sum} - max:#{s.max} - min:#{s.min} - avg:#{s.avg} - median:#{s.median}"
       stats_array << [s.uri, s.count, s.sum, s.max, s.min, s.avg, s.median]
     end
     stats_array = stats_array[0..result_limit - 1] if result_limit.positive?
-    stats_array.tabalize(['Uri', 'Calls', 'Total Time', 'Max', 'Min', 'Avg', 'Median'],
-                         %i[left right right right right right right])
+    stats_array.tabalize(
+      ['Uri', 'Calls', 'Total Time', 'Max', 'Min', 'Avg', 'Median'],
+      %i[left right right right right right right]
+    )
   end
 
   def self.print_usage

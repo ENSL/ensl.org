@@ -104,8 +104,10 @@ module Features
 
       if TEST_VIDEO_URL.present?
         local_path = TEST_VIDEOS_DIR.join(TEST_VIDEO_FILENAME)
-        download_and_sample_video(TEST_VIDEO_FILENAME, local_path,
-                                  remote_url: TEST_VIDEO_URL) unless File.exist?(local_path)
+        unless File.exist?(local_path)
+          download_and_sample_video(TEST_VIDEO_FILENAME, local_path,
+                                    remote_url: TEST_VIDEO_URL)
+        end
         return
       end
 
@@ -260,8 +262,10 @@ module Features
     def all_video_specs
       generated = GENERATED_VIDEO_SPECS.map { |s| { filename: s[:filename], expected_duration: s[:duration] } }
       remote = REMOTE_VIDEO_LIST.map { |name| { filename: name, expected_duration: MAX_SAMPLE_DURATION.to_f } }
-      remote << { filename: TEST_VIDEO_FILENAME,
-                  expected_duration: MAX_SAMPLE_DURATION.to_f } if TEST_VIDEO_URL.present?
+      if TEST_VIDEO_URL.present?
+        remote << { filename: TEST_VIDEO_FILENAME,
+                    expected_duration: MAX_SAMPLE_DURATION.to_f }
+      end
       generated + remote
     end
 

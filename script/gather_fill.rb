@@ -29,7 +29,7 @@ ActiveRecord::Base.transaction do
     user, created_now = find_or_create_dev_user(username)
     created << username if created_now
 
-    gatherer = Gatherer.find_or_create_by!(gather: gather, user: user)
+    Gatherer.find_or_create_by!(gather: gather, user: user)
     joined << user.username
   end
 end

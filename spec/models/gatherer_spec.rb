@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Rails/SkipsModelValidations
 require 'rails_helper'
 
 RSpec.describe Gatherer, type: :model do
@@ -378,3 +379,4 @@ RSpec.describe Gatherer, type: :model do
     end
   end
 end
+# rubocop:enable Rails/SkipsModelValidations

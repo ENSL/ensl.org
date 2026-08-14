@@ -110,10 +110,19 @@ RSpec.describe Teamer, type: :model do
     it 'clears user team without running full user validations' do
       member = create(:user, username: 'MemberOne')
       duplicate = create(:user, username: 'MemberTwo')
-      duplicate.update_column(:username, member.username.downcase)
+      # Intentionally create a broken duplicate-username state without invoking the
+      # model validation layer; the test is verifying that the destroy path bypasses
+      # user validations while clearing team membership.
+      # rubocop:disable Rails/SkipsModelValidations
+      duplicate.update_columns(username: member.username.downcase)
+      # rubocop:enable Rails/SkipsModelValidations
 
       team = create(:team)
-      member.update_column(:team_id, team.id)
+      # This intentionally bypasses validations because the duplicate username state
+      # is already present and the test is exercising the destroy path, not user save validation.
+      # rubocop:disable Rails/SkipsModelValidations
+      member.update_columns(team_id: team.id, updated_at: Time.current)
+      # rubocop:enable Rails/SkipsModelValidations
       teamer = create(:teamer, user: member, team: team, rank: Teamer::RANK_MEMBER)
 
       expect { User.find(member.id).update!(team_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
