@@ -3,7 +3,14 @@
     <tr>
       <% columns.each do |column| %>
         <% column_type = (column[:type] || :string).to_sym %>
-        <th class="<%= 'sortable-table-number' if column_type == :number %>" data-sort-type="<%= column_type %>"><%= column[:label] %></th>
+        <% tooltip = column[:tooltip] %>
+        <th
+          class="<%= 'sortable-table-number' if column_type == :number %><%= ' sortable-table-tip' if tooltip %>"
+          data-sort-type="<%= column_type %>"
+          <% if tooltip %>data-tooltip="<%= tooltip %>" aria-label="<%= column[:label] %>: <%= tooltip %>"<% end %>
+        >
+          <span class="sortable-table-label"><%= column[:label] %></span>
+        </th>
       <% end %>
     </tr>
   </thead>

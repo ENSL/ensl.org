@@ -10,12 +10,18 @@
     text-align: right;
   }
 
+  th {
+    vertical-align: bottom;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
   .sortable-table-header {
     cursor: pointer;
     user-select: none;
-    white-space: nowrap;
 
-    &:hover { text-decoration: underline; }
+    &:hover .sortable-table-label { text-decoration: underline; }
   }
 
   .sortable-table-indicator {
@@ -23,6 +29,75 @@
     width: 1em;
     color: inherit;
     opacity: 0.6;
+  }
+
+  // Explanatory bubble for column headers carrying a :tooltip (see
+  // AnalysisHelper#sortable_table). Kept CSS-only so it works without JS.
+  .sortable-table-tip {
+    position: relative;
+
+    &::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      z-index: 20;
+      width: max-content;
+      max-width: 240px;
+      transform: translate(-50%, -4px);
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgb(17 24 39 / 96%);
+      box-shadow: 0 6px 16px rgb(0 0 0 / 25%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+      text-align: left;
+      text-transform: none;
+      white-space: normal;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.12s ease, transform 0.12s ease;
+    }
+
+    &:hover::after,
+    &:focus-within::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+    }
+
+    // Keep the bubble on screen for the outermost columns.
+    &:first-child::after {
+      left: 0;
+      transform: translate(0, -4px);
+    }
+
+    &:first-child:hover::after { transform: translate(0, 0); }
+
+    &:last-child::after {
+      right: 0;
+      left: auto;
+      transform: translate(0, -4px);
+    }
+
+    &:last-child:hover::after { transform: translate(0, 0); }
+  }
+}
+
+// Filter row above an analysis listing: keeps each label/select pair together
+// but lets several pairs share one line.
+.analysis-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 }
 

@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   namespace :analysis do
     root to: 'home#index'
     resources :users, only: [:index]
+    resources :teams, only: [:index]
     resources :maps, only: [:index]
     resources :pick_orders, only: [:index]
   end

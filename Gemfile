@@ -24,6 +24,9 @@ gem 'sidekiq-cron'
 # Reads the Parquet files exported by the ensl_analysis Python pipeline
 gem 'duckdb'
 
+# Bayesian multiplayer rating system, used to rank teams from match results
+gem 'openskill'
+
 # Puma for Web server.
 # Faraday provides NET-HTTP functions
 gem 'faraday'

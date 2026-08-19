@@ -1,0 +1,156 @@
+<h1 class="title">Team rankings</h1>
+
+<div class="box wide">
+  <p>
+    OpenSkill ratings replayed from every finished league match, plus each team's
+    record and tournament victories. Teams with no finished matches are left out.
+    Click a column header to sort, or hover one to see what it means.
+  </p>
+
+  <%= form_with url: analysis_teams_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :game, 'Game:' %>
+        <%= select_tag :game,
+                       options_for_select(@games.map { |g| [g, g] }, @selected_game),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :min_matches, 'Minimum matches:' %>
+        <%= select_tag :min_matches,
+                       options_for_select(@min_matches_options.map { |n| [n, n] }, @selected_min_matches),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
+
+  <% if @rankings.empty? %>
+    <p>No team results are available for <%= @selected_game %> yet.</p>
+  <% else %>
+    <%
+      format_number = lambda do |value, precision: 2|
+        value.nil? ? '–' : number_with_precision(value, precision: precision)
+      end
+
+      # Same presentation as the player rankings page: shift the raw rating
+      # into a familiar Elo-like range instead of showing values around zero.
+      scaled = lambda do |value|
+        value.nil? ? nil : ((value * 100) + 1_000)
+      end
+
+      columns = [
+        {
+          key: :team,
+          label: 'Team',
+          type: :string,
+          tooltip: 'The team as registered on the site. Only teams with at least one finished ' \
+                   "#{@selected_game} match appear here.",
+          sort_value: ->(team) { team.to_s.downcase },
+          format: ->(team) { namelink(team) }
+        },
+        {
+          key: :rating,
+          label: 'OpenSkill',
+          type: :number,
+          tooltip: 'Team strength from match results only, ignoring who played. Every team starts equal ' \
+                   'and every finished match is replayed in order, so beating strong opponents is worth ' \
+                   'far more than beating weak ones. Higher is better.',
+          sort_value: scaled,
+          format: ->(value) { format_number.call(scaled.call(value), precision: 0) }
+        },
+        {
+          key: :matches,
+          label: 'Matches',
+          type: :number,
+          tooltip: 'Finished matches played against another team in a counted contest.'
+        },
+        {
+          key: :wins,
+          label: 'Wins',
+          type: :number,
+          tooltip: 'Finished matches where the team scored more than its opponent.'
+        },
+        {
+          key: :losses,
+          label: 'Losses',
+          type: :number,
+          tooltip: 'Finished matches where the team scored less than its opponent.'
+        },
+        {
+          key: :draws,
+          label: 'Draws',
+          type: :number,
+          tooltip: 'Finished matches that ended level, with both teams on the same non-zero score.'
+        },
+        {
+          key: :win_ratio,
+          label: 'Win ratio %',
+          type: :number,
+          tooltip: 'Wins as a percentage of all finished matches. Draws count against it, and it takes ' \
+                   'no account of opponent strength.',
+          sort_value: ->(value) { value.nil? ? nil : (value * 100) },
+          format: ->(value) { value.nil? ? '–' : format_number.call(value * 100, precision: 0) }
+        },
+        {
+          key: :tournament_wins,
+          label: 'Tournament wins',
+          type: :number,
+          tooltip: 'Contests an admin has explicitly marked this team as the winner of. A tournament runs ' \
+                   'many contests and only the deciding one is marked, so this cannot be inferred from ' \
+                   'standings and may be missing for older tournaments.'
+        },
+        {
+          key: :contests,
+          label: 'Contests',
+          type: :number,
+          tooltip: 'Separate seasons, cups and ladders the team actually played a match in.'
+        },
+        {
+          key: :player_skill,
+          label: 'Top 6 player skill',
+          type: :number,
+          tooltip: 'Average individual OpenSkill rating of the six best-rated players who have played for ' \
+                   'this team, from the per-player analysis data. Unlike the OpenSkill column this says ' \
+                   'nothing about results -- it estimates how strong the squad was on paper.',
+          sort_value: scaled,
+          format: ->(value) { format_number.call(scaled.call(value), precision: 0) }
+        },
+        {
+          key: :rated_members,
+          label: 'Rated players',
+          type: :number,
+          tooltip: 'How many players the previous column is averaged over, up to six. Individual ratings ' \
+                   'only exist for players with parsed rounds, so a low number means a thin estimate.'
+        },
+        {
+          key: :mu,
+          label: 'Mu (μ)',
+          type: :number,
+          tooltip: "The raw OpenSkill estimate of the team's strength, before any allowance for how " \
+                   'certain that estimate is. Every team starts at 25.',
+          format: ->(value) { format_number.call(value, precision: 1) }
+        },
+        {
+          key: :sigma,
+          label: 'Sigma (σ)',
+          type: :number,
+          tooltip: 'How unsure the rating still is. It starts at 8.3 and shrinks with every match played, ' \
+                   'so a high value means too few matches to trust the number. The OpenSkill column is ' \
+                   'mu minus three sigma, which is why lightly played teams rank low.',
+          format: ->(value) { format_number.call(value, precision: 1) }
+        }
+      ]
+    %>
+
+    <%= sortable_table(columns: columns, rows: @rankings, id: 'team-rankings') %>
+
+    <p>
+      Ratings start even for every team and are updated match by match in
+      chronological order, so a high rating means beating strong opposition, not
+      simply playing a lot. Player skill draws on everyone ever fielded in one of the
+      team's lineups, not just its current roster &mdash; but individual ratings only
+      exist for players with parsed rounds, so check the rated players column before
+      reading much into it.
+    </p>
+  <% end %>
+</div>

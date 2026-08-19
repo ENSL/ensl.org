@@ -42,6 +42,11 @@ class Contest < ApplicationRecord
   TYPE_LEAGUE = 1
   TYPE_BRACKET = 2
 
+  # The site has no game column; NS1 contests are recognised by their legacy
+  # naming ("S7: Division 1", "Night..."), everything newer is NS2.
+  GAMES = %w[NS1 NS2].freeze
+  NS2_FIRST_CONTEST_ID = 113
+
   scope :active, -> { where.not(status: STATUS_CLOSED) }
   scope :inactive, -> { where(status: STATUS_CLOSED) }
   scope :joinable, lambda {
@@ -52,6 +57,13 @@ class Contest < ApplicationRecord
   scope :nsls1, -> { where('name LIKE ?', 'NSL S1:%') }
   scope :nsls2, -> { where('name LIKE ?', 'NSL S2:%') }
   scope :ns1seasons, -> { where('name LIKE ?', 'S%:%') }
+  scope :for_game, lambda { |key|
+    if key.to_s == 'NS1'
+      where('name LIKE ? OR name LIKE ?', 'S%:%', '%Night%')
+    else
+      where(arel_table[:id].gt(NS2_FIRST_CONTEST_ID))
+    end
+  }
 
   has_many :matches, dependent: :destroy
   has_many :weeks, dependent: :destroy
@@ -216,13 +228,7 @@ class Contest < ApplicationRecord
   end
 
   def self.historical(key)
-    scope = ordered.includes(:contesters)
-    case key
-    when 'NS1'
-      scope.where('name LIKE ? OR name LIKE ?', 'S%:%', '%Night%')
-    else
-      scope.where('id > ?', '113')
-    end
+    ordered.includes(:contesters).for_game(key)
   end
 
   def self.params(params, _cuser)

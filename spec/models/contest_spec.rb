@@ -147,7 +147,7 @@ RSpec.describe Contest, type: :model do
     end
 
     it 'filters to contests with an id greater than 113 for any other key' do
-      expect(Contest.historical('whatever').to_sql).to include("id > '113'")
+      expect(Contest.historical('whatever').to_sql).to include('`id` > 113')
     end
   end
 

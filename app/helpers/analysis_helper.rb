@@ -10,6 +10,7 @@ module AnalysisHelper
   #   key         - symbol used to look up the raw value in each row hash
   #   label       - column header text
   #   type        - :string (default) or :number; controls sort comparison
+  #   tooltip     - optional plain-text explanation shown when hovering the header
   #   sort_value  - optional proc(raw_value) -> comparable value (defaults to raw_value)
   #   format      - optional proc(raw_value) -> displayed value (defaults to raw_value)
   # rows: array of hashes, each keyed by every column's :key

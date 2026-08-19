@@ -15,6 +15,12 @@ module Analysis
         path_helper: :analysis_users_path
       },
       {
+        title: 'Team rankings',
+        description: 'OpenSkill ratings, records and tournament wins for every team, NS1 and NS2 separately.',
+        icon: 'users',
+        path_helper: :analysis_teams_path
+      },
+      {
         title: 'Map balance',
         description: 'Marine vs alien win rates for every map currently in rotation.',
         icon: 'map',
