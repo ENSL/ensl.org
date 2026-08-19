@@ -55,6 +55,8 @@ RSpec.configure do |config|
 
   config.filter_rails_from_backtrace!
 
+  config.include ActiveSupport::Testing::TimeHelpers
+
   config.include Controllers::JsonHelpers, type: :controller
   config.include Controllers::JsonHelpers, type: :request
   config.include Controllers::SessionHelpers, type: :controller

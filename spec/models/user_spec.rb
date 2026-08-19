@@ -660,6 +660,43 @@ describe User do
       expect(subject.touch_last_visit_if_stale!).to be(false)
     end
 
+    it 'updates lastvisit when it is older than the given threshold' do
+      subject = create(:user, lastvisit: 10.seconds.ago)
+
+      # A near-zero threshold means any past lastvisit counts as stale, so this
+      # exercises the update path without having to wait for the real default (2 minutes).
+      result = subject.touch_last_visit_if_stale!(threshold: 0.seconds)
+
+      expect(result).to be_truthy
+      expect(subject.reload.lastvisit).to be_within(5).of(Time.now.utc)
+    end
+
+    it 'leaves lastvisit untouched when it is newer than the given threshold' do
+      original = 10.seconds.ago
+      subject = create(:user, lastvisit: original)
+
+      result = subject.touch_last_visit_if_stale!(threshold: 1.minute)
+
+      expect(result).to be false
+      expect(subject.reload.lastvisit).to be_within(1).of(original)
+    end
+
+    it 'gives each newly created user a fresh lastvisit instead of one frozen at class load' do
+      # Regression test: `attribute :lastvisit, default: Time.now.utc` evaluates
+      # Time.now.utc exactly once (when the class body loads), so every user
+      # created afterwards without an explicit lastvisit shared that same
+      # frozen timestamp - it never advanced. Create three users at different
+      # points in time and prove their default lastvisit values actually
+      # differ (and track "now"), instead of all being identical.
+      user_a = travel_to(2.days.ago) { create(:user) }
+      user_b = travel_to(1.day.ago) { create(:user) }
+      user_c = create(:user)
+
+      expect(user_a.lastvisit).to be < user_b.lastvisit
+      expect(user_b.lastvisit).to be < user_c.lastvisit
+      expect(user_c.lastvisit).to be_within(5).of(Time.now.utc)
+    end
+
     it 'writes can_play flag as 0 in plugin_verified_buffer when user cannot play' do
       subject = create(:user, steamid: '0:1:456')
       allow(subject).to receive(:can_play?).and_return(false)

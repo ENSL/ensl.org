@@ -66,7 +66,7 @@ class User < ApplicationRecord
   # attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password, :password_updated, :password_force, :fullname, :random_password
 
-  attribute :lastvisit, :datetime, default: Time.now.utc
+  attribute :lastvisit, :datetime, default: -> { Time.now.utc }
   attribute :password_hash, :integer, default: PASSWORD_SCRYPT
 
   belongs_to :team, optional: true

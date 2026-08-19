@@ -10,6 +10,7 @@ class GathersController < ApplicationController
   end
 
   def show
+    Gatherer.kick_idle!(@gather)
     render layout: 'full'
   end
 
@@ -46,6 +47,7 @@ class GathersController < ApplicationController
       # Only the fields required by refresh + the version response are needed here.
       # Avoid Gather.basic (5 association JOINs) on every poll from 12 sessions.
       gather = Gather.find(params[:id])
+      Gatherer.kick_idle!(gather)
       gather.refresh_and_broadcast_if_status_changed!
 
       render json: { id: gather.id, version: gather.version }

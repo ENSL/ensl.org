@@ -21,7 +21,7 @@
 #
 
 class Gatherer < ApplicationRecord
-  IDLE_TIME = 600
+  IDLE_TIME = 3600
   EJECT_VOTES = 4
 
   STATE_ACTIVE = 0
@@ -64,7 +64,7 @@ class Gatherer < ApplicationRecord
   }
   scope :idle, lambda {
     joins('LEFT JOIN users ON users.id = gatherers.user_id')
-      .where('lastvisit < ?', 30.minutes.ago.utc)
+      .where('lastvisit < ?', IDLE_TIME.seconds.ago.utc)
   }
 
   belongs_to :user, optional: true
@@ -91,6 +91,28 @@ class Gatherer < ApplicationRecord
 
     def params(params, _cuser)
       params.require(:gatherer).permit(:status, :username, :user_id, :gather_id, :team, :votes, :confirm)
+    end
+
+    # Off by default: no automated idle kicking happens unless explicitly turned on.
+    def idle_kick_enabled?
+      ActiveModel::Type::Boolean.new.cast(ENV.fetch('GATHER_IDLE_KICK_ENABLED', 'false'))
+    end
+
+    # Removes idle gatherers from gathers still open for join. No-op when disabled.
+    # Scope to a single gather (e.g. the one currently being viewed) by passing
+    # gather. Returns the gatherers that were kicked.
+    def kick_idle!(gather = nil)
+      return [] unless idle_kick_enabled?
+
+      scope = idle.joins(:gather).merge(Gather.where(status: Gather::STATE_RUNNING))
+      scope = scope.where(gather_id: gather.id) if gather
+
+      scope.find_each.map do |gatherer|
+        kicked_gather = gatherer.gather
+        gatherer.destroy!
+        Gathers::Broadcaster.call(kicked_gather)
+        gatherer
+      end
     end
   end
 
