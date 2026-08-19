@@ -116,7 +116,8 @@ class GatherersController < ApplicationController
     render turbo_stream: [
       turbo_stream.replace('notification', partial: 'application/messages'),
       turbo_stream.replace(view_context.dom_id(@gather, :frame), partial: 'gathers/frame',
-                                                                 locals: { gather: @gather, gatherer: @gatherer })
+                                                                 locals: { gather: @gather, gatherer: @gatherer,
+                                                                           render_notification: false })
     ]
   end
 end
