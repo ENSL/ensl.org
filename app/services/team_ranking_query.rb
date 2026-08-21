@@ -55,12 +55,14 @@ class TeamRankingQuery
     rows = records.values.select { |record| record[:matches] >= @min_matches }
     teams = teams_by_id(rows.map { |record| record[:team_id] })
 
-    rows.filter_map do |record|
+    built_rows = rows.filter_map do |record|
       team = teams[record[:team_id]]
       next unless team
 
       build_row(record, team)
     end
+
+    built_rows.sort_by { |row| -row[:rating] }
   end
 
   private
