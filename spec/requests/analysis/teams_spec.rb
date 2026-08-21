@@ -15,7 +15,7 @@ RSpec.describe 'Analysis::TeamsController', type: :request do
       create(:match, contest: contest, contester1: contester1, contester2: contester2, match_time: 1.day.ago)
         .update!(score1: 3, score2: 1)
 
-      get '/analysis/teams', params: { game: 'NS2' }
+      get '/analysis/teams', params: { game: 'NS2', min_matches: 1 }
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Rated Squad')

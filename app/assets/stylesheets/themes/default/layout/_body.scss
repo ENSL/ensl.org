@@ -55,11 +55,11 @@ body#tinymce {
 
   // Used by layouts/full_wide instead of .full: the body-background images
   // are fixed-width strips meant for the 1020px column, so a wider page
-  // falls back to a plain fill instead of a background that stops partway
-  // across and leaves the rest of the row bare.
+  // falls back to a flat fill in the same gray instead of a background that
+  // stops partway across and leaves the rest of the row bare.
   &.full-wide {
     padding-top: 40px;
-    background: $base-body-color;
+    background: $light-gray;
   }
 
   &.no-body {
