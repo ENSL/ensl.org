@@ -1,29 +1,46 @@
+@use "sass:color";
 @use "../variables" as *;
 
 footer.footer {
   $footer-link-color: #5a5a5a;
 
-  background: url("layout/footer-background.png");
-  height: 155px;
-  max-height: 155px;
+  background-color: color.adjust(#5a5a5a, $lightness: -25%);
+  background-image: url("layout/footer-background.png");
+  background-repeat: repeat-x;
+  background-size: 15px 100%;
+  min-height: 155px;
 
   .content {
-    padding-top: $container-padding;
+    padding-top: 2em;
+    padding-bottom: 1em;
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 0.75rem;
+
+    ul {
+      margin: 0;
+    }
   }
 
   li {
     text-align: center;
+    font-size: 13px;
+    line-height: 1.35;
   }
 
   li a {
     color: $footer-link-color;
   }
 
-  li h3 a {
+  li h3 a,
+  li h3 {
     text-transform: uppercase;
     color: white;
-    font-size: 20px;
-  }  
+    font-size: 15px;
+  }
 
   p {
     color: $footer-link-color;

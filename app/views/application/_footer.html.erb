@@ -1,6 +1,11 @@
 <footer class="footer">
   <div class="content mx-auto max-w-[1020px]">
-    <div class="footer-links sm:grid sm:grid-cols-4 sm:gap-x-4">
+    <div class="footer-links">
+      <ul>
+        <li><h3><%= link_to "News", root_path %></h3></li>
+        <li><%= link_to "Twitter", "https://twitter.com/nslnews" %></li>
+        <li><%= link_to "Steam", "http://steamcommunity.com/groups/nsleagues" %></li>
+      </ul>
       <ul>
         <li><h3><%= link_to "Contests", current_contests_path %></h3></li>
         <li><%= link_to "Current", current_contests_path %></li>
@@ -8,9 +13,9 @@
         <li><%= link_to "NS1 History", historical_contests_path(id: "NS1") %></li>
       </ul>
       <ul>
-        <li><h3><%= link_to "Gathers", Gather.last %></h3></li>
+        <li><h3><%= link_to "Gathers", article_url(464) %></h3></li>
         <li><%= link_to "Introduction", article_path(464) %></li>
-        <li><%= link_to "Archives", gathers_path %></li>
+        <li><%= link_to "Archives", "/gathers/" %></li>
       </ul>
       <ul>
         <li><h3><%= link_to "Articles", articles_path %></h3></li>
@@ -21,7 +26,17 @@
       <ul>
         <li><h3><%= link_to "Forums", forums_path %></h3></li>
         <li><%= link_to "Index", forums_path %></li>
-        <li><%= link_to "Rules", topic_path(12) %></li>
+        <li><%= link_to "Rules", "/topics/640" %></li>
+      </ul>
+      <ul>
+        <li><h3>League</h3></li>
+        <li><%= link_to "Users", users_path %></li>
+        <li><%= link_to "Stats", analysis_root_path %></li>
+        <li><%= link_to "Teams", teams_path %></li>
+        <li><%= link_to "Staff", about_staff_path %></li>
+        <li><%= link_to "Bans", bans_url %></li>
+        <li><%= link_to "Servers", servers_url %></li>
+        <li><%= link_to "Contact", new_issue_path %></li>
       </ul>
     </div>
     <p>&copy; <%= Time.zone.now.year %> NSL</p>
