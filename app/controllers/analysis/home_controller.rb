@@ -27,8 +27,8 @@ module Analysis
         path_helper: :analysis_maps_path
       },
       {
-        title: 'NS1 pick order',
-        description: 'How fast NS1 players usually get picked when gather teams are drafted.',
+        title: 'NS1 Gather Rankings',
+        description: 'Pick-order-based NS1 gather rankings, including a draft-only OpenSkill score.',
         icon: 'sort-numeric-down',
         path_helper: :analysis_pick_orders_path
       }

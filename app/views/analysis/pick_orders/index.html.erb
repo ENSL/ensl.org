@@ -1,24 +1,25 @@
-<h1 class="title">NS1 pick order rankings</h1>
+<h1 class="title">NS1 Gather Rankings</h1>
 
 <div class="box wide">
   <p>
-    How fast each player usually gets picked when NS1 gather teams are drafted &mdash;
-    lower average pick number means picked sooner. Captain appearances are excluded from a
-    player's average, since captains are voted in rather than skill-picked; this doesn't
-    affect a captain's own ranking otherwise. Click a column header to sort.
+    NS1 gather rankings from draft behavior only. The OpenSkill ranking here is replayed
+    entirely from pick order history (not from match outcomes), so getting picked early in
+    stronger drafts is worth more than the same pick in weaker drafts. Captain appearances
+    are excluded from pick-order calculations because captains are voted in. Click a column
+    header to sort.
   </p>
 
   <%= form_with url: analysis_pick_orders_path, method: :get, local: true do %>
     <p>
-      <%= label_tag :min_picks, 'Minimum picks:' %>
-      <%= select_tag :min_picks,
-                     options_for_select(@min_picks_options.map { |n| [n, n] }, @selected_min_picks),
+      <%= label_tag :min_games, 'Minimum games:' %>
+      <%= select_tag :min_games,
+                     options_for_select(@min_games_options.map { |n| [n, n] }, @selected_min_games),
                      onchange: 'this.form.requestSubmit()' %>
     </p>
   <% end %>
 
   <% if @rankings.empty? %>
-    <p>No NS1 pick data is available yet.</p>
+    <p>No NS1 gather draft data is available yet.</p>
   <% else %>
     <%
       columns = [
@@ -30,12 +31,24 @@
           format: ->(user) { namelink(user) }
         },
         {
+          key: :pick_openskill,
+          label: 'OpenSkill ranking',
+          type: :number,
+          format: ->(value) { number_with_precision(value, precision: 3) }
+        },
+        {
           key: :average_pick_order,
           label: 'Average pick #',
           type: :number,
           format: ->(value) { number_with_precision(value, precision: 2) }
         },
-        { key: :picks_count, label: 'Picks', type: :number, format: ->(value) { value.to_i } }
+        {
+          key: :captain_percentage,
+          label: '% captain',
+          type: :number,
+          format: ->(value) { number_with_precision(value, precision: 1) + '%' }
+        },
+        { key: :games_count, label: 'Games', type: :number, format: ->(value) { value.to_i } }
       ]
     %>
 
