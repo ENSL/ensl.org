@@ -345,7 +345,10 @@ class User < ApplicationRecord
   def touch_last_visit_if_stale!(threshold: 2.minutes)
     return false unless lastvisit&.<(threshold.ago.utc)
 
-    update(lastvisit: Time.now.utc)
+    # update_columns bypasses validations: this bookkeeping write must not be
+    # silently blocked by unrelated legacy data issues on the record (e.g. a
+    # username that only now collides case-insensitively with another user).
+    update_columns(lastvisit: Time.now.utc)
   end
 
   def ensure_profile!
@@ -547,7 +550,12 @@ class User < ApplicationRecord
   # This serves multiple functions
   def send_new_password
     generate_password unless raw_password&.length.to_i.positive?
-    save!
+    # save(validate: false) skips before_validation too, so update_password (which
+    # hashes raw_password into password) must be called explicitly beforehand.
+    # Password reset is system-generated (not raw user input) and must not be
+    # blocked by unrelated legacy data problems on the record.
+    update_password
+    save!(validate: false)
 
     send_password_message
     Notifications.password(self, raw_password).deliver
@@ -581,8 +589,9 @@ class User < ApplicationRecord
   end
 
   # Records a successful login by stamping the user's last IP and visit time.
+  # update_columns bypasses validations, same reasoning as touch_last_visit_if_stale!.
   def record_login!(ip)
-    update(lastip: ip, lastvisit: Time.now.utc)
+    update_columns(lastip: ip, lastvisit: Time.now.utc)
   end
 
   def apply_login_state!(verified_steamid:)
@@ -602,7 +611,8 @@ class User < ApplicationRecord
   def attach_verified_steamid!(verified_steamid)
     return false if verified_steamid.blank? || steamid == verified_steamid
 
-    update(steamid: verified_steamid)
+    # Steam-verified, not typed by the user - same reasoning as touch_last_visit_if_stale!.
+    update_columns(steamid: verified_steamid)
   end
 
   def can_create?(_cuser)

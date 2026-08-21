@@ -38,6 +38,24 @@ RSpec.describe 'User login', type: :request do
     expect(flash[:notice]).to be_present
   end
 
+  it 'still records lastip/lastvisit on login for a user invalid due to unrelated legacy data' do
+    # Big-picture regression: production had real users whose accounts were
+    # invalid for reasons unrelated to login (e.g. a username that now collides
+    # case-insensitively with someone else's after a rename). That must not
+    # block ordinary operations like logging in and stamping lastip/lastvisit.
+    create(:user, username: 'DupeLoginFlow')
+    u = create(:user, username: 'legacy_dupe_login', raw_password: raw_password)
+    u.update_column(:username, 'dupeloginflow')
+    expect(u.reload).not_to be_valid
+
+    login_post('dupeloginflow', raw_password)
+
+    expect(flash[:notice]).to be_present
+    u.reload
+    expect(u.lastip).to be_present
+    expect(u.lastvisit).to be_within(5).of(Time.now.utc)
+  end
+
   it 'redirects to root if return_to points to an error page' do
     u = create(:user, username: 'return_user', raw_password: raw_password)
 

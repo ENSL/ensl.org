@@ -263,6 +263,20 @@ describe User do
       expect(msg.recipient).to eq(u)
     end
 
+    it 'send_new_password still resets the password for a record invalid due to unrelated legacy data' do
+      # Password reset is system-generated, not raw user input (see generate_password),
+      # so it must not be blocked by e.g. a case-insensitive duplicate username.
+      create(:user, username: 'DupeReset')
+      u = create(:user)
+      u.update_column(:username, 'dupereset')
+
+      expect(u.reload).not_to be_valid
+
+      old_password = u.password
+      expect { u.send_new_password }.not_to raise_error
+      expect(u.reload.password).not_to eq(old_password)
+    end
+
     it '.reset_password_for_identity resets only matching username/email pairs' do
       u = create(:user)
       allow_any_instance_of(User).to receive(:send_new_password).and_return(true)
@@ -549,6 +563,38 @@ describe User do
         expect(result).to eq(banned: true, password_upgraded: false, steamid_updated: false)
         expect(subject.reload.steamid).to eq('0:1:123')
       end
+
+      it 'still links a verified steamid when the record is invalid due to unrelated legacy data' do
+        # Steam-verified, not typed by the user, so an unrelated legacy problem
+        # (a case-insensitive duplicate username here) must not block it.
+        create(:user, username: 'DupeSteam')
+        subject = create(:user, steamid: '0:1:123')
+        subject.update_column(:username, 'dupesteam')
+
+        expect(subject.reload).not_to be_valid
+
+        result = subject.apply_login_state!(verified_steamid: '0:1:456')
+
+        expect(result).to eq(banned: false, password_upgraded: false, steamid_updated: true)
+        expect(subject.reload.steamid).to eq('0:1:456')
+      end
+    end
+
+    describe '#record_login!' do
+      it 'stamps lastip and lastvisit even when the record is invalid due to unrelated legacy data' do
+        create(:user, username: 'DupeLogin')
+        subject = create(:user)
+        subject.update_column(:username, 'dupelogin')
+
+        expect(subject.reload).not_to be_valid
+        expect(subject.errors[:username]).to include('has already been taken')
+
+        subject.record_login!('203.0.113.9')
+
+        subject.reload
+        expect(subject.lastip).to eq('203.0.113.9')
+        expect(subject.lastvisit).to be_within(5).of(Time.now.utc)
+      end
     end
 
     describe '#ensure_profile!' do
@@ -679,6 +725,37 @@ describe User do
 
       expect(result).to be false
       expect(subject.reload.lastvisit).to be_within(1).of(original)
+    end
+
+    it 'still updates lastvisit when the record is invalid due to unrelated legacy data, ' \
+       'e.g. a username that now collides case-insensitively' do
+      # Production bug: touch_last_visit_if_stale! used `update`, which runs full
+      # validation. Any pre-existing legacy data problem unrelated to lastvisit
+      # (duplicate username differing only by case, in this case) made the write
+      # silently fail forever, no matter how often the user visited the site.
+      create(:user, username: 'DupeName')
+      subject = create(:user, lastvisit: 10.seconds.ago)
+      subject.update_column(:username, 'dupename')
+
+      expect(subject.reload).not_to be_valid
+      expect(subject.errors[:username]).to include('has already been taken')
+
+      result = subject.touch_last_visit_if_stale!(threshold: 0.seconds)
+
+      expect(result).to be_truthy
+      expect(subject.reload.lastvisit).to be_within(5).of(Time.now.utc)
+    end
+
+    it 'still rejects a user trying to rename themselves to an existing case-insensitive duplicate username' do
+      # The bypasses above are only for system/bookkeeping writes that don't carry
+      # direct user input. A user's own self-service update must still go through
+      # full validation, so they can't make a previously-valid record invalid.
+      create(:user, username: 'TakenName')
+      subject = create(:user, username: 'MyOwnName')
+
+      expect(subject.update(username: 'takenname')).to be false
+      expect(subject.errors[:username]).to include('has already been taken')
+      expect(subject.reload.username).to eq('MyOwnName')
     end
 
     it 'gives each newly created user a fresh lastvisit instead of one frozen at class load' do

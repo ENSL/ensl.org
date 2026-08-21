@@ -279,6 +279,17 @@ RSpec.describe 'UsersController', type: :request do
       expect(flash[:error]).to be_present
     end
 
+    it 'rejects renaming to a case-insensitive duplicate username, even for admins' do
+      create(:user, username: 'ExistingName')
+      login_as(admin)
+
+      patch "/users/#{user.id}", params: { user: { username: 'existingname' } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+      expect(user.reload.username).not_to eq('existingname')
+    end
+
     it 'returns 403 when another non-admin tries to update the user' do
       other_user = create(:user)
       login_as(other_user)
