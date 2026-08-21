@@ -21,6 +21,45 @@ RSpec.describe GathersHelper, type: :helper do
     end
   end
 
+  describe '#gather_header_badge' do
+    it 'describes a running gather as still filling up' do
+      badge = helper.gather_header_badge(instance_double(Gather, status: Gather::STATE_RUNNING))
+      expect(badge[:description]).to match(/filling up/)
+      expect(badge[:classes]).to match(/bg-sky-600/)
+      expect(badge[:classes]).to match(/text-white/)
+    end
+
+    it 'describes a voting gather' do
+      badge = helper.gather_header_badge(instance_double(Gather, status: Gather::STATE_VOTING))
+      expect(badge[:description]).to match(/Voting/)
+      expect(badge[:classes]).to match(/bg-emerald-600/)
+      expect(badge[:classes]).to match(/text-white/)
+    end
+
+    it 'describes a picking gather with a slot still open' do
+      gather = instance_double(Gather, status: Gather::STATE_PICKING, picking_slot_available?: true)
+      badge = helper.gather_header_badge(gather)
+      expect(badge[:description]).to match(/picking teams/)
+      expect(badge[:classes]).to match(/bg-orange-600/)
+      expect(badge[:classes]).to match(/text-white/)
+    end
+
+    it 'describes a picking gather with teams already full as finished' do
+      gather = instance_double(Gather, status: Gather::STATE_PICKING, picking_slot_available?: false)
+      badge = helper.gather_header_badge(gather)
+      expect(badge[:description]).to match(/finished/)
+      expect(badge[:classes]).to match(/bg-gray-100/)
+      expect(badge[:classes]).to match(/text-gray-900/)
+    end
+
+    it 'describes a finished gather' do
+      badge = helper.gather_header_badge(instance_double(Gather, status: Gather::STATE_FINISHED))
+      expect(badge[:description]).to match(/finished/)
+      expect(badge[:classes]).to match(/bg-gray-100/)
+      expect(badge[:classes]).to match(/text-gray-900/)
+    end
+  end
+
   describe '#render_gather' do
     before do
       allow(helper).to receive(:headers).and_return({})

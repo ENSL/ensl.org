@@ -1,6 +1,19 @@
 <header data-turbo="false">
   <div class="banner <%= 'authenticated' if cuser %>">
-    <div class="mx-auto max-w-[1020px]">
+    <div class="relative mx-auto max-w-[1020px]">
+      <% if cuser && (active_gather = active_gather_for_header) && @gather&.id != active_gather.id %>
+        <%# Positioned clear of the ~360px-wide logo image that overhangs the left of the banner %>
+        <% badge = gather_header_badge(active_gather) %>
+        <%= link_to gather_path(active_gather),
+              class: "absolute left-[380px] top-1/2 -translate-y-1/2 inline-flex items-center gap-3 rounded-full px-4 py-2 shadow-lg transition-transform hover:scale-105 #{badge[:classes]}",
+              title: badge[:description] do %>
+          <%= fa_icon badge[:icon], class: 'text-lg' %>
+          <span class="flex flex-col leading-tight">
+            <span class="text-xs font-bold uppercase tracking-wide">You've signed up for <%= active_gather.category&.name %> Gather.</span>
+            <span class="text-[11px] font-normal normal-case opacity-90"><%= badge[:description] %></span>
+          </span>
+        <% end %>
+      <% end %>
       <div id="authentication" class="ml-auto <%= cuser ? 'w-1/4' : 'w-1/2' %> <%= 'admin' if cuser && cuser.admin? %>">
         <% if cuser %>
           <%= render partial: "widgets/logged" %>

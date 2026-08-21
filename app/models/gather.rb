@@ -37,6 +37,7 @@ class Gather < ApplicationRecord
   FULL = 12
   SERVERS = [3, 5, 23, 21, 22].freeze
   VOTING_TIMEOUT_SECONDS = 60
+  RECENT_ACTIVITY_WINDOW = 1.hour
   PICK_STRATEGY_DEFAULT = Gathers::PickPlan::DEFAULT_STRATEGY
   PICK_STRATEGIES = Gathers::PickPlan::STRATEGIES.keys.freeze
 
@@ -88,8 +89,43 @@ class Gather < ApplicationRecord
       find_game(name)&.gathers&.ordered&.first
     end
 
+    # Gather a user should be pointed back to: one they're currently in, or one that
+    # finished recently enough that they might still be lingering around (e.g. checking
+    # server info). A gather stops being "active" once an hour has passed since voting/
+    # picking started (covers abandoned gathers stuck mid-pick) or once superseded by a
+    # newer gather in the same category.
+    def active_for_user(user)
+      return nil unless user
+
+      in_progress = user.gathers.where(status: [STATE_RUNNING, STATE_VOTING, STATE_PICKING])
+                        .order(id: :desc)
+                        .find { |gather| gather.status == STATE_RUNNING || gather_recently_started_picking?(gather) }
+      return in_progress if in_progress
+
+      recent = user.gathers.where(status: STATE_FINISHED)
+                   .where('gathers.updated_at > ?', RECENT_ACTIVITY_WINDOW.ago)
+                   .order(id: :desc).first
+      return nil unless recent
+
+      # A follow-up gather is auto-created the moment voting ends (see complete_voting!),
+      # long before this one reaches FINISHED, so its mere existence doesn't mean much.
+      # Only treat the old one as superseded once players have actually started joining it.
+      superseded = where(category_id: recent.category_id).where('gathers.id > ?', recent.id).joins(:gatherers).exists?
+      superseded ? nil : recent
+    end
+
     def params(params, _cuser)
       params.require(:gather).permit(:status, :captain1_id, :captain2_id, :map1_id, :map2_id, :server_id, :turn)
+    end
+
+    private
+
+    # Falls back to updated_at when voting_start_time is unavailable (e.g. a gatherer
+    # left mid-pick, dropping the count below FULL) so a stuck gather can't stay
+    # "active" forever just because its pick-start time can't be computed.
+    def gather_recently_started_picking?(gather)
+      start_time = gather.voting_start_time || gather.updated_at
+      start_time.present? && start_time > RECENT_ACTIVITY_WINDOW.ago
     end
   end
 

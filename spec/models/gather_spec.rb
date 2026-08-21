@@ -44,6 +44,111 @@ RSpec.describe Gather, type: :model do
     end
   end
 
+  describe '.active_for_user' do
+    it 'returns nil for a nil user' do
+      expect(described_class.active_for_user(nil)).to be_nil
+    end
+
+    it 'returns the in-progress gather the user belongs to' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      gather.update_column(:status, Gather::STATE_VOTING)
+      create(:gatherer, gather: gather, user: user)
+
+      expect(described_class.active_for_user(user)).to eq(gather)
+    end
+
+    it 'returns an in-progress gather that started picking within the recent-activity window' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      create(:gatherer, gather: gather, user: user)
+      create_list(:gatherer, 11, gather: gather)
+      gather.update_column(:status, Gather::STATE_VOTING)
+
+      expect(described_class.active_for_user(user)).to eq(gather)
+    end
+
+    it 'ignores an in-progress gather that started picking longer ago than the recent-activity window' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      create(:gatherer, gather: gather, user: user)
+      create_list(:gatherer, 11, gather: gather)
+      gather.gatherers.update_all(created_at: 2.hours.ago)
+      gather.update_column(:status, Gather::STATE_PICKING)
+
+      expect(described_class.active_for_user(user)).to be_nil
+    end
+
+    it 'ignores a stale picking gather whose pick-start time cannot be computed ' \
+       '(e.g. a gatherer left, dropping the count below FULL)' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      create(:gatherer, gather: gather, user: user)
+      create_list(:gatherer, 5, gather: gather)
+      gather.update_column(:status, Gather::STATE_PICKING)
+      gather.update_column(:updated_at, 2.hours.ago)
+
+      expect(gather.voting_start_time).to be_nil
+      expect(described_class.active_for_user(user)).to be_nil
+    end
+
+    it 'returns a recently finished gather the user belongs to' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      gather.update_column(:status, Gather::STATE_FINISHED)
+      create(:gatherer, gather: gather, user: user)
+
+      expect(described_class.active_for_user(user)).to eq(gather)
+    end
+
+    it 'ignores a gather finished longer ago than the recently-finished window' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      gather.update_column(:status, Gather::STATE_FINISHED)
+      create(:gatherer, gather: gather, user: user)
+      gather.update_column(:updated_at, 2.hours.ago)
+
+      expect(described_class.active_for_user(user)).to be_nil
+    end
+
+    it 'still returns a recently finished gather when the follow-up gather has no players yet' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      gather.update_column(:status, Gather::STATE_FINISHED)
+      create(:gatherer, gather: gather, user: user)
+      create(:gather, category: category) # empty follow-up, auto-created when voting ended
+
+      expect(described_class.active_for_user(user)).to eq(gather)
+    end
+
+    it 'ignores a recently finished gather once players have started joining the newer gather' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      gather = create(:gather, category: category)
+      gather.update_column(:status, Gather::STATE_FINISHED)
+      create(:gatherer, gather: gather, user: user)
+      newer_gather = create(:gather, category: category)
+      create(:gatherer, gather: newer_gather)
+
+      expect(described_class.active_for_user(user)).to be_nil
+    end
+
+    it 'ignores gathers the user does not belong to' do
+      user = create(:user)
+      category = create(:category, name: 'ns2', domain: Category::DOMAIN_GAMES)
+      create(:gather, category: category, status: Gather::STATE_RUNNING)
+
+      expect(described_class.active_for_user(user)).to be_nil
+    end
+  end
+
   describe '#admin_update' do
     it 'updates the gather and broadcasts on success' do
       gather = create(:gather)

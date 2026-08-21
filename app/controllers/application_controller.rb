@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   helper :all
   helper_method :strip
   helper_method :error_container_id_for, :error_wrapper_id_for
+  helper_method :active_gather_for_header
 
   before_action :set_controller_and_action_names
   before_action :set_paper_trail_whodunnit
@@ -95,6 +96,13 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def active_gather_for_header
+    return nil unless cuser
+    return @active_gather_for_header if defined?(@active_gather_for_header)
+
+    @active_gather_for_header = Gather.active_for_user(cuser)
+  end
 
   def error_container_id_for(record)
     "#{dom_id(record)}_errors"
