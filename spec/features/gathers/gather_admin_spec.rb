@@ -91,6 +91,20 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     end
   end
 
+  scenario 'admin only sees the new gather control before the gather starts' do
+    gather.update!(status: Gather::STATE_RUNNING)
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(gather)
+
+      expect(page).to have_button('Start New Gather')
+      expect(page).to have_no_button('Restart Gather')
+      expect(page).to have_no_button('Change Turn')
+      expect(page).to have_no_button('Replace Player')
+    end
+  end
+
   scenario 'admin starts a new gather and new users can join' do
     new_gather = nil
     Capybara.using_session('admin') do

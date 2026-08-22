@@ -1,5 +1,6 @@
 <h1>Gather Admin: #<%= @gather.id %></h1>
 
+<% unless @gather.status == Gather::STATE_RUNNING %>
 <div class="restart">
     <h3>Restart Gather</h3>
 
@@ -57,6 +58,7 @@
     <% end %>
     <% end %>
 </div>
+<% end %>
 
 <div class="restart">
     <h3>Start New</h3>
