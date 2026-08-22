@@ -172,6 +172,7 @@ RSpec.describe Team, type: :model do
           name: 'Allowed',
           tag: 'TAG',
           comment: 'Hello',
+          teamers_count: 500,
           created_at: Time.current,
           updated_at: Time.current
         }
@@ -183,6 +184,7 @@ RSpec.describe Team, type: :model do
       expect(permitted.to_h).not_to have_key('id')
       expect(permitted.to_h).not_to have_key('active')
       expect(permitted.to_h).not_to have_key('founder_id')
+      expect(permitted.to_h).not_to have_key('teamers_count')
     end
   end
 end

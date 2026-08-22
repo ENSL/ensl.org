@@ -191,7 +191,7 @@ class Team < ApplicationRecord
     return {} unless params
 
     if params[:team].present?
-      params.require(:team).permit!.except(:id, :active, :founder_id, :created_at, :updated_at)
+      params.require(:team).permit(:name, :irc, :web, :tag, :country, :comment, :recruiting, :logo)
     else
       {}
     end

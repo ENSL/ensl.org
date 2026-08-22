@@ -3,6 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe Profile, type: :model do
+  describe '.params' do
+    it 'permits current profile fields and rejects legacy and protected fields' do
+      params = ActionController::Parameters.new(
+        profile: { town: 'Oslo', notify_pms: false, psu: '750W', user_id: 123, achievements_parsed: 'injected' }
+      )
+
+      expect(described_class.params(params, nil).to_h).to eq('town' => 'Oslo', 'notify_pms' => false)
+    end
+  end
+
   describe '#init_steam_profile' do
     it 'extracts numeric ids from profile URLs' do
       profile = build(:profile, steam_profile: 'http://steamcommunity.com/profiles/76561198000000000')

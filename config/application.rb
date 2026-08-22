@@ -13,9 +13,6 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-# FIXME
-ActionController::Parameters.permit_all_parameters = true
-
 module ActionDispatch
   module Session
     class MyCustomStore < ActionDispatch::Session::CookieStore

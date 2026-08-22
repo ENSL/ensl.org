@@ -34,6 +34,24 @@ require 'rails_helper'
 describe User do
   let!(:user) { create :user }
 
+  describe '.params' do
+    it 'permits current nested profile fields and rejects legacy and protected fields' do
+      params = ActionController::Parameters.new(
+        user: {
+          firstname: 'Jane',
+          profile_attributes: { town: 'Oslo', psu: '750W', user_id: 123, signature_parsed: 'injected' }
+        }
+      )
+
+      permitted = described_class.params(params, user, 'update').to_h
+
+      expect(permitted).to eq(
+        'firstname' => 'Jane',
+        'profile_attributes' => { 'town' => 'Oslo' }
+      )
+    end
+  end
+
   describe '.normalize_steamid' do
     it 'returns nil for nil and blank values' do
       expect(described_class.normalize_steamid(nil)).to be_nil

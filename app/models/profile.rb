@@ -65,6 +65,12 @@
 class Profile < ApplicationRecord
   include Extra
 
+  PERMITTED_ATTRIBUTES = %i[
+    steam_profile web achievements signature avatar stream town
+    notify_news notify_articles notify_movies notify_gather notify_own_match
+    notify_any_match notify_challenge notify_pms
+  ].freeze
+
   # attr_protected :user_id, :id, :updated_at, :created_at
 
   belongs_to :user, optional: true
@@ -108,6 +114,6 @@ class Profile < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    params.require(:profile).except!(:id, :user_id, :updated_at).permit!
+    params.require(:profile).permit(*PERMITTED_ATTRIBUTES)
   end
 end
