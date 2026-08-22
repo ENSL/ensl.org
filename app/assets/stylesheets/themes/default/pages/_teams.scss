@@ -33,6 +33,16 @@
     }
   }
 
+  form.join-team {
+    display: flow-root;
+    margin: 20px 0;
+
+    .controls {
+      width: auto;
+      margin: 0;
+    }
+  }
+
   .controls {
     display: flow-root;
     width: 100%;

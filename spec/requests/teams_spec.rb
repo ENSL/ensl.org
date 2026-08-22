@@ -31,6 +31,24 @@ RSpec.describe 'TeamsController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Show Team')
+
+      page = Nokogiri::HTML(response.body)
+      expect(page.at_css('#team-profile img.logo')['src']).to eq('/images/icons/noavatar.png')
+      expect(page.css('#team .tab').map { |panel| panel['id'] }).to eq(%w[general members matches statistics])
+      expect(page.at_css('#statistics').text).to include('0.0 %')
+      expect(page.at_css('#statistics').text).not_to include('NaN')
+    end
+
+    it 'keeps the join action in its own row before the team tabs' do
+      team = create(:team)
+      login_as(user)
+
+      get team_path(team)
+
+      page = Nokogiri::HTML(response.body)
+      join_form = page.at_css('#team-profile > form.join-team')
+      expect(join_form).to be_present
+      expect(join_form.next_element['id']).to eq('team')
     end
   end
 

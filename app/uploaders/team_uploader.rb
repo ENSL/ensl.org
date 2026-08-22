@@ -10,6 +10,6 @@ class TeamUploader < ImageUploader
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
   def default_url
-    '/images/icons/noavatar.jpg'
+    '/images/icons/noavatar.png'
   end
 end
