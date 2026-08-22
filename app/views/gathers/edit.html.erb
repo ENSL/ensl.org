@@ -60,6 +60,25 @@
 </div>
 <% end %>
 
+<% if @gather.open_for_join? %>
+<div class="add-player">
+    <h3>Add Player</h3>
+
+    <%= form_for Gatherer.new(gather: @gather), html: { class: 'square' } do |f| %>
+    <%= f.hidden_field :gather_id %>
+    <%= f.hidden_field :confirm, value: '1' %>
+
+    <div class="fields horizontal">
+        <%= f.label :username, "Username" %>
+        <%= f.text_field :username %>
+    </div>
+    <div class="controls">
+        <%= f.submit 'Add Player' %>
+    </div>
+    <% end %>
+</div>
+<% end %>
+
 <div class="restart">
     <h3>Start New</h3>
     <%= form_for Gather.new do |f| %>

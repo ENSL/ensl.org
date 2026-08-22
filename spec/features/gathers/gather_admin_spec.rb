@@ -105,6 +105,45 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     end
   end
 
+  scenario 'admin adds the last player and other players see voting start' do
+    open_gather = FactoryBot.create(:gather, maps_count: 3, servers_count: 2)
+    joined_users = FactoryBot.create_list(:user, Gather::FULL - 1, raw_password: 'password123')
+    joined_users.each { |user| open_gather.gatherers.create!(user: user) }
+    added_user = FactoryBot.create(:user, raw_password: 'password123')
+
+    Capybara.using_session('observer') do
+      sign_in_via_session(joined_users.first)
+      visit gather_path(open_gather)
+      expect(page).to have_content('1 more needed')
+    end
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(open_gather)
+      fill_in 'Username', with: added_user.username
+      click_button 'Add Player'
+      expect(page).to have_content(I18n.t('gathers.join'))
+    end
+
+    expect(open_gather.reload.status).to eq(Gather::STATE_VOTING)
+    expect(open_gather.gatherers.of_user(added_user)).to exist
+
+    Capybara.using_session('observer') do
+      expect(page).to have_content('Please vote captains and maps.', wait: 10)
+    end
+  end
+
+  scenario 'admin cannot add a player to a full gather' do
+    gather.update!(status: Gather::STATE_RUNNING)
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(gather)
+
+      expect(page).to have_no_button('Add Player')
+    end
+  end
+
   scenario 'admin starts a new gather and new users can join' do
     new_gather = nil
     Capybara.using_session('admin') do

@@ -161,7 +161,11 @@ class Gatherer < ApplicationRecord
   end
 
   def can_create?(cuser, _params = {})
-    joining_actor?(cuser) && gather.open_for_join? && gather.gatherers.of_user(cuser).none?
+    return false unless gather.open_for_join?
+
+    return delegated_join_allowed?(cuser) if username.present?
+
+    joining_actor?(cuser) && gather.gatherers.of_user(cuser).none?
   end
 
   def can_update?(cuser, params = {})
@@ -221,6 +225,13 @@ class Gatherer < ApplicationRecord
     return false unless cuser
 
     user == cuser && !cuser.banned?(Ban::TYPE_GATHER)
+  end
+
+  def delegated_join_allowed?(cuser)
+    return false unless cuser && privileged?(cuser)
+
+    self.user = User.find_by(username: username)
+    user.present? && !user.banned?(Ban::TYPE_GATHER) && gather.gatherers.of_user(user).none?
   end
 
   def privileged?(cuser)

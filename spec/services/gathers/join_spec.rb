@@ -66,6 +66,27 @@ describe Gathers::Join do
       expect(result.success?).to be(false)
     end
 
+    it 'allows an admin to join another user by username' do
+      admin = create(:user, :admin)
+      result = described_class.call(
+        actor: admin,
+        params: { gather_id: gather.id, username: user.username, confirm: '1' }
+      )
+
+      expect(result.success?).to be(true)
+      expect(result.gatherer.user).to eq(user)
+    end
+
+    it 'prevents an ordinary user from joining another user by username' do
+      other_user = create(:user)
+      result = described_class.call(
+        actor: other_user,
+        params: { gather_id: gather.id, username: user.username, confirm: '1' }
+      )
+
+      expect(result.success?).to be(false)
+    end
+
     it 'prevents nil actor from joining' do
       result = described_class.call(actor: nil, params: join_params)
       expect(result.success?).to be(false)
@@ -140,9 +161,20 @@ describe Gathers::Join do
       create_list(:gatherer, Gather::FULL, gather: gather)
     end
 
-    it 'still allows joining' do
+    it 'prevents self-joining' do
       result = described_class.call(actor: user, params: join_params)
-      expect(result.success?).to be(false) # Should fail due to gather being full
+      expect(result.success?).to be(false)
+    end
+
+    it 'prevents an admin from joining another user' do
+      gather.update!(status: Gather::STATE_RUNNING)
+      admin = create(:user, :admin)
+      result = described_class.call(
+        actor: admin,
+        params: { gather_id: gather.id, username: user.username, confirm: '1' }
+      )
+
+      expect(result.success?).to be(false)
     end
   end
 end
