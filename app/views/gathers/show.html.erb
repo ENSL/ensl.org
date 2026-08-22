@@ -23,6 +23,10 @@
     </span>
   </h1>
 
+  <% if @gather.status == Gather::STATE_FINISHED && (started_at = @gather.voting_start_time) %>
+    <h5 class="title text-center gather-started-at">Started <%= longtime started_at %></h5>
+  <% end %>
+
   <div class="flex justify-between">
     <div class="previous">
       <%= link_to @gather.previous_gather, class: 'button tiny' do %>
