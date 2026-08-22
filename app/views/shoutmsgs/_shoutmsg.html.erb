@@ -9,7 +9,9 @@
       <% end %>
     </span>
     <span class="time">
-      <%= local_time(shoutmsg.created_at || Time.current, format: '%H:%M') %>
+      <% timestamp = shoutmsg.created_at || Time.current %>
+      <% timestamp_format = shoutmsg.shoutable_type == 'Gather' && timestamp.to_date != Time.zone.today ? '%b %d, %H:%M' : '%H:%M' %>
+      <%= local_time(timestamp, format: timestamp_format) %>
     </span>
   </div>
   <div class="message">

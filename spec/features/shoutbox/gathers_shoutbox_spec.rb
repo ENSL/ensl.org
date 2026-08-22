@@ -74,6 +74,26 @@ feature 'Gathers', js: true do
       expect(find('#sidebar')).to have_content 'You have been muted.'
     end
 
+    scenario 'dates older gather messages without changing the main shoutbox' do
+      create(:shoutmsg, shoutable: gather, created_at: 1.day.ago, text: 'Older gather message')
+      create(:shoutmsg, shoutable: gather, created_at: Time.current, text: 'Today gather message')
+      create(:shoutmsg, created_at: 1.day.ago, text: 'Older main message')
+
+      visit gather_path(gather)
+
+      within(gather_selector) do
+        expect(page).to have_css('.shoutmsg:first-child time[data-format="%b %d, %H:%M"]')
+        expect(page).to have_css('.shoutmsg:last-child time[data-format="%H:%M"]')
+      end
+
+      visit root_path
+
+      within('#shoutbox') do
+        expect(page).to have_css('time[data-format="%H:%M"]')
+        expect(page).not_to have_css('time[data-format="%b %d, %H:%M"]')
+      end
+    end
+
     scenario 'gather shoutbox is scrollable, keeps full buffer, appends at bottom, and autoscrolls to latest' do
       prefix = "gather-buffer-#{SecureRandom.hex(4)}"
       12.times { |n| create(:shoutmsg, shoutable: gather, user: user, text: "#{prefix}-#{n}") }
