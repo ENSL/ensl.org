@@ -64,3 +64,20 @@
     }
   }
 }
+
+.shoutmsg.activity {
+  color: #555;
+  font-style: italic;
+
+  .message .contents {
+    padding-right: 48px;
+  }
+
+  .time {
+    position: absolute;
+    right: 0;
+    color: #777;
+    font-size: 11px;
+    font-style: normal;
+  }
+}

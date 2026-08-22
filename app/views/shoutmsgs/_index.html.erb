@@ -3,7 +3,15 @@
 <%= turbo_stream_from shoutmsg_new.domain %>
 
 <div id="<%= shoutmsg_new.domain %>" class="shoutbox-messages">
-  <%= render partial: "shoutmsgs/shoutmsg", collection: object.shoutmsgs.includes(:user).order('id ASC'), locals: { popup: 'this' } %>
+  <% messages = object.shoutmsgs.includes(:user).to_a %>
+  <% activities = object.activities.includes(:owner, :recipient).to_a %>
+  <% (messages + activities).sort_by { |item| [item.created_at, item.id] }.each do |item| %>
+    <% if item.is_a?(Shoutmsg) %>
+      <%= render partial: 'shoutmsgs/shoutmsg', locals: { shoutmsg: item, popup: 'this' } %>
+    <% else %>
+      <%= render partial: 'shoutmsgs/activity', locals: { activity: item } %>
+    <% end %>
+  <% end %>
 </div>
 
 <%= render partial: "shoutmsgs/new", locals: { shoutmsg: shoutmsg_new, popup: "this" } %>

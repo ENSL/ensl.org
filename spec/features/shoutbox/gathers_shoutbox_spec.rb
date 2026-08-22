@@ -94,6 +94,31 @@ feature 'Gathers', js: true do
       end
     end
 
+    scenario 'interleaves gather activities with messages without adding them to the main shoutbox' do
+      create(:shoutmsg, shoutable: gather, user: user, created_at: 3.minutes.ago, text: 'Before activity')
+      activity = gather.create_activity(
+        key: 'gather.admin_updated',
+        owner: user,
+        parameters: { changes: ['Turn: 1 -> 2'] }
+      )
+      activity.update!(created_at: 2.minutes.ago)
+      create(:shoutmsg, shoutable: gather, user: user, created_at: 1.minute.ago, text: 'After activity')
+
+      visit gather_path(gather)
+
+      contents = all("#{gather_selector} .contents", minimum: 3).map(&:text)
+      before_index = contents.index { |text| text.include?('Before activity') }
+      activity_index = contents.index { |text| text.include?('Updated gather settings') }
+      after_index = contents.index { |text| text.include?('After activity') }
+      expect(before_index).to be < activity_index
+      expect(activity_index).to be < after_index
+
+      visit root_path
+      within('#shoutbox') do
+        expect(page).not_to have_content('Updated gather settings')
+      end
+    end
+
     scenario 'gather shoutbox is scrollable, keeps full buffer, appends at bottom, and autoscrolls to latest' do
       prefix = "gather-buffer-#{SecureRandom.hex(4)}"
       12.times { |n| create(:shoutmsg, shoutable: gather, user: user, text: "#{prefix}-#{n}") }

@@ -13,6 +13,7 @@ module Gathers
 
     def call
       gatherer = Gatherer.new(@params)
+      gatherer.activity_owner = @actor
 
       Gather.transaction do
         Gatherer.transaction do

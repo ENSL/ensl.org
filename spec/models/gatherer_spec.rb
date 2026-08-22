@@ -232,6 +232,36 @@ RSpec.describe Gatherer, type: :model do
         expect(result.updated).to be true
         expect(Gathers::Broadcaster).to have_received(:call).with(gather)
       end
+
+      it 'records and broadcasts a player substitution' do
+        previous_user = gatherer.user
+        replacement_user = create(:user)
+        raw_params = ActionController::Parameters.new(
+          gatherer: { id: gatherer.id, username: replacement_user.username }
+        )
+        allow(Gatherer).to receive(:params).and_call_original
+        allow(Gathers::ActivityBroadcaster).to receive(:call)
+
+        result = gatherer.update_for_actor(raw_params, actor)
+
+        expect(result.updated).to be true
+        activity = gather.activities.find_by!(key: 'gather.player_substituted')
+        expect(activity.owner).to eq(actor)
+        expect(activity.recipient).to eq(replacement_user)
+        expect(activity.parameters[:previous_player]).to eq(previous_user.to_s)
+        expect(Gathers::ActivityBroadcaster).to have_received(:call).with(activity)
+      end
+
+      it 'does not record a substitution when the player is unchanged' do
+        raw_params = ActionController::Parameters.new(
+          gatherer: { id: gatherer.id, username: gatherer.user.username }
+        )
+        allow(Gatherer).to receive(:params).and_call_original
+
+        expect { gatherer.update_for_actor(raw_params, actor) }.not_to(
+          change { gather.activities.where(key: 'gather.player_substituted').count }
+        )
+      end
     end
 
     describe '#update_status_from_key' do

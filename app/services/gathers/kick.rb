@@ -15,7 +15,10 @@ module Gathers
       raise AccessError unless @actor && (@actor.admin? || @actor.gather_moderator?)
 
       gather = @gatherer.gather
-      @gatherer.destroy!
+      Gather.transaction do
+        gather.create_gather_activity key: 'gather.kicked', owner: @actor, recipient: @gatherer.user
+        @gatherer.destroy!
+      end
       Broadcaster.call(gather)
       Result.new(gather: gather)
     rescue StandardError => e

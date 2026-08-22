@@ -14,6 +14,7 @@ describe Gathers::Join do
 
   before do
     allow(Gathers::Broadcaster).to receive(:call)
+    allow(Gathers::ActivityBroadcaster).to receive(:call)
   end
 
   describe '.call' do
@@ -31,6 +32,22 @@ describe Gathers::Join do
       expect do
         described_class.call(actor: user, params: join_params)
       end.to change(Gatherer, :count).by(1)
+    end
+
+    it 'records who joined the gather' do
+      described_class.call(actor: user, params: join_params)
+
+      activity = gather.activities.find_by!(key: 'gather.joined')
+      expect(activity.owner).to eq(user)
+      expect(activity.recipient).to eq(user)
+    end
+
+    it 'broadcasts the join activity after it commits' do
+      described_class.call(actor: user, params: join_params)
+
+      expect(Gathers::ActivityBroadcaster).to have_received(:call).with(
+        an_object_having_attributes(key: 'gather.joined', trackable: gather)
+      )
     end
 
     it 'assigns the user to the gatherer' do
@@ -109,6 +126,29 @@ describe Gathers::Join do
     it 'locks the gather during transaction' do
       expect_any_instance_of(Gather).to receive(:lock!).and_call_original
       described_class.call(actor: user, params: join_params)
+    end
+  end
+
+  describe 'when the gather fills' do
+    before do
+      create_list(:gatherer, Gather::FULL - 1, gather: gather)
+    end
+
+    it 'records the final join before captain voting starts' do
+      described_class.call(actor: user, params: join_params)
+
+      expect(gather.activities.order(:id).last(2).map(&:key)).to eq(
+        %w[gather.joined gather.voting_started]
+      )
+    end
+
+    it 'broadcasts both final-join events in chronological order' do
+      broadcast_keys = []
+      allow(Gathers::ActivityBroadcaster).to receive(:call) { |activity| broadcast_keys << activity.key }
+
+      described_class.call(actor: user, params: join_params)
+
+      expect(broadcast_keys.last(2)).to eq(%w[gather.joined gather.voting_started])
     end
   end
 

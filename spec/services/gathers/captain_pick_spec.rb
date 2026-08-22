@@ -29,6 +29,15 @@ describe Gathers::CaptainPick do
       end.to change { player.reload.team }.from(nil).to(1)
     end
 
+    it 'records the captain, player, and team' do
+      described_class.call(actor: captain.user, gather: gather, player_id: player.id)
+
+      activity = gather.activities.find_by!(key: 'gather.player_picked')
+      expect(activity.owner).to eq(captain.user)
+      expect(activity.recipient).to eq(player.user)
+      expect(activity.parameters[:team]).to eq(1)
+    end
+
     it 'broadcasts the change' do
       described_class.call(actor: captain.user, gather: gather, player_id: player.id)
       expect(Gathers::Broadcaster).to have_received(:call).with(gather)

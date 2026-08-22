@@ -1,0 +1,36 @@
+<% details = (activity.parameters || {}).with_indifferent_access %>
+<div class="shoutmsg activity">
+  <div class="message">
+    <div class="contents">
+      <% case activity.key %>
+      <% when 'gather.joined' %>
+        <%= namelink(activity.recipient) %>
+        <%= activity.owner == activity.recipient ? 'joined the gather.' : 'was added to the gather.' %>
+      <% when 'gather.left' %>
+        <%= namelink(activity.recipient) %> left the gather.
+      <% when 'gather.kicked' %>
+        Removed <%= namelink(activity.recipient) %> from the gather.
+      <% when 'gather.voting_started' %>
+        Gather filled with <%= details[:player_count] %> players. Captain voting started.
+      <% when 'gather.picking_started' %>
+        Voting finished. Captains are <%= details[:captain1] %> and <%= details[:captain2] %>.
+        Maps: <%= details[:maps].to_a.join(' and ') %>. Server: <%= details[:server].presence || 'none' %>.
+      <% when 'gather.player_picked' %>
+        Picked <%= namelink(activity.recipient) %> for team <%= details[:team] %>.
+      <% when 'gather.player_substituted' %>
+        <%= namelink(activity.owner) %> replaced <%= details[:previous_player] %> with
+        <%= namelink(activity.recipient) %>.
+      <% when 'gather.finished' %>
+        Gather finished.
+      <% when 'gather.admin_updated' %>
+        Updated gather settings: <%= details[:changes].to_a.join('; ') %>.
+      <% else %>
+        <%= activity.key.to_s.humanize %>.
+      <% end %>
+      <span class="time">
+        <% timestamp_format = activity.created_at.to_date != Time.zone.today ? '%b %d, %H:%M' : '%H:%M' %>
+        <%= local_time(activity.created_at, format: timestamp_format) %>
+      </span>
+    </div>
+  </div>
+</div>

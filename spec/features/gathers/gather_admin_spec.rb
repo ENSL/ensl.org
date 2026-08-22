@@ -142,6 +142,10 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
 
       gather.reload
       expect(gather.users.map(&:id)).to include(replacement_user.id)
+      activity = gather.activities.find_by!(key: 'gather.player_substituted')
+      expect(activity.owner).to eq(admin)
+      expect(activity.recipient).to eq(replacement_user)
+      expect(activity.parameters[:previous_player]).to eq(first_username)
     end
   end
 

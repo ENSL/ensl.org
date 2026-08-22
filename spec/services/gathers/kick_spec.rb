@@ -30,6 +30,15 @@ describe Gathers::Kick do
         end.to change(Gatherer, :count).by(-1)
       end
 
+      it 'records the administrator and removed player' do
+        player = gatherer.user
+        described_class.call(actor: admin, gatherer: gatherer)
+
+        activity = gather.activities.find_by!(key: 'gather.kicked')
+        expect(activity.owner).to eq(admin)
+        expect(activity.recipient).to eq(player)
+      end
+
       it 'broadcasts the change' do
         described_class.call(actor: admin, gatherer: gatherer)
         expect(Gathers::Broadcaster).to have_received(:call).with(gather)

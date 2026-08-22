@@ -28,6 +28,14 @@ describe Gathers::Leave do
       end.to change(Gatherer, :count).by(-1)
     end
 
+    it 'records who left the gather' do
+      described_class.call(actor: user, gatherer: gatherer)
+
+      activity = gather.activities.find_by!(key: 'gather.left')
+      expect(activity.owner).to eq(user)
+      expect(activity.recipient).to eq(user)
+    end
+
     it 'broadcasts the change' do
       described_class.call(actor: user, gatherer: gatherer)
       expect(Gathers::Broadcaster).to have_received(:call).with(gather)

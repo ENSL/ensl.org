@@ -10,7 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_12_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_114907) do
+  create_table "activities", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key"
+    t.bigint "owner_id"
+    t.string "owner_type"
+    t.text "parameters"
+    t.bigint "recipient_id"
+    t.string "recipient_type"
+    t.bigint "trackable_id"
+    t.string "trackable_type"
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id"], name: "index_activities_on_owner"
+    t.index ["recipient_type", "recipient_id"], name: "index_activities_on_recipient"
+    t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+  end
+
   create_table "analysis_results", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "batch_id"
     t.datetime "created_at", precision: nil, null: false

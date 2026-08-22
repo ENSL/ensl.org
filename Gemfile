@@ -64,6 +64,8 @@ gem 'rmagick'
 gem 'active_record_union'
 # Auditing/version tracking
 gem 'paper_trail'
+# Semantic user and domain activity tracking
+gem 'public_activity', '~> 3.0'
 
 # External APIs. Google for calendar.
 # Steam condensers for querying Steam API and last to help with SteamIDs

@@ -33,7 +33,9 @@ class GathersController < ApplicationController
   def update
     raise AccessError unless @gather.can_update? cuser
 
-    flash[:notice] = 'Gather was successfully updated.' if @gather.admin_update(Gather.params(params, cuser))
+    if @gather.admin_update(Gather.params(params, cuser), actor: cuser)
+      flash[:notice] = 'Gather was successfully updated.'
+    end
 
     redirect_to @gather
   end

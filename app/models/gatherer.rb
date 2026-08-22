@@ -37,7 +37,7 @@ class Gatherer < ApplicationRecord
 
   include Extra
 
-  attr_accessor :confirm, :skip_callbacks, :username
+  attr_accessor :activity_owner, :confirm, :skip_callbacks, :username
 
   scope :team, ->(team) { where(team: team) }
   scope :of_user, ->(user) { where(user_id: user.id) }
@@ -78,6 +78,7 @@ class Gatherer < ApplicationRecord
   validate :validate_username
 
   before_save :assign_pick_order_on_pick
+  after_create :record_join_activity
   after_create :update_gather_after_join
   after_update :advance_gather_after_pick, unless: proc { |gatherer| gatherer.skip_callbacks == true }
   after_destroy :remove_gather_votes
@@ -140,7 +141,12 @@ class Gatherer < ApplicationRecord
       return UpdateForActorResult.new(authorized: false, updated: false, errors: errors)
     end
 
-    updated = update(gatherer_params)
+    previous_user = user
+    updated = false
+    Gatherer.transaction do
+      updated = update(gatherer_params)
+      record_player_substitution(actor, previous_user) if updated && saved_change_to_user_id?
+    end
     Gathers::Broadcaster.call(gather) if updated
     UpdateForActorResult.new(authorized: true, updated: updated, errors: errors)
   end
@@ -183,6 +189,19 @@ class Gatherer < ApplicationRecord
   end
 
   private
+
+  def record_player_substitution(actor, previous_user)
+    gather.create_gather_activity(
+      key: 'gather.player_substituted',
+      owner: actor,
+      recipient: user,
+      parameters: { previous_player: previous_user.to_s }
+    )
+  end
+
+  def record_join_activity
+    gather.create_gather_activity key: 'gather.joined', owner: activity_owner || user, recipient: user
+  end
 
   def update_gather_after_join
     member_count = gather.gatherers.count

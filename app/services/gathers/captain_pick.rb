@@ -26,6 +26,12 @@ module Gathers
             gatherer = @gather.gatherers.lock.find(@player_id)
             raise AccessError unless gatherer.can_update?(@actor, { team: gatherer.team })
 
+            @gather.create_gather_activity(
+              key: 'gather.player_picked',
+              owner: @actor,
+              recipient: gatherer.user,
+              parameters: { team: @gather.turn }
+            )
             gatherer.update!(team: @gather.turn)
             @gather.reload
           end

@@ -29,6 +29,8 @@
 #
 
 class Gather < ApplicationRecord
+  include GatherActivityTracking
+
   STATE_RUNNING = 0
   STATE_VOTING = 3
   STATE_PICKING = 1
@@ -134,7 +136,12 @@ class Gather < ApplicationRecord
   end
 
   def states
-    { STATE_RUNNING => 'Running', STATE_PICKING => 'Picking', STATE_FINISHED => 'Finished' }
+    {
+      STATE_RUNNING => 'Running',
+      STATE_VOTING => 'Voting',
+      STATE_PICKING => 'Picking',
+      STATE_FINISHED => 'Finished'
+    }
   end
 
   def first
@@ -159,7 +166,10 @@ class Gather < ApplicationRecord
 
   def start_voting_if_full!
     with_lock do
-      update!(status: STATE_VOTING) if gatherers.count >= FULL && status == STATE_RUNNING
+      if gatherers.count >= FULL && status == STATE_RUNNING
+        update!(status: STATE_VOTING)
+        record_voting_started_activity
+      end
     end
   end
 
@@ -238,12 +248,14 @@ class Gather < ApplicationRecord
     true if cuser.admin? || cuser.gather_moderator?
   end
 
-  def admin_update(attributes)
+  def admin_update(attributes = {}, actor: nil, **keyword_attributes)
+    attributes = attributes.to_h.merge(keyword_attributes)
     updated = with_lock do
       admin_attributes = prepare_admin_attributes(attributes)
       next false unless update(admin_attributes)
 
       assign_captain_teams if saved_change_to_captain1_id? || saved_change_to_captain2_id?
+      record_admin_update_activity(actor, admin_attributes.keys)
       true
     end
     Gathers::Broadcaster.call(self) if updated
@@ -297,6 +309,7 @@ class Gather < ApplicationRecord
       )
     )
     assign_captain_teams
+    record_picking_started_activity
   end
 
   def create_follow_up_gather
@@ -343,6 +356,7 @@ class Gather < ApplicationRecord
     case transition
     when :finish
       update!(status: STATE_FINISHED)
+      record_finished_activity
     when :team_one
       update!(turn: 1)
     when :team_two

@@ -159,6 +159,18 @@ RSpec.describe Gather, type: :model do
       expect(Gathers::Broadcaster).to have_received(:call).with(gather)
     end
 
+    it 'records the administrator and changed values' do
+      gather = create(:gather)
+      admin = create(:user, :admin)
+      allow(Gathers::Broadcaster).to receive(:call)
+
+      gather.admin_update({ turn: 1 }, actor: admin)
+
+      activity = gather.activities.find_by!(key: 'gather.admin_updated')
+      expect(activity.owner).to eq(admin)
+      expect(activity.parameters[:changes]).to include('Turn: none -> 1')
+    end
+
     it 'returns false and does not broadcast when the update fails' do
       gather = create(:gather)
       allow(gather).to receive(:update).and_return(false)
@@ -231,6 +243,7 @@ RSpec.describe Gather, type: :model do
       gather.refresh(nil)
       gather.reload
       expect(gather.status).to eq(Gather::STATE_FINISHED)
+      expect(gather.activities.where(key: 'gather.finished')).to exist
     end
 
     it 'switches to team 1 when team 2 has the next pick window' do
@@ -318,6 +331,19 @@ RSpec.describe Gather, type: :model do
 
       expect(gather.map1).to eq(gather.gather_maps.ordered.first)
       expect(gather.map2).to be_nil
+    end
+
+    it 'records voting winners when picking starts' do
+      gather = create(:gather, maps_count: 2, servers_count: 1)
+      create_list(:gatherer, Gather::FULL, gather: gather)
+
+      gather.send(:complete_voting!)
+
+      activity = gather.activities.find_by!(key: 'gather.picking_started')
+      expect(activity.parameters[:captain1]).to be_present
+      expect(activity.parameters[:captain2]).to be_present
+      expect(activity.parameters[:maps]).to contain_exactly(gather.map1.to_s, gather.map2.to_s)
+      expect(activity.parameters[:server]).to eq(gather.server.to_s)
     end
 
     it 'uses default voting timeout outside test environment' do
