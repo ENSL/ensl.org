@@ -38,6 +38,32 @@
     <% end %>
 </div>
 
+<% if [Gather::STATE_PICKING, Gather::STATE_FINISHED].include?(@gather.status) %>
+<div class="maps-server">
+    <h3>Change Maps and Server</h3>
+
+    <%= form_for(@gather, html: { class: 'square' }) do |f| %>
+    <%= render 'shared/errors', messages: @gather.errors.full_messages %>
+
+    <div class="fields horizontal">
+        <%= f.label :map1_id, "Map #1" %>
+        <%= f.select :map1_id, @gather.gather_maps.collect { |gather_map| [gather_map.map, gather_map.id] } %>
+    </div>
+    <div class="fields horizontal">
+        <%= f.label :map2_id, "Map #2" %>
+        <%= f.select :map2_id, @gather.gather_maps.collect { |gather_map| [gather_map.map, gather_map.id] } %>
+    </div>
+    <div class="fields horizontal">
+        <%= f.label :server_id, "Server" %>
+        <%= f.select :server_id, @gather.servers.collect { |server| [server, server.id] } %>
+    </div>
+    <div class="controls">
+        <%= f.submit 'Change Maps and Server' %>
+    </div>
+    <% end %>
+</div>
+<% end %>
+
 
 <div class="replace">
     <h3>Replace Players</h3>

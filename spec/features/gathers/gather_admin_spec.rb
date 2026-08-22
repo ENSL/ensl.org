@@ -7,7 +7,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     Capybara.default_max_wait_time = 5
   end
 
-  let!(:gather) { FactoryBot.create(:gather, maps_count: 3, servers_count: 2) }
+  let!(:gather) { FactoryBot.create(:gather, maps_count: 4, servers_count: 2) }
   # create a full gather: 12 players so the gather can be in PICKING state
   let!(:users) { FactoryBot.create_list(:user, 12, raw_password: 'password123') }
   let!(:gatherers) do
@@ -46,6 +46,60 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
 
       gather.reload
       expect(gather.turn).to eq(2)
+    end
+  end
+
+  scenario 'other players see admin map and server changes without reloading' do
+    original_maps = gather.gather_maps.first(2)
+    selected_maps = gather.gather_maps.last(2)
+    original_server = gather.servers.first
+    selected_server = gather.servers.last
+    gather.update!(status: Gather::STATE_FINISHED, map1: original_maps.first, map2: original_maps.second,
+                   server: original_server)
+
+    Capybara.using_session('observer') do
+      sign_in_via_session(users.first)
+      visit gather_path(gather)
+      expect(page).to have_content(original_maps.first.to_s)
+      expect(page).to have_content(original_maps.second.to_s)
+      expect(page).to have_content(original_server.to_s)
+      expect(page).to have_no_content(selected_maps.first.to_s)
+      expect(page).to have_no_content(selected_maps.second.to_s)
+      expect(page).to have_no_content(selected_server.to_s)
+    end
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(gather)
+
+      select selected_maps.first.to_s, from: 'gather_map1_id'
+      select selected_maps.second.to_s, from: 'gather_map2_id'
+      select selected_server.to_s, from: 'gather_server_id'
+      click_button 'Change Maps and Server'
+
+      expect(page).to have_selector('div#gather', wait: 10)
+    end
+
+    gather.reload
+    expect(gather.map1).to eq(selected_maps.first)
+    expect(gather.map2).to eq(selected_maps.second)
+    expect(gather.server).to eq(selected_server)
+
+    Capybara.using_session('observer') do
+      expect(page).to have_content(selected_maps.first.to_s, wait: 10)
+      expect(page).to have_content(selected_maps.second.to_s)
+      expect(page).to have_content(selected_server.to_s)
+    end
+  end
+
+  scenario 'admin cannot change maps and server until voting has ended' do
+    gather.update!(status: Gather::STATE_VOTING)
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(gather)
+
+      expect(page).to have_no_button('Change Maps and Server')
     end
   end
 
@@ -130,6 +184,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
 
     Capybara.using_session('observer') do
       expect(page).to have_content('Please vote captains and maps.', wait: 10)
+      expect(page).to have_content(added_user.username)
     end
   end
 
