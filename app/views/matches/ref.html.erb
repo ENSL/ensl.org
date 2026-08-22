@@ -74,7 +74,8 @@
 
       <div class="fields horizontal">
         <%= f.label 'Player of the match' %>
-        <%= f.text_field :motm_name, { value: User.get(@match.motm_id) } %>
+        <%= render 'shared/user_search_field', form: f, attribute: :motm_name,
+                                               value: User.get(@match.motm_id) %>
       </div>
 
       <div class="controls">

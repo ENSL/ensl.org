@@ -204,6 +204,13 @@ describe Issue do
       expect(issue.status).to eq(Issue::STATUS_OPEN)
     end
 
+    it 'rejects an unknown assignee username' do
+      issue = build(:issue, assigned_name: 'missing-user')
+
+      expect(issue).not_to be_valid
+      expect(issue.errors[:assigned_name]).to include('User not found')
+    end
+
     it 'leaves text_parsed unchanged when text is nil' do
       issue = build(:issue, text: nil)
 

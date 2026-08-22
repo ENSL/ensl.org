@@ -158,18 +158,20 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     expect(group.reload.users.count).to eq(initial_count)
   end
 
-  scenario 'adding member with non-existent username is ignored' do
+  scenario 'adding member with non-existent username shows an error' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Team')
 
     visit "/groups/#{group.id}/edit"
 
     within('div.add') do
+      expect(page).to have_css('input#grouper_username[list="grouper_username_usernames"]')
+      expect(page).to have_css('datalist#grouper_username_usernames option', visible: :all)
       fill_in 'grouper[username]', with: 'nonexistentuser123'
       click_button 'Add Member'
     end
 
-    # Should not add the member
+    expect(page).to have_content('Username User not found')
     expect(group.reload.users).to be_empty
   end
 

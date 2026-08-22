@@ -151,7 +151,11 @@ class Movie < ApplicationRecord
     return if user_name.blank?
 
     user = User.find_by(username: user_name)
-    self.user = user if user
+    if user
+      self.user = user
+    else
+      errors.add(:user_name, 'User not found')
+    end
   end
 
   def snapshot_path(_index = 0)

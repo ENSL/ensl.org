@@ -149,6 +149,21 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     end
   end
 
+  scenario 'invalid replacement username shows an error' do
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(gather)
+
+      original_user_ids = gather.users.ids
+      select gather.gatherers.first.user.username, from: 'gatherer_id'
+      fill_in 'gatherer_username', with: 'missing-player'
+      click_button 'Replace Player'
+
+      expect(page).to have_content('Username User not found')
+      expect(gather.reload.users.ids).to match_array(original_user_ids)
+    end
+  end
+
   scenario 'admin only sees the new gather control before the gather starts' do
     gather.update!(status: Gather::STATE_RUNNING)
 
@@ -189,6 +204,20 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     Capybara.using_session('observer') do
       expect(page).to have_content('Please vote captains and maps.', wait: 10)
       expect(page).to have_content(added_user.username)
+    end
+  end
+
+  scenario 'invalid added username shows an error' do
+    open_gather = FactoryBot.create(:gather, maps_count: 3, servers_count: 2)
+
+    Capybara.using_session('admin') do
+      sign_in_via_session(admin)
+      visit edit_gather_path(open_gather)
+      fill_in 'Username', with: 'missing-player'
+      click_button 'Add Player'
+
+      expect(page).to have_content('Username User not found')
+      expect(open_gather.reload.gatherers).to be_empty
     end
   end
 

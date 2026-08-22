@@ -1,0 +1,18 @@
+<% field_value = local_assigns.fetch(:value, nil) %>
+<% user_scope = local_assigns.fetch(:users, User.all) %>
+<% list_id = local_assigns.fetch(:list_id, "#{form.object_name}_#{attribute}_usernames") %>
+<% usernames = if user_scope.respond_to?(:reorder) && user_scope.respond_to?(:pluck)
+                 user_scope.reorder(:username).pluck(:username)
+               else
+                 user_scope.filter_map { |entry| entry.respond_to?(:user) ? entry.user&.username : entry&.username }.uniq.sort
+               end %>
+<%= form.text_field attribute,
+                    value: field_value,
+                    list: list_id,
+                    placeholder: 'Search by username',
+                    autocomplete: 'off' %>
+<datalist id="<%= list_id %>">
+  <% usernames.each do |username| %>
+    <option value="<%= username %>"></option>
+  <% end %>
+</datalist>

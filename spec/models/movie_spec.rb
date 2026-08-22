@@ -255,7 +255,7 @@ RSpec.describe Movie, type: :model do
         expect { movie.assign_user_from_user_name }.not_to raise_error
       end
 
-      it 'keeps existing user when username lookup misses' do
+      it 'adds an error when username lookup misses' do
         movie.user = nil
         allow(User).to receive(:find_by).with(username: 'missing').and_return(nil)
         movie.user_name = 'missing'
@@ -263,6 +263,7 @@ RSpec.describe Movie, type: :model do
         movie.assign_user_from_user_name
 
         expect(movie.user).to be_nil
+        expect(movie.errors[:user_name]).to include('User not found')
       end
     end
 

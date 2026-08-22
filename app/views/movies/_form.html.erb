@@ -33,7 +33,7 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :user_name, "Author" %>
-    <%= f.text_field :user_name, { value: user } %>
+    <%= render 'shared/user_search_field', form: f, attribute: :user_name, value: user %>
   </div>
   <% file_options = DataFile.movies.collect { |d| ["#{d.name}", d.id] } %>
   <% if file && !file_options.any? { |(_, id)| id == movie.file_id } %>

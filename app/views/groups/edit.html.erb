@@ -66,7 +66,7 @@
 
             <div class="fields horizontal">
               <%= f.label :username %>
-              <%= f.text_field :username %>
+              <%= render 'shared/user_search_field', form: f, attribute: :username %>
             </div>
 
             <div class="fields horizontal">

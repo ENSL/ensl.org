@@ -76,7 +76,8 @@
     </div>
     <div class="fields horizontal">
         <%= f.label :username, "Replace with:" %>
-        <%= f.text_field :username %>
+        <%= render 'shared/user_search_field', form: f, attribute: :username,
+                                               list_id: 'replacement_usernames' %>
     </div>
     <div class="controls">
         <%= f.submit 'Replace Player' %>
@@ -96,7 +97,8 @@
 
     <div class="fields horizontal">
         <%= f.label :username, "Username" %>
-        <%= f.text_field :username %>
+        <%= render 'shared/user_search_field', form: f, attribute: :username,
+                                               list_id: 'additional_player_usernames' %>
     </div>
     <div class="controls">
         <%= f.submit 'Add Player' %>

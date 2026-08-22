@@ -62,7 +62,8 @@ class GatherersController < ApplicationController
     if join_result.success?
       flash[:notice] = t('gathers.join')
     else
-      flash[:error] = @gatherer&.errors&.full_messages&.to_sentence || join_result.error.to_s
+      validation_errors = @gatherer&.errors&.full_messages
+      flash[:error] = validation_errors.present? ? validation_errors.to_sentence : join_result.error.to_s
     end
   end
 

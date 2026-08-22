@@ -13,13 +13,8 @@
       <%= f.label :assigned %>
       <% assigned_username = issue.assigned.present? ? User.find_by(id: issue.assigned)&.username : nil %>
       <div class="inputs">
-        <%= f.text_field :assigned_name, list: 'staff_list', value: assigned_username, placeholder: 'Enter username or pick from list' %>
-        <datalist id="staff_list">
-          <% staff_usernames = Group.staff.map { |g| g.respond_to?(:user) ? g.user : g }.compact.map(&:username).uniq %>
-          <% staff_usernames.each do |uname| %>
-            <option value="<%= uname %>"></option>
-          <% end %>
-        </datalist>
+        <%= render 'shared/user_search_field', form: f, attribute: :assigned_name, value: assigned_username,
+                                               users: Group.staff, list_id: 'staff_usernames' %>
       </div>
     </div>
   <% end %>

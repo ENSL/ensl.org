@@ -192,6 +192,13 @@ RSpec.describe Match, type: :model do
       expect(match.motm).to eq(user)
     end
 
+    it 'rejects an unknown player of the match username' do
+      match = build(:match, motm_name: 'missing-user')
+
+      expect(match).not_to be_valid
+      expect(match.errors[:motm_name]).to include('User not found')
+    end
+
     it 'adds an error when both contesters belong to the same team' do
       contest = create(:contest)
       team = create(:team)

@@ -74,7 +74,7 @@ class Gatherer < ApplicationRecord
   validates :user_id, uniqueness: { scope: :gather_id }
   validates :team, inclusion: { in: 1..2, allow_nil: true }
   validates :pick_order, numericality: { only_integer: true, greater_than: 0, allow_nil: true }
-  validates :confirm, acceptance: true, unless: proc { |gatherer| gatherer.user.gatherers.count >= 5 }
+  validates :confirm, acceptance: true, unless: proc { |gatherer| gatherer.user&.gatherers&.count.to_i >= 5 }
   validate :validate_username
 
   before_save :assign_pick_order_on_pick
@@ -123,7 +123,7 @@ class Gatherer < ApplicationRecord
     if (u = User.where(username: username).first)
       self.user = u
     else
-      errors.add(:username, t(:gatherer_wrong_username))
+      errors.add(:username, 'User not found')
     end
   end
 
@@ -250,7 +250,9 @@ class Gatherer < ApplicationRecord
     return false unless cuser && privileged?(cuser)
 
     self.user = User.find_by(username: username)
-    user.present? && !user.banned?(Ban::TYPE_GATHER) && gather.gatherers.of_user(user).none?
+    return true unless user
+
+    !user.banned?(Ban::TYPE_GATHER) && gather.gatherers.of_user(user).none?
   end
 
   def privileged?(cuser)

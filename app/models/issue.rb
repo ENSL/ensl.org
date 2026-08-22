@@ -61,6 +61,7 @@ class Issue < ApplicationRecord
   validate :validate_status
 
   before_validation :init_variables, if: proc(&:new_record?)
+  before_validation :assign_user_from_assigned_name, if: proc { |issue| issue.assigned_name.present? }
   before_save :parse_text
 
   acts_as_readable on: :created_at
@@ -89,8 +90,12 @@ class Issue < ApplicationRecord
   end
 
   def init_variables
-    self.assigned = User.find_by(username: assigned_name) if assigned_name
     self.status = STATUS_OPEN unless status
+  end
+
+  def assign_user_from_assigned_name
+    self.assigned = User.find_by(username: assigned_name)
+    errors.add(:assigned_name, 'User not found') unless assigned
   end
 
   def validate_status

@@ -41,6 +41,7 @@ class Grouper < ApplicationRecord
 
   def fetch_user
     self.user = User.find_by(username: username)
+    errors.add(:username, 'User not found') unless user
   end
 
   def can_create?(cuser)

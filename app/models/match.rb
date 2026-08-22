@@ -137,7 +137,7 @@ class Match < ApplicationRecord
 
   before_create :set_hltv
   after_create :send_notifications
-  before_save :set_motm, if: proc { |match| match.motm_name.present? }
+  before_validation :set_motm, if: proc { |match| match.motm_name.present? }
   before_update :reset_contest, if: proc { |match|
     match.will_save_change_to_score1? || match.will_save_change_to_score2?
   }
@@ -228,6 +228,7 @@ class Match < ApplicationRecord
 
   def set_motm
     self.motm = User.find_by(username: motm_name)
+    errors.add(:motm_name, 'User not found') unless motm
   end
 
   def set_predictions
