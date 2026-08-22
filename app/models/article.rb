@@ -56,12 +56,11 @@ class Article < ApplicationRecord
   scope :limited, -> { limit(5) }
   scope :nodrafts, -> { where(status: STATUS_PUBLISHED) }
   scope :drafts, -> { where(status: STATUS_DRAFT) }
-  scope :articles, -> { where(['category_id IN (SELECT id FROM categories WHERE domain = ?)', Category::DOMAIN_ARTICLES]) }
-  # FIXME: shorter
-  scope :news, -> { where(category_id: Category.select(:id).where(domain: Category::DOMAIN_NEWS)) }
+  scope :domain, ->(value) { where(category_id: Category.domain(value).select(:id)) }
+  scope :articles, -> { domain(Category::DOMAIN_ARTICLES) }
+  scope :news, -> { domain(Category::DOMAIN_NEWS) }
   scope :category, ->(cat) { where(category_id: cat) }
-  scope :domain, ->(domain) { includes(:category).where("categories.domain = '?'", domain) }
-  # scope :nospecial, -> { where("category_id != ?", Category::SPECIAL) }
+  scope :nospecial, -> { where.not(category_id: Category::SPECIAL) }
   scope :interviews, -> { where(category_id: Category::INTERVIEWS) }
 
   belongs_to :user, optional: true
