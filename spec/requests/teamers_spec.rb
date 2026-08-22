@@ -92,8 +92,8 @@ RSpec.describe 'TeamersController', type: :request do
       leader = create(:user)
       team = create(:team, founder: leader)
       member_user = create(:user)
-      member_user.update!(team_id: team.id)
       teamer = create(:teamer, user: member_user, team: team, rank: Teamer::RANK_MEMBER)
+      member_user.update!(team_id: team.id)
       login_as(leader)
 
       expect do

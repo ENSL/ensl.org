@@ -23,14 +23,18 @@ RSpec.describe Teamer, type: :model do
   end
 
   describe 'destroy behavior' do
-    it 'destroys record if rank is JOINER and clears user team_id' do
+    it 'destroys a join request without changing another valid primary team' do
       user = create(:user)
-      team = create(:team)
-      user.update!(team_id: team.id)
-      t = Teamer.create!(user: user, team: team, rank: Teamer::RANK_JOINER)
-      t.destroy
-      expect(Teamer.where(id: t.id)).to be_empty
-      expect(user.reload.team_id).to be_nil
+      primary_team = create(:team)
+      requested_team = create(:team)
+      create(:teamer, user: user, team: primary_team, rank: Teamer::RANK_MEMBER)
+      user.update!(team: primary_team)
+      request = create(:teamer, user: user, team: requested_team, rank: Teamer::RANK_JOINER)
+
+      request.destroy
+
+      expect(Teamer.where(id: request.id)).to be_empty
+      expect(user.reload.team).to eq(primary_team)
     end
 
     it 'marks rank REMOVED for non-joiner' do

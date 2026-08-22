@@ -269,6 +269,33 @@ RSpec.describe 'UsersController', type: :request do
       expect(user.username).not_to eq('RenamedUser')
     end
 
+    it 'allows unrelated updates when the stored primary team is a legacy invalid value' do
+      stale_user = create(:user)
+      team = create(:team)
+      create(:teamer, user: stale_user, team: team, rank: Teamer::RANK_JOINER)
+      stale_user.update_column(:team_id, team.id)
+      login_as(stale_user)
+
+      patch "/users/#{stale_user.id}", params: { user: { firstname: 'Updated' } }
+
+      expect(response).to redirect_to(user_path(stale_user))
+      expect(stale_user.reload.attributes.slice('firstname', 'team_id')).to eq(
+        'firstname' => 'Updated',
+        'team_id' => team.id
+      )
+    end
+
+    it 'rejects assigning a primary team without an active membership' do
+      invalid_team = create(:team)
+      login_as(user)
+
+      patch "/users/#{user.id}", params: { user: { team_id: invalid_team.id } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:edit)
+      expect(user.reload.team_id).to be_nil
+    end
+
     it 're-renders edit on validation failure' do
       login_as(admin)
 

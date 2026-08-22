@@ -21,7 +21,7 @@ class MatchProposalsController < ApplicationController
     @proposal = build_match_proposal
     raise AccessError unless @proposal.can_create? cuser
 
-    @proposal.assign_attributes(team: cuser.team, status: MatchProposal::STATUS_PENDING, actor: cuser)
+    @proposal.assign_attributes(team: cuser.active_team, status: MatchProposal::STATUS_PENDING, actor: cuser)
     return handle_match_proposal_create_success if @proposal.save
 
     render :new

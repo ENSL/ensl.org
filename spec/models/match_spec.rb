@@ -326,12 +326,22 @@ RSpec.describe Match, type: :model do
       allow(match.contester2.team).to receive(:is_leader?).and_return(false)
       allow(match.contester1.team).to receive(:is_leader?).with(leader).and_return(true)
       allow(match.contester2.team).to receive(:is_leader?).with(leader).and_return(false)
-      allow(leader).to receive(:team).and_return(match.contester1.team)
+      allow(leader).to receive(:active_team).and_return(match.contester1.team)
 
       expect(match.can_make_proposal?(leader)).to be true
       expect(match.can_make_proposal?(outsider)).to be false
       expect(match.user_in_match?(leader)).to be true
       expect(match.user_in_match?(outsider)).to be false
+    end
+
+    it 'does not treat an inactive team affiliation as match participation' do
+      former_member = create(:user)
+      former_team = match.contester1.team
+      former_team.update!(active: false)
+      create(:teamer, user: former_member, team: former_team, rank: Teamer::RANK_REMOVED)
+      former_member.update!(team: former_team)
+
+      expect(match.user_in_match?(former_member)).to be false
     end
 
     it 'returns false for can_make_proposal? when user is nil' do

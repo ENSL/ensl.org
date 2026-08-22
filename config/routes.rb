@@ -83,7 +83,7 @@ Rails.application.routes.draw do
   get 'comments/quote'
   resources :comments, except: [:new]
   resources :shoutmsgs, except: %i[edit new update]
-  resources :teamers, except: %i[new show update] do
+  resources :teamers, except: %i[new show edit update] do
     collection do
       get :replace
     end

@@ -127,10 +127,11 @@ class Team < ApplicationRecord
 
     transaction do
       # rubocop:disable Rails/SkipsModelValidations
-      User.where(team_id: id).update_all(team_id: nil)
       if has_matches
         update!(active: false)
         teamers.update_all(rank: Teamer::RANK_REMOVED)
+      else
+        User.where(team_id: id).update_all(team_id: nil)
       end
       # rubocop:enable Rails/SkipsModelValidations
     end
@@ -180,7 +181,8 @@ class Team < ApplicationRecord
       next if new_rank == Teamer::RANK_JOINER && member.rank != Teamer::RANK_JOINER
 
       promoted_from_joiner = member.rank == Teamer::RANK_JOINER && new_rank >= Teamer::RANK_MEMBER
-      member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
+      next unless member.update(rank: new_rank, comment: comment_params&.[](member.id.to_s))
+
       # rubocop:disable Rails/SkipsModelValidations
       member.user.update_columns(team_id: id, updated_at: Time.current) if promoted_from_joiner
       # rubocop:enable Rails/SkipsModelValidations

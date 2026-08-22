@@ -17,13 +17,6 @@ class TeamersController < ApplicationController
     end
   end
 
-  def edit
-    teamer_id = params['teamer']
-    @teamer = Teamer.find(teamer_id)
-    @teamer.update(team_id: params['id'])
-    redirect_to_back
-  end
-
   def destroy
     @teamer = Teamer.find params[:id]
     raise AccessError unless @teamer.can_destroy? cuser

@@ -163,7 +163,7 @@ class User < ApplicationRecord
   validates :time_zone, length: { maximum: 100, allow_blank: true }
   validates :public_email, inclusion: { in: [true, false], allow_nil: true }
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
-  validate :validate_team
+  validate :validate_team, if: :will_save_change_to_team_id?
 
   # Allow existing duplicate steamids in DB to continue working.
   # Enforce uniqueness when there are no prior duplicates; if duplicates already
@@ -472,7 +472,10 @@ class User < ApplicationRecord
   end
 
   def received_team_messages
-    Message.where(recipient_id: team_id, recipient_type: 'Team')
+    current_team = active_team
+    return Message.none unless current_team
+
+    Message.where(recipient: current_team)
   end
 
   def sent_messages
@@ -491,14 +494,19 @@ class User < ApplicationRecord
     steamid[0] = '0' if steamid.present?
   end
 
-  # FIXME: if team has been removed
   def validate_team
-    return unless team && !active_teams.exists?({ id: team.id })
-    return if persisted? && will_save_change_to_team_id?
+    return if team_id.nil? || affiliated_with_team?(team_id)
 
-    # Attempts to fix team, gracefully
-    self.team = nil
     errors.add :team
+  end
+
+  def active_team
+    team if active_teams.exists?(id: team_id)
+  end
+
+  def affiliated_with_team?(candidate_team_id)
+    Team.exists?(candidate_team_id) &&
+      teamers.where(team_id: candidate_team_id).where.not(rank: Teamer::RANK_JOINER).exists?
   end
 
   def password_update_needed?
@@ -767,17 +775,10 @@ class User < ApplicationRecord
   end
 
   def self.params(params, cuser, operation)
-    # Explicitly permit nested profile attributes
-    profile_allowed = (
-      Profile.column_names.map(&:to_sym) +
-      %i[notify_news notify_articles notify_movies notify_gather notify_own_match
-         notify_any_match notify_challenge notify_pms avatar _destroy]
-    ).uniq
-
     allowed = [
       :raw_password, :firstname, :lastname, :email, :steamid, :country,
       :birthdate, :timezone, :public_email, :filter, :time_zone, :team_id,
-      { profile_attributes: profile_allowed }
+      { profile_attributes: Profile::PERMITTED_ATTRIBUTES }
     ]
     allowed << :username if cuser&.admin? || operation == 'create'
 
@@ -804,7 +805,6 @@ class User < ApplicationRecord
     }
   end
 
-  # FIXME: revisit this
   def filtered_update_attributes(raw_params, actor)
     attrs = self.class.params(raw_params, actor, 'update')
     attrs = attrs.except(:username) unless can_change_name?(actor)

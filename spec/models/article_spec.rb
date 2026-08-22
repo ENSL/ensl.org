@@ -7,6 +7,22 @@ RSpec.describe Article, type: :model do
   let(:admin) { create(:user, :admin) }
   let(:author) { create(:user) }
 
+  describe 'category scopes' do
+    it 'filters by domain and excludes the special category' do
+      news_category = create(:category, domain: Category::DOMAIN_NEWS)
+      article_category = create(:category, domain: Category::DOMAIN_ARTICLES)
+      special_category = create(:category, id: Category::SPECIAL, domain: Category::DOMAIN_ARTICLES)
+      news = create(:article, category: news_category)
+      article = create(:article, category: article_category)
+      special = create(:article, category: special_category)
+
+      expect(described_class.domain(Category::DOMAIN_NEWS)).to contain_exactly(news)
+      expect(described_class.news).to contain_exactly(news)
+      expect(described_class.articles).to contain_exactly(article, special)
+      expect(described_class.articles.nospecial).to contain_exactly(article)
+    end
+  end
+
   describe '#init_variables' do
     it 'forces draft status and downgrades html coding for non-admin users' do
       article = described_class.new(user: author, status: described_class::STATUS_PUBLISHED,

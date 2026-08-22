@@ -91,12 +91,12 @@ class MatchProposal < ApplicationRecord
     when STATUS_REVOKED
       # unconfirmed can only be revoked by team making the proposal
       # confirmed can only be revoked if soon enough before match time
-      status == STATUS_PENDING && team == cuser.team ||
+      status == STATUS_PENDING && team == cuser.active_team ||
         status == STATUS_CONFIRMED && proposed_time > CONFIRMATION_LIMIT.minutes.from_now
     when STATUS_CONFIRMED, STATUS_REJECTED
       # only team proposed to can reject or confirm and only if soon enough before match time
       status_ok = status == STATUS_PENDING
-      team_ok = team != cuser.team
+      team_ok = team != cuser.active_team
       time_ok = CONFIRMATION_LIMIT.minutes.from_now < proposed_time
 
       status_ok && team_ok && time_ok

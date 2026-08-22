@@ -99,6 +99,22 @@ RSpec.describe Team, type: :model do
       expect(member.comment).to eq('Good player')
       expect(joiner.reload.team_id).to eq(team.id)
     end
+
+    it 'does not assign the primary team when promotion fails' do
+      leader = create(:user)
+      team = create(:team, founder: leader)
+      joiner = create(:user)
+      member = create(:teamer, team: team, user: joiner, rank: Teamer::RANK_JOINER)
+
+      team.apply_member_rank_updates!(
+        actor: leader,
+        rank_params: { member.id.to_s => Teamer::RANK_MEMBER.to_s },
+        comment_params: { member.id.to_s => 'longer than fifteen characters' }
+      )
+
+      expect(member.reload.rank).to eq(Teamer::RANK_JOINER)
+      expect(joiner.reload.team_id).to be_nil
+    end
   end
 
   describe '.search' do
@@ -207,13 +223,30 @@ RSpec.describe Team, type: :model do
   end
 
   describe 'destroy behavior' do
-    it 'clears users team_id when destroying' do
+    it 'clears users team_id when permanently deleting a team' do
       team = create(:team)
       user = create(:user)
-      # set team without invoking user validations
+      create(:teamer, team: team, user: user, rank: Teamer::RANK_MEMBER)
       user.update!(team_id: team.id)
+
       team.destroy
+
       expect(user.reload.team_id).to be_nil
+    end
+
+    it 'preserves users team_id when archiving a team with matches' do
+      team = create(:team)
+      user = create(:user)
+      create(:teamer, team: team, user: user, rank: Teamer::RANK_MEMBER)
+      user.update!(team: team)
+      contest = create(:contest)
+      contester = create(:contester, team: team, contest: contest)
+      create(:match, contest: contest, contester1: contester, contester2: create(:contester, contest: contest))
+
+      team.destroy
+
+      expect(user.reload.team).to eq(team)
+      expect(user.active_team).to be_nil
     end
 
     it 'marks inactive and updates teamers when matches exist' do

@@ -421,7 +421,7 @@ class Match < ApplicationRecord
   end
 
   def user_in_match?(user)
-    !!(user && (user.team == contester1.team || user.team == contester2.team))
+    !!(user && (user.active_team == contester1.team || user.active_team == contester2.team))
   end
 
   def confirmed_proposal?

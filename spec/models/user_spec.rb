@@ -305,13 +305,99 @@ describe User do
   end
 
   describe 'validate_team' do
-    it 'clears invalid team and adds error' do
+    it 'rejects assigning a team without a past or present membership' do
       team = create(:team)
       u = build(:user)
       u.team = team
+
       expect(u.valid?).to be false
-      expect(u.team).to be_nil
+      expect(u.team).to eq(team)
       expect(u.errors[:team]).not_to be_empty
+    end
+
+    it 'allows assigning an active membership as the primary team' do
+      u = create(:user)
+      team = create(:team)
+      create(:teamer, user: u, team: team, rank: Teamer::RANK_MEMBER)
+
+      expect(u.update(team: team)).to be true
+      expect(u.reload.team).to eq(team)
+    end
+
+    it 'allows an inactive former team as a profile affiliation but not as an active team' do
+      u = create(:user)
+      team = create(:team, active: false)
+      create(:teamer, user: u, team: team, rank: Teamer::RANK_REMOVED)
+
+      expect(u.update(team: team)).to be true
+      expect(u.reload.team).to eq(team)
+      expect(u.active_team).to be_nil
+    end
+
+    it 'rejects assigning a pending join request as a profile affiliation' do
+      u = create(:user)
+      team = create(:team)
+      create(:teamer, user: u, team: team, rank: Teamer::RANK_JOINER)
+
+      expect(u.update(team: team)).to be false
+      expect(u.errors[:team]).not_to be_empty
+    end
+
+    it 'rejects changing from a valid primary team to a team without a membership history' do
+      u = create(:user)
+      current_team = create(:team)
+      invalid_team = create(:team)
+      create(:teamer, user: u, team: current_team, rank: Teamer::RANK_MEMBER)
+      u.update!(team: current_team)
+
+      expect(u.update(team: invalid_team)).to be false
+      expect(u.errors[:team]).not_to be_empty
+      expect(u.reload.team).to eq(current_team)
+    end
+
+    it 'allows unrelated updates when a legacy primary team is invalid' do
+      u = create(:user)
+      team = create(:team)
+      create(:teamer, user: u, team: team, rank: Teamer::RANK_JOINER)
+      u.update_column(:team_id, team.id)
+
+      expect(u.update(firstname: 'Updated')).to be true
+      expect(u.reload.attributes.slice('firstname', 'team_id')).to eq(
+        'firstname' => 'Updated',
+        'team_id' => team.id
+      )
+    end
+
+    it 'allows clearing a legacy invalid primary team' do
+      u = create(:user)
+      team = create(:team)
+      u.update_column(:team_id, team.id)
+
+      expect(u.update(team: nil)).to be true
+      expect(u.reload.team_id).to be_nil
+    end
+  end
+
+  describe '#received_team_messages' do
+    it 'includes messages for the active primary team' do
+      u = create(:user)
+      active_team = create(:team)
+      create(:teamer, user: u, team: active_team, rank: Teamer::RANK_MEMBER)
+      u.update!(team: active_team)
+      message = create(:message, recipient: active_team)
+
+      expect(u.received_team_messages).to contain_exactly(message)
+    end
+
+    it 'does not include messages for an inactive former-team affiliation' do
+      u = create(:user)
+      former_team = create(:team, active: false)
+      create(:teamer, user: u, team: former_team, rank: Teamer::RANK_REMOVED)
+      u.update!(team: former_team)
+      create(:message, recipient: former_team)
+
+      expect(u.reload.team).to eq(former_team)
+      expect(u.received_team_messages).to be_empty
     end
   end
 
