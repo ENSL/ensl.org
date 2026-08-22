@@ -90,8 +90,10 @@ RSpec.feature 'Gather leave', type: :feature, js: true do
           sign_in_via_session(viewer)
           visit gather_path(gather)
 
-          expect(page).to have_content(active_player.username)
-          expect(page).not_to have_content(idle_player.username)
+          within('#gatherers') do
+            expect(page).to have_content(active_player.username)
+            expect(page).not_to have_content(idle_player.username)
+          end
         end
       ensure
         ENV['GATHER_IDLE_KICK_ENABLED'] = previous
