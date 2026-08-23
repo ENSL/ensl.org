@@ -69,6 +69,7 @@ class UsersController < ApplicationController
     return if already_logged_in?
 
     user = User.build_for_registration(raw_params: params, actor: cuser, remote_ip: request.env['REMOTE_ADDR'])
+    user.apply_steam_registration_profile!(session[:steam_registration_profile]) if session[:verified_steamid].present?
 
     raise AccessError unless user.can_create? cuser
 

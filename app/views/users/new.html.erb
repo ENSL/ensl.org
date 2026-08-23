@@ -11,6 +11,7 @@
 
   <%= form_for @user, html: { class: "square", data: { turbo: false } } do |f| %>
     <%= render 'shared/errors', messages: @user.errors.full_messages %>
+    <%= f.hidden_field :time_zone, data: { browser_time_zone: true } %>
     <% unless session[:verified_steamid] %>
       <div class="horizontal fields">
       <%= link_to "Create your account via Steam", "/auth/steam", method: :POST %>

@@ -82,6 +82,7 @@ class SessionBloatGuard
 
     session.delete('cached_user')
     session.delete('verified_steamid')
+    session.delete('steam_registration_profile')
   end
 
   def session_bytesize(session)

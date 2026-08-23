@@ -125,7 +125,10 @@ class SessionsController < ApplicationController
   def cache_callback_user(user)
     payload = user.callback_session_payload
     session[:verified_steamid] = payload[:verified_steamid]
-    session[:cached_user] = payload[:cached_user] if user.new_record?
+    return unless user.new_record?
+
+    session[:cached_user] = payload[:cached_user]
+    session[:steam_registration_profile] = payload[:steam_registration_profile]
   end
 
   def callback_user?(user)

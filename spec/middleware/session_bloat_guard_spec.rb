@@ -36,9 +36,17 @@ RSpec.describe SessionBloatGuard do
       'omniauth.params' => {},
       'cached_user' => { id: 176, username: 'example_user', steamid: '0:1:1511705' }.to_json,
       'verified_steamid' => '0:1:1511705',
+      'steam_registration_profile' => steam_registration_profile,
       'passkey_login' => { 'challenge' => 'abc', 'user_id' => nil, 'expires_at' => 5.minutes.from_now.to_i },
       'return_to' => 'http://localhost:4000/halloffame',
       'user' => (logged_in ? 176 : nil)
+    }
+  end
+
+  def steam_registration_profile
+    {
+      'country' => 'FI', 'steam_profile' => 'example_user',
+      'avatar_url' => 'https://avatars.steamstatic.com/hash_medium.jpg'
     }
   end
 
@@ -55,7 +63,9 @@ RSpec.describe SessionBloatGuard do
 
     middleware.call('rack.session' => session)
 
-    expect(session.keys).to contain_exactly('cached_user', 'verified_steamid', 'passkey_login', 'return_to', 'user')
+    expect(session.keys).to contain_exactly(
+      'cached_user', 'verified_steamid', 'steam_registration_profile', 'passkey_login', 'return_to', 'user'
+    )
   end
 
   it 'calls the inner app and returns its response untouched' do
@@ -110,7 +120,9 @@ RSpec.describe SessionBloatGuard do
 
     middleware.call('rack.session' => session)
 
-    expect(session.keys).to contain_exactly('cached_user', 'verified_steamid', 'passkey_login', 'return_to', 'user')
+    expect(session.keys).to contain_exactly(
+      'cached_user', 'verified_steamid', 'steam_registration_profile', 'passkey_login', 'return_to', 'user'
+    )
   end
 
   # rack-openid (see OpenID::Consumer.new(session, store) in rack-openid) uses the Rack

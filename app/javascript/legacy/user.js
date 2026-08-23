@@ -32,6 +32,11 @@ export function HideUserPopup() {
 // User/profile handlers: profile tabs, users index sorting/search, and Steam lookup.
 export function bindUserHandlers() {
   const userTabs = $("#user-profile .tabs")
+  const timeZoneInput = document.querySelector("[data-browser-time-zone]")
+
+  if (timeZoneInput && !timeZoneInput.value && Intl.DateTimeFormat) {
+    timeZoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+  }
 
   // Switches active tab styling and loads tab content via JS response.
   $(document).off("click", "#user-profile li a")

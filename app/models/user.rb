@@ -33,6 +33,7 @@ require 'digest/md5'
 require 'steam_id'
 require 'scrypt'
 require 'securerandom'
+require 'uri'
 
 class SteamIdValidator < ActiveModel::Validator
   def validate(record)
@@ -57,7 +58,8 @@ class User < ApplicationRecord
   PASSWORD_MD5_SCRYPT = 2
 
   # attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
-  attr_accessor :raw_password, :password_updated, :password_force, :fullname, :random_password
+  attr_accessor :raw_password, :password_updated, :password_force, :fullname, :random_password,
+                :steam_registration_profile
 
   attribute :lastvisit, :datetime, default: -> { Time.now.utc }
   attribute :password_hash, :integer, default: PASSWORD_SCRYPT
@@ -509,7 +511,7 @@ class User < ApplicationRecord
 
   def init_variables
     self.public_email = false
-    self.time_zone = 'Amsterdam'
+    self.time_zone = 'Amsterdam' if time_zone.blank?
     generate_password if !raw_password && new_record?
     build_profile if profile.blank?
     # Email is required; do not auto-fill when blank.
@@ -799,8 +801,23 @@ class User < ApplicationRecord
   def callback_session_payload
     {
       verified_steamid: steamid,
-      cached_user: to_json
+      cached_user: to_json,
+      steam_registration_profile: steam_registration_profile
     }
+  end
+
+  def apply_steam_registration_profile!(metadata)
+    return if metadata.blank?
+
+    metadata = metadata.with_indifferent_access
+    self.country = metadata[:country] if country.blank? && metadata[:country].to_s.match?(/\A[A-Z]{2}\z/)
+    profile = self.profile || build_profile
+    profile.steam_profile = metadata[:steam_profile] if profile.steam_profile.blank?
+
+    avatar_url = metadata[:avatar_url]
+    profile.remote_avatar_url = avatar_url if profile.avatar.blank? && self.class.trusted_steam_avatar_url?(avatar_url)
+  rescue CarrierWave::DownloadError => e
+    Rails.logger.warn("Steam avatar import failed: #{e.message}")
   end
 
   def filtered_update_attributes(raw_params, actor)
@@ -818,18 +835,40 @@ class User < ApplicationRecord
 
       steamid = User.normalize_steamid(auth_hash[:uid])
       user = User.where('LOWER(steamid) = LOWER(?)', steamid).first
-      unless user
-        user = User.new(username: auth_hash[:info][:nickname], lastip: lastip, fullname: auth_hash[:info][:name],
-                        steamid: steamid)
-        user.fix_attributes
-        user.build_profile
-        # TODO: user make valid by force
-        # user.profile.country
-        # get profile picture, :image
-        # This really shouldn't fail.
-      end
-      return user
+      return user || build_from_steam_auth(auth_hash, lastip, steamid)
     end
     nil
+  end
+
+  def self.build_from_steam_auth(auth_hash, lastip, steamid)
+    info = auth_hash[:info] || {}
+    user = User.new(username: info[:nickname], lastip: lastip, fullname: info[:name], steamid: steamid)
+    user.steam_registration_profile = steam_registration_profile_from(auth_hash)
+    user.country = user.steam_registration_profile[:country]
+    user.fix_attributes
+    user.build_profile
+    user.profile.steam_profile = user.steam_registration_profile[:steam_profile]
+    user
+  end
+
+  def self.trusted_steam_avatar_url?(value)
+    uri = URI.parse(value.to_s)
+    return false unless uri.scheme == 'https'
+
+    %w[avatars.steamstatic.com steamcdn-a.akamaihd.net].include?(uri.host)
+  rescue URI::InvalidURIError
+    false
+  end
+
+  def self.steam_registration_profile_from(auth_hash)
+    info = auth_hash[:info] || {}
+    raw_info = auth_hash.dig(:extra, :raw_info) || {}
+    profile_url = info.dig(:urls, :Profile).to_s
+
+    {
+      country: raw_info[:loccountrycode].to_s.upcase.presence,
+      steam_profile: profile_url[%r{\Ahttps?://steamcommunity\.com/(?:id|profiles)/([^/]+)/?\z}, 1],
+      avatar_url: info[:image].presence
+    }
   end
 end

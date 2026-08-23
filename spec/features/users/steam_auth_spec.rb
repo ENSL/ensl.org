@@ -13,6 +13,16 @@ RSpec.describe 'Steam authentication link', type: :feature, js: true do
   it 'user creates a new account via Steam', js: true do
     username = 'spec_steam_user'
     email = 'spec+steam@example.com'
+    OmniAuth.config.mock_auth[:steam] = OmniAuth::AuthHash.new(
+      provider: 'steam',
+      uid: '76561198000000000',
+      info: {
+        nickname: username,
+        name: 'Steam User',
+        urls: { Profile: 'https://steamcommunity.com/id/spec_steam_user/' }
+      },
+      extra: { raw_info: { loccountrycode: 'FI' } }
+    )
 
     visit root_path
 
@@ -50,5 +60,9 @@ RSpec.describe 'Steam authentication link', type: :feature, js: true do
     # After signup, user should be logged in
     expect(page).to have_link('Logout')
     expect(page).to have_content(username)
+
+    created_user = User.find_by!(username: username)
+    expect(created_user.country).to eq('FI')
+    expect(created_user.profile.steam_profile).to eq('spec_steam_user')
   end
 end

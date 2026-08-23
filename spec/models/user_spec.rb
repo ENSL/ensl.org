@@ -634,16 +634,19 @@ describe User do
             email: 'reg_user@example.com',
             raw_password: 'Secret123!',
             firstname: 'Reg',
-            lastname: 'User'
+            lastname: 'User',
+            time_zone: 'Europe/Helsinki'
           }
         )
 
         built = described_class.build_for_registration(raw_params: raw, actor: nil, remote_ip: '10.9.8.7')
+        built.valid?
 
         expect(built).to be_a(User)
         expect(built).to be_new_record
         expect(built.lastip).to eq('10.9.8.7')
         expect(built.username).to eq('reg_user')
+        expect(built.time_zone).to eq('Europe/Helsinki')
       end
     end
 
@@ -667,11 +670,13 @@ describe User do
     describe '#callback_session_payload' do
       it 'returns verified steamid and cached user json' do
         subject = create(:user, steamid: '0:1:123')
+        subject.steam_registration_profile = { country: 'DE' }
 
         payload = subject.callback_session_payload
 
         expect(payload[:verified_steamid]).to eq('0:1:123')
         expect(payload[:cached_user]).to eq(subject.to_json)
+        expect(payload[:steam_registration_profile]).to eq(country: 'DE')
       end
     end
 
@@ -990,7 +995,17 @@ describe User do
     end
 
     it 'builds a new user from steam auth when steam uid is unknown' do
-      auth_hash = { provider: 'steam', uid: 'STEAM_0:1:654', info: { nickname: 'FreshNick', name: 'Fresh User' } }
+      auth_hash = {
+        provider: 'steam',
+        uid: 'STEAM_0:1:654',
+        info: {
+          nickname: 'FreshNick',
+          name: 'Fresh User',
+          image: 'https://avatars.steamstatic.com/hash_medium.jpg',
+          urls: { Profile: 'https://steamcommunity.com/id/fresh_user/' }
+        },
+        extra: { raw_info: { loccountrycode: 'de' } }
+      }
 
       result = User.find_or_build(auth_hash, '8.8.8.8')
 
@@ -999,7 +1014,43 @@ describe User do
       expect(result.username).to start_with('FreshNick')
       expect(result.lastip).to eq('8.8.8.8')
       expect(result.steamid).to eq('0:1:654')
+      expect(result.country).to eq('DE')
       expect(result.profile).to be_present
+      expect(result.profile.steam_profile).to eq('fresh_user')
+      expect(result.steam_registration_profile[:avatar_url]).to eq(
+        'https://avatars.steamstatic.com/hash_medium.jpg'
+      )
+    end
+
+    it 'only applies avatar URLs hosted by Steam' do
+      subject = build(:user, country: nil)
+      profile = subject.build_profile
+      allow(profile).to receive(:remote_avatar_url=)
+
+      subject.apply_steam_registration_profile!(
+        country: 'GB', steam_profile: 'fresh_user', avatar_url: 'https://example.com/avatar.jpg'
+      )
+
+      expect(subject.country).to eq('GB')
+      expect(profile.steam_profile).to eq('fresh_user')
+      expect(profile).not_to have_received(:remote_avatar_url=)
+    end
+
+    it 'accepts string-keyed session metadata without failing when the Steam avatar is unavailable' do
+      subject = build(:user, country: nil)
+      profile = subject.build_profile
+      allow(profile).to receive(:remote_avatar_url=).and_raise(CarrierWave::DownloadError, 'unavailable')
+
+      expect do
+        subject.apply_steam_registration_profile!(
+          'country' => 'FI',
+          'steam_profile' => 'steam_user',
+          'avatar_url' => 'https://avatars.steamstatic.com/hash_medium.jpg'
+        )
+      end.not_to raise_error
+
+      expect(subject.country).to eq('FI')
+      expect(profile.steam_profile).to eq('steam_user')
     end
   end
 end
