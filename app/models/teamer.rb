@@ -33,8 +33,6 @@ class Teamer < ApplicationRecord
 
   validates :comment, length: { in: 0..15, allow_blank: true }
   validates :user, :team, presence: true
-  # validate_on_create:validate_team
-  # validate_on_create:validate_contests
   validate :validate_team
 
   scope :basic, -> { includes(:user).order('rank DESC, created_at ASC') }
@@ -88,10 +86,6 @@ class Teamer < ApplicationRecord
                         .exists?
 
     errors.add :team, I18n.t(:teams_join_twice)
-  end
-
-  def validate_contests
-    # TODO
   end
 
   def fetch_user
