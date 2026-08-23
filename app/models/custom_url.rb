@@ -16,7 +16,7 @@
 #  index_custom_urls_on_name        (name)
 #
 
-# TODO: move this to a gem
+# NOTE: Consider moving this to a gem
 class CustomUrl < ApplicationRecord
   MENU_LINKED_NAMES = %w[compmod halloffame rules tutorials].freeze
 

@@ -38,7 +38,8 @@ end
 pidfile "#{app_dir}/tmp/pids/puma.pid"
 state_path "#{app_dir}/tmp/puma.state"
 
-# FIXME: sometimes the app becomes super slow if workers are used, investigate
+# NOTE: sometimes the app becomes super slow if workers are used, investigate
+# No actual reason to user workers right now so this is non-issue.
 workers Integer(ENV['PUMA_WORKERS']) if ENV.key?('PUMA_WORKERS') && ENV['PUMA_WORKERS'].to_i.positive?
 worker_timeout Integer(ENV['PUMA_TIMEOUT'] || 30)
 threads Integer(ENV['PUMA_MIN_THREADS'] || 1), Integer(ENV['PUMA_MAX_THREADS'] || 16)
