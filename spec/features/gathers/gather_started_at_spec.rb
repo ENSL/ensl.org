@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.feature 'Gather start time', type: :feature do
   scenario 'shows when voting started on a finished gather' do
     gather = create(:gather)
-    create_list(:gatherer, Gather::FULL - 1, gather: gather, created_at: 2.hours.ago)
     started_at = Time.zone.local(2026, 8, 22, 14, 35)
+    create_list(:gatherer, Gather::FULL - 1, gather: gather, created_at: started_at - 1.hour)
     create(:gatherer, gather: gather, created_at: started_at)
     gather.update_column(:status, Gather::STATE_FINISHED)
 
