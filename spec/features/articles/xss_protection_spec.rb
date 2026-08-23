@@ -6,18 +6,17 @@ feature 'XSS Protection in Articles', js: true do
   let!(:category) { create(:category, domain: Category::DOMAIN_NEWS) }
   let!(:admin) { create(:user, :admin) }
 
-  scenario 'BBCode format prevents XSS attacks' do
+  scenario 'HTML format prevents script injection' do
     sign_in_as(admin)
     visit new_article_path
 
     expect(page).to have_selector('#article_title', wait: 5)
     fill_in 'article_title', with: 'XSS Test Article'
 
-    select 'BBCode', from: 'article_text_coding'
+    select 'Plain HTML', from: 'article_text_coding'
+    expect(page).to have_selector('.tox-tinymce', wait: 5)
 
-    # Try to inject script tag via BBCode
-    expect(page).to have_selector('#article_text', visible: :all, wait: 5)
-    fill_tinymce 'article_text', '[b]Safe content[/b]<script>alert("XSS")</script>'
+    fill_tinymce 'article_text', '<strong>Safe content</strong><script>alert("XSS")</script>'
 
     click_button I18n.t('helpers.submit.post.create')
 
@@ -76,17 +75,17 @@ feature 'XSS Protection in Articles', js: true do
     expect(page.html).not_to include('<iframe')
   end
 
-  scenario 'BBCode format prevents event handler injection' do
+  scenario 'HTML format prevents event handler injection' do
     sign_in_as(admin)
     visit new_article_path
 
     expect(page).to have_selector('#article_title', wait: 5)
     fill_in 'article_title', with: 'Event Handler Test'
 
-    select 'BBCode', from: 'article_text_coding'
+    select 'Plain HTML', from: 'article_text_coding'
+    expect(page).to have_selector('.tox-tinymce', wait: 5)
 
-    expect(page).to have_selector('#article_text', visible: :all, wait: 5)
-    fill_tinymce 'article_text', '[b]Text[/b]<img src=x onerror="alert(1)">'
+    fill_tinymce 'article_text', '<strong>Text</strong><img src="x" onerror="alert(1)">'
 
     click_button I18n.t('helpers.submit.post.create')
 

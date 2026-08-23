@@ -62,8 +62,7 @@
   <div class="fields horizontal wide article-editor<%= ' article-editor-loading' if editor_enabled %>"
        data-controller="article-editor"
        data-article-editor-enabled-value="<%= editor_enabled %>"
-       data-article-format-target="editor"
-       data-action="article:file-added@window->article-editor#insertFile">
+      data-article-format-target="editor">
     <h4>Content</h4>
     <%= f.text_area :text, class: 'tinymce', rows: 30, cols: 80,
                  data: { action: 'input->article-format#contentChanged' } %>

@@ -3,9 +3,9 @@
 
   <div class="content">
     <% if article.text_coding == Article::CODING_HTML %>
-      <%= sanitize(article.text) %>
+      <%= sanitize_article_content(article.text) %>
     <% else %>
-      <%= sanitize(article.text_parsed) %>
+      <%= sanitize_article_content(article.text_parsed) %>
     <% end %>
   </div>
 

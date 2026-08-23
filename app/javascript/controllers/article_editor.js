@@ -6,11 +6,14 @@ export default class extends Controller {
   connect() {
     this.connected = true
     this.attempts = 0
+    this.insertFileListener = this.insertFile.bind(this)
+    window.addEventListener("article:file-added", this.insertFileListener)
     if (this.enabledValue) this.enable()
   }
 
   disconnect() {
     this.connected = false
+    window.removeEventListener("article:file-added", this.insertFileListener)
     window.clearTimeout(this.retryTimer)
     this.editor?.remove()
   }
@@ -89,10 +92,14 @@ export default class extends Controller {
   }
 
   insertFile(event) {
-    const editor = this.editor || window.tinymce?.get(this.element.querySelector("textarea.tinymce")?.id)
-    if (!editor) return
-
     const { url, title, image } = event.detail
+    const textarea = this.element.querySelector("textarea.tinymce")
+    const editor = this.editor || window.tinymce?.get(textarea?.id)
+    if (!editor) {
+      this.insertMarkdownFile(textarea, { url, title, image })
+      return
+    }
+
     const escapedUrl = editor.dom.encode(url)
     const escapedTitle = editor.dom.encode(title)
     const html = image
@@ -101,6 +108,22 @@ export default class extends Controller {
 
     editor.insertContent(html)
     editor.focus()
+  }
+
+  insertMarkdownFile(textarea, { url, title, image }) {
+    if (!textarea) return
+
+    const escapedTitle = title.replace(/([\\\[\]])/g, "\\$1")
+    const escapedUrl = url.replace(/([\\()])/g, "\\$1")
+    const markdown = image
+      ? `![${escapedTitle}](${escapedUrl})`
+      : `[${escapedTitle}](${escapedUrl})`
+    const selectionStart = textarea.selectionStart
+    const selectionEnd = textarea.selectionEnd
+
+    textarea.setRangeText(markdown, selectionStart, selectionEnd, "end")
+    textarea.dispatchEvent(new Event("input", { bubbles: true }))
+    textarea.focus()
   }
 
   activateEditor(editor) {

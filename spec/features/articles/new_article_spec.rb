@@ -34,7 +34,6 @@ feature 'User creates new article', js: true do
         expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
       end
 
-      # TODO: add more fancier formatting tests (images, links, etc)
       it 'groups categories by alphabetized domain and category name' do
         create(:category, domain: Category::DOMAIN_ARTICLES, name: 'Zulu')
         create(:category, domain: Category::DOMAIN_ARTICLES, name: 'Alpha')
@@ -64,6 +63,54 @@ feature 'User creates new article', js: true do
 
         expect(page).to have_selector('.tox-tinymce', wait: 5)
         expect(page).to have_select('article_text_coding', selected: 'Plain HTML', disabled: false)
+      end
+
+      it 'creates HTML with bold text and a link using TinyMCE' do
+        visit new_article_path
+        fill_in 'article_title', with: article[:title]
+        select 'Plain HTML', from: 'article_text_coding'
+        expect(page).to have_selector('.tox-tinymce', wait: 5)
+
+        page.execute_script(<<~JAVASCRIPT)
+          const editor = tinymce.get('article_text')
+          editor.setContent('<p><span id="bold-target">Bold text</span> and <span id="link-target">linked text</span></p>')
+          editor.selection.select(editor.dom.select('#bold-target')[0])
+          editor.execCommand('Bold')
+          editor.selection.select(editor.dom.select('#link-target')[0])
+          editor.execCommand('mceInsertLink', false, { href: 'https://example.com/guide' })
+          editor.save()
+          editor.fire('input')
+        JAVASCRIPT
+        click_button I18n.t('helpers.submit.post.create')
+
+        expect(page).to have_css('.article .content strong', text: 'Bold text')
+        expect(page).to have_link('linked text', href: 'https://example.com/guide')
+        expect(Article.order(:id).last.text_coding).to eq(Article::CODING_HTML)
+      end
+
+      it 'renders the supported Markdown formatting in bulk' do
+        visit new_article_path
+        fill_in 'article_title', with: article[:title]
+        fill_in 'article_text', with: markdown_formatting_sample
+        click_button I18n.t('helpers.submit.post.create')
+
+        within '.article .content' do
+          expect(page).to have_css('h1', text: 'Main heading')
+          expect(page).to have_css('h2', text: 'Secondary heading')
+          expect(page).to have_css('strong', text: 'Bold text')
+          expect(page).to have_css('em', text: 'Italic text')
+          expect(page).to have_css('del', text: 'Struck text')
+          expect(page).to have_css('ul li', text: 'Bullet item')
+          expect(page).to have_css('ol li', text: 'Numbered item')
+          expect(page).to have_css('blockquote', text: 'Quoted text')
+          expect(page).to have_css('p code', text: 'inline_code')
+          expect(page).to have_css('pre code', text: 'puts "fenced code"')
+          expect(page).to have_link('Markdown guide', href: 'https://www.markdownguide.org/')
+          expect(page).to have_css('img[src="https://example.com/image.png"][alt="Example image"]')
+          expect(page).to have_css('hr')
+          expect(page).to have_css('table thead th', text: 'Column A')
+          expect(page).to have_css('table tbody td', text: 'Value B')
+        end
       end
 
       it 'returns to the Markdown textarea when changed back before editing' do
@@ -247,6 +294,7 @@ feature 'User creates new article', js: true do
 
   describe 'editing a Markdown article' do
     let!(:admin) { create(:user, :admin) }
+    let!(:article_directory) { create(:directory, :articles) }
     let!(:markdown_article) { create(:article, user: admin, category: category, text: '**Current Markdown**') }
 
     it 'shows the Markdown guide without offering another conversion' do
@@ -259,11 +307,67 @@ feature 'User creates new article', js: true do
         expect(page).to have_no_select('article_text_coding')
       end
     end
+
+    it 'uploads an image without navigation and inserts Markdown into the textarea' do
+      upload = Tempfile.new(['markdown-article-image', '.png'])
+      upload.binmode
+      upload.write("\x89PNG\r\n\x1a\n")
+      upload.close
+
+      sign_in_as(admin)
+      visit edit_article_path(markdown_article)
+
+      within '#article_file_upload' do
+        attach_file 'data_file_name', upload.path
+        click_button 'Create'
+      end
+
+      notice = I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human)
+      expect(page).to have_content(notice, wait: 5)
+      created_file = DataFile.order(:id).last
+      expect(page).to have_current_path(edit_article_path(markdown_article))
+      expect(page).to have_selector("#data_file_#{created_file.id}", wait: 5)
+      expect(find_field('article_text').value).to include("![#{created_file}](#{created_file.url})")
+    ensure
+      FileUtils.rm_f(created_file.location) if created_file&.location
+      upload&.unlink
+    end
   end
 
   private
 
   def long_text
     (0..10_000).map { (0...8).map { rand(65..90).chr }.join }.join(' ') # 90008
+  end
+
+  def markdown_formatting_sample
+    <<~MARKDOWN
+      # Main heading
+      ## Secondary heading
+
+      **Bold text** and *Italic text* and ~~Struck text~~.
+
+      - Bullet item
+
+      1. Numbered item
+
+      > Quoted text
+
+      Use `inline_code` here.
+
+      ```ruby
+      puts "fenced code"
+      ```
+
+      [Markdown guide](https://www.markdownguide.org/)
+
+      ![Example image](https://example.com/image.png)
+
+      ---
+
+      | Column A | Column B |
+      | -------- | -------- |
+      | Value A  | Value B  |
+    MARKDOWN
   end
 end
