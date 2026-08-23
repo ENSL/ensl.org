@@ -7,6 +7,8 @@ import GatherMusicController from "controllers/gather_music"
 import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
 import MapBalanceChartController from "controllers/map_balance_chart"
+import ArticleEditorController from "controllers/article_editor"
+import ArticleFileController from "controllers/article_file"
 import "legacy/local"
 import "legacy/shoutbox"
 
@@ -19,3 +21,5 @@ application.register("gather-music", GatherMusicController)
 application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
 application.register("map-balance-chart", MapBalanceChartController)
+application.register("article-editor", ArticleEditorController)
+application.register("article-file", ArticleFileController)

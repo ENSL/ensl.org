@@ -11,6 +11,8 @@
     <%= javascript_include_tag 'jquery_ujs', defer: false %>
     <%= javascript_include_tag 'yetii', defer: false %>
     <%= javascript_include_tag 'twemoji', defer: false %>
+    <%= tinymce_assets %>
+    <%= javascript_tag tinymce_configurations_javascript, nonce: true %>
     <%= javascript_importmap_tags %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% unless Rails.env.test? %>

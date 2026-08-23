@@ -1,0 +1,15 @@
+<%= form_for file, html: { multipart: true, id: 'article_file_upload' } do |form| %>
+  <div id="article_file_errors">
+    <%= render 'shared/errors', messages: file.errors.full_messages %>
+  </div>
+
+  <%= form.hidden_field :directory_id %>
+  <%= form.hidden_field :article_id %>
+
+  <div class="fields">
+    <%= form.file_field :name %>
+  </div>
+  <div class="controls">
+    <%= form.submit 'Create' %>
+  </div>
+<% end %>

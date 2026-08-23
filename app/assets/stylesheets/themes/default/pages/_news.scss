@@ -112,9 +112,46 @@ div.article-links {
 */
 
 form.article {
+  display: flow-root;
 
   h4 {
     margin-bottom: 20px;
+  }
+}
+
+.article-editor {
+  position: relative;
+
+  textarea {
+    width: 100%;
+  }
+
+  .article-editor-status {
+    display: none;
+  }
+
+  &.article-editor-loading:not(:has(.tox-tinymce)) {
+    min-height: 520px;
+
+    textarea {
+      visibility: hidden;
+    }
+
+    .article-editor-status {
+      display: flex;
+      position: absolute;
+      inset: 44px 0 0;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #aaa;
+      background: #fff;
+    }
+  }
+
+  &:has(.tox-tinymce) {
+    .article-editor-status {
+      display: none;
+    }
   }
 }
 

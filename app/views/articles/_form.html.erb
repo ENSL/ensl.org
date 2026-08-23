@@ -1,8 +1,6 @@
-<% if article.text_coding == Article::CODING_HTML %>
-  <%= render partial: "javascripts/mce_full" %>
-<% end %>
+<% editor_enabled = article.text_coding == Article::CODING_HTML %>
 
-<h1>Editing Article</h1>
+<h1><%= article.new_record? ? 'New Article' : 'Editing Article' %></h1>
 
 <%= form_for(article, html: { class: 'article square' }) do |f| %>
   <div id="<%= error_wrapper_id_for(article) %>">
@@ -25,11 +23,22 @@
   </div>
   <div class="fields horizontal">
     <%= f.label :category_id %>
-    <%= f.select :category_id, Category.ordered.collect{|c| ["#{c.domains[c.domain]} - #{c}", c.id]} %>
+    <% category_groups = Category.all.group_by { |category| category.domains[category.domain] }
+                                 .sort_by { |domain, _categories| domain }
+                                 .map { |domain, categories| [domain, categories.sort_by { |category| category.name.downcase }.map { |category| [category.name, category.id] }] } %>
+    <%= f.select :category_id, grouped_options_for_select(category_groups, article.category_id) %>
   </div>
-  <div class="fields horizontal wide">
+  <div class="fields horizontal wide article-editor<%= ' article-editor-loading' if editor_enabled %>"
+       <% if editor_enabled %>
+         data-controller="article-editor"
+         data-action="article:file-added@window->article-editor#insertFile"
+       <% end %>>
     <h4>Content</h4>
     <%= f.text_area :text, :class => "tinymce", :rows => 30, :cols => 80 %>
+    <% if editor_enabled %>
+      <div class="article-editor-status" role="status">Loading editor...</div>
+      <noscript><style>.article-editor-loading textarea { visibility: visible !important; }</style></noscript>
+    <% end %>
   </div>
   <div class="controls inline">
     <%= f.submit %>
@@ -40,24 +49,13 @@
   <div class="files">
     <h4>Files</h4>
 
-    <%= render partial: "data_files/list", locals: { files: article.files } %>
+    <div id="article_files">
+      <%= render partial: "data_files/list", locals: { files: article.files } %>
+    </div>
 
     <% if file && file.can_create?(cuser) %>
       <h4>New File</h4>
-
-      <%= form_for file, html: { multipart: true } do |f| %>
-        <%= render 'shared/errors', messages: file.errors.full_messages %>
-
-        <%= f.hidden_field :directory_id %>
-        <%= f.hidden_field :article_id %>
-
-        <div class="fields">
-          <%= f.file_field :name %>
-        </div>
-        <div class="controls">
-          <%= f.submit 'Create' %>
-        </div>
-      <% end %>
+      <%= render 'data_files/article_upload_form', file: file %>
     <% end %>
   </div>
 <% end %>

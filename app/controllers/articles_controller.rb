@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
+  layout 'full', only: %i[new edit create update]
+
   before_action :load_article, only: %i[show edit update cleanup destroy]
 
   def index

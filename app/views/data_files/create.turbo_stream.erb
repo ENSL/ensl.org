@@ -1,0 +1,22 @@
+<%= turbo_stream.replace 'notification' do %>
+  <%= render 'application/messages' %>
+<% end %>
+
+<%= turbo_stream.replace 'article_files' do %>
+  <div id="article_files">
+    <%= render 'data_files/list', files: @article.files.reload %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace 'article_file_upload' do %>
+  <%= render 'data_files/article_upload_form', file: @file %>
+<% end %>
+
+<% if @uploaded_file %>
+  <%= turbo_stream.append 'article_files' do %>
+    <span data-controller="article-file"
+          data-article-file-url-value="<%= @uploaded_file.url %>"
+          data-article-file-title-value="<%= @uploaded_file.to_s %>"
+          data-article-file-image-value="<%= @uploaded_file.name.content_type.to_s.start_with?('image/') %>"></span>
+  <% end %>
+<% end %>

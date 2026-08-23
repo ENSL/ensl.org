@@ -31,11 +31,9 @@ class DataFilesController < ApplicationController
     raise AccessError unless @file.can_create? cuser
 
     if @file.save
-      flash[:notice] = flash_action_message(:create, @file)
-      check_downloadability
-      redirect_to redirect_target_after_create_path(@file)
+      respond_to_successful_create
     else
-      respond_with_validation_errors(@file, template: :new)
+      respond_to_failed_create
     end
   end
 
@@ -76,6 +74,32 @@ class DataFilesController < ApplicationController
 
   private
 
+  def respond_to_successful_create
+    respond_to do |format|
+      format.html do
+        flash[:notice] = flash_action_message(:create, @file)
+        check_downloadability
+        redirect_to redirect_target_after_create_path(@file)
+      end
+      format.turbo_stream do
+        flash.now[:notice] = flash_action_message(:create, @file)
+        check_downloadability
+        prepare_article_file_response
+      end
+    end
+  end
+
+  def respond_to_failed_create
+    respond_to do |format|
+      format.html { respond_with_validation_errors(@file, template: :new) }
+      format.turbo_stream do
+        flash.now[:error] = @file.errors.full_messages.to_sentence
+        prepare_article_file_response
+        render :create, status: :unprocessable_content
+      end
+    end
+  end
+
   def check_downloadability
     origin = DataFile.public_download_origin
     return if origin.blank? || @file.downloadable_from?(origin)
@@ -89,6 +113,14 @@ class DataFilesController < ApplicationController
 
   def prepare_edit_form_data
     @add_related_options = DataFile.related_selection_options(@file)
+  end
+
+  def prepare_article_file_response
+    @article = @file.article
+    raise ActionController::UnknownFormat unless @article
+
+    @uploaded_file = @file if @file.persisted?
+    @file = DataFile.new(directory_id: Directory::ARTICLES, article: @article) if @file.persisted?
   end
 
   def safe_return_to
