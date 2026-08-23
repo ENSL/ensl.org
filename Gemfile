@@ -104,6 +104,9 @@ gem 'recaptcha', require: 'recaptcha/rails'
 # Provides URL parsing to links for user content.
 gem 'rails_autolink'
 
+# Best-effort conversion of legacy article HTML/BBCode to Markdown.
+gem 'reverse_markdown'
+
 #
 # Assets, JS and CSS
 

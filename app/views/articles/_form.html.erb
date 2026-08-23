@@ -1,8 +1,33 @@
 <% editor_enabled = article.text_coding == Article::CODING_HTML %>
+<% markdown_guide = link_to 'Markdown guide', 'https://www.markdownguide.org/basic-syntax/', target: '_blank', rel: 'noopener' %>
 
-<h1><%= article.new_record? ? 'New Article' : 'Editing Article' %></h1>
+<div data-controller="article-format"
+  data-article-format-html-value="<%= Article::CODING_HTML %>"
+  data-action="article:content-changed@window->article-format#contentChanged">
+  <h1><%= article.new_record? ? 'New Article' : 'Editing Article' %></h1>
 
-<%= form_for(article, html: { class: 'article square' }) do |f| %>
+  <%= form_for(article, html: {
+        class: 'article square',
+        data: article.persisted? ? { article_format_target: 'form' } : {}
+      }) do |f| %>
+    <% unless article.new_record? %>
+      <div class="fields horizontal">
+        <%= f.label :text_coding, 'Format' %>
+        <div class="inputs">
+          <% if article.format_conversion_options.any? %>
+            <%= f.select :text_coding,
+                         options_for_select(article.format_conversion_options),
+                         { include_blank: "#{article.codings.fetch(article.text_coding)} (current)" },
+                         data: { article_format_target: 'select', action: 'article-format#convert' } %>
+          <% else %>
+            <span><%= article.codings.fetch(article.text_coding) %></span>
+          <% end %>
+          <% if article.text_coding == Article::CODING_MARKDOWN || article.format_conversion_options.any? %>
+            <%= markdown_guide %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   <div id="<%= error_wrapper_id_for(article) %>">
     <%= render 'shared/errors', messages: article.errors.full_messages, container_id: error_container_id_for(article) %>
   </div>
@@ -17,10 +42,16 @@
       <%= f.select :status, article.statuses.invert %>
     </div>
   <% end %>
-  <div class="fields horizontal">
-    <%= f.label :text_coding %>
-    <%= f.select :text_coding, article.codings.invert %>
-  </div>
+    <% if article.new_record? %>
+      <div class="fields horizontal">
+        <%= f.label :text_coding, 'Format' %>
+        <div class="inputs">
+          <%= f.select :text_coding, article.new_article_codings.invert,
+                       {}, data: { article_format_target: 'select', action: 'article-format#newFormatChanged' } %>
+          <%= markdown_guide %>
+        </div>
+      </div>
+    <% end %>
   <div class="fields horizontal">
     <%= f.label :category_id %>
     <% category_groups = Category.all.group_by { |category| category.domains[category.domain] }
@@ -29,21 +60,21 @@
     <%= f.select :category_id, grouped_options_for_select(category_groups, article.category_id) %>
   </div>
   <div class="fields horizontal wide article-editor<%= ' article-editor-loading' if editor_enabled %>"
-       <% if editor_enabled %>
-         data-controller="article-editor"
-         data-action="article:file-added@window->article-editor#insertFile"
-       <% end %>>
+       data-controller="article-editor"
+       data-article-editor-enabled-value="<%= editor_enabled %>"
+       data-article-format-target="editor"
+       data-action="article:file-added@window->article-editor#insertFile">
     <h4>Content</h4>
-    <%= f.text_area :text, :class => "tinymce", :rows => 30, :cols => 80 %>
-    <% if editor_enabled %>
-      <div class="article-editor-status" role="status">Loading editor...</div>
-      <noscript><style>.article-editor-loading textarea { visibility: visible !important; }</style></noscript>
-    <% end %>
+    <%= f.text_area :text, class: 'tinymce', rows: 30, cols: 80,
+                 data: { action: 'input->article-format#contentChanged' } %>
+    <div class="article-editor-status" role="status">Loading editor...</div>
+    <noscript><style>.article-editor-loading textarea { visibility: visible !important; }</style></noscript>
   </div>
   <div class="controls inline">
     <%= f.submit %>
   </div>
-<% end %>
+  <% end %>
+</div>
 
 <% unless article.new_record? %>
   <div class="files">

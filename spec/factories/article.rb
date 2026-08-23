@@ -6,7 +6,7 @@ FactoryBot.define do
     association :category
     sequence(:title) { |n| "Article #{n}" }
     sequence(:text)  { (0..100).map { (0...8).map { rand(65..90).chr }.join }.join(' ') }
-    text_coding { Article::CODING_BBCODE }
+    text_coding { Article::CODING_MARKDOWN }
     status { Article::STATUS_PUBLISHED }
 
     trait :front_page_dataset do

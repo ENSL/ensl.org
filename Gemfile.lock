@@ -570,6 +570,8 @@ GEM
       actionpack (>= 7.0)
       railties (>= 7.0)
     retriable (3.8.0)
+    reverse_markdown (3.0.2)
+      nokogiri
     rexml (3.4.4)
     rmagick (7.1.1)
       observer (~> 0.1)
@@ -826,6 +828,7 @@ DEPENDENCIES
   redis (~> 4.8)
   redis-namespace
   responders
+  reverse_markdown
   rmagick
   rspec-benchmark
   rspec-core

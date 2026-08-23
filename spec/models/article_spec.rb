@@ -24,14 +24,14 @@ RSpec.describe Article, type: :model do
   end
 
   describe '#init_variables' do
-    it 'forces draft status and downgrades html coding for non-admin users' do
+    it 'forces draft status and preserves the selected format for non-admin users' do
       article = described_class.new(user: author, status: described_class::STATUS_PUBLISHED,
                                     text_coding: described_class::CODING_HTML)
 
       article.init_variables
 
       expect(article.status).to eq(described_class::STATUS_DRAFT)
-      expect(article.text_coding).to eq(described_class::CODING_BBCODE)
+      expect(article.text_coding).to eq(described_class::CODING_HTML)
     end
 
     it 'leaves admin status and html coding unchanged' do
@@ -50,6 +50,63 @@ RSpec.describe Article, type: :model do
       article = described_class.new(text: '<b>safe</b>', text_coding: described_class::CODING_HTML)
 
       expect { article.format_text }.not_to change(article, :text_parsed)
+    end
+  end
+
+  describe 'format conversion' do
+    it 'converts HTML to Markdown' do
+      html = '<h2>Heading</h2><p>A <strong>bold</strong> link to <a href="/rules">rules</a>.</p>'
+      article = create(:article, user: admin, category: category, text_coding: described_class::CODING_HTML, text: html)
+
+      article.update!(text_coding: described_class::CODING_MARKDOWN)
+
+      expect(article.text).to include('## Heading', '**bold**', '[rules](/rules)')
+      expect(article.text_parsed).to include('<h2', '>Heading<', '<strong>bold</strong>')
+    end
+
+    it 'converts BBCode to Markdown' do
+      article = legacy_bbcode_article('[b]Bold[/b] and [url=/rules]rules[/url]')
+
+      article.update!(text_coding: described_class::CODING_MARKDOWN)
+
+      expect(article.text).to include('**Bold**', '[rules](/rules)')
+    end
+
+    it 'rejects every unsupported conversion' do
+      unsupported = [
+        [described_class::CODING_HTML, described_class::CODING_BBCODE],
+        [described_class::CODING_MARKDOWN, described_class::CODING_HTML],
+        [described_class::CODING_MARKDOWN, described_class::CODING_BBCODE],
+        [described_class::CODING_BBCODE, described_class::CODING_HTML]
+      ]
+
+      unsupported.each do |source, target|
+        article = if source == described_class::CODING_BBCODE
+                    legacy_bbcode_article('[b]Bold[/b]')
+                  else
+                    create(:article, user: admin, category: category, text_coding: source, text: 'Bold')
+                  end
+
+        expect(article.update(text_coding: target)).to be(false)
+        expect(article.errors[:text_coding]).to include('cannot be converted between those formats')
+        expect(article.reload.text_coding).to eq(source)
+      end
+    end
+
+    it 'rejects changing the content and format together' do
+      article = create(:article, user: admin, category: category, text_coding: described_class::CODING_HTML,
+                                 text: '<p>Original</p>')
+
+      expect(article.update(text: '<p>Changed</p>', text_coding: described_class::CODING_MARKDOWN)).to be(false)
+      expect(article.errors[:text_coding]).to include('cannot be changed while editing the content')
+      expect(article.reload.text).to eq('<p>Original</p>')
+    end
+
+    it 'rejects BBCode for new articles' do
+      article = build(:article, user: admin, category: category, text_coding: described_class::CODING_BBCODE)
+
+      expect(article).not_to be_valid
+      expect(article.errors[:text_coding]).to include('BBCode is not supported for new articles')
     end
   end
 
@@ -173,13 +230,7 @@ RSpec.describe Article, type: :model do
     end
 
     it 'parses bbcode text into text_parsed before save' do
-      article = Article.new(
-        user: admin,
-        category: category,
-        title: 'BBCode article',
-        text: '[b]bold[/b]',
-        text_coding: described_class::CODING_BBCODE
-      )
+      article = legacy_bbcode_article('[b]bold[/b]')
 
       allow(article).to receive(:bbcode_to_html).with(article.text).and_return('<p>bold</p>')
 
@@ -201,13 +252,7 @@ RSpec.describe Article, type: :model do
   describe 'XSS protection' do
     context 'with BBCode format' do
       it 'strips script tags from text' do
-        article = Article.new(
-          user: admin,
-          category: category,
-          title: 'BBCode XSS test',
-          text: '[b]bold[/b]<script>alert("xss")</script>',
-          text_coding: described_class::CODING_BBCODE
-        )
+        article = legacy_bbcode_article('[b]bold[/b]<script>alert("xss")</script>')
 
         article.save!
 
@@ -217,13 +262,7 @@ RSpec.describe Article, type: :model do
       end
 
       it 'strips iframe tags from text' do
-        article = Article.new(
-          user: admin,
-          category: category,
-          title: 'BBCode iframe test',
-          text: '[b]text[/b]<iframe src="evil.com"></iframe>',
-          text_coding: described_class::CODING_BBCODE
-        )
+        article = legacy_bbcode_article('[b]text[/b]<iframe src="evil.com"></iframe>')
 
         article.save!
 
@@ -231,13 +270,7 @@ RSpec.describe Article, type: :model do
       end
 
       it 'strips event handlers from text' do
-        article = Article.new(
-          user: admin,
-          category: category,
-          title: 'BBCode event handler test',
-          text: '[b]text[/b]<img src=x onerror="alert(1)">',
-          text_coding: described_class::CODING_BBCODE
-        )
+        article = legacy_bbcode_article('[b]text[/b]<img src=x onerror="alert(1)">')
 
         article.save!
 
@@ -324,5 +357,13 @@ RSpec.describe Article, type: :model do
         expect(article.text).to eq('<p>Test content</p>')
       end
     end
+  end
+
+  def legacy_bbcode_article(text)
+    article = create(:article, user: admin, category: category, text: 'Legacy article')
+    # rubocop:disable Rails/SkipsModelValidations -- Legacy BBCode fixture; new BBCode articles are intentionally invalid.
+    article.update_columns(text: text, text_coding: described_class::CODING_BBCODE, text_parsed: nil)
+    # rubocop:enable Rails/SkipsModelValidations
+    article.reload
   end
 end

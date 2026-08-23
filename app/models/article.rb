@@ -43,7 +43,12 @@ class Article < ApplicationRecord
   G_RULES = 464
   COMPMOD = 998
 
-  attribute :text_coding, :integer, default: CODING_HTML
+  FORMAT_CONVERSIONS = {
+    [CODING_HTML, CODING_MARKDOWN] => :html,
+    [CODING_BBCODE, CODING_MARKDOWN] => :bbcode
+  }.freeze
+
+  attribute :text_coding, :integer, default: CODING_MARKDOWN
   attribute :status, :integer, default: STATUS_DRAFT
 
   scope :recent, -> { order('created_at DESC').limit(8) }
@@ -74,8 +79,12 @@ class Article < ApplicationRecord
 
   validates :user, :category, presence: true
   validate :validate_status
+  validate :validate_new_article_format, on: :create
+  validate :validate_format_conversion, on: :update
+  validate :validate_format_only_update, on: :update
 
   before_validation :init_variables, if: proc(&:new_record?)
+  before_save :convert_format, if: -> { persisted? && will_save_change_to_text_coding? }
   before_save :format_text
   after_save :send_notifications
   after_update :clear_read_marks, if: :saved_change_to_text?
@@ -104,9 +113,22 @@ class Article < ApplicationRecord
     errors.add :status, I18n.t(:invalid_status) unless statuses.include? status
   end
 
+  def validate_new_article_format
+    errors.add(:text_coding, 'BBCode is not supported for new articles') if text_coding == CODING_BBCODE
+  end
+
   def init_variables
     self.status = STATUS_DRAFT unless user&.admin?
-    self.text_coding = CODING_BBCODE if !user&.admin? && (text_coding == CODING_HTML)
+  end
+
+  def new_article_codings
+    codings.except(CODING_BBCODE).merge(CODING_MARKDOWN => 'Markdown (recommended)')
+  end
+
+  def format_conversion_options
+    FORMAT_CONVERSIONS.filter_map do |(source, target), _converter|
+      [codings.fetch(target), target] if source == text_coding
+    end
   end
 
   def format_text
@@ -117,12 +139,31 @@ class Article < ApplicationRecord
     end
   end
 
+  def validate_format_conversion
+    return unless will_save_change_to_text_coding?
+    return if FORMAT_CONVERSIONS.key?([text_coding_in_database, text_coding])
+
+    errors.add(:text_coding, 'cannot be converted between those formats')
+  end
+
+  def validate_format_only_update
+    return unless will_save_change_to_text_coding? && will_save_change_to_text?
+
+    errors.add(:text_coding, 'cannot be changed while editing the content')
+  end
+
+  def convert_format
+    converter = FORMAT_CONVERSIONS.fetch([text_coding_in_database, text_coding])
+    source = converter == :bbcode ? bbcode_to_html(text) : text
+    self.text = ReverseMarkdown.convert(source)
+  end
+
   def clear_read_marks
     read_marks.delete_all
   end
 
   def markdown_to_html(source)
-    text = EmojiParser.parse(source.to_s, &:raw)
+    text = EmojiParser.parse(source.to_s, &:raw).encode(Encoding::UTF_8)
 
     if defined?(Commonmarker)
       # Disable raw HTML to prevent XSS

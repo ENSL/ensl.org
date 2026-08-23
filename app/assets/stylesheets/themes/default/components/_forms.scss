@@ -82,6 +82,11 @@ form {
         &:focus {
           outline: none;
         }
+
+        &:disabled {
+          color: color.adjust($input-text, $lightness: 35%);
+          cursor: not-allowed;
+        }
       }
 
       &::after {
@@ -113,6 +118,26 @@ form {
       &:focus {
         border: $input-border-width solid $input-secondary;
         color: $input-secondary;
+      }
+
+      &:has(select:disabled) {
+        border-color: color.adjust($input-border-colour, $lightness: 15%);
+        background-color: color.adjust($input-primary, $lightness: -5%);
+        cursor: not-allowed;
+
+        &::after {
+          border-left-color: color.adjust($input-border-colour, $lightness: 15%);
+          color: color.adjust($input-border-colour, $lightness: 15%);
+        }
+
+        &:hover {
+          border-color: color.adjust($input-border-colour, $lightness: 15%);
+
+          &::after {
+            border-left-color: color.adjust($input-border-colour, $lightness: 15%);
+            color: color.adjust($input-border-colour, $lightness: 15%);
+          }
+        }
       }
     }
 

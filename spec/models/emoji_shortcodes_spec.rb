@@ -7,7 +7,11 @@ RSpec.describe 'Emoji shortcode parsing' do
     user = create(:user)
     other_user = create(:user)
     category = create(:category)
-    article = create(:article, user: user, category: category, text: ':smile:', text_coding: Article::CODING_BBCODE)
+    article = create(:article, user: user, category: category, text: 'Legacy article')
+    # rubocop:disable Rails/SkipsModelValidations -- Legacy BBCode fixture; new BBCode articles are intentionally invalid.
+    article.update_column(:text_coding, Article::CODING_BBCODE)
+    # rubocop:enable Rails/SkipsModelValidations
+    article.update!(text: ':smile:')
 
     post = create(:post, user: user, topic: create(:topic, user: user), text: ':heart:')
     comment = Comment.create!(user: user, commentable: article, text: ':fire:')
