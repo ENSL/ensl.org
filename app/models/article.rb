@@ -78,10 +78,9 @@ class Article < ApplicationRecord
   before_validation :init_variables, if: proc(&:new_record?)
   before_save :format_text
   after_save :send_notifications
+  after_update :clear_read_marks, if: :saved_change_to_text?
 
   # has_view_count
-  # TODO: consider migrating to updated_at to allow
-  #        read marks to update on edit
   acts_as_readable on: :created_at
   has_paper_trail on: [:update], only: %i[title text text_parsed text_coding]
 
@@ -116,6 +115,10 @@ class Article < ApplicationRecord
     elsif text_coding == CODING_MARKDOWN
       self.text_parsed = markdown_to_html(text)
     end
+  end
+
+  def clear_read_marks
+    read_marks.delete_all
   end
 
   def markdown_to_html(source)

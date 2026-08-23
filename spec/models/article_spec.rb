@@ -53,6 +53,29 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe 'read marks' do
+    let(:article) { create(:article, user: admin, category: category) }
+    let(:reader) { create(:user) }
+
+    it 'keeps the article read when only metadata changes' do
+      article.mark_as_read!(for: reader)
+
+      article.update!(title: 'Renamed article')
+
+      expect(article.read_marks).to be_present
+      expect(article.unread?(reader)).to be(false)
+    end
+
+    it 'makes the article unread when its text changes' do
+      article.mark_as_read!(for: reader)
+
+      article.update!(text: 'Revised article content')
+
+      expect(article.read_marks).to be_empty
+      expect(article.unread?(reader)).to be(true)
+    end
+  end
+
   describe '#send_notifications' do
     let(:article) do
       described_class.new(user: admin, category: category, title: 'Published article',
