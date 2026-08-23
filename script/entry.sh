@@ -41,7 +41,6 @@ if [ "$ASSETS_PRECOMPILE" -eq 1 ]; then
   bundle exec rails dartsass:build
   bundle exec rails tailwindcss:build
   bundle exec rails assets:precompile
-  # chown -R web:web $APP_PATH
 fi
 
 # Start puma unless disabled for debugging

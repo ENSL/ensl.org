@@ -152,8 +152,6 @@ ENV RAILS_ENV=production
 # Generate rake secret
 # RUN rake secret && rails credentials:edit --environment production
 
-# Assets could be compiled here. Not used atm.
-
 #
 # Staging
 #
