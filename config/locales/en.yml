@@ -12,6 +12,7 @@ en:
   pcws_create: "PCW was successfully saved."
   servers_updated: "Servers updated."
   applying_team: "Applying for team: "
+  teams_member_add: "Team member added."
   tweets_refresh: "Tweetit refreshed."
   votes_success: "Voted successfully."
 

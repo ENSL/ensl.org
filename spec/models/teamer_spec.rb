@@ -146,6 +146,14 @@ RSpec.describe Teamer, type: :model do
       expect(t.can_create?(user, user_id: user.id, team_id: team.id)).to be true
     end
 
+    it 'allows only admins to create a membership by username' do
+      teamer = Teamer.new(username: user.username, team: team)
+      admin = create(:user, :admin)
+
+      expect(teamer.can_create?(admin, username: user.username, team_id: team.id)).to be true
+      expect(teamer.can_create?(user, username: user.username, team_id: team.id)).to be false
+    end
+
     it 'can_update? requires admin' do
       t = build(:teamer)
       admin = double('User')
@@ -173,6 +181,25 @@ RSpec.describe Teamer, type: :model do
       allow(team).to receive(:is_leader?).with(other).and_return(false)
       allow(other).to receive(:admin?).and_return(false)
       expect(t.can_destroy?(other)).to be false
+    end
+  end
+
+  describe 'username lookup' do
+    let(:team) { create(:team) }
+
+    it 'resolves an existing user before validation' do
+      user = create(:user)
+      teamer = Teamer.new(username: user.username, team: team, rank: Teamer::RANK_MEMBER)
+
+      expect(teamer).to be_valid
+      expect(teamer.user).to eq(user)
+    end
+
+    it 'adds an error for an unknown username' do
+      teamer = Teamer.new(username: 'missing-user', team: team, rank: Teamer::RANK_MEMBER)
+
+      expect(teamer).not_to be_valid
+      expect(teamer.errors[:username]).to include('User not found')
     end
   end
 

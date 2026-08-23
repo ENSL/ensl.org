@@ -52,6 +52,7 @@
           <%= f.submit "Update" %>
         </div>
       <% end %>
+
     </div>
 
     <div id="members" class="tab">
@@ -84,6 +85,29 @@
         </table>
         <div class="controls">
           <%= f.submit "Update" %>
+        </div>
+      <% end %>
+
+      <% if cuser&.admin? %>
+        <% new_teamer = @new_teamer || Teamer.new(team: @team, rank: Teamer::RANK_MEMBER) %>
+        <div class="add">
+          <h3>Add a Member</h3>
+
+          <%= form_for new_teamer, html: { class: 'square', data: { turbo: false } } do |f| %>
+            <div id="<%= error_wrapper_id_for(new_teamer) %>">
+              <%= render 'shared/errors', messages: new_teamer.errors.full_messages, container_id: error_container_id_for(new_teamer) %>
+            </div>
+            <%= f.hidden_field :team_id %>
+
+            <div class="fields horizontal">
+              <%= f.label :username %>
+              <%= render 'shared/user_search_field', form: f, attribute: :username %>
+            </div>
+
+            <div class="controls">
+              <%= f.submit 'Add Member' %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>

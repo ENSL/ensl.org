@@ -21,6 +21,8 @@
 class Teamer < ApplicationRecord
   include Extra
 
+  attr_accessor :username
+
   RANK_REMOVED = -2
   RANK_JOINER = -1
   RANK_MEMBER = 0
@@ -55,6 +57,7 @@ class Teamer < ApplicationRecord
   has_many :other_teamers, ->(teamer) { where('teamers.id != ?', teamer.id) }, through: :user, source: :teamers
   has_many :contesters, through: :team
 
+  before_validation :fetch_user, if: proc { |teamer| teamer.username.present? }
   before_create :init_variables
 
   delegate :to_s, to: :user
@@ -91,6 +94,11 @@ class Teamer < ApplicationRecord
     # TODO
   end
 
+  def fetch_user
+    self.user = User.find_by(username: username)
+    errors.add(:username, 'User not found') unless user
+  end
+
   def init_variables
     self.rank = RANK_JOINER unless rank
   end
@@ -112,6 +120,8 @@ class Teamer < ApplicationRecord
   # rubocop:enable Rails/ActiveRecordOverride
 
   def can_create?(cuser, params)
+    return cuser&.admin? if username.present?
+
     cuser and Verification.contain params, %i[user_id team_id]
   end
 
@@ -134,7 +144,7 @@ class Teamer < ApplicationRecord
   end
 
   def self.params(params, _cuser)
-    params.require(:teamer).permit(:comment, :rank, :team_id, :user_id)
+    params.require(:teamer).permit(:comment, :rank, :team_id, :user_id, :username)
   end
 
   def self.build_for_actor(params, actor)

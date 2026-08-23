@@ -174,6 +174,35 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     expect(member.reload.comment).to eq('Invited')
   end
 
+  scenario 'Admin adds a member by username' do
+    team = create(:team)
+    new_member = create(:user)
+    sign_in_as(admin)
+    visit edit_team_path(team)
+
+    find("a[href='#members']").click
+    within('#members', visible: :all) do
+      fill_in 'teamer[username]', with: new_member.username
+      click_button 'Add Member'
+    end
+
+    expect(page).to have_content(I18n.t(:teams_member_add))
+    membership = team.teamers.find_by(user: new_member)
+    expect(membership).to be_present
+    expect(membership.rank).to eq(Teamer::RANK_MEMBER)
+  end
+
+  scenario 'Team leaders cannot add members directly' do
+    team = create(:team, founder: user)
+    sign_in_as(user)
+    visit edit_team_path(team)
+
+    within('#members', visible: :all) do
+      expect(page).not_to have_button('Add Member')
+      expect(page).not_to have_field('teamer[username]')
+    end
+  end
+
   scenario 'shows errors on invalid team update' do
     team = create(:team, founder: user)
     sign_in_as(user)
