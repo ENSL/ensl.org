@@ -681,8 +681,6 @@ class Directory < ApplicationRecord
     nil
   end
 
-  # TODO: check that you can download files
-
   def can_create?(cuser)
     return false unless cuser
 

@@ -343,6 +343,49 @@ describe DataFile do
     end
   end
 
+  describe '#downloadable_from?' do
+    let(:file) { build(:data_file) }
+
+    before do
+      allow(file.name).to receive(:url).and_return('/probe/example.txt')
+    end
+
+    it 'checks the public file URL with HEAD' do
+      request = stub_request(:head, 'https://www.example.test/files/probe/example.txt').to_return(status: 200)
+
+      expect(file.downloadable_from?('https://www.example.test')).to be(true)
+      expect(request).to have_been_requested.once
+    end
+
+    it 'logs an HTTP failure and returns false' do
+      stub_request(:head, 'https://www.example.test/files/probe/example.txt').to_return(status: 404)
+
+      expect(Rails.logger).to receive(:error).with(/HTTP 404/)
+      expect(file.downloadable_from?('https://www.example.test')).to be(false)
+    end
+
+    it 'logs a transport failure and returns false' do
+      stub_request(:head, 'https://www.example.test/files/probe/example.txt').to_timeout
+
+      expect(Rails.logger).to receive(:error).with(/File download check failed/)
+      expect(file.downloadable_from?('https://www.example.test')).to be(false)
+    end
+  end
+
+  describe '.public_download_origin' do
+    it 'uses the existing production domain setting in production' do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::EnvironmentInquirer.new('production'))
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('PRODUCTION_DOMAIN').and_return('www.example.test')
+
+      expect(described_class.public_download_origin).to eq('https://www.example.test')
+    end
+
+    it 'does not configure an external check in test' do
+      expect(described_class.public_download_origin).to be_nil
+    end
+  end
+
   describe '#sync_file_metadata' do
     it 'updates MD5 hash from disk file' do
       file_path = '/tmp/test_dirs/sync_md5_test_2.txt'

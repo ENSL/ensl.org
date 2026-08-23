@@ -36,6 +36,7 @@
 
 require 'digest/md5'
 require 'fileutils'
+require 'net/http'
 require 'securerandom'
 
 class DataFile < ApplicationRecord
@@ -135,6 +136,28 @@ class DataFile < ApplicationRecord
 
     # Ensure URL starts with /files/
     carrywave_url.start_with?('/files/') ? carrywave_url : "/files#{carrywave_url}"
+  end
+
+  def downloadable_from?(origin)
+    uri = URI.join(origin, url)
+    http_options = { use_ssl: uri.scheme == 'https', open_timeout: 1, read_timeout: 1 }
+    response = Net::HTTP.start(uri.host, uri.port, **http_options) do |http|
+      http.request(Net::HTTP::Head.new(uri.request_uri))
+    end
+    return true if response.is_a?(Net::HTTPSuccess)
+
+    Rails.logger.error("File download check failed for #{uri}: HTTP #{response.code}")
+    false
+  rescue StandardError => e
+    Rails.logger.error("File download check failed for #{uri || url}: #{e.class}: #{e.message}")
+    false
+  end
+
+  def self.public_download_origin
+    return unless Rails.env.production? || Rails.env.staging?
+
+    domain = ENV["#{Rails.env.upcase}_DOMAIN"]
+    "https://#{domain}" if domain.present?
   end
 
   # Get the top-level directory (root of the hierarchy) for this file

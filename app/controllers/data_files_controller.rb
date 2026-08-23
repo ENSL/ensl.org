@@ -32,6 +32,7 @@ class DataFilesController < ApplicationController
 
     if @file.save
       flash[:notice] = flash_action_message(:create, @file)
+      check_downloadability
       redirect_to redirect_target_after_create_path(@file)
     else
       respond_with_validation_errors(@file, template: :new)
@@ -74,6 +75,13 @@ class DataFilesController < ApplicationController
   end
 
   private
+
+  def check_downloadability
+    origin = DataFile.public_download_origin
+    return if origin.blank? || @file.downloadable_from?(origin)
+
+    flash[:alert] = 'File uploaded successfully, but its download URL is not currently reachable.'
+  end
 
   def load_file
     @file = DataFile.find params[:id]
