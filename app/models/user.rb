@@ -56,13 +56,6 @@ class User < ApplicationRecord
   PASSWORD_MD5 = 1
   PASSWORD_MD5_SCRYPT = 2
 
-  # TODO: move this to a file
-  PASSWORD_MESSAGE = \
-    "Hello %s, \n" \
-    "Your new password is: %s \n \n \n" \
-    "(Make sure you copy all characters and no whitespace when using copy-paste)\n" \
-    "(Security information: your password is stored with hash %s)\n"
-
   # attr_protected :id, :created_at, :updated_at, :lastvisit, :lastip, :password, :version
   attr_accessor :raw_password, :password_updated, :password_force, :fullname, :random_password
 
@@ -574,10 +567,15 @@ class User < ApplicationRecord
     user ? user.send_new_password : false
   end
 
-  def send_password_message(text = User::PASSWORD_MESSAGE)
+  def send_password_message
     msg = Message.new
     msg.title = 'New password for ENSL website'
-    msg.text = format(text, username, raw_password, password_hash_s)
+    msg.text = I18n.t(
+      'users.password_message',
+      username: username,
+      password: raw_password,
+      password_hash: password_hash_s
+    )
     msg.sender_type = 'System'
     msg.recipient_type = 'User'
     msg.recipient = self

@@ -301,9 +301,12 @@ describe User do
       u = create(:user)
       u.raw_password = 'SecretPass123!'
       expect { u.send_new_password }.to change { Message.count }.by(1)
-      # message should be to this user
+
       msg = Message.last
       expect(msg.recipient).to eq(u)
+      expect(msg.text).to include("Hello #{u.username},")
+      expect(msg.text).to include('Your new password is: SecretPass123!')
+      expect(msg.text).to include("stored with hash #{u.password_hash_s}")
     end
 
     it 'send_new_password still resets the password for a record invalid due to unrelated legacy data' do

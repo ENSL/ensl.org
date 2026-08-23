@@ -143,6 +143,13 @@ en:
     signup_steam: "You created an account via Steam. Please update your user details."
     steamid_update: "Your Steam ID has been updated to %s. You can now log in via Steam."
     callback_fail: "Steam login failed. Please try again. This could be a network issue. If the problem persists, please contact staff."
+    password_message: |-
+      Hello %{username},
+      Your new password is: %{password}
+
+
+      (Make sure you copy all characters and no whitespace when using copy-paste)
+      (Security information: your password is stored with hash %{password_hash})
     update:
       failure: "User could not be updated."
 
