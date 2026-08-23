@@ -211,7 +211,7 @@ describe User do
       create(:teamer, user: user, team: team, rank: Teamer::RANK_MEMBER)
     end
 
-    it 'includes upcoming matches for active team members and referees without duplicates' do
+    it 'orders upcoming team and referee matches together without duplicates' do
       team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
       referee_match = create(:match, referee: user, match_time: 2.days.from_now)
       shared_match = create(
@@ -223,7 +223,13 @@ describe User do
       )
       create(:match, contest: contest, contester1: team_contester, match_time: 1.day.ago)
 
-      expect(user.upcoming_matches).to contain_exactly(team_match, referee_match, shared_match)
+      expect(user.upcoming_matches).to eq([shared_match, referee_match, team_match])
+    end
+
+    it 'includes a match when the users team is the second contester' do
+      team_match = create(:match, contest: contest, contester2: team_contester, match_time: 1.day.from_now)
+
+      expect(user.upcoming_matches).to include(team_match)
     end
 
     it 'excludes team matches when the user is only waiting to join' do
@@ -238,6 +244,25 @@ describe User do
       team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
 
       expect(user.upcoming_matches).not_to include(team_match)
+    end
+
+    it 'excludes matches for inactive teams and former members' do
+      team_match = create(:match, contest: contest, contester1: team_contester, match_time: 1.day.from_now)
+
+      team.update!(active: false)
+      expect(user.reload.upcoming_matches).not_to include(team_match)
+
+      team.update!(active: true)
+      user.teamers.find_by!(team: team).update!(rank: Teamer::RANK_REMOVED)
+      expect(user.reload.upcoming_matches).not_to include(team_match)
+    end
+
+    it 'excludes unscheduled matches' do
+      unscheduled_team_match = create(:match, contest: contest, contester1: team_contester, match_time: nil)
+      unscheduled_referee_match = create(:match, referee: user, match_time: nil)
+
+      expect(user.upcoming_matches).not_to include(unscheduled_team_match, unscheduled_referee_match)
+      expect(user.past_matches).not_to include(unscheduled_team_match, unscheduled_referee_match)
     end
 
     it 'includes only unfinished past matches for team members and referees' do

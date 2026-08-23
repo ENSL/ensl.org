@@ -483,11 +483,11 @@ class User < ApplicationRecord
   end
 
   def upcoming_matches
-    upcoming_team_matches.ordered | upcoming_ref_matches.ordered
+    (upcoming_team_matches | upcoming_ref_matches).sort_by(&:match_time).reverse
   end
 
   def past_matches
-    past_team_matches.unfinished.ordered | past_ref_matches.unfinished.ordered
+    (past_team_matches.unfinished | past_ref_matches.unfinished).sort_by(&:match_time).reverse
   end
 
   def correct_steamid_universe
