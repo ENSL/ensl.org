@@ -142,26 +142,6 @@ RSpec.describe Match, type: :model do
       expect(match.score_color).to eq('red')
     end
 
-    it 'returns opponent details' do
-      contest = create(:contest)
-      team1 = create(:team)
-      team2 = create(:team)
-      cont1 = create(:contester, contest: contest, team: team1)
-      cont2 = create(:contester, contest: contest, team: team2)
-      match = create(:match, contest: contest, contester1: cont1, contester2: cont2,
-                             score1: 4, score2: 1, points1: 2, points2: 0)
-
-      match.friendly = team1
-      expect(match.get_opponent).to eq(cont2)
-      expect(match.get_opponent(:score)).to eq(1)
-      expect(match.get_opponent(:points)).to eq(0)
-
-      match.friendly = team2
-      expect(match.get_opponent).to eq(cont1)
-      expect(match.get_opponent(:score)).to eq(4)
-      expect(match.get_opponent(:points)).to eq(2)
-    end
-
     it 'builds a sanitized demo file name' do
       match = create(:match)
       allow(Verification).to receive(:uncrap).and_return('safe-demo-name')

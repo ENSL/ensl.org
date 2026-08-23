@@ -211,6 +211,10 @@ module ApplicationHelper
     end
   end
 
+  def match_opponent_contester(match, friendly_team)
+    friendly_team == match.contester1.team ? match.contester2 : match.contester1
+  end
+
   def match_list_score_color(match)
     return 'black' if match.score1.nil? || match.score2.nil?
     return 'yellow' if match.score1 == match.score2

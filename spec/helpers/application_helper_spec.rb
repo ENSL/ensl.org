@@ -299,6 +299,11 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(helper.match_list_opponent_team(match, other_team)).to eq(away_team)
     end
 
+    it 'returns the opposing contester for the friendly team' do
+      expect(helper.match_opponent_contester(match, home_team)).to eq(away_contester)
+      expect(helper.match_opponent_contester(match, away_team)).to eq(home_contester)
+    end
+
     it 'returns home-based score color and text' do
       expect(helper.match_list_score_color(match)).to eq('green')
       expect(helper.match_list_score_text(match)).to eq('3 - 1')

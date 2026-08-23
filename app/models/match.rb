@@ -190,17 +190,6 @@ class Match < ApplicationRecord
     matchers.where(contester_id: contester2_id)
   end
 
-  # FIXME: this is a view helper and doesn't belong here
-  def get_opponent(param = nil)
-    if param.nil?
-      friendly == contester1.team ? contester2 : contester1
-    elsif param == :score
-      friendly == contester1.team ? score2 : score1
-    elsif param == :points
-      friendly == contester1.team ? points2 : points1
-    end
-  end
-
   def get_opposing_team(team)
     team == contester1.team ? contester2.team : contester1.team
   end

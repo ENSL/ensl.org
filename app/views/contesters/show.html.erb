@@ -42,9 +42,8 @@
         </tr>
 
         <% @matches.each do |match| %>
-          <% match.friendly = team %>
           <tr>
-            <td><%= namelink match.get_opponent %></td>
+            <td><%= namelink match_opponent_contester(match, team) %></td>
             <td><%= link_to shorttime(match.match_time), match %></td>
             <td><%= namelink match.map1 %>, <%= namelink match.map2 %></td>
             <td><%= namelink match.server %></td>
