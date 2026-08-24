@@ -17,15 +17,8 @@ module Features
 
       # Wait for TinyMCE to be available and set content on its editor
       while Time.zone.now - start < wait
-        begin
-          present = page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
-        rescue StandardError
-          # Catch any driver errors (Playwright or otherwise) during script evaluation
-          present = false
-        end
-
-        if present
-          page.execute_script("tinymce.get(\"#{element_id}\").setContent(#{contents_js})")
+        if tinymce_editor_present?(element_id)
+          set_tinymce_content(element_id, contents_js)
           return
         end
 
@@ -39,6 +32,26 @@ module Features
       end
 
       raise "TinyMCE editor not available and textarea##{element_id} not found"
+    end
+
+    def tinymce_editor_present?(element_id)
+      page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
+    rescue StandardError
+      # Catch any driver errors (Playwright or otherwise) during script evaluation
+      false
+    end
+
+    # setContent alone doesn't sync to the underlying textarea or fire change
+    # listeners (e.g. article_format.js's format-lock) — save() pushes the
+    # value through immediately instead of racing Turbo's submit interception
+    # against TinyMCE's own submit-time sync hook.
+    def set_tinymce_content(element_id, contents_js)
+      page.execute_script(<<~JS)
+        const editor = tinymce.get("#{element_id}")
+        editor.setContent(#{contents_js})
+        editor.save()
+        editor.fire('input')
+      JS
     end
 
     def submit(model, action)

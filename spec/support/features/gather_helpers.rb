@@ -275,7 +275,10 @@ module Features
     end
 
     def playwright_page_crash?(error)
-      error.message.match?(/Page crashed|Target crashed/i)
+      # Covers real renderer crashes as well as navigations Chromium aborts because
+      # another navigation (e.g. gather_sync.js's own poll-triggered reload) was
+      # already in flight when we called visit — both are transient and safe to retry.
+      error.message.match?(/Page crashed|Target crashed|net::ERR_ABORTED/i)
     end
   end
 end
