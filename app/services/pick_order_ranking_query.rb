@@ -76,7 +76,10 @@ class PickOrderRankingQuery
                      'gathers.id',
                      'gatherers.user_id',
                      'gatherers.pick_order',
-                     Arel.sql('CASE WHEN gatherers.id = COALESCE(gathers.captain1_id, 0) OR gatherers.id = COALESCE(gathers.captain2_id, 0) THEN 1 ELSE 0 END')
+                     Arel.sql(
+                       'CASE WHEN gatherers.id = COALESCE(gathers.captain1_id, 0) OR ' \
+                       'gatherers.id = COALESCE(gathers.captain2_id, 0) THEN 1 ELSE 0 END'
+                     )
                    )
   end
 

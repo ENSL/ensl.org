@@ -94,18 +94,33 @@ Rails/ApplicationController:
   Exclude:
     - 'app/controllers/api/**/*'
 
+# Staging is a deployed Rails environment in this application and has its own
+# config/environments/staging.rb; Rails/UnknownEnv does not infer it reliably.
+Rails/UnknownEnv:
+  Environments:
+    - development
+    - test
+    - production
+    - staging
+
 # LogLine is part of the legacy/WIP log-ingestion subsystem (along with
 # LogFile and Round/Rounder) that predates the validation conventions used
 # elsewhere in the app; its update_attribute calls are intentional shortcuts,
 # not oversights. spec/factories bulk-insert with insert_all! for performance
-# (large fixture datasets), and challenge_spec uses update_column to bypass
-# callbacks when arranging test state -- both are deliberate, not missed
-# validations.
+# (large fixture datasets), challenge_spec and the listed gather/user specs use
+# update_column(s) to bypass callbacks or validations when arranging test state
+# -- all are deliberate, not missed validations.
 Rails/SkipsModelValidations:
   Exclude:
     - 'app/models/log_line.rb'
     - 'spec/factories/**/*'
     - 'spec/models/challenge_spec.rb'
+    - 'spec/features/gathers/gather_header_badge_spec.rb'
+    - 'spec/features/gathers/gather_started_at_spec.rb'
+    - 'spec/features/users/user_login_spec.rb'
+    - 'spec/models/gather_spec.rb'
+    - 'spec/models/user_spec.rb'
+    - 'spec/requests/users_spec.rb'
 
 # Rounder#ensl_team is part of the same legacy/WIP round-tracking subsystem as
 # Round and LogLine. Team intentionally has no reciprocal `has_many :rounders`,

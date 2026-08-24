@@ -343,7 +343,9 @@ class User < ApplicationRecord
     # update_columns bypasses validations: this bookkeeping write must not be
     # silently blocked by unrelated legacy data issues on the record (e.g. a
     # username that only now collides case-insensitively with another user).
+    # rubocop:disable Rails/SkipsModelValidations
     update_columns(lastvisit: Time.now.utc)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def ensure_profile!
@@ -598,9 +600,11 @@ class User < ApplicationRecord
 
   # Records a successful login by stamping the user's last IP and visit time.
   # update_columns bypasses validations, same reasoning as touch_last_visit_if_stale!.
+  # rubocop:disable Rails/SkipsModelValidations
   def record_login!(ip)
     update_columns(lastip: ip, lastvisit: Time.now.utc)
   end
+  # rubocop:enable Rails/SkipsModelValidations
 
   def apply_login_state!(verified_steamid:)
     return { banned: true, password_upgraded: password_upgraded?, steamid_updated: false } if banned?(Ban::TYPE_SITE)
@@ -620,7 +624,9 @@ class User < ApplicationRecord
     return false if verified_steamid.blank? || steamid == verified_steamid
 
     # Steam-verified, not typed by the user - same reasoning as touch_last_visit_if_stale!.
+    # rubocop:disable Rails/SkipsModelValidations
     update_columns(steamid: verified_steamid)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def can_create?(_cuser)
