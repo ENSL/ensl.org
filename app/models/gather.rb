@@ -131,10 +131,7 @@ class Gather < ApplicationRecord
     end
   end
 
-  def to_s
-    "Gather_#{id}"
-  end
-
+  # Used by GatherActivityTracking#activity_value to render human-readable admin-update diffs.
   def states
     {
       STATE_RUNNING => 'Running',

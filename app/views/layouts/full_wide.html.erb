@@ -3,7 +3,7 @@
   <%= render "head" %>
   <body data-disable-flash-fade="<%= Rails.env.test? %>" data-controller="twemoji emoji-autocomplete">
     <div id="container">
-      <%= render "header" %>
+      <%= render "header", gather: @gather %>
       <%= render "navigation" %>
       <!-- Wider than layouts/full's 1020px cap, for pages whose tables/columns need the extra room. -->
       <div class="relative z-10 mx-auto max-w-[1600px]">

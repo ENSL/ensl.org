@@ -1,7 +1,7 @@
 <header data-turbo="false">
   <div class="banner <%= 'authenticated' if cuser %>">
     <div class="relative mx-auto max-w-[1020px]">
-      <% if cuser && (active_gather = active_gather_for_header) && @gather&.id != active_gather.id %>
+      <% if cuser && (active_gather = active_gather_for_header) && gather&.id != active_gather.id %>
         <%# Positioned clear of the ~360px-wide logo image that overhangs the left of the banner %>
         <% badge = gather_header_badge(active_gather) %>
         <%= link_to gather_path(active_gather),

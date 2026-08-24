@@ -6,6 +6,9 @@
 module SessionHygiene
   extend ActiveSupport::Concern
 
+  STALE_SESSION_KEY_PREFIXES = ['OpenID::', 'omniauth.'].freeze
+  CACHED_USER_SESSION_KEYS = %i[cached_user verified_steamid steam_registration_profile].freeze
+
   included do
     before_action :purge_stale_session_data
   end
@@ -16,12 +19,10 @@ module SessionHygiene
     # NOTE: session is ActionDispatch::Request::Session, which only supports #keys/#each,
     # not the Hash-only #each_key rubocop wants to suggest here.
     session.keys.each do |key| # rubocop:disable Style/HashEachMethods
-      session.delete(key) if key.to_s.start_with?('OpenID::', 'omniauth.')
+      session.delete(key) if STALE_SESSION_KEY_PREFIXES.any? { |prefix| key.to_s.start_with?(prefix) }
     end
     return unless cuser
 
-    session.delete(:cached_user)
-    session.delete(:verified_steamid)
-    session.delete(:steam_registration_profile)
+    CACHED_USER_SESSION_KEYS.each { |key| session.delete(key) }
   end
 end

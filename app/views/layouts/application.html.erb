@@ -4,7 +4,7 @@
   <body data-disable-flash-fade="<%= Rails.env.test? %>" data-controller="twemoji emoji-autocomplete">
     <div id="container">
       <%= render "messages" %>
-      <%= render "header" %>
+      <%= render "header", gather: @gather %>
       <%= render "navigation" %>
       <div class="relative z-10 mx-auto max-w-[1020px]">
         <div id="content" class="grid grid-cols-12 gap-x-5 <%= yield :main_class %>">

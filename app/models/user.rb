@@ -812,10 +812,10 @@ class User < ApplicationRecord
     metadata = metadata.with_indifferent_access
     self.country = metadata[:country] if country.blank? && metadata[:country].to_s.match?(/\A[A-Z]{2}\z/)
     profile = self.profile || build_profile
-    profile.steam_profile = metadata[:steam_profile] if profile.steam_profile.blank?
+    profile.steam_profile = metadata[:steam_profile] unless profile.steam_profile?
 
     avatar_url = metadata[:avatar_url]
-    profile.remote_avatar_url = avatar_url if profile.avatar.blank? && self.class.trusted_steam_avatar_url?(avatar_url)
+    profile.remote_avatar_url = avatar_url if !profile.avatar? && self.class.trusted_steam_avatar_url?(avatar_url)
   rescue CarrierWave::DownloadError => e
     Rails.logger.warn("Steam avatar import failed: #{e.message}")
   end
