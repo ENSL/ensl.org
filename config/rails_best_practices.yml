@@ -64,6 +64,24 @@ RemoveUnusedMethodsInModelsCheck:
     - "Match#demo_name"
     - "Round#winner_s"
     - "Teamer#api_v1_member_payload"
+    # Verified in use (controllers/views/helpers/services/specs) - the gem's call-graph
+    # can't resolve calls dispatched through an association (e.g. Gatherer#gather.foo!)
+    # or bare self-calls from an included concern (Gather#states from
+    # GatherActivityTracking#activity_value).
+    - "Gather#states"
+    - "Gather#previous_gather"
+    - "Gather#next_gather"
+    - "Gather#open_for_join?"
+    - "Gather#start_voting_if_full!"
+    - "Gather#notify_interested_users_if_threshold_reached!"
+    - "Gather#voting_time_remaining"
+    - "Gather#refresh_and_broadcast_if_status_changed!"
+    - "Gather#advance_picking_after_pick!"
+    - "Gather#picking_slot_available?"
+    - "Gather#bump_version!"
+    - "Gather#can_create?"
+    - "Gather#can_update?"
+    - "Gather#admin_update"
 ReplaceComplexCreationWithFactoryMethodCheck:
   attribute_assignment_count: 2
   ignored_files: ["app/views/rounds/", "app/controllers/rounds_controller\\.rb"]
