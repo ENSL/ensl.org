@@ -69,14 +69,17 @@ RSpec.configure do |config|
   config.include Capybara::DSL
 
   config.around(:each, type: :feature) do |example|
-    # Skip per-user HTML renders in Broadcaster during feature specs.
-    # N concurrent sessions each trigger O(n) partial renders on every join/vote/pick,
-    # creating O(n²) render load that exhausts the DB pool under Playwright.
-    # The version bump still fires so gather_sync.js reloads via polling.
-    Gathers::Broadcaster.skip_broadcasts = true
+    # Real broadcasts are the default so feature specs match production behaviour.
+    # Broadcasting is event-based (one render burst per join/vote/pick/admin action),
+    # not periodic, so this is cheap for normal specs. Only spec/features/gathers/
+    # gathers_spec.rb (12 concurrent sessions, dozens of events) opts out itself,
+    # since there N per-event renders repeated many times over does add up.
+    Gathers::Broadcaster.skip_broadcasts = false
+    Gathers::ActivityBroadcaster.skip_broadcasts = false
     example.run
   ensure
     Gathers::Broadcaster.skip_broadcasts = false
+    Gathers::ActivityBroadcaster.skip_broadcasts = false
   end
 
   config.after(:each, type: :feature) do

@@ -9,12 +9,19 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
 
   around do |example|
     previous_timeout = ENV['GATHER_VOTING_TIMEOUT_TEST']
-    previous_skip_broadcasts = Gathers::Broadcaster.skip_broadcasts
+    previous_broadcaster_skip = Gathers::Broadcaster.skip_broadcasts
+    previous_activity_skip = Gathers::ActivityBroadcaster.skip_broadcasts
     ENV['GATHER_VOTING_TIMEOUT_TEST'] = '20'
-    Gathers::Broadcaster.skip_broadcasts = false
+    # 12 concurrent sessions x dozens of join/vote/pick events would repeat the
+    # per-event N-renders many times over; skip both broadcasters here and rely
+    # on gather_sync.js's /version polling fallback instead (version bump still
+    # fires so gatherers still see updates, just on the poll cadence).
+    Gathers::Broadcaster.skip_broadcasts = true
+    Gathers::ActivityBroadcaster.skip_broadcasts = true
     example.run
   ensure
-    Gathers::Broadcaster.skip_broadcasts = previous_skip_broadcasts
+    Gathers::Broadcaster.skip_broadcasts = previous_broadcaster_skip
+    Gathers::ActivityBroadcaster.skip_broadcasts = previous_activity_skip
     ENV['GATHER_VOTING_TIMEOUT_TEST'] = previous_timeout
   end
 
