@@ -14,7 +14,8 @@ class GatherStartedPushJob
                    .where(gatherers: { gather_id: gather.id }, profiles: { notify_push_gather: true })
                    .distinct.pluck(:id)
 
-    PushNotifications::Deliver.call(user_ids: user_ids, payload: payload(gather))
+    delivered = PushNotifications::Deliver.call(user_ids: user_ids, payload: payload(gather))
+    Rails.logger.info("[GatherStartedPushJob] gather=#{gather.id} opted_in=#{user_ids.size} delivered=#{delivered}")
   end
 
   private

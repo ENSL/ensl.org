@@ -10,4 +10,17 @@ namespace :web_push do
     puts "VAPID_PRIVATE_KEY=#{key.private_key}"
     puts 'VAPID_SUBJECT=mailto:staff@ensl.org'
   end
+
+  desc 'Send a test push notification to a user, e.g. rake web_push:test[username]'
+  task :test, [:username] => :environment do |_task, args|
+    user = User.find_by(username: args[:username])
+    abort "No user named #{args[:username]}" unless user
+
+    delivered = PushNotifications::Deliver.call(
+      user_ids: [user.id],
+      payload: { title: 'ENSL test', body: 'Push notifications are working.', tag: 'ensl-test', url: '/gather' }
+    )
+
+    puts "subscriptions=#{user.push_subscriptions.count} delivered=#{delivered}"
+  end
 end

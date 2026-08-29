@@ -15,10 +15,17 @@ module PushNotifications
     end
 
     def call
-      return 0 unless WebPushCredentials.configured?
-      return 0 if @user_ids.empty?
+      unless WebPushCredentials.configured?
+        Rails.logger.warn('[PushNotifications] skipped: VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY are not set')
+        return 0
+      end
 
-      PushSubscription.for_users(@user_ids).find_each.count { |subscription| deliver(subscription) }
+      subscriptions = PushSubscription.for_users(@user_ids).to_a
+      delivered = subscriptions.count { |subscription| deliver(subscription) }
+      Rails.logger.info(
+        "[PushNotifications] users=#{@user_ids.size} subscriptions=#{subscriptions.size} delivered=#{delivered}"
+      )
+      delivered
     end
 
     private
@@ -33,11 +40,12 @@ module PushNotifications
         ttl: @ttl
       )
       true
-    rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription, WebPush::Unauthorized
+    rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription, WebPush::Unauthorized => e
+      Rails.logger.warn("[PushNotifications] dropping stale subscription=#{subscription.id}: #{e.message}")
       subscription.destroy
       false
     rescue StandardError => e
-      Rails.logger.warn("[PushNotifications] delivery failed subscription=#{subscription.id}: #{e.message}")
+      Rails.logger.warn("[PushNotifications] delivery failed subscription=#{subscription.id}: #{e.class}: #{e.message}")
       false
     end
 

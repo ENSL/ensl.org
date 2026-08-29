@@ -13,16 +13,24 @@ self.addEventListener("push", (event) => {
     payload = { body: event.data ? event.data.text() : "" }
   }
 
+  console.log("[ENSL push] received", payload)
+
   const title = payload.title || "ENSL"
   const options = {
     body: payload.body || "",
     tag: payload.tag || "ensl",
-    icon: "/images/shared/favicon.ico",
-    renotify: true,
+    icon: "/images/shared/discord.png",
     data: { url: payload.url || "/" }
   }
 
-  event.waitUntil(self.registration.showNotification(title, options))
+  // A push handler that never shows a notification makes Chrome display its own
+  // "site updated in background" message, so always fall back to a bare notification.
+  event.waitUntil(
+    self.registration.showNotification(title, options).catch((error) => {
+      console.error("[ENSL push] showNotification failed", error)
+      return self.registration.showNotification(title, { body: options.body })
+    })
+  )
 })
 
 self.addEventListener("notificationclick", (event) => {
