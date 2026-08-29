@@ -98,7 +98,8 @@ USER web
 WORKDIR /var/www
 COPY --chown=web Gemfile Gemfile.lock /var/www/
 
-RUN bundle config set github.https true && \
+RUN git config --global --add safe.directory /var/www && \
+    bundle config set github.https true && \
     bundle config set path '/var/bundle' && \
     bundle config set build.duckdb '--with-duckdb-include=/opt/duckdb/include --with-duckdb-lib=/opt/duckdb/lib' && \
     bundle config unset without && \
