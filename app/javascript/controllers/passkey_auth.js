@@ -1,4 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
+import { postJSON } from "lib/request"
+import { showFlash } from "lib/flash"
 
 export default class extends Controller {
   static targets = ["loginButton"]
@@ -60,7 +62,7 @@ export default class extends Controller {
     webauthn.WebAuthnAbortService.cancelCeremony()
 
     try {
-      const options = await this.postJSON(this.optionsUrlValue, { username })
+      const options = await postJSON(this.optionsUrlValue, { username })
       const credential = await webauthn.startAuthentication({ optionsJSON: options })
       await this.finishLogin(credential)
     } catch (error) {
@@ -78,7 +80,7 @@ export default class extends Controller {
     let credential
 
     try {
-      const options = await this.postJSON(this.optionsUrlValue, {})
+      const options = await postJSON(this.optionsUrlValue, {})
       credential = await webauthn.startAuthentication({
         optionsJSON: options,
         useBrowserAutofill: true,
@@ -108,7 +110,7 @@ export default class extends Controller {
 
   // Send the signed credential to the server and follow any redirect it returns.
   async finishLogin(credential) {
-    const result = await this.postJSON(this.authenticateUrlValue, { credential })
+    const result = await postJSON(this.authenticateUrlValue, { credential })
 
     if (result.redirect_to) {
       window.location.href = result.redirect_to
@@ -141,9 +143,9 @@ export default class extends Controller {
     }
 
     try {
-      const options = await this.postJSON(this.registerOptionsUrlValue, {})
+      const options = await postJSON(this.registerOptionsUrlValue, {})
       const credential = await webauthn.startRegistration({ optionsJSON: options })
-      await this.postJSON(this.registerUrlValue, { credential })
+      await postJSON(this.registerUrlValue, { credential })
       window.location.reload()
     } catch (error) {
       this.showStatus(error.message || "Passkey registration failed.")
@@ -163,63 +165,9 @@ export default class extends Controller {
     }
   }
 
-  // POST JSON with the Rails CSRF token and return the parsed response body.
-  async postJSON(url, payload) {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": this.csrfToken()
-      },
-      credentials: "same-origin",
-      body: JSON.stringify(payload)
-    })
-
-    const json = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      throw new Error(json.error || "Request failed")
-    }
-
-    return json
-  }
-
-  // Read the Rails CSRF token from the page head.
-  csrfToken() {
-    const meta = document.querySelector("meta[name='csrf-token']")
-    return meta ? meta.content : ""
-  }
-
   // Show an error using the shared flash banner (like a failed password login) instead of a
   // local status box, so it doesn't squeeze the login fields when the message wraps.
   showStatus(text) {
-    const notification = document.getElementById("notification")
-    if (!notification) {
-      window.alert(text)
-      return
-    }
-
-    notification.innerHTML = ""
-    const message = document.createElement("div")
-    message.className = "message error"
-    message.textContent = text
-    notification.appendChild(message)
-    notification.style.display = "block"
-    notification.style.opacity = "1"
-
-    this.scheduleFlashFade(notification)
-  }
-
-  // Mirror the same auto-fade behavior the server-rendered flash uses.
-  scheduleFlashFade(notification) {
-    if (document.body.dataset.disableFlashFade === "true") return
-
-    window.clearTimeout(this.flashFadeTimeout)
-    this.flashFadeTimeout = window.setTimeout(() => {
-      if (window.jQuery) {
-        window.jQuery(notification).fadeOut()
-      } else {
-        notification.style.display = "none"
-      }
-    }, 3000)
+    showFlash(text, "error")
   }
 }
