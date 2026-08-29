@@ -14,6 +14,15 @@ RSpec.describe 'AboutController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(:staff)
     end
+
+    it 'renders staff flags from country codes' do
+      create(:user, :admin, country: 'FI')
+
+      get '/about/staff'
+
+      expect(response.body).to include('flag-fi')
+      expect(response.body).not_to include('flag-finland')
+    end
   end
 
   describe 'GET /about/adminpanel' do
