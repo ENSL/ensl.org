@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_29_120000) do
   create_table "activities", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -622,6 +622,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
     t.boolean "notify_news"
     t.boolean "notify_own_match"
     t.boolean "notify_pms", default: true, null: false
+    t.boolean "notify_push_gather", default: false, null: false
     t.string "psu"
     t.string "ram"
     t.string "res"
@@ -640,6 +641,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
     t.integer "user_id"
     t.string "web"
     t.index ["user_id"], name: "index_profiles_on_user_id"
+  end
+
+  create_table "push_subscriptions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "auth_key", null: false
+    t.datetime "created_at", precision: nil
+    t.string "endpoint", limit: 500, null: false
+    t.string "p256dh_key", null: false
+    t.datetime "updated_at", precision: nil
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true, length: 191
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
   create_table "rates", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|

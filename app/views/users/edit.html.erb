@@ -169,6 +169,12 @@
             </div>
 
             <div class="fields horizontal">
+              <%= p.label :notify_push_gather, "Browser push when a gather starts" %>
+              <%= p.check_box :notify_push_gather %>
+              <%= p.label :notify_push_gather, class: 'checkbox' %>
+            </div>
+
+            <div class="fields horizontal">
               <%= p.label :notify_own_match, "My team's matches" %>
               <%= p.check_box :notify_own_match %>
               <%= p.label :notify_own_match, class: 'checkbox' %>

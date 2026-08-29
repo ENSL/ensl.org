@@ -73,6 +73,7 @@ class User < ApplicationRecord
   has_many :votes, dependent: :destroy
   has_many :gatherers, dependent: :destroy
   has_many :gathers, through: :gatherers
+  has_many :push_subscriptions, dependent: :destroy
   has_many :groupers, dependent: :destroy
   has_many :posts, dependent: :destroy
   has_many :groups, through: :groupers

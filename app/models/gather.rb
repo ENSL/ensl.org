@@ -284,9 +284,21 @@ class Gather < ApplicationRecord
   def refresh_voting
     return unless voting_expired?
 
-    with_lock do
-      complete_voting! if status == STATE_VOTING && voting_expired?
+    started_picking = with_lock do
+      next false unless status == STATE_VOTING && voting_expired?
+
+      complete_voting!
+      true
     end
+
+    enqueue_gather_started_push if started_picking
+  end
+
+  # Kept outside the transaction above: a Redis hiccup must not roll back the state change.
+  def enqueue_gather_started_push
+    GatherStartedPushJob.perform_async(id)
+  rescue StandardError => e
+    Rails.logger.warn("[GatherStartedPushJob] enqueue failed gather=#{id}: #{e.message}")
   end
 
   def voting_expired?

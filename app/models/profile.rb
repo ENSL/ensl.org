@@ -39,6 +39,7 @@
 #  notify_news         :boolean
 #  notify_own_match    :boolean
 #  notify_pms          :boolean          default(TRUE), not null
+#  notify_push_gather  :boolean          default(FALSE), not null
 #  psu                 :string(255)
 #  ram                 :string(255)
 #  res                 :string(255)
@@ -68,7 +69,7 @@ class Profile < ApplicationRecord
   PERMITTED_ATTRIBUTES = %i[
     steam_profile web achievements signature avatar stream town
     notify_news notify_articles notify_movies notify_gather notify_own_match
-    notify_any_match notify_challenge notify_pms
+    notify_any_match notify_challenge notify_pms notify_push_gather
   ].freeze
 
   # attr_protected :user_id, :id, :updated_at, :created_at

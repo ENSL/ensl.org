@@ -81,6 +81,9 @@ gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-steam'
 gem 'webauthn'
 
+# Web Push (VAPID) for browser push notifications, e.g. when a gather starts.
+gem 'web-push'
+
 # gem 'ratyrate'
 # gem "acts_as_rateable", :git => "git://github.com/anton-zaytsev/acts_as_rateable.git"
 

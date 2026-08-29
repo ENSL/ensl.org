@@ -4,6 +4,7 @@ import EmojiAutocompleteController from "controllers/emoji_autocomplete"
 import TwemojiController from "controllers/twemoji"
 import ServerTableController from "controllers/server_table"
 import GatherMusicController from "controllers/gather_music"
+import GatherPushController from "controllers/gather_push"
 import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
 import MapBalanceChartController from "controllers/map_balance_chart"
@@ -19,6 +20,7 @@ application.register("emoji-autocomplete", EmojiAutocompleteController)
 application.register("twemoji", TwemojiController)
 application.register("server-table", ServerTableController)
 application.register("gather-music", GatherMusicController)
+application.register("gather-push", GatherPushController)
 application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
 application.register("map-balance-chart", MapBalanceChartController)

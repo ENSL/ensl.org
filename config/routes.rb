@@ -114,6 +114,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :push_subscription, only: %i[create destroy]
+
   resources :groups
   resources :groupers, only: %i[create update destroy]
   resources :forumers, only: %i[create destroy update]

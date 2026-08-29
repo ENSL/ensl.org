@@ -111,6 +111,16 @@
        data-gather-music-should-play-value="<%= gather_music_should_play? %>">
     <%= audio_tag '/sounds/gather-1.mp3', id: 'gather-music', class: 'gather-audio', loop: true, preload: (Rails.env.test? ? 'none' : 'metadata'), data: { gather_music_target: 'audio' } %>
     <%= button_tag 'Mute', type: 'button', id: 'mute', class: 'button', data: { gather_music_target: 'muteButton', action: 'gather-music#toggleMute' } %>
+    <% if current_user && WebPushCredentials.configured? %>
+      <span data-controller="gather-push"
+            data-gather-push-vapid-public-key-value="<%= WebPushCredentials.public_key %>"
+            data-gather-push-url-value="<%= push_subscription_path %>"
+            data-gather-push-enabled-value="<%= current_user.profile&.notify_push_gather ? true : false %>">
+        <%= button_tag 'Notify Me', type: 'button', id: 'gather-push-toggle', class: 'button',
+                       title: 'Get a browser notification when this gather starts',
+                       data: { gather_push_target: 'button', action: 'gather-push#toggle' } %>
+      </span>
+    <% end %>
     <% if current_user and (current_user.admin? or current_user.gather_moderator?) %>
       <%= link_to "Admin Page", edit_gather_path(gather), class: 'admin button', data: { turbo: false } %>
     <% end %>
