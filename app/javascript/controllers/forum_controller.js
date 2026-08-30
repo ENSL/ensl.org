@@ -5,41 +5,40 @@ import { Controller } from "@hotwired/stimulus"
 // Mounted globally on <body>.
 export default class extends Controller {
   connect() {
-    const $ = window.jQuery
-    if (!$) return
+    this.handleClick = (event) => {
+      if (event.target.closest(".fastReply")) return this.showReply(event)
 
-    // Shows the quick reply form and focuses its textarea, then hides the trigger button.
-    $(document).off("click.forum", ".fastReply")
-    $(document).on("click.forum", ".fastReply", function(e) {
-      e.preventDefault()
-      $("#reply").fadeIn("fast", function() {
-        $(this).find("textarea").focus()
-        $(".fastReply").addClass("invisible")
-      })
-    })
+      const callTarget = event.target.closest("[data-on='click'][data-call]")
+      if (callTarget) this.dispatchDataCall(event, callTarget)
+    }
 
-    $(document).off("click.forum", "[data-on='click'][data-call]")
-    $(document).on("click.forum", "[data-on='click'][data-call]", (event) => this.dispatchDataCall(event))
+    document.addEventListener("click", this.handleClick)
   }
 
   disconnect() {
+    document.removeEventListener("click", this.handleClick)
+  }
+
+  // Shows the quick reply form and focuses its textarea, then hides the trigger button.
+  showReply(event) {
+    event.preventDefault()
     const $ = window.jQuery
     if (!$) return
 
-    $(document).off("click.forum", ".fastReply")
-    $(document).off("click.forum", "[data-on='click'][data-call]")
+    $("#reply").fadeIn("fast", function() {
+      $(this).find("textarea").focus()
+      document.querySelectorAll(".fastReply").forEach((button) => button.classList.add("invisible"))
+    })
   }
 
   // Looks up the requested handler by name and invokes it with the parsed args.
-  dispatchDataCall(event) {
-    const $ = window.jQuery
-    const $el = $(event.currentTarget)
+  dispatchDataCall(event, el) {
     const handlers = { QuoteText: (id, type) => this.quoteText(id, type) }
-    const fn = handlers[$el.data("call")]
+    const fn = handlers[el.dataset.call]
     if (!fn) return
 
     event.preventDefault()
-    const args = String($el.data("args") || "")
+    const args = String(el.dataset.args || "")
       .split(",")
       .map((arg) => arg.trim().replace(/^['"]|['"]$/g, ""))
       .filter((arg) => arg.length > 0)
@@ -50,6 +49,8 @@ export default class extends Controller {
   // Requests quote JS for a post/comment and executes the response.
   quoteText(id, type) {
     const $ = window.jQuery
+    if (!$) return
+
     const quoteType = type || "posts"
     const url = quoteType === "posts" ? `/posts/${id}/quote.js` : `/${quoteType}/quote.js?id=${id}`
 
@@ -60,3 +61,4 @@ export default class extends Controller {
     })
   }
 }
+

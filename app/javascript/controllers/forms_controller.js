@@ -1,55 +1,48 @@
 import { Controller } from "@hotwired/stimulus"
 
+const REFLOW_EVENTS = ["turbo:load", "turbo:render", "turbo:frame-load"]
+
 // Generic form handlers: link-driven form submission, select decoration, autosubmit selects,
 // and nested-form "add fields" support. Mounted globally on <body>; binds via delegation since
 // the markup it targets (data-submit-form links, autosubmit selects, plain selects) is rendered
 // across many unrelated views/partials.
 export default class extends Controller {
   connect() {
-    const $ = window.jQuery
-    if (!$) return
-
     // Emulates rails-ujs link-to-form-submit with optional confirm and dynamic action override.
-    $(document).off("click.forms", "a[data-submit-form]")
-    $(document).on("click.forms", "a[data-submit-form]", (event) => this.submitForm(event))
+    this.handleClick = (event) => {
+      const link = event.target.closest("a[data-submit-form]")
+      if (link) this.submitForm(event, link)
+    }
 
     // Auto-submits forms when autosubmit select values change.
-    $(document).off("change.forms", "select.autosubmit")
-    $(document).on("change.forms", "select.autosubmit", function() {
-      $(this).closest("form").submit()
-    })
+    this.handleChange = (event) => {
+      const select = event.target.closest("select.autosubmit")
+      if (select) select.closest("form")?.submit()
+    }
+
+    document.addEventListener("click", this.handleClick)
+    document.addEventListener("change", this.handleChange)
 
     this.wrapSelects()
     this.handleReflow = () => this.wrapSelects()
-    document.addEventListener("turbo:load", this.handleReflow)
-    document.addEventListener("turbo:render", this.handleReflow)
-    document.addEventListener("turbo:frame-load", this.handleReflow)
+    REFLOW_EVENTS.forEach((eventName) => document.addEventListener(eventName, this.handleReflow))
   }
 
   disconnect() {
-    const $ = window.jQuery
-    if ($) {
-      $(document).off("click.forms", "a[data-submit-form]")
-      $(document).off("change.forms", "select.autosubmit")
-    }
-
-    document.removeEventListener("turbo:load", this.handleReflow)
-    document.removeEventListener("turbo:render", this.handleReflow)
-    document.removeEventListener("turbo:frame-load", this.handleReflow)
+    document.removeEventListener("click", this.handleClick)
+    document.removeEventListener("change", this.handleChange)
+    REFLOW_EVENTS.forEach((eventName) => document.removeEventListener(eventName, this.handleReflow))
   }
 
-  submitForm(event) {
+  submitForm(event, link) {
     event.preventDefault()
-    const $ = window.jQuery
-    const $link = $(event.currentTarget)
 
-    const confirmMessage = $link.data("confirm")
+    const confirmMessage = link.dataset.confirm
     if (confirmMessage && !window.confirm(confirmMessage)) {
       return
     }
 
-    const formId = $link.data("form-id")
-    const formSelector = $link.data("form-selector")
+    const { formId, formSelector, url, formAction } = link.dataset
     let form = null
 
     if (formId) {
@@ -57,12 +50,12 @@ export default class extends Controller {
     } else if (formSelector) {
       form = document.querySelector(formSelector)
     } else {
-      form = $link.closest("form")[0]
+      form = link.closest("form")
     }
 
-    const url = $link.data("url") || $link.data("form-action")
-    if (form && url) {
-      try { form.action = url } catch (_err) { }
+    const targetUrl = url || formAction
+    if (form && targetUrl) {
+      try { form.action = targetUrl } catch (_err) { }
     }
 
     if (form) {
@@ -92,23 +85,22 @@ export default class extends Controller {
 
   // Wraps plain selects once, then mirrors disabled state to wrapper class for styling hooks.
   wrapSelects() {
-    const $ = window.jQuery
-    if (!$) return
+    document.querySelectorAll("select").forEach((select) => {
+      if (select.parentElement?.classList.contains("select-wrapper")) return
 
-    $("select").each(function(_i, el) {
-      const $select = $(el)
-      if ($select.parent().hasClass("select-wrapper")) return
+      const wrapper = document.createElement("div")
+      wrapper.className = "select-wrapper"
+      select.replaceWith(wrapper)
+      wrapper.appendChild(select)
 
-      $select.wrap('<div class="select-wrapper" />')
-      $select.off("DOMSubtreeModified")
-      $select.on("DOMSubtreeModified", function() {
-        const $el = $(this)
-        const $wrapper = $el.parent()
-        $wrapper.toggleClass("disabled", $el.is("[disabled]"))
-      })
-
-      $select.trigger("DOMSubtreeModified")
+      this.syncSelectWrapperState(select)
+      new MutationObserver(() => this.syncSelectWrapperState(select))
+        .observe(select, { attributes: true, attributeFilter: ["disabled"] })
     })
+  }
+
+  syncSelectWrapperState(select) {
+    select.parentElement?.classList.toggle("disabled", select.disabled)
   }
 
   // Rails nested-form helper: inserts association template with a unique placeholder ID.

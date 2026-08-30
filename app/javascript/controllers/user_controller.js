@@ -9,48 +9,20 @@ export default class extends Controller {
     document.addEventListener("turbo:load", this.handleTurboLoad)
     document.addEventListener("turbo:render", this.handleTurboLoad)
 
-    const $ = window.jQuery
-    if (!$) return
+    this.handleClick = (event) => {
+      const tabLink = event.target.closest("#user-profile li a")
+      if (tabLink) return this.switchTab(tabLink)
 
-    // Switches active tab styling and loads tab content via JS response.
-    $(document).off("click.user", "#user-profile li a")
-    $(document).on("click.user", "#user-profile li a", function() {
-      const $userTabs = $("#user-profile .tabs")
-      $userTabs.find("li").removeClass("activeli")
-      $(this).parent().addClass("activeli")
-
-      $.ajax({
-        type: "GET",
-        url: `${window.location.pathname}.js?page=${$(this).attr("id")}`,
-        dataType: "script"
-      })
-    })
-
-    // Replaces placeholder with fetched Steam profile link for the viewed user.
-    $(document).off("click.user", "#steam-search a")
-    $(document).on("click.user", "#steam-search a", function(event) {
-      event.preventDefault()
-
-      const $search = $("#steam-search")
-      const id = $search.data("user-id")
-
-      $search.html("<p>Searching...</p>")
-
-      $.get(`/api/v1/users/${id}`, function(data) {
-        $search.html(`<a href='${data.steam.url}'>Steam Profile: ${data.steam.nickname}</a>`)
-      })
-    })
+      const steamLink = event.target.closest("#steam-search a")
+      if (steamLink) this.searchSteam(event)
+    }
+    document.addEventListener("click", this.handleClick)
   }
 
   disconnect() {
     document.removeEventListener("turbo:load", this.handleTurboLoad)
     document.removeEventListener("turbo:render", this.handleTurboLoad)
-
-    const $ = window.jQuery
-    if (!$) return
-
-    $(document).off("click.user", "#user-profile li a")
-    $(document).off("click.user", "#steam-search a")
+    document.removeEventListener("click", this.handleClick)
   }
 
   fillBrowserTimeZone() {
@@ -59,4 +31,35 @@ export default class extends Controller {
       timeZoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ""
     }
   }
+
+  // Switches active tab styling and loads tab content via JS response.
+  switchTab(tabLink) {
+    const $ = window.jQuery
+    if (!$) return
+
+    document.querySelectorAll("#user-profile .tabs li").forEach((li) => li.classList.remove("activeli"))
+    tabLink.parentElement?.classList.add("activeli")
+
+    $.ajax({
+      type: "GET",
+      url: `${window.location.pathname}.js?page=${tabLink.id}`,
+      dataType: "script"
+    })
+  }
+
+  // Replaces placeholder with fetched Steam profile link for the viewed user.
+  async searchSteam(event) {
+    event.preventDefault()
+
+    const container = document.getElementById("steam-search")
+    if (!container) return
+
+    const userId = container.dataset.userId
+    container.innerHTML = "<p>Searching...</p>"
+
+    const response = await fetch(`/api/v1/users/${userId}`)
+    const data = await response.json()
+    container.innerHTML = `<a href='${data.steam.url}'>Steam Profile: ${data.steam.nickname}</a>`
+  }
 }
+

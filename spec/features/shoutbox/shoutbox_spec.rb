@@ -156,7 +156,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     expect(first_text).to include("#{prefix}-11")
   end
 
-  scenario 'main shoutbox mousewheel changes scroll position' do
+  scenario 'main shoutbox wheel scroll changes scroll position' do
     20.times { |n| create(:shoutmsg, text: "wheel-main-#{n}-#{SecureRandom.hex(2)}") }
 
     visit root_path
@@ -165,7 +165,9 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     page.execute_script("document.querySelector('#shoutbox').scrollTop = 100;")
     before = page.evaluate_script("document.querySelector('#shoutbox').scrollTop")
 
-    page.execute_script("$(document.querySelector('#shoutbox')).trigger('mousewheel', [120]);")
+    page.execute_script(<<~JS)
+      document.querySelector('#shoutbox').dispatchEvent(new WheelEvent('wheel', { deltaY: 120, bubbles: true }));
+    JS
     sleep 0.1
     after = page.evaluate_script("document.querySelector('#shoutbox').scrollTop")
 

@@ -10,41 +10,44 @@ export default class extends Controller {
     document.addEventListener("turbo:load", this.handleTurboLoad)
     document.addEventListener("turbo:render", this.handleTurboLoad)
 
-    const $ = window.jQuery
-    if (!$) return
+    this.handleClick = (event) => {
+      if (event.target.closest("a#gather-info-hide")) return this.hideGatherInfo()
 
-    // Dismisses the gather-info panel from the gather page.
-    $(document).off("click.local", "a#gather-info-hide")
-    $(document).on("click.local", "a#gather-info-hide", function() {
-      $("div#gather-info").fadeOut("slow", 0)
-    })
-
-    // Updates match proposal status from clicked action and patches row cells from JSON response.
-    $(document).off("click.local", "form.edit_match_proposal a")
-    $(document).on("click.local", "form.edit_match_proposal a", function() {
-      const form = $(this).closest("form.edit_match_proposal")
-      form.children("input#match_proposal_status").val($(this).data("id"))
-      $.post(form.attr("action"), form.serialize(), function(data) {
-        const tr = form.closest("tr")
-        tr.children("td").eq(2).text(data.status)
-        if (data.status === "Revoked" || data.status === "Rejected") tr.children("td").eq(3).empty()
-      }, "json")
-        .fail(function(err) {
-          const errjson = JSON.parse(err.responseText)
-          alert(errjson.error.message)
-        })
-    })
+      const proposalLink = event.target.closest("form.edit_match_proposal a")
+      if (proposalLink) this.updateMatchProposal(proposalLink)
+    }
+    document.addEventListener("click", this.handleClick)
   }
 
   disconnect() {
     document.removeEventListener("turbo:load", this.handleTurboLoad)
     document.removeEventListener("turbo:render", this.handleTurboLoad)
+    document.removeEventListener("click", this.handleClick)
+  }
 
+  // Dismisses the gather-info panel from the gather page.
+  hideGatherInfo() {
+    const $ = window.jQuery
+    if (!$) return
+    $("div#gather-info").fadeOut("slow", 0)
+  }
+
+  // Updates match proposal status from clicked action and patches row cells from JSON response.
+  updateMatchProposal(link) {
     const $ = window.jQuery
     if (!$) return
 
-    $(document).off("click.local", "a#gather-info-hide")
-    $(document).off("click.local", "form.edit_match_proposal a")
+    const form = $(link).closest("form.edit_match_proposal")
+    form.children("input#match_proposal_status").val($(link).data("id"))
+    $.post(form.attr("action"), form.serialize(), function(data) {
+      const tr = form.closest("tr")
+      tr.children("td").eq(2).text(data.status)
+      if (data.status === "Revoked" || data.status === "Rejected") tr.children("td").eq(3).empty()
+    }, "json")
+      .fail(function(err) {
+        const errjson = JSON.parse(err.responseText)
+        alert(errjson.error.message)
+      })
   }
 
   // Fades transient flash notification after a short delay unless explicitly disabled.
@@ -56,3 +59,4 @@ export default class extends Controller {
     $("#notification").delay(3000).fadeOut()
   }
 }
+

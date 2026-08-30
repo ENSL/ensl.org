@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Keeps shoutbox transcripts pinned to the bottom and supports mousewheel scrolling
+const REFLOW_EVENTS = ["turbo:load", "turbo:render", "turbo:frame-load"]
+
+// Keeps shoutbox transcripts pinned to the bottom and supports wheel scrolling
 // on the sidebar shoutbox widget. Mounted globally on <body>.
 export default class extends Controller {
   connect() {
@@ -8,30 +10,21 @@ export default class extends Controller {
 
     this.handleReflow = () => this.initAutoscroll()
     this.handleStreamRender = () => setTimeout(() => this.initAutoscroll(), 0)
-    ;["turbo:load", "turbo:render", "turbo:frame-load"].forEach((eventName) => {
-      document.addEventListener(eventName, this.handleReflow)
-    })
+    REFLOW_EVENTS.forEach((eventName) => document.addEventListener(eventName, this.handleReflow))
     document.addEventListener("turbo:before-stream-render", this.handleStreamRender)
 
-    const $ = window.jQuery
-    if (!$) return
-
-    $(document).off("mousewheel.shoutbox", "div#shoutbox")
-    $(document).on("mousewheel.shoutbox", "div#shoutbox", function(ev, delta) {
-      const scrollTop = $(this).scrollTop()
-      $(this).scrollTop(scrollTop - Math.round(delta))
-    })
+    this.handleWheel = (event) => {
+      const transcript = event.target.closest("div#shoutbox")
+      if (!transcript) return
+      transcript.scrollTop += Math.round(event.deltaY)
+    }
+    document.addEventListener("wheel", this.handleWheel, { passive: true })
   }
 
   disconnect() {
-    ;["turbo:load", "turbo:render", "turbo:frame-load"].forEach((eventName) => {
-      document.removeEventListener(eventName, this.handleReflow)
-    })
+    REFLOW_EVENTS.forEach((eventName) => document.removeEventListener(eventName, this.handleReflow))
     document.removeEventListener("turbo:before-stream-render", this.handleStreamRender)
-
-    const $ = window.jQuery
-    if (!$) return
-    $(document).off("mousewheel.shoutbox", "div#shoutbox")
+    document.removeEventListener("wheel", this.handleWheel)
   }
 
   // Jump a shoutbox transcript to the newest message.
@@ -41,18 +34,11 @@ export default class extends Controller {
 
   // Keep every transcript pane pinned to the bottom and avoid double-binding observers.
   initAutoscroll() {
-    const $ = window.jQuery
-    if (!$) return
-
-    $(".shoutbox-messages").each((_i, el) => {
+    document.querySelectorAll(".shoutbox-messages").forEach((el) => {
       this.scrollToBottom(el)
 
-      if (el.dataset && el.dataset.shoutboxAutoscroll === "1") {
-        return
-      }
-      if (el.dataset) {
-        el.dataset.shoutboxAutoscroll = "1"
-      }
+      if (el.dataset.shoutboxAutoscroll === "1") return
+      el.dataset.shoutboxAutoscroll = "1"
 
       const observer = new MutationObserver(() => {
         setTimeout(() => this.scrollToBottom(el), 10)
@@ -61,3 +47,4 @@ export default class extends Controller {
     })
   }
 }
+
