@@ -35,7 +35,16 @@ module Features
     end
 
     def tinymce_editor_present?(element_id)
-      page.evaluate_script("typeof tinymce !== 'undefined' && tinymce.get(\"#{element_id}\") != null")
+      # `tinymce.get(id)` returns an editor as soon as init registers it, before its iframe/UI
+      # (and thus setContent) is actually ready -- check `initialized` too, or setContent can
+      # silently no-op and the form submits with empty content (flaky under CI load).
+      page.evaluate_script(<<~JS)
+        (() => {
+          if (typeof tinymce === 'undefined') return false
+          const editor = tinymce.get("#{element_id}")
+          return !!editor && editor.initialized === true
+        })()
+      JS
     rescue StandardError
       # Catch any driver errors (Playwright or otherwise) during script evaluation
       false
