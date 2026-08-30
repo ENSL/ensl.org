@@ -18,4 +18,3 @@ pin 'local-time' # @3.0.3
 
 pin_all_from 'app/javascript/controllers', under: 'controllers'
 pin_all_from 'app/javascript/lib', under: 'lib'
-pin_all_from 'app/javascript/legacy', under: 'legacy'

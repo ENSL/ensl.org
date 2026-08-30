@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <%= render "head" %>
-  <body>
+  <body data-disable-flash-fade="<%= Rails.env.test? %>" data-controller="forms forum user local shoutbox">
     <div id="container">
       <%= render "header", gather: @gather %>
       <%= render "navigation" %>

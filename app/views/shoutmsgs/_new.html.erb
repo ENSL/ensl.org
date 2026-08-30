@@ -3,13 +3,14 @@
   <% if cuser.banned? Ban::TYPE_MUTE %>
     You have been muted.
   <% else %>
-    <%= form_with(model: shoutmsg, id: "new_#{shoutmsg.domain}", html: { class: 'new-shout', data: { turbo: true } }, local: false) do |f| %>
+    <%= form_with(model: shoutmsg, id: "new_#{shoutmsg.domain}", html: { class: 'new-shout', data: { turbo: true, controller: 'shout-form' } }, local: false) do |f| %>
       <% if shoutmsg.shoutable %>
         <%= f.hidden_field :shoutable_type %>
         <%= f.hidden_field :shoutable_id %>
       <% end %>
       <div class="fields">
-        <%= f.text_field :text, size: 12, id: "#{shoutmsg.domain}_text", class: "shout_input" %>
+        <%= f.text_field :text, size: 12, id: "#{shoutmsg.domain}_text", class: "shout_input",
+              data: { shout_form_target: "input", action: "keyup->shout-form#updateInputState change->shout-form#updateInputState" } %>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
       </div>
       <div class="controls">
@@ -26,14 +27,4 @@
 <% if local_assigns[:show_rules_link] && !rules_link_rendered %>
   <%= link_to "Shoutbox Rules", article_path(Article::SB_RULES), class: 'shoutbox-rules' %>
 <% end %>
-
-<script type="text/javascript">
-document.addEventListener("turbo:load", function() {
-  try {
-    ShoutboxController({ context: $("#new_<%= shoutmsg.domain %>") });
-  } catch (e) {
-    // shoutbox controller may not be available in some test environments
-  }
-});
-</script>
 

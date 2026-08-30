@@ -253,7 +253,9 @@ module ApplicationHelper
     fields = form_builder.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
       render(association.to_s.singularize, f: builder)
     end
-    link_to(name, '#', onclick: "add_fields(this, '#{association}', '#{escape_javascript(fields)}'); return false;")
+    link_to(name, '#', data: {
+              action: 'forms#addFields', forms_association_param: association, forms_template_param: fields
+            })
   end
 
   def timezone_offset
