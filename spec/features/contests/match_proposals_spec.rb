@@ -92,6 +92,18 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     expect(proposal.status_change_allowed?(team2_leader, MatchProposal::STATUS_CONFIRMED)).to be true
   end
 
+  scenario 'opposing team confirms a proposal via the inline action link' do
+    proposal = create(:match_proposal, :in_near_future, match: match, team: team1)
+
+    sign_in_via_session(team2_leader)
+    visit match_proposals_path(match)
+
+    within('tr', text: team1.name) { click_link 'Confirm' }
+
+    expect(page).to have_content('Confirmed', wait: 5)
+    expect(proposal.reload.status).to eq(MatchProposal::STATUS_CONFIRMED)
+  end
+
   scenario 'team leader cannot confirm own proposal' do
     create(:match_proposal, :in_near_future, match: match, team: team1)
 

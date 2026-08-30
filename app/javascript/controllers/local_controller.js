@@ -14,7 +14,10 @@ export default class extends Controller {
       if (event.target.closest("a#gather-info-hide")) return this.hideGatherInfo()
 
       const proposalLink = event.target.closest("form.edit_match_proposal a")
-      if (proposalLink) this.updateMatchProposal(proposalLink)
+      if (proposalLink) {
+        event.preventDefault()
+        this.updateMatchProposal(proposalLink)
+      }
     }
     document.addEventListener("click", this.handleClick)
   }

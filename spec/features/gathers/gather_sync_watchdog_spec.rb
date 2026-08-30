@@ -38,6 +38,42 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     expect(evaluate_script("localStorage.getItem('gather_sync_force_reload')")).to eq('1')
   end
 
+  scenario 'reloads the gather frame after detecting a version change via polling' do
+    sign_in_via_session(user)
+    visit gather_path(gather)
+
+    expect(page).to have_selector('#gather', wait: 5)
+    initial_version = gather.version
+
+    gather.bump_version!
+
+    expect(page).to have_css("#gather_#{gather.id}_version[data-version='#{gather.version}']", wait: 8)
+    expect(gather.version).to be > initial_version
+  end
+
+  scenario 'dismisses the gather-info panel' do
+    sign_in_via_session(user)
+    visit gather_path(gather)
+
+    expect(page).to have_selector('#gather-info', wait: 5)
+    find('#gather-info-hide').click
+
+    expect(page).to have_no_selector('#gather-info', wait: 5)
+  end
+
+  scenario 'shows a blocked-notifications message when push permission is denied' do
+    allow(WebPushCredentials).to receive_messages(configured?: true, public_key: 'test-vapid-public-key')
+
+    sign_in_via_session(user)
+    visit gather_path(gather)
+
+    expect(page).to have_button('Notify Me', wait: 5)
+    click_button 'Notify Me'
+
+    expect(page).to have_css('#notification .message.error', wait: 5)
+    expect(page).to have_button('Notify Me', wait: 5)
+  end
+
   scenario 'renders gather music controls next to admin button' do
     sign_in_via_session(admin)
     visit gather_path(gather)
@@ -130,5 +166,20 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     click_button 'Unmute'
     expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(false)
     expect(page).to have_button('Mute', id: 'mute')
+  end
+
+  scenario 'persists the muted preference across a page reload' do
+    gather.update!(status: Gather::STATE_RUNNING)
+
+    sign_in_via_session(admin)
+    visit gather_path(gather)
+
+    click_button 'Mute'
+    expect(page).to have_button('Unmute', id: 'mute')
+
+    visit gather_path(gather)
+
+    expect(page).to have_button('Unmute', id: 'mute', wait: 5)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(true)
   end
 end
