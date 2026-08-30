@@ -39,14 +39,16 @@ module Ensl
     # Custom directories with classes and modules you want to be autoloadable.
     # Only register the services root (no recursive dirs as roots)
     services_root = Rails.root.join('app', 'services').to_s
+    lib_root = Rails.root.join('lib').to_s
     # Remove any previously added nested service dirs (cleanup)
     nested_service_dirs = Dir[File.join(services_root, '**/')]
     config.autoload_paths -= nested_service_dirs
     config.eager_load_paths -= nested_service_dirs
 
     config.autoload_paths = (config.autoload_paths + [services_root,
+                                                      lib_root,
                                                       Rails.root.join('app', 'models', 'concerns').to_s]).uniq
-    config.eager_load_paths = (config.eager_load_paths + [services_root]).uniq
+    config.eager_load_paths = (config.eager_load_paths + [services_root, lib_root]).uniq
 
     # Be sure to restart your server when you modify this file.
     config.session_store :cookie_store,
