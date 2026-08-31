@@ -3,133 +3,246 @@
 require 'rails_helper'
 
 RSpec.describe Match, type: :model do
-  describe 'ladder recalculation and reset' do
-    it 'recomputes ladder ranks when a ladder match is changed' do
-      contest = Contest.create!(name: 'LadderTest', start: Time.now.utc, end: 1.day.from_now.utc,
-                                default_time: Time.now.utc, status: Contest::STATUS_OPEN, contest_type: Contest::TYPE_LADDER)
+  # Ladder ranks live in Contester#score: 1 is the top rank and the values must stay
+  # contiguous (1..N) across every active contester of the ladder.
+  let(:contest) { create(:contest, contest_type: Contest::TYPE_LADDER) }
 
-      team1 = Team.create!(name: 'Team One', tag: 'T1')
-      team2 = Team.create!(name: 'Team Two', tag: 'T2')
+  def build_ladder(size)
+    Array.new(size) { |index| create(:contester, contest: contest, team: create(:team), score: index + 1) }
+  end
 
-      cont1 = Contester.create!(team: team1, contest: contest, score: 1)
-      cont2 = Contester.create!(team: team2, contest: contest, score: 2)
+  def play(home, away, score1, score2, time = 1.hour.ago)
+    Match.create!(contest: contest, contester1: home, contester2: away,
+                  score1: score1, score2: score2, match_time: time)
+  end
 
-      # cont2 beats cont1 -> should swap ranks (cont2 becomes 1)
-      match = Match.create!(contest: contest, contester1: cont1, contester2: cont2, score1: 2, score2: 3,
-                            match_time: Time.now.utc)
-      cont1.reload
-      cont2.reload
-      # A win by cont2 should move it up one and push cont1 down one.
-      expect([cont1.score, cont2.score]).to match_array([2, 1])
+  def ranks(*contesters)
+    contesters.map { |contester| contester.reload.score }
+  end
 
-      # Now change the match so cont1 wins -> ranks should revert and then apply new result
+  def rank_order
+    contest.contesters.active.ranked.map { |contester| contester.team.name }
+  end
+
+  describe 'applying a ladder result' do
+    it 'moves the winner into the rank of the better-ranked opponent' do
+      a, b, c, d = build_ladder(4)
+
+      play(c, a, 3, 1)
+
+      expect(ranks(a, b, c, d)).to eq([2, 3, 1, 4])
+    end
+
+    it 'moves the winner up when it is the away team' do
+      a, b, c, d = build_ladder(4)
+
+      play(a, d, 1, 3)
+
+      expect(ranks(a, b, c, d)).to eq([2, 3, 4, 1])
+    end
+
+    it 'leaves ranks untouched when the better-ranked team wins' do
+      a, b, c, d = build_ladder(4)
+
+      play(a, d, 4, 1)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+    end
+
+    it 'leaves ranks untouched when the better-ranked away team wins' do
+      a, b, c, d = build_ladder(4)
+
+      play(d, a, 1, 4)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+    end
+
+    it 'moves a drawing challenger to the rank directly below its opponent' do
+      a, b, c, d = build_ladder(4)
+
+      play(b, d, 2, 2)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 4, 3])
+    end
+
+    it 'moves a drawing home challenger to the rank directly below its opponent' do
+      a, b, c, d = build_ladder(4)
+
+      play(d, b, 2, 2)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 4, 3])
+    end
+
+    it 'never promotes a drawing challenger past the team it drew with' do
+      a, b, c, d = build_ladder(4)
+
+      play(a, c, 1, 1)
+
+      expect(ranks(a, b, c, d)).to eq([1, 3, 2, 4])
+      expect(a.reload.score).to be < c.reload.score
+    end
+
+    it 'never produces a rank below 1 when drawing with the top team' do
+      a, b = build_ladder(2)
+
+      play(a, b, 1, 1)
+
+      expect(ranks(a, b)).to eq([1, 2])
+    end
+
+    it 'leaves adjacent ranks untouched on a draw' do
+      a, b, c, d = build_ladder(4)
+
+      play(b, c, 2, 2)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+    end
+
+    it 'records the rank gap it acted on' do
+      a, _b, c, _d = build_ladder(4)
+
+      match = play(c, a, 3, 1)
+
+      expect(match.reload.diff).to eq(-2)
+    end
+
+    it 'updates win, loss and draw records' do
+      a, b, = build_ladder(3)
+
+      play(a, b, 3, 1)
+
+      expect([a.reload.win, a.loss, a.draw]).to eq([1, 0, 0])
+      expect([b.reload.win, b.loss, b.draw]).to eq([0, 1, 0])
+    end
+
+    it 'keeps ranks contiguous after a series of results' do
+      a, b, c, d = build_ladder(4)
+
+      play(d, a, 3, 1, 4.hours.ago)
+      play(b, c, 2, 2, 3.hours.ago)
+      play(c, d, 1, 3, 2.hours.ago)
+      play(a, b, 4, 2, 1.hour.ago)
+
+      expect(ranks(a, b, c, d).sort).to eq([1, 2, 3, 4])
+    end
+  end
+
+  describe 'rescoring a ladder match' do
+    it 'reverts a win and applies the new result' do
+      a, b, c, d = build_ladder(4)
+      match = play(c, a, 3, 1)
+      expect(ranks(a, b, c, d)).to eq([2, 3, 1, 4])
+
+      match.update!(score1: 1, score2: 3)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+      expect([a.reload.win, a.loss]).to eq([1, 0])
+      expect([c.reload.win, c.loss]).to eq([0, 1])
+    end
+
+    it 'reverts a win into a draw' do
+      a, b, c, d = build_ladder(4)
+      match = play(c, a, 3, 1)
+
+      match.update!(score1: 2, score2: 2)
+
+      expect(ranks(a, b, c, d)).to eq([1, 3, 2, 4])
+      expect(a.reload.draw).to eq(1)
+      expect(c.reload.draw).to eq(1)
+    end
+
+    it 'reverts a draw into a win' do
+      a, b, c, d = build_ladder(4)
+      match = play(b, d, 2, 2)
+      expect(ranks(a, b, c, d)).to eq([1, 2, 4, 3])
+
+      match.update!(score1: 4, score2: 1)
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+      expect(b.reload.draw).to eq(0)
+      expect(d.reload.draw).to eq(0)
+    end
+
+    it 'reverts a draw into the opposite win' do
+      a, b, c, d = build_ladder(4)
+      match = play(b, d, 2, 2)
+
+      match.update!(score1: 1, score2: 4)
+
+      expect(ranks(a, b, c, d)).to eq([1, 3, 4, 2])
+    end
+
+    it 'is a no-op when a result that changed nothing is rescored' do
+      a, b, c, d = build_ladder(4)
+      match = play(a, d, 4, 1)
+
       match.update!(score1: 3, score2: 2)
 
-      cont1.reload
-      cont2.reload
-      # After changing the match so cont1 wins, the ranks should revert.
-      expect([cont1.score, cont2.score]).to match_array([1, 2])
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
     end
 
-    it 'evolves ranks across multiple ladder matches and updates' do
-      contest = Contest.create!(name: 'LadderEvolution', start: Time.now.utc, end: 1.day.from_now.utc,
-                                default_time: Time.now.utc, status: Contest::STATUS_OPEN, contest_type: Contest::TYPE_LADDER)
+    it 'recomputes the stored rank gap instead of reusing a stale one' do
+      a, b, c, d = build_ladder(4)
+      match = play(c, a, 3, 1, 2.hours.ago)
+      play(d, b, 3, 1, 1.hour.ago)
 
-      team1 = Team.create!(name: 'Team Alpha', tag: 'TA')
-      team2 = Team.create!(name: 'Team Bravo', tag: 'TB')
-      team3 = Team.create!(name: 'Team Charlie', tag: 'TC')
+      match.update!(score1: 1, score2: 3)
 
-      cont1 = Contester.create!(team: team1, contest: contest, score: 1)
-      cont2 = Contester.create!(team: team2, contest: contest, score: 2)
-      cont3 = Contester.create!(team: team3, contest: contest, score: 3)
-
-      # Team Bravo beats Team Alpha -> swap ranks 1 and 2
-      Match.create!(contest: contest, contester1: cont1, contester2: cont2, score1: 1, score2: 2,
-                    match_time: Time.now.utc)
-      cont1.reload
-      cont2.reload
-      cont3.reload
-      expect([cont1.score, cont2.score, cont3.score]).to match_array([2, 1, 3])
-
-      # Team Charlie beats Team Bravo (higher rank) -> Charlie moves to 1
-      Match.create!(contest: contest, contester1: cont2, contester2: cont3, score1: 1, score2: 2,
-                    match_time: Time.now.utc)
-      cont1.reload
-      cont2.reload
-      cont3.reload
-      expect([cont1.score, cont2.score, cont3.score]).to match_array([2, 3, 1])
-
-      # Update the first match so Alpha wins instead -> should undo and reapply
-      first_match = Match.where(contest: contest).ordered.last
-      first_match.update!(score1: 3, score2: 1)
-
-      cont1.reload
-      cont2.reload
-      cont3.reload
-      expect([cont1.score, cont2.score, cont3.score]).to match_array([1, 3, 2])
+      expect(match.reload.diff).to eq(a.reload.score - c.reload.score)
+      expect(ranks(a, b, c, d).sort).to eq([1, 2, 3, 4])
     end
 
-    it 'keeps ranks stable when lower-ranked team wins' do
-      contest = Contest.create!(name: 'LadderStable', start: Time.now.utc, end: 1.day.from_now.utc,
-                                default_time: Time.now.utc, status: Contest::STATUS_OPEN, contest_type: Contest::TYPE_LADDER)
+    it 'keeps ranks contiguous when a match in the middle of a series is rescored' do
+      a, b, c, d = build_ladder(4)
+      play(d, a, 3, 1, 3.hours.ago)
+      match = play(b, c, 1, 3, 2.hours.ago)
+      play(a, d, 3, 1, 1.hour.ago)
 
-      team1 = Team.create!(name: 'Team Delta', tag: 'TD')
-      team2 = Team.create!(name: 'Team Echo', tag: 'TE')
-
-      cont1 = Contester.create!(team: team1, contest: contest, score: 1)
-      cont2 = Contester.create!(team: team2, contest: contest, score: 3)
-
-      # Higher-ranked cont1 beats lower-ranked cont2 -> no rank change expected
-      Match.create!(contest: contest, contester1: cont1, contester2: cont2, score1: 4, score2: 1,
-                    match_time: Time.now.utc)
-
-      cont1.reload
-      cont2.reload
-      expect([cont1.score, cont2.score]).to match_array([1, 3])
-    end
-
-    it 'moves lower-ranked team to just above on a draw' do
-      contest = Contest.create!(name: 'LadderDraw', start: Time.now.utc, end: 1.day.from_now.utc,
-                                default_time: Time.now.utc, status: Contest::STATUS_OPEN, contest_type: Contest::TYPE_LADDER)
-
-      team1 = Team.create!(name: 'Team Foxtrot', tag: 'TF')
-      team2 = Team.create!(name: 'Team Golf', tag: 'TG')
-
-      cont1 = Contester.create!(team: team1, contest: contest, score: 2)
-      cont2 = Contester.create!(team: team2, contest: contest, score: 4)
-
-      # Lower-ranked cont2 draws higher-ranked cont1 -> cont2 moves just above cont1
-      Match.create!(contest: contest, contester1: cont1, contester2: cont2, score1: 2, score2: 2,
-                    match_time: Time.now.utc)
-
-      cont1.reload
-      cont2.reload
-      expect([cont1.score, cont2.score]).to match_array([3, 1])
-    end
-
-    it 'reverts ladder ranks on draw update' do
-      contest = Contest.create!(name: 'LadderDrawUpdate', start: Time.now.utc, end: 1.day.from_now.utc,
-                                default_time: Time.now.utc, status: Contest::STATUS_OPEN, contest_type: Contest::TYPE_LADDER)
-
-      team1 = Team.create!(name: 'Team Hotel', tag: 'TH')
-      team2 = Team.create!(name: 'Team India', tag: 'TI')
-
-      cont1 = Contester.create!(team: team1, contest: contest, score: 2)
-      cont2 = Contester.create!(team: team2, contest: contest, score: 5)
-
-      match = Match.create!(contest: contest, contester1: cont1, contester2: cont2, score1: 1, score2: 1,
-                            match_time: Time.now.utc)
-
-      cont1.reload
-      cont2.reload
-      expect([cont1.score, cont2.score]).to match_array([3, 1])
-
-      # Change to cont1 win (higher-ranked) -> revert draw move
       match.update!(score1: 3, score2: 1)
 
-      cont1.reload
-      cont2.reload
-      expect([cont1.score, cont2.score]).to match_array([2, 5])
+      expect(ranks(a, b, c, d).sort).to eq([1, 2, 3, 4])
+    end
+  end
+
+  describe 'destroying a ladder match' do
+    it 'reverts the rank move it caused' do
+      a, b, c, d = build_ladder(4)
+      match = play(c, a, 3, 1)
+
+      match.destroy
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+    end
+
+    it 'reverts a draw move' do
+      a, b, c, d = build_ladder(4)
+      match = play(b, d, 2, 2)
+
+      match.destroy
+
+      expect(ranks(a, b, c, d)).to eq([1, 2, 3, 4])
+    end
+
+    it 'reverts win and loss records' do
+      a, b, = build_ladder(3)
+      match = play(a, b, 3, 1)
+
+      match.destroy
+
+      expect([a.reload.win, a.loss]).to eq([0, 0])
+      expect([b.reload.win, b.loss]).to eq([0, 0])
+    end
+
+    it 'keeps the effect of the remaining matches' do
+      a, b, c, d = build_ladder(4)
+      match = play(c, a, 3, 1, 2.hours.ago)
+      play(d, b, 3, 1, 1.hour.ago)
+
+      match.destroy
+
+      expect(ranks(a, b, c, d).sort).to eq([1, 2, 3, 4])
+      expect(d.reload.win).to eq(1)
+      expect(d.score).to be < b.reload.score
     end
   end
 end

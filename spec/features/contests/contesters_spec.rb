@@ -51,6 +51,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
 
   scenario 'Edit contester and return to contest teams tab', :aggregate_failures do
     contester = create(:contester, contest: contest, team: team)
+    create(:contester, contest: contest) # a second team, so rank 2 is a valid ladder rank
     visit edit_contester_path(contester)
 
     # The edit page should have a back link to contest teams

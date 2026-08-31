@@ -88,19 +88,37 @@ class Contester < ApplicationRecord
 
   def assign_ladder_join_score!
     return unless contest&.contest_type == Contest::TYPE_LADDER
+    # The column defaults to 0, which is not a valid (1-based) rank.
+    return if score.to_i.positive?
 
-    self.score = contest.contesters.active.count + 1
+    self.score = next_ladder_rank
   end
 
   def rebalance_ladder_rank!(new_rank_value)
     return unless contest&.contest_type == Contest::TYPE_LADDER
 
     new_rank = new_rank_value.to_i
-    max_rank = contest.contesters.active.count
+    max_rank = contest.ladder_contesters.count
     raise Exceptions::Error, I18n.t(:rank_invalid) unless new_rank.positive? && (new_rank <= max_rank)
 
     old_rank = score
     contest.update_ranks(self, old_rank, new_rank) if old_rank != new_rank
+  end
+
+  # Ranks are 1-based and contiguous; querying directly avoids a stale association cache.
+  def next_ladder_rank
+    Contester.where(contest_id: contest_id, active: true).maximum(:score).to_i + 1
+  end
+
+  def close_ladder_rank_gap!
+    return unless contest&.contest_type == Contest::TYPE_LADDER
+    return if score.nil?
+
+    # rubocop:disable Rails/SkipsModelValidations
+    Contester.where(contest_id: contest_id, active: true)
+             .where('score > ?', score)
+             .update_all('score = score - 1')
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def init_variables
@@ -108,14 +126,7 @@ class Contester < ApplicationRecord
     self.trend = Contester::TREND_FLAT
     self.extra = 0
 
-    # Initialize ladder contesters with sequential scores to avoid negative values during rank updates
-    # But only if score was not explicitly set
-    return unless contest&.contest_type == Contest::TYPE_LADDER
-    return if score.present?
-
-    # Get the current max score in this ladder, default to -1 so first contester gets 0
-    max_score = contest.contesters.maximum(:score) || -1
-    self.score = max_score + 1
+    assign_ladder_join_score!
   end
 
   def validate_member_participation
@@ -152,6 +163,7 @@ class Contester < ApplicationRecord
 
   def destroy
     update!(active: false)
+    close_ladder_rank_gap!
   end
 
   def can_create?(cuser, params = {})

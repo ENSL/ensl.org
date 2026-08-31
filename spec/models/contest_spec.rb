@@ -180,23 +180,86 @@ RSpec.describe Contest, type: :model do
   describe 'ranking helpers and recalculation' do
     it 'updates ladder ranks when a contester moves down or up' do
       ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
-      cont1 = create(:contester, contest: ladder, score: 0)
-      cont2 = create(:contester, contest: ladder, score: 1)
+      cont1 = create(:contester, contest: ladder, score: 1)
+      cont2 = create(:contester, contest: ladder, score: 2)
+      cont3 = create(:contester, contest: ladder, score: 3)
+
+      ladder.update_ranks(cont1, 1, 3)
+      cont2.reload
+      cont3.reload
+      expect(cont1.score).to eq(3)
+      expect(cont1.trend).to eq(Contester::TREND_DOWN)
+      expect([cont2.score, cont3.score]).to eq([1, 2])
+
+      ladder.update_ranks(cont1, 3, 1)
+      cont2.reload
+      cont3.reload
+      expect(cont1.score).to eq(1)
+      expect(cont1.trend).to eq(Contester::TREND_UP)
+      expect([cont2.score, cont3.score]).to eq([2, 3])
+    end
+
+    it 'ignores contesters that left the ladder when shifting ranks' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      cont1 = create(:contester, contest: ladder, score: 1)
+      cont2 = create(:contester, contest: ladder, score: 2)
+      gone = create(:contester, contest: ladder, score: 3)
+      gone.update!(active: false)
+
+      ladder.update_ranks(cont1, 1, 3)
+
+      expect(cont2.reload.score).to eq(1)
+      expect(gone.reload.score).to eq(3)
+    end
+
+    it 'does nothing when the rank is unchanged' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      cont1 = create(:contester, contest: ladder, score: 1)
+      cont2 = create(:contester, contest: ladder, score: 2)
+
+      ladder.update_ranks(cont1, 1, 1)
+
+      expect([cont1.reload.score, cont2.reload.score]).to eq([1, 2])
+    end
+
+    it 'reseeds ladder ranks from join order' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      cont1 = create(:contester, contest: ladder, score: 7)
+      cont2 = create(:contester, contest: ladder, score: 7)
       cont3 = create(:contester, contest: ladder, score: 2)
 
-      ladder.update_ranks(cont1, 0, 2)
-      cont2.reload
-      cont3.reload
-      expect(cont1.score).to eq(2)
-      expect(cont1.trend).to eq(Contester::TREND_DOWN)
-      expect([cont2.score, cont3.score]).to eq([0, 1])
+      ladder.seed_ladder_ranks
 
-      ladder.update_ranks(cont1, 2, 0)
-      cont2.reload
-      cont3.reload
-      expect(cont1.score).to eq(0)
-      expect(cont1.trend).to eq(Contester::TREND_UP)
-      expect([cont2.score, cont3.score]).to eq([1, 2])
+      expect([cont1.reload.score, cont2.reload.score, cont3.reload.score]).to eq([1, 2, 3])
+    end
+
+    it 'replays a ladder instead of zeroing its ranks' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      cont1 = create(:contester, contest: ladder, score: 1)
+      cont2 = create(:contester, contest: ladder, score: 2)
+      cont3 = create(:contester, contest: ladder, score: 3)
+      create(:match, contest: ladder, contester1: cont3, contester2: cont1, score1: 3, score2: 1,
+                     match_time: 2.hours.ago)
+
+      ladder.recalculate
+
+      expect([cont1.reload.score, cont2.reload.score, cont3.reload.score]).to eq([2, 3, 1])
+      expect(cont3.win).to eq(1)
+      expect(cont1.loss).to eq(1)
+    end
+
+    it 'restores contiguous ladder ranks from legacy duplicated scores' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      cont1 = create(:contester, contest: ladder)
+      cont2 = create(:contester, contest: ladder)
+      cont3 = create(:contester, contest: ladder)
+      # rubocop:disable Rails/SkipsModelValidations
+      Contester.where(contest_id: ladder.id).update_all(score: 0)
+      # rubocop:enable Rails/SkipsModelValidations
+
+      ladder.recalculate
+
+      expect([cont1.reload.score, cont2.reload.score, cont3.reload.score]).to eq([1, 2, 3])
     end
 
     it 'recalculates contest standings from finished matches' do

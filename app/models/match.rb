@@ -231,6 +231,9 @@ class Match < ApplicationRecord
     # rubocop:disable Rails/SkipsModelValidations
     predictions.update_all(result: 0)
     # rubocop:enable Rails/SkipsModelValidations
+    # reset_contest already reverted the ladder ranks; a full replay would discard manual ordering.
+    return if contest.contest_type == Contest::TYPE_LADDER
+
     contest.recalculate
   end
 
@@ -240,52 +243,16 @@ class Match < ApplicationRecord
     return if contest.contest_type == Contest::TYPE_LEAGUE &&
               !contester2.active || !contester1.active
 
-    # Revert win/draw/loss records
-    if score1_was == score2_was
-      contester1.draw = contester1.draw - 1
-      contester2.draw = contester2.draw - 1
-    elsif score1_was > score2_was
-      contester1.win = contester1.win - 1
-      contester2.loss = contester2.loss - 1
-    elsif score1_was < score2_was
-      contester1.loss = contester1.loss - 1
-      contester2.win = contester2.win - 1
-    end
+    refresh_ladder_contesters
+    revert_records
 
     return if contest.contest_type == Contest::TYPE_BRACKET
 
     if contest.contest_type == Contest::TYPE_LADDER
-      return if diff.nil?
-
-      score_diff_was = score2_was - score1_was
-      prior_diff = diff
-
-      if score_diff_was.zero?
-        if prior_diff.negative?
-          # original: update_ranks(contester1, a, b - 1)
-          old_rank = contester1.score
-          new_rank = contester1.score + 1 - prior_diff
-          contest.update_ranks(contester1, old_rank, new_rank)
-        else
-          # original: update_ranks(contester2, b, a - 1)
-          old_rank = contester2.score
-          new_rank = contester1.score - 1 + prior_diff
-          contest.update_ranks(contester2, old_rank, new_rank)
-        end
-      elsif score_diff_was.negative? && prior_diff.negative?
-        # original: update_ranks(contester1, a, b)
-        old_rank = contester1.score
-        new_rank = contester1.score - prior_diff
-        contest.update_ranks(contester1, old_rank, new_rank)
-      elsif score_diff_was.positive? && prior_diff.positive?
-        # original: update_ranks(contester2, b, a)
-        old_rank = contester2.score
-        new_rank = contester2.score + prior_diff
-        contest.update_ranks(contester2, old_rank, new_rank)
-      end
-
+      revert_ladder_ranks
       contester1.save!
       contester2.save!
+      self.diff = nil
       return
     end
 
@@ -295,8 +262,57 @@ class Match < ApplicationRecord
     contester2.save!
   end
 
+  def revert_records
+    if score1_was == score2_was
+      contester1.draw -= 1
+      contester2.draw -= 1
+    elsif score1_was > score2_was
+      contester1.win -= 1
+      contester2.loss -= 1
+    else
+      contester1.loss -= 1
+      contester2.win -= 1
+    end
+  end
+
+  # update_ranks shuffles ranks with a bulk update, so cached contesters can hold stale ranks.
+  def refresh_ladder_contesters
+    return unless contest.contest_type == Contest::TYPE_LADDER
+
+    contester1.reload
+    contester2.reload
+  end
+
+  def move_rank(contester, offset)
+    contest.update_ranks(contester, contester.score, contester.score + offset)
+  end
+
+  # Undoes the single rank move applied by #apply_ladder_ranks. diff is the rank gap
+  # (contester2.score - contester1.score) that was in effect when the match was applied.
+  def revert_ladder_ranks
+    return if diff.nil?
+
+    if score1_was == score2_was
+      revert_ladder_draw
+    elsif score1_was > score2_was && diff.negative?
+      move_rank(contester1, -diff)
+    elsif score1_was < score2_was && diff.positive?
+      move_rank(contester2, diff)
+    end
+  end
+
+  def revert_ladder_draw
+    move_rank(contester1, -1 - diff) if diff.negative?
+    move_rank(contester2, diff - 1) if diff.positive?
+  end
+
   def handle_score_change
     recalculate
+    # recalculate runs after the save cycle, so its columns need persisting without re-firing callbacks.
+    columns = slice(:diff, :points1, :points2).select { |name, _| changed.include?(name) }
+    # rubocop:disable Rails/SkipsModelValidations
+    update_columns(columns) if columns.any?
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   # Recalculate contesters' points and records based on current match scores
@@ -305,60 +321,74 @@ class Match < ApplicationRecord
     return if contest.contest_type == Contest::TYPE_LEAGUE &&
               !contester2.active || !contester1.active
 
-    if score1 == score2
-      contester1.draw = contester1.draw + 1
-      contester2.draw = contester2.draw + 1
-      contester1.trend = Contester::TREND_FLAT
-      contester2.trend = Contester::TREND_FLAT
-    elsif score1 > score2
-      contester1.win = contester1.win + 1
-      contester2.loss = contester2.loss + 1
-      contester1.trend = Contester::TREND_UP
-      contester2.trend = Contester::TREND_DOWN
-    elsif score1 < score2
-      contester1.loss = contester1.loss + 1
-      contester2.win = contester2.win + 1
-      contester1.trend = Contester::TREND_DOWN
-      contester2.trend = Contester::TREND_UP
-    end
+    refresh_ladder_contesters
+    apply_records
 
-    self.diff = diff || (contester2.score - contester1.score)
+    self.diff = if contest.contest_type == Contest::TYPE_LADDER
+                  contester2.score - contester1.score
+                else
+                  diff || (contester2.score - contester1.score)
+                end
 
     if contest.contest_type == Contest::TYPE_LADDER
-      # Old ELO-based ranking system (disabled)
-      # self.points1 = contest.elo_score score1, score2, diff
-      # self.points2 = contest.elo_score score2, score1, -(diff)
-      # contester1.extra = contester1.extra + contest.modulus_base / 10
-      # contester2.extra = contester2.extra + contest.modulus_base / 10
-
-      score_diff = score2 - score1
-      if score_diff.zero? # Draw
-        if diff.negative? # contester2 has higher rank
-          # set contester1s rank one below contester2
-          new_rank = [contester2.score - 1, 0].max
-          contest.update_ranks(contester1, contester1.score, new_rank)
-        else
-          # set contester2s rank one below contester1
-          new_rank = [contester1.score - 1, 0].max
-          contest.update_ranks(contester2, contester2.score, new_rank)
-        end
-      elsif score_diff.negative? && diff.negative? # contester1 won and contester2 has higher rank
-        contest.update_ranks(contester1, contester1.score, contester2.score)
-      elsif score_diff.positive? && diff.positive? # contester2 won and contester1 has higher rank
-        contest.update_ranks(contester2, contester2.score, contester1.score)
-      end
-
+      apply_ladder_ranks
     elsif contest.contest_type == Contest::TYPE_LEAGUE
-      self.points1 = score1
-      self.points2 = score2
-      contester1.score = (contester1.score + points1).negative? ? 0 : contester1.score + points1
-      contester2.score = (contester2.score + points2).negative? ? 0 : contester2.score + points2
+      apply_league_points
     end
 
     return if contest.contest_type == Contest::TYPE_BRACKET
 
     contester1.save!
     contester2.save!
+  end
+
+  def apply_records
+    case score1 <=> score2
+    when 0
+      contester1.draw += 1
+      contester2.draw += 1
+    when 1
+      contester1.win += 1
+      contester2.loss += 1
+    else
+      contester1.loss += 1
+      contester2.win += 1
+    end
+
+    contester1.trend = trend_for(score1 <=> score2)
+    contester2.trend = trend_for(score2 <=> score1)
+  end
+
+  def trend_for(result)
+    case result
+    when 1 then Contester::TREND_UP
+    when -1 then Contester::TREND_DOWN
+    else Contester::TREND_FLAT
+    end
+  end
+
+  def apply_league_points
+    self.points1 = score1
+    self.points2 = score2
+    contester1.score = [contester1.score + points1, 0].max
+    contester2.score = [contester2.score + points2, 0].max
+  end
+
+  # Ladder rules: beating a better-ranked opponent takes their rank; drawing with one
+  # moves you to the position directly below them. Beating a worse-ranked opponent changes nothing.
+  def apply_ladder_ranks
+    if score1 == score2
+      apply_ladder_draw
+    elsif score1 > score2 && diff.negative?
+      move_rank(contester1, diff)
+    elsif score1 < score2 && diff.positive?
+      move_rank(contester2, -diff)
+    end
+  end
+
+  def apply_ladder_draw
+    move_rank(contester1, diff + 1) if diff.negative?
+    move_rank(contester2, 1 - diff) if diff.positive?
   end
 
   def hltv_record(addr, pwd)

@@ -118,8 +118,26 @@ class Contest < ApplicationRecord
   def recalculate
     # rubocop:disable Rails/SkipsModelValidations
     Match.where(contest_id: id).update_all('diff = null, points1 = null, points2 = null')
-    Contester.where(contest_id: id).update_all('score = 0, win = 0, loss = 0, draw = 0, extra = 0')
+    if contest_type == TYPE_LADDER
+      Contester.where(contest_id: id).update_all('win = 0, loss = 0, draw = 0, extra = 0')
+      seed_ladder_ranks
+    else
+      Contester.where(contest_id: id).update_all('score = 0, win = 0, loss = 0, draw = 0, extra = 0')
+    end
     # rubocop:enable Rails/SkipsModelValidations
+    replay_matches
+  end
+
+  # A ladder's score column is the rank, so it is reseeded from join order instead of zeroed.
+  def seed_ladder_ranks
+    ladder_contesters.order(:id).each_with_index do |contester, index|
+      # rubocop:disable Rails/SkipsModelValidations
+      contester.update_columns(score: index + 1, trend: Contester::TREND_FLAT)
+      # rubocop:enable Rails/SkipsModelValidations
+    end
+  end
+
+  def replay_matches
     matches.finished.chrono.each do |match|
       match.recalculate
       match.save
@@ -191,22 +209,25 @@ class Contest < ApplicationRecord
   end
 
   def update_ranks(contester, old_rank, new_rank)
+    return if old_rank.nil? || new_rank.nil? || old_rank == new_rank
+
+    # rubocop:disable Rails/SkipsModelValidations
     if old_rank < new_rank
-      # rubocop:disable Rails/SkipsModelValidations
-      Contester.where(contest_id: id)
-               .where('score > ? AND score <= ?', old_rank, new_rank)
-               .update_all(['score = score - 1, trend = ?', Contester::TREND_UP])
-      # rubocop:enable Rails/SkipsModelValidations
+      ladder_contesters.where('score > ? AND score <= ?', old_rank, new_rank)
+                       .update_all(['score = score - 1, trend = ?', Contester::TREND_UP])
       contester.trend = Contester::TREND_DOWN
-    elsif old_rank > new_rank
-      # rubocop:disable Rails/SkipsModelValidations
-      Contester.where(contest_id: id)
-               .where('score < ? AND score >= ?', old_rank, new_rank)
-               .update_all(['score = score + 1, trend = ?', Contester::TREND_DOWN])
-      # rubocop:enable Rails/SkipsModelValidations
+    else
+      ladder_contesters.where('score < ? AND score >= ?', old_rank, new_rank)
+                       .update_all(['score = score + 1, trend = ?', Contester::TREND_DOWN])
       contester.trend = Contester::TREND_UP
     end
+    # rubocop:enable Rails/SkipsModelValidations
     contester.score = new_rank
+  end
+
+  # Deliberately not the :contesters association, whose cache goes stale during rank shuffling.
+  def ladder_contesters
+    Contester.where(contest_id: id, active: true)
   end
 
   def can_join?(cuser)

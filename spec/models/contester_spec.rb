@@ -251,6 +251,44 @@ RSpec.describe Contester, type: :model do
       expect(preset_contester.score).to eq(42)
     end
 
+    it 'assigns contiguous 1-based ranks to teams joining a ladder' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+
+      contesters = Array.new(3) { create(:contester, contest: ladder) }
+
+      expect(contesters.map(&:score)).to eq([1, 2, 3])
+    end
+
+    it 'does not reuse the rank of a team that left the ladder' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      create(:contester, contest: ladder)
+      create(:contester, contest: ladder).destroy
+
+      expect(create(:contester, contest: ladder).score).to eq(2)
+    end
+
+    it 'closes the rank gap when a team leaves the ladder' do
+      ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
+      first = create(:contester, contest: ladder)
+      second = create(:contester, contest: ladder)
+      third = create(:contester, contest: ladder)
+
+      second.destroy
+
+      expect([first.reload.score, third.reload.score]).to eq([1, 2])
+      expect(ladder.contesters.active.count).to eq(2)
+    end
+
+    it 'leaves scores alone when a team leaves a non-ladder contest' do
+      league = create(:contest, :league)
+      first = create(:contester, contest: league, score: 6)
+      second = create(:contester, contest: league, score: 3)
+
+      second.destroy
+
+      expect(first.reload.score).to eq(6)
+    end
+
     it 'permits expected params' do
       params = ActionController::Parameters.new(contester: { team_id: 1, contest_id: 2, ignored: 'x' })
 
