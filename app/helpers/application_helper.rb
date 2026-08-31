@@ -231,11 +231,11 @@ module ApplicationHelper
   end
 
   def flag(country)
-    if country && country.to_s.size.positive?
-      image_tag 'shared/blank.gif', class: "flag flag-#{country.downcase}"
-    else
-      image_tag 'shared/blank.gif', class: 'flag flag-placeholder'
-    end
+    code = country.to_s.downcase
+    # Never interpolate unvalidated input into the class attribute.
+    return image_tag 'shared/blank.gif', class: 'flag flag-placeholder' unless /\A[a-z]{2}\z/.match?(code)
+
+    image_tag 'shared/blank.gif', class: "flag flag-#{code}"
   end
 
   def add_comments(object)

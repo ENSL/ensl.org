@@ -143,6 +143,13 @@ RSpec.describe ApplicationHelper, type: :helper do
     it 'renders the placeholder flag when no country is present' do
       expect(helper.flag(nil)).to include('flag-placeholder')
     end
+
+    it 'renders the placeholder flag instead of injecting extra css classes' do
+      result = helper.flag('fi animate-spin')
+
+      expect(result).to include('flag-placeholder')
+      expect(result).not_to include('spin')
+    end
   end
 
   describe '#add_comments' do

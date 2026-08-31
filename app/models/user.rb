@@ -158,6 +158,8 @@ class User < ApplicationRecord
   # validates_format_of :steamid, :with => /\A(STEAM_)?[0-5]:[01]:\d+\Z/
   validates :time_zone, length: { maximum: 100, allow_blank: true }
   validates :public_email, inclusion: { in: [true, false], allow_nil: true }
+  # Only enforced on change so legacy values such as '--' keep saving.
+  validates :country, format: { with: /\A[A-Z]{2}\z/, allow_blank: true }, if: :country_changed?
   # validates_inclusion_of :password_hash, in: => [User::PASSWORD_SCRYPT, User::PASSWORD_MD5, User::PASSWORD_MD5_SCRYPT]
   validate :validate_team, if: :will_save_change_to_team_id?
 
