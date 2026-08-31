@@ -12,6 +12,7 @@ class DataFilesController < ApplicationController
 
     @files = DataFile.missing
     @movies = DataFile.movies_without_video
+    render layout: 'full'
   end
 
   def new

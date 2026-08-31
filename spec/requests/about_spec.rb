@@ -60,7 +60,35 @@ RSpec.describe 'AboutController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(reconcile_directory_path(root))
-      expect(response.body).to include(directory_path(root))
+      expect(response.body).to include(admin_data_files_path)
+    end
+
+    it 'links every admin menu item to its destination' do
+      root = create(:directory, :root)
+      login_as(admin)
+
+      get '/about/adminpanel'
+
+      expect(response).to have_http_status(:ok)
+      [
+        new_article_path,
+        admin_articles_path,
+        reconcile_directory_path(root),
+        admin_data_files_path,
+        admin_movies_path,
+        contests_path,
+        challenges_path,
+        maps_path,
+        users_path,
+        groups_path,
+        bans_path,
+        categories_path,
+        custom_urls_path,
+        issues_path,
+        polls_path
+      ].each do |path|
+        expect(response.body).to include(%(href="#{path}"))
+      end
     end
 
     it 'hides root directory links when there are no directories' do
