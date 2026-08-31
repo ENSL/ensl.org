@@ -1,27 +1,94 @@
 <div class="movie-full">
-    <h1 class="fancy">
-        <span><%= namelink @movie %></span>
-    </h1>
+    <header class="movie-full__header">
+        <p class="movie-full__eyebrow">Movie archive</p>
+        <h1><%= @movie %></h1>
+        <% if @movie.user %>
+            <p class="movie-full__byline">Submitted by <%= link_to @movie.user.username, movies_url(author: @movie.user_id) %></p>
+        <% end %>
 
-    <%= render @movie %>
+        <% if cuser && @movie.can_update?(cuser) %>
+            <div class="movie-full__actions">
+                <%= link_to 'Edit movie', edit_movie_path(@movie), class: 'button tiny' %>
+                <%= link_to 'Make a preview', preview_movie_path(@movie), method: :post, class: 'button tiny' %>
+                <% if @movie.can_destroy?(cuser) %>
+                    <%= button_to 'Destroy', movie_path(@movie), method: :delete, form: { class: 'inline' }, class: 'button tiny', data: { turbo_confirm: 'Are you sure?' } %>
+                <% end %>
+            </div>
+        <% end %>
+    </header>
 
-    <% if @movie.playback_url %>
-    <div class="player">
-        <video controls width="640" preload="metadata">
-            <source src="<%= @movie.playback_url %>" type="video/mp4">
-        Your browser does not support the video tag.
-        </video>
+    <figure class="movie-full__stage-wrap">
+        <div class="movie-full__stage" aria-label="Movie preview">
+            <% if @movie.playback_url %>
+                <video controls preload="metadata" poster="<%= @movie.snapshot_url if @movie.picture %>">
+                    <source src="<%= @movie.playback_url %>" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            <% elsif @movie.picture %>
+                <%= image_tag @movie.snapshot_url, class: 'movie-full__poster', alt: "Preview image for #{@movie}" %>
+            <% else %>
+                <div class="movie-full__empty-preview">
+                    <%= fa_icon('film', class: 'movie-full__empty-icon') %>
+                    <span>Preview unavailable</span>
+                </div>
+            <% end %>
+        </div>
+        <figcaption class="movie-full__caption">
+            <% if @movie.playback_url %>
+                This preview may be compressed. For the best quality, download the original and play it in <a href="https://www.videolan.org/vlc/">VLC</a>.
+            <% else %>
+                No web preview is available. Download the original and play it in <a href="https://www.videolan.org/vlc/">VLC</a>.
+            <% end %>
+        </figcaption>
+    </figure>
 
+    <div class="movie-full__meta">
+        <% if @movie.length_s.present? %>
+            <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.length_s %></span><span class="movie-full__stat-label">Length</span></div>
+        <% end %>
+        <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.view_count %></span><span class="movie-full__stat-label">Views</span></div>
+        <% if @movie.format.present? %>
+            <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.format %></span><span class="movie-full__stat-label">Format</span></div>
+        <% end %>
+        <% if @movie.file %>
+            <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.file.created_at.strftime('%b %-d, %Y') %></span><span class="movie-full__stat-label">Added</span></div>
+        <% end %>
     </div>
-    <p>
-        This is a preview version and video quality may not be the best. For the
-        best experince please download the movie and use eg.
-        <a href="https://www.videolan.org/vlc/">VLC</a>
-    </p>
 
-    <% else %>
-    <p>There is no preview available. Please download the movie and use eg. <a href="https://www.videolan.org/vlc/">VLC</a></p>
+    <% if @movie.content.present? %>
+        <section class="movie-full__card">
+            <h2>About this movie</h2>
+            <div class="movie-full__description"><%= simple_format @movie.content %></div>
+        </section>
     <% end %>
+
+    <section class="movie-full__card">
+        <h2>Downloads</h2>
+        <div class="movie-full__downloads">
+            <% @movie.all_files.compact.each do |movie_file| %>
+                <article class="movie-full__download">
+                    <div class="movie-full__file-icon"><%= fa_icon('file-video-o') %></div>
+                    <div class="movie-full__file-info">
+                        <% if movie_file.file_exists? %>
+                            <%= link_to File.basename(movie_file.name.to_s), movie_file.url, class: 'movie-full__file-name' %>
+                        <% else %>
+                            <span class="movie-full__file-name muted"><%= File.basename(movie_file.name.to_s) %></span>
+                            <span class="movie-full__missing">File missing</span>
+                        <% end %>
+                        <span class="movie-full__file-meta"><%= movie_file.size_s %> MB &middot; MD5 <%= movie_file.md5_s %></span>
+                    </div>
+                    <% if movie_file.file_exists? %>
+                        <%= link_to movie_file.url, class: 'movie-full__download-link', title: 'Download file', 'aria-label': "Download #{File.basename(movie_file.name.to_s)}" do %>
+                            <%= fa_icon('download') %>
+                        <% end %>
+                    <% end %>
+                </article>
+            <% end %>
+            <% if @movie.all_files.compact.empty? %>
+                <p class="movie-full__no-files">No downloadable files are available for this movie.</p>
+            <% end %>
+        </div>
+    </section>
 </div>
 
 <%= add_comments @movie.file if @movie.file %>

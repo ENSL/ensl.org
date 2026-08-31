@@ -82,32 +82,212 @@ table.movie {
 }
 
 .movie-full {
+  max-width: 920px;
+  margin: 0 auto;
 
-  .title {
-    display: none;
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 18px;
+    margin: 8px 0 20px;
+    text-align: center;
+
+    h1 {
+      width: 100%;
+      margin: 0;
+      font-size: 2.1rem;
+      line-height: 1.15;
+    }
   }
 
-  .player {
-    display: block;
-    position: relative;
+  &__eyebrow {
     width: 100%;
-    height: 0;
-    padding-bottom: 56%;
-    padding-top: 50px;
-    margin-bottom: 20px;
+    margin: 0 0 6px;
+    color: $light-blue;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
 
-    video {
-      position: absolute;
+  &__byline {
+    margin: 0;
+    color: $medium-gray;
+  }
+
+  &__stage-wrap {
+    margin: 0;
+  }
+
+  &__stage {
+    overflow: hidden;
+    background: $dark-gray;
+    border-radius: 6px;
+    box-shadow: $content-shadow;
+
+    video,
+    .movie-full__poster,
+    .movie-full__empty-preview {
+      display: block;
       width: 100%;
-      height: 100%;
-      top: 0;
+      aspect-ratio: 16 / 9;
     }
 
-    object {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
+    video,
+    .movie-full__poster {
+      object-fit: contain;
     }
+  }
+
+  &__empty-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: white;
+    background: linear-gradient(135deg, $dark-blue, $dark-gray);
+  }
+
+  &__empty-icon {
+    color: $light-blue;
+    font-size: 2rem;
+  }
+
+  &__caption {
+    margin: 10px 2px 0;
+    color: $medium-gray;
+    font-size: .85rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  &__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    text-align: center;
+    background: white;
+    border: 1px solid $light-gray;
+    border-radius: 10px;
+    box-shadow: $light-shadow;
+  }
+
+  &__stat-value {
+    overflow: hidden;
+    color: $blue;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__stat-label {
+    color: $medium-gray;
+    font-size: .75rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  &__card {
+    padding: 22px 24px;
+    background: white;
+    border: 1px solid $light-gray;
+    border-radius: 10px;
+    box-shadow: $light-shadow;
+  }
+
+  &__card + &__card {
+    margin-top: 20px;
+  }
+
+  h2 {
+    margin: 0 0 14px;
+    color: $blue;
+    font-size: 1rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  &__description {
+    color: $dark-gray;
+    line-height: 1.7;
+
+    p:first-child { margin-top: 0; }
+    p:last-child { margin-bottom: 0; }
+  }
+
+  &__downloads {
+    border-top: 1px solid $light-gray;
+  }
+
+  &__download {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 4px;
+    border-bottom: 1px solid $light-gray;
+  }
+
+  &__file-icon {
+    display: grid;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    color: $blue;
+    background: #e8f3f9;
+    border-radius: 50%;
+  }
+
+  &__file-info { min-width: 0; }
+
+  &__file-name {
+    display: block;
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__file-meta,
+  &__missing {
+    display: block;
+    margin-top: 2px;
+    color: $medium-gray;
+    font-size: .8rem;
+  }
+
+  &__missing { color: $light-red; }
+
+  &__download-link {
+    margin-left: auto;
+    padding: 7px;
+    color: $blue;
+    font-size: 1.1rem;
+  }
+
+  &__no-files { color: $medium-gray; }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  @media (max-width: 680px) {
+    &__header h1 { font-size: 1.65rem; }
+    &__meta { grid-template-columns: repeat(2, 1fr); }
   }
 }

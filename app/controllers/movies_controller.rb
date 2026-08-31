@@ -19,9 +19,11 @@ class MoviesController < ApplicationController
   def show
     @movie.mark_as_read! for: cuser if cuser
     @movie.record_view_count(request.remote_ip, logged_in: cuser.nil?)
-    return unless @movie.file&.related
-
-    redirect_to data_file_path(@movie.file.related)
+    if @movie.file&.related
+      redirect_to data_file_path(@movie.file.related)
+    else
+      render layout: 'full'
+    end
   end
 
   def refresh
