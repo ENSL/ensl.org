@@ -127,6 +127,20 @@ describe Gathers::Join do
       expect_any_instance_of(Gather).to receive(:lock!).and_call_original
       described_class.call(actor: user, params: join_params)
     end
+
+    it 'rechecks capacity after acquiring the gather lock' do
+      create_list(:gatherer, Gather::FULL - 1, gather: gather)
+
+      allow_any_instance_of(Gather).to receive(:lock!).and_wrap_original do |lock, *args|
+        create(:gatherer, gather: gather, user: create(:user)) if gather.gatherers.count == Gather::FULL - 1
+        lock.call(*args)
+      end
+
+      expect do
+        @result = described_class.call(actor: user, params: join_params)
+      end.not_to change(Gatherer, :count)
+      expect(@result.success?).to be(false)
+    end
   end
 
   describe 'when the gather fills' do
