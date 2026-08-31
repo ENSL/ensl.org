@@ -4,20 +4,26 @@
 
 @use "../variables" as *;
 
-#file {
+table.files-list {
+  margin: 20px 0;
 
-  .actions,
-  .files-list {
-    margin: 20px 0;
+  .file-name {
+    width: 28%;
   }
 
-  .files-list table {
-    table-layout: auto;
+  .file-path {
+    overflow-wrap: anywhere;
+  }
 
-    th,
-    td {
-      overflow-wrap: anywhere;
-    }
+  .file-size {
+    white-space: nowrap;
+    text-align: right;
+    width: 5.5rem;
+  }
+
+  .actions {
+    white-space: nowrap;
+    width: 1%;
   }
 }
 

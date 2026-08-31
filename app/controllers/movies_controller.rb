@@ -32,6 +32,7 @@ class MoviesController < ApplicationController
     raise AccessError unless cuser&.admin?
 
     @movies = Movie.includes(:user, :file, :preview).ordered.all
+    render layout: 'full'
   end
 
   def new

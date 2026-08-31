@@ -1,19 +1,17 @@
 <table class="striped files-list">
   <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Path</th>
-    <th>Size</th>
-    <th>Actions</th>
+    <th class="file-name">Name</th>
+    <th class="file-path">Path</th>
+    <th class="file-size">Size</th>
+    <th class="actions">Actions</th>
   </tr>
 
   <% files.each do |file| %>
     <tr id="data_file_<%= file.id %>">
-      <td><%= namelink file %></td>
-      <td><%= h file.description %></td>
-      <td><%= h file.url %></td>
-      <td><%= file.size_s %></td>
-      <td>
+      <td class="file-name"><%= namelink file %></td>
+      <td class="file-path"><%= h file.url %></td>
+      <td class="file-size"><%= file.size_s %></td>
+      <td class="actions">
         <% if file.can_update? cuser %>
           <%= link_to fa_icon('pencil'), edit_data_file_path(file) %>
           <% end; if file.can_destroy? cuser %>

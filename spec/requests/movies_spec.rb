@@ -39,6 +39,7 @@ RSpec.describe 'MoviesController', type: :request do
       get '/movies/admin'
 
       expect(response).to have_http_status(:ok)
+      expect(response).to render_template(layout: 'full')
       expect(response.body).to include("href=\"/movies/#{movie.id}/preview\"")
       expect(response.body).to match(/(?:data-method|data-turbo-method)="post"/)
     end

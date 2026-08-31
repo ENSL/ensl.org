@@ -59,6 +59,8 @@ RSpec.describe 'DataFilesController', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(layout: 'full')
+      expect(response.body).to include('class="file-path"')
+      expect(response.body).not_to include('<th>Description</th>')
       expect(response.body).to include('Broken file')
       expect(response.body).to include('Unrelated movie file')
       expect(response.body.scan('Unrelated movie file').size).to eq(1)
