@@ -259,14 +259,88 @@ RSpec.describe 'UsersController', type: :request do
   end
 
   describe 'PATCH /users/:id' do
-    it 'lets a non-admin update their own profile without changing username' do
+    it 'lets a non-admin update all profile fields without changing username' do
+      avatar = Tempfile.new(['avatar', '.png'])
+      avatar.binmode
+      image = Magick::Image.new(2, 2) { |canvas| canvas.background_color = 'red' }
+      image.write(avatar.path)
+      avatar.rewind
+      profile_id = user.profile.id
       login_as(user)
 
-      patch "/users/#{user.id}", params: { user: { username: 'RenamedUser', firstname: 'Updated' } }
+      patch "/users/#{user.id}", params: {
+        user: {
+          username: 'RenamedUser',
+          raw_password: 'UpdatedPasswordABC123',
+          firstname: 'Updated',
+          lastname: 'Member',
+          email: 'updated@example.com',
+          steamid: '0:1:123456789',
+          birthdate: '1990-01-02',
+          country: 'NO',
+          time_zone: 'Europe/Oslo',
+          public_email: '1',
+          profile_attributes: {
+            id: profile_id,
+            steam_profile: 'updated_player',
+            web: 'https://example.com',
+            achievements: 'Won the cup',
+            signature: 'Updated signature',
+            avatar: Rack::Test::UploadedFile.new(avatar.path, 'image/png'),
+            stream: 'https://twitch.tv/updated_player',
+            town: 'Oslo',
+            notify_news: '1',
+            notify_articles: '1',
+            notify_movies: '1',
+            notify_gather: '1',
+            notify_push_gather: '1',
+            notify_own_match: '1',
+            notify_any_match: '1',
+            notify_challenge: '0',
+            notify_pms: '0'
+          }
+        }
+      }
 
       expect(response).to redirect_to(user_path(user))
-      expect(user.reload.firstname).to eq('Updated')
+      expect(user.reload.attributes.slice('firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone',
+                                          'public_email')).to eq(
+                                            'firstname' => 'Updated',
+                                            'lastname' => 'Member',
+                                            'email' => 'updated@example.com',
+                                            'steamid' => '0:1:123456789',
+                                            'birthdate' => Date.new(1990, 1, 2),
+                                            'country' => 'NO',
+                                            'time_zone' => 'Europe/Oslo',
+                                            'public_email' => true
+                                          )
+      expect(user.profile.attributes.slice('steam_profile', 'web', 'achievements', 'signature', 'stream', 'town',
+                                           'notify_news', 'notify_articles', 'notify_movies', 'notify_gather',
+                                           'notify_push_gather', 'notify_own_match', 'notify_any_match',
+                                           'notify_challenge', 'notify_pms')).to eq(
+                                             'steam_profile' => 'updated_player',
+                                             'web' => 'https://example.com',
+                                             'achievements' => 'Won the cup',
+                                             'signature' => 'Updated signature',
+                                             'stream' => 'https://twitch.tv/updated_player',
+                                             'town' => 'Oslo',
+                                             'notify_news' => true,
+                                             'notify_articles' => true,
+                                             'notify_movies' => true,
+                                             'notify_gather' => true,
+                                             'notify_push_gather' => true,
+                                             'notify_own_match' => true,
+                                             'notify_any_match' => true,
+                                             'notify_challenge' => false,
+                                             'notify_pms' => false
+                                           )
+      expect(user.profile.id).to eq(profile_id)
+      expect(user.profile[:avatar]).to eq("#{profile_id}.png")
+      expect(User.authenticate(username: user.username, password: 'UpdatedPasswordABC123')).to eq(user)
       expect(user.username).not_to eq('RenamedUser')
+    ensure
+      image&.destroy!
+      avatar.close!
     end
 
     it 'allows unrelated updates when the stored primary team is a legacy invalid value' do

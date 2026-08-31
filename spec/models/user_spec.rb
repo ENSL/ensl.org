@@ -52,6 +52,16 @@ describe User do
     end
   end
 
+  describe 'nested profile attributes' do
+    it 'updates the existing profile when attributes omit its id' do
+      profile_id = user.profile.id
+
+      user.update!(profile_attributes: { achievements: 'Won the cup' })
+
+      expect(user.reload.profile).to have_attributes(id: profile_id, achievements: 'Won the cup')
+    end
+  end
+
   describe '.normalize_steamid' do
     it 'returns nil for nil and blank values' do
       expect(described_class.normalize_steamid(nil)).to be_nil

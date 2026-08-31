@@ -5,6 +5,7 @@
 
   <%= form_for @user, html: { multipart: true, id: 'profile', class: 'square' } do |f| %>
     <% f.fields_for :profile do |p| %>
+      <%= p.hidden_field :id %>
       <div id="user" class="tabbed">
         <ul id="user-nav" class="tabs">
           <li><a href="#account">Account</a></li>

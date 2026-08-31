@@ -187,7 +187,7 @@ class User < ApplicationRecord
   after_create :send_new_password, if: proc { random_password == true }
   before_save :correct_steamid_universe
 
-  accepts_nested_attributes_for :profile
+  accepts_nested_attributes_for :profile, update_only: true
 
   acts_as_reader
 
@@ -787,7 +787,7 @@ class User < ApplicationRecord
     allowed = [
       :raw_password, :firstname, :lastname, :email, :steamid, :country,
       :birthdate, :timezone, :public_email, :filter, :time_zone, :team_id,
-      { profile_attributes: Profile::PERMITTED_ATTRIBUTES }
+      { profile_attributes: [:id, *Profile::PERMITTED_ATTRIBUTES] }
     ]
     allowed << :username if cuser&.admin? || operation == 'create'
 
