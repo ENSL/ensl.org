@@ -119,10 +119,13 @@ class DataFile < ApplicationRecord
   end
 
   def file_exists?
-    current_path = full_path
-    return false if current_path.blank?
+    # `location` (CarrierWave) can be wrong if the directory association is broken/nil
+    # (e.g. nullified directory_id), even though the cached `path` column still points
+    # at a real file on disk, so check both instead of trusting one over the other.
+    return true if location.present? && File.exist?(location)
+    return true if path.present? && File.exist?(path)
 
-    File.exist?(current_path)
+    false
   end
 
   # Shortcut to get the URL for this file from CarrierWave
@@ -133,6 +136,15 @@ class DataFile < ApplicationRecord
   def url
     carrywave_url = name.url
     return nil if carrywave_url.blank?
+
+    # CarrierWave derives this from the (possibly broken/nil) directory association; if that
+    # leaves us pointing at a file that isn't actually there while the cached `path` column
+    # still resolves on disk, build the URL from `path` instead so links aren't mislinked.
+    if location.present? && !File.exist?(location) && path.present? && File.exist?(path)
+      root = File.expand_path(Directory.files_root.to_s)
+      relative = File.expand_path(path).delete_prefix("#{root}/")
+      return "/files/#{relative}"
+    end
 
     # Ensure URL starts with /files/
     carrywave_url.start_with?('/files/') ? carrywave_url : "/files#{carrywave_url}"

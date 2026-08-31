@@ -49,6 +49,26 @@ RSpec.describe 'MoviesController', type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'links to a working preview URL even when the preview file directory link is stale' do
+      movies_dir = movie.file.directory
+      source = movie.file
+      FileUtils.mkdir_p(File.dirname(source.path))
+      File.write(source.path, 'source-bytes')
+
+      preview = create(:data_file, :preview, directory: movies_dir, related: source)
+      FileUtils.mkdir_p(File.dirname(preview.path))
+      File.write(preview.path, 'preview-bytes')
+      # Simulate a broken/orphaned directory association while `path` still resolves.
+      preview.update_columns(directory_id: nil)
+      movie.update!(preview: preview)
+      login_as(admin)
+
+      get '/movies/admin'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("href=\"/files/#{movies_dir.relative_path}/#{File.basename(preview.path)}\"")
+    end
   end
 
   describe 'GET /movies/new' do
@@ -198,6 +218,26 @@ RSpec.describe 'MoviesController', type: :request do
       get "/movies/#{movie.id}"
 
       expect(response).to redirect_to(data_file_path(related_file))
+    end
+
+    it 'does not report the preview file as missing when its directory link is stale but the file exists on disk' do
+      movies_dir = movie.file.directory
+      source = movie.file
+      FileUtils.mkdir_p(File.dirname(source.path))
+      File.write(source.path, 'source-bytes')
+
+      preview = create(:data_file, :preview, directory: movies_dir, related: source)
+      FileUtils.mkdir_p(File.dirname(preview.path))
+      File.write(preview.path, 'preview-bytes')
+      # Simulate a broken/orphaned directory association (e.g. reorganized outside Rails)
+      # while the cached `path` column still points at the real file.
+      preview.update_columns(directory_id: nil)
+
+      get "/movies/#{movie.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('File missing')
+      expect(response.body).to include(File.basename(preview.path))
     end
   end
 

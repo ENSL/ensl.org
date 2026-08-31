@@ -325,6 +325,24 @@ describe DataFile do
 
       expect(file.file_exists?).to be(false)
     end
+
+    it 'falls back to the cached path when the CarrierWave location is stale (e.g. broken directory association)' do
+      real_path = File.join(@test_root, 'movies', 'clip_preview.mp4')
+      FileUtils.mkdir_p(File.dirname(real_path))
+      File.write(real_path, 'video-bytes')
+
+      file = build(:data_file, path: real_path)
+      allow(file).to receive(:location).and_return(File.join(@test_root, 'clip_preview.mp4'))
+
+      expect(file.file_exists?).to be(true)
+    end
+
+    it 'returns false when neither the location nor the cached path exist on disk' do
+      file = build(:data_file, path: File.join(@test_root, 'missing.mp4'))
+      allow(file).to receive(:location).and_return(File.join(@test_root, 'also_missing.mp4'))
+
+      expect(file.file_exists?).to be(false)
+    end
   end
 
   describe '#url' do
@@ -340,6 +358,27 @@ describe DataFile do
       allow(file.name).to receive(:url).and_return('/uploads/example.mp4')
 
       expect(file.url).to eq('/files/uploads/example.mp4')
+    end
+
+    it 'builds the URL from the cached path when the CarrierWave URL points at a missing file ' \
+       'but path resolves on disk (e.g. broken directory association)' do
+      real_path = File.join(@test_root, 'movies', 'clip_preview.mp4')
+      FileUtils.mkdir_p(File.dirname(real_path))
+      File.write(real_path, 'video-bytes')
+
+      file = build(:data_file, path: real_path)
+      allow(file).to receive(:location).and_return(File.join(@test_root, 'clip_preview.mp4'))
+      allow(file.name).to receive(:url).and_return('/clip_preview.mp4')
+
+      expect(file.url).to eq('/files/movies/clip_preview.mp4')
+    end
+
+    it 'uses the plain CarrierWave URL when neither location nor path resolve on disk' do
+      file = build(:data_file, path: File.join(@test_root, 'missing.mp4'))
+      allow(file).to receive(:location).and_return(File.join(@test_root, 'also_missing.mp4'))
+      allow(file.name).to receive(:url).and_return('/uploads/missing.mp4')
+
+      expect(file.url).to eq('/files/uploads/missing.mp4')
     end
   end
 
