@@ -93,9 +93,11 @@ class Profile < ApplicationRecord
   validates :steam_profile, format: { with: /\A[A-Za-z0-9_\-+]{1,40}\z/, allow_blank: true }
 
   validates :stream, length: { maximum: 255 }
+  validates_database_size_of :achievements_parsed, error_attribute: :achievements
+  validates_database_size_of :signature_parsed, error_attribute: :signature
 
   before_validation :init_steam_profile
-  before_save :parse_text
+  before_validation :parse_text
 
   mount_uploader :avatar, AvatarUploader
 

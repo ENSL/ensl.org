@@ -8,6 +8,21 @@ module Extra
   CODING_BBCODE = 1
   CODING_MARKDOWN = 2
 
+  class_methods do
+    def validates_database_size_of(*attributes, error_attribute: nil)
+      validate do |record|
+        attributes.each do |attribute|
+          value = record.public_send(attribute)
+          limit = record.class.columns_hash.fetch(attribute.to_s).limit
+
+          next if value.blank? || limit.nil? || value.bytesize <= limit
+
+          record.errors.add(error_attribute || attribute, "formatted text is too long (maximum is #{limit} bytes)")
+        end
+      end
+    end
+  end
+
   included do
     def codings
       {

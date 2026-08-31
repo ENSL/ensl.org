@@ -58,11 +58,12 @@ class Issue < ApplicationRecord
 
   validates :title, length: { in: 1..50 }
   validates :text, length: { in: 1..65_000 }
+  validates_database_size_of :text_parsed, error_attribute: :text
   validate :validate_status
 
   before_validation :init_variables, if: proc(&:new_record?)
   before_validation :assign_user_from_assigned_name, if: proc { |issue| issue.assigned_name.present? }
-  before_save :parse_text
+  before_validation :parse_text
 
   acts_as_readable on: :created_at
 

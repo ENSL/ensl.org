@@ -76,6 +76,7 @@ class Article < ApplicationRecord
 
   validates :title, length: { in: 1..50 }
   validates :text, length: { in: 1..16_000_000 }
+  validates_database_size_of :text_parsed, error_attribute: :text
 
   validates :user, :category, presence: true
   validate :validate_status
@@ -84,6 +85,7 @@ class Article < ApplicationRecord
   validate :validate_format_only_update, on: :update
 
   before_validation :init_variables, if: proc(&:new_record?)
+  before_validation :format_text
   before_save :convert_format, if: -> { persisted? && will_save_change_to_text_coding? }
   before_save :format_text
   after_save :send_notifications

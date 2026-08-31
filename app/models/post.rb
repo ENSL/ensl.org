@@ -28,8 +28,9 @@ class Post < ApplicationRecord
 
   validates :topic, :user, presence: true
   validates :text, length: { in: 1..10_000 }
+  validates_database_size_of :text_parsed, error_attribute: :text
 
-  before_save :parse_text
+  before_validation :parse_text
   after_destroy :remove_topics, if: proc { |post| post.topic.posts.count.zero? }
 
   belongs_to :user, optional: true

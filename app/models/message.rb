@@ -29,13 +29,14 @@ class Message < ApplicationRecord
 
   validates :title, length: { in: 1..100 }
   validates :text, length: { in: 1..65_000 }
+  validates_database_size_of :text_parsed, error_attribute: :text
 
   scope :ordered, -> { order('created_at DESC') }
 
   belongs_to :sender, polymorphic: true, optional: true
   belongs_to :recipient, polymorphic: true, optional: true
 
-  before_save :parse_text
+  before_validation :parse_text
   after_create :send_notifications
 
   acts_as_readable on: :created_at

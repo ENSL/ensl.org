@@ -37,8 +37,9 @@ class Comment < ApplicationRecord
 
   validates :commentable, :user, presence: true
   validates :text, length: { in: 1..10_000 }
+  validates_database_size_of :text_parsed, error_attribute: :text
 
-  before_save :parse_text
+  before_validation :parse_text
 
   def parse_text
     return unless text

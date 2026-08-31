@@ -57,6 +57,14 @@ RSpec.describe Profile, type: :model do
       expect(profile.achievements_parsed).to eq('<strong>wins</strong>')
       expect(profile.signature_parsed).to eq('<em>sig</em>')
     end
+
+    it 'rejects parsed achievements that exceed the database column limit' do
+      profile = build(:profile, achievements: '[b]wins[/b]')
+      allow(profile).to receive(:bbcode_to_html).and_return('a' * 401)
+
+      expect(profile).not_to be_valid
+      expect(profile.errors[:achievements]).to include('formatted text is too long (maximum is 400 bytes)')
+    end
   end
 
   describe 'validations' do
