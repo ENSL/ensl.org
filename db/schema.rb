@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_120000) do
   create_table "activities", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -372,40 +372,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_120000) do
     t.index ["lockable_id", "lockable_type"], name: "index_locks_on_lockable_id_and_lockable_type"
   end
 
-  create_table "log_events", id: :integer, charset: "latin1", collation: "latin1_swedish_ci", force: :cascade do |t|
+  create_table "log_files", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
-    t.string "description"
-    t.string "name"
-    t.integer "team"
-    t.datetime "updated_at", precision: nil
+    t.string "filename"
+    t.string "server_name"
+    t.string "sha256", null: false
+    t.index ["sha256"], name: "index_log_files_on_sha256", unique: true
   end
 
-  create_table "log_files", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
-    t.string "md5"
-    t.string "name"
-    t.integer "server_id"
-    t.integer "size"
-    t.datetime "updated_at", precision: nil
-    t.index ["server_id"], name: "index_log_files_on_server_id"
-  end
-
-  create_table "log_lines", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
-    t.integer "actor_id"
+  create_table "log_lines", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "actor_steamid"
     t.datetime "created_at", precision: nil
-    t.string "details"
-    t.integer "domain"
+    t.string "event_type"
     t.integer "log_file_id"
+    t.string "line_digest", limit: 64
+    t.string "param1"
+    t.string "param2"
+    t.string "param3"
+    t.text "raw_text"
     t.integer "round_id"
-    t.integer "server_id"
-    t.string "specifics1"
-    t.string "specifics2"
-    t.integer "target_id"
-    t.text "text"
-    t.index ["actor_id"], name: "index_log_lines_on_actor_id"
-    t.index ["log_file_id"], name: "index_log_lines_on_log_file_id"
+    t.string "server_name"
+    t.string "target_steamid"
+    t.index ["log_file_id", "line_digest"], name: "index_log_lines_on_log_file_and_digest", unique: true
     t.index ["round_id"], name: "index_log_lines_on_round_id"
-    t.index ["server_id"], name: "index_log_lines_on_server_id"
-    t.index ["target_id"], name: "index_log_lines_on_target_id"
   end
 
   create_table "maps", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|
@@ -691,38 +680,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_120000) do
     t.index ["user_id"], name: "index_readings_on_user_id"
   end
 
-  create_table "rounders", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
-    t.integer "deaths"
-    t.integer "kills"
-    t.string "name"
-    t.string "roles"
+  create_table "rounders", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "round_id"
+    t.float "share"
     t.string "steamid"
     t.integer "team"
-    t.integer "team_id"
-    t.integer "user_id"
+    t.index ["round_id", "steamid"], name: "index_rounders_on_round_and_steamid", unique: true
     t.index ["round_id"], name: "index_rounders_on_round_id"
-    t.index ["team_id"], name: "index_rounders_on_team_id"
-    t.index ["user_id"], name: "index_rounders_on_user_id"
   end
 
-  create_table "rounds", id: :integer, charset: "utf8mb3", collation: "utf8mb3_swedish_ci", force: :cascade do |t|
-    t.integer "commander_id"
-    t.datetime "end", precision: nil
-    t.integer "map_id"
+  create_table "rounds", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "end_time", precision: nil
     t.string "map_name"
-    t.integer "match_id"
-    t.integer "server_id"
-    t.datetime "start", precision: nil
-    t.integer "team1_id"
-    t.integer "team2_id"
-    t.integer "winner"
-    t.index ["commander_id"], name: "index_rounds_on_commander_id"
-    t.index ["map_id"], name: "index_rounds_on_map_id"
-    t.index ["match_id"], name: "index_rounds_on_match_id"
-    t.index ["server_id"], name: "index_rounds_on_server_id"
-    t.index ["team1_id"], name: "index_rounds_on_team1_id"
-    t.index ["team2_id"], name: "index_rounds_on_team2_id"
+    t.integer "result"
+    t.string "server_name"
+    t.datetime "start_time", precision: nil
+    t.index ["server_name", "start_time"], name: "index_rounds_on_server_name_and_start_time", unique: true
   end
 
   create_table "server_versions", id: :integer, charset: "utf8mb3", collation: "utf8mb3_general_ci", force: :cascade do |t|

@@ -6,38 +6,31 @@
 #
 #  id       :integer          not null, primary key
 #  round_id :integer
-#  user_id  :integer
-#  team     :integer
-#  roles    :string(255)
-#  kills    :integer
-#  deaths   :integer
-#  name     :string(255)
 #  steamid  :string(255)
-#  team_id  :integer
+#  team     :integer
+#  share    :float
+#
+# Indexes
+#
+#  index_rounders_on_round_and_steamid (round_id, steamid) UNIQUE
 #
 
+# One player's participation in a Round, imported from the ensl_analysis
+# Python pipeline's `round_users` parquet export (see RoundBatchImportService).
+#
+# `steamid` (rather than a `user_id` FK snapshotted at import time) is the
+# link to our own User records, resolved live via `user` below -- same
+# convention as AnalysisResult. `team` is 1 for marine, -1 for alien,
+# matching the Python pipeline's convention.
 class Rounder < ApplicationRecord
-  attr_accessor :lifeform
-
-  scope :team, ->(team) { where(team: team) }
-  scope :match, ->(steamid) { where(steamid: steamid) }
-  scope :ordered, -> { order('kills DESC, deaths ASC') }
-  scope :stats,
-        lambda {
-          select('id, team_id, COUNT(*) as num')
-            .group('team_id')
-            .order('num DESC')
-            .having('num > 3')
-        }
-  scope :extras, -> { includes(:round, :user) }
-  scope :within,
-        ->(from, to) { where('created_at > ? AND created_at < ?', from.utc, to.utc) }
+  TEAM_MARINES = 1
+  TEAM_ALIENS = -1
 
   belongs_to :round
-  belongs_to :user
-  belongs_to :ensl_team, class_name: 'Team', foreign_key: 'team_id'
+  belongs_to :user, primary_key: 'steamid', foreign_key: 'steamid', optional: true, inverse_of: false
 
   def to_s
-    user ? user.username : name
+    user ? user.username : steamid
   end
 end
+

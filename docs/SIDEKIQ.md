@@ -6,6 +6,7 @@ This project uses Sidekiq with Redis and defines these workers in `app/workers`:
 - `GithubReleaseAssetSyncJob`
 - `DataFileSyncJob`
 - `AnalysisBatchImportJob`
+- `RoundBatchImportJob`
 
 ## 1. Start Sidekiq
 
@@ -58,10 +59,11 @@ DataFileSyncJob.perform_async
 GithubReleaseAssetSyncJob.perform_async
 ```
 
-For `AnalysisBatchImportJob`, pass a valid batch id:
+For `AnalysisBatchImportJob`/`RoundBatchImportJob`, pass a valid batch id:
 
 ```ruby
 AnalysisBatchImportJob.perform_async(batch_id)
+RoundBatchImportJob.perform_async(batch_id)
 ```
 
 Example:
@@ -80,6 +82,7 @@ ServerMetadataSyncJob.new.perform
 DataFileSyncJob.new.perform
 GithubReleaseAssetSyncJob.new.perform
 AnalysisBatchImportJob.new.perform(batch_id)
+RoundBatchImportJob.new.perform(batch_id)
 ```
 
 Note: this runs inline in the console process and bypasses Sidekiq queueing/retries.

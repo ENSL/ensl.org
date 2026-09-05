@@ -1,33 +1,21 @@
-<% sort_link = lambda do |param|
-  key = param
-  key += '_reverse' if params[:sort] == param
-
-  {
-    title: 'Sort by this field',
-    href: url_for(params: params.merge({ sort: key, page: nil }))
-  }
-end %>
-
+<%# WIP: minimal placeholder pending rework for the new Round schema (see RoundsController). %>
 <table class="data">
   <tr>
-    <th><%= sort_link.call(:start) %></th>
-    <th><%= sort_link.call(:server) %></th>
-    <th><%= sort_link.call(:team1) %></th>
-    <th><%= sort_link.call(:team2) %></th>
-    <th><%= sort_link.call(:map) %></th>
-    <th><%= sort_link.call(:commander) %></th>
+    <th>Start</th>
+    <th>Server</th>
+    <th>Map</th>
+    <th>Result</th>
   </tr>
 
   <% rounds.each do |round| %>
     <tr class="<%= cycle('even', 'odd') %>">
-      <td><%= link_to (shorttime round.start), round %></td>
-      <td><%= namelink round.server %></td>
-      <td><%= namelink round.team1 if round.team1 %></td>
-      <td><%= namelink round.team2 if round.team2 %></td>
-      <td><%= round.map.nil? ? h(round.map_name) : namelink(round.map) %></td>
-      <td><%= (round.commander.nil? or round.commander.user.nil?) ? h(round.commander) : namelink(round.commander.user) %></td>
+      <td><%= link_to (round.start_time ? shorttime(round.start_time) : 'n/a'), round %></td>
+      <td><%= h round.server_name %></td>
+      <td><%= h round.map_name %></td>
+      <td><%= h round.winner_s %></td>
     </tr>
   <% end %>
 </table>
 
 <%= will_paginate rounds %>
+

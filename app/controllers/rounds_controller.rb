@@ -1,30 +1,18 @@
 # frozen_string_literal: true
 
+# frozen_string_literal: true
+
+# WIP: round/log data is now imported from the ensl_analysis Python pipeline
+# (see RoundBatchImportService) instead of parsed in Rails. This controller
+# and its views haven't been reworked for the new Round/Rounder schema yet --
+# kept minimal (just enough to boot) rather than wired up for real display.
 class RoundsController < ApplicationController
-  SORT_COLUMNS = {
-    'start' => 'start',
-    'server' => 'server_id',
-    'team1' => 'team1_id',
-    'team2' => 'team2_id',
-    'map' => 'map_name',
-    'commander' => 'commander_id'
-  }.freeze
-
   def index
-    sort = SORT_COLUMNS[params['sort']]
-
-    @rounds = Round.basic.paginate \
-      order: sort,
-      page: params[:page],
-      per_page: 30
-
-    return unless params[:ajax]
-
-    render partial: 'list', layout: false
-    nil
+    @rounds = Round.order(start_time: :desc).paginate(page: params[:page], per_page: 30)
   end
 
   def show
     @round = Round.find(params[:id])
   end
 end
+

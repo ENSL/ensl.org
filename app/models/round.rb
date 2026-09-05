@@ -4,123 +4,46 @@
 #
 # Table name: rounds
 #
-#  id           :integer          not null, primary key
-#  server_id    :integer
-#  start        :datetime
-#  end          :datetime
-#  winner       :integer
-#  match_id     :integer
-#  commander_id :integer
-#  team1_id     :integer
-#  team2_id     :integer
-#  map_name     :string(255)
-#  map_id       :integer
+#  id          :integer          not null, primary key
+#  server_name :string(255)
+#  start_time  :datetime
+#  end_time    :datetime
+#  map_name    :string(255)
+#  result      :integer
+#
+# Indexes
+#
+#  index_rounds_on_server_name_and_start_time (server_name, start_time) UNIQUE
 #
 
+# One NS1 round, imported from the ensl_analysis Python pipeline's `rounds`
+# parquet export (see RoundBatchImportService). Not tied to any ladder
+# match/team/map record -- the pipeline only knows about servers and maps by
+# name, not our Server/Map/Match/Team rows.
+#
+# `id` here is a Rails-assigned primary key, not the Python exporter's own
+# `rounds.id` -- that id is just a per-run counter, not stable across
+# batches, so rows are upserted on (server_name, start_time) instead (see
+# the RestructureRoundAndLogModels migration for why).
 class Round < ApplicationRecord
-  scope :basic, -> { includes(:commander, :map, :server, :team1, :team2).order('start DESC') }
+  RESULT_MARINE_WIN = 1
+  RESULT_ALIEN_WIN = 0
 
   has_many :rounders, dependent: :destroy
   has_many :log_lines, dependent: :destroy
 
-  belongs_to :team1, class_name: 'Team'
-  belongs_to :team2, class_name: 'Team'
-  belongs_to :server
-  belongs_to :match
-  belongs_to :commander, class_name: 'Rounder'
-  belongs_to :map
+  def winner_s
+    case result
+    when RESULT_MARINE_WIN then 'Marines'
+    when RESULT_ALIEN_WIN then 'Aliens'
+    end
+  end
 
   def length
-    total_seconds = (self.end - start).to_i
+    return nil unless start_time && end_time
+
+    total_seconds = (end_time - start_time).to_i
     format('%<minutes>02d:%<seconds>02d', minutes: total_seconds / 60, seconds: total_seconds % 60)
   end
-
-  def winner_s
-    winner == 1 ? 'Marines' : 'Aliens'
-  end
-
-  def marine_stats
-    { 'built_resourcetower' => 'Marine RTs',
-      'built_item_genericammo' => 'Ammo Packs',
-      'built_item_health' => 'Medpacks' }
-  end
-
-  def alien_stats
-    { 'built_alienresourcetower' => 'Alien RTs',
-      'lerk' => 'Lerks',
-      'fade' => 'Fades',
-      'onos' => 'Onoses' }
-  end
-
-  def self.marine_events
-    { 'built_resourcetower' => 'RT Built',
-      'built_phasegate' => 'PG Built',
-      'built_team_infportal' => 'IP Built',
-      'built_team_armory' => 'Armory Built',
-      'built_team_observatory' => 'Obs Built',
-      'built_team_armslab' => 'ARMS Built',
-      'built_team_command' => 'CC Built',
-      'built_team_prototypelab' => 'Proto Built',
-      'built_team_turretfactory' => 'TF Built',
-      'built_team_turret' => 'Turret Built',
-      'built_team_siegeturret' => 'Siege Built',
-      'destroyed_resourcetower' => 'RT Destroyed',
-      'destroyed_phasegate' => 'PG Destroyed',
-      'destroyed_team_infportal' => 'IP Destroyed',
-      'destroyed_team_armory' => 'Armory Destroyed',
-      'destroyed_team_observatory' => 'Obs Destroyed',
-      'destroyed_team_armslab' => 'ARMS Destroyed',
-      'destroyed_team_command' => 'CC Destroyed',
-      'destroyed_team_prototypelab' => 'Proto Destroyed',
-      'destroyed_team_turretfactory' => 'TF Destroyed',
-      'destroyed_team_turret' => 'Turret Destroyed',
-      'destroyed_team_siegeturret' => 'Siege Destroyed',
-      'scan' => 'Scan',
-      'research_motiontracking' => 'MT Tech',
-      'research_phasetech' => 'PG Tech',
-      'research_distressbeacon' => 'Beacon',
-      'research_armorl1' => 'Armor 1',
-      'research_armorl2' => 'Armor 2',
-      'research_armorl3' => 'Armor 3',
-      'research_weaponsl1' => 'Weapons 1',
-      'research_weaponsl2' => 'Weapons 2',
-      'research_weaponsl3' => 'Weapons 3',
-      'research_advarmory' => 'AA',
-      'research_electrical' => 'Electrify',
-      'research_advturretfactory' => 'A-TFAC',
-      'research_cancel' => 'Research Cancel',
-      'kill' => 'Frag' }
-  end
-
-  def self.alien_events
-    { 'built_team_hive' => 'Hive Built',
-      'built_movementchamber' => 'MC Built',
-      'built_sensorychamber' => 'SC Built',
-      'built_defensechamber' => 'DC Built',
-      'built_offensechamber' => 'OC Built',
-      'built_alienresourcetower' => 'RT Built',
-      'destroyed_team_hive' => 'Hive Destroyed',
-      'destroyed_movementchamber' => 'MC Destroyed',
-      'destroyed_sensorychamber' => 'SC Destroyed',
-      'destroyed_defensechamber' => 'DC Destroyed',
-      'destroyed_offensechamber' => 'OC Destroyed',
-      'destroyed_alienresourcetower' => 'RT Destroyed',
-      'gorge' => 'Gorge up',
-      'lerk' => 'Lerk up',
-      'fade' => 'Fade up',
-      'onos' => 'Onos up',
-      'kill' => 'Frag' }
-  end
-
-  def self.alien_event(event)
-    return alien_events[event] if alien_events.include?(event)
-
-    nil
-  end
-
-  def self.marine_event(event)
-    return marine_events[event] if marine_events.include?(event)
-
-    nil
-  end
 end
+
