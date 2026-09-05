@@ -19,18 +19,26 @@
 # Python pipeline's `round_users` parquet export (see RoundBatchImportService).
 #
 # `steamid` (rather than a `user_id` FK snapshotted at import time) is the
-# link to our own User records, resolved live via `user` below -- same
-# convention as AnalysisResult. `team` is 1 for marine, -1 for alien,
-# matching the Python pipeline's convention.
+# link to our own User records -- same convention as AnalysisResult, though
+# unlike AnalysisResult this resolves the link with a normalized lookup (see
+# `user` below) instead of a plain `belongs_to`, because the pipeline's
+# steamid format ("STEAM_0:1:97069") doesn't match User#steamid's normalized,
+# prefix-stripped format ("0:1:97069") -- a bare `belongs_to primary_key:
+# foreign_key:` comparison between those two never matches. `team` is 1 for
+# marine, -1 for alien, matching the Python pipeline's convention.
 class Rounder < ApplicationRecord
   TEAM_MARINES = 1
   TEAM_ALIENS = -1
 
   belongs_to :round
-  belongs_to :user, primary_key: 'steamid', foreign_key: 'steamid', optional: true, inverse_of: false
 
   def to_s
     user ? user.username : steamid
   end
-end
 
+  def user
+    return nil if steamid.blank?
+
+    @user ||= User.find_by(steamid: User.normalize_steamid(steamid))
+  end
+end

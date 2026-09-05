@@ -92,8 +92,22 @@
     text-transform: uppercase;
   }
 
+  &__player-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  &__player-table {
+    h3 {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+    }
+  }
+
   @media (max-width: 680px) {
     &__header h1 { font-size: 1.65rem; }
     &__meta { grid-template-columns: repeat(2, 1fr); }
+    &__player-tables { grid-template-columns: 1fr; }
   }
 }
