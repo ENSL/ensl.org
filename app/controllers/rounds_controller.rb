@@ -23,5 +23,6 @@ class RoundsController < ApplicationController
     # the timeline only cares about what happened during the round itself.
     log_lines = log_lines.where(created_at: @round.start_time..) if @round.start_time
     @log_lines = log_lines.order(:created_at, :id).to_a
+    render layout: 'full'
   end
 end

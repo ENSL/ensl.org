@@ -24,6 +24,89 @@
   </div>
 
   <section class="round-full__card">
+    <h2>Players</h2>
+
+    <% player_names = round_timeline_names(@log_lines) %>
+    <% marines, aliens = @round.rounders.partition { |rounder| rounder.team == Rounder::TEAM_MARINES } %>
+    <% player_stats = round_player_stats(@round.rounders, @log_lines) %>
+    <% marines.sort_by! { |rounder| [-player_stats[rounder.steamid][:kd_ratio], rounder.steamid] } %>
+    <% aliens.sort_by! { |rounder| [-player_stats[rounder.steamid][:kd_ratio], rounder.steamid] } %>
+    <div class="round-full__player-tables">
+      <div class="round-full__player-table">
+        <h3>Marines</h3>
+        <table class="data round-full__players-table round-full__players-table--marines">
+          <colgroup>
+            <col class="round-full__player-name-column">
+            <col class="round-full__ensl-name-column">
+            <col class="round-full__steamid-column">
+            <col class="round-full__share-column">
+            <col class="round-full__number-column" span="3">
+          </colgroup>
+          <tr>
+            <th>In-game name</th>
+            <th>ENSL username</th>
+            <th>Steam ID</th>
+            <th>Share</th>
+            <th>K</th>
+            <th>D</th>
+            <th>K/D</th>
+          </tr>
+          <% marines.each do |rounder| %>
+            <% stats = player_stats[rounder.steamid] %>
+            <tr>
+              <td class="round-full__player-name"><%= h(player_names[rounder.steamid] || rounder.steamid) %></td>
+              <td class="round-full__ensl-name"><% if rounder.user %><span class="round-full__ensl-identity"><%= flag(rounder.user.country) %><%= namelink(rounder.user) %></span><% else %>-<% end %></td>
+              <td><%= h(User.normalize_steamid(rounder.steamid) || rounder.steamid) %></td>
+              <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
+              <td><%= stats[:kills] %></td>
+              <td><%= stats[:deaths] %></td>
+              <td><%= stats[:kd_ratio].infinite? ? '-' : number_with_precision(stats[:kd_ratio], precision: 2) %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+
+      <div class="round-full__player-table">
+        <h3>Aliens</h3>
+        <table class="data round-full__players-table round-full__players-table--aliens">
+          <colgroup>
+            <col class="round-full__player-name-column">
+            <col class="round-full__ensl-name-column">
+            <col class="round-full__steamid-column">
+            <col class="round-full__share-column">
+            <col class="round-full__number-column" span="5">
+          </colgroup>
+          <tr>
+            <th>In-game name</th>
+            <th>ENSL username</th>
+            <th>Steam ID</th>
+            <th>Share</th>
+            <th>K</th>
+            <th>D</th>
+            <th>K/D</th>
+            <th>RTs</th>
+            <th>Res</th>
+          </tr>
+          <% aliens.each do |rounder| %>
+            <% stats = player_stats[rounder.steamid] %>
+            <tr>
+              <td class="round-full__player-name"><%= h(player_names[rounder.steamid] || rounder.steamid) %></td>
+              <td class="round-full__ensl-name"><% if rounder.user %><span class="round-full__ensl-identity"><%= flag(rounder.user.country) %><%= namelink(rounder.user) %></span><% else %>-<% end %></td>
+              <td><%= h(User.normalize_steamid(rounder.steamid) || rounder.steamid) %></td>
+              <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
+              <td><%= stats[:kills] %></td>
+              <td><%= stats[:deaths] %></td>
+              <td><%= stats[:kd_ratio].infinite? ? '-' : number_with_precision(stats[:kd_ratio], precision: 2) %></td>
+              <td><%= stats[:resource_towers] %></td>
+              <td><%= stats[:resources_spent] %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="round-full__card">
     <h2>Timeline</h2>
 
     <% timeline_events = round_timeline_events(@round, @log_lines) %>
@@ -68,46 +151,6 @@
         <% end %>
       </div>
     <% end %>
-  </section>
-
-  <section class="round-full__card">
-    <h2>Players</h2>
-
-    <% player_names = round_timeline_names(@log_lines) %>
-    <% marines, aliens = @round.rounders.partition { |rounder| rounder.team == Rounder::TEAM_MARINES } %>
-    <div class="round-full__player-tables">
-      <div class="round-full__player-table">
-        <h3>Marines</h3>
-        <table class="data">
-          <tr>
-            <th>Player</th>
-            <th>Share</th>
-          </tr>
-          <% marines.each do |rounder| %>
-            <tr>
-              <td><%= round_player_name(rounder, player_names) %></td>
-              <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-
-      <div class="round-full__player-table">
-        <h3>Aliens</h3>
-        <table class="data">
-          <tr>
-            <th>Player</th>
-            <th>Share</th>
-          </tr>
-          <% aliens.each do |rounder| %>
-            <tr>
-              <td><%= round_player_name(rounder, player_names) %></td>
-              <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-    </div>
   </section>
 </div>
 

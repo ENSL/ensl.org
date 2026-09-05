@@ -292,23 +292,54 @@ RSpec.describe 'rounds/show', type: :view do
     expect(rendered).to include('&lt;script&gt;')
   end
 
-  it 'shows player nicknames (not steamids) in two team tables without a steamid/team column' do
-    kill = LogLine.create!(round: round, event_type: 'kill', param1: 'AlienOne', param2: 'machinegun',
-                           actor_steamid: 'STEAM_0:1:1', target_steamid: 'STEAM_0:1:2',
-                           raw_text: "#{player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team')} killed " \
-                                     "#{player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team')} with \"machinegun\"",
-                           created_at: round.start_time + 5.seconds)
+  it 'shows separate team tables above the timeline with player identities and alien round statistics' do
+    create(:user, steamid: 'STEAM_0:1:2', username: 'RegisteredAlien', country: 'FI')
+    Rounder.create!(round: round, steamid: 'STEAM_0:1:3', team: Rounder::TEAM_ALIENS, share: 0.25)
+    kill1 = LogLine.create!(round: round, event_type: 'kill', param1: 'MarineOne', param2: 'bitegun',
+                            actor_steamid: 'STEAM_0:1:2', target_steamid: 'STEAM_0:1:1',
+                            raw_text: "#{player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team')} killed " \
+                                      "#{player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team')} with \"bitegun\"",
+                            created_at: round.start_time + 5.seconds)
+    kill2 = LogLine.create!(round: round, event_type: 'kill', param1: 'MarineOne', param2: 'bitegun',
+                            actor_steamid: 'STEAM_0:1:2', target_steamid: 'STEAM_0:1:1',
+                            raw_text: "#{player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team')} killed " \
+                                      "#{player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team')} with \"bitegun\"",
+                            created_at: round.start_time + 10.seconds)
+    alien_death = LogLine.create!(round: round, event_type: 'kill', param1: 'AlienTwo', param2: 'machinegun',
+                                  actor_steamid: 'STEAM_0:1:1', target_steamid: 'STEAM_0:1:3',
+                                  raw_text: "#{player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team')} killed " \
+                        "#{player_raw('AlienTwo', 'STEAM_0:1:3', 'alien1team')} with \"machinegun\"",
+                                  created_at: round.start_time + 12.seconds)
+    tower = LogLine.create!(round: round, event_type: 'structure_destroyed', param1: 'resourcetower',
+                            actor_steamid: 'STEAM_0:1:2', raw_text: 'destroyed RT',
+                            created_at: round.start_time + 15.seconds)
+    gorge = LogLine.create!(round: round, event_type: 'role_change', param1: 'gorge',
+                            actor_steamid: 'STEAM_0:1:2', raw_text: player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team'),
+                            created_at: round.start_time + 20.seconds)
+    fade = LogLine.create!(round: round, event_type: 'role_change', param1: 'fade',
+                           actor_steamid: 'STEAM_0:1:2', raw_text: player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team'),
+                           created_at: round.start_time + 25.seconds)
 
-    assign(:log_lines, [kill])
+    assign(:log_lines, [kill1, kill2, alien_death, tower, gorge, fade])
 
     render
 
     expect(rendered).to include('Marines')
     expect(rendered).to include('Aliens')
-    expect(rendered).to include('MarineOne')
-    expect(rendered).to include('AlienOne')
-    expect(rendered).not_to include('<th>Steam ID</th>')
-    expect(rendered).not_to include('<th>Team</th>')
+    expect(rendered).to include('<th>In-game name</th>')
+    expect(rendered).to include('<th>ENSL username</th>')
+    expect(rendered).to include('<th>Steam ID</th>')
+    expect(rendered).to include('<th>K/D</th>')
+    expect(rendered).to include('<th>RTs</th>')
+    expect(rendered).to include('<th>Res</th>')
+    expect(rendered).to include('flag-fi')
+    expect(rendered).to include('RegisteredAlien')
+    expect(rendered).to match(/round-full__ensl-identity.*?flag-fi.*?RegisteredAlien/m)
+    expect(rendered).to include('0:1:2')
+    expect(rendered).not_to include('>STEAM_0:1:2</td>')
+    expect(rendered).to match(%r{AlienOne.*?<td>2</td>.*?<td>0</td>.*?<td>-</td>.*?<td>1</td>.*?<td>60</td>}m)
+    expect(rendered.index('AlienOne')).to be < rendered.index('AlienTwo')
+    expect(rendered.index('<h2>Players</h2>')).to be < rendered.index('<h2>Timeline</h2>')
   end
 
   it 'links a player name to their ENSL profile when the steamid matches a registered user' do

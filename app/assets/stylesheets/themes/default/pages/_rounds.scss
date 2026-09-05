@@ -6,7 +6,8 @@
   modeled after .movie-full (pages/_files.scss) for visual consistency.
 */
 .round-full {
-  max-width: 920px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
 
   &__header {
@@ -94,18 +95,60 @@
 
   &__player-tables {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
   }
 
   &__player-table {
+    overflow-x: auto;
+
     h3 {
       margin: 0 0 8px;
       font-size: 0.9rem;
     }
   }
 
-  @media (max-width: 680px) {
+  &__players-table {
+    th,
+    td {
+      white-space: nowrap;
+    }
+  }
+
+  &__player-name-column { width: 29%; }
+  &__ensl-name-column { width: 23%; }
+  &__steamid-column { width: 12%; }
+  &__share-column { width: 6%; }
+
+  &__players-table--marines &__number-column { width: 10%; }
+  &__players-table--aliens &__number-column { width: 6%; }
+
+  &__player-name,
+  &__ensl-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__ensl-identity {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100%;
+    padding: 1px 0;
+
+    .flag {
+      flex: 0 0 auto;
+      vertical-align: middle;
+    }
+
+    a {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  @media (width <= 680px) {
     &__header h1 { font-size: 1.65rem; }
     &__meta { grid-template-columns: repeat(2, 1fr); }
     &__player-tables { grid-template-columns: 1fr; }

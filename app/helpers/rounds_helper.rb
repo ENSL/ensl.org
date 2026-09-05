@@ -82,6 +82,10 @@ module RoundsHelper
     'onos' => 'Onos'
   }.freeze
 
+  ROUND_PLAYER_LIFEFORM_COSTS = {
+    'skulk' => 0, 'gorge' => 10, 'lerk' => 30, 'fade' => 50, 'onos' => 75
+  }.freeze
+
   # param2 on a "kill" event -- either a real weapon, or (less obviously) the
   # name of the structure/environment that got the kill credit instead.
   ROUND_TIMELINE_WEAPON_NAMES = {
@@ -142,6 +146,37 @@ module RoundsHelper
     return namelink(rounder.user) if rounder.user
 
     names_by_steamid[rounder.steamid] || rounder.steamid
+  end
+
+  # Per-player totals shown above the timeline. Costs are recorded from each
+  # alien lifeform role_change; structure events are deliberately excluded.
+  def round_player_stats(rounders, log_lines)
+    stats = rounders.index_by(&:steamid).transform_values do
+      { kills: 0, deaths: 0, resource_towers: 0, resources_spent: 0 }
+    end
+
+    log_lines.each do |log_line|
+      case log_line.event_type
+      when 'kill'
+        stats[log_line.actor_steamid][:kills] += 1 if stats.key?(log_line.actor_steamid)
+        stats[log_line.target_steamid][:deaths] += 1 if stats.key?(log_line.target_steamid)
+      when 'structure_destroyed'
+        if %w[resourcetower alienresourcetower].include?(log_line.param1) && stats.key?(log_line.actor_steamid)
+          stats[log_line.actor_steamid][:resource_towers] += 1
+        end
+      when 'role_change'
+        cost = ROUND_PLAYER_LIFEFORM_COSTS[log_line.param1]
+        stats[log_line.actor_steamid][:resources_spent] += cost if cost && stats.key?(log_line.actor_steamid)
+      end
+    end
+
+    stats.each_value do |player_stats|
+      player_stats[:kd_ratio] = if player_stats[:deaths].zero?
+                                  Float::INFINITY
+                                else
+                                  player_stats[:kills].fdiv(player_stats[:deaths])
+                                end
+    end
   end
 
   private
