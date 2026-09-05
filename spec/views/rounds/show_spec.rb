@@ -68,11 +68,13 @@ RSpec.describe 'rounds/show', type: :view do
     expect(alien_top).to be > marine_top
   end
 
-  it 'trusts the raw_text team over a stale/incorrect Rounder#team (real round 1130 bug)' do
-    # Rounder says STEAM_0:1:1 is on the ALIEN team for this round (e.g. an
-    # upstream Python bug misreads an early pre-round team pick), but every
-    # actual in-round log line has them on marine1team -- the rendered side
-    # must follow the log line, not the (wrong) Rounder summary.
+  it 'renders side from Rounder#team as-is, even when it disagrees with raw_text (by design -- ' \
+     'see /memories/repo/round-timeline.md; import-side mistakes should stay visible, not be papered over)' do
+    # Rounder says STEAM_0:1:1 is on the ALIEN team for this round (a real,
+    # confirmed upstream Python/log-parser bug -- see round 1130/542 notes),
+    # even though every actual in-round log line has them on marine1team.
+    # The timeline must still follow Rounder#team, not the log line, so the
+    # mistake is visible in the UI instead of silently hidden here.
     Rounder.where(round: round, steamid: 'STEAM_0:1:1').update!(team: Rounder::TEAM_ALIENS)
 
     kill = LogLine.create!(
@@ -88,7 +90,7 @@ RSpec.describe 'rounds/show', type: :view do
     render
 
     kill_row = rendered[/(round-timeline-row--\w+)"[^>]*>(?:(?!round-timeline-row).)*MarineOne killed AlienOne/m, 1]
-    expect(kill_row).to eq('round-timeline-row--marine')
+    expect(kill_row).to eq('round-timeline-row--alien')
   end
 
   it 'suppresses individual join_team spam and shows one roster summary per side instead' do
@@ -340,6 +342,29 @@ RSpec.describe 'rounds/show', type: :view do
     expect(rendered).to match(%r{AlienOne.*?<td>2</td>.*?<td>0</td>.*?<td>-</td>.*?<td>1</td>.*?<td>60</td>}m)
     expect(rendered.index('AlienOne')).to be < rendered.index('AlienTwo')
     expect(rendered.index('<h2>Players</h2>')).to be < rendered.index('<h2>Timeline</h2>')
+  end
+
+  it 'puts a player in the Players table by Rounder#team as-is, even when it disagrees with raw_text ' \
+     '(by design -- real round 542 had several rounders permanently mismarked; that should stay visible)' do
+    # Rounder says STEAM_0:1:2 is a MARINE, but every in-round log line has
+    # them on alien1team -- the Marines table must still list them, matching
+    # the (wrong) Rounder data, so the mismatch is visible for fixing upstream.
+    Rounder.where(round: round, steamid: 'STEAM_0:1:2').update!(team: Rounder::TEAM_MARINES)
+
+    kill = LogLine.create!(round: round, event_type: 'kill', param1: 'MarineOne', param2: 'bitegun',
+                           actor_steamid: 'STEAM_0:1:2', target_steamid: 'STEAM_0:1:1',
+                           raw_text: "#{player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team')} killed " \
+                                     "#{player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team')} with \"bitegun\"",
+                           created_at: round.start_time + 5.seconds)
+
+    assign(:log_lines, [kill])
+
+    render
+
+    aliens_table = rendered[%r{<h3>Aliens</h3>.*?</table>}m]
+    marines_table = rendered[%r{<h3>Marines</h3>.*?</table>}m]
+    expect(marines_table).to include('AlienOne')
+    expect(aliens_table).not_to include('AlienOne')
   end
 
   it 'links a player name to their ENSL profile when the steamid matches a registered user' do

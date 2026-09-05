@@ -30,12 +30,9 @@ module RoundsHelper
   ROUND_TIMELINE_HIVE_GROW_TIME = 3.minutes
 
   # Matches a player token as it appears embedded in LogLine#raw_text, e.g.
-  # `"jiriki<15><STEAM_0:1:1511705><marine1team>"` -- used both to recover
-  # in-game nicknames (Rounder only stores steamid/team, not a name) and to
-  # read the player's ACTUAL team at that instant (see round_timeline_side_for
-  # -- Rounder#team is a single round-level summary that can be wrong for
-  # players who hop teams before the round officially starts).
-  ROUND_TIMELINE_PLAYER_RE = /"(.+?)<\d+><(STEAM_[\d:]+)><([^">]*)>"/
+  # `"jiriki<15><STEAM_0:1:1511705><marine1team>"` -- used to recover in-game
+  # nicknames, since Rounder only stores steamid/team, not a name.
+  ROUND_TIMELINE_PLAYER_RE = /"(.+?)<\d+><(STEAM_[\d:]+)><[^">]*>"/
 
   ROUND_TIMELINE_STRUCTURE_NAMES = {
     'alienresourcetower' => 'Alien Resource Tower', 'defensechamber' => 'Defense Chamber',
@@ -134,7 +131,7 @@ module RoundsHelper
   def round_timeline_names(log_lines)
     names = {}
     log_lines.each do |log_line|
-      log_line.raw_text.to_s.scan(ROUND_TIMELINE_PLAYER_RE) { |name, steamid, _team| names[steamid] = name }
+      log_line.raw_text.to_s.scan(ROUND_TIMELINE_PLAYER_RE) { |name, steamid| names[steamid] = name }
     end
     names
   end
@@ -255,7 +252,7 @@ module RoundsHelper
     actor = round_timeline_name(log_line.actor_steamid, context)
     {
       created_at: log_line.created_at,
-      side: round_timeline_side_for(log_line.actor_steamid, nil, context, raw_text: log_line.raw_text),
+      side: round_timeline_side_for(log_line.actor_steamid, nil, context),
       description: round_timeline_role_description(actor, log_line.param1, previous_role)
     }
   end
@@ -272,7 +269,7 @@ module RoundsHelper
     actor = round_timeline_name(gestate_line.actor_steamid, context)
     {
       created_at: gestate_line.created_at,
-      side: round_timeline_side_for(gestate_line.actor_steamid, nil, context, raw_text: gestate_line.raw_text),
+      side: round_timeline_side_for(gestate_line.actor_steamid, nil, context),
       description: round_timeline_evolve_description(actor, target_role, gestate[:previous_role])
     }
   end
@@ -304,7 +301,7 @@ module RoundsHelper
       round_timeline_flush_drop(state, context)
       state[:pending_drop] = {
         actor_steamid: log_line.actor_steamid, created_at: log_line.created_at, last_time: log_line.created_at,
-        raw_text: log_line.raw_text, counts: Hash.new(0).merge(log_line.param1 => 1)
+        counts: Hash.new(0).merge(log_line.param1 => 1)
       }
     end
   end
@@ -318,7 +315,7 @@ module RoundsHelper
     end
     {
       created_at: drop[:created_at],
-      side: round_timeline_side_for(drop[:actor_steamid], nil, context, raw_text: drop[:raw_text]),
+      side: round_timeline_side_for(drop[:actor_steamid], nil, context),
       description: "#{round_timeline_name(drop[:actor_steamid], context)} dropped #{parts.to_sentence}"
     }
   end
@@ -341,14 +338,14 @@ module RoundsHelper
     actor = round_timeline_name(log_line.actor_steamid, context)
     state[:items] << {
       created_at: log_line.created_at,
-      side: round_timeline_side_for(log_line.actor_steamid, nil, context, raw_text: log_line.raw_text),
+      side: round_timeline_side_for(log_line.actor_steamid, nil, context),
       description: "#{actor} started growing a Hive, ready in 3:00"
     }
   end
 
   def round_timeline_hive_destroyed_item(log_line, state, context)
     actor = round_timeline_name(log_line.actor_steamid, context)
-    side = round_timeline_side_for(log_line.actor_steamid, nil, context, raw_text: log_line.raw_text)
+    side = round_timeline_side_for(log_line.actor_steamid, nil, context)
     # FIFO: the earliest hive that hasn't finished growing yet is assumed to
     # be the one that just died (the log has no per-hive identity to match on).
     still_growing_index = state[:growing_hives].index { |predicted_at| predicted_at > log_line.created_at }
@@ -437,30 +434,16 @@ module RoundsHelper
       .clamp(ROUND_TIMELINE_MIN_PX_PER_SECOND, ROUND_TIMELINE_MAX_PX_PER_SECOND)
   end
 
-  # The specific log line's raw_text (the player's team suffix at THAT
-  # instant) is trusted over Rounder#team, which is a single round-level
-  # summary that can be wrong for players who hop teams before the round
-  # officially starts (real example: round 1130, actor ends up permanently
-  # marked "alien" for the round because of an early pre-round team pick,
-  # even though every in-round log line shows them on marine1team).
-  def round_timeline_side_for(actor_steamid, target_steamid, context, raw_text: nil)
-    round_timeline_team_from_raw(raw_text, actor_steamid) ||
-      round_timeline_team_from_raw(raw_text, target_steamid) ||
-      round_timeline_rounder_side(actor_steamid, context) ||
+  # Side is read straight from Rounder#team -- deliberately NOT cross-checked
+  # against raw_text, even though Rounder#team can be wrong (see
+  # /memories/repo/round-timeline.md for confirmed real examples). This is
+  # intentional: showing exactly what's in `rounders`, mistakes included, is
+  # what makes those import-side mistakes visible/findable in the UI instead
+  # of silently papered over -- the actual fix belongs in the log parser.
+  def round_timeline_side_for(actor_steamid, target_steamid, context)
+    round_timeline_rounder_side(actor_steamid, context) ||
       round_timeline_rounder_side(target_steamid, context) ||
       'neutral'
-  end
-
-  def round_timeline_team_from_raw(raw_text, steamid)
-    return nil if raw_text.blank? || steamid.blank?
-
-    raw_text.scan(ROUND_TIMELINE_PLAYER_RE) do |_, sid, team|
-      next unless sid == steamid
-
-      return 'marine' if team.to_s.start_with?('marine')
-      return 'alien' if team.to_s.start_with?('alien')
-    end
-    nil
   end
 
   def round_timeline_rounder_side(steamid, context)
@@ -493,8 +476,7 @@ module RoundsHelper
   def round_timeline_plain_item(log_line, state, context)
     {
       created_at: log_line.created_at,
-      side: round_timeline_side_for(log_line.actor_steamid, log_line.target_steamid, context,
-                                    raw_text: log_line.raw_text),
+      side: round_timeline_side_for(log_line.actor_steamid, log_line.target_steamid, context),
       description: round_timeline_description(log_line, state, context)
     }
   end
