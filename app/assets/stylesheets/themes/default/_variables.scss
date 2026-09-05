@@ -54,6 +54,12 @@ $light-yellow: #FFF6BF;
 $light-green: #1f7f5c;
 
 $medium-gray: color.adjust(#5a5a5a, $lightness: 30%);
+
+// Shared marine/alien accent colours -- used by the map balance chart
+// (app/javascript/controllers/map_balance_chart.js) and the round timeline
+// (components/_timeline.scss, pages/_rounds.scss) for visual consistency.
+$marine-color: #3b82f6;
+$alien-color: #f59e0b;
  
 $base-body-color: white;
 $base-font-color: $dark-gray;

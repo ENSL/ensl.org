@@ -1,0 +1,99 @@
+@use "sass:color";
+@use "../variables" as *;
+
+/*
+  Round show page (see rounds/show.html.erb) -- header/stat-grid/card layout
+  modeled after .movie-full (pages/_files.scss) for visual consistency.
+*/
+.round-full {
+  max-width: 920px;
+  margin: 0 auto;
+
+  &__header {
+    margin: 8px 0 20px;
+    text-align: center;
+
+    h1 {
+      margin: 0;
+      font-size: 2.1rem;
+      line-height: 1.15;
+    }
+  }
+
+  &__eyebrow {
+    margin: 0 0 6px;
+    color: $light-blue;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__byline {
+    margin: 4px 0 0;
+    color: $medium-gray;
+  }
+
+  &__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    text-align: center;
+    background: $base-body-color;
+    border: 1px solid $light-gray;
+    border-radius: 10px;
+    box-shadow: $light-shadow;
+  }
+
+  &__stat-value {
+    overflow: hidden;
+    color: $blue;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__stat--marine &__stat-value { color: $marine-color; }
+  &__stat--alien &__stat-value { color: $alien-color; }
+
+  &__stat-label {
+    color: $medium-gray;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__card {
+    padding: 22px 24px;
+    background: $base-body-color;
+    border: 1px solid $light-gray;
+    border-radius: 10px;
+    box-shadow: $light-shadow;
+  }
+
+  &__card + &__card {
+    margin-top: 20px;
+  }
+
+  h2 {
+    margin: 0 0 14px;
+    color: $blue;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 680px) {
+    &__header h1 { font-size: 1.65rem; }
+    &__meta { grid-template-columns: repeat(2, 1fr); }
+  }
+}

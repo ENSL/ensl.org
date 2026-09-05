@@ -1,40 +1,95 @@
-<%# WIP: minimal placeholder pending rework for the new Round schema (see RoundsController). %>
-<div class="wide box">
-  <h1>
-    <%= h @round.server_name %> : <%= @round.start_time ? longtime(@round.start_time) : 'n/a' %>
-  </h1>
-</div>
-
-<div class="wide box">
-  <h2 class="center">
-    General Info
-  </h2>
-
-  <div class="wide center">
-    <%= cascade @round, ["winner_s", "length", "map_name"] %>
-  </div>
-</div>
-
-<div class="wide box">
-  <h2 class="center">
-    Players
-  </h2>
-
-  <table class="data">
-    <tr>
-      <th>Steam ID</th>
-      <th>ENSL</th>
-      <th>Team</th>
-      <th>Share</th>
-    </tr>
-    <% @round.rounders.each do |rounder| %>
-      <tr>
-        <td><%= h rounder.steamid %></td>
-        <td><%= namelink rounder.user if rounder.user %></td>
-        <td><%= rounder.team == Rounder::TEAM_MARINES ? 'Marines' : 'Aliens' %></td>
-        <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
-      </tr>
+<div class="round-full">
+  <header class="round-full__header">
+    <p class="round-full__eyebrow">Round archive</p>
+    <h1><%= h @round.server_name %></h1>
+    <% if @round.start_time %>
+      <p class="round-full__byline"><%= longtime(@round.start_time) %></p>
     <% end %>
-  </table>
+  </header>
+
+  <div class="round-full__meta">
+    <% winner_class = { Round::RESULT_MARINE_WIN => 'marine', Round::RESULT_ALIEN_WIN => 'alien' }[@round.result] %>
+    <div class="round-full__stat round-full__stat--<%= winner_class %>">
+      <span class="round-full__stat-value"><%= @round.winner_s || '–' %></span>
+      <span class="round-full__stat-label">Winner</span>
+    </div>
+    <div class="round-full__stat">
+      <span class="round-full__stat-value"><%= @round.length || '–' %></span>
+      <span class="round-full__stat-label">Length</span>
+    </div>
+    <div class="round-full__stat">
+      <span class="round-full__stat-value"><%= @round.map_name.presence || '–' %></span>
+      <span class="round-full__stat-label">Map</span>
+    </div>
+  </div>
+
+  <section class="round-full__card">
+    <h2>Timeline</h2>
+
+    <% timeline_events = round_timeline_events(@round, @log_lines) %>
+    <% if timeline_events.empty? %>
+      <p class="center">No event log has been imported for this round yet.</p>
+    <% else %>
+      <div class="round-timeline-legend">
+        <span class="round-timeline-legend-item round-timeline-legend-item--marine">Marines</span>
+        <span class="round-timeline-legend-item round-timeline-legend-item--alien">Aliens</span>
+      </div>
+
+      <div class="round-timeline" style="height: <%= round_timeline_height(timeline_events) %>px;">
+        <div class="round-timeline-spine"></div>
+        <% timeline_events.each do |event| %>
+          <div class="round-timeline-row round-timeline-row--<%= event[:side] %>" style="top: <%= event[:top] %>px;">
+            <div class="round-timeline-side round-timeline-side--marine">
+              <% if event[:side] == 'marine' %>
+                <div class="round-timeline-card">
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="round-timeline-marker">
+              <% if event[:side] == 'neutral' %>
+                <div class="round-timeline-card round-timeline-card--neutral">
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                </div>
+              <% else %>
+                <span class="round-timeline-dot"></span>
+              <% end %>
+            </div>
+
+            <div class="round-timeline-side round-timeline-side--alien">
+              <% if event[:side] == 'alien' %>
+                <div class="round-timeline-card">
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="round-full__card">
+    <h2>Players</h2>
+
+    <table class="data">
+      <tr>
+        <th>Steam ID</th>
+        <th>ENSL</th>
+        <th>Team</th>
+        <th>Share</th>
+      </tr>
+      <% @round.rounders.each do |rounder| %>
+        <tr>
+          <td><%= h rounder.steamid %></td>
+          <td><%= namelink rounder.user if rounder.user %></td>
+          <td><%= rounder.team == Rounder::TEAM_MARINES ? 'Marines' : 'Aliens' %></td>
+          <td><%= number_to_percentage(rounder.share.to_f * 100, precision: 0) if rounder.share %></td>
+        </tr>
+      <% end %>
+    </table>
+  </section>
+</div>
 </div>
 

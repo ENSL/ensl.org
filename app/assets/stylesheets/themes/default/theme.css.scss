@@ -32,6 +32,7 @@
 @use "components/tabs";
 @use "components/shoutbox";
 @use "components/flags";
+@use "components/timeline";
 
 /*
   Pages
@@ -51,3 +52,4 @@
 @use "pages/servers";
 @use "pages/groups";
 @use "pages/custom_urls";
+@use "pages/rounds";
