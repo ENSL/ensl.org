@@ -50,11 +50,9 @@ class RoundBatchImportService
     # Rounders/log_lines resolve their round_id/log_file_id against what was
     # just imported above, so the id maps must be rebuilt after that upsert.
     counts[:rounders] = upsert(Rounder, read_rounders(connection))
-    counts[:log_lines] = upsert(LogLine, read_log_lines(connection))
+    counts[:log_lines] = upsert_log_lines(connection)
 
-    if counts.values.sum.zero?
-      raise Error, "No recognized exports found for batch #{@batch_id} under #{batch_dir}"
-    end
+    raise Error, "No recognized exports found for batch #{@batch_id} under #{batch_dir}" if counts.values.sum.zero?
 
     Rails.logger.info("[RoundBatchImportService] Imported #{counts} for batch #{@batch_id}")
     counts
@@ -134,14 +132,36 @@ class RoundBatchImportService
   # Joins log_lines -> rounds/log_files/users (twice, for actor and target)
   # to resolve every FK by natural key. Requires all three sibling exports
   # -- a log_lines export with none of its context is not useful to import.
-  def read_log_lines(connection)
+  #
+  # A batch's log_lines export commonly runs into the millions of rows, so
+  # unlike the other sources this streams straight off the query result and
+  # upserts UPSERT_SLICE_SIZE at a time instead of materializing one giant
+  # Ruby array first -- doing that reliably OOMs on real-sized batches.
+  def upsert_log_lines(connection)
+    sql = log_lines_sql
+    return 0 unless sql
+
+    total = 0
+    connection.query(sql).each_slice(UPSERT_SLICE_SIZE) do |slice|
+      records = slice.filter_map { |row| log_line_record(row) }
+      next if records.empty?
+
+      # rubocop:disable Rails/SkipsModelValidations -- see #upsert above
+      LogLine.upsert_all(records, record_timestamps: false)
+      # rubocop:enable Rails/SkipsModelValidations
+      total += records.size
+    end
+    total
+  end
+
+  def log_lines_sql
     log_lines_glob = existing_glob('log_lines')
     rounds_glob = existing_glob('rounds')
     log_files_glob = existing_glob('log_files')
     users_glob = existing_glob('users')
-    return [] unless log_lines_glob && rounds_glob && log_files_glob && users_glob
+    return nil unless log_lines_glob && rounds_glob && log_files_glob && users_glob
 
-    sql = <<~SQL.squish
+    <<~SQL.squish
       SELECT ll.raw_text, ll.event_type, ll.param1, ll.param2, ll.param3,
              r.server_name AS round_server_name, date_trunc('second', r.start_time) AS round_start_time,
              lf.sha256 AS log_file_sha256, au.steam_id AS actor_steamid, tu.steam_id AS target_steamid,
@@ -152,28 +172,29 @@ class RoundBatchImportService
       LEFT JOIN read_parquet('#{users_glob}') au ON ll.actor_id = au.id
       LEFT JOIN read_parquet('#{users_glob}') tu ON ll.target_id = tu.id
     SQL
+  end
 
-    connection.query(sql).filter_map do |(raw_text, event_type, param1, param2, param3, round_server_name,
-                                            round_start_time, log_file_sha256, actor_steamid, target_steamid,
-                                            server_name, created_at)|
-      log_file_id = log_file_id_for(log_file_sha256)
-      next unless log_file_id # every log line came from some log file; skip if that file wasn't imported
+  def log_line_record(row)
+    (raw_text, event_type, param1, param2, param3, round_server_name, round_start_time,
+     log_file_sha256, actor_steamid, target_steamid, server_name, created_at) = row
 
-      {
-        log_file_id: log_file_id,
-        round_id: round_id_for(round_server_name, round_start_time),
-        raw_text: raw_text,
-        event_type: event_type,
-        param1: param1,
-        param2: param2,
-        param3: param3,
-        actor_steamid: actor_steamid,
-        target_steamid: target_steamid,
-        server_name: server_name,
-        created_at: created_at,
-        line_digest: Digest::SHA256.hexdigest(raw_text.to_s)
-      }
-    end
+    log_file_id = log_file_id_for(log_file_sha256)
+    return nil unless log_file_id # every log line came from some log file; skip if that file wasn't imported
+
+    {
+      log_file_id: log_file_id,
+      round_id: round_id_for(round_server_name, round_start_time),
+      raw_text: raw_text,
+      event_type: event_type,
+      param1: param1,
+      param2: param2,
+      param3: param3,
+      actor_steamid: actor_steamid,
+      target_steamid: target_steamid,
+      server_name: server_name,
+      created_at: created_at,
+      line_digest: Digest::SHA256.hexdigest(raw_text.to_s)
+    }
   end
 
   # (server_name, start_time) -> our Round#id, for resolving the Python

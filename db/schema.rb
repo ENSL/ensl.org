@@ -384,8 +384,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_120000) do
     t.string "actor_steamid"
     t.datetime "created_at", precision: nil
     t.string "event_type"
-    t.integer "log_file_id"
     t.string "line_digest", limit: 64
+    t.integer "log_file_id"
     t.string "param1"
     t.string "param2"
     t.string "param3"

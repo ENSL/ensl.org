@@ -13,19 +13,19 @@ RSpec.describe RoundBatchImportService do
 
   describe '#call' do
     it 'raises when nothing was imported' do
-      allow(service).to receive_messages(read_log_files: [], read_rounds: [], read_rounders: [], read_log_lines: [])
+      allow(service).to receive_messages(read_log_files: [], read_rounds: [], read_rounders: [], upsert_log_lines: 0)
 
       expect { service.call }.to raise_error(RoundBatchImportService::Error, /No recognized exports/)
     end
 
     it 'upserts each table and returns row counts' do
       allow(service).to receive(:read_log_files).and_return([{ sha256: 'abc', filename: 'a.log',
-                                                                 server_name: 's', created_at: Time.current }])
+                                                               server_name: 's', created_at: Time.current }])
       allow(service).to receive(:read_rounds).and_return([{ server_name: 's', start_time: Time.current,
-                                                              end_time: Time.current, map_name: 'ns_eclipse',
-                                                              result: 1 }])
+                                                            end_time: Time.current, map_name: 'ns_eclipse',
+                                                            result: 1 }])
       allow(service).to receive(:read_rounders).and_return([{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }])
-      allow(service).to receive(:read_log_lines).and_return([])
+      allow(service).to receive(:upsert_log_lines).and_return(0)
       allow(LogFile).to receive(:upsert_all)
       allow(Round).to receive(:upsert_all)
       allow(Rounder).to receive(:upsert_all)
@@ -104,19 +104,19 @@ RSpec.describe RoundBatchImportService do
     end
   end
 
-  describe '#read_log_lines' do
+  describe '#upsert_log_lines' do
     let(:connection) { instance_double('DuckDB::Connection') }
 
-    it 'returns empty array unless rounds, log_files, and users are all present' do
+    it 'returns 0 unless rounds, log_files, and users are all present' do
       allow(service).to receive(:existing_glob).with('log_lines').and_return('/tmp/log_lines/*.parquet')
       allow(service).to receive(:existing_glob).with('rounds').and_return('/tmp/rounds/*.parquet')
       allow(service).to receive(:existing_glob).with('log_files').and_return(nil)
       allow(service).to receive(:existing_glob).with('users').and_return('/tmp/users/*.parquet')
 
-      expect(service.send(:read_log_lines, connection)).to eq([])
+      expect(service.send(:upsert_log_lines, connection)).to eq(0)
     end
 
-    it 'resolves round_id/log_file_id by natural key and computes a line digest' do
+    it 'resolves round_id/log_file_id by natural key, computes a line digest, and upserts in slices' do
       log_file = LogFile.create!(sha256: 'sha', filename: 'a.log')
       round = Round.create!(server_name: 'server one', start_time: Time.current.change(usec: 0))
       allow(service).to receive(:existing_glob).and_return('/tmp/glob/*.parquet')
@@ -126,16 +126,20 @@ RSpec.describe RoundBatchImportService do
            '1:2:3', '4:5:6', 'server one', Time.current]
         ]
       )
+      allow(LogLine).to receive(:upsert_all)
 
-      rows = service.send(:read_log_lines, connection)
+      count = service.send(:upsert_log_lines, connection)
 
-      expect(rows.first).to include(
-        log_file_id: log_file.id,
-        round_id: round.id,
-        raw_text: 'raw line text',
-        actor_steamid: '1:2:3',
-        target_steamid: '4:5:6',
-        line_digest: Digest::SHA256.hexdigest('raw line text')
+      expect(count).to eq(1)
+      expect(LogLine).to have_received(:upsert_all).with(
+        contain_exactly(hash_including(
+                          log_file_id: log_file.id,
+                          round_id: round.id,
+                          raw_text: 'raw line text',
+                          actor_steamid: '1:2:3',
+                          target_steamid: '4:5:6',
+                          line_digest: Digest::SHA256.hexdigest('raw line text')
+                        )), record_timestamps: false
       )
     end
 
@@ -144,8 +148,12 @@ RSpec.describe RoundBatchImportService do
       allow(connection).to receive(:query).and_return(
         [['raw line text', 'kill', nil, nil, nil, nil, nil, 'missing-sha', nil, nil, 'server one', Time.current]]
       )
+      allow(LogLine).to receive(:upsert_all)
 
-      expect(service.send(:read_log_lines, connection)).to eq([])
+      count = service.send(:upsert_log_lines, connection)
+
+      expect(count).to eq(0)
+      expect(LogLine).not_to have_received(:upsert_all)
     end
   end
 
