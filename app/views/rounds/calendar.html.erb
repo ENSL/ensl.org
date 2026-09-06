@@ -1,0 +1,42 @@
+<div id="rounds-calendar">
+  <header class="rounds-archive__header">
+    <div>
+      <h1>Round Calendar</h1>
+      <p>Recorded rounds by day.</p>
+    </div>
+    <%= link_to 'Round archive', rounds_path, class: 'button rounds-archive__calendar-link' %>
+  </header>
+
+  <nav class="rounds-calendar__year-nav" aria-label="Calendar year">
+    <%= link_to 'Previous year', calendar_rounds_path(year: @year - 1), class: 'button' %>
+    <%= form_tag calendar_rounds_path, method: :get, class: 'rounds-calendar__year-form' do %>
+      <%= label_tag :year, 'Year' %>
+      <%= number_field_tag :year, @year, min: 2000, max: Time.zone.today.year + 1 %>
+      <%= submit_tag 'Show' %>
+    <% end %>
+    <%= link_to 'Next year', calendar_rounds_path(year: @year + 1), class: 'button' %>
+  </nav>
+
+  <div class="rounds-calendar__months">
+    <% 1.upto(12) do |month_number| %>
+      <% month = Date.new(@year, month_number, 1) %>
+      <% days = Array.new(month.wday) + (month..month.end_of_month).to_a %>
+      <% days.fill(nil, days.length...42) %>
+      <section class="rounds-calendar__month">
+        <h2><%= month.strftime('%B') %></h2>
+        <div class="rounds-calendar__weekdays"><% %w[Sun Mon Tue Wed Thu Fri Sat].each do |weekday| %><span><%= weekday %></span><% end %></div>
+        <div class="rounds-calendar__days">
+          <% days.each do |day| %>
+            <% count = day && @round_counts[day] %>
+            <% intensity = count ? [Math.log2(count + 1).ceil, 4].min : 0 %>
+            <% if day %>
+              <%= link_to rounds_path(from: day, to: day), class: "rounds-calendar__day rounds-calendar__day--#{intensity}", title: "#{day}: #{count || 0} rounds" do %>
+                <span><%= day.day %></span><strong><%= count if count %></strong>
+              <% end %>
+            <% else %><span class="rounds-calendar__day rounds-calendar__day--empty"></span><% end %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
+</div>

@@ -1,10 +1,12 @@
-<%# WIP: minimal placeholder pending rework for the new Round schema (see RoundsController). %>
-<table class="data">
+<p class="rounds-archive__count"><%= pluralize(rounds.total_entries, 'round') %></p>
+<table class="data rounds-archive__table">
   <tr>
     <th>Start</th>
     <th>Server</th>
     <th>Map</th>
     <th>Result</th>
+    <th>Length</th>
+    <th>Players</th>
   </tr>
 
   <% rounds.each do |round| %>
@@ -13,6 +15,8 @@
       <td><%= h round.server_name %></td>
       <td><%= h round.map_name %></td>
       <td><%= h round.winner_s %></td>
+      <td><%= h round.length || 'n/a' %></td>
+      <td><%= round.rounders.size %></td>
     </tr>
   <% end %>
 </table>

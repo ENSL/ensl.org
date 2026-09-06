@@ -7,6 +7,23 @@
     <% end %>
   </header>
 
+  <div class="round-full__navigation">
+    <div class="previous">
+      <% if @previous_round %>
+        <%= link_to @previous_round, class: 'button tiny' do %>
+          <%= fa_icon 'chevron-left' %> Previous
+        <% end %>
+      <% end %>
+    </div>
+    <div class="next">
+      <% if @next_round %>
+        <%= link_to @next_round, class: 'button tiny' do %>
+          Next <%= fa_icon 'chevron-right' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
   <div class="round-full__meta">
     <% winner_class = { Round::RESULT_MARINE_WIN => 'marine', Round::RESULT_ALIEN_WIN => 'alien' }[@round.result] %>
     <div class="round-full__stat round-full__stat--<%= winner_class %>">

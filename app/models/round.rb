@@ -28,6 +28,13 @@
 class Round < ApplicationRecord
   RESULT_MARINE_WIN = 1
   RESULT_ALIEN_WIN = 0
+  LENGTH_BUCKETS = {
+    'under_5' => [0, 5 * 60],
+    '5_to_10' => [5 * 60, 10 * 60],
+    '10_to_20' => [10 * 60, 20 * 60],
+    '20_to_30' => [20 * 60, 30 * 60],
+    'over_30' => [30 * 60, nil]
+  }.freeze
 
   # Matches a player token embedded in LogLine#raw_text, e.g.
   # `"jiriki<15><STEAM_0:1:1511705><marine1team>"` -- used by observed_teams
@@ -37,6 +44,20 @@ class Round < ApplicationRecord
 
   has_many :rounders, dependent: :destroy
   has_many :log_lines, dependent: :destroy
+
+  def self.filtered(filters)
+    scope = all
+    scope = scope.where('rounders.steamid LIKE ?', "%#{filters[:steamid]}%") if filters[:steamid].present?
+    scope = scope.where('users.username LIKE ?', "%#{filters[:username]}%") if filters[:username].present?
+    scope = scope.where('log_lines.raw_text LIKE ?', "%\"#{filters[:nickname]}%<%") if filters[:nickname].present?
+    scope = scope.where('rounds.map_name LIKE ?', "%#{filters[:map]}%") if filters[:map].present?
+    scope = scope.where('rounds.server_name LIKE ?', "%#{filters[:server]}%") if filters[:server].present?
+    scope = scope.where(result: filters[:result]) if %w[0 1].include?(filters[:result].to_s)
+    scope = apply_length_filter(scope, filters[:length])
+    scope = apply_date_filter(scope, filters[:from], filters[:to])
+
+    scope.distinct
+  end
 
   def winner_s
     case result
@@ -70,6 +91,27 @@ class Round < ApplicationRecord
       end
       tally
     end
+  end
+
+  def self.apply_length_filter(scope, bucket)
+    minimum, maximum = LENGTH_BUCKETS.fetch(bucket.to_s, [nil, nil])
+    return scope unless minimum
+
+    scope = scope.where('rounds.end_time IS NOT NULL')
+    scope = scope.where('TIMESTAMPDIFF(SECOND, rounds.start_time, rounds.end_time) >= ?', minimum)
+    return scope unless maximum
+
+    scope.where('TIMESTAMPDIFF(SECOND, rounds.start_time, rounds.end_time) < ?', maximum)
+  end
+
+  def self.apply_date_filter(scope, from, to)
+    from_time = Time.zone.parse(from.to_s)
+    to_time = Time.zone.parse(to.to_s)
+    scope = scope.where('rounds.start_time >= ?', from_time) if from_time
+    scope = scope.where('rounds.start_time < ?', to_time + 1.day) if to_time
+    scope
+  rescue ArgumentError
+    scope
   end
 
   private

@@ -1,7 +1,28 @@
-<h1>
-  ENSL Round Archive
-</h1>
+<div id="rounds-archive">
+  <header class="rounds-archive__header">
+    <div>
+      <h1>ENSL Round Archive</h1>
+      <p>Browse recorded Natural Selection rounds.</p>
+    </div>
+    <%= link_to 'Calendar', calendar_rounds_path, class: 'button rounds-archive__calendar-link' %>
+  </header>
 
-<div class="wide box" id="roundsList">
-  <%= render :partial => "rounds", :object => @rounds %>
+  <%= form_tag rounds_path, method: :get, class: 'square rounds-archive__filters' do %>
+    <div class="rounds-archive__filter-grid">
+      <div class="fields"><%= label_tag :username, 'ENSL username' %><%= text_field_tag :username, @filters[:username], placeholder: 'Registered player' %></div>
+      <div class="fields"><%= label_tag :nickname, 'In-game nickname' %><%= text_field_tag :nickname, @filters[:nickname], placeholder: 'Name seen in logs' %></div>
+      <div class="fields"><%= label_tag :steamid, 'Steam ID' %><%= text_field_tag :steamid, @filters[:steamid], placeholder: '0:1:12345' %></div>
+      <div class="fields"><%= label_tag :map, 'Map' %><%= select_tag :map, options_for_select([['Any map', '']] + @maps.map { |map| [map, map] }, @filters[:map]) %></div>
+      <div class="fields"><%= label_tag :server, 'Server' %><%= select_tag :server, options_for_select([['Any server', '']] + @servers.map { |server| [server, server] }, @filters[:server]) %></div>
+      <div class="fields"><%= label_tag :result, 'Winner' %><%= select_tag :result, options_for_select([['Any winner', ''], ['Marines', Round::RESULT_MARINE_WIN], ['Aliens', Round::RESULT_ALIEN_WIN]], @filters[:result]) %></div>
+      <div class="fields"><%= label_tag :length, 'Round length' %><%= select_tag :length, options_for_select([['Any length', ''], ['Under 5 min', 'under_5'], ['5-10 min', '5_to_10'], ['10-20 min', '10_to_20'], ['20-30 min', '20_to_30'], ['30+ min', 'over_30']], @filters[:length]) %></div>
+      <div class="fields"><%= label_tag :from, 'From' %><%= date_field_tag :from, @filters[:from] %></div>
+      <div class="fields"><%= label_tag :to, 'To' %><%= date_field_tag :to, @filters[:to] %></div>
+      <div class="rounds-archive__filter-actions"><%= submit_tag 'Filter' %><%= link_to 'Clear', rounds_path, class: 'button' %></div>
+    </div>
+  <% end %>
+
+  <div id="roundsList">
+    <%= render partial: 'rounds', object: @rounds %>
+  </div>
 </div>

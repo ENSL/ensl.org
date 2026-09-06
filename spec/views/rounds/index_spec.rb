@@ -24,7 +24,10 @@ RSpec.describe 'rounds/index', type: :view do
       result: Round::RESULT_MARINE_WIN
     )
 
-    assign(:rounds, Round.where(id: round.id).paginate(page: 1, per_page: 30))
+    assign(:filters, {})
+    assign(:maps, [round.map_name])
+    assign(:servers, [round.server_name])
+    assign(:rounds, Round.where(id: round.id).paginate(page: 1, per_page: 50))
 
     render
 
@@ -37,7 +40,10 @@ RSpec.describe 'rounds/index', type: :view do
   it 'shows n/a for a round with no recorded start time' do
     round = Round.create!(server_name: 'ENSL Server One', map_name: 'ns_altair_legacy', start_time: nil)
 
-    assign(:rounds, Round.where(id: round.id).paginate(page: 1, per_page: 30))
+    assign(:filters, {})
+    assign(:maps, [round.map_name])
+    assign(:servers, [round.server_name])
+    assign(:rounds, Round.where(id: round.id).paginate(page: 1, per_page: 50))
 
     render
 
