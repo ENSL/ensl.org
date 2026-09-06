@@ -8,8 +8,8 @@ fi
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
-# Use dynamic propshaft to avoid caching issues with assets　in development
-rm -f public/assets/.manifest.json
+# Clean out any precompiled assets so Propshaft serves live-compiled CSS dynamically in development
+rm -rf public/assets/* public/assets/.[!.]* 2>/dev/null || true
 
 # Let the debug gem allow remote connections,
 # but avoid loading until `debugger` is called

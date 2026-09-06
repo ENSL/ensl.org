@@ -1,24 +1,22 @@
 # frozen_string_literal: true
 
-def ensure_test_assets_precompiled!
-  return if ENV['SKIP_ASSET_PRECOMPILE'].present?
+def ensure_test_assets_built!
+  return if ENV['SKIP_ASSET_BUILD'].present?
 
-  # Propshaft writes public/assets/.manifest.json after assets:precompile
-  manifest = Rails.root.join('public/assets/.manifest.json')
-  return if File.exist?(manifest)
+  theme_css = Rails.root.join('app/assets/builds/themes/default/theme.css')
+  tailwind_css = Rails.root.join('app/assets/builds/tailwind.css')
+  return if File.exist?(theme_css) && File.exist?(tailwind_css)
 
-  puts 'Precompiling assets for test environment...'
-  # dartsass:build and tailwindcss:build must run before assets:precompile
-  # because Propshaft does not compile — it only fingerprints existing files.
+  puts 'Building assets for test environment...'
   success = system(
     { 'RAILS_ENV' => 'test' },
-    'bin/rails', 'dartsass:build', 'tailwindcss:build', 'assets:precompile'
+    'bin/rails', 'dartsass:build', 'tailwindcss:build'
   )
-  abort('Assets precompile failed in test environment.') unless success
+  abort('Asset build failed in test environment.') unless success
 end
 
 RSpec.configure do |config|
   config.before(:suite) do
-    ensure_test_assets_precompiled!
+    ensure_test_assets_built!
   end
 end
