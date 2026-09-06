@@ -79,6 +79,30 @@ module RoundsHelper
     'onos' => 'Onos'
   }.freeze
 
+  ROUND_TIMELINE_ICON_NAMES = {
+    'alienresourcetower' => 'res_tower', 'defensechamber' => 'regeneration',
+    'movementchamber' => 'celerity', 'offensechamber' => 'adrenaline', 'sensorychamber' => 'silence',
+    'resourcetower' => 'res_tower', 'siegeturret' => 'siege', 'team_advarmory' => 'advanced_armory',
+    'team_advturretfactory' => 'turret_factory', 'team_armory' => 'armory', 'team_armslab' => 'arms_lab',
+    'team_command' => 'command_console', 'team_hive' => 'hive_icon', 'team_infportal' => 'inf_portal',
+    'team_observatory' => 'observatory', 'team_prototypelab' => 'proto_lab', 'team_turretfactory' => 'turret_factory',
+    'turret' => 'sentry', 'item_catalyst' => 'catalysts', 'item_genericammo' => 'ammo', 'item_health' => 'health',
+    'item_heavyarmor' => 'heavy', 'item_jetpack' => 'jetpack', 'weapon_grenadegun' => 'grenade_launcher',
+    'weapon_heavymachinegun' => 'hmg', 'weapon_mine' => 'mine', 'weapon_shotgun' => 'shotgun', 'weapon_welder' => 'welder',
+    'soldier' => 'lmg', 'gorge' => 'gorge', 'lerk' => 'lerk', 'fade' => 'fade', 'onos' => 'onos', 'skulk' => 'skulk',
+    'knife' => 'knife', 'machinegun' => 'lmg', 'pistol' => 'pistol', 'shotgun' => 'shotgun',
+    'heavymachinegun' => 'hmg', 'grenade' => 'grenade_launcher', 'handgrenade' => 'grenade_launcher',
+    'item_mine' => 'mine', 'welder' => 'welder', 'research_advarmory' => 'advanced_armory',
+    'research_advturretfactory' => 'siege_upgrade', 'research_armorl1' => 'armor_upgrades',
+    'research_armorl2' => 'armor_upgrades', 'research_armorl3' => 'armor_upgrades',
+    'research_catalysts' => 'catalysts', 'research_distressbeacon' => 'distress_beacon',
+    'research_electrical' => 'electrical_defense', 'research_grenades' => 'grenade_launcher',
+    'research_heavyarmor' => 'heavy_tech', 'research_jetpacks' => 'jetpack_tech',
+    'research_motiontracking' => 'motion_tracking', 'research_phasetech' => 'phase_tech',
+    'research_weaponsl1' => 'damage_upgrades', 'research_weaponsl2' => 'damage_upgrades',
+    'research_weaponsl3' => 'damage_upgrades'
+  }.freeze
+
   ROUND_PLAYER_LIFEFORM_COSTS = {
     'skulk' => 0, 'gorge' => 10, 'lerk' => 30, 'fade' => 50, 'onos' => 75
   }.freeze
@@ -114,8 +138,28 @@ module RoundsHelper
     items.map do |item|
       top = [(item[:created_at] - reference_time) * px_per_second, top + ROUND_TIMELINE_MIN_GAP].max
       { side: item[:side], top: top.round, time_label: round_timeline_time_label(item[:created_at] - reference_time),
-        description: item[:description] }
+        description: item[:description], icon_placements: item[:icon_placements] || [] }
     end
+  end
+
+  # Renders each icon immediately after the player, lifeform, structure, or
+  # weapon it represents while escaping every part of the log-derived text.
+  def round_timeline_description_with_icons(description, icon_placements)
+    remaining = description.to_s
+    fragments = []
+
+    icon_placements.each do |text, icon|
+      before, match, after = remaining.partition(text)
+      next if match.empty?
+
+      fragments << h(before) unless before.empty?
+      fragments << h(match)
+      fragments << image_tag("/images/ns1/#{icon}.gif", class: 'round-timeline-icon', alt: '')
+      remaining = after
+    end
+
+    fragments << h(remaining) unless remaining.empty?
+    safe_join(fragments)
   end
 
   # Total container height needed to fit every positioned event.
@@ -250,10 +294,12 @@ module RoundsHelper
 
   def round_timeline_role_item(log_line, previous_role, context)
     actor = round_timeline_name(log_line.actor_steamid, context)
+    role = ROUND_TIMELINE_ROLE_NAMES[log_line.param1] || log_line.param1.to_s.humanize
     {
       created_at: log_line.created_at,
       side: round_timeline_side_for(log_line.actor_steamid, nil, context),
-      description: round_timeline_role_description(actor, log_line.param1, previous_role)
+      description: round_timeline_role_description(actor, log_line.param1, previous_role),
+      icon_placements: [[role, round_timeline_icon_for(log_line.param1)]].compact
     }
   end
 
@@ -267,10 +313,12 @@ module RoundsHelper
   def round_timeline_evolve_item(gestate, target_role, context)
     gestate_line = gestate[:line]
     actor = round_timeline_name(gestate_line.actor_steamid, context)
+    role = ROUND_TIMELINE_ROLE_NAMES[target_role] || target_role.to_s.humanize
     {
       created_at: gestate_line.created_at,
       side: round_timeline_side_for(gestate_line.actor_steamid, nil, context),
-      description: round_timeline_evolve_description(actor, target_role, gestate[:previous_role])
+      description: round_timeline_evolve_description(actor, target_role, gestate[:previous_role]),
+      icon_placements: target_role ? [[role, round_timeline_icon_for(target_role)]] : []
     }
   end
 
@@ -316,8 +364,19 @@ module RoundsHelper
     {
       created_at: drop[:created_at],
       side: round_timeline_side_for(drop[:actor_steamid], nil, context),
-      description: "#{round_timeline_name(drop[:actor_steamid], context)} dropped #{parts.to_sentence}"
+      description: "#{round_timeline_name(drop[:actor_steamid], context)} dropped #{parts.to_sentence}",
+      icon_placements: round_timeline_drop_icon_placements(drop)
     }
+  end
+
+  def round_timeline_drop_icon_placements(drop)
+    drop[:counts].filter_map do |type, count|
+      icon = round_timeline_icon_for(type)
+      next unless icon
+
+      name = ROUND_TIMELINE_ITEM_NAMES[type]
+      [count == 1 ? "1 #{name}" : "#{count} #{name.pluralize}", icon]
+    end
   end
 
   # A hive takes a fixed 3 minutes to finish growing once started -- track it
@@ -339,7 +398,8 @@ module RoundsHelper
     state[:items] << {
       created_at: log_line.created_at,
       side: round_timeline_side_for(log_line.actor_steamid, nil, context),
-      description: "#{actor} started growing a Hive, ready in 3:00"
+      description: "#{actor} started growing a Hive, ready in 3:00",
+      icon_placements: [['Hive', round_timeline_icon_for('team_hive')]]
     }
   end
 
@@ -364,7 +424,8 @@ module RoundsHelper
                     "#{actor} destroyed a Hive (#{count} #{'hive'.pluralize(count)} left)"
                   end
 
-    state[:items] << { created_at: log_line.created_at, side: side, description: description }
+    state[:items] << { created_at: log_line.created_at, side: side, description: description,
+               icon_placements: [['Hive', round_timeline_icon_for('team_hive')]] }
   end
 
   # A hive that grew to completion gets its own "fully grown" virtual marker
@@ -384,7 +445,8 @@ module RoundsHelper
 
     count = round_timeline_adjust_count(state, 'team_hive', 1)
     state[:items] << { created_at: predicted_at, side: 'neutral',
-                       description: "A Hive is fully grown (#{count} #{'hive'.pluralize(count)} total)" }
+                       description: "A Hive is fully grown (#{count} #{'hive'.pluralize(count)} total)",
+                       icon_placements: [['Hive', round_timeline_icon_for('team_hive')]] }
   end
 
   # Any hive still growing when the real log lines run out either finished
@@ -477,8 +539,49 @@ module RoundsHelper
     {
       created_at: log_line.created_at,
       side: round_timeline_side_for(log_line.actor_steamid, log_line.target_steamid, context),
-      description: round_timeline_description(log_line, state, context)
+      description: round_timeline_description(log_line, state, context),
+      icon_placements: round_timeline_icon_placements_for_line(log_line, state, context)
     }
+  end
+
+  def round_timeline_icon_placements_for_line(log_line, state, context)
+    case log_line.event_type
+    when 'kill'
+      round_timeline_kill_icon_placements(log_line, state, context)
+    when 'structure_built', 'structure_destroyed', 'recycle', 'research_start'
+      round_timeline_structure_icon_placements(log_line)
+    end
+  end
+
+  def round_timeline_kill_icon_placements(log_line, state, context)
+    actor = round_timeline_name(log_line.actor_steamid, context)
+    target = round_timeline_name(log_line.target_steamid, context) || log_line.param1
+    weapon = ROUND_TIMELINE_WEAPON_NAMES[log_line.param2] || ROUND_TIMELINE_STRUCTURE_NAMES[log_line.param2] ||
+             log_line.param2.to_s.tr('_', ' ')
+    [[actor, round_timeline_icon_for(round_timeline_lifeform_for(log_line.actor_steamid, state, context))],
+     [target, round_timeline_icon_for(round_timeline_lifeform_for(log_line.target_steamid, state, context))],
+     [weapon, round_timeline_icon_for(log_line.param2)]].select { |_text, icon| icon }
+  end
+
+  def round_timeline_structure_icon_placements(log_line)
+    icon = round_timeline_icon_for(log_line.param1)
+    return [] unless icon
+
+    name = if log_line.event_type == 'research_start'
+             ROUND_TIMELINE_RESEARCH_NAMES[log_line.param1] || log_line.param1.to_s.humanize
+           else
+             round_timeline_structure_name(log_line.param1)
+           end
+    [[name, icon]]
+  end
+
+  def round_timeline_lifeform_for(steamid, state, context)
+    state[:last_role][steamid] ||
+      (round_timeline_rounder_side(steamid, context) == 'marine' ? 'soldier' : 'skulk')
+  end
+
+  def round_timeline_icon_for(type)
+    ROUND_TIMELINE_ICON_NAMES[type]
   end
 
   def round_timeline_description(log_line, state, context)

@@ -60,8 +60,8 @@ RSpec.describe 'rounds/show', type: :view do
     expect(rendered).to include('round-timeline-row--alien')
     expect(rendered).to include('00:30')
     expect(rendered).to include('01:30')
-    expect(rendered).to include('MarineOne killed AlienOne with LMG')
-    expect(rendered).to include('AlienOne killed MarineOne with Bite')
+    expect(strip_tags(rendered)).to include('MarineOne killed AlienOne with LMG')
+    expect(strip_tags(rendered)).to include('AlienOne killed MarineOne with Bite')
 
     marine_top = rendered[/round-timeline-row--marine" style="top: (\d+)px/, 1].to_i
     alien_top = rendered[/round-timeline-row--alien" style="top: (\d+)px/, 1].to_i
@@ -89,7 +89,7 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    kill_row = rendered[/(round-timeline-row--\w+)"[^>]*>(?:(?!round-timeline-row).)*MarineOne killed AlienOne/m, 1]
+    kill_row = rendered[/(round-timeline-row--\w+)"[^>]*>(?:(?!round-timeline-row).)*MarineOne.*?killed AlienOne/m, 1]
     expect(kill_row).to eq('round-timeline-row--alien')
   end
 
@@ -132,8 +132,8 @@ RSpec.describe 'rounds/show', type: :view do
 
     expect(rendered).not_to include('became a Skulk')
     expect(rendered).not_to include('became a Marine')
-    expect(rendered).to include('MarineOne took command')
-    expect(rendered).to include('MarineOne left the chair')
+    expect(strip_tags(rendered)).to include('MarineOne took command')
+    expect(strip_tags(rendered)).to include('MarineOne left the chair')
   end
 
   it 'distinguishes evolving to a new lifeform from upgrading the same one' do
@@ -157,8 +157,9 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('AlienOne started evolving to Fade')
-    expect(rendered).to include('AlienOne started upgrading')
+    expect(strip_tags(rendered)).to include('AlienOne started evolving to Fade')
+    expect(strip_tags(rendered)).to include('AlienOne started upgrading')
+    expect(rendered).to include('/images/ns1/fade.gif')
   end
 
   it 'groups nearby commander item drops into one combined entry' do
@@ -175,7 +176,7 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('dropped 2 Medpacks and 1 Ammo Pack')
+    expect(strip_tags(rendered)).to include('dropped 2 Medpacks and 1 Ammo Pack')
   end
 
   it 'shows a running total when resource towers/chambers are built and destroyed' do
@@ -193,9 +194,27 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('built a Resource Tower (1 total)')
-    expect(rendered).to include('built a Resource Tower (2 total)')
-    expect(rendered).to include('destroyed a Resource Tower (1 left)')
+    expect(strip_tags(rendered)).to include('built a Resource Tower (1 total)')
+    expect(strip_tags(rendered)).to include('built a Resource Tower (2 total)')
+    expect(strip_tags(rendered)).to include('destroyed a Resource Tower (1 left)')
+    expect(rendered).to include('/images/ns1/res_tower.gif')
+  end
+
+  it 'places attacker and victim lifeform icons after their names in kills' do
+    fade = LogLine.create!(round: round, event_type: 'role_change', param1: 'fade', actor_steamid: 'STEAM_0:1:2',
+                           raw_text: player_raw('AlienOne', 'STEAM_0:1:2', 'alien1team'),
+                           created_at: round.start_time + 5.seconds)
+    kill = LogLine.create!(round: round, event_type: 'kill', param1: 'AlienOne', param2: 'machinegun',
+                           actor_steamid: 'STEAM_0:1:1', target_steamid: 'STEAM_0:1:2',
+                           raw_text: player_raw('MarineOne', 'STEAM_0:1:1', 'marine1team'),
+                           created_at: round.start_time + 10.seconds)
+
+    assign(:log_lines, [fade, kill])
+
+    render
+
+    expect(strip_tags(rendered)).to include('MarineOne killed AlienOne with LMG')
+    expect(rendered).to match(/MarineOne<img[^>]+src="\/images\/ns1\/lmg.gif"[^>]*> killed AlienOne<img[^>]+src="\/images\/ns1\/fade.gif"[^>]*> with LMG/m)
   end
 
   it 'shows "scanned the area" instead of "built a Scan"' do
@@ -219,8 +238,8 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('started growing a Hive, ready in 3:00')
-    expect(rendered).to include('A Hive is fully grown (1 hive total)')
+    expect(strip_tags(rendered)).to include('started growing a Hive, ready in 3:00')
+    expect(strip_tags(rendered)).to include('A Hive is fully grown (1 hive total)')
   end
 
   it 'cancels the virtual hive marker and skips the count when a growing hive is destroyed first' do
@@ -235,7 +254,7 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('destroyed a Hive before it finished growing')
+    expect(strip_tags(rendered)).to include('destroyed a Hive before it finished growing')
     expect(rendered).not_to include('fully grown')
   end
 
@@ -251,8 +270,8 @@ RSpec.describe 'rounds/show', type: :view do
 
     render
 
-    expect(rendered).to include('A Hive is fully grown (1 hive total)')
-    expect(rendered).to include('destroyed a Hive (0 hives left)')
+    expect(strip_tags(rendered)).to include('A Hive is fully grown (1 hive total)')
+    expect(strip_tags(rendered)).to include('destroyed a Hive (0 hives left)')
   end
 
   it 'handles destroying a hive with no matching build in this log window (e.g. a pre-existing home hive)' do
@@ -263,7 +282,7 @@ RSpec.describe 'rounds/show', type: :view do
     assign(:log_lines, [destroyed])
 
     expect { render }.not_to raise_error
-    expect(rendered).to include('destroyed a Hive')
+    expect(strip_tags(rendered)).to include('destroyed a Hive')
   end
 
   it 'synthesizes a Round ended marker from the Round record when log lines exist but none say round_end' do

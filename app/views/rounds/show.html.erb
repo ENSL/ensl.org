@@ -125,7 +125,7 @@
             <div class="round-timeline-side round-timeline-side--marine">
               <% if event[:side] == 'marine' %>
                 <div class="round-timeline-card">
-                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= round_timeline_description_with_icons(event[:description], event[:icon_placements]) %>
                 </div>
               <% end %>
             </div>
@@ -133,7 +133,7 @@
             <div class="round-timeline-marker">
               <% if event[:side] == 'neutral' %>
                 <div class="round-timeline-card round-timeline-card--neutral">
-                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= round_timeline_description_with_icons(event[:description], event[:icon_placements]) %>
                 </div>
               <% else %>
                 <span class="round-timeline-dot"></span>
@@ -143,7 +143,7 @@
             <div class="round-timeline-side round-timeline-side--alien">
               <% if event[:side] == 'alien' %>
                 <div class="round-timeline-card">
-                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= h event[:description] %>
+                  <span class="round-timeline-time"><%= event[:time_label] %></span><%= round_timeline_description_with_icons(event[:description], event[:icon_placements]) %>
                 </div>
               <% end %>
             </div>

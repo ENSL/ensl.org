@@ -136,4 +136,14 @@ $round-timeline-marker-size: 22px;
     font-style: normal;
     font-variant-numeric: tabular-nums;
   }
+
+  &-icon {
+    display: inline-block;
+    width: 1.6em !important;
+    height: 1.6em !important;
+    max-width: 1.6em;
+    margin: 0 3px 0 2px;
+    object-fit: contain;
+    vertical-align: -0.45em;
+  }
 }
