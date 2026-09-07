@@ -8,6 +8,8 @@ import GatherPushController from "controllers/gather_push"
 import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
 import MapBalanceChartController from "controllers/map_balance_chart"
+import ActivityChartController from "controllers/activity_chart"
+import RoundLengthChartController from "controllers/round_length_chart"
 import ArticleEditorController from "controllers/article_editor"
 import ArticleFileController from "controllers/article_file"
 import ArticleFormatController from "controllers/article_format"
@@ -28,6 +30,8 @@ application.register("gather-push", GatherPushController)
 application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
 application.register("map-balance-chart", MapBalanceChartController)
+application.register("activity-chart", ActivityChartController)
+application.register("round-length-chart", RoundLengthChartController)
 application.register("article-editor", ArticleEditorController)
 application.register("article-file", ArticleFileController)
 application.register("article-format", ArticleFormatController)

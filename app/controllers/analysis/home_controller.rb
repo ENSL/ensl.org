@@ -37,6 +37,18 @@ module Analysis
         description: 'Which NS1 marine opening research orders win the most, straight from the round logs.',
         icon: 'sitemap',
         path_helper: :analysis_tech_paths_path
+      },
+      {
+        title: 'NS1 Round length',
+        description: 'How marine and alien win rates shift with round length, overall or on a single map.',
+        icon: 'stopwatch',
+        path_helper: :analysis_round_lengths_path
+      },
+      {
+        title: 'NS1 Play times',
+        description: 'When rounds actually get played: a day-of-week by hour-of-day activity heatmap.',
+        icon: 'calendar-alt',
+        path_helper: :analysis_activity_path
       }
     ].freeze
 

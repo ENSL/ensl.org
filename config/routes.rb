@@ -36,6 +36,10 @@ Rails.application.routes.draw do
     resources :maps, only: [:index]
     resources :pick_orders, only: [:index]
     resources :tech_paths, only: [:index]
+    # Not `resources`: both are single read-only listings with no id, and
+    # `resources :activity` would name the route analysis_activity_index_path.
+    get 'activity', to: 'activity#index'
+    get 'round_lengths', to: 'round_lengths#index'
   end
 
   root to: 'articles#news_index'

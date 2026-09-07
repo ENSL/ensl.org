@@ -123,6 +123,60 @@
   white-space: pre;
 }
 
+// Weekday x hour activity heatmap on /analysis/activity. Cell background is
+// set inline (an alpha ramp on $marine-color) since the intensity is data,
+// not style; everything else about the grid lives here.
+.activity-heatmap {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+
+  th,
+  td {
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 90%);
+    text-align: center;
+  }
+
+  thead th {
+    padding-bottom: 4px;
+    border: 0;
+    color: $medium-gray;
+    font-weight: 400;
+  }
+
+  tbody th {
+    width: 7em;
+    padding-right: 8px;
+    border: 0;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .activity-heatmap-cell {
+    height: 28px;
+    background-color: $light-gray;
+    color: $dark-gray;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Once a cell is dark enough, dark-on-blue stops being readable.
+  .activity-heatmap-hot {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .activity-heatmap-total {
+    width: 4em;
+    border: 0;
+    padding-left: 8px;
+    font-weight: 600;
+    text-align: right;
+  }
+}
+
 @mixin fa-solid($unicode) {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;

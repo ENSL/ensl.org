@@ -1,0 +1,63 @@
+<h1 class="title">NS1 Play times</h1>
+
+<div class="box wide">
+  <p>
+    When NS1 rounds actually get played, from the current imported analysis snapshot.
+    Each cell is one weekday/hour slot; the darker it is, the more rounds started then.
+  </p>
+
+  <% if @total_rounds.zero? %>
+    <p>No round activity data is available yet.</p>
+  <% else %>
+    <p class="text-sm text-gray-600">
+      <%= number_with_delimiter(@total_rounds) %> rounds
+      <% if @busiest_cell %>
+        &mdash; busiest slot is <%= @busiest_cell[:day_name] %>
+        <%= format('%02d:00', @busiest_cell[:hour]) %> with
+        <%= number_with_delimiter(@busiest_cell[:count]) %> rounds.
+      <% end %>
+    </p>
+
+    <table class="activity-heatmap">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Day</span></th>
+          <% RoundActivityQuery::HOURS.each do |hour| %>
+            <th scope="col"><%= format('%02d', hour) %></th>
+          <% end %>
+          <th scope="col" class="activity-heatmap-total">All</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @days.each do |day| %>
+          <tr>
+            <th scope="row"><%= day.name %></th>
+            <% day.cells.each do |cell| %>
+              <td
+                class="activity-heatmap-cell"
+                style="background-color: rgb(59 130 246 / <%= (cell.share * 100).round %>%);"
+                title="<%= day.name %> <%= format('%02d:00', cell.hour) %> — <%= cell.rounds %> rounds"
+              >
+                <span class="<%= 'activity-heatmap-hot' if cell.share > 0.55 %>">
+                  <%= cell.rounds.positive? ? cell.rounds : '' %>
+                </span>
+              </td>
+            <% end %>
+            <td class="activity-heatmap-total"><%= number_with_delimiter(day.total) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <h2 class="mt-8 text-lg font-semibold">Rounds per hour of day</h2>
+    <p class="text-sm text-gray-600">The same data with the weekday collapsed &mdash; the shape of a play night.</p>
+
+    <div
+      data-controller="activity-chart"
+      data-activity-chart-hours-value="<%= @hour_totals.to_json %>"
+      style="height: 260px;"
+    >
+      <canvas data-activity-chart-target="canvas"></canvas>
+    </div>
+  <% end %>
+</div>

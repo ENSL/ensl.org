@@ -1,0 +1,85 @@
+<h1 class="title">NS1 Round length</h1>
+
+<div class="box wide">
+  <p>
+    Marine vs alien win rate as a function of how long the round lasted. Every finished
+    round is bucketed by its length; the line is the marine win rate in that bucket and the
+    bars behind it show how many rounds it is based on, so a spike over a near-empty bucket
+    can be read for what it is. The dashed line marks a perfect 50/50 split.
+  </p>
+
+  <%= form_with url: analysis_round_lengths_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :map, 'Map:' %>
+        <%= select_tag :map,
+                       options_for_select(
+                         [['every map', '']] +
+                           @map_options.map { |name, rounds| ["#{name} (#{rounds})", name] },
+                         @selected_map.to_s
+                       ),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
+
+  <% if @total_rounds.zero? %>
+    <p>No finished rounds are available<%= " for #{@selected_map}" if @selected_map %> yet.</p>
+  <% else %>
+    <%
+      format_percent = lambda do |value|
+        value.nil? ? '–' : "#{number_with_precision(value, precision: 1)}%"
+      end
+      format_duration = lambda do |seconds|
+        seconds.nil? ? '–' : format('%<minutes>d:%<seconds>02d', minutes: seconds.to_i / 60,
+                                                                 seconds: seconds.to_i % 60)
+      end
+    %>
+
+    <p class="text-sm text-gray-600">
+      <%= number_with_delimiter(@total_rounds) %> finished <%= 'round'.pluralize(@total_rounds) %> <%= @selected_map ? "on #{@selected_map}" : 'across every map' %> &mdash;
+      median length <%= format_duration.call(@median_seconds) %>, marines win
+      <%= format_percent.call(@marine_win_percentage) %> of them overall.
+    </p>
+
+    <div
+      data-controller="round-length-chart"
+      data-round-length-chart-buckets-value="<%= @buckets.map(&:to_h).to_json %>"
+      style="height: 340px;"
+    >
+      <canvas data-round-length-chart-target="canvas"></canvas>
+    </div>
+
+    <%= sortable_table(
+      id: 'round-lengths',
+      columns: [
+        { key: :label, label: 'Length (min)', type: :number,
+          sort_value: ->(label) { label.to_i },
+          tooltip: 'Round length bucket, in minutes. The last bucket is open-ended.' },
+        { key: :rounds, label: 'Rounds', type: :number, format: ->(value) { value.to_i } },
+        { key: :marine_wins, label: 'Marine wins', type: :number, format: ->(value) { value.to_i } },
+        { key: :alien_wins, label: 'Alien wins', type: :number, format: ->(value) { value.to_i } },
+        { key: :marine_win_percentage, label: 'Marine win %', type: :number, format: format_percent },
+        { key: :alien_win_percentage, label: 'Alien win %', type: :number, format: format_percent }
+      ],
+      rows: @buckets.map(&:to_h)
+    ) %>
+
+    <h2 class="mt-8 text-lg font-semibold">Round length by map</h2>
+    <p class="text-sm text-gray-600">
+      How long a map typically plays, next to how often marines win on it &mdash; the other
+      way round from the filter above. Always covers every map, whatever the filter is set to.
+    </p>
+
+    <%= sortable_table(
+      id: 'round-lengths-by-map',
+      columns: [
+        { key: :map_name, label: 'Map', type: :string },
+        { key: :rounds, label: 'Rounds', type: :number, format: ->(value) { value.to_i } },
+        { key: :median_seconds, label: 'Median length', type: :number, format: format_duration },
+        { key: :marine_win_percentage, label: 'Marine win %', type: :number, format: format_percent }
+      ],
+      rows: @maps
+    ) %>
+  <% end %>
+</div>
