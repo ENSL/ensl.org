@@ -101,6 +101,28 @@
   }
 }
 
+// One "Tech path" cell on /analysis/tech_paths -- an icon+name chain that has
+// to stay readable when it wraps onto a second line inside a table cell. The
+// explicit width stops the four narrow numeric columns from claiming an even
+// quarter each and squeezing the path down to one step per line.
+#marine-tech-paths {
+  th:first-child,
+  td:first-child {
+    width: 55%;
+  }
+}
+
+.tech-path-step {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.tech-path-arrow {
+  color: #9ca3af;
+  white-space: pre;
+}
+
 @mixin fa-solid($unicode) {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;

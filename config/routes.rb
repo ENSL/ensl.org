@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     resources :teams, only: [:index]
     resources :maps, only: [:index]
     resources :pick_orders, only: [:index]
+    resources :tech_paths, only: [:index]
   end
 
   root to: 'articles#news_index'

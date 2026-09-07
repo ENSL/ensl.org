@@ -1,0 +1,83 @@
+<h1 class="title">Marine tech paths</h1>
+
+<div class="box wide">
+  <p>
+    The research orders marine commanders went for, ranked by how often the round was won.
+    Every group is an opening prefix of up to N <em>distinct</em> researches, in order. Every
+    round which starts with that prefix contributes to its record, regardless of any later tech.
+    Click a column header to sort.
+  </p>
+  <p class="text-sm text-gray-600">
+    The length selector adds longer prefixes; it never removes shorter ones. For example,
+    Armor 1 is counted in every round that begins with Armor 1 at any setting, while Armor 1
+    &rarr; Weapons 1 is added when the setting is at least 2. Pick "uncapped" to include every
+    opening prefix recorded in the logs.
+  </p>
+  <p class="text-sm text-gray-600">
+    Distress Beacon is ignored (a panic button, not a plan), and the NS1 logs only record when
+    a research <em>starts</em>, never when it finishes or which one got cancelled &mdash; so
+    this is what commanders went for, not what they got.
+  </p>
+
+  <%= form_with url: analysis_tech_paths_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :path_length, 'Techs per path:' %>
+        <%= select_tag :path_length,
+                       options_for_select(
+                         @path_length_options.map { |n| ["up to #{n}", n] } +
+                           [['uncapped', MarineTechPathQuery::UNCAPPED_PATH_LENGTH]],
+                         @selected_path_length || MarineTechPathQuery::UNCAPPED_PATH_LENGTH
+                       ),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :min_rounds, 'Minimum rounds per group:' %>
+        <%= select_tag :min_rounds,
+                       options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :result_limit, 'Rows:' %>
+        <%= select_tag :result_limit,
+                       options_for_select(
+                         @result_limit_options.map { |n| ["top #{n}", n] } +
+                           [['all qualifying', MarineTechPathQuery::UNCAPPED_RESULT_LIMIT]],
+                         @selected_result_limit || MarineTechPathQuery::UNCAPPED_RESULT_LIMIT
+                       ),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
+
+  <% if @tech_paths.empty? %>
+    <p>
+      Among the <%= number_with_delimiter(@paths_found) %> opening paths at this setting, none
+      was used in <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
+    </p>
+  <% else %>
+    <p class="text-sm text-gray-600">
+      Based on <%= number_with_delimiter(@rounds_analysed) %> rounds. Of the
+      <%= number_with_delimiter(@paths_found) %> opening paths at this setting,
+      <%= number_with_delimiter(@paths_above_minimum) %> were used in at least
+      <%= @selected_min_rounds %> rounds; showing
+      <%= @selected_result_limit ? "the best #{@tech_paths.size}" : 'all' %> by win rate below.
+    </p>
+
+    <%= sortable_table(
+      id: 'marine-tech-paths',
+      columns: [
+        { key: :path, label: 'Tech path', type: :string,
+          sort_value: ->(path) { tech_path_label(path) },
+          format: ->(path) { tech_path_display(path) } },
+        { key: :rounds, label: 'Rounds', type: :number,
+          tooltip: 'How many rounds started with this research order.' },
+        { key: :wins, label: 'Wins', type: :number },
+        { key: :losses, label: 'Losses', type: :number },
+        { key: :win_ratio, label: 'Win %', type: :number,
+          format: ->(value) { "#{number_with_precision(value, precision: 1)}%" } }
+      ],
+      rows: @tech_paths
+    ) %>
+  <% end %>
+</div>

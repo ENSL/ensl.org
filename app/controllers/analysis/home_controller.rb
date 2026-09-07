@@ -31,6 +31,12 @@ module Analysis
         description: 'Pick-order-based NS1 gather rankings, including a draft-only OpenSkill score.',
         icon: 'sort-numeric-down',
         path_helper: :analysis_pick_orders_path
+      },
+      {
+        title: 'Marine tech paths',
+        description: 'Which marine opening research orders win the most, straight from the round logs.',
+        icon: 'sitemap',
+        path_helper: :analysis_tech_paths_path
       }
     ].freeze
 
