@@ -9,8 +9,8 @@ module Analysis
   class HomeController < Analysis::BaseController
     PAGES = [
       {
-        title: 'Rankings',
-        description: 'Skill ratings and win/loss records for every tracked player. Sort by any column.',
+        title: 'NS1 Rankings',
+        description: 'NS1 skill ratings and win/loss records for every tracked player. Sort by any column.',
         icon: 'trophy',
         path_helper: :analysis_users_path
       },
@@ -21,8 +21,8 @@ module Analysis
         path_helper: :analysis_teams_path
       },
       {
-        title: 'Map balance',
-        description: 'Marine vs alien win rates for every map currently in rotation.',
+        title: 'NS1 Map balance',
+        description: 'NS1 marine vs alien win rates for every map currently in rotation.',
         icon: 'map',
         path_helper: :analysis_maps_path
       },
@@ -33,8 +33,8 @@ module Analysis
         path_helper: :analysis_pick_orders_path
       },
       {
-        title: 'Marine tech paths',
-        description: 'Which marine opening research orders win the most, straight from the round logs.',
+        title: 'NS1 Marine tech paths',
+        description: 'Which NS1 marine opening research orders win the most, straight from the round logs.',
         icon: 'sitemap',
         path_helper: :analysis_tech_paths_path
       }
