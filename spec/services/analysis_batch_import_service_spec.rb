@@ -12,23 +12,38 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#call' do
-    it 'returns 0 when there are no rows to import' do
+    it 'returns an empty stat when there are no rows to import' do
       allow(service).to receive(:read_rows).and_return([])
       allow(AnalysisResult).to receive(:upsert_all)
 
-      expect(service.call).to eq(0)
+      expect(service.call.processed).to eq(0)
       expect(AnalysisResult).not_to have_received(:upsert_all)
     end
 
-    it 'upserts all rows in slices and returns imported count' do
+    it 'upserts all rows in slices and returns processed/inserted counts' do
       rows = Array.new(1_001) { |i| { steamid: "s#{i}", model: 'os', metric: 'skill', value: i } }
       allow(service).to receive(:read_rows).and_return(rows)
       allow(AnalysisResult).to receive(:upsert_all)
 
-      expect(service.call).to eq(1_001)
+      stat = service.call
+
+      expect(stat.processed).to eq(1_001)
+      expect(stat.inserted).to eq(0) # upsert_all stubbed out, so nothing actually landed
+      expect(stat.existing).to eq(1_001)
       expect(AnalysisResult).to have_received(:upsert_all).twice
       expect(AnalysisResult).to have_received(:upsert_all).with(rows.first(1_000), record_timestamps: false)
       expect(AnalysisResult).to have_received(:upsert_all).with(rows.last(1), record_timestamps: false)
+    end
+
+    it 'counts rows actually inserted' do
+      rows = [{ batch_id: batch_id, steamid: 's1', model: 'os', metric: 'skill', value: 1.0,
+                milestone: AnalysisResult::NO_MILESTONE, created_at: Time.current }]
+      allow(service).to receive(:read_rows).and_return(rows)
+      stat = nil
+
+      expect { stat = service.call }.to change(AnalysisResult, :count).by(1)
+      expect(stat.inserted).to eq(1)
+      expect(stat.existing).to eq(0)
     end
   end
 

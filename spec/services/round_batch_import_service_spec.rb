@@ -13,7 +13,8 @@ RSpec.describe RoundBatchImportService do
 
   describe '#call' do
     it 'raises when nothing was imported' do
-      allow(service).to receive_messages(read_log_files: [], read_rounds: [], read_rounders: [], upsert_log_lines: 0)
+      allow(service).to receive_messages(read_log_files: [], read_rounds: [], read_rounders: [],
+                                         upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0))
 
       expect { service.call }.to raise_error(RoundBatchImportService::Error, /No recognized exports/)
     end
@@ -25,17 +26,31 @@ RSpec.describe RoundBatchImportService do
                                                             end_time: Time.current, map_name: 'ns_eclipse',
                                                             result: 1 }])
       allow(service).to receive(:read_rounders).and_return([{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }])
-      allow(service).to receive(:upsert_log_lines).and_return(0)
+      allow(service).to receive(:upsert_log_lines).and_return(ImportRowStat.new(processed: 0, inserted: 0))
       allow(LogFile).to receive(:upsert_all)
       allow(Round).to receive(:upsert_all)
       allow(Rounder).to receive(:upsert_all)
 
-      counts = service.call
+      stats = service.call
 
-      expect(counts).to eq(log_files: 1, rounds: 1, rounders: 1, log_lines: 0)
+      expect(stats.transform_values(&:processed)).to eq(log_files: 1, rounds: 1, rounders: 1, log_lines: 0)
       expect(LogFile).to have_received(:upsert_all).with(anything, record_timestamps: false)
       expect(Round).to have_received(:upsert_all).with(anything, record_timestamps: false)
       expect(Rounder).to have_received(:upsert_all).with(anything, record_timestamps: false)
+    end
+
+    it 'reports how many rows were newly inserted per table' do
+      allow(service).to receive_messages(
+        read_log_files: [{ sha256: 'abc', filename: 'a.log', server_name: 's', created_at: Time.current }],
+        read_rounds: [], read_rounders: [],
+        upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0)
+      )
+
+      stats = service.call
+
+      expect(stats[:log_files].inserted).to eq(1)
+      expect(stats[:log_files].existing).to eq(0)
+      expect(stats[:log_files].to_s).to eq('1 rows (1 new, 0 existing)')
     end
   end
 
@@ -113,7 +128,7 @@ RSpec.describe RoundBatchImportService do
       allow(service).to receive(:existing_glob).with('log_files').and_return(nil)
       allow(service).to receive(:existing_glob).with('users').and_return('/tmp/users/*.parquet')
 
-      expect(service.send(:upsert_log_lines, connection)).to eq(0)
+      expect(service.send(:upsert_log_lines, connection).processed).to eq(0)
     end
 
     it 'resolves round_id/log_file_id by natural key, computes a line digest, and upserts in slices' do
@@ -128,9 +143,9 @@ RSpec.describe RoundBatchImportService do
       )
       allow(LogLine).to receive(:upsert_all)
 
-      count = service.send(:upsert_log_lines, connection)
+      stat = service.send(:upsert_log_lines, connection)
 
-      expect(count).to eq(1)
+      expect(stat.processed).to eq(1)
       expect(LogLine).to have_received(:upsert_all).with(
         contain_exactly(hash_including(
                           log_file_id: log_file.id,
@@ -150,9 +165,9 @@ RSpec.describe RoundBatchImportService do
       )
       allow(LogLine).to receive(:upsert_all)
 
-      count = service.send(:upsert_log_lines, connection)
+      stat = service.send(:upsert_log_lines, connection)
 
-      expect(count).to eq(0)
+      expect(stat.processed).to eq(0)
       expect(LogLine).not_to have_received(:upsert_all)
     end
   end

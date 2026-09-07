@@ -37,25 +37,27 @@ class RoundBatchImportService
     @exports_dir = File.expand_path(exports_dir || ENV.fetch('ANALYSIS_EXPORTS_DIR', DEFAULT_EXPORTS_DIR))
   end
 
-  # Returns a hash of imported row counts per table, e.g.
-  # { log_files: 1, rounds: 12, rounders: 34, log_lines: 560 }.
+  # Returns a hash of ImportRowStat per table, e.g.
+  # { log_files: <1 rows (1 new, 0 existing)>, rounds: ..., ... }.
   def call
     database = DuckDB::Database.open
     connection = database.connect
 
-    counts = {
+    stats = {
       log_files: upsert(LogFile, read_log_files(connection)),
       rounds: upsert(Round, read_rounds(connection))
     }
     # Rounders/log_lines resolve their round_id/log_file_id against what was
     # just imported above, so the id maps must be rebuilt after that upsert.
-    counts[:rounders] = upsert(Rounder, read_rounders(connection))
-    counts[:log_lines] = upsert_log_lines(connection)
+    stats[:rounders] = upsert(Rounder, read_rounders(connection))
+    stats[:log_lines] = upsert_log_lines(connection)
 
-    raise Error, "No recognized exports found for batch #{@batch_id} under #{batch_dir}" if counts.values.sum.zero?
+    if stats.values.sum(&:processed).zero?
+      raise Error, "No recognized exports found for batch #{@batch_id} under #{batch_dir}"
+    end
 
-    Rails.logger.info("[RoundBatchImportService] Imported #{counts} for batch #{@batch_id}")
-    counts
+    log_stats(stats)
+    stats
   ensure
     connection&.close
     database&.close
@@ -63,8 +65,17 @@ class RoundBatchImportService
 
   private
 
+  def log_stats(stats)
+    Rails.logger.info("[RoundBatchImportService] Imported batch #{@batch_id}:")
+    stats.each do |table, stat|
+      Rails.logger.info("[RoundBatchImportService]   #{table}: #{stat}")
+    end
+  end
+
   def upsert(model, rows)
-    return 0 if rows.empty?
+    return ImportRowStat.new(processed: 0, inserted: 0) if rows.empty?
+
+    max_id_before = model.maximum(:id) || 0
 
     rows.each_slice(UPSERT_SLICE_SIZE) do |slice|
       # rubocop:disable Rails/SkipsModelValidations -- bulk import of already-validated
@@ -72,7 +83,7 @@ class RoundBatchImportService
       model.upsert_all(slice, record_timestamps: false)
       # rubocop:enable Rails/SkipsModelValidations
     end
-    rows.size
+    ImportRowStat.measure(model, processed: rows.size, max_id_before: max_id_before)
   end
 
   def read_log_files(connection)
@@ -139,8 +150,9 @@ class RoundBatchImportService
   # Ruby array first -- doing that reliably OOMs on real-sized batches.
   def upsert_log_lines(connection)
     sql = log_lines_sql
-    return 0 unless sql
+    return ImportRowStat.new(processed: 0, inserted: 0) unless sql
 
+    max_id_before = LogLine.maximum(:id) || 0
     total = 0
     connection.query(sql).each_slice(UPSERT_SLICE_SIZE) do |slice|
       records = slice.filter_map { |row| log_line_record(row) }
@@ -151,7 +163,7 @@ class RoundBatchImportService
       # rubocop:enable Rails/SkipsModelValidations
       total += records.size
     end
-    total
+    ImportRowStat.measure(LogLine, processed: total, max_id_before: max_id_before)
   end
 
   def log_lines_sql

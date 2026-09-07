@@ -63,11 +63,13 @@ class AnalysisBatchImportService
     @exports_dir = File.expand_path(exports_dir || ENV.fetch('ANALYSIS_EXPORTS_DIR', DEFAULT_EXPORTS_DIR))
   end
 
-  # Returns the number of rows imported (upserted) for this batch.
+  # Returns an ImportRowStat for `analysis_results`: how many rows this batch
+  # wrote, and how many of those were new rather than overwrites.
   def call
     rows = read_rows
-    return 0 if rows.empty?
+    return ImportRowStat.new(processed: 0, inserted: 0) if rows.empty?
 
+    max_id_before = AnalysisResult.maximum(:id) || 0
     rows.each_slice(UPSERT_SLICE_SIZE) do |slice|
       # unique_by is intentionally omitted: MySQL doesn't support it (Rails
       # raises if you pass it) and instead upserts against whichever unique
@@ -79,24 +81,37 @@ class AnalysisBatchImportService
       # rubocop:enable Rails/SkipsModelValidations
     end
 
-    Rails.logger.info("[AnalysisBatchImportService] Imported #{rows.size} rows for batch #{@batch_id}")
-    rows.size
+    stat = ImportRowStat.measure(AnalysisResult, processed: rows.size, max_id_before: max_id_before)
+    log_stat(stat)
+    stat
   end
 
   private
+
+  def log_stat(stat)
+    Rails.logger.info("[AnalysisBatchImportService] Imported batch #{@batch_id}:")
+    Rails.logger.info("[AnalysisBatchImportService]   analysis_results: #{stat}")
+    @source_counts.to_h.each do |source, count|
+      Rails.logger.info("[AnalysisBatchImportService]     from #{source}: #{count} rows")
+    end
+  end
 
   def read_rows
     database = DuckDB::Database.open
     connection = database.connect
     imported_at = Time.current
 
-    rows = [
-      read_legacy_rows(connection, imported_at),
-      read_skill_model_rows(connection, imported_at),
-      read_player_stat_rows(connection, imported_at),
-      read_map_balance_rows(connection, imported_at),
-      read_time_of_week_rows(connection, imported_at)
-    ].flatten(1)
+    # Kept per source as well as flattened, so a run can report which export
+    # each chunk of the single-table import came from.
+    by_source = {
+      legacy: read_legacy_rows(connection, imported_at),
+      skill_models: read_skill_model_rows(connection, imported_at),
+      player_stats: read_player_stat_rows(connection, imported_at),
+      map_balance: read_map_balance_rows(connection, imported_at),
+      time_of_week: read_time_of_week_rows(connection, imported_at)
+    }
+    @source_counts = by_source.transform_values(&:size)
+    rows = by_source.values.flatten(1)
 
     return rows if rows.any?
 
