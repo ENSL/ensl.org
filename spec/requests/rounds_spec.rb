@@ -50,6 +50,33 @@ RSpec.describe 'RoundsController', type: :request do
     end
   end
 
+  describe 'GET /rounds/statistics' do
+    it 'groups rounds by their in-log start time, including empty months' do
+      Round.create!(server_name: 'ENSL One', start_time: Time.zone.parse('2024-01-15 20:00'))
+      Round.create!(server_name: 'ENSL Two', start_time: Time.zone.parse('2024-03-15 20:00'))
+      Round.create!(server_name: 'ENSL Three', start_time: Time.zone.parse('2024-03-20 20:00'))
+      Round.create!(server_name: 'No timestamp')
+
+      get '/rounds/statistics'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Round Data Over Time', '3 recorded rounds', '2024 Q1', '3 rounds')
+      months = controller.instance_variable_get(:@months)
+      expect(months).to eq([
+                             { date: Date.new(2024, 1, 1), count: 1 },
+                             { date: Date.new(2024, 2, 1), count: 0 },
+                             { date: Date.new(2024, 3, 1), count: 2 }
+                           ])
+    end
+
+    it 'explains when the import has no round start times' do
+      get '/rounds/statistics'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('No round start times are available yet')
+    end
+  end
+
   describe 'GET /rounds/:id' do
     let(:round) do
       Round.create!(

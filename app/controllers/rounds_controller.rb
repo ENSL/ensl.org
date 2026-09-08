@@ -28,6 +28,23 @@ class RoundsController < ApplicationController
     render layout: 'full'
   end
 
+  def statistics
+    monthly_counts = Round.where.not(start_time: nil)
+                          .group(Arel.sql('YEAR(start_time)'), Arel.sql('MONTH(start_time)')).count
+    @total_rounds = monthly_counts.values.sum
+    @months = monthly_buckets(monthly_counts)
+    @years = @months.group_by { |month| month[:date].year }
+                    .map { |year, months| { year: year, count: months.sum { |month| month[:count] } } }
+                    .sort_by { |year| year[:year] }
+    @quarters = @months.group_by { |month| [month[:date].year, ((month[:date].month - 1) / 3) + 1] }
+                       .map do |(year, quarter), months|
+                         { year: year, quarter: quarter, count: months.sum { |month| month[:count] } }
+                       end
+                       .sort_by { |quarter| [quarter[:year], quarter[:quarter]] }
+    @peak_monthly_count = @months.map { |month| month[:count] }.max || 0
+    render layout: 'full'
+  end
+
   def show
     @round = Round.find(params[:id])
     @previous_round = Round.where('start_time < ? OR (start_time = ? AND id < ?)', @round.start_time, @round.start_time,
@@ -51,5 +68,18 @@ class RoundsController < ApplicationController
 
   def round_filters
     params.permit(:username, :nickname, :steamid, :map, :server, :result, :length, :from, :to)
+  end
+
+  def monthly_buckets(monthly_counts)
+    return [] if monthly_counts.empty?
+
+    first_year, first_month = monthly_counts.keys.min
+    last_year, last_month = monthly_counts.keys.max
+    first_date = Date.new(first_year, first_month, 1)
+    last_date = Date.new(last_year, last_month, 1)
+
+    (first_date..last_date).select { |date| date.day == 1 }.map do |date|
+      { date: date, count: monthly_counts.fetch([date.year, date.month], 0) }
+    end
   end
 end

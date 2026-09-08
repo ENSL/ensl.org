@@ -1,0 +1,52 @@
+<div id="rounds-statistics">
+  <header class="rounds-archive__header">
+    <div>
+      <h1>Round Data Over Time</h1>
+      <p>Distribution of imported NS1 rounds by their in-log round-start timestamp.</p>
+    </div>
+    <%= link_to 'Round archive', rounds_path, class: 'button rounds-archive__calendar-link' %>
+  </header>
+
+  <% if @months.empty? %>
+    <p class="square">No round start times are available yet.</p>
+  <% else %>
+    <p class="rounds-archive__count"><%= number_with_delimiter(@total_rounds) %> recorded rounds from <%= @months.first[:date].strftime('%B %Y') %> to <%= @months.last[:date].strftime('%B %Y') %>.</p>
+
+    <section class="square rounds-statistics__histogram" aria-labelledby="rounds-by-month-heading">
+      <h2 id="rounds-by-month-heading">Rounds by month</h2>
+      <div class="rounds-statistics__bars" role="img" aria-label="Histogram of rounds started each month">
+        <% @months.each do |month| %>
+          <% height = @peak_monthly_count.zero? ? 0 : (month[:count].fdiv(@peak_monthly_count) * 100).round %>
+          <div class="rounds-statistics__bar-wrap" title="<%= month[:date].strftime('%B %Y') %>: <%= pluralize(month[:count], 'round') %>">
+            <span class="rounds-statistics__bar" style="height: <%= height %>%;"></span>
+          </div>
+        <% end %>
+      </div>
+      <div class="rounds-statistics__axis" aria-hidden="true">
+        <span><%= @months.first[:date].strftime('%Y') %></span>
+        <span><%= @months.last[:date].strftime('%Y') %></span>
+      </div>
+      <p class="rounds-statistics__note">Each bar is a calendar month; hover a bar for its exact count.</p>
+    </section>
+
+    <div class="rounds-statistics__breakdowns">
+      <section class="square">
+        <h2>By year</h2>
+        <table class="data">
+          <% @years.each do |year| %>
+            <tr><th scope="row"><%= year[:year] %></th><td><%= pluralize(year[:count], 'round') %></td></tr>
+          <% end %>
+        </table>
+      </section>
+
+      <section class="square">
+        <h2>By quarter</h2>
+        <table class="data">
+          <% @quarters.each do |quarter| %>
+            <tr><th scope="row"><%= quarter[:year] %> Q<%= quarter[:quarter] %></th><td><%= pluralize(quarter[:count], 'round') %></td></tr>
+          <% end %>
+        </table>
+      </section>
+    </div>
+  <% end %>
+</div>
