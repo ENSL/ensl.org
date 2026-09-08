@@ -41,6 +41,7 @@ jobs:
               /workspace/public/assets \
               /workspace/public/local \
               /workspace/public/files \
+              /workspace/public/uploads \
               /workspace/spec/fixtures/files/videos \
               /workspace/app/assets/builds \
               /workspace/db/data
@@ -51,6 +52,7 @@ jobs:
               /workspace/public/assets \
               /workspace/public/local \
               /workspace/public/files \
+              /workspace/public/uploads \
               /workspace/spec/fixtures/files/videos \
               /workspace/app/assets/builds
           '

@@ -437,9 +437,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       # Should not see edit controls at all since they don't own the movie
       expect(page).not_to have_link('Edit')
-      within('table.movie') do
-        expect(page).not_to have_link('Destroy', exact: true)
-      end
+      expect(page).not_to have_selector('.movie-full__actions')
+      expect(page).not_to have_button('Destroy', exact: true)
     end
 
     scenario 'movie maker can make preview for their own movie' do
