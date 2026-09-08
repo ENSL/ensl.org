@@ -69,8 +69,8 @@ class MarineTechPathQuery
   end
 
   # Returns an array of hashes: { path: [research keys], rounds:, wins:,
-  # losses:, win_ratio: (0-100) }, best win ratio first. A nil result_limit
-  # returns every path which meets the minimum round count.
+  # losses:, reach_rate: (0-100), win_ratio: (0-100) }, best win ratio first.
+  # A nil result_limit returns every path which meets the minimum round count.
   def call
     rows = qualifying_rows.sort_by { |row| [-row[:win_ratio], -row[:rounds]] }
     @result_limit ? rows.first(@result_limit) : rows
@@ -100,6 +100,7 @@ class MarineTechPathQuery
       next if rounds < @min_rounds
 
       { path: path, rounds: rounds, wins: counts[:wins], losses: counts[:losses],
+        reach_rate: (rounds * 100.0 / rounds_analysed),
         win_ratio: (counts[:wins] * 100.0 / rounds) }
     end
   end

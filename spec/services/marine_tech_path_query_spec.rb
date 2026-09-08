@@ -37,7 +37,21 @@ describe MarineTechPathQuery do
 
       expect(row[:path]).to eq(%w[research_armorl1 research_weaponsl1 research_phasetech])
       expect(row).to include(rounds: 3, wins: 2, losses: 1)
+      expect(row[:reach_rate]).to be_within(0.01).of(100.0)
       expect(row[:win_ratio]).to be_within(0.01).of(66.67)
+    end
+
+    it 'reports reach rate as a path share of all analysed rounds' do
+      2.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_armorl1])
+      end
+      round_with_research(result: Round::RESULT_ALIEN_WIN, researches: %w[research_weaponsl1])
+
+      path = described_class.call(path_length: 1, min_rounds: 1).find do |result|
+        result[:path] == %w[research_armorl1]
+      end
+
+      expect(path[:reach_rate]).to be_within(0.01).of(66.67)
     end
 
     it 'treats a different research order as a different path' do

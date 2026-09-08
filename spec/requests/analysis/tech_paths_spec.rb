@@ -27,6 +27,8 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(response.body).to include('Marine tech paths')
       expect(response.body).to include('Armor Level 1')
       expect(response.body).to include('Phase Technology')
+      expect(response.body).to include('Reach %')
+      expect(response.body).to include('100.0%')
     end
 
     it 'truncates paths to the selected maximum length' do
