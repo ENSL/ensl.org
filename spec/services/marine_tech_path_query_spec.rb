@@ -63,6 +63,15 @@ describe MarineTechPathQuery do
       expect(row[:path]).to eq(%w[research_armorl1 research_weaponsl1])
     end
 
+    it 'includes Catalysts as an opening research' do
+      round_with_research(result: Round::RESULT_MARINE_WIN,
+                          researches: %w[research_catalysts research_armorl1])
+
+      paths = described_class.call(path_length: 1, min_rounds: 1).map { |row| row[:path] }
+
+      expect(paths).to include(%w[research_catalysts])
+    end
+
     it 'retains every opening prefix when the path length is uncapped' do
       round_with_research(result: Round::RESULT_MARINE_WIN,
                           researches: %w[research_armorl1 research_weaponsl1 research_phasetech])

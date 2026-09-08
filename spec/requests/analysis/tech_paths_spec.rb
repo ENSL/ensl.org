@@ -66,6 +66,17 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(response.body).to include('all qualifying')
     end
 
+    it 'says all qualifying paths are shown when the selected limit is not reached' do
+      5.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_weaponsl1])
+      end
+
+      get '/analysis/tech_paths', params: { min_rounds: 5, result_limit: 20 }
+
+      expect(response.body).to include('all 1 qualifying paths below')
+      expect(response.body).not_to include('the best 1 by win rate')
+    end
+
     it 'renders an empty-state message when nothing meets the minimum' do
       get '/analysis/tech_paths', params: { min_rounds: 50 }
 

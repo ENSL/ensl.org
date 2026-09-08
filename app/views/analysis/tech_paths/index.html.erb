@@ -61,7 +61,11 @@
       <%= number_with_delimiter(@paths_found) %> opening paths at this setting,
       <%= number_with_delimiter(@paths_above_minimum) %> were used in at least
       <%= @selected_min_rounds %> rounds; showing
-      <%= @selected_result_limit ? "the best #{@tech_paths.size}" : 'all' %> by win rate below.
+      <%= if @selected_result_limit && @paths_above_minimum > @tech_paths.size
+            "the best #{@tech_paths.size} by win rate"
+          else
+            "all #{@tech_paths.size} qualifying paths"
+          end %> below.
     </p>
 
     <%= sortable_table(
