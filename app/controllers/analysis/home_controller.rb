@@ -55,6 +55,12 @@ module Analysis
         description: 'When rounds actually get played: a day-of-week by hour-of-day activity heatmap.',
         icon: 'calendar-alt',
         path_helper: :analysis_activity_path
+      },
+      {
+        title: 'Round Data Over Time',
+        description: 'Explore how imported NS1 rounds are distributed across months, quarters, and years.',
+        icon: 'bar-chart',
+        path_helper: :statistics_rounds_path
       }
     ].freeze
 

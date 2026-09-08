@@ -60,7 +60,9 @@ RSpec.describe 'RoundsController', type: :request do
       get '/rounds/statistics'
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Round Data Over Time', '3 recorded rounds', '2024 Q1', '3 rounds')
+      expect(response.body).to include('Round Data Over Time', 'Recorded rounds', '2024 Q1')
+      expect(response.body).to include('Every recorded round', 'Busiest month', 'rounds-statistics__ranked-bars')
+      expect(response.body).to include('/rounds?from=2024-01-01&amp;to=2024-01-31')
       months = controller.instance_variable_get(:@months)
       expect(months).to eq([
                              { date: Date.new(2024, 1, 1), count: 1 },

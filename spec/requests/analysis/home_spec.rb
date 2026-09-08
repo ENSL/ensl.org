@@ -13,11 +13,13 @@ RSpec.describe 'Analysis::HomeController', type: :request do
       expect(response.body).to include(analysis_maps_path)
       expect(response.body).to include(analysis_pick_orders_path)
       expect(response.body).to include(analysis_tech_paths_path)
+      expect(response.body).to include(statistics_rounds_path)
       expect(response.body).to include('NS1 Rankings')
       expect(response.body).to include('NS1 Map balance')
       expect(response.body).to include('NS1 Gather Rankings')
       expect(response.body).to include('NS1 Marine tech paths')
       expect(response.body).to include('Team rankings')
+      expect(response.body).to include('Round Data Over Time')
     end
   end
 end

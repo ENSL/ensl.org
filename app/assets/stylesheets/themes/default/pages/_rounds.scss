@@ -43,6 +43,160 @@
 .rounds-archive__count { margin: 22px 0 0; color: $medium-gray; }
 .rounds-archive__table td:last-child { text-align: right; }
 
+#rounds-statistics {
+  padding-bottom: 28px;
+
+  .rounds-archive__header { margin-bottom: 26px; }
+}
+
+.rounds-statistics__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 22px;
+  overflow: hidden;
+  border: 1px solid $light-gray;
+  border-radius: 6px;
+  background: $base-body-color;
+  box-shadow: $light-shadow;
+}
+
+.rounds-statistics__stat {
+  min-width: 0;
+  padding: 18px 20px;
+  border-right: 1px solid $light-gray;
+
+  &:last-child { border-right: 0; }
+  span, small { display: block; }
+  span, small { color: $medium-gray; }
+  span, small { font-size: 0.78rem; }
+  strong { display: block; }
+  strong { margin: 4px 0 2px; }
+  strong { color: $blue; }
+  strong { font-size: 1.45rem; }
+  strong { line-height: 1.1; }
+}
+
+.rounds-statistics__histogram,
+.rounds-statistics__breakdown {
+  border: 1px solid $light-gray;
+  border-radius: 6px;
+  background: $base-body-color;
+  box-shadow: $light-shadow;
+}
+
+.rounds-statistics__histogram { padding: 22px 24px 16px; }
+
+.rounds-statistics__section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+
+  h2 { margin: 0; }
+  > p { margin: 0; }
+  > p { color: $medium-gray; }
+  > p { font-size: 0.85rem; }
+}
+
+.rounds-statistics__eyebrow {
+  margin: 0 0 4px;
+  color: $light-blue;
+  font-size: 0.72rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.rounds-statistics__chart {
+  position: relative;
+  height: 250px;
+  border-bottom: 1px solid $light-gray;
+}
+
+.rounds-statistics__grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+
+  span { border-top: 1px dashed color.adjust($light-gray, $alpha: -0.25); }
+}
+
+.rounds-statistics__bars {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: end;
+  height: 100%;
+  gap: 2px;
+}
+
+.rounds-statistics__bar-wrap {
+  display: flex;
+  flex: 1 1 0;
+  align-items: end;
+  height: 100%;
+  min-width: 2px;
+  outline-offset: 2px;
+
+  &:hover .rounds-statistics__bar,
+  &:focus .rounds-statistics__bar { background: $blue; }
+}
+
+.rounds-statistics__bar {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  background: $light-blue;
+  transition: background 0.12s ease;
+}
+
+.rounds-statistics__axis {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  color: $medium-gray;
+  font-size: 0.75rem;
+}
+
+.rounds-statistics__breakdowns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.rounds-statistics__breakdown { padding: 18px 20px 20px; }
+.rounds-statistics__breakdown h2 { margin: 0 0 16px; }
+.rounds-statistics__breakdown h2 { font-size: 1.05rem; }
+.rounds-statistics__ranked-bars { display: grid; }
+.rounds-statistics__ranked-bars { gap: 9px; }
+
+.rounds-statistics__ranked-row {
+  display: grid;
+  grid-template-columns: 7ch minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  color: $medium-gray;
+  font-size: 0.8rem;
+
+  strong { color: $dark-gray; }
+  strong { font-size: 0.8rem; }
+}
+
+.rounds-statistics__track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: color.adjust($light-gray, $alpha: -0.42);
+
+  i { display: block; }
+  i { height: 100%; }
+  i { background: $light-blue; }
+}
+
 #rounds-calendar { padding-bottom: 20px; }
 
 .rounds-calendar__year-nav {
@@ -118,6 +272,11 @@
 @media (width <= 760px) {
   .rounds-archive__filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rounds-calendar__months { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rounds-statistics__summary { grid-template-columns: 1fr; }
+  .rounds-statistics__stat { border-right: 0; }
+  .rounds-statistics__stat { border-bottom: 1px solid $light-gray; }
+  .rounds-statistics__stat:last-child { border-bottom: 0; }
+  .rounds-statistics__breakdowns { grid-template-columns: 1fr; }
 }
 
 @media (width <= 500px) {
@@ -127,6 +286,11 @@
   .rounds-calendar__year-nav .button { text-align: center; }
   .rounds-calendar__year-form { justify-content: center; }
   .rounds-calendar__months { grid-template-columns: 1fr; }
+  .rounds-statistics__histogram { padding: 18px 14px 14px; }
+  .rounds-statistics__section-heading { align-items: start; }
+  .rounds-statistics__section-heading { flex-direction: column; }
+  .rounds-statistics__section-heading { gap: 5px; }
+  .rounds-statistics__chart { height: 180px; }
 }
 
 /*

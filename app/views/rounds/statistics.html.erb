@@ -10,42 +10,54 @@
   <% if @months.empty? %>
     <p class="square">No round start times are available yet.</p>
   <% else %>
-    <p class="rounds-archive__count"><%= number_with_delimiter(@total_rounds) %> recorded rounds from <%= @months.first[:date].strftime('%B %Y') %> to <%= @months.last[:date].strftime('%B %Y') %>.</p>
+    <% busiest_month = @months.max_by { |month| month[:count] } %>
+    <% peak_yearly_count = @years.map { |year| year[:count] }.max %>
+    <% peak_quarterly_count = @quarters.map { |quarter| quarter[:count] }.max %>
 
-    <section class="square rounds-statistics__histogram" aria-labelledby="rounds-by-month-heading">
-      <h2 id="rounds-by-month-heading">Rounds by month</h2>
-      <div class="rounds-statistics__bars" role="img" aria-label="Histogram of rounds started each month">
-        <% @months.each do |month| %>
-          <% height = @peak_monthly_count.zero? ? 0 : (month[:count].fdiv(@peak_monthly_count) * 100).round %>
-          <div class="rounds-statistics__bar-wrap" title="<%= month[:date].strftime('%B %Y') %>: <%= pluralize(month[:count], 'round') %>">
-            <span class="rounds-statistics__bar" style="height: <%= height %>%;"></span>
-          </div>
-        <% end %>
+    <div class="rounds-statistics__summary" aria-label="Round data summary">
+      <div class="rounds-statistics__stat"><span>Recorded rounds</span><strong><%= number_with_delimiter(@total_rounds) %></strong></div>
+      <div class="rounds-statistics__stat"><span>History covered</span><strong><%= @months.first[:date].strftime('%Y') %>&ndash;<%= @months.last[:date].strftime('%Y') %></strong></div>
+      <div class="rounds-statistics__stat"><span>Busiest month</span><strong><%= busiest_month[:date].strftime('%b %Y') %></strong><small><%= pluralize(busiest_month[:count], 'round') %></small></div>
+    </div>
+
+    <section class="rounds-statistics__histogram" aria-labelledby="rounds-by-month-heading">
+      <div class="rounds-statistics__section-heading">
+        <div><p class="rounds-statistics__eyebrow">Monthly activity</p><h2 id="rounds-by-month-heading">Every recorded round</h2></div>
+        <p>Choose a month to explore its rounds.</p>
+      </div>
+      <div class="rounds-statistics__chart" role="img" aria-label="Histogram of rounds started each month">
+        <div class="rounds-statistics__grid" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="rounds-statistics__bars">
+          <% @months.each do |month| %>
+            <% height = @peak_monthly_count.zero? ? 0 : (month[:count].fdiv(@peak_monthly_count) * 100).round %>
+            <%= link_to rounds_path(from: month[:date], to: month[:date].end_of_month), class: 'rounds-statistics__bar-wrap', title: "#{month[:date].strftime('%B %Y')}: #{pluralize(month[:count], 'round')}", aria: { label: "View #{pluralize(month[:count], 'round')} from #{month[:date].strftime('%B %Y')}" } do %>
+              <span class="rounds-statistics__bar" style="height: <%= [height, 2].max %>%;"></span>
+            <% end %>
+          <% end %>
       </div>
       <div class="rounds-statistics__axis" aria-hidden="true">
         <span><%= @months.first[:date].strftime('%Y') %></span>
         <span><%= @months.last[:date].strftime('%Y') %></span>
       </div>
-      <p class="rounds-statistics__note">Each bar is a calendar month; hover a bar for its exact count.</p>
     </section>
 
     <div class="rounds-statistics__breakdowns">
-      <section class="square">
+      <section class="rounds-statistics__breakdown">
         <h2>By year</h2>
-        <table class="data">
+        <div class="rounds-statistics__ranked-bars">
           <% @years.each do |year| %>
-            <tr><th scope="row"><%= year[:year] %></th><td><%= pluralize(year[:count], 'round') %></td></tr>
+            <div class="rounds-statistics__ranked-row"><span><%= year[:year] %></span><div class="rounds-statistics__track"><i style="width: <%= (year[:count].fdiv(peak_yearly_count) * 100).round %>%;"></i></div><strong><%= number_with_delimiter(year[:count]) %></strong></div>
           <% end %>
-        </table>
+        </div>
       </section>
 
-      <section class="square">
+      <section class="rounds-statistics__breakdown">
         <h2>By quarter</h2>
-        <table class="data">
+        <div class="rounds-statistics__ranked-bars">
           <% @quarters.each do |quarter| %>
-            <tr><th scope="row"><%= quarter[:year] %> Q<%= quarter[:quarter] %></th><td><%= pluralize(quarter[:count], 'round') %></td></tr>
+            <div class="rounds-statistics__ranked-row"><span><%= quarter[:year] %> Q<%= quarter[:quarter] %></span><div class="rounds-statistics__track"><i style="width: <%= (quarter[:count].fdiv(peak_quarterly_count) * 100).round %>%;"></i></div><strong><%= number_with_delimiter(quarter[:count]) %></strong></div>
           <% end %>
-        </table>
+        </div>
       </section>
     </div>
   <% end %>
