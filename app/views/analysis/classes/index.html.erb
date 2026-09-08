@@ -1,0 +1,45 @@
+<h1 class="title">NS1 Class performance</h1>
+
+<div class="box wide">
+  <p>
+    Per-player class performance from the most recent analysis batch, aggregated across all maps and teams.
+    Damage per resource is calculated for this page only. Click a column header to sort.
+  </p>
+
+  <%= form_with url: analysis_classes_path, method: :get, local: true do %>
+    <p>
+      <%= label_tag :class_name, 'Class:' %>
+      <%= select_tag :class_name,
+                     options_for_select([['All classes', '']] + @class_names.map { |name| [name.titleize, name] }, @selected_class_name),
+                     onchange: 'this.form.requestSubmit()' %>
+      <%= label_tag :min_games, 'Minimum games:' %>
+      <%= select_tag :min_games,
+                     options_for_select(@min_games_options.map { |count| [count, count] }, @selected_min_games),
+                     onchange: 'this.form.requestSubmit()' %>
+    </p>
+  <% end %>
+
+  <% if @performances.empty? %>
+    <p>No class performance data is available yet.</p>
+  <% else %>
+    <% format_number = lambda { |value, precision: 1| value.nil? ? '–' : number_with_precision(value, precision: precision) } %>
+
+    <%= sortable_table(
+      id: 'class-performance',
+      columns: [
+        { key: :user, label: 'Player', type: :string, sort_value: ->(user) { user.to_s.downcase }, format: ->(user) { namelink(user) } },
+        { key: :sample_size, label: 'Games', type: :number, format: ->(value) { value&.to_i } },
+        { key: :kills, label: 'Kills', type: :number, format: ->(value) { value&.to_i } },
+        { key: :deaths, label: 'Deaths', type: :number, format: ->(value) { value&.to_i } },
+        { key: :kill_death_ratio, label: 'K/D', type: :number, format: format_number },
+        { key: :damage, label: 'Damage', type: :number, format: ->(value) { format_number.call(value, precision: 0) } },
+        { key: :minutes_played, label: 'Minutes', type: :number, format: format_number },
+        { key: :damage_per_minute, label: 'Damage/min', type: :number, format: format_number },
+        { key: :damage_per_resource, label: 'Damage/resource', type: :number, format: format_number },
+        { key: :resources_per_minute, label: 'Resources/min', type: :number, format: format_number },
+        { key: :win_rate, label: 'Win rate %', type: :number, sort_value: ->(value) { value && value * 100 }, format: ->(value) { value.nil? ? '–' : format_number.call(value * 100) } }
+      ],
+      rows: @performances
+    ) %>
+  <% end %>
+</div>

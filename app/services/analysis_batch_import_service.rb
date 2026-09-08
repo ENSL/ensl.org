@@ -12,6 +12,7 @@ require 'duckdb'
 #   <exports_dir>/<batch_id>/metrics/*.parquet           (per-model aggregates)
 #   <exports_dir>/<batch_id>/skill_<model>/*.parquet     (per-player model output)
 #   <exports_dir>/<batch_id>/users/*.parquet             (player stats + steamid lookup)
+#   <exports_dir>/<batch_id>/class_stats/*.parquet       (per-player class totals)
 #   <exports_dir>/<batch_id>/map_balance/*.parquet       (per-map win rates)
 #   <exports_dir>/<batch_id>/time_of_week/*.parquet      (round counts per hour-of-week)
 #
@@ -53,6 +54,10 @@ class AnalysisBatchImportService
   # `skill` is intentionally excluded -- it's not used yet, and the real
   # per-model skill values are covered by SKILL_MODEL_METRIC_COLUMNS above.
   PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
+
+  # Per-player class totals. Source rows are split by map and team, so these
+  # are summed for each player/class before being stored.
+  CLASS_STAT_METRICS = %w[kills deaths damage minutes_played resources_spent wins losses sample_size].freeze
 
   # Columns pulled from `map_balance/*.parquet`, one analysis_results row per
   # (map, metric).
@@ -107,6 +112,7 @@ class AnalysisBatchImportService
       legacy: read_legacy_rows(connection, imported_at),
       skill_models: read_skill_model_rows(connection, imported_at),
       player_stats: read_player_stat_rows(connection, imported_at),
+      class_stats: read_class_stat_rows(connection, imported_at),
       map_balance: read_map_balance_rows(connection, imported_at),
       time_of_week: read_time_of_week_rows(connection, imported_at)
     }
@@ -174,6 +180,29 @@ class AnalysisBatchImportService
     read_metric_columns(connection, users_glob, 'steam_id', PLAYER_STAT_METRICS) do |steamid, metric, value|
       historical_row(imported_at, steamid: steamid, model: 'player_stats', metric: metric, value: value,
                                   milestone: nil)
+    end
+  end
+
+  # Aggregate source rows across maps and teams so each stored result is for
+  # one player playing one class, regardless of map or side.
+  def read_class_stat_rows(connection, imported_at)
+    users_glob = existing_glob('users')
+    class_stats_glob = existing_glob('class_stats')
+    return [] unless users_glob && class_stats_glob
+
+    CLASS_STAT_METRICS.flat_map do |metric|
+      sql = <<~SQL.squish
+        SELECT u.steam_id, c.class_name, SUM(c.#{metric})
+        FROM read_parquet('#{class_stats_glob}') c
+        JOIN read_parquet('#{users_glob}') u ON c.user_id = u.id
+        WHERE c.class_name IS NOT NULL AND c.#{metric} IS NOT NULL
+        GROUP BY u.steam_id, c.class_name
+      SQL
+
+      connection.query(sql).map do |(steamid, class_name, value)|
+        historical_row(imported_at, steamid: steamid, model: "class_stats:#{class_name}", metric: metric,
+                                    value: value, milestone: nil)
+      end
     end
   end
 

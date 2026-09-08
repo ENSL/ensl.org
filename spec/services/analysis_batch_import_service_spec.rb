@@ -167,6 +167,22 @@ RSpec.describe AnalysisBatchImportService do
     end
   end
 
+  describe '#read_class_stat_rows' do
+    let(:connection) { instance_double('DuckDB::Connection') }
+
+    it 'aggregates class stats across maps and teams under the player and class model' do
+      allow(service).to receive(:existing_glob).with('users').and_return('/tmp/users/*.parquet')
+      allow(service).to receive(:existing_glob).with('class_stats').and_return('/tmp/class_stats/*.parquet')
+      allow(connection).to receive(:query).and_return([['0:1:2', 'skulk', 9]])
+
+      rows = service.send(:read_class_stat_rows, connection, Time.current)
+
+      expect(rows.map { |row| row[:model] }.uniq).to eq(['class_stats:skulk'])
+      expect(rows.map { |row| row[:metric] }).to match_array(AnalysisBatchImportService::CLASS_STAT_METRICS)
+      expect(rows).to all(include(steamid: '0:1:2'))
+    end
+  end
+
   describe '#read_map_balance_rows' do
     let(:connection) { instance_double('DuckDB::Connection') }
 

@@ -15,6 +15,12 @@ module Analysis
         path_helper: :analysis_users_path
       },
       {
+        title: 'NS1 Class performance',
+        description: 'Compare each player with every NS1 class, independent of map, team, and side.',
+        icon: 'crosshairs',
+        path_helper: :analysis_classes_path
+      },
+      {
         title: 'Team rankings',
         description: 'OpenSkill ratings, records and tournament wins for every team, NS1 and NS2 separately.',
         icon: 'users',
