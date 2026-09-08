@@ -2,6 +2,7 @@
 
 require 'logger'
 require_relative '../lib/safety/database_guard'
+require_relative '../lib/mda'
 
 Safety::DatabaseGuard.abort_if_dangerous_db_task!(argv: ARGV, env: ENV)
 
@@ -49,6 +50,8 @@ module Ensl
                                                       lib_root,
                                                       Rails.root.join('app', 'models', 'concerns').to_s]).uniq
     config.eager_load_paths = (config.eager_load_paths + [services_root, lib_root]).uniq
+
+    Rails.autoloaders.main.ignore(Rails.root.join('lib/mda.rb'))
 
     # Be sure to restart your server when you modify this file.
     config.session_store :cookie_store,
