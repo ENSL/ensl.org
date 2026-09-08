@@ -10,6 +10,7 @@ CI.run do
   step 'Static analysis: Gem audit', 'bin/bundler-audit'
   step 'Static analysis: Importmap audit', 'bin/importmap audit'
   step 'Static analysis: CSS', 'yarn lint:css'
+  step 'Static analysis: Zeitwerk compliance', 'bin/rails zeitwerk:check'
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.
