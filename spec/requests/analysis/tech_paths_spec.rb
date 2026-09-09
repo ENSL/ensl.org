@@ -15,6 +15,25 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
   end
 
   describe 'GET /analysis/tech_paths' do
+    it 'uses static, level-specific icons for grenade, armor, and weapon research' do
+      5.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_grenades research_armorl1 research_armorl2 research_armorl3
+                                           research_weaponsl1 research_weaponsl2 research_weaponsl3])
+      end
+
+      get '/analysis/tech_paths', params: { path_length: 'all', min_rounds: 5 }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(*%w[grenades armor_upgrade_1 armor_upgrade_2 armor_upgrade_3 weapon_upgrade_1
+                                           weapon_upgrade_2 weapon_upgrade_3].map do |icon|
+        "/images/ns1/#{icon}.png"
+      end)
+      expect(response.body).not_to include('/images/ns1/grenade_launcher.gif')
+      expect(response.body).not_to include('/images/ns1/armor_upgrades.gif')
+      expect(response.body).not_to include('/images/ns1/damage_upgrades.gif')
+    end
+
     it 'renders the winning tech paths with readable research names' do
       5.times do
         round_with_research(result: Round::RESULT_MARINE_WIN,

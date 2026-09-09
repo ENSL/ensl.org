@@ -93,14 +93,14 @@ module RoundsHelper
     'knife' => 'knife', 'machinegun' => 'lmg', 'pistol' => 'pistol', 'shotgun' => 'shotgun',
     'heavymachinegun' => 'hmg', 'grenade' => 'grenade_launcher', 'handgrenade' => 'grenade_launcher',
     'item_mine' => 'mine', 'welder' => 'welder', 'research_advarmory' => 'advanced_armory',
-    'research_advturretfactory' => 'siege_upgrade', 'research_armorl1' => 'armor_upgrades',
-    'research_armorl2' => 'armor_upgrades', 'research_armorl3' => 'armor_upgrades',
+    'research_advturretfactory' => 'siege_upgrade', 'research_armorl1' => 'armor_upgrade_1.png',
+    'research_armorl2' => 'armor_upgrade_2.png', 'research_armorl3' => 'armor_upgrade_3.png',
     'research_catalysts' => 'catalysts', 'research_distressbeacon' => 'distress_beacon',
-    'research_electrical' => 'electrical_defense', 'research_grenades' => 'grenade_launcher',
+    'research_electrical' => 'electrical_defense', 'research_grenades' => 'grenades.png',
     'research_heavyarmor' => 'heavy_tech', 'research_jetpacks' => 'jetpack_tech',
     'research_motiontracking' => 'motion_tracking', 'research_phasetech' => 'phase_tech',
-    'research_weaponsl1' => 'damage_upgrades', 'research_weaponsl2' => 'damage_upgrades',
-    'research_weaponsl3' => 'damage_upgrades'
+    'research_weaponsl1' => 'weapon_upgrade_1.png', 'research_weaponsl2' => 'weapon_upgrade_2.png',
+    'research_weaponsl3' => 'weapon_upgrade_3.png'
   }.freeze
 
   ROUND_PLAYER_LIFEFORM_COSTS = {
@@ -154,7 +154,7 @@ module RoundsHelper
 
       fragments << h(before) unless before.empty?
       fragments << h(match)
-      fragments << image_tag("/images/ns1/#{icon}.gif", class: 'round-timeline-icon', alt: '')
+      fragments << image_tag(round_timeline_icon_path(icon), class: 'round-timeline-icon', alt: '')
       remaining = after
     end
 
@@ -167,6 +167,10 @@ module RoundsHelper
     return 0 if events.empty?
 
     events.last[:top] + 80
+  end
+
+  def round_timeline_icon_path(icon)
+    "/images/ns1/#{icon.end_with?('.png') ? icon : "#{icon}.gif"}"
   end
 
   # steamid -> in-game nickname recovered from raw_text (see
@@ -425,7 +429,7 @@ module RoundsHelper
                   end
 
     state[:items] << { created_at: log_line.created_at, side: side, description: description,
-               icon_placements: [['Hive', round_timeline_icon_for('team_hive')]] }
+                       icon_placements: [['Hive', round_timeline_icon_for('team_hive')]] }
   end
 
   # A hive that grew to completion gets its own "fully grown" virtual marker

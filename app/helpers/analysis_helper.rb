@@ -46,7 +46,7 @@ module AnalysisHelper
   def tech_path_display(path)
     steps = path.map do |research|
       icon = RoundsHelper::ROUND_TIMELINE_ICON_NAMES[research]
-      image = image_tag("/images/ns1/#{icon}.gif", class: 'round-timeline-icon', alt: '') if icon
+      image = image_tag(tech_icon_path(icon), class: 'round-timeline-icon', alt: '') if icon
       tag.span(safe_join([image, tech_path_research_name(research)].compact), class: 'tech-path-step')
     end
     safe_join(steps, tag.span(' → ', class: 'tech-path-arrow'))
@@ -87,7 +87,7 @@ module AnalysisHelper
     paths.each_with_index.to_h do |row, index|
       research = row[:path].last
       icon = RoundsHelper::ROUND_TIMELINE_ICON_NAMES[research]
-      ["tech#{index}", { icon: icon ? "/images/ns1/#{icon}.gif" : nil, label: tech_path_research_name(research) }]
+      ["tech#{index}", { icon: icon ? tech_icon_path(icon) : nil, label: tech_path_research_name(research) }]
     end
   end
 
@@ -111,13 +111,17 @@ module AnalysisHelper
     nodes = (TECH_REQUIREMENT_TREE.keys + TECH_REQUIREMENT_TREE.values.flatten).uniq
     nodes.index_with do |node|
       icon = TECH_REQUIREMENT_BUILDINGS.dig(node, :icon) || RoundsHelper::ROUND_TIMELINE_ICON_NAMES[node]
-      { label: tech_requirement_tree_label(node), icon: icon ? "/images/ns1/#{icon}.gif" : nil,
+      { label: tech_requirement_tree_label(node), icon: icon ? tech_icon_path(icon) : nil,
         stats: tech_requirement_tree_stats(node, paths, rounds_analysed),
         parents: tech_requirement_parents(node), children: TECH_REQUIREMENT_TREE.fetch(node, []) }
     end
   end
 
   private
+
+  def tech_icon_path(icon)
+    "/images/ns1/#{icon.end_with?('.png') ? icon : "#{icon}.gif"}"
+  end
 
   def tech_requirement_tree_label(node)
     TECH_REQUIREMENT_BUILDINGS.dig(node, :label) || tech_path_research_name(node)
