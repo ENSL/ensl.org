@@ -109,7 +109,7 @@ class MarineTechPathQuery
     @tally ||= begin
       counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0 } }
       paths_by_round.each do |round_id, full_path|
-        outcome = results_by_round[round_id] == Round::RESULT_MARINE_WIN ? :wins : :losses
+        outcome = winning_result?(results_by_round[round_id]) ? :wins : :losses
         maximum_length = @path_length || full_path.length
         full_path.first(maximum_length).each_index do |index|
           counts[full_path.first(index + 1)][outcome] += 1
@@ -142,5 +142,9 @@ class MarineTechPathQuery
 
   def results_by_round
     @results_by_round ||= Round.where(id: paths_by_round.keys).pluck(:id, :result).to_h
+  end
+
+  def winning_result?(result)
+    result == Round::RESULT_MARINE_WIN
   end
 end

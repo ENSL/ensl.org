@@ -180,7 +180,8 @@
   }
 }
 
-.tech-requirements__tooltip {
+.tech-requirements__tooltip,
+.tech-tree__tooltip {
   position: fixed;
   z-index: 10;
   display: grid;

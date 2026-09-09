@@ -26,6 +26,11 @@ module AnalysisHelper
     'proto_lab' => { label: 'Prototype Lab', icon: 'proto_lab' },
     'turret_factory' => { label: 'Turret Factory', icon: 'turret_factory' }
   }.freeze
+  ALIEN_CHAMBER_ICONS = {
+    'defensechamber' => '/images/ns1/640alienupgradecategories_0.png',
+    'movementchamber' => '/images/ns1/640alienupgradecategories_2.png',
+    'sensorychamber' => '/images/ns1/640alienupgradecategories_3.png'
+  }.freeze
 
   # columns: array of hashes, each with:
   #   key         - symbol used to look up the raw value in each row hash
@@ -52,7 +57,9 @@ module AnalysisHelper
   end
 
   def tech_path_research_name(research)
-    RoundsHelper::ROUND_TIMELINE_RESEARCH_NAMES[research] || research.to_s.sub(/\Aresearch_/, '').humanize
+    RoundsHelper::ROUND_TIMELINE_RESEARCH_NAMES[research] ||
+      RoundsHelper::ROUND_TIMELINE_STRUCTURE_NAMES[research] ||
+      research.to_s.sub(/\Aresearch_/, '').humanize
   end
 
   # Plain-text version of the same path, used as the client-side sort key.
@@ -85,8 +92,10 @@ module AnalysisHelper
   def tech_tree_icons(paths)
     paths.each_with_index.to_h do |row, index|
       research = row[:path].last
-      icon = RoundsHelper::ROUND_TIMELINE_ICON_NAMES[research]
-      ["tech#{index}", { icon: icon ? tech_icon_path(icon) : nil, label: tech_path_research_name(research) }]
+      icon_name = RoundsHelper::ROUND_TIMELINE_ICON_NAMES[research]
+      icon = ALIEN_CHAMBER_ICONS[research] || (tech_icon_path(icon_name) if icon_name)
+      ["tech#{index}", { icon: icon, label: tech_path_research_name(research), rounds: row[:rounds],
+                         reachRate: row[:reach_rate], winRatio: row[:win_ratio] }]
     end
   end
 

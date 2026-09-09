@@ -49,6 +49,12 @@ module Analysis
         ]
       },
       {
+        title: 'NS1 Alien tech tree',
+        description: 'Which chamber choices win the most, using each hive\'s first built chamber from the round logs.',
+        icon: 'project-diagram',
+        path_helper: :analysis_alien_tech_tree_path
+      },
+      {
         title: 'NS1 Round length',
         description: 'How marine and alien win rates shift with round length, overall or on a single map.',
         icon: 'stopwatch',

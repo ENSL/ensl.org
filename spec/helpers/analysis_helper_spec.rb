@@ -38,4 +38,20 @@ RSpec.describe AnalysisHelper, type: :helper do
       expect(tree_research).to match_array(tracked_research)
     end
   end
+
+  describe '#tech_tree_icons' do
+    it 'uses the alien upgrade category images for chamber choices' do
+      icons = helper.tech_tree_icons([
+                                       { path: ['defensechamber'], rounds: 12, reach_rate: 30.0, win_ratio: 50.0 },
+                                       { path: ['movementchamber'], rounds: 10, reach_rate: 25.0, win_ratio: 60.0 },
+                                       { path: ['sensorychamber'], rounds: 8, reach_rate: 20.0, win_ratio: 75.0 }
+                                     ])
+
+      expect(icons).to include(
+        'tech0' => include(icon: '/images/ns1/640alienupgradecategories_0.png'),
+        'tech1' => include(icon: '/images/ns1/640alienupgradecategories_2.png'),
+        'tech2' => include(icon: '/images/ns1/640alienupgradecategories_3.png')
+      )
+    end
+  end
 end

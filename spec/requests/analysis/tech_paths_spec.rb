@@ -129,4 +129,26 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(jetpacks).to include('rounds' => 10)
     end
   end
+
+  describe 'GET /analysis/alien_tech_tree' do
+    it 'renders the dynamic chamber graph without a list view' do
+      5.times do
+        round_with_research(result: Round::RESULT_ALIEN_WIN, researches: [])
+        round = Round.order(:id).last
+        LogLine.create!(round: round, event_type: 'structure_built', param1: 'defensechamber',
+                        created_at: round.start_time)
+      end
+
+      get '/analysis/alien_tech_tree'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('NS1 Alien tech tree', 'Defense Chamber', 'data-controller="tech-tree"')
+      graph = Nokogiri::HTML(response.body).at_css('[data-tech-tree-icons-value]')
+      node_data = JSON.parse(graph['data-tech-tree-icons-value'])
+      expect(node_data.fetch('tech0')).to include('icon' => '/images/ns1/640alienupgradecategories_0.png',
+                                                  'rounds' => 5)
+      expect(response.body).to include('data-tech-tree-target="tooltip"')
+      expect(response.body).not_to include('Techs per path:')
+    end
+  end
 end

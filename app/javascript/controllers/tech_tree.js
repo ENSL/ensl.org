@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import mermaid from "mermaid"
 
 export default class extends Controller {
-  static targets = ["graph"]
+  static targets = ["graph", "tooltip"]
   static values = { diagram: String, icons: Object }
 
   connect() {
@@ -26,6 +26,9 @@ export default class extends Controller {
       const title = document.createElementNS(namespace, "title")
       title.textContent = research.label
       node.prepend(title)
+      node.addEventListener("pointerenter", (event) => this.showTooltip(event, research))
+      node.addEventListener("pointermove", (event) => this.positionTooltip(event))
+      node.addEventListener("pointerleave", () => this.hideTooltip())
       if (!research.icon) return
 
       const background = document.createElementNS(namespace, "rect")
@@ -52,4 +55,35 @@ export default class extends Controller {
     })
   }
 
+  showTooltip(event, research) {
+    this.tooltipTarget.replaceChildren()
+    const title = document.createElement("strong")
+    title.textContent = research.label
+    this.tooltipTarget.append(title)
+
+    this.addLine(`${research.winRatio.toFixed(1)}% win`)
+    this.addLine(`${research.rounds.toLocaleString()} samples`)
+    this.addLine(`${research.reachRate.toFixed(1)}% reach`)
+    this.tooltipTarget.hidden = false
+    this.positionTooltip(event)
+  }
+
+  addLine(text) {
+    const line = document.createElement("span")
+    line.textContent = text
+    this.tooltipTarget.append(line)
+  }
+
+  positionTooltip(event) {
+    const margin = 16
+    const { width, height } = this.tooltipTarget.getBoundingClientRect()
+    const left = Math.min(event.clientX + margin, window.innerWidth - width - margin)
+    const top = Math.min(event.clientY + margin, window.innerHeight - height - margin)
+    this.tooltipTarget.style.left = `${Math.max(margin, left)}px`
+    this.tooltipTarget.style.top = `${Math.max(margin, top)}px`
+  }
+
+  hideTooltip() {
+    this.tooltipTarget.hidden = true
+  }
 }

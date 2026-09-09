@@ -3,9 +3,8 @@
 module Analysis
   # /analysis/tech_paths -- the marine opening tech orders with the best win
   # rates, derived from raw `research_start` log lines by
-  # MarineTechPathQuery. Aliens have no equivalent research events in the
-  # logs (their upgrades are chambers, i.e. `structure_built`), so this page
-  # is marine-only for now.
+  # MarineTechPathQuery. Alien chamber choices are exposed as a graph at
+  # /analysis/alien_tech_tree.
   class TechPathsController < Analysis::BaseController
     def index
       @path_length_options = MarineTechPathQuery::PATH_LENGTH_OPTIONS
@@ -31,8 +30,22 @@ module Analysis
                                       result_limit: nil)
       @tech_paths = query.call
       @rounds_analysed = query.rounds_analysed
+      @tech_tree_team = 'Marine'
+      @tech_tree_step = 'research option'
 
       render layout: 'full'
+    end
+
+    def alien_tree
+      query = AlienTechPathQuery.new(path_length: nil,
+                                     min_rounds: MarineTechPathQuery::DEFAULT_MIN_ROUNDS,
+                                     result_limit: nil)
+      @tech_paths = query.call
+      @rounds_analysed = query.rounds_analysed
+      @tech_tree_team = 'Alien'
+      @tech_tree_step = 'chamber choice'
+
+      render :tree, layout: 'full'
     end
 
     def requirements
