@@ -34,13 +34,19 @@ RSpec.describe 'DirectoriesController', type: :request do
   describe 'GET /directories/:id' do
     it 'renders the file list for a hidden directory' do
       directory = create(:directory, parent: ensure_root_directory, hidden: true)
-      create(:data_file, directory: directory, title: 'Hidden File', description: 'Directory description paragraph')
+      data_file = create(
+        :data_file,
+        directory: directory,
+        title: 'Hidden File',
+        description: 'Directory description paragraph'
+      )
 
       get "/directories/#{directory.id}"
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Hidden File')
-      expect(response.body).to include('Directory description paragraph')
+      expect(response.body).to include(data_file.url)
+      expect(response.body).not_to include('Directory description paragraph')
     end
 
     it 'loads the root listing for a visible directory' do

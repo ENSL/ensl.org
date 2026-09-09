@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 feature 'User profile', js: true do
+  def displayed_time(time, timezone = Rails.application.config.time_zone)
+    Time.use_zone(timezone) { time.strftime('%d %B %y %H:%M') }
+  end
+
   scenario "shows a freshly created user's current last-visit time, not a stale frozen default" do
     # Regression guard: `User#lastvisit` used to default to `Time.now.utc` evaluated
     # once at class load, so a brand new user's profile could show a "Last visit"
@@ -11,14 +15,14 @@ feature 'User profile', js: true do
 
     visit user_path(registrant)
 
-    expect(page).to have_content(registrant.lastvisit.strftime('%d %B %y %H:%M'))
+    expect(page).to have_content(displayed_time(registrant.lastvisit))
     expect(registrant.lastvisit).to be_within(5).of(Time.now.utc)
   end
 
   scenario 'reflects the moment a player logged back in after a period of inactivity' do
     registrant = create(:user, raw_password: 'password123')
     registrant.update!(lastvisit: 3.days.ago.change(usec: 0))
-    old_last_visit_text = registrant.lastvisit.strftime('%d %B %y %H:%M')
+    old_last_visit_text = displayed_time(registrant.reload.lastvisit)
 
     visit user_path(registrant)
     expect(page).to have_content(old_last_visit_text)
@@ -29,7 +33,7 @@ feature 'User profile', js: true do
     expect(registrant.lastvisit).to be_within(5).of(Time.now.utc)
 
     visit user_path(registrant)
-    expect(page).to have_content(registrant.lastvisit.strftime('%d %B %y %H:%M'))
+    expect(page).to have_content(displayed_time(registrant.lastvisit, registrant.time_zone))
     expect(page).not_to have_content(old_last_visit_text)
   end
 
@@ -47,14 +51,14 @@ feature 'User profile', js: true do
     # Session/cookie stays valid; only their lastvisit falls behind as if they
     # left the tab open without interacting.
     registrant.update!(lastvisit: 3.days.ago.change(usec: 0))
-    old_last_visit_text = registrant.lastvisit.strftime('%d %B %y %H:%M')
+    old_last_visit_text = displayed_time(registrant.lastvisit, registrant.time_zone)
 
     visit gather_path(gather)
 
     expect(registrant.reload.lastvisit).to be_within(5).of(Time.now.utc)
 
     visit user_path(registrant)
-    expect(page).to have_content(registrant.lastvisit.strftime('%d %B %y %H:%M'))
+    expect(page).to have_content(displayed_time(registrant.lastvisit, registrant.time_zone))
     expect(page).not_to have_content(old_last_visit_text)
   end
 

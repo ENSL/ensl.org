@@ -264,7 +264,7 @@ module ApplicationHelper
     if user
       user.time_zone
     else
-      Time.zone.name
+      Rails.application.config.time_zone
     end
   end
 
