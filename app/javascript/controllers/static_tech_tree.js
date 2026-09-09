@@ -69,7 +69,7 @@ export default class extends Controller {
         const heading = document.createElement("b")
         heading.textContent = "Best observed next research"
         this.tooltipTarget.append(heading)
-        nodeData.stats.next_choices.forEach((choice) => this.addLine(`${choice.label}: ${choice.win_ratio.toFixed(1)}% win`))
+        nodeData.stats.next_choices.forEach((choice) => this.addLine(`${choice.label}: ${choice.win_ratio.toFixed(1)}% win · ${choice.rounds.toLocaleString()} samples`))
       }
     }
 

@@ -14,16 +14,15 @@ module AnalysisHelper
     'research_weaponsl1' => %w[research_weaponsl2],
     'research_weaponsl2' => %w[research_weaponsl3],
     'observatory' => %w[research_motiontracking research_phasetech],
-    'armory' => %w[advanced_armory research_grenades],
+    'armory' => %w[research_advarmory research_grenades],
     'turret_factory' => %w[research_electrical research_advturretfactory],
-    'advanced_armory' => %w[proto_lab],
+    'research_advarmory' => %w[proto_lab],
     'proto_lab' => %w[research_jetpacks research_heavyarmor]
   }.freeze
   TECH_REQUIREMENT_BUILDINGS = {
     'arms_lab' => { label: 'Arms Lab', icon: 'arms_lab' },
     'observatory' => { label: 'Observatory', icon: 'observatory' },
     'armory' => { label: 'Armory', icon: 'armory' },
-    'advanced_armory' => { label: 'Advanced Armory', icon: 'advanced_armory' },
     'proto_lab' => { label: 'Prototype Lab', icon: 'proto_lab' },
     'turret_factory' => { label: 'Turret Factory', icon: 'turret_factory' }
   }.freeze
@@ -102,17 +101,17 @@ module AnalysisHelper
     lines << 'classDef building fill:transparent,stroke:transparent,color:transparent'
     lines << 'classDef research fill:transparent,stroke:transparent,color:transparent'
     lines << 'class start start'
-    lines << 'class arms_lab,observatory,armory,advanced_armory,proto_lab,turret_factory building'
-    lines << 'class research_armorl1,research_armorl2,research_armorl3,research_weaponsl1,research_weaponsl2,research_weaponsl3,research_catalysts,research_motiontracking,research_phasetech,research_grenades,research_jetpacks,research_heavyarmor,research_electrical,research_advturretfactory research'
+    lines << 'class arms_lab,observatory,armory,proto_lab,turret_factory building'
+    lines << 'class research_armorl1,research_armorl2,research_armorl3,research_weaponsl1,research_weaponsl2,research_weaponsl3,research_catalysts,research_motiontracking,research_phasetech,research_grenades,research_jetpacks,research_heavyarmor,research_electrical,research_advturretfactory,research_advarmory research'
     lines.join("\n")
   end
 
-  def tech_requirement_tree_nodes(paths, rounds_analysed)
+  def tech_requirement_tree_nodes(paths, rounds_analysed, min_rounds: 1)
     nodes = (TECH_REQUIREMENT_TREE.keys + TECH_REQUIREMENT_TREE.values.flatten).uniq
     nodes.index_with do |node|
       icon = TECH_REQUIREMENT_BUILDINGS.dig(node, :icon) || RoundsHelper::ROUND_TIMELINE_ICON_NAMES[node]
       { label: tech_requirement_tree_label(node), icon: icon ? tech_icon_path(icon) : nil,
-        stats: tech_requirement_tree_stats(node, paths, rounds_analysed),
+        stats: tech_requirement_tree_stats(node, paths, rounds_analysed, min_rounds: min_rounds),
         parents: tech_requirement_parents(node), children: TECH_REQUIREMENT_TREE.fetch(node, []) }
     end
   end
@@ -127,28 +126,28 @@ module AnalysisHelper
     TECH_REQUIREMENT_BUILDINGS.dig(node, :label) || tech_path_research_name(node)
   end
 
-  def tech_requirement_tree_stats(research, paths, rounds_analysed)
+  def tech_requirement_tree_stats(research, paths, rounds_analysed, min_rounds:)
     return nil unless research.start_with?('research_')
 
     positions = (1..3).filter_map do |position|
       rows = paths.select { |row| row[:path].length == position && row[:path].last == research }
-      tech_requirement_tree_result(rows, rounds_analysed, position)
+      tech_requirement_tree_result(rows, rounds_analysed, position, min_rounds: min_rounds)
     end
     overall_rows = paths.select { |row| row[:path].last == research }
     next_choices = paths.select { |row| row[:path].length > 1 && row[:path][-2] == research }
                         .group_by { |row| row[:path].last }
                         .filter_map do |next_research, rows|
-      result = tech_requirement_tree_result(rows, rounds_analysed)
+      result = tech_requirement_tree_result(rows, rounds_analysed, min_rounds: min_rounds)
       result&.merge(key: tech_requirement_tree_node_id(next_research), label: tech_path_research_name(next_research))
     end.max_by(5) { |result| [result[:win_ratio], result[:rounds]] }
 
-    { overall: tech_requirement_tree_result(overall_rows, rounds_analysed), positions: positions,
+    { overall: tech_requirement_tree_result(overall_rows, rounds_analysed, min_rounds: min_rounds), positions: positions,
       next_choices: next_choices }
   end
 
-  def tech_requirement_tree_result(rows, rounds_analysed, position = nil)
+  def tech_requirement_tree_result(rows, rounds_analysed, position = nil, min_rounds:)
     rounds = rows.sum { |row| row[:rounds] }
-    return if rounds.zero?
+    return if rounds < min_rounds
 
     wins = rows.sum { |row| row[:wins] }
     { position: position, rounds: rounds, reach_rate: rounds * 100.0 / rounds_analysed,
@@ -160,7 +159,6 @@ module AnalysisHelper
   end
 
   def tech_requirement_tree_node_id(research)
-    { 'research_advarmory' => 'advanced_armory', 'research_advturretfactory' => 'turret_factory' }.fetch(research,
-                                                                                                         research)
+    research
   end
 end

@@ -36,6 +36,8 @@ module Analysis
     end
 
     def requirements
+      @min_rounds_options = MarineTechPathQuery::MIN_ROUNDS_OPTIONS
+      @selected_min_rounds = MarineTechPathQuery.normalize_min_rounds(params[:min_rounds])
       query = MarineTechPathQuery.new(path_length: nil, min_rounds: 1, result_limit: nil)
       @tech_paths = query.call
       @rounds_analysed = query.rounds_analysed

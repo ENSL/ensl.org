@@ -13,14 +13,26 @@
     </nav>
   </div>
   <p class="text-sm text-gray-600">
-    Hover a research icon to reveal its prerequisite and available follow-up edges, plus observed results. Building nodes are
-    shown now and will gain results when their events enter the data feed.
+    Hover a research icon to reveal its prerequisite and available follow-up edges, plus observed results. The sample
+    threshold applies to each result, not each distinct tech path. Building nodes are shown now and will gain results when
+    their events enter the data feed.
   </p>
+
+  <%= form_with url: analysis_tech_requirements_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :min_rounds, 'Minimum samples:' %>
+        <%= select_tag :min_rounds,
+                       options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
 
   <div
     data-controller="static-tech-tree"
     data-static-tech-tree-diagram-value="<%= tech_requirement_tree_diagram %>"
-    data-static-tech-tree-nodes-value="<%= tech_requirement_tree_nodes(@tech_paths, @rounds_analysed).to_json %>"
+    data-static-tech-tree-nodes-value="<%= tech_requirement_tree_nodes(@tech_paths, @rounds_analysed, min_rounds: @selected_min_rounds).to_json %>"
   >
     <div class="tech-requirements__graph" data-static-tech-tree-target="graph"></div>
     <div class="tech-requirements__tooltip" data-static-tech-tree-target="tooltip" hidden></div>

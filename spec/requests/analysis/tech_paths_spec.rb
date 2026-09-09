@@ -111,4 +111,22 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe 'GET /analysis/tech_requirements' do
+    it 'aggregates fragmented research paths before applying the selected sample threshold' do
+      10.times do |index|
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: ["research_armorl#{(index % 3) + 1}", 'research_jetpacks'])
+      end
+
+      get '/analysis/tech_requirements', params: { min_rounds: 10 }
+
+      graph = Nokogiri::HTML(response.body).at_css('[data-static-tech-tree-nodes-value]')
+      node_data = graph['data-static-tech-tree-nodes-value']
+      jetpacks = JSON.parse(node_data).fetch('research_jetpacks').fetch('stats').fetch('overall')
+
+      expect(response).to have_http_status(:ok)
+      expect(jetpacks).to include('rounds' => 10)
+    end
+  end
 end
