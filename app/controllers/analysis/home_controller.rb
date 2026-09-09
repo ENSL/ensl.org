@@ -42,7 +42,11 @@ module Analysis
         title: 'NS1 Marine tech paths',
         description: 'Which NS1 marine opening research orders win the most, straight from the round logs.',
         icon: 'sitemap',
-        path_helper: :analysis_tech_paths_path
+        links: [
+          { label: 'List', icon: 'list', path_helper: :analysis_tech_paths_path },
+          { label: 'Paths', icon: 'project-diagram', path_helper: :analysis_tech_tree_path },
+          { label: 'Game tree', icon: 'sitemap', path_helper: :analysis_tech_requirements_path }
+        ]
       },
       {
         title: 'NS1 Round length',

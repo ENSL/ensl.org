@@ -8,22 +8,23 @@
 
   <div class="grid gap-6 sm:grid-cols-2">
     <% @pages.each do |page| %>
-      <%= link_to send(page[:path_helper]),
-                  class: 'group flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-6 shadow-sm ' \
-                         'transition duration-150 hover:-translate-y-1 hover:border-blue-400 hover:shadow-lg' do %>
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600
-                 transition duration-150 group-hover:bg-blue-600 group-hover:text-white"
-        >
-          <%= fa_icon(page[:icon], class: 'text-xl') %>
+      <section class="group flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition duration-150 hover:-translate-y-1 hover:border-blue-400 hover:shadow-lg">
+        <div class="flex items-start gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition duration-150 group-hover:bg-blue-600 group-hover:text-white">
+            <%= fa_icon(page[:icon], class: 'text-lg') %>
+          </div>
+          <h2 class="pt-2 text-lg font-semibold text-gray-900"><%= page[:title] %></h2>
         </div>
-        <h2 class="text-lg font-semibold text-gray-900"><%= page[:title] %></h2>
         <p class="text-sm text-gray-600"><%= page[:description] %></p>
-        <span class="mt-auto inline-flex items-center gap-1 text-sm font-medium text-blue-600">
-          View
-          <%= fa_icon('arrow-right', class: 'text-xs transition duration-150 group-hover:translate-x-1') %>
-        </span>
-      <% end %>
+        <div class="mt-auto flex items-center gap-4 text-sm font-medium text-blue-600">
+          <% (page[:links] || [{ label: 'View', icon: 'arrow-right', path_helper: page[:path_helper] }]).each do |link| %>
+            <%= link_to send(link[:path_helper]), class: 'inline-flex items-center gap-1 hover:text-blue-800' do %>
+              <%= link[:label] %>
+              <%= fa_icon(link[:icon], class: 'text-xs') %>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
     <% end %>
 
     <div

@@ -1,0 +1,32 @@
+<h1 class="title">NS1 Marine tech tree</h1>
+
+<div class="wide tech-tree">
+  <div class="tech-tree__header">
+    <p>Observed commander opening choices, joined where their research order overlaps.</p>
+    <nav class="tech-tree__links" aria-label="Tech tree views">
+      <%= link_to analysis_tech_paths_path, class: 'button tech-tree__list-link' do %>
+        <%= fa_icon('list') %> List
+      <% end %>
+      <%= link_to analysis_tech_requirements_path, class: 'button tech-tree__list-link' do %>
+        <%= fa_icon('sitemap') %> Game tree
+      <% end %>
+    </nav>
+  </div>
+  <p class="text-sm text-gray-600">
+    Based on <%= number_with_delimiter(@rounds_analysed) %> rounds. Each icon is a research option seen in at
+    least <%= MarineTechPathQuery::DEFAULT_MIN_ROUNDS %> openings. Every qualifying continuation is shown. Each node
+    shows the marine win rate; hover an icon for its name.
+  </p>
+
+  <% if @tech_paths.empty? %>
+    <p>No qualifying tech paths were found.</p>
+  <% else %>
+    <div
+      data-controller="tech-tree"
+      data-tech-tree-diagram-value="<%= tech_tree_diagram(@tech_paths) %>"
+      data-tech-tree-icons-value="<%= tech_tree_icons(@tech_paths).to_json %>"
+    >
+      <div class="tech-tree__graph" data-tech-tree-target="graph"></div>
+    </div>
+  <% end %>
+</div>

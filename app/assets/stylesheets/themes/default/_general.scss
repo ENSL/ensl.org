@@ -123,6 +123,114 @@
   white-space: pre;
 }
 
+.tech-tree__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  p { margin: 0; }
+}
+
+.tech-tree__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tech-tree__list-link {
+  float: none;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.tech-requirements__graph {
+  width: 100%;
+  margin-top: 20px;
+
+  svg {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .tech-requirements__icon { pointer-events: none; }
+  .tech-requirements__icon-background { fill: #000; }
+  .flowchart-link {
+    opacity: .65;
+    stroke: hsl(0deg 0% 45%);
+  }
+
+  .tech-requirements__observed-edge {
+    fill: none;
+    stroke: #36b1ff;
+    stroke-dasharray: 6 4;
+    stroke-width: 3px;
+  }
+
+  .tech-requirements__observed-edge-label {
+    fill: #0e4d78;
+    font-size: 11px;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+  }
+}
+
+.tech-requirements__tooltip {
+  position: fixed;
+  z-index: 10;
+  display: grid;
+  gap: 5px;
+  width: min(300px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid #0e4d78;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+  color: #21262a;
+  font-size: .8rem;
+  pointer-events: none;
+
+  strong {
+    color: #0e4d78;
+    font-size: .95rem;
+  }
+
+  b {
+    margin-top: 4px;
+    color: hsl(0deg 0% 45%);
+    font-size: .75rem;
+  }
+}
+
+.tech-tree__graph {
+  width: 100%;
+  margin-top: 20px;
+
+  svg {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .tech-tree__icon { pointer-events: none; }
+  .tech-tree__icon-background { fill: #000; }
+}
+
+@media (width <= 680px) {
+  .tech-tree__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tech-tree__links { justify-content: flex-start; }
+}
+
 // Weekday x hour activity heatmap on /analysis/activity. Cell background is
 // set inline (an alpha ramp on $marine-color) since the intensity is data,
 // not style; everything else about the grid lives here.

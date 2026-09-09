@@ -13,6 +13,7 @@ pin '@fortawesome/fontawesome-free',
 pin '@simplewebauthn/browser', to: 'https://cdn.jsdelivr.net/npm/@simplewebauthn/browser@13.3.0/esm/index.js', preload: true
 pin 'tributejs', to: 'https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.esm.js', preload: true
 pin 'chart.js', to: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/auto/+esm'
+pin 'mermaid', to: 'https://cdn.jsdelivr.net/npm/mermaid@11.12.1/+esm'
 
 pin 'local-time' # @3.0.3
 

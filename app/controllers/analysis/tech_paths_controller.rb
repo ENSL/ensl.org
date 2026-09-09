@@ -24,5 +24,23 @@ module Analysis
 
       render layout: 'full'
     end
+
+    def tree
+      query = MarineTechPathQuery.new(path_length: nil,
+                                      min_rounds: MarineTechPathQuery::DEFAULT_MIN_ROUNDS,
+                                      result_limit: nil)
+      @tech_paths = query.call
+      @rounds_analysed = query.rounds_analysed
+
+      render layout: 'full'
+    end
+
+    def requirements
+      query = MarineTechPathQuery.new(path_length: nil, min_rounds: 1, result_limit: nil)
+      @tech_paths = query.call
+      @rounds_analysed = query.rounds_analysed
+
+      render layout: 'full'
+    end
   end
 end

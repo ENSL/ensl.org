@@ -10,6 +10,8 @@ import SortableTableController from "controllers/sortable_table"
 import MapBalanceChartController from "controllers/map_balance_chart"
 import ActivityChartController from "controllers/activity_chart"
 import RoundLengthChartController from "controllers/round_length_chart"
+import TechTreeController from "controllers/tech_tree"
+import StaticTechTreeController from "controllers/static_tech_tree"
 import ArticleEditorController from "controllers/article_editor"
 import ArticleFileController from "controllers/article_file"
 import ArticleFormatController from "controllers/article_format"
@@ -32,6 +34,8 @@ application.register("sortable-table", SortableTableController)
 application.register("map-balance-chart", MapBalanceChartController)
 application.register("activity-chart", ActivityChartController)
 application.register("round-length-chart", RoundLengthChartController)
+application.register("tech-tree", TechTreeController)
+application.register("static-tech-tree", StaticTechTreeController)
 application.register("article-editor", ArticleEditorController)
 application.register("article-file", ArticleFileController)
 application.register("article-format", ArticleFormatController)

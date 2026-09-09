@@ -1,0 +1,28 @@
+<h1 class="title">NS1 Marine game tech tree</h1>
+
+<div class="wide tech-requirements">
+  <div class="tech-tree__header">
+    <p>Marine research and building prerequisites, with observed research results where log data is available.</p>
+    <nav class="tech-tree__links" aria-label="Tech tree views">
+      <%= link_to analysis_tech_paths_path, class: 'button tech-tree__list-link' do %>
+        <%= fa_icon('list') %> List
+      <% end %>
+      <%= link_to analysis_tech_tree_path, class: 'button tech-tree__list-link' do %>
+        <%= fa_icon('project-diagram') %> Paths
+      <% end %>
+    </nav>
+  </div>
+  <p class="text-sm text-gray-600">
+    Hover a research icon to reveal its prerequisite and available follow-up edges, plus observed results. Building nodes are
+    shown now and will gain results when their events enter the data feed.
+  </p>
+
+  <div
+    data-controller="static-tech-tree"
+    data-static-tech-tree-diagram-value="<%= tech_requirement_tree_diagram %>"
+    data-static-tech-tree-nodes-value="<%= tech_requirement_tree_nodes(@tech_paths, @rounds_analysed).to_json %>"
+  >
+    <div class="tech-requirements__graph" data-static-tech-tree-target="graph"></div>
+    <div class="tech-requirements__tooltip" data-static-tech-tree-target="tooltip" hidden></div>
+  </div>
+</div>
