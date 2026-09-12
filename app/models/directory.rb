@@ -54,7 +54,7 @@ class Directory < ApplicationRecord
 
   belongs_to :parent, class_name: 'Directory', optional: true
   has_many :subdirs, class_name: 'Directory', foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
-  has_many :files, -> { order('name') }, class_name: 'DataFile', inverse_of: :directory, dependent: :nullify
+  has_many :files, -> { order(created_at: :desc) }, class_name: 'DataFile', inverse_of: :directory, dependent: :nullify
 
   scope :ordered, ->  { order('name ASC') }
   scope :path_sorted, -> { order('path ASC') }

@@ -1,6 +1,7 @@
 <h1>Editing File</h1>
 
 <%= form_for(@file, html: { class: 'square' }) do |f| %>
+  <%= hidden_field_tag :return_to, @return_to %>
   <div id="<%= dom_id(@file) %>_errors_wrapper">
     <%= render 'shared/errors', messages: @file.errors.full_messages, container_id: "#{dom_id(@file)}_errors" %>
   </div>
@@ -24,6 +25,7 @@
 
   <div class="controls">
     <%= f.submit 'Update' %>
+    <%= link_to 'Back to directory', @return_to, class: 'button' %>
   </div>
 <% end %>
 

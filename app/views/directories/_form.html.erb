@@ -1,4 +1,4 @@
-<div class="wide box">
+<div class="box">
   <%= form_for directory, html: { class: "square" } do |f| %>
     <div id="<%= dom_id(directory) %>_errors_wrapper">
       <%= render 'shared/errors', messages: directory.errors.full_messages, container_id: "#{dom_id(directory)}_errors" %>

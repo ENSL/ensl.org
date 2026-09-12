@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DirectoriesController < ApplicationController
+  layout 'full'
+
   before_action :load_directory, except: %i[new create]
   respond_to :html, :turbo_stream
 

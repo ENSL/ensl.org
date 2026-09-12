@@ -104,6 +104,19 @@ RSpec.describe 'DataFilesController', type: :request do
   end
 
   describe 'GET /data_files/:id/edit' do
+    it 'renders full-width and preserves a safe directory return path' do
+      login_as(admin)
+      directory = create(:directory, parent: ensure_root_directory)
+      file = create(:data_file, directory: directory)
+
+      get "/data_files/#{file.id}/edit", params: { return_to: directory_path(directory) }
+
+      expect(response).to render_template(layout: 'full')
+      expect(response.body).to include('name="return_to"')
+      expect(response.body).to include("value=\"#{directory_path(directory)}\"")
+      expect(response.body).to include('Back to directory')
+    end
+
     it 'renders related-file options including the related count suffix' do
       login_as(admin)
       directory = create(:directory, parent: ensure_root_directory)

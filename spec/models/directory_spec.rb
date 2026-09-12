@@ -50,6 +50,14 @@ describe Directory do
     it { is_expected.to belong_to(:parent).optional }
     it { is_expected.to have_many(:subdirs) }
     it { is_expected.to have_many(:files) }
+
+    it 'orders files from newest to oldest' do
+      directory = create(:directory)
+      older = create(:data_file, directory: directory, created_at: 2.days.ago)
+      newer = create(:data_file, directory: directory, created_at: 1.day.ago)
+
+      expect(directory.files).to eq([newer, older])
+    end
   end
 
   describe 'validations' do

@@ -32,6 +32,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     within("#dir_#{parent.id}") do
       expect(page).to have_content('Directory intro')
       expect(page).to have_link(child.title)
+      expect(page.evaluate_script("getComputedStyle(document.querySelector('#dir_#{parent.id} .subdirectories ul')).listStyleType")).to eq('disc')
       expect(page).to have_content(file.title)
       expect(page).to have_content('Release notes text')
       expect(page).not_to have_link('Edit Directory')
@@ -91,6 +92,39 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     directory.reload
     expect(directory.title).to eq('After Title')
     expect(directory.description).to eq('After description')
+  end
+
+  scenario 'admin opens a file edit action and returns to its directory' do
+    root = ensure_root_directory!
+    directory = create(:directory, parent: root, title: 'File Actions')
+    child = create(:directory, parent: directory, title: 'Visible Child')
+    file = create(:data_file, directory: directory, title: 'Editable File')
+
+    sign_in_via_session(admin)
+    visit directory_path(root)
+    open_directory_tab(directory)
+
+    within("#file_#{file.id}") do
+      find("a.edit-file[aria-label='Edit file']").click
+    end
+
+    expect(page).to have_current_path(edit_data_file_path(file, return_to: directory_path(directory)))
+    expect(page).to have_css('h1', text: 'Editing File')
+    click_link 'Back to directory'
+
+    expect(page).to have_current_path(directory_path(directory))
+    expect(page).to have_css("#dir_#{directory.id}", visible: true)
+    expect(page).to have_link(child.title)
+
+    within("#file_#{file.id}") do
+      accept_confirm do
+        find("a.remove-file[aria-label='Remove file']").click
+      end
+    end
+
+    expect(page).to have_current_path(directory_path(directory))
+    expect(page).not_to have_css("#file_#{file.id}")
+    expect(DataFile.exists?(file.id)).to be false
   end
 
   scenario 'admin deletes a directory from directory controls' do

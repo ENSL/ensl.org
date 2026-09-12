@@ -32,6 +32,24 @@ RSpec.describe 'DirectoriesController', type: :request do
   end
 
   describe 'GET /directories/:id' do
+    it 'renders a full-width listing with descriptions, modification times, and working admin actions' do
+      directory = create(:directory, parent: ensure_root_directory, hidden: false, description: 'Directory intro')
+      child = create(:directory, parent: directory, title: 'Child directory')
+      older = create(:data_file, directory: directory, title: 'Older file', created_at: 2.days.ago)
+      newer = create(:data_file, directory: directory, title: 'Newer file', created_at: 1.day.ago)
+      login_as(admin)
+
+      get "/directories/#{directory.id}"
+
+      expect(response).to render_template(layout: 'full')
+      expect(response.body.index('Directory intro')).to be < response.body.index(child.title)
+      expect(response.body.index(newer.title)).to be < response.body.index(older.title)
+      expect(response.body).to include('class="file-modified"')
+      expect(response.body).to include(edit_data_file_path(newer, return_to: directory_path(directory)))
+      expect(response.body).to include('data-turbo-method="delete"')
+      expect(response.body).to include('data-turbo-confirm="Are you sure?"')
+    end
+
     it 'renders the file list for a hidden directory' do
       directory = create(:directory, parent: ensure_root_directory, hidden: true)
       data_file = create(

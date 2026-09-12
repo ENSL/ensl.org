@@ -3,6 +3,7 @@
     <th class="file-name">Name</th>
     <th class="file-path">Path</th>
     <th class="file-size">Size</th>
+    <th class="file-modified">Modified</th>
     <th class="actions">Actions</th>
   </tr>
 
@@ -11,11 +12,15 @@
       <td class="file-name"><%= namelink file %></td>
       <td class="file-path"><%= h file.url %></td>
       <td class="file-size"><%= file.size_s %></td>
+      <td class="file-modified"><%= shorttime file.created_at %></td>
       <td class="actions">
         <% if file.can_update? cuser %>
-          <%= link_to fa_icon('pencil'), edit_data_file_path(file) %>
+          <%= link_to fa_icon('pencil'), edit_data_file_path(file, return_to: directory_path(file.directory)),
+            class: 'edit-file', title: 'Edit file', aria: { label: 'Edit file' } %>
           <% end; if file.can_destroy? cuser %>
-          <%= link_to fa_icon('times'), file, confirm: 'Are you sure?', method: :delete %>
+          <%= link_to fa_icon('times'), file,
+            class: 'remove-file', title: 'Remove file', aria: { label: 'Remove file' },
+            data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
         <% end %>
       </td>
     </tr>

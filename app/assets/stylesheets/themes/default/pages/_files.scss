@@ -33,6 +33,15 @@ table.files-list {
 
 #files {
 
+  .subdirectories ul.disc {
+    list-style-type: disc;
+    margin: 20px 0;
+
+    li {
+      margin-left: 40px;
+    }
+  }
+
   .file {
     display: flow-root;
     width: 100%;
@@ -45,6 +54,15 @@ table.files-list {
       position: absolute;
       top: 20px;
       right: 0;
+      z-index: 1;
+
+      a {
+        align-items: center;
+        display: inline-flex;
+        height: 24px;
+        justify-content: center;
+        width: 24px;
+      }
     }
 
     .comments {

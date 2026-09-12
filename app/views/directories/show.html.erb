@@ -35,10 +35,11 @@
         <% if !dir.parent_root? %>
           <h3><%= directory_links @directory %></h3>
         <% end %>
-        <% if !dir.subdirs.ordered.empty?  %>
-          <% if dir.parent_root?  %>
-            <h3>Sub-directories</h3>
-          <% end %>
+        <% if dir.description.present? %>
+          <p><%= dir.description %></p>
+        <% end %>
+          <h3>Sub-directories</h3>
+        <% if dir.subdirs.ordered.any? %>
             <div class="subdirectories">
               <ul class="disc">
                 <% dir.subdirs.ordered.each do |subdir| %>
@@ -46,12 +47,10 @@
                 <% end %>
               </ul>
             </div>
-          <% end %>
-        </div>
-
-        <% if dir.description.present? %>
-          <p><%= dir.description %></p>
+        <% else %>
+          <p class="subdirectories empty">No sub-directories.</p>
         <% end %>
+        </div>
 
         <h3>Files</h3>
 
@@ -59,11 +58,14 @@
           <div class="file" id="file_<%= file.id %>">
             <div class="actions">
               <% if file.can_update? cuser %>
-                <%= link_to fa_icon('pencil'), edit_data_file_path(file) %>
+                <%= link_to fa_icon('pencil'), edit_data_file_path(file, return_to: directory_path(dir)),
+                  class: 'edit-file', title: 'Edit file', aria: { label: 'Edit file' } %>
               <% end %>
 
               <% if file.can_destroy? cuser %>
-                <%= link_to fa_icon('times'), file, confirm: 'Are you sure?', method: :delete %>
+                <%= link_to fa_icon('times'), file,
+                  class: 'remove-file', title: 'Remove file', aria: { label: 'Remove file' },
+                  data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
               <% end %>
             </div>
 
@@ -72,6 +74,7 @@
 
             <div class="comments">
               <%= fa_icon('fa-solid fa-ruler-vertical') %> <%= file.size_s %>
+              <span class="file-modified"><%= fa_icon('clock') %> <%= shorttime file.created_at %></span>
 
               <% if file.related_files.count > 0 %>
                 <%= link_to file do %>

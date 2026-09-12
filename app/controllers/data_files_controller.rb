@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DataFilesController < ApplicationController
+  layout 'full'
+
   before_action :load_file, only: %i[show edit update destroy rate]
   before_action :prepare_edit_form_data, only: %i[edit update]
   respond_to :html, :turbo_stream
@@ -114,6 +116,7 @@ class DataFilesController < ApplicationController
 
   def prepare_edit_form_data
     @add_related_options = DataFile.related_selection_options(@file)
+    @return_to = safe_return_to || directory_path(@file.directory)
   end
 
   def prepare_article_file_response
