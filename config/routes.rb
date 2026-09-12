@@ -37,6 +37,7 @@ Rails.application.routes.draw do
     resources :maps, only: [:index]
     resources :pick_orders, only: [:index]
     resources :tech_paths, only: [:index]
+    resources :alien_strategies, only: [:index]
     get 'tech_tree', to: 'tech_paths#tree'
     get 'alien_tech_tree', to: 'tech_paths#alien_tree'
     get 'tech_requirements', to: 'tech_paths#requirements'

@@ -13,6 +13,7 @@ require 'duckdb'
 #   <exports_dir>/<batch_id>/skill_<model>/*.parquet     (per-player model output)
 #   <exports_dir>/<batch_id>/users/*.parquet             (player stats + steamid lookup)
 #   <exports_dir>/<batch_id>/class_stats/*.parquet       (per-player class totals)
+#   <exports_dir>/<batch_id>/alien_strategies/*.parquet  (per-round alien strategies)
 #   <exports_dir>/<batch_id>/map_balance/*.parquet       (per-map win rates)
 #   <exports_dir>/<batch_id>/time_of_week/*.parquet      (round counts per hour-of-week)
 #
@@ -108,14 +109,7 @@ class AnalysisBatchImportService
 
     # Kept per source as well as flattened, so a run can report which export
     # each chunk of the single-table import came from.
-    by_source = {
-      legacy: read_legacy_rows(connection, imported_at),
-      skill_models: read_skill_model_rows(connection, imported_at),
-      player_stats: read_player_stat_rows(connection, imported_at),
-      class_stats: read_class_stat_rows(connection, imported_at),
-      map_balance: read_map_balance_rows(connection, imported_at),
-      time_of_week: read_time_of_week_rows(connection, imported_at)
-    }
+    by_source = source_rows(connection, imported_at)
     @source_counts = by_source.transform_values(&:size)
     rows = by_source.values.flatten(1)
 
@@ -125,6 +119,18 @@ class AnalysisBatchImportService
   ensure
     connection&.close
     database&.close
+  end
+
+  def source_rows(connection, imported_at)
+    {
+      legacy: read_legacy_rows(connection, imported_at),
+      skill_models: read_skill_model_rows(connection, imported_at),
+      player_stats: read_player_stat_rows(connection, imported_at),
+      class_stats: read_class_stat_rows(connection, imported_at),
+      alien_strategies: read_alien_strategy_rows(connection, imported_at),
+      map_balance: read_map_balance_rows(connection, imported_at),
+      time_of_week: read_time_of_week_rows(connection, imported_at)
+    }
   end
 
   # Legacy/aggregate sources: an older WIP layout wrote a single
@@ -203,6 +209,23 @@ class AnalysisBatchImportService
         historical_row(imported_at, steamid: steamid, model: "class_stats:#{class_name}", metric: metric,
                                     value: value, milestone: nil)
       end
+    end
+  end
+
+  def read_alien_strategy_rows(connection, imported_at)
+    glob = existing_glob('alien_strategies')
+    return [] unless glob
+
+    sql = <<~SQL.squish
+      SELECT round_id, result, duration_seconds, strategy
+      FROM read_parquet('#{glob}')
+      WHERE strategy IS NOT NULL AND result IN (0, 1)
+    SQL
+
+    connection.query(sql).map do |(round_id, result, duration_seconds, strategy)|
+      historical_row(imported_at, steamid: strategy, model: 'alien_strategy',
+                                  metric: result.zero? ? 'alien_win' : 'marine_win',
+                                  value: duration_seconds || 0, milestone: round_id)
     end
   end
 

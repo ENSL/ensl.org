@@ -1,0 +1,86 @@
+<h1 class="title">NS1 Alien strategies</h1>
+
+<div class="box wide alien-strategies">
+  <p>
+    Alien team strategies from analysis batch <%= @batch_id || 'not imported' %>, grouped by the
+    opening actions of all six players. Role slots are interchangeable: the same six role paths
+    count together even when they appear under different role numbers in the source data.
+  </p>
+  <p class="text-sm text-gray-600">
+    Each icon lane is one player. The action limit keeps only the first N actions in every lane,
+    so a longer path beginning Gorge &rarr; Resource Tower &rarr; Skulk joins that three-action group.
+  </p>
+
+  <%= form_with url: analysis_alien_strategies_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :action_limit, 'Actions per role:' %>
+        <%= select_tag :action_limit,
+                       options_for_select(
+                         @action_limit_options.map { |n| ["first #{n}", n] } +
+                           [['uncapped', AlienStrategyQuery::UNCAPPED_ACTION_LIMIT]],
+                         @selected_action_limit || AlienStrategyQuery::UNCAPPED_ACTION_LIMIT
+                       ),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :min_rounds, 'Minimum rounds per group:' %>
+        <%= select_tag :min_rounds,
+                       options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :result_limit, 'Cards:' %>
+        <%= select_tag :result_limit,
+                       options_for_select(
+                         @result_limit_options.map { |n| ["top #{n}", n] } +
+                           [['all qualifying', AlienStrategyQuery::UNCAPPED_RESULT_LIMIT]],
+                         @selected_result_limit || AlienStrategyQuery::UNCAPPED_RESULT_LIMIT
+                       ),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
+
+  <% if @strategies.empty? %>
+    <p>
+      <% if @batch_id %>
+        None of the <%= number_with_delimiter(@strategies_found) %> strategies was used in
+        <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
+      <% else %>
+        Alien strategy data has not been imported yet.
+      <% end %>
+    </p>
+  <% else %>
+    <p class="text-sm text-gray-600">
+      Based on <%= number_with_delimiter(@rounds_analysed) %> rounds from batch <%= @batch_id %>.
+      <%= number_with_delimiter(@strategies_above_minimum) %> of
+      <%= number_with_delimiter(@strategies_found) %> strategies meet the
+      <%= @selected_min_rounds %>-round minimum; showing
+      <%= @selected_result_limit && @strategies_above_minimum > @strategies.size ?
+            "the best #{@strategies.size} by alien win rate" : "all #{@strategies.size} qualifying strategies" %>.
+    </p>
+
+    <div class="alien-strategy-grid">
+      <% @strategies.each do |strategy| %>
+        <article class="alien-strategy-card">
+          <div class="alien-strategy-card__roles" aria-label="Six player role paths">
+            <% strategy[:roles].each do |role| %>
+              <div class="alien-strategy-role"><%= alien_strategy_role_display(role) %></div>
+            <% end %>
+          </div>
+          <dl class="alien-strategy-card__stats">
+            <div class="alien-strategy-card__primary" style="<%= alien_strategy_win_style(strategy[:win_ratio]) %>">
+              <dt>Alien win rate</dt>
+              <dd><%= number_with_precision(strategy[:win_ratio], precision: 1) %>%</dd>
+            </div>
+            <div><dt>Rounds</dt><dd><%= number_with_delimiter(strategy[:rounds]) %></dd></div>
+            <div><dt>Record</dt><dd><%= strategy[:wins] %>&ndash;<%= strategy[:losses] %></dd></div>
+            <div><dt>Reach</dt><dd><%= number_with_precision(strategy[:reach_rate], precision: 1) %>%</dd></div>
+            <div><dt>Median win</dt><dd><%= alien_strategy_duration(strategy[:median_win_time]) %></dd></div>
+          </dl>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</div>

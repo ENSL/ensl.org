@@ -55,6 +55,12 @@ module Analysis
         path_helper: :analysis_alien_tech_tree_path
       },
       {
+        title: 'NS1 Alien strategies',
+        description: 'Six-player alien role and build combinations, grouped by their opening actions and win rate.',
+        icon: 'layer-group',
+        path_helper: :analysis_alien_strategies_path
+      },
+      {
         title: 'NS1 Round length',
         description: 'How marine and alien win rates shift with round length, overall or on a single map.',
         icon: 'stopwatch',

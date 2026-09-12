@@ -31,6 +31,19 @@ module AnalysisHelper
     'movementchamber' => '/images/ns1/640alienupgradecategories_2.png',
     'sensorychamber' => '/images/ns1/640alienupgradecategories_3.png'
   }.freeze
+  ALIEN_STRATEGY_ACTIONS = {
+    'skulk' => { label: 'Skulk', icon: 'skulk.png' },
+    'gorge' => { label: 'Gorge', icon: 'gorge.png' },
+    'lerk' => { label: 'Lerk', icon: 'lerk.png' },
+    'fade' => { label: 'Fade', icon: 'fade.png' },
+    'onos' => { label: 'Onos', icon: 'onos.png' },
+    'rt' => { label: 'Alien Resource Tower', icon: '640alienupgradecategories_4.png' },
+    'dc' => { label: 'Defense Chamber', icon: 'defensechamber.png' },
+    'mc' => { label: 'Movement Chamber', icon: 'movementchamber.png' },
+    'oc' => { label: 'Offense Chamber', icon: 'offensechamber.png' },
+    'sc' => { label: 'Sensory Chamber', icon: 'sensorychamber.png' },
+    'hive' => { label: 'Hive', icon: '640alienupgradecategories_5.png' }
+  }.freeze
 
   # columns: array of hashes, each with:
   #   key         - symbol used to look up the raw value in each row hash
@@ -65,6 +78,31 @@ module AnalysisHelper
   # Plain-text version of the same path, used as the client-side sort key.
   def tech_path_label(path)
     path.map { |research| tech_path_research_name(research) }.join(' > ')
+  end
+
+  def alien_strategy_role_display(path)
+    path = ['skulk'] if path == ['none']
+
+    actions = path.map do |action|
+      details = ALIEN_STRATEGY_ACTIONS[action]
+      next tag.span(action.upcase, class: 'alien-strategy-action__fallback') unless details
+
+      image_tag(tech_icon_path(details[:icon]), class: 'alien-strategy-action__icon', alt: details[:label],
+                                                title: details[:label])
+    end
+    safe_join(actions, tag.span('›', class: 'alien-strategy-role__arrow', aria: { hidden: true }))
+  end
+
+  def alien_strategy_win_style(win_ratio)
+    hue = (win_ratio.clamp(0, 100) * 1.2).round
+    "--win-hue: #{hue}"
+  end
+
+  def alien_strategy_duration(seconds)
+    return '—' unless seconds
+
+    duration = seconds.to_i
+    format('%<minutes>d:%<seconds>02d', minutes: duration / 60, seconds: duration % 60)
   end
 
   def tech_tree_diagram(paths)
