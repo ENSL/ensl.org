@@ -45,6 +45,17 @@ RSpec.describe AnalysisBatchImportService do
       expect(stat.inserted).to eq(1)
       expect(stat.existing).to eq(0)
     end
+
+    it 'rejects oversized steamids before bulk upsert' do
+      rows = [{ batch_id: batch_id, steamid: 's' * 256, model: 'os', metric: 'skill', value: 1.0,
+                milestone: AnalysisResult::NO_MILESTONE, created_at: Time.current }]
+      allow(service).to receive(:read_rows).and_return(rows)
+      allow(AnalysisResult).to receive(:upsert_all)
+
+      expect { service.call }.to raise_error(AnalysisBatchImportService::Error,
+                                             /row 1: steamid=.*exceeds 255 characters/)
+      expect(AnalysisResult).not_to have_received(:upsert_all)
+    end
   end
 
   describe '#read_rows' do
@@ -180,6 +191,22 @@ RSpec.describe AnalysisBatchImportService do
       expect(rows.map { |row| row[:model] }.uniq).to eq(['class_stats:skulk'])
       expect(rows.map { |row| row[:metric] }).to match_array(AnalysisBatchImportService::CLASS_STAT_METRICS)
       expect(rows).to all(include(steamid: '0:1:2'))
+    end
+  end
+
+  describe '#read_alien_strategy_rows' do
+    let(:connection) { instance_double('DuckDB::Connection') }
+
+    it 'removes redundant role labels so long strategy paths fit the subject column' do
+      strategy = Array.new(6) { |index| "r#{index + 1}=#{'x' * 39}" }.join(',')
+      allow(service).to receive(:existing_glob).with('alien_strategies').and_return('/tmp/strategies/*.parquet')
+      allow(connection).to receive(:query).and_return([[1, 0, 10, strategy]])
+
+      row = service.send(:read_alien_strategy_rows, connection, Time.current).first
+
+      expect(strategy.length).to eq(257)
+      expect(row[:steamid]).to eq(Array.new(6, 'x' * 39).join(','))
+      expect(row[:steamid].length).to eq(239)
     end
   end
 

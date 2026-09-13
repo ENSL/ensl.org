@@ -75,6 +75,7 @@ class AnalysisBatchImportService
     rows = read_rows
     return ImportRowStat.new(processed: 0, inserted: 0) if rows.empty?
 
+    validate_row_lengths!(rows)
     max_id_before = AnalysisResult.maximum(:id) || 0
     rows.each_slice(UPSERT_SLICE_SIZE) do |slice|
       # unique_by is intentionally omitted: MySQL doesn't support it (Rails
@@ -223,7 +224,7 @@ class AnalysisBatchImportService
     SQL
 
     connection.query(sql).map do |(round_id, result, duration_seconds, strategy)|
-      historical_row(imported_at, steamid: strategy, model: 'alien_strategy',
+      historical_row(imported_at, steamid: compact_alien_strategy(strategy), model: 'alien_strategy',
                                   metric: result.zero? ? 'alien_win' : 'marine_win',
                                   value: duration_seconds || 0, milestone: round_id)
     end
@@ -294,6 +295,26 @@ class AnalysisBatchImportService
 
   def current_snapshot_row(imported_at, attrs)
     historical_row(imported_at, attrs).merge(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID)
+  end
+
+  def compact_alien_strategy(strategy)
+    strategy.to_s.split(',').map { |assignment| assignment.sub(/\Ar\d+=/, '') }.join(',')
+  end
+
+  def validate_row_lengths!(rows)
+    string_limits = AnalysisResult.columns_hash.filter_map do |column, definition|
+      [column, definition.limit] if definition.type == :string && definition.limit
+    end.to_h
+
+    rows.each_with_index do |row, index|
+      string_limits.each do |column, limit|
+        value = row[column.to_sym]
+        next unless value.is_a?(String) && value.length > limit
+
+        raise Error,
+              "Invalid analysis result at row #{index + 1}: #{column}=#{value.inspect} exceeds #{limit} characters"
+      end
+    end
   end
 
   def batch_dir

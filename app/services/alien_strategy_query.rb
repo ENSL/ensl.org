@@ -105,7 +105,7 @@ class AlienStrategyQuery
   def canonical_roles(strategy)
     roles = strategy.split(',').filter_map do |assignment|
       _slot, actions = assignment.split('=', 2)
-      next unless actions
+      actions ||= _slot
 
       path = actions.split('+')
       path = path.first(@action_limit) if @action_limit
