@@ -24,7 +24,8 @@
         <%= select_tag :action_limit,
                        options_for_select(
                          @action_limit_options.map { |n| ["first #{n}", n] } +
-                           [['uncapped', AlienStrategyQuery::UNCAPPED_ACTION_LIMIT]],
+                           [['best across limits', AlienStrategyQuery::BEST_ACTION_LIMIT],
+                            ['uncapped', AlienStrategyQuery::UNCAPPED_ACTION_LIMIT]],
                          @selected_action_limit || AlienStrategyQuery::UNCAPPED_ACTION_LIMIT
                        ),
                        onchange: 'this.form.requestSubmit()' %>
@@ -77,7 +78,7 @@
       Based on <%= number_with_delimiter(@rounds_analysed) %> rounds from batch <%= @batch_id %>.
       <%= number_with_delimiter(@results_above_filters) %> qualifying
       <%= @selected_result_view == 'role_actions' ? 'role actions' : 'six-player strategies' %>
-      meet the selected filters; showing
+      <%= @selected_action_limit == AlienStrategyQuery::BEST_ACTION_LIMIT ? 'across all action limits ' : '' %>meet the selected filters; showing
       <%= @selected_result_limit && @results_above_filters > @strategies.size ?
         "the best #{@strategies.size} by alien win rate" :
         "all #{@strategies.size} qualifying #{@selected_result_view == 'role_actions' ? 'role actions' : 'strategies'}" %>.
@@ -86,6 +87,11 @@
     <div class="alien-strategy-grid">
       <% @strategies.each do |strategy| %>
         <article class="alien-strategy-card">
+          <% if strategy[:action_limit] %>
+            <p class="text-sm text-gray-600">Best at first <%= strategy[:action_limit] %> actions per role</p>
+          <% elsif @selected_action_limit == AlienStrategyQuery::BEST_ACTION_LIMIT %>
+            <p class="text-sm text-gray-600">Best at uncapped actions per role</p>
+          <% end %>
           <div class="alien-strategy-card__roles" aria-label="<%= @selected_result_view == 'role_actions' ? 'Role action' : 'Six player role paths' %>">
             <% if @selected_result_view == 'role_actions' %>
               <div class="alien-strategy-role"><%= alien_strategy_role_display(strategy[:role]) %></div>

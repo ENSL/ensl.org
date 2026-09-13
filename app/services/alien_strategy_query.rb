@@ -8,6 +8,7 @@ class AlienStrategyQuery
   ACTION_LIMIT_OPTIONS = (1..10).to_a.freeze
   DEFAULT_ACTION_LIMIT = 3
   UNCAPPED_ACTION_LIMIT = 'all'
+  BEST_ACTION_LIMIT = 'best'
 
   MIN_ROUNDS_OPTIONS = [5, 10, 25, 50].freeze
   DEFAULT_MIN_ROUNDS = 10
@@ -23,6 +24,7 @@ class AlienStrategyQuery
 
   def self.normalize_action_limit(value)
     return nil if value.to_s == UNCAPPED_ACTION_LIMIT
+    return BEST_ACTION_LIMIT if value.to_s == BEST_ACTION_LIMIT
 
     ACTION_LIMIT_OPTIONS.include?(value.to_i) ? value.to_i : DEFAULT_ACTION_LIMIT
   end
@@ -67,11 +69,11 @@ class AlienStrategyQuery
   end
 
   def strategies_found
-    tally.size
+    @action_limit == BEST_ACTION_LIMIT ? best_candidate_rows.size : tally.size
   end
 
   def strategies_above_minimum
-    qualifying_rows.size
+    @action_limit == BEST_ACTION_LIMIT ? best_candidate_rows.size : qualifying_rows.size
   end
 
   def results_above_filters
@@ -86,15 +88,38 @@ class AlienStrategyQuery
 
   def result_rows
     @result_rows ||= begin
-      rows = @result_view == 'role_actions' ? qualifying_role_action_rows : qualifying_rows
+      rows = @action_limit == BEST_ACTION_LIMIT ? best_candidate_rows : selected_result_rows
       rows.select do |row|
         @min_median_win_time.nil? || row[:median_win_time] && row[:median_win_time] >= @min_median_win_time
       end
     end
   end
 
-  def qualifying_rows
-    @qualifying_rows ||= tally.filter_map do |roles, counts|
+  def selected_result_rows(action_limit = @action_limit)
+    @result_view == 'role_actions' ? qualifying_role_action_rows(action_limit) : qualifying_rows(action_limit)
+  end
+
+  def best_candidate_rows
+    @best_candidate_rows ||= begin
+      rows = (ACTION_LIMIT_OPTIONS + [nil]).flat_map do |action_limit|
+        selected_result_rows(action_limit).map { |row| row.merge(action_limit: action_limit) }
+      end
+
+      rows.each_with_object({}) do |row, unique_rows|
+        # Longer limits can reproduce an identical group when no player took another action.
+        unique_rows[best_row_key(row)] ||= row
+      end.values
+    end
+  end
+
+  def best_row_key(row)
+    group = @result_view == 'role_actions' ? row[:role] : row[:roles]
+    [group, row[:rounds], row[:wins], row[:losses], row[:median_win_time]]
+  end
+
+  def qualifying_rows(action_limit = @action_limit)
+    @qualifying_rows ||= {}
+    @qualifying_rows[action_limit] ||= tally(action_limit).filter_map do |roles, counts|
       rounds = counts[:wins] + counts[:losses]
       next if rounds < @min_rounds
 
@@ -105,8 +130,9 @@ class AlienStrategyQuery
     end
   end
 
-  def qualifying_role_action_rows
-    @qualifying_role_action_rows ||= role_action_tally.filter_map do |role, counts|
+  def qualifying_role_action_rows(action_limit = @action_limit)
+    @qualifying_role_action_rows ||= {}
+    @qualifying_role_action_rows[action_limit] ||= role_action_tally(action_limit).filter_map do |role, counts|
       rounds = counts[:wins] + counts[:losses]
       next if rounds < @min_rounds
 
@@ -117,21 +143,23 @@ class AlienStrategyQuery
     end
   end
 
-  def tally
+  def tally(action_limit = @action_limit)
     empty_counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0, win_times: [] } }
-    @tally ||= strategy_results.each_with_object(empty_counts) do |row, counts|
+    @tallies ||= {}
+    @tallies[action_limit] ||= strategy_results.each_with_object(empty_counts) do |row, counts|
       outcome = row.metric == 'alien_win' ? :wins : :losses
-      strategy_counts = counts[canonical_roles(row.steamid)]
+      strategy_counts = counts[canonical_roles(row.steamid, action_limit)]
       strategy_counts[outcome] += 1
       strategy_counts[:win_times] << row.value if outcome == :wins && row.value.positive?
     end
   end
 
-  def role_action_tally
+  def role_action_tally(action_limit = @action_limit)
     empty_counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0, win_times: [] } }
-    @role_action_tally ||= strategy_results.each_with_object(empty_counts) do |row, counts|
+    @role_action_tallies ||= {}
+    @role_action_tallies[action_limit] ||= strategy_results.each_with_object(empty_counts) do |row, counts|
       outcome = row.metric == 'alien_win' ? :wins : :losses
-      canonical_roles(row.steamid).uniq.each do |role|
+      canonical_roles(row.steamid, action_limit).uniq.each do |role|
         role_counts = counts[role]
         role_counts[outcome] += 1
         role_counts[:win_times] << row.value if outcome == :wins && row.value.positive?
@@ -157,13 +185,13 @@ class AlienStrategyQuery
                           end
   end
 
-  def canonical_roles(strategy)
+  def canonical_roles(strategy, action_limit = @action_limit)
     roles = strategy.split(',').filter_map do |assignment|
       _slot, actions = assignment.split('=', 2)
       actions ||= _slot
 
       path = actions.split('+')
-      path = path.first(@action_limit) if @action_limit
+      path = path.first(action_limit) if action_limit
       path.freeze
     end
     roles.sort_by { |path| [path == ['none'] ? 1 : 0, path.join('+')] }.freeze

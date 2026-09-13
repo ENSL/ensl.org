@@ -33,4 +33,11 @@ RSpec.describe 'Analysis::AlienStrategiesController', type: :request do
     expect(response).to have_http_status(:ok)
     expect(response.body).to include('Median win at least:', '30:00', 'Fade')
   end
+
+  it 'offers a best-across-limits action filter' do
+    get '/analysis/alien_strategies', params: { action_limit: 'best' }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('best across limits')
+  end
 end

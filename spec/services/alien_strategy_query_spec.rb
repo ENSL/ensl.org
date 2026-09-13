@@ -44,6 +44,30 @@ RSpec.describe AlienStrategyQuery do
       expect(results.map { |result| result[:role] }).to include(['fade'])
       expect(results.map { |result| result[:role] }).not_to include(['gorge'])
     end
+
+    it 'includes the strongest qualifying groups from different action limits in best mode' do
+      10.times do |index|
+        create_strategy_result(strategy: 'gorge+hive,skulk,skulk,skulk,skulk,skulk',
+                               metric: index < 8 ? 'alien_win' : 'marine_win',
+                               value: index < 8 ? 900 : 0, milestone: index + 20)
+        create_strategy_result(strategy: 'gorge+rt,skulk,skulk,skulk,skulk,skulk', metric: 'marine_win',
+                               value: 0, milestone: index + 30)
+      end
+
+      results = described_class.new(action_limit: 'best', min_rounds: 10, result_limit: nil,
+                                    result_view: 'strategies').call
+
+      best_two_action_group = results.find do |result|
+        result[:action_limit] == 2 && result[:roles].first == %w[gorge hive]
+      end
+      one_action_group = results.find do |result|
+        result[:action_limit] == 1 && result[:roles].first == ['gorge']
+      end
+
+      expect(best_two_action_group).to include(rounds: 10, wins: 8, losses: 2, win_ratio: 80.0)
+      expect(one_action_group).to include(rounds: 30, wins: 14, losses: 16,
+                                          win_ratio: (14 * 100.0 / 30))
+    end
   end
 
   describe 'defaults' do
