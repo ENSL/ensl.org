@@ -2,13 +2,19 @@
 
 <div class="box wide alien-strategies">
   <p>
-    Alien team strategies from analysis batch <%= @batch_id || 'not imported' %>, grouped by the
-    opening actions of all six players. Role slots are interchangeable: the same six role paths
-    count together even when they appear under different role numbers in the source data.
+    Alien team strategies from analysis batch <%= @batch_id || 'not imported' %>. Role slots are
+    interchangeable: the same paths count together even when they appear under different role
+    numbers in the source data.
   </p>
   <p class="text-sm text-gray-600">
-    Each icon lane is one player. The action limit keeps only the first N actions in every lane,
-    so a longer path beginning Gorge &rarr; Resource Tower &rarr; Skulk joins that three-action group.
+    <% if @selected_result_view == 'role_actions' %>
+      Best role actions combine every round containing the same player action path. The action limit keeps only the
+      first N actions in that path, so a longer path beginning Gorge &rarr; Resource Tower &rarr; Skulk joins that
+      three-action result.
+    <% else %>
+      Each icon lane is one player. The action limit keeps only the first N actions in every lane, so a longer path
+      beginning Gorge &rarr; Resource Tower &rarr; Skulk joins that three-action group.
+    <% end %>
   </p>
 
   <%= form_with url: analysis_alien_strategies_path, method: :get, local: true do %>
@@ -24,9 +30,24 @@
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
+        <%= label_tag :result_view, 'Show:' %>
+        <%= select_tag :result_view,
+                       options_for_select([['best role actions', 'role_actions'], ['six-player strategies', 'strategies']],
+                                          @selected_result_view),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
         <%= label_tag :min_rounds, 'Minimum rounds per group:' %>
         <%= select_tag :min_rounds,
                        options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :min_median_win_time, 'Median win at least:' %>
+        <%= select_tag :min_median_win_time,
+                       options_for_select([['any length', nil]] +
+                         @min_median_win_time_options.map { |seconds| [alien_strategy_duration(seconds), seconds] },
+                         @selected_min_median_win_time),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
@@ -45,7 +66,7 @@
   <% if @strategies.empty? %>
     <p>
       <% if @batch_id %>
-        None of the <%= number_with_delimiter(@strategies_found) %> strategies was used in
+        No <%= @selected_result_view == 'role_actions' ? 'role action' : 'strategy' %> met the
         <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
       <% else %>
         Alien strategy data has not been imported yet.
@@ -54,19 +75,24 @@
   <% else %>
     <p class="text-sm text-gray-600">
       Based on <%= number_with_delimiter(@rounds_analysed) %> rounds from batch <%= @batch_id %>.
-      <%= number_with_delimiter(@strategies_above_minimum) %> of
-      <%= number_with_delimiter(@strategies_found) %> strategies meet the
-      <%= @selected_min_rounds %>-round minimum; showing
-      <%= @selected_result_limit && @strategies_above_minimum > @strategies.size ?
-            "the best #{@strategies.size} by alien win rate" : "all #{@strategies.size} qualifying strategies" %>.
+      <%= number_with_delimiter(@results_above_filters) %> qualifying
+      <%= @selected_result_view == 'role_actions' ? 'role actions' : 'six-player strategies' %>
+      meet the selected filters; showing
+      <%= @selected_result_limit && @results_above_filters > @strategies.size ?
+        "the best #{@strategies.size} by alien win rate" :
+        "all #{@strategies.size} qualifying #{@selected_result_view == 'role_actions' ? 'role actions' : 'strategies'}" %>.
     </p>
 
     <div class="alien-strategy-grid">
       <% @strategies.each do |strategy| %>
         <article class="alien-strategy-card">
-          <div class="alien-strategy-card__roles" aria-label="Six player role paths">
-            <% strategy[:roles].each do |role| %>
-              <div class="alien-strategy-role"><%= alien_strategy_role_display(role) %></div>
+          <div class="alien-strategy-card__roles" aria-label="<%= @selected_result_view == 'role_actions' ? 'Role action' : 'Six player role paths' %>">
+            <% if @selected_result_view == 'role_actions' %>
+              <div class="alien-strategy-role"><%= alien_strategy_role_display(strategy[:role]) %></div>
+            <% else %>
+              <% strategy[:roles].each do |role| %>
+                <div class="alien-strategy-role"><%= alien_strategy_role_display(role) %></div>
+              <% end %>
             <% end %>
           </div>
           <dl class="alien-strategy-card__stats">
