@@ -63,7 +63,10 @@ module AnalysisHelper
   def tech_path_display(path)
     steps = path.map do |research|
       icon = RoundsHelper::ROUND_TIMELINE_ICON_NAMES[research]
-      image = image_tag(tech_icon_path(icon), class: 'round-timeline-icon', alt: '') if icon
+      if icon
+        image = image_tag(tech_icon_path(icon), class: 'round-timeline-icon', alt: '',
+                                                title: tech_path_research_name(research))
+      end
       tag.span(safe_join([image, tech_path_research_name(research)].compact), class: 'tech-path-step')
     end
     safe_join(steps, tag.span(' → ', class: 'tech-path-arrow'))
@@ -83,12 +86,15 @@ module AnalysisHelper
   def alien_strategy_role_display(path)
     path = ['skulk'] if path == ['none']
 
-    actions = path.map do |action|
+    actions = path.chunk_while { |action, next_action| action == next_action }.map do |group|
+      action = group.first
       details = ALIEN_STRATEGY_ACTIONS[action]
-      next tag.span(action.upcase, class: 'alien-strategy-action__fallback') unless details
+      count = tag.sup("x#{group.size}", class: 'alien-strategy-action__count') if group.size > 1
+      next tag.span(safe_join([action.upcase, count].compact), class: 'alien-strategy-action__fallback') unless details
 
-      image_tag(tech_icon_path(details[:icon]), class: 'alien-strategy-action__icon', alt: details[:label],
-                                                title: details[:label])
+      tag.span(safe_join([image_tag(tech_icon_path(details[:icon]), class: 'alien-strategy-action__icon', alt: details[:label],
+                                                                    title: details[:label]), count].compact),
+               class: 'alien-strategy-action', title: details[:label])
     end
     safe_join(actions, tag.span('›', class: 'alien-strategy-role__arrow', aria: { hidden: true }))
   end

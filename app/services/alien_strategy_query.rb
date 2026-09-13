@@ -18,9 +18,10 @@ class AlienStrategyQuery
   UNCAPPED_RESULT_LIMIT = 'all'
 
   RESULT_VIEW_OPTIONS = %w[role_actions strategies].freeze
-  DEFAULT_RESULT_VIEW = 'role_actions'
+  DEFAULT_RESULT_VIEW = 'strategies'
 
   MIN_MEDIAN_WIN_TIME_OPTIONS = [300, 600, 900, 1200, 1500, 1800].freeze
+  COALESCED_CHAMBER_ACTIONS = { 'dcs' => 'dc', 'mcs' => 'mc', 'ocs' => 'oc', 'scs' => 'sc' }.freeze
 
   def self.normalize_action_limit(value)
     return nil if value.to_s == UNCAPPED_ACTION_LIMIT
@@ -49,18 +50,28 @@ class AlienStrategyQuery
     MIN_MEDIAN_WIN_TIME_OPTIONS.include?(value.to_i) ? value.to_i : nil
   end
 
+  def self.normalize_strategy_filter(value)
+    value.to_s.downcase.split(/[^a-z0-9]+/).reject(&:blank?).join('+')
+  end
+
+  def self.normalize_coalesce_chambers(value)
+    value == '1'
+  end
+
   def initialize(action_limit: DEFAULT_ACTION_LIMIT, min_rounds: DEFAULT_MIN_ROUNDS,
                  result_limit: DEFAULT_RESULT_LIMIT, result_view: DEFAULT_RESULT_VIEW,
-                 min_median_win_time: nil)
+                 min_median_win_time: nil, strategy_filter: nil, coalesce_chambers: false)
     @action_limit = action_limit
     @min_rounds = min_rounds
     @result_limit = result_limit
     @result_view = result_view
     @min_median_win_time = min_median_win_time
+    @strategy_filter = self.class.normalize_strategy_filter(strategy_filter)
+    @coalesce_chambers = coalesce_chambers
   end
 
   def call
-    rows = result_rows.sort_by { |row| [-row[:win_ratio], -row[:rounds]] }
+    rows = filtered_result_rows.sort_by { |row| [-row[:win_ratio], -row[:rounds]] }
     @result_limit ? rows.first(@result_limit) : rows
   end
 
@@ -77,7 +88,7 @@ class AlienStrategyQuery
   end
 
   def results_above_filters
-    result_rows.size
+    filtered_result_rows.size
   end
 
   def latest_batch_id
@@ -179,7 +190,8 @@ class AlienStrategyQuery
     @strategy_results ||= if latest_batch_id
                             AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'alien_strategy')
                                           .where(metric: %w[alien_win marine_win])
-                                          .where.not(steamid: [AnalysisResult::NO_STEAMID, nil]).to_a
+                                          .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
+                                          .then { |scope| filter_strategy_results(scope) }.to_a
                           else
                             []
                           end
@@ -190,10 +202,28 @@ class AlienStrategyQuery
       _slot, actions = assignment.split('=', 2)
       actions ||= _slot
 
-      path = actions.split('+')
+      path = actions.split('+').map { |action| canonical_action(action) }
       path = path.first(action_limit) if action_limit
       path.freeze
     end
     roles.sort_by { |path| [path == ['none'] ? 1 : 0, path.join('+')] }.freeze
+  end
+
+  def filter_strategy_results(scope)
+    scope
+  end
+
+  def filtered_result_rows
+    return result_rows if @strategy_filter.blank?
+
+    terms = @strategy_filter.split('+')
+    result_rows.select do |row|
+      paths = @result_view == 'role_actions' ? [row[:role]] : row[:roles]
+      paths.any? { |path| terms.all? { |term| path.include?(term) } }
+    end
+  end
+
+  def canonical_action(action)
+    @coalesce_chambers ? COALESCED_CHAMBER_ACTIONS.fetch(action, action) : action
   end
 end

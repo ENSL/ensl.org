@@ -8,7 +8,7 @@ RSpec.describe 'Analysis::AlienStrategiesController', type: :request do
                              metric: metric, value: value, milestone: milestone)
   end
 
-  it 'defaults to the top twenty-five qualifying role actions with ten rounds' do
+  it 'defaults to the top twenty-five qualifying six-player strategies with ten rounds' do
     10.times do |index|
       create_strategy_result(strategy: 'gorge,skulk,skulk,skulk,skulk,skulk',
                              metric: 'alien_win', value: 900, milestone: index)
@@ -17,9 +17,9 @@ RSpec.describe 'Analysis::AlienStrategiesController', type: :request do
     get '/analysis/alien_strategies'
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include('best role actions', 'top 25', 'Minimum rounds per group:')
+    expect(response.body).to include('six-player strategies', 'top 25', 'Minimum rounds per group:')
     expect(response.body).to include('Gorge', 'Alien win rate')
-    expect(Nokogiri::HTML(response.body).css('.alien-strategy-role').size).to eq(2)
+    expect(Nokogiri::HTML(response.body).css('.alien-strategy-role').size).to eq(6)
   end
 
   it 'accepts the median win-time minimum filter' do

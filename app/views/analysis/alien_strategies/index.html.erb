@@ -38,6 +38,13 @@
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
+        <%= label_tag :coalesce_chambers, 'Chambers:' %>
+        <%= select_tag :coalesce_chambers,
+                       options_for_select([['separate', '0'], ['coalesce MC, SC, DC, and OC', '1']],
+                                          @coalesce_chambers ? '1' : '0'),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
         <%= label_tag :min_rounds, 'Minimum rounds per group:' %>
         <%= select_tag :min_rounds,
                        options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
@@ -60,6 +67,10 @@
                          @selected_result_limit || AlienStrategyQuery::UNCAPPED_RESULT_LIMIT
                        ),
                        onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
+        <%= label_tag :strategy_filter, 'Contains:' %>
+        <%= text_field_tag :strategy_filter, @strategy_filter, placeholder: 'rt+mc', onchange: 'this.form.requestSubmit()' %>
       </span>
     </p>
   <% end %>

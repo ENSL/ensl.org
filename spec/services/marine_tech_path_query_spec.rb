@@ -134,6 +134,19 @@ describe MarineTechPathQuery do
       expect(described_class.call(path_length: 2, min_rounds: 1, result_limit: 1).size).to eq(1)
     end
 
+    it 'filters displayed paths without changing their aggregated results' do
+      2.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_armorl1 research_weaponsl1])
+      end
+      round_with_research(result: Round::RESULT_ALIEN_WIN, researches: %w[research_armorl1 research_weaponsl1])
+
+      results = described_class.call(path_length: 2, min_rounds: 1, result_limit: nil,
+                                     strategy_filter: 'armor+weapons')
+
+      expect(results).to include(include(path: %w[research_armorl1 research_weaponsl1], rounds: 3, wins: 2, losses: 1))
+    end
+
     it 'returns every qualifying path when the row limit is uncapped' do
       round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_armorl1 research_weaponsl1])
       round_with_research(result: Round::RESULT_ALIEN_WIN, researches: %w[research_weaponsl1 research_armorl1])

@@ -37,8 +37,9 @@ class MarineTechPathQuery
   UNCAPPED_RESULT_LIMIT = 'all'
 
   def self.call(path_length: DEFAULT_PATH_LENGTH, min_rounds: DEFAULT_MIN_ROUNDS,
-                result_limit: DEFAULT_RESULT_LIMIT)
-    new(path_length: path_length, min_rounds: min_rounds, result_limit: result_limit).call
+                result_limit: DEFAULT_RESULT_LIMIT, strategy_filter: nil)
+    new(path_length: path_length, min_rounds: min_rounds, result_limit: result_limit,
+        strategy_filter: strategy_filter).call
   end
 
   # Both normalizers exist for the controller's benefit: query string values
@@ -61,18 +62,23 @@ class MarineTechPathQuery
     RESULT_LIMIT_OPTIONS.include?(value.to_i) ? value.to_i : DEFAULT_RESULT_LIMIT
   end
 
+  def self.normalize_strategy_filter(value)
+    value.to_s.downcase.split(/[^a-z0-9]+/).reject(&:blank?).join('+')
+  end
+
   def initialize(path_length: DEFAULT_PATH_LENGTH, min_rounds: DEFAULT_MIN_ROUNDS,
-                 result_limit: DEFAULT_RESULT_LIMIT)
+                 result_limit: DEFAULT_RESULT_LIMIT, strategy_filter: nil)
     @path_length = path_length
     @min_rounds = min_rounds
     @result_limit = result_limit
+    @strategy_filter = self.class.normalize_strategy_filter(strategy_filter)
   end
 
   # Returns an array of hashes: { path: [research keys], rounds:, wins:,
   # losses:, reach_rate: (0-100), win_ratio: (0-100) }, best win ratio first.
   # A nil result_limit returns every path which meets the minimum round count.
   def call
-    rows = qualifying_rows.sort_by { |row| [-row[:win_ratio], -row[:rounds]] }
+    rows = filtered_rows.sort_by { |row| [-row[:win_ratio], -row[:rounds]] }
     @result_limit ? rows.first(@result_limit) : rows
   end
 
@@ -102,6 +108,16 @@ class MarineTechPathQuery
       { path: path, rounds: rounds, wins: counts[:wins], losses: counts[:losses],
         reach_rate: (rounds * 100.0 / rounds_analysed),
         win_ratio: (counts[:wins] * 100.0 / rounds) }
+    end
+  end
+
+  def filtered_rows
+    return qualifying_rows if @strategy_filter.blank?
+
+    terms = @strategy_filter.split('+')
+    qualifying_rows.select do |row|
+      path = row[:path].join('+').downcase
+      terms.all? { |term| path.include?(term) }
     end
   end
 

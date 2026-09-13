@@ -13,9 +13,10 @@ module Analysis
       @selected_min_rounds = MarineTechPathQuery.normalize_min_rounds(params[:min_rounds])
       @result_limit_options = MarineTechPathQuery::RESULT_LIMIT_OPTIONS
       @selected_result_limit = MarineTechPathQuery.normalize_result_limit(params[:result_limit])
+      @strategy_filter = MarineTechPathQuery.normalize_strategy_filter(params[:strategy_filter])
 
       query = MarineTechPathQuery.new(path_length: @selected_path_length, min_rounds: @selected_min_rounds,
-                                      result_limit: @selected_result_limit)
+                                      result_limit: @selected_result_limit, strategy_filter: @strategy_filter)
       @tech_paths = query.call
       @rounds_analysed = query.rounds_analysed
       @paths_found = query.paths_found

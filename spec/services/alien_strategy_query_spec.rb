@@ -16,6 +16,14 @@ RSpec.describe AlienStrategyQuery do
 
       expect(query.send(:canonical_roles, compact)).to eq(query.send(:canonical_roles, legacy))
     end
+
+    it 'coalesces chamber variants, but not resource towers, when selected' do
+      query = described_class.new(action_limit: nil, coalesce_chambers: true)
+
+      expect(query.send(:canonical_roles, 'dc+dcs+mc+mcs+oc+ocs+sc+scs+rt+rts,skulk')).to include(
+        %w[dc dc mc mc oc oc sc sc rt rts]
+      )
+    end
   end
 
   describe '#call' do
@@ -45,6 +53,27 @@ RSpec.describe AlienStrategyQuery do
       expect(results.map { |result| result[:role] }).not_to include(['gorge'])
     end
 
+    it 'filters displayed strategies without changing their analysis' do
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil,
+                                    result_view: 'role_actions', strategy_filter: 'gorge').call
+
+      expect(results).to contain_exactly(include(role: ['gorge'], rounds: 10, wins: 6, losses: 4))
+    end
+
+    it 'merges offense chamber variants into the same analyzed group when selected' do
+      5.times do |index|
+        create_strategy_result(strategy: 'oc,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 20)
+        create_strategy_result(strategy: 'ocs,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 30)
+      end
+
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil,
+                                    result_view: 'role_actions', coalesce_chambers: true).call
+
+      expect(results).to include(include(role: ['oc'], rounds: 10, wins: 10, losses: 0))
+    end
+
     it 'includes the strongest qualifying groups from different action limits in best mode' do
       10.times do |index|
         create_strategy_result(strategy: 'gorge+hive,skulk,skulk,skulk,skulk,skulk',
@@ -71,10 +100,10 @@ RSpec.describe AlienStrategyQuery do
   end
 
   describe 'defaults' do
-    it 'starts with ten rounds, top twenty-five, and role actions' do
+    it 'starts with ten rounds, top twenty-five, and six-player strategies' do
       expect(described_class::DEFAULT_MIN_ROUNDS).to eq(10)
       expect(described_class::DEFAULT_RESULT_LIMIT).to eq(25)
-      expect(described_class::DEFAULT_RESULT_VIEW).to eq('role_actions')
+      expect(described_class::DEFAULT_RESULT_VIEW).to eq('strategies')
     end
   end
 end

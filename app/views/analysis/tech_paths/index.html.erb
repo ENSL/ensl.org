@@ -38,6 +38,10 @@
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
+        <%= label_tag :strategy_filter, 'Contains:' %>
+        <%= text_field_tag :strategy_filter, @strategy_filter, placeholder: 'armor+weapons', onchange: 'this.form.requestSubmit()' %>
+      </span>
+      <span>
         <%= label_tag :result_limit, 'Rows:' %>
         <%= select_tag :result_limit,
                        options_for_select(
