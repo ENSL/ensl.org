@@ -17,6 +17,7 @@ module Analysis
       @result_limit_options = MarineTechPathQuery::RESULT_LIMIT_OPTIONS
       @selected_result_limit = MarineTechPathQuery.normalize_result_limit(params[:result_limit])
       @strategy_filter = MarineTechPathQuery.normalize_strategy_filter(params[:strategy_filter])
+      @individual_techs = @selected_path_length == MarineTechPathQuery::INDIVIDUAL_TECHS_PATH_LENGTH
 
       query = MarineTechPathQuery.new(path_length: @selected_path_length, min_rounds: @selected_min_rounds,
                                       result_limit: @selected_result_limit, strategy_filter: @strategy_filter)

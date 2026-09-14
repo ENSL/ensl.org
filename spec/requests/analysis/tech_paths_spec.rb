@@ -75,6 +75,19 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(response.body).to include('Phase Technology')
     end
 
+    it 'offers individual research aggregation for techs that occur after the opening' do
+      5.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_armorl1 research_weaponsl1 research_heavyarmor])
+      end
+
+      get '/analysis/tech_paths', params: { path_length: 'techs', min_rounds: 5,
+                                            strategy_filter: 'heavyarmor' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('individual techs', 'Marine research choices', 'Heavy Armor', '100.0%')
+    end
+
     it 'accepts a selected row limit and the all-qualifying option' do
       get '/analysis/tech_paths', params: { result_limit: '50' }
 

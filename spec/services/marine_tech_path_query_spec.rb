@@ -147,6 +147,22 @@ describe MarineTechPathQuery do
       expect(results).to include(include(path: %w[research_armorl1 research_weaponsl1], rounds: 3, wins: 2, losses: 1))
     end
 
+    it 'aggregates a research wherever it occurred when individual techs are selected' do
+      2.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_armorl1 research_weaponsl1 research_heavyarmor])
+      end
+      round_with_research(result: Round::RESULT_ALIEN_WIN,
+                          researches: %w[research_phasetech research_heavyarmor])
+
+      results = described_class.call(path_length: 'techs', min_rounds: 1, result_limit: nil,
+                                     strategy_filter: 'heavyarmor')
+
+      expect(results).to contain_exactly(
+        include(path: ['research_heavyarmor'], rounds: 3, wins: 2, losses: 1)
+      )
+    end
+
     it 'returns every qualifying path when the row limit is uncapped' do
       round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_armorl1 research_weaponsl1])
       round_with_research(result: Round::RESULT_ALIEN_WIN, researches: %w[research_weaponsl1 research_armorl1])

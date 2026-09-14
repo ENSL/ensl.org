@@ -3,8 +3,13 @@
 
 <div class="box wide">
   <p>
-    Opening marine research orders, grouped by their first distinct researches. NS1 logs record
-    starts, not completions or cancellations, and exclude Distress Beacon.
+    <% if @individual_techs %>
+      Marine research choices, counted once per round wherever they occurred. NS1 logs record
+      starts, not completions or cancellations, and exclude Distress Beacon.
+    <% else %>
+      Opening marine research orders, grouped by their first distinct researches. NS1 logs record
+      starts, not completions or cancellations, and exclude Distress Beacon.
+    <% end %>
   </p>
 
   <%= form_with url: analysis_tech_paths_path, method: :get, local: true do %>
@@ -14,7 +19,8 @@
         <%= select_tag :path_length,
                        options_for_select(
                          @path_length_options.map { |n| ["up to #{n}", n] } +
-                           [['uncapped', MarineTechPathQuery::UNCAPPED_PATH_LENGTH]],
+                           [['individual techs', MarineTechPathQuery::INDIVIDUAL_TECHS_PATH_LENGTH],
+                            ['uncapped', MarineTechPathQuery::UNCAPPED_PATH_LENGTH]],
                          @selected_path_length || MarineTechPathQuery::UNCAPPED_PATH_LENGTH
                        ),
                        onchange: 'this.form.requestSubmit()' %>
@@ -51,24 +57,24 @@
 
   <% if @tech_paths.empty? %>
     <p>
-      Among the <%= number_with_delimiter(@paths_found) %> opening paths at this setting, none
+      Among the <%= number_with_delimiter(@paths_found) %> <%= @individual_techs ? 'research choices' : 'opening paths' %> at this setting, none
       was used in <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
     </p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@tech_paths.size) %> of <%= number_with_delimiter(@paths_found) %> opening research orders.
+      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@tech_paths.size) %> of <%= number_with_delimiter(@paths_found) %> <%= @individual_techs ? 'research choices' : 'opening research orders' %>.
     </p>
 
     <%= sortable_table(
       id: 'marine-tech-paths',
       columns: [
-        { key: :path, label: 'Tech path', type: :string,
+        { key: :path, label: @individual_techs ? 'Research' : 'Tech path', type: :string,
           sort_value: ->(path) { tech_path_label(path) },
           format: ->(path) { tech_path_display(path) } },
         { key: :rounds, label: 'Rounds', type: :number,
-          tooltip: 'How many rounds started with this research order.' },
+          tooltip: @individual_techs ? 'How many rounds started this research.' : 'How many rounds started with this research order.' },
         { key: :reach_rate, label: 'Reach %', type: :number,
-          tooltip: 'The percentage of analysed rounds which started with this research order.',
+          tooltip: @individual_techs ? 'The percentage of analysed rounds which started this research.' : 'The percentage of analysed rounds which started with this research order.',
           format: ->(value) { "#{number_with_precision(value, precision: 1)}%" } },
         { key: :wins, label: 'Wins', type: :number },
         { key: :losses, label: 'Losses', type: :number },

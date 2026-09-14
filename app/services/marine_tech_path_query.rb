@@ -28,6 +28,7 @@ class MarineTechPathQuery
   PATH_LENGTH_OPTIONS = (1..10).to_a.freeze
   DEFAULT_PATH_LENGTH = 3
   UNCAPPED_PATH_LENGTH = 'all'
+  INDIVIDUAL_TECHS_PATH_LENGTH = 'techs'
 
   MIN_ROUNDS_OPTIONS = [5, 10, 25, 50].freeze
   DEFAULT_MIN_ROUNDS = 10
@@ -48,6 +49,7 @@ class MarineTechPathQuery
   # Returns nil for the uncapped option.
   def self.normalize_path_length(value)
     return nil if value.to_s == UNCAPPED_PATH_LENGTH
+    return INDIVIDUAL_TECHS_PATH_LENGTH if value.to_s == INDIVIDUAL_TECHS_PATH_LENGTH
 
     PATH_LENGTH_OPTIONS.include?(value.to_i) ? value.to_i : DEFAULT_PATH_LENGTH
   end
@@ -132,9 +134,13 @@ class MarineTechPathQuery
       counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0 } }
       paths_by_round.each do |round_id, full_path|
         outcome = winning_result?(results_by_round[round_id]) ? :wins : :losses
-        maximum_length = @path_length || full_path.length
-        full_path.first(maximum_length).each_index do |index|
-          counts[full_path.first(index + 1)][outcome] += 1
+        if @path_length == INDIVIDUAL_TECHS_PATH_LENGTH
+          full_path.each { |research| counts[[research]][outcome] += 1 }
+        else
+          maximum_length = @path_length || full_path.length
+          full_path.first(maximum_length).each_index do |index|
+            counts[full_path.first(index + 1)][outcome] += 1
+          end
         end
       end
       counts
