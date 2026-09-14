@@ -26,6 +26,7 @@ module Analysis
       @strategies_found = query.strategies_found
       @strategies_above_minimum = query.strategies_above_minimum
       @results_above_filters = query.results_above_filters
+      @strategy_filter_options = query.filter_options
 
       render layout: 'full'
     end

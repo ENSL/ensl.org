@@ -30,7 +30,7 @@ class MarineTechPathQuery
   UNCAPPED_PATH_LENGTH = 'all'
 
   MIN_ROUNDS_OPTIONS = [5, 10, 25, 50].freeze
-  DEFAULT_MIN_ROUNDS = 5
+  DEFAULT_MIN_ROUNDS = 10
 
   RESULT_LIMIT_OPTIONS = [10, 20, 25, 50, 100].freeze
   DEFAULT_RESULT_LIMIT = 20
@@ -96,6 +96,12 @@ class MarineTechPathQuery
   # Of those, how many were taken in at least min_rounds rounds.
   def paths_above_minimum
     qualifying_rows.size
+  end
+
+  # Tokens accepted by the Contains filter, drawn from the same log events as
+  # the paths so browser suggestions cannot drift from the query vocabulary.
+  def filter_options
+    research_events.map { |_round_id, research| research.delete_prefix('research_') }.uniq.sort
   end
 
   private

@@ -100,10 +100,19 @@ RSpec.describe AlienStrategyQuery do
   end
 
   describe 'defaults' do
-    it 'starts with ten rounds, top twenty-five, and six-player strategies' do
-      expect(described_class::DEFAULT_MIN_ROUNDS).to eq(10)
+    it 'starts with best action limits, twenty-five rounds, and six-player strategies' do
+      expect(described_class::DEFAULT_ACTION_LIMIT).to eq('best')
+      expect(described_class::DEFAULT_MIN_ROUNDS).to eq(25)
       expect(described_class::DEFAULT_RESULT_LIMIT).to eq(25)
       expect(described_class::DEFAULT_RESULT_VIEW).to eq('strategies')
+    end
+  end
+
+  describe '#filter_options' do
+    it 'returns the action tokens accepted by the contains filter' do
+      create_strategy_result(strategy: 'gorge+rt,skulk', metric: 'alien_win', value: 900, milestone: 99)
+
+      expect(described_class.new.filter_options).to eq(%w[gorge rt skulk])
     end
   end
 end

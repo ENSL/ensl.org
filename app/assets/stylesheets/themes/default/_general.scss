@@ -102,6 +102,11 @@
   }
 }
 
+.analysis-filter-input {
+  width: min(260px, 70vw);
+  min-width: 220px;
+}
+
 .stats-page__faction-icon {
   width: 32px;
   height: 32px;

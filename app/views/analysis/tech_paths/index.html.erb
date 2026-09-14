@@ -3,21 +3,8 @@
 
 <div class="box wide">
   <p>
-    The research orders marine commanders went for, ranked by how often the round was won.
-    Every group is an opening prefix of up to N <em>distinct</em> researches, in order. Every
-    round which starts with that prefix contributes to its record, regardless of any later tech.
-    Click a column header to sort.
-  </p>
-  <p class="text-sm text-gray-600">
-    The length selector adds longer prefixes; it never removes shorter ones. For example,
-    Armor 1 is counted in every round that begins with Armor 1 at any setting, while Armor 1
-    &rarr; Weapons 1 is added when the setting is at least 2. Pick "uncapped" to include every
-    opening prefix recorded in the logs.
-  </p>
-  <p class="text-sm text-gray-600">
-    Distress Beacon is ignored (a panic button, not a plan), and the NS1 logs only record when
-    a research <em>starts</em>, never when it finishes or which one got cancelled &mdash; so
-    this is what commanders went for, not what they got.
+    Opening marine research orders, grouped by their first distinct researches. NS1 logs record
+    starts, not completions or cancellations, and exclude Distress Beacon.
   </p>
 
   <%= form_with url: analysis_tech_paths_path, method: :get, local: true do %>
@@ -33,17 +20,24 @@
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
-        <%= label_tag :min_rounds, 'Minimum rounds per group:' %>
+        <%= label_tag :min_rounds, 'Minimum rounds:' %>
         <%= select_tag :min_rounds,
                        options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :strategy_filter, 'Contains:' %>
-        <%= text_field_tag :strategy_filter, @strategy_filter, placeholder: 'armor+weapons', onchange: 'this.form.requestSubmit()' %>
+        <span data-controller="token-autocomplete">
+          <%= text_field_tag :strategy_filter, @strategy_filter, class: 'analysis-filter-input', list: 'marine-strategy-options', placeholder: 'armorl1+weaponsl1', data: { token_autocomplete_target: 'input', action: 'input->token-autocomplete#updateOptions' } %>
+          <datalist id="marine-strategy-options">
+            <% @strategy_filter_options.each do |option| %>
+              <option data-token-autocomplete-target="option" data-token="<%= option %>" value="<%= option %>"></option>
+            <% end %>
+          </datalist>
+        </span>
       </span>
       <span>
-        <%= label_tag :result_limit, 'Rows:' %>
+        <%= label_tag :result_limit, 'Results:' %>
         <%= select_tag :result_limit,
                        options_for_select(
                          @result_limit_options.map { |n| ["top #{n}", n] } +
@@ -62,15 +56,7 @@
     </p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> rounds. Of the
-      <%= number_with_delimiter(@paths_found) %> opening paths at this setting,
-      <%= number_with_delimiter(@paths_above_minimum) %> were used in at least
-      <%= @selected_min_rounds %> rounds; showing
-      <%= if @selected_result_limit && @paths_above_minimum > @tech_paths.size
-            "the best #{@tech_paths.size} by win rate"
-          else
-            "all #{@tech_paths.size} qualifying paths"
-          end %> below.
+      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@tech_paths.size) %> of <%= number_with_delimiter(@paths_found) %> opening research orders.
     </p>
 
     <%= sortable_table(

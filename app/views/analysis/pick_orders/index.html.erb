@@ -23,7 +23,7 @@
     <p>No NS1 gather draft data is available yet.</p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@played_gathers) %> drafted NS1 gathers; <%= number_with_delimiter(@matched_users) %> players matched the selected minimum.
+      Based on <%= number_with_delimiter(@played_gathers) %> drafted NS1 gathers; showing <%= number_with_delimiter(@matched_users) %> of <%= number_with_delimiter(@available_users) %> player records.
     </p>
     <%
       columns = [

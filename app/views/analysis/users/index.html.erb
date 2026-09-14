@@ -20,7 +20,7 @@
     <p>No analysis results are available yet.</p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; <%= number_with_delimiter(@matched_users) %> players matched the selected minimum.
+      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@matched_users) %> of <%= number_with_delimiter(@available_users) %> player records.
     </p>
     <%
       skill_display_multiplier = {

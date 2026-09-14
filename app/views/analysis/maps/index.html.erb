@@ -11,6 +11,9 @@
   <% if @map_balances.empty? %>
     <p>No map balance data is available yet.</p>
   <% else %>
+    <p class="text-sm text-gray-600">
+      Based on <%= number_with_delimiter(@rounds_analysed) %> recorded rounds; showing <%= number_with_delimiter(@map_balances.size) %> map records.
+    </p>
     <div
       data-controller="map-balance-chart"
       data-map-balance-chart-maps-value="<%= @map_balances.to_json %>"

@@ -61,6 +61,11 @@ class PickOrderRankingQuery
     call.size
   end
 
+  def available_users
+    replay_pick_orders!
+    User.where(id: records.filter_map { |user_id, record| user_id if record[:pick_games_count].positive? }).count
+  end
+
   private
 
   def model

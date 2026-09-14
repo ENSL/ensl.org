@@ -4,9 +4,7 @@
 <div class="wide tech-requirements">
   <p>Marine research and building prerequisites, with observed research results where log data is available.</p>
   <p class="text-sm text-gray-600">
-    Hover a research icon to reveal its prerequisite and available follow-up edges, plus observed results. The sample
-    threshold applies to each result, not each distinct tech path. Building nodes are shown now and will gain results when
-    their events enter the data feed.
+    Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing recorded research results where available.
   </p>
 
   <%= form_with url: analysis_tech_requirements_path, method: :get, local: true do %>

@@ -2,11 +2,21 @@
 <h1 class="title">NS1 <%= @tech_tree_team %> Graph</h1>
 
 <div class="wide tech-tree">
-  <p>Observed opening choices, joined where their order overlaps.</p>
+  <p>Observed opening choices, joined where their order overlaps. <%= @tech_tree_rules %></p>
+
+  <%= form_with url: @tech_tree_team == 'Marine' ? analysis_tech_tree_path : analysis_alien_tech_tree_path, method: :get, local: true do %>
+    <p class="analysis-filters">
+      <span>
+        <%= label_tag :min_rounds, 'Minimum rounds:' %>
+        <%= select_tag :min_rounds,
+                       options_for_select(@min_rounds_options.map { |count| [count, count] }, @selected_min_rounds),
+                       onchange: 'this.form.requestSubmit()' %>
+      </span>
+    </p>
+  <% end %>
+
   <p class="text-sm text-gray-600">
-    Based on <%= number_with_delimiter(@rounds_analysed) %> rounds. Each icon is a <%= @tech_tree_step %> seen in at
-    least <%= MarineTechPathQuery::DEFAULT_MIN_ROUNDS %> openings. Every qualifying continuation is shown. Each node
-    shows the <%= @tech_tree_team.downcase %> win rate; hover an icon for its name.
+    Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@tech_paths.size) %> of <%= number_with_delimiter(@paths_found) %> opening <%= @tech_tree_team == 'Marine' ? 'research' : 'chamber' %> paths.
   </p>
 
   <% if @tech_paths.empty? %>

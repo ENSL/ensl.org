@@ -13,6 +13,7 @@ module Analysis
       @rankings = query.call
       @played_gathers = query.played_gathers
       @matched_users = query.matched_users
+      @available_users = query.available_users
       render layout: 'full'
     end
 

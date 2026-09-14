@@ -179,6 +179,15 @@ describe MarineTechPathQuery do
     end
   end
 
+  describe '#filter_options' do
+    it 'returns the research tokens accepted by the contains filter' do
+      round_with_research(result: Round::RESULT_MARINE_WIN,
+                          researches: %w[research_armorl1 research_weaponsl1 research_distressbeacon])
+
+      expect(described_class.new.filter_options).to eq(%w[armorl1 weaponsl1])
+    end
+  end
+
   describe 'parameter normalization' do
     it 'falls back to defaults for unsupported values' do
       expect(described_class.normalize_path_length(99)).to eq(described_class::DEFAULT_PATH_LENGTH)

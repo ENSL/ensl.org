@@ -28,7 +28,7 @@
     <p>No class performance data is available yet.</p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@performances.size) %> of <%= number_with_delimiter(@possible_users) %> matched players.
+      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@performances.size) %> of <%= number_with_delimiter(@possible_users) %> player records.
     </p>
     <% format_number = lambda { |value, precision: 1| value.nil? ? '–' : number_with_precision(value, precision: precision) } %>
 

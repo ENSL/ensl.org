@@ -7,6 +7,7 @@ import GatherMusicController from "controllers/gather_music"
 import GatherPushController from "controllers/gather_push"
 import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
+import TokenAutocompleteController from "controllers/token_autocomplete"
 import MapBalanceChartController from "controllers/map_balance_chart"
 import ActivityChartController from "controllers/activity_chart"
 import RoundLengthChartController from "controllers/round_length_chart"
@@ -31,6 +32,7 @@ application.register("gather-music", GatherMusicController)
 application.register("gather-push", GatherPushController)
 application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
+application.register("token-autocomplete", TokenAutocompleteController)
 application.register("map-balance-chart", MapBalanceChartController)
 application.register("activity-chart", ActivityChartController)
 application.register("round-length-chart", RoundLengthChartController)

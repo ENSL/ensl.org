@@ -7,6 +7,7 @@ module Analysis
   class MapsController < Analysis::BaseController
     def index
       @map_balances = MapBalanceQuery.call
+      @rounds_analysed = @map_balances.sum { |balance| balance[:total_games].to_i }
       render layout: 'full'
     end
   end

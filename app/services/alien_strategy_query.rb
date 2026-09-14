@@ -6,12 +6,12 @@
 # r1 and r2 never creates a different strategy.
 class AlienStrategyQuery
   ACTION_LIMIT_OPTIONS = (1..10).to_a.freeze
-  DEFAULT_ACTION_LIMIT = 3
   UNCAPPED_ACTION_LIMIT = 'all'
   BEST_ACTION_LIMIT = 'best'
+  DEFAULT_ACTION_LIMIT = BEST_ACTION_LIMIT
 
   MIN_ROUNDS_OPTIONS = [5, 10, 25, 50].freeze
-  DEFAULT_MIN_ROUNDS = 10
+  DEFAULT_MIN_ROUNDS = 25
 
   RESULT_LIMIT_OPTIONS = [10, 20, 25, 50, 100].freeze
   DEFAULT_RESULT_LIMIT = 25
@@ -93,6 +93,12 @@ class AlienStrategyQuery
 
   def latest_batch_id
     @latest_batch_id ||= AnalysisResult.historical.where(model: 'alien_strategy').maximum(:batch_id)
+  end
+
+  # Tokens accepted by the Contains filter, after applying the selected chamber
+  # coalescing rule so suggestions always match the displayed strategies.
+  def filter_options
+    strategy_results.flat_map { |result| canonical_roles(result.steamid).flatten }.uniq.sort
   end
 
   private
@@ -203,7 +209,7 @@ class AlienStrategyQuery
       actions ||= _slot
 
       path = actions.split('+').map { |action| canonical_action(action) }
-      path = path.first(action_limit) if action_limit
+      path = path.first(action_limit) if action_limit.is_a?(Integer)
       path.freeze
     end
     roles.sort_by { |path| [path == ['none'] ? 1 : 0, path.join('+')] }.freeze

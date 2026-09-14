@@ -59,6 +59,10 @@ class PlayerRankingQuery
     call.size
   end
 
+  def available_users
+    metrics_by_steamid.count { |steamid, _metrics| users_by_steamid[steamid] }
+  end
+
   private
 
   def skill_columns(metrics)
