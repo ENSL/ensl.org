@@ -397,7 +397,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
     it 'falls back to the application timezone' do
       helper.define_singleton_method(:cuser) { nil }
-      allow(Time.zone).to receive(:name).and_return('UTC')
+      allow(Rails.application.config).to receive(:time_zone).and_return('UTC')
 
       expect(helper.timezone_offset).to eq('UTC')
     end
