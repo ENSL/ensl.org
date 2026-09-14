@@ -84,6 +84,15 @@ class MarineTechPathQuery
     @result_limit ? rows.first(@result_limit) : rows
   end
 
+  # Cache all values the list page needs together, so a cache hit avoids both
+  # the raw log scan and the in-memory aggregation.
+  def report
+    Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
+      { tech_paths: call, rounds_analysed: rounds_analysed, paths_found: paths_found,
+        paths_above_minimum: paths_above_minimum, filter_options: filter_options }
+    end
+  end
+
   # Total number of rounds that contributed to the tally, before the
   # min_rounds cutoff -- shown as context so a tiny sample is obvious.
   def rounds_analysed
@@ -107,6 +116,10 @@ class MarineTechPathQuery
   end
 
   private
+
+  def cache_key
+    ['marine-tech-path-report', LogLine.maximum(:id), @path_length, @min_rounds, @result_limit, @strategy_filter]
+  end
 
   def qualifying_rows
     @qualifying_rows ||= tally.filter_map do |path, counts|
@@ -160,12 +173,12 @@ class MarineTechPathQuery
   end
 
   def research_events
-    Round.where.not(result: nil)
-         .joins(:log_lines)
-         .where(log_lines: { event_type: 'research_start' })
-         .where.not(log_lines: { param1: EXCLUDED_RESEARCH + [nil] })
-         .order('log_lines.created_at', 'log_lines.id')
-         .pluck('log_lines.round_id', 'log_lines.param1')
+    @research_events ||= Round.where.not(result: nil)
+                              .joins(:log_lines)
+                              .where(log_lines: { event_type: 'research_start' })
+                              .where.not(log_lines: { param1: EXCLUDED_RESEARCH + [nil] })
+                              .order('log_lines.created_at', 'log_lines.id')
+                              .pluck('log_lines.round_id', 'log_lines.param1')
   end
 
   def results_by_round

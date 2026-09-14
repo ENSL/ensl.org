@@ -21,11 +21,12 @@ module Analysis
 
       query = MarineTechPathQuery.new(path_length: @selected_path_length, min_rounds: @selected_min_rounds,
                                       result_limit: @selected_result_limit, strategy_filter: @strategy_filter)
-      @tech_paths = query.call
-      @rounds_analysed = query.rounds_analysed
-      @paths_found = query.paths_found
-      @paths_above_minimum = query.paths_above_minimum
-      @strategy_filter_options = query.filter_options
+      report = query.report
+      @tech_paths = report[:tech_paths]
+      @rounds_analysed = report[:rounds_analysed]
+      @paths_found = report[:paths_found]
+      @paths_above_minimum = report[:paths_above_minimum]
+      @strategy_filter_options = report[:filter_options]
 
       render layout: 'full'
     end

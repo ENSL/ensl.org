@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
   create_table "activities", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -393,6 +393,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_120000) do
     t.integer "round_id"
     t.string "server_name"
     t.string "target_steamid"
+    t.index ["event_type", "created_at", "id"], name: "index_log_lines_on_event_type_and_order"
     t.index ["log_file_id", "line_digest"], name: "index_log_lines_on_log_file_and_digest", unique: true
     t.index ["round_id"], name: "index_log_lines_on_round_id"
   end
