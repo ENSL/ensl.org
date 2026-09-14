@@ -1,9 +1,10 @@
+<%= link_to 'Back', analysis_root_path, class: 'analysis-back' %>
 <h1 class="title">NS1 Player rankings</h1>
 
 <div class="box wide">
   <p>
     NS1 skill ratings and win/loss stats from the most recent analysis batch.
-    Click a column header to sort.
+    Click a column header to sort, or hover a column heading for an explanation.
   </p>
 
   <%= form_with url: analysis_users_path, method: :get, local: true do %>
@@ -18,6 +19,9 @@
   <% if @rankings.empty? %>
     <p>No analysis results are available yet.</p>
   <% else %>
+    <p class="text-sm text-gray-600">
+      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; <%= number_with_delimiter(@matched_users) %> players matched the selected minimum.
+    </p>
     <%
       skill_display_multiplier = {
         skill_dl: 10_000,
@@ -35,13 +39,14 @@
         value.nil? ? '–' : number_with_precision(value, precision: precision)
       end
 
-      skill_column = lambda do |key, label|
+      skill_column = lambda do |key, label, tooltip|
         multiplier = skill_display_multiplier.fetch(key, 1)
         offset = skill_display_offset.fetch(key, 0)
         {
           key: key,
           label: label,
           type: :number,
+          tooltip: tooltip,
           sort_value: ->(value) { value.nil? ? nil : ((value * multiplier) + offset) },
           format: ->(value) { value.nil? ? '–' : format_number.call((value * multiplier) + offset, precision: 0) }
         }
@@ -61,15 +66,16 @@
           key: :win_ratio,
           label: 'Win ratio %',
           type: :number,
+          tooltip: 'Wins divided by wins plus losses. It does not account for opponent strength or team balance, so a healthy competitive player pool should tend towards 50%, not treat a higher ratio as a complete skill measure.',
           sort_value: ->(value) { value.nil? ? nil : (value * 100) },
           format: ->(value) { value.nil? ? '–' : format_number.call(value * 100, precision: 0) }
         },
-        skill_column.call(:skill_dl, 'DL Model'),
-        skill_column.call(:skill_mlt, 'Moulton Model'),
-        skill_column.call(:skill_os_btf, 'OpenSkill BT Model')
+        skill_column.call(:skill_dl, 'DL model', 'A custom Deep Learning skill-ranking model. This is currently the most accurate player-skill estimate available here, using the imported NS1 analysis data.'),
+        skill_column.call(:skill_os_btf, 'OpenSkill', 'A Bayesian rating system which updates a player estimate from match outcomes while accounting for uncertainty. It is roughly the second most accurate model here, but ratings are less reliable for players with few analysed rounds.'),
+        skill_column.call(:skill_mlt, 'Moulton model', 'Moulton\'s NS2 rating model, applied here to NS1 data as a comparison. It estimates skill from match outcomes but is roughly the third most accurate model here; treat it as historical context rather than the primary ranking.')
       ]
     %>
 
-    <%= sortable_table(columns: columns, rows: @rankings, id: 'player-rankings') %>
+    <%= sortable_table(columns: columns, rows: @rankings, id: 'player-rankings', default_sort: :skill_dl, default_direction: :descending) %>
   <% end %>
 </div>

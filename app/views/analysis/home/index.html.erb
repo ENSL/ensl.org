@@ -11,7 +11,11 @@
       <section class="group flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition duration-150 hover:-translate-y-1 hover:border-blue-400 hover:shadow-lg">
         <div class="flex items-start gap-3">
           <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition duration-150 group-hover:bg-blue-600 group-hover:text-white">
-            <%= fa_icon(page[:icon], class: 'text-lg') %>
+            <% if page[:image] %>
+              <%= image_tag(page[:image], class: 'stats-page__faction-icon', alt: '') %>
+            <% else %>
+              <%= fa_icon(page[:icon], class: 'text-lg') %>
+            <% end %>
           </div>
           <h2 class="pt-2 text-lg font-semibold text-gray-900"><%= page[:title] %></h2>
         </div>

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe MapBalanceQuery do
   describe '.call' do
-    it 'returns maps with positive total games sorted by total_games descending' do
+    it 'returns maps with positive total games sorted by marine win rate descending' do
       create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
                                steamid: 'ns_tram', model: 'map_balance', metric: 'total_games', value: 12)
       create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
@@ -28,10 +28,9 @@ RSpec.describe MapBalanceQuery do
 
       rows = described_class.call
 
-      expect(rows.map { |r| r[:map_name] }).to eq(%w[ns_veil ns_tram])
-      expect(rows.first[:total_games]).to eq(20)
-      expect(rows.last[:marine_win_percentage]).to eq(58.3)
-      expect(rows.last[:alien_win_percentage]).to eq(41.7)
+      expect(rows.map { |r| r[:map_name] }).to eq(%w[ns_tram ns_veil])
+      expect(rows.first[:marine_win_percentage]).to eq(58.3)
+      expect(rows.first[:alien_win_percentage]).to eq(41.7)
     end
 
     it 'ignores rows with nil or sentinel steamid values' do

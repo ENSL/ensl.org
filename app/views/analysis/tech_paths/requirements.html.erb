@@ -1,17 +1,8 @@
-<h1 class="title">NS1 Marine game tech tree</h1>
+<%= link_to 'Back', analysis_root_path, class: 'analysis-back' %>
+<h1 class="title">NS1 Marine Tech tree</h1>
 
 <div class="wide tech-requirements">
-  <div class="tech-tree__header">
-    <p>Marine research and building prerequisites, with observed research results where log data is available.</p>
-    <nav class="tech-tree__links" aria-label="Tech tree views">
-      <%= link_to analysis_tech_paths_path, class: 'button tech-tree__list-link' do %>
-        <%= fa_icon('list') %> List
-      <% end %>
-      <%= link_to analysis_tech_tree_path, class: 'button tech-tree__list-link' do %>
-        <%= fa_icon('project-diagram') %> Paths
-      <% end %>
-    </nav>
-  </div>
+  <p>Marine research and building prerequisites, with observed research results where log data is available.</p>
   <p class="text-sm text-gray-600">
     Hover a research icon to reveal its prerequisite and available follow-up edges, plus observed results. The sample
     threshold applies to each result, not each distinct tech path. Building nodes are shown now and will gain results when

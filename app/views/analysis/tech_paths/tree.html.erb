@@ -1,25 +1,8 @@
-<h1 class="title">NS1 <%= @tech_tree_team %> tech tree</h1>
+<%= link_to 'Back', analysis_root_path, class: 'analysis-back' %>
+<h1 class="title">NS1 <%= @tech_tree_team %> Graph</h1>
 
 <div class="wide tech-tree">
-  <div class="tech-tree__header">
-    <p>Observed opening choices, joined where their order overlaps.</p>
-    <nav class="tech-tree__links" aria-label="Tech tree views">
-      <%= link_to analysis_tech_tree_path, class: 'button tech-tree__list-link' do %>
-        <%= fa_icon('project-diagram') %> Marine tree
-      <% end %>
-      <%= link_to analysis_alien_tech_tree_path, class: 'button tech-tree__list-link' do %>
-        <%= fa_icon('project-diagram') %> Alien tree
-      <% end %>
-      <% if @tech_tree_team == 'Marine' %>
-        <%= link_to analysis_tech_paths_path, class: 'button tech-tree__list-link' do %>
-          <%= fa_icon('list') %> List
-        <% end %>
-        <%= link_to analysis_tech_requirements_path, class: 'button tech-tree__list-link' do %>
-          <%= fa_icon('sitemap') %> Game tree
-        <% end %>
-      <% end %>
-    </nav>
-  </div>
+  <p>Observed opening choices, joined where their order overlaps.</p>
   <p class="text-sm text-gray-600">
     Based on <%= number_with_delimiter(@rounds_analysed) %> rounds. Each icon is a <%= @tech_tree_step %> seen in at
     least <%= MarineTechPathQuery::DEFAULT_MIN_ROUNDS %> openings. Every qualifying continuation is shown. Each node

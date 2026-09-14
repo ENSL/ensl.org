@@ -9,16 +9,16 @@ module Analysis
   class HomeController < Analysis::BaseController
     PAGES = [
       {
-        title: 'NS1 Rankings',
+        title: 'NS1 Player rankings',
         description: 'NS1 skill ratings and win/loss records for every tracked player. Sort by any column.',
         icon: 'trophy',
         path_helper: :analysis_users_path
       },
       {
-        title: 'NS1 Class performance',
-        description: 'Compare each player with every NS1 class, independent of map, team, and side.',
-        icon: 'crosshairs',
-        path_helper: :analysis_classes_path
+        title: 'NS1 Gather Rankings',
+        description: 'Pick-order-based NS1 gather rankings, including a draft-only OpenSkill score.',
+        icon: 'sort-numeric-down',
+        path_helper: :analysis_pick_orders_path
       },
       {
         title: 'Team rankings',
@@ -33,32 +33,33 @@ module Analysis
         path_helper: :analysis_maps_path
       },
       {
-        title: 'NS1 Gather Rankings',
-        description: 'Pick-order-based NS1 gather rankings, including a draft-only OpenSkill score.',
-        icon: 'sort-numeric-down',
-        path_helper: :analysis_pick_orders_path
+        title: 'NS1 Class performance',
+        description: 'Compare each player with every NS1 class, independent of map, team, and side.',
+        icon: 'crosshairs',
+        path_helper: :analysis_classes_path
       },
       {
-        title: 'NS1 Marine tech paths',
+        title: 'NS1 Marine Strategies',
         description: 'Which NS1 marine opening research orders win the most, straight from the round logs.',
         icon: 'sitemap',
+        image: '/images/ns1/comm_icon.gif',
+        category: :marine,
         links: [
-          { label: 'List', icon: 'list', path_helper: :analysis_tech_paths_path },
-          { label: 'Paths', icon: 'project-diagram', path_helper: :analysis_tech_tree_path },
-          { label: 'Game tree', icon: 'sitemap', path_helper: :analysis_tech_requirements_path }
+          { label: 'Strategies', icon: 'list', path_helper: :analysis_tech_paths_path },
+          { label: 'Graph', icon: 'project-diagram', path_helper: :analysis_tech_tree_path },
+          { label: 'Tech tree', icon: 'sitemap', path_helper: :analysis_tech_requirements_path }
         ]
       },
       {
-        title: 'NS1 Alien tech tree',
-        description: 'Which chamber choices win the most, using each hive\'s first built chamber from the round logs.',
-        icon: 'project-diagram',
-        path_helper: :analysis_alien_tech_tree_path
-      },
-      {
-        title: 'NS1 Alien strategies',
+        title: 'NS1 Alien Strategies',
         description: 'Six-player alien role and build combinations, grouped by their opening actions and win rate.',
         icon: 'layer-group',
-        path_helper: :analysis_alien_strategies_path
+        image: '/images/ns1/hive_icon.gif',
+        category: :alien,
+        links: [
+          { label: 'Strategies', icon: 'list', path_helper: :analysis_alien_strategies_path },
+          { label: 'Graph', icon: 'project-diagram', path_helper: :analysis_alien_tech_tree_path }
+        ]
       },
       {
         title: 'NS1 Round length',
@@ -67,16 +68,13 @@ module Analysis
         path_helper: :analysis_round_lengths_path
       },
       {
-        title: 'NS1 Play times',
-        description: 'When rounds actually get played: a day-of-week by hour-of-day activity heatmap.',
+        title: 'NS1 Round activity',
+        description: 'Explore when rounds are played during a week and how the imported record has grown over time.',
         icon: 'calendar-alt',
-        path_helper: :analysis_activity_path
-      },
-      {
-        title: 'Round Data Over Time',
-        description: 'Explore how imported NS1 rounds are distributed across months, quarters, and years.',
-        icon: 'bar-chart',
-        path_helper: :statistics_rounds_path
+        links: [
+          { label: 'Weekly', icon: 'calendar-alt', path_helper: :analysis_activity_path },
+          { label: 'Annual', icon: 'bar-chart', path_helper: :statistics_rounds_path }
+        ]
       }
     ].freeze
 

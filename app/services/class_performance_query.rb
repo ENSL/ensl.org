@@ -6,6 +6,7 @@
 class ClassPerformanceQuery
   METRICS = %w[kills deaths damage minutes_played resources_spent wins losses sample_size].freeze
   MODEL_PREFIX = 'class_stats:'
+  EXCLUDED_CLASSES = %w[heavy jetpack].freeze
   MIN_GAMES_OPTIONS = [25, 50, 100].freeze
   DEFAULT_MIN_GAMES = MIN_GAMES_OPTIONS.first
 
@@ -23,6 +24,7 @@ class ClassPerformanceQuery
                   .distinct
                   .pluck(:model)
                   .map { |model| model.delete_prefix(MODEL_PREFIX) }
+                  .reject { |class_name| EXCLUDED_CLASSES.include?(class_name) }
                   .sort
   end
 
@@ -34,14 +36,21 @@ class ClassPerformanceQuery
   def call
     return [] unless latest_batch_id
 
-    metrics_by_subject.filter_map do |(steamid, model), metrics|
+    grouped_metrics.filter_map do |steamid, metrics|
       user = users_by_steamid[steamid]
       next unless user
-      next if @class_name && model != "#{MODEL_PREFIX}#{@class_name}"
       next if @min_games && metrics['sample_size'].present? && metrics['sample_size'] < @min_games
 
-      performance(user, model, metrics)
+      performance(user, metrics)
     end
+  end
+
+  def possible_users
+    grouped_metrics.keys.intersection(users_by_steamid.keys).size
+  end
+
+  def rounds_analysed
+    Round.where.not(result: nil).count
   end
 
   private
@@ -76,6 +85,20 @@ class ClassPerformanceQuery
     end
   end
 
+  def grouped_metrics
+    selected_metrics = metrics_by_subject.select do |(_steamid, model), _metrics|
+      @class_name.nil? || model == "#{MODEL_PREFIX}#{@class_name}"
+    end
+    return selected_metrics.transform_keys(&:first) if @class_name
+
+    empty_metrics = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    selected_metrics.each_with_object(empty_metrics) do |((steamid, model), metrics), totals|
+      next if EXCLUDED_CLASSES.include?(model.delete_prefix(MODEL_PREFIX))
+
+      metrics.each { |metric, value| totals[steamid][metric] += value.to_f }
+    end
+  end
+
   def rate(numerator, denominator)
     return nil unless numerator && denominator&.positive?
 
@@ -91,13 +114,13 @@ class ClassPerformanceQuery
     numeric
   end
 
-  def performance(user, model, metrics)
+  def performance(user, metrics)
     damage = metrics['damage']
     minutes_played = metrics['minutes_played']
     resources_spent = metrics['resources_spent']
 
     {
-      user: user, class_name: model.delete_prefix(MODEL_PREFIX),
+      user: user, class_name: @class_name,
       kills: metrics['kills'], deaths: metrics['deaths'], damage: damage,
       kill_death_ratio: rate(metrics['kills'], metrics['deaths']),
       minutes_played: minutes_played, damage_per_minute: rate(damage, minutes_played),

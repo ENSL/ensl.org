@@ -8,7 +8,7 @@ RSpec.describe ClassPerformanceQuery do
                              metric: metric, value: value)
   end
 
-  it 'pivots only the latest batch into map-independent player and class rows' do
+  it 'pivots only the latest batch into map-independent player rows' do
     user = create(:user, steamid: '0:1:12345')
     create_result(batch_id: 1, steamid: user.steamid, class_name: 'skulk', metric: 'damage', value: 10)
     metrics = %w[kills deaths damage resources_spent minutes_played wins sample_size]
@@ -18,7 +18,7 @@ RSpec.describe ClassPerformanceQuery do
 
     performance = described_class.call.first
 
-    expect(performance).to include(user: user, class_name: 'skulk', damage: 500, damage_per_resource: 20,
+    expect(performance).to include(user: user, class_name: nil, damage: 500, damage_per_resource: 20,
                                    damage_per_minute: 50, kill_death_ratio: 2, win_rate: 0.75)
   end
 
@@ -49,11 +49,33 @@ RSpec.describe ClassPerformanceQuery do
     expect(performances.first[:class_name]).to eq('fade')
   end
 
+  it 'sums reliable classes into one all-classes row per player' do
+    user = create(:user)
+    %w[skulk fade heavy jetpack].each_with_index do |class_name, index|
+      create_result(batch_id: 7, steamid: user.steamid, class_name: class_name, metric: 'kills', value: index + 1)
+      create_result(batch_id: 7, steamid: user.steamid, class_name: class_name, metric: 'sample_size', value: 10)
+    end
+
+    performances = described_class.call
+
+    expect(performances).to have_attributes(size: 1)
+    expect(performances.first).to include(user: user, kills: 3, sample_size: 20)
+  end
+
   it 'returns available classes only from the latest batch' do
     user = create(:user)
     create_result(batch_id: 5, steamid: user.steamid, class_name: 'skulk', metric: 'sample_size', value: 30)
     create_result(batch_id: 6, steamid: user.steamid, class_name: 'fade', metric: 'sample_size', value: 30)
 
     expect(described_class.class_names).to eq(['fade'])
+  end
+
+  it 'does not offer heavy or jetpack as class filters' do
+    user = create(:user)
+    %w[heavy jetpack skulk].each do |class_name|
+      create_result(batch_id: 8, steamid: user.steamid, class_name: class_name, metric: 'sample_size', value: 30)
+    end
+
+    expect(described_class.class_names).to eq(['skulk'])
   end
 end

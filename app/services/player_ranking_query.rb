@@ -15,8 +15,8 @@ class PlayerRankingQuery
   # Historical per-player stats, stored under model 'player_stats'.
   PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
 
-  MIN_GAMES_OPTIONS = [25, 50, 100].freeze
-  DEFAULT_MIN_GAMES = MIN_GAMES_OPTIONS.first
+  MIN_GAMES_OPTIONS = [25, 50, 70, 100].freeze
+  DEFAULT_MIN_GAMES = 70
 
   def self.call(min_games: nil)
     new(min_games: min_games).call
@@ -32,7 +32,7 @@ class PlayerRankingQuery
   def call
     return [] unless latest_batch_id
 
-    metrics_by_steamid.filter_map do |steamid, metrics|
+    rankings = metrics_by_steamid.filter_map do |steamid, metrics|
       user = users_by_steamid[steamid]
       next unless user
 
@@ -48,6 +48,15 @@ class PlayerRankingQuery
         win_ratio: metrics['player_stats.win_ratio']
       }.merge(skill_columns(metrics))
     end
+    rankings.sort_by { |row| [-row[:skill_dl].to_f, row[:user].to_s.downcase] }
+  end
+
+  def rounds_analysed
+    Round.where.not(result: nil).count
+  end
+
+  def matched_users
+    call.size
   end
 
   private

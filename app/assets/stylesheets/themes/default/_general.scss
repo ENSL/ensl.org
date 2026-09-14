@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "variables" as *;
 
 .invisible { display: none !important; }
@@ -99,6 +100,21 @@
     align-items: center;
     gap: 6px;
   }
+}
+
+.stats-page__faction-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.analysis-back {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
 }
 
 // One "Tech path" cell on /analysis/tech_paths -- an icon+name chain that has

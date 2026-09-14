@@ -1,3 +1,4 @@
+<%= link_to 'Back', analysis_root_path, class: 'analysis-back' %>
 <h1 class="title">NS1 Map balance</h1>
 
 <div class="box wide">
@@ -34,7 +35,9 @@
         { key: :marine_win_percentage, label: 'Marine win %', type: :number, format: format_percent },
         { key: :alien_win_percentage, label: 'Alien win %', type: :number, format: format_percent }
       ],
-      rows: @map_balances
+      rows: @map_balances,
+      default_sort: :marine_win_percentage,
+      default_direction: :descending
     ) %>
   <% end %>
 </div>

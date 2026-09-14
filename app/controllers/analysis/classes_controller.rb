@@ -9,7 +9,10 @@ module Analysis
       @selected_class_name = params[:class_name].presence if @class_names.include?(params[:class_name])
       @min_games_options = ClassPerformanceQuery::MIN_GAMES_OPTIONS
       @selected_min_games = normalize_min_games_param
-      @performances = ClassPerformanceQuery.call(class_name: @selected_class_name, min_games: @selected_min_games)
+      query = ClassPerformanceQuery.new(class_name: @selected_class_name, min_games: @selected_min_games)
+      @performances = query.call
+      @rounds_analysed = query.rounds_analysed
+      @possible_users = query.possible_users
       render layout: 'full'
     end
 

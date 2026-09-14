@@ -23,6 +23,9 @@ export default class extends Controller {
       header.addEventListener("click", handler)
       this.handlers.set(header, handler)
     })
+
+    const defaultHeader = this.headers.find((header) => header.dataset.sortKey === this.defaultKeyValue)
+    if (defaultHeader) this.sortBy(defaultHeader, this.defaultDirectionValue)
   }
 
   disconnect() {
@@ -33,8 +36,8 @@ export default class extends Controller {
     return Array.from(this.element.querySelectorAll("thead th[data-sort-type]"))
   }
 
-  sortBy(header) {
-    const direction = header.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending"
+  sortBy(header, direction = null) {
+    direction ||= header.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending"
     const columnIndex = Array.from(header.parentElement.children).indexOf(header)
     const type = header.dataset.sortType || "string"
 

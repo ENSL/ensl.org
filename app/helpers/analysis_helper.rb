@@ -53,8 +53,10 @@ module AnalysisHelper
   #   sort_value  - optional proc(raw_value) -> comparable value (defaults to raw_value)
   #   format      - optional proc(raw_value) -> displayed value (defaults to raw_value)
   # rows: array of hashes, each keyed by every column's :key
-  def sortable_table(columns:, rows:, id: nil)
-    render partial: 'analysis/sortable_table', locals: { columns: columns, rows: rows, id: id }
+  def sortable_table(columns:, rows:, id: nil, default_sort: nil, default_direction: :ascending)
+    locals = { columns: columns, rows: rows, id: id, default_sort: default_sort,
+               default_direction: default_direction }
+    render partial: 'analysis/sortable_table', locals: locals
   end
 
   # Renders a MarineTechPathQuery path (raw `research_*` keys) as an arrow-

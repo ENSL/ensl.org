@@ -9,7 +9,10 @@ module Analysis
     def index
       @min_games_options = PickOrderRankingQuery::MIN_GAMES_OPTIONS
       @selected_min_games = normalize_min_games_param
-      @rankings = PickOrderRankingQuery.call(game: 'NS1', min_games: @selected_min_games)
+      query = PickOrderRankingQuery.new(game: 'NS1', min_games: @selected_min_games)
+      @rankings = query.call
+      @played_gathers = query.played_gathers
+      @matched_users = query.matched_users
       render layout: 'full'
     end
 

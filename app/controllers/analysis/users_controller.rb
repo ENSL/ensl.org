@@ -9,7 +9,10 @@ module Analysis
     def index
       @min_games_options = PlayerRankingQuery::MIN_GAMES_OPTIONS
       @selected_min_games = normalize_min_games_param
-      @rankings = PlayerRankingQuery.call(min_games: @selected_min_games)
+      query = PlayerRankingQuery.new(min_games: @selected_min_games)
+      @rankings = query.call
+      @rounds_analysed = query.rounds_analysed
+      @matched_users = query.matched_users
       render layout: 'full'
     end
 

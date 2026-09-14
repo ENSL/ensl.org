@@ -53,6 +53,14 @@ class PickOrderRankingQuery
     end
   end
 
+  def played_gathers
+    game_rows.map(&:first).uniq.size
+  end
+
+  def matched_users
+    call.size
+  end
+
   private
 
   def model

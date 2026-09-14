@@ -88,8 +88,8 @@ describe PlayerRankingQuery do
 
     it 'falls back to default min_games for invalid values' do
       user = create(:user, steamid: '0:1:99998')
-      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 20)
-      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 10)
+      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 50)
+      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 30)
       create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'os', metric: 'skill', value: 2.0)
 
       expect(described_class.call(min_games: 'invalid').map { |row| row[:user] }).to include(user)

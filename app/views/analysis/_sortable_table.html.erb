@@ -1,4 +1,4 @@
-<table<%= %( id="#{id}").html_safe if id %> class="data sortable-table" data-controller="sortable-table">
+<table<%= %( id="#{id}").html_safe if id %> class="data sortable-table" data-controller="sortable-table"<%= %( data-sortable-table-default-key-value="#{default_sort}" data-sortable-table-default-direction-value="#{default_direction}").html_safe if default_sort %>>
   <thead>
     <tr>
       <% columns.each do |column| %>
@@ -7,6 +7,7 @@
         <th
           class="<%= 'sortable-table-number' if column_type == :number %><%= ' sortable-table-tip' if tooltip %>"
           data-sort-type="<%= column_type %>"
+          data-sort-key="<%= column[:key] %>"
           <% if tooltip %>data-tooltip="<%= tooltip %>" aria-label="<%= column[:label] %>: <%= tooltip %>"<% end %>
         >
           <span class="sortable-table-label"><%= column[:label] %></span>
