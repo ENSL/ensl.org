@@ -147,6 +147,45 @@ describe MarineTechPathQuery do
       expect(results).to include(include(path: %w[research_armorl1 research_weaponsl1], rounds: 3, wins: 2, losses: 1))
     end
 
+    it 'requires every normalized Contains token in the same opening path' do
+      2.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_armorl1 research_weaponsl1])
+      end
+      round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_armorl1 research_phasetech])
+
+      results = described_class.call(path_length: 2, min_rounds: 1, result_limit: nil,
+                                     strategy_filter: ' ARMOR, weapons ')
+
+      expect(results).to contain_exactly(
+        include(path: %w[research_armorl1 research_weaponsl1], rounds: 2)
+      )
+    end
+
+    it 'does not expose a later research through an opening-path filter' do
+      5.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_armorl1 research_weaponsl1 research_heavyarmor])
+      end
+
+      results = described_class.call(path_length: 2, min_rounds: 5, result_limit: nil,
+                                     strategy_filter: 'heavyarmor')
+
+      expect(results).to be_empty
+    end
+
+    it 'applies the result limit after filtering matching paths' do
+      5.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN, researches: %w[research_armorl1])
+        round_with_research(result: Round::RESULT_ALIEN_WIN, researches: %w[research_weaponsl1])
+      end
+
+      results = described_class.call(path_length: 1, min_rounds: 5, result_limit: 1,
+                                     strategy_filter: 'weapons')
+
+      expect(results).to contain_exactly(include(path: ['research_weaponsl1'], rounds: 5, losses: 5))
+    end
+
     it 'aggregates a research wherever it occurred when individual techs are selected' do
       2.times do
         round_with_research(result: Round::RESULT_MARINE_WIN,
@@ -160,6 +199,22 @@ describe MarineTechPathQuery do
 
       expect(results).to contain_exactly(
         include(path: ['research_heavyarmor'], rounds: 3, wins: 2, losses: 1)
+      )
+    end
+
+    it 'counts an individual research once per round before applying the sample minimum' do
+      4.times do
+        round_with_research(result: Round::RESULT_MARINE_WIN,
+                            researches: %w[research_heavyarmor research_armorl1 research_heavyarmor])
+      end
+      round_with_research(result: Round::RESULT_ALIEN_WIN,
+                          researches: %w[research_phasetech research_heavyarmor])
+
+      results = described_class.call(path_length: 'techs', min_rounds: 5, result_limit: nil,
+                                     strategy_filter: 'heavyarmor')
+
+      expect(results).to contain_exactly(
+        include(path: ['research_heavyarmor'], rounds: 5, wins: 4, losses: 1)
       )
     end
 
@@ -209,6 +264,7 @@ describe MarineTechPathQuery do
       expect(described_class.normalize_path_length(99)).to eq(described_class::DEFAULT_PATH_LENGTH)
       expect(described_class.normalize_path_length('4')).to eq(4)
       expect(described_class.normalize_path_length('all')).to be_nil
+      expect(described_class.normalize_path_length('techs')).to eq('techs')
       expect(described_class.normalize_min_rounds('nonsense')).to eq(described_class::DEFAULT_MIN_ROUNDS)
       expect(described_class.normalize_min_rounds('25')).to eq(25)
       expect(described_class.normalize_result_limit(999)).to eq(described_class::DEFAULT_RESULT_LIMIT)

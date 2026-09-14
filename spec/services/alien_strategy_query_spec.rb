@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe AlienStrategyQuery do
-  def create_strategy_result(strategy:, metric:, value:, milestone:)
-    create(:analysis_result, batch_id: 1, model: 'alien_strategy', steamid: strategy,
+  def create_strategy_result(strategy:, metric:, value:, milestone:, batch_id: 1)
+    create(:analysis_result, batch_id: batch_id, model: 'alien_strategy', steamid: strategy,
                              metric: metric, value: value, milestone: milestone)
   end
 
@@ -60,6 +60,51 @@ RSpec.describe AlienStrategyQuery do
       expect(results).to contain_exactly(include(role: ['gorge'], rounds: 10, wins: 6, losses: 4))
     end
 
+    it 'requires all Contains tokens in one player action path' do
+      10.times do |index|
+        create_strategy_result(strategy: 'gorge+hive,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 40)
+        create_strategy_result(strategy: 'gorge,fade+hive,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 50)
+      end
+
+      results = described_class.new(action_limit: 2, min_rounds: 10, result_limit: nil,
+                                    strategy_filter: 'Gorge, Hive').call
+
+      expect(results).to contain_exactly(include(roles: [
+                                                   %w[gorge hive], ['skulk'], ['skulk'], ['skulk'], ['skulk'], ['skulk']
+                                                 ], rounds: 10))
+    end
+
+    it 'only filters on actions visible at the selected action limit' do
+      10.times do |index|
+        create_strategy_result(strategy: 'gorge+hive,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 60)
+      end
+
+      first_action = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil,
+                                         strategy_filter: 'hive').call
+      two_actions = described_class.new(action_limit: 2, min_rounds: 10, result_limit: nil,
+                                        strategy_filter: 'hive').call
+
+      expect(first_action).to be_empty
+      expect(two_actions).to include(include(roles: [
+                                               %w[gorge hive], ['skulk'], ['skulk'], ['skulk'], ['skulk'], ['skulk']
+                                             ], rounds: 10))
+    end
+
+    it 'counts a repeated role action only once per round in role-action view' do
+      10.times do |index|
+        create_strategy_result(strategy: 'gorge,gorge,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 70)
+      end
+
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil,
+                                    result_view: 'role_actions').call
+
+      expect(results).to include(include(role: ['gorge'], rounds: 20, wins: 16, losses: 4))
+    end
+
     it 'merges offense chamber variants into the same analyzed group when selected' do
       5.times do |index|
         create_strategy_result(strategy: 'oc,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
@@ -72,6 +117,48 @@ RSpec.describe AlienStrategyQuery do
                                     result_view: 'role_actions', coalesce_chambers: true).call
 
       expect(results).to include(include(role: ['oc'], rounds: 10, wins: 10, losses: 0))
+    end
+
+    it 'matches coalesced chamber names in the Contains filter' do
+      10.times do |index|
+        create_strategy_result(strategy: 'ocs,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 80)
+      end
+
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil,
+                                    result_view: 'role_actions', coalesce_chambers: true,
+                                    strategy_filter: 'oc').call
+
+      expect(results).to include(include(role: ['oc'], rounds: 10, wins: 10))
+    end
+
+    it 'applies the result limit after filtering matching strategies' do
+      10.times do |index|
+        create_strategy_result(strategy: 'fade,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 90)
+        create_strategy_result(strategy: 'gorge,skulk,skulk,skulk,skulk,skulk', metric: 'marine_win', value: 0,
+                               milestone: index + 100)
+      end
+
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: 1,
+                                    strategy_filter: 'gorge').call
+
+      expect(results).to contain_exactly(include(roles: [
+                                                   ['gorge'], ['skulk'], ['skulk'], ['skulk'], ['skulk'], ['skulk']
+                                                 ], rounds: 20, wins: 6, losses: 14))
+    end
+
+    it 'uses only the newest imported analysis batch' do
+      10.times do |index|
+        create_strategy_result(strategy: 'onos,skulk,skulk,skulk,skulk,skulk', metric: 'alien_win', value: 900,
+                               milestone: index + 110, batch_id: 2)
+      end
+
+      results = described_class.new(action_limit: 1, min_rounds: 10, result_limit: nil).call
+
+      expect(results).to contain_exactly(include(roles: [
+                                                   ['onos'], ['skulk'], ['skulk'], ['skulk'], ['skulk'], ['skulk']
+                                                 ], rounds: 10, wins: 10))
     end
 
     it 'includes the strongest qualifying groups from different action limits in best mode' do
@@ -113,6 +200,13 @@ RSpec.describe AlienStrategyQuery do
       create_strategy_result(strategy: 'gorge+rt,skulk', metric: 'alien_win', value: 900, milestone: 99)
 
       expect(described_class.new.filter_options).to eq(%w[gorge rt skulk])
+    end
+
+    it 'uses the selected chamber coalescing rule' do
+      create_strategy_result(strategy: 'ocs,skulk', metric: 'alien_win', value: 900, milestone: 100)
+
+      expect(described_class.new(coalesce_chambers: true).filter_options).to include('oc')
+      expect(described_class.new(coalesce_chambers: true).filter_options).not_to include('ocs')
     end
   end
 end

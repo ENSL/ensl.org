@@ -43,7 +43,7 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       get '/analysis/tech_paths', params: { min_rounds: 5 }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Marine tech paths')
+      expect(response.body).to include('NS1 Marine Strategies')
       expect(response.body).to include('Armor Level 1')
       expect(response.body).to include('Phase Technology')
       expect(response.body).to include('Reach %')
@@ -88,6 +88,20 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       expect(response.body).to include('individual techs', 'Marine research choices', 'Heavy Armor', '100.0%')
     end
 
+    it 'keeps a normalized Contains filter and the selected aggregation mode in the form' do
+      round_with_research(result: Round::RESULT_MARINE_WIN,
+                          researches: %w[research_armorl1 research_heavyarmor])
+
+      get '/analysis/tech_paths', params: { path_length: 'techs', min_rounds: 5,
+                                            strategy_filter: 'Heavy Armor' }
+
+      document = Nokogiri::HTML(response.body)
+      expect(response).to have_http_status(:ok)
+      expect(document.at_css('#path_length option[selected]')['value']).to eq('techs')
+      expect(document.at_css('#strategy_filter')['value']).to eq('heavy+armor')
+      expect(document.css('#marine-strategy-options option').map { |option| option['value'] }).to include('heavyarmor')
+    end
+
     it 'accepts a selected row limit and the all-qualifying option' do
       get '/analysis/tech_paths', params: { result_limit: '50' }
 
@@ -107,8 +121,7 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
 
       get '/analysis/tech_paths', params: { min_rounds: 5, result_limit: 20 }
 
-      expect(response.body).to include('all 1 qualifying paths below')
-      expect(response.body).not_to include('the best 1 by win rate')
+      expect(response.body).to include('showing 1 of 1 opening research orders')
     end
 
     it 'renders an empty-state message when nothing meets the minimum' do
@@ -155,7 +168,7 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       get '/analysis/alien_tech_tree'
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('NS1 Alien tech tree', 'Defense Chamber', 'data-controller="tech-tree"')
+      expect(response.body).to include('NS1 Alien Graph', 'Defense Chamber', 'data-controller="tech-tree"')
       graph = Nokogiri::HTML(response.body).at_css('[data-tech-tree-icons-value]')
       node_data = JSON.parse(graph['data-tech-tree-icons-value'])
       expect(node_data.fetch('tech0')).to include('icon' => '/images/ns1/640alienupgradecategories_0.png',
