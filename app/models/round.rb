@@ -45,18 +45,50 @@ class Round < ApplicationRecord
   has_many :rounders, dependent: :destroy
   has_many :log_lines, dependent: :destroy
 
-  def self.filtered(filters)
-    scope = all
-    scope = scope.where('rounders.steamid LIKE ?', "%#{filters[:steamid]}%") if filters[:steamid].present?
-    scope = scope.where('users.username LIKE ?', "%#{filters[:username]}%") if filters[:username].present?
-    scope = scope.where('log_lines.raw_text LIKE ?', "%\"#{filters[:nickname]}%<%") if filters[:nickname].present?
-    scope = scope.where('rounds.map_name LIKE ?', "%#{filters[:map]}%") if filters[:map].present?
-    scope = scope.where('rounds.server_name LIKE ?', "%#{filters[:server]}%") if filters[:server].present?
-    scope = scope.where(result: filters[:result]) if %w[0 1].include?(filters[:result].to_s)
-    scope = apply_length_filter(scope, filters[:length])
-    scope = apply_date_filter(scope, filters[:from], filters[:to])
+  scope :chronologically, -> { order(start_time: :asc, id: :asc) }
+  scope :with_players_and_users, lambda {
+    left_joins(:rounders).joins("LEFT JOIN users ON users.steamid = REPLACE(rounders.steamid, 'STEAM_', '')")
+  }
+  scope :with_log_lines, -> { joins('LEFT JOIN log_lines ON log_lines.round_id = rounds.id') }
+  scope :for_steamid, ->(steamid) { steamid.present? ? where('rounders.steamid LIKE ?', "%#{steamid}%") : self }
+  scope :for_username, ->(username) { username.present? ? where('users.username LIKE ?', "%#{username}%") : self }
+  scope :for_nickname, lambda { |nickname|
+    nickname.present? ? where('log_lines.raw_text LIKE ?', "%\"#{nickname}%<%") : self
+  }
+  scope :for_map, ->(map_name) { map_name.present? ? where('rounds.map_name LIKE ?', "%#{map_name}%") : self }
+  scope :for_server, lambda { |server_name|
+    server_name.present? ? where('rounds.server_name LIKE ?', "%#{server_name}%") : self
+  }
+  scope :for_result, ->(result) { %w[0 1].include?(result.to_s) ? where(result: result) : self }
+  scope :for_length, ->(bucket) { Round.apply_length_filter(self, bucket) }
+  scope :between_dates, ->(from, to) { Round.apply_date_filter(self, from, to) }
 
-    scope.distinct
+  ARCHIVE_FILTER_SCOPES = {
+    steamid: :for_steamid,
+    username: :for_username,
+    nickname: :for_nickname,
+    map: :for_map,
+    server: :for_server,
+    result: :for_result,
+    length: :for_length
+  }.freeze
+
+  def self.present_map_names
+    where.not(map_name: [nil, '']).distinct.order(:map_name).pluck(:map_name)
+  end
+
+  def self.present_server_names
+    where.not(server_name: [nil, '']).distinct.order(:server_name).pluck(:server_name)
+  end
+
+  def self.counts_by_day_in(year)
+    where(start_time: Date.new(year, 1, 1)...Date.new(year + 1, 1, 1)).group('DATE(start_time)').count
+  end
+
+  def self.filtered(filters)
+    ARCHIVE_FILTER_SCOPES.reduce(all) do |scope, (filter, scope_name)|
+      scope.public_send(scope_name, filters[filter])
+    end.between_dates(filters[:from], filters[:to]).distinct
   end
 
   def winner_s
@@ -71,6 +103,22 @@ class Round < ApplicationRecord
 
     total_seconds = (end_time - start_time).to_i
     format('%<minutes>02d:%<seconds>02d', minutes: total_seconds / 60, seconds: total_seconds % 60)
+  end
+
+  def previous
+    self.class.where('start_time < ? OR (start_time = ? AND id < ?)', start_time, start_time, id)
+        .order(start_time: :desc, id: :desc).first
+  end
+
+  def next
+    self.class.where('start_time > ? OR (start_time = ? AND id > ?)', start_time, start_time, id)
+        .chronologically.first
+  end
+
+  def timeline_log_lines
+    timeline = log_lines.where.not(event_type: %w[attacked player_acts])
+    timeline = timeline.where(created_at: start_time..) if start_time
+    timeline.order(:created_at, :id)
   end
 
   # steamid -> tally of {'marine' => N, 'alien' => M} seen in this round's own
