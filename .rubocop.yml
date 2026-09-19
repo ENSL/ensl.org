@@ -1,7 +1,13 @@
 plugins:
   # rubocop-rails adds Rails-specific cops that understand controller, model,
   # and routing conventions better than the core Ruby cops alone.
+  - rubocop-performance
   - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-capybara
+  - rubocop-factory_bot
 
 AllCops:
   NewCops: disable
