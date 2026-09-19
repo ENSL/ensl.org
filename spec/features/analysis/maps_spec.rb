@@ -50,8 +50,8 @@ RSpec.feature 'Analysis map balance page', type: :feature, js: true do
   scenario 'sorts the table by column, blanks always last' do
     visit '/analysis/maps'
 
-    # Default order from the server: most-played map first.
-    expect(map_names).to eq(%w[ns_altair ns_tanith ns_hera])
+    # Default order: best marine win percentage first, with missing values last.
+    expect(map_names).to eq(%w[ns_tanith ns_altair ns_hera])
 
     find('#map-balance thead th', text: 'Games').click
     expect(map_names).to eq(%w[ns_hera ns_tanith ns_altair])

@@ -16,7 +16,7 @@ class MapBalanceQuery
 
   # Returns an array of hashes: { map_name:, marine_wins:, alien_wins:,
   # total_games:, marine_win_percentage:, alien_win_percentage: }, sorted by
-  # marine win percentage descending. Maps with no games
+  # marine win percentage descending, with missing percentages last. Maps with no games
   # recorded are skipped.
   def call
     rows = metrics_by_map.filter_map do |map_name, metrics|
@@ -32,7 +32,9 @@ class MapBalanceQuery
         alien_win_percentage: metrics['alien_win_percentage']
       }
     end
-    rows.sort_by { |row| [-row[:marine_win_percentage].to_f, -row[:total_games]] }
+    rows.sort_by do |row|
+      [row[:marine_win_percentage].nil? ? 1 : 0, -row[:marine_win_percentage].to_f, -row[:total_games]]
+    end
   end
 
   private

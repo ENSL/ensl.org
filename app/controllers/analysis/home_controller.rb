@@ -9,7 +9,7 @@ module Analysis
   class HomeController < Analysis::BaseController
     PAGES = [
       {
-        title: 'NS1 Player rankings',
+        title: 'NS1 Rankings',
         description: 'NS1 skill ratings and win/loss records for every tracked player. Sort by any column.',
         icon: 'trophy',
         path_helper: :analysis_users_path
@@ -39,7 +39,7 @@ module Analysis
         path_helper: :analysis_classes_path
       },
       {
-        title: 'NS1 Marine Strategies',
+        title: 'NS1 Marine tech paths',
         description: 'Which NS1 marine opening research orders win the most, straight from the round logs.',
         icon: 'sitemap',
         image: '/images/ns1/comm_icon.gif',
@@ -51,7 +51,7 @@ module Analysis
         ]
       },
       {
-        title: 'NS1 Alien Strategies',
+        title: 'NS1 Alien tech tree',
         description: 'Six-player alien role and build combinations, grouped by their opening actions and win rate.',
         icon: 'layer-group',
         image: '/images/ns1/hive_icon.gif',
@@ -68,7 +68,7 @@ module Analysis
         path_helper: :analysis_round_lengths_path
       },
       {
-        title: 'NS1 Round activity',
+        title: 'Round Data Over Time',
         description: 'Explore when rounds are played during a week and how the imported record has grown over time.',
         icon: 'calendar-alt',
         links: [
