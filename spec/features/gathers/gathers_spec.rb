@@ -11,12 +11,7 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     previous_timeout = ENV['GATHER_VOTING_TIMEOUT_TEST']
     previous_broadcaster_skip = Gathers::Broadcaster.skip_broadcasts
     previous_activity_skip = Gathers::ActivityBroadcaster.skip_broadcasts
-    previous_reuse_server = Capybara.reuse_server
     ENV['GATHER_VOTING_TIMEOUT_TEST'] = '20'
-    # Each named session creates a Capybara server object. Sharing the server
-    # races its lazy responsiveness check under this 12-user flow, causing a
-    # second Puma to bind the cached port. Isolate these test-only sessions.
-    Capybara.reuse_server = false
     # 12 concurrent sessions x dozens of join/vote/pick events would repeat the
     # per-event N-renders many times over; skip both broadcasters here and rely
     # on gather_sync.js's /version polling fallback instead (version bump still
@@ -25,7 +20,6 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     Gathers::ActivityBroadcaster.skip_broadcasts = true
     example.run
   ensure
-    Capybara.reuse_server = previous_reuse_server
     Gathers::Broadcaster.skip_broadcasts = previous_broadcaster_skip
     Gathers::ActivityBroadcaster.skip_broadcasts = previous_activity_skip
     ENV['GATHER_VOTING_TIMEOUT_TEST'] = previous_timeout
@@ -91,6 +85,20 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     expect(captain1).not_to be_nil
     expect(captain2).not_to be_nil
 
+    session_for_user_id = users.each_with_index.to_h { |user, index| [user.id, "user_#{index}"] }
+    captain_sessions = [session_for_user_id[captain1.id], session_for_user_id[captain2.id]].compact
+    picking_users = [captain1, captain2, users[0]].uniq
+
+    # Only captains and the observer need a browser after voting. Closing the
+    # other nine pages avoids renderer crashes under this 12-user scenario.
+    Capybara.reset_sessions!
+    picking_users.each do |user|
+      Capybara.using_session(session_for_user_id.fetch(user.id)) do
+        sign_in_via_session(user)
+        visit_gather_with_retry(gather)
+      end
+    end
+
     # End-of-voting transition should create exactly one follow-up gather.
     expect(Gather.where(category_id: gather.category_id).count).to eq(2)
 
@@ -101,9 +109,6 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
     puts('Captain voting has ended, picking phase has started.')
 
     # Let whichever captain has the current turn pick from the lobby until no players remain.
-    session_for_user_id = users.each_with_index.to_h { |u, i| [u.id, "user_#{i}"] }
-    captain_sessions = [session_for_user_id[captain1.id], session_for_user_id[captain2.id]].compact
-
     while gather.reload.gatherers.lobby.exists?
       picked = false
       attempts = 0
@@ -145,7 +150,11 @@ RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
             next unless safe_has_selector?('ul#lobby-gatherers input[type="radio"]', wait: 5)
 
             safe_click { all('ul#lobby-gatherers input[type="radio"]', minimum: 1, wait: 5).sample.click }
-            safe_click { find('input[value="Pick"]').click }
+            # A sync-driven frame replacement can remove the submit control just
+            # after the radio selection. Let the outer loop reload and retry.
+            next unless safe_has_selector?('input[value="Pick"]', wait: 1)
+
+            safe_click { find('input[value="Pick"]', wait: 1).click }
 
             # Verify the pick actually happened by checking DB state changed
             sleep(0.3)
