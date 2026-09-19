@@ -111,6 +111,14 @@ module AnalysisHelper
     "--win-hue: #{hue}"
   end
 
+  def alien_strategy_result_view_options
+    [['best role actions', 'role_actions'], ['six-player strategies', 'strategies']]
+  end
+
+  def alien_strategy_chamber_options
+    [['separate', '0'], ['coalesce MC, SC, DC, and OC', '1']]
+  end
+
   def alien_strategy_duration(seconds)
     return '—' unless seconds
 

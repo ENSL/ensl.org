@@ -7,24 +7,8 @@ module Analysis
   # so this stays a plain index with no params/pagination to worry about.
   class UsersController < Analysis::BaseController
     def index
-      @min_games_options = PlayerRankingQuery::MIN_GAMES_OPTIONS
-      @selected_min_games = normalize_min_games_param
-      query = PlayerRankingQuery.new(min_games: @selected_min_games)
-      @rankings = query.call
-      @rounds_analysed = query.rounds_analysed
-      @matched_users = query.matched_users
-      @available_users = query.available_users
+      @report = PlayerRankingQuery.from_params(params).report
       render layout: 'full'
-    end
-
-    private
-
-    def normalize_min_games_param
-      value = Integer(params[:min_games], exception: false)
-      return PlayerRankingQuery::DEFAULT_MIN_GAMES unless value
-      return PlayerRankingQuery::DEFAULT_MIN_GAMES unless PlayerRankingQuery::MIN_GAMES_OPTIONS.include?(value)
-
-      value
     end
   end
 end

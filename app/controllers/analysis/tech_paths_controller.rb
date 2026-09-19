@@ -10,24 +10,7 @@ module Analysis
     ALIEN_GRAPH_MIN_ROUNDS_OPTIONS = [1, 5, 10, 25, 50].freeze
 
     def index
-      @path_length_options = MarineTechPathQuery::PATH_LENGTH_OPTIONS
-      @selected_path_length = MarineTechPathQuery.normalize_path_length(params[:path_length])
-      @min_rounds_options = MarineTechPathQuery::MIN_ROUNDS_OPTIONS
-      @selected_min_rounds = MarineTechPathQuery.normalize_min_rounds(params[:min_rounds])
-      @result_limit_options = MarineTechPathQuery::RESULT_LIMIT_OPTIONS
-      @selected_result_limit = MarineTechPathQuery.normalize_result_limit(params[:result_limit])
-      @strategy_filter = MarineTechPathQuery.normalize_strategy_filter(params[:strategy_filter])
-      @individual_techs = @selected_path_length == MarineTechPathQuery::INDIVIDUAL_TECHS_PATH_LENGTH
-
-      query = MarineTechPathQuery.new(path_length: @selected_path_length, min_rounds: @selected_min_rounds,
-                                      result_limit: @selected_result_limit, strategy_filter: @strategy_filter)
-      report = query.report
-      @tech_paths = report[:tech_paths]
-      @rounds_analysed = report[:rounds_analysed]
-      @paths_found = report[:paths_found]
-      @paths_above_minimum = report[:paths_above_minimum]
-      @strategy_filter_options = report[:filter_options]
-
+      @report = MarineTechPathQuery.from_params(params).report
       render layout: 'full'
     end
 

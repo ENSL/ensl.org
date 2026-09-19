@@ -30,5 +30,13 @@ RSpec.describe 'Analysis::PickOrdersController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('No NS1 gather draft data is available yet.')
     end
+
+    it 'keeps supporting the legacy min_picks parameter' do
+      get '/analysis/pick_orders', params: { min_picks: 5 }
+
+      document = Nokogiri::HTML(response.body)
+      expect(response).to have_http_status(:ok)
+      expect(document.at_css('#min_games option[selected]')['value']).to eq('5')
+    end
   end
 end

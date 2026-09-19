@@ -23,6 +23,16 @@ class AlienStrategyQuery
   MIN_MEDIAN_WIN_TIME_OPTIONS = [300, 600, 900, 1200, 1500, 1800].freeze
   COALESCED_CHAMBER_ACTIONS = { 'dcs' => 'dc', 'mcs' => 'mc', 'ocs' => 'oc', 'scs' => 'sc' }.freeze
 
+  def self.from_params(params)
+    new(action_limit: normalize_action_limit(params[:action_limit]),
+        min_rounds: normalize_min_rounds(params[:min_rounds]),
+        result_limit: normalize_result_limit(params[:result_limit]),
+        result_view: normalize_result_view(params[:result_view]),
+        min_median_win_time: normalize_min_median_win_time(params[:min_median_win_time]),
+        strategy_filter: normalize_strategy_filter(params[:strategy_filter]),
+        coalesce_chambers: normalize_coalesce_chambers(params[:coalesce_chambers]))
+  end
+
   def self.normalize_action_limit(value)
     return nil if value.to_s == UNCAPPED_ACTION_LIMIT
     return BEST_ACTION_LIMIT if value.to_s == BEST_ACTION_LIMIT
@@ -75,20 +85,24 @@ class AlienStrategyQuery
     @result_limit ? rows.first(@result_limit) : rows
   end
 
+  def report
+    { action_limit_options: ACTION_LIMIT_OPTIONS, selected_action_limit: @action_limit,
+      min_rounds_options: MIN_ROUNDS_OPTIONS, selected_min_rounds: @min_rounds,
+      result_limit_options: RESULT_LIMIT_OPTIONS, selected_result_limit: @result_limit,
+      selected_result_view: @result_view,
+      min_median_win_time_options: MIN_MEDIAN_WIN_TIME_OPTIONS,
+      selected_min_median_win_time: @min_median_win_time, strategy_filter: @strategy_filter,
+      coalesce_chambers: @coalesce_chambers, strategies: call, batch_id: latest_batch_id,
+      rounds_analysed: rounds_analysed, strategies_found: strategies_found,
+      strategy_filter_options: filter_options }
+  end
+
   def rounds_analysed
     strategy_results.size
   end
 
   def strategies_found
     @action_limit == BEST_ACTION_LIMIT ? best_candidate_rows.size : tally.size
-  end
-
-  def strategies_above_minimum
-    @action_limit == BEST_ACTION_LIMIT ? best_candidate_rows.size : qualifying_rows.size
-  end
-
-  def results_above_filters
-    filtered_result_rows.size
   end
 
   def latest_batch_id

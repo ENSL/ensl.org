@@ -11,16 +11,16 @@
     <p>
       <%= label_tag :min_games, 'Minimum games:' %>
       <%= select_tag :min_games,
-                     options_for_select(@min_games_options.map { |n| [n, n] }, @selected_min_games),
+                     options_for_select(@report[:min_games_options].map { |n| [n, n] }, @report[:selected_min_games]),
                      onchange: 'this.form.requestSubmit()' %>
     </p>
   <% end %>
 
-  <% if @rankings.empty? %>
+  <% if @report[:rankings].empty? %>
     <p>No analysis results are available yet.</p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@matched_users) %> of <%= number_with_delimiter(@available_users) %> player records.
+      Based on <%= number_with_delimiter(@report[:rounds_analysed]) %> finished rounds; showing <%= number_with_delimiter(@report[:matched_users]) %> of <%= number_with_delimiter(@report[:available_users]) %> player records.
     </p>
     <%
       skill_display_multiplier = {
@@ -76,6 +76,6 @@
       ]
     %>
 
-    <%= sortable_table(columns: columns, rows: @rankings, id: 'player-rankings', default_sort: :skill_dl, default_direction: :descending) %>
+    <%= sortable_table(columns: columns, rows: @report[:rankings], id: 'player-rankings', default_sort: :skill_dl, default_direction: :descending) %>
   <% end %>
 </div>

@@ -20,5 +20,12 @@ RSpec.describe 'Analysis::UsersController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('No analysis results are available yet.')
     end
+
+    it 'selects the default minimum-games threshold' do
+      get '/analysis/users'
+
+      document = Nokogiri::HTML(response.body)
+      expect(document.at_css('#min_games option[selected]')['value']).to eq('70')
+    end
   end
 end

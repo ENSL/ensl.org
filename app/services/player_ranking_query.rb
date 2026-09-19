@@ -18,12 +18,26 @@ class PlayerRankingQuery
   MIN_GAMES_OPTIONS = [25, 50, 70, 100].freeze
   DEFAULT_MIN_GAMES = 70
 
+  def self.from_params(params)
+    new(min_games: normalize_min_games(params[:min_games], default: DEFAULT_MIN_GAMES))
+  end
+
   def self.call(min_games: nil)
     new(min_games: min_games).call
   end
 
+  def self.normalize_min_games(value, default: nil)
+    return default if value.nil?
+
+    numeric = Integer(value, exception: false)
+    return DEFAULT_MIN_GAMES unless numeric
+    return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)
+
+    numeric
+  end
+
   def initialize(min_games: nil)
-    @min_games = normalize_min_games(min_games)
+    @min_games = self.class.normalize_min_games(min_games)
   end
 
   # Returns an array of hashes: { steamid:, user:, wins:, losses:,
@@ -49,6 +63,12 @@ class PlayerRankingQuery
       }.merge(skill_columns(metrics))
     end
     rankings.sort_by { |row| [-row[:skill_dl].to_f, row[:user].to_s.downcase] }
+  end
+
+  def report
+    rankings = call
+    { min_games_options: MIN_GAMES_OPTIONS, selected_min_games: @min_games, rankings: rankings,
+      rounds_analysed: rounds_analysed, matched_users: rankings.size, available_users: available_users }
   end
 
   def rounds_analysed
@@ -107,15 +127,5 @@ class PlayerRankingQuery
         memo[raw_steamid] = user if user
       end
     end
-  end
-
-  def normalize_min_games(value)
-    return nil if value.nil?
-
-    numeric = Integer(value, exception: false)
-    return DEFAULT_MIN_GAMES unless numeric
-    return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)
-
-    numeric
   end
 end

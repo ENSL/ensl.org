@@ -12,25 +12,25 @@
         <%= label_tag :action_limit, 'Actions per role:' %>
         <%= select_tag :action_limit,
                        options_for_select(
-                         @action_limit_options.map { |n| ["first #{n}", n] } +
+                         @report[:action_limit_options].map { |n| ["first #{n}", n] } +
                            [['best across limits', AlienStrategyQuery::BEST_ACTION_LIMIT],
                             ['uncapped', AlienStrategyQuery::UNCAPPED_ACTION_LIMIT]],
-                         @selected_action_limit || AlienStrategyQuery::UNCAPPED_ACTION_LIMIT
+                         @report[:selected_action_limit] || AlienStrategyQuery::UNCAPPED_ACTION_LIMIT
                        ),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :min_rounds, 'Minimum rounds:' %>
         <%= select_tag :min_rounds,
-                       options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       options_for_select(@report[:min_rounds_options].map { |n| [n, n] }, @report[:selected_min_rounds]),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :strategy_filter, 'Contains:' %>
         <span data-controller="token-autocomplete">
-          <%= text_field_tag :strategy_filter, @strategy_filter, class: 'analysis-filter-input', list: 'alien-strategy-options', placeholder: 'rt+mc', data: { token_autocomplete_target: 'input', action: 'input->token-autocomplete#updateOptions' } %>
+          <%= text_field_tag :strategy_filter, @report[:strategy_filter], class: 'analysis-filter-input', list: 'alien-strategy-options', placeholder: 'rt+mc', data: { token_autocomplete_target: 'input', action: 'input->token-autocomplete#updateOptions' } %>
           <datalist id="alien-strategy-options">
-            <% @strategy_filter_options.each do |option| %>
+            <% @report[:strategy_filter_options].each do |option| %>
               <option data-token-autocomplete-target="option" data-token="<%= option %>" value="<%= option %>"></option>
             <% end %>
           </datalist>
@@ -40,61 +40,59 @@
         <%= label_tag :result_limit, 'Results:' %>
         <%= select_tag :result_limit,
                        options_for_select(
-                         @result_limit_options.map { |n| ["top #{n}", n] } +
+                         @report[:result_limit_options].map { |n| ["top #{n}", n] } +
                            [['all qualifying', AlienStrategyQuery::UNCAPPED_RESULT_LIMIT]],
-                         @selected_result_limit || AlienStrategyQuery::UNCAPPED_RESULT_LIMIT
+                         @report[:selected_result_limit] || AlienStrategyQuery::UNCAPPED_RESULT_LIMIT
                        ),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :result_view, 'Show:' %>
         <%= select_tag :result_view,
-                       options_for_select([['best role actions', 'role_actions'], ['six-player strategies', 'strategies']],
-                                          @selected_result_view),
+                       options_for_select(alien_strategy_result_view_options, @report[:selected_result_view]),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :coalesce_chambers, 'Chambers:' %>
         <%= select_tag :coalesce_chambers,
-                       options_for_select([['separate', '0'], ['coalesce MC, SC, DC, and OC', '1']],
-                                          @coalesce_chambers ? '1' : '0'),
+                       options_for_select(alien_strategy_chamber_options, @report[:coalesce_chambers] ? '1' : '0'),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :min_median_win_time, 'Median win at least:' %>
         <%= select_tag :min_median_win_time,
                        options_for_select([['any length', nil]] +
-                         @min_median_win_time_options.map { |seconds| [alien_strategy_duration(seconds), seconds] },
-                         @selected_min_median_win_time),
+                         @report[:min_median_win_time_options].map { |seconds| [alien_strategy_duration(seconds), seconds] },
+                         @report[:selected_min_median_win_time]),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
     </p>
   <% end %>
 
-  <% if @strategies.empty? %>
+  <% if @report[:strategies].empty? %>
     <p>
-      <% if @batch_id %>
-        No <%= @selected_result_view == 'role_actions' ? 'role action' : 'strategy' %> met the
-        <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
+      <% if @report[:batch_id] %>
+        No <%= @report[:selected_result_view] == 'role_actions' ? 'role action' : 'strategy' %> met the
+        <%= @report[:selected_min_rounds] %> or more rounds. Try a lower minimum.
       <% else %>
         Alien strategy data has not been imported yet.
       <% end %>
     </p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@strategies.size) %> of <%= number_with_delimiter(@strategies_found) %> <%= @selected_result_view == 'role_actions' ? 'role-action records' : 'six-player strategy records' %>.
+      Based on <%= number_with_delimiter(@report[:rounds_analysed]) %> finished rounds; showing <%= number_with_delimiter(@report[:strategies].size) %> of <%= number_with_delimiter(@report[:strategies_found]) %> <%= @report[:selected_result_view] == 'role_actions' ? 'role-action records' : 'six-player strategy records' %>.
     </p>
 
     <div class="alien-strategy-grid">
-      <% @strategies.each do |strategy| %>
+      <% @report[:strategies].each do |strategy| %>
         <article class="alien-strategy-card">
           <% if strategy[:action_limit] %>
             <p class="text-sm text-gray-600">Best at first <%= strategy[:action_limit] %> actions per role</p>
-          <% elsif @selected_action_limit == AlienStrategyQuery::BEST_ACTION_LIMIT %>
+          <% elsif @report[:selected_action_limit] == AlienStrategyQuery::BEST_ACTION_LIMIT %>
             <p class="text-sm text-gray-600">Best at uncapped actions per role</p>
           <% end %>
-          <div class="alien-strategy-card__roles" aria-label="<%= @selected_result_view == 'role_actions' ? 'Role action' : 'Six player role paths' %>">
-            <% if @selected_result_view == 'role_actions' %>
+          <div class="alien-strategy-card__roles" aria-label="<%= @report[:selected_result_view] == 'role_actions' ? 'Role action' : 'Six player role paths' %>">
+            <% if @report[:selected_result_view] == 'role_actions' %>
               <div class="alien-strategy-role"><%= alien_strategy_role_display(strategy[:role]) %></div>
             <% else %>
               <% strategy[:roles].each do |role| %>

@@ -37,6 +37,13 @@ class MarineTechPathQuery
   DEFAULT_RESULT_LIMIT = 20
   UNCAPPED_RESULT_LIMIT = 'all'
 
+  def self.from_params(params)
+    new(path_length: normalize_path_length(params[:path_length]),
+        min_rounds: normalize_min_rounds(params[:min_rounds]),
+        result_limit: normalize_result_limit(params[:result_limit]),
+        strategy_filter: normalize_strategy_filter(params[:strategy_filter]))
+  end
+
   def self.call(path_length: DEFAULT_PATH_LENGTH, min_rounds: DEFAULT_MIN_ROUNDS,
                 result_limit: DEFAULT_RESULT_LIMIT, strategy_filter: nil)
     new(path_length: path_length, min_rounds: min_rounds, result_limit: result_limit,
@@ -87,10 +94,18 @@ class MarineTechPathQuery
   # Cache all values the list page needs together, so a cache hit avoids both
   # the raw log scan and the in-memory aggregation.
   def report
-    Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
+    cached_report = Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
       { tech_paths: call, rounds_analysed: rounds_analysed, paths_found: paths_found,
         paths_above_minimum: paths_above_minimum, filter_options: filter_options }
     end
+
+    cached_report.merge(
+      path_length_options: PATH_LENGTH_OPTIONS, selected_path_length: @path_length,
+      min_rounds_options: MIN_ROUNDS_OPTIONS, selected_min_rounds: @min_rounds,
+      result_limit_options: RESULT_LIMIT_OPTIONS, selected_result_limit: @result_limit,
+      strategy_filter: @strategy_filter,
+      individual_techs: @path_length == INDIVIDUAL_TECHS_PATH_LENGTH
+    )
   end
 
   # Total number of rounds that contributed to the tally, before the

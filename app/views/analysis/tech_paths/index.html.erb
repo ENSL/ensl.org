@@ -3,7 +3,7 @@
 
 <div class="box wide">
   <p>
-    <% if @individual_techs %>
+    <% if @report[:individual_techs] %>
       Marine research choices, counted once per round wherever they occurred. NS1 logs record
       starts, not completions or cancellations, and exclude Distress Beacon.
     <% else %>
@@ -18,25 +18,25 @@
         <%= label_tag :path_length, 'Techs per path:' %>
         <%= select_tag :path_length,
                        options_for_select(
-                         @path_length_options.map { |n| ["up to #{n}", n] } +
+                         @report[:path_length_options].map { |n| ["up to #{n}", n] } +
                            [['individual techs', MarineTechPathQuery::INDIVIDUAL_TECHS_PATH_LENGTH],
                             ['uncapped', MarineTechPathQuery::UNCAPPED_PATH_LENGTH]],
-                         @selected_path_length || MarineTechPathQuery::UNCAPPED_PATH_LENGTH
+                         @report[:selected_path_length] || MarineTechPathQuery::UNCAPPED_PATH_LENGTH
                        ),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :min_rounds, 'Minimum rounds:' %>
         <%= select_tag :min_rounds,
-                       options_for_select(@min_rounds_options.map { |n| [n, n] }, @selected_min_rounds),
+                       options_for_select(@report[:min_rounds_options].map { |n| [n, n] }, @report[:selected_min_rounds]),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
       <span>
         <%= label_tag :strategy_filter, 'Contains:' %>
         <span data-controller="token-autocomplete">
-          <%= text_field_tag :strategy_filter, @strategy_filter, class: 'analysis-filter-input', list: 'marine-strategy-options', placeholder: 'armorl1+weaponsl1', data: { token_autocomplete_target: 'input', action: 'input->token-autocomplete#updateOptions' } %>
+          <%= text_field_tag :strategy_filter, @report[:strategy_filter], class: 'analysis-filter-input', list: 'marine-strategy-options', placeholder: 'armorl1+weaponsl1', data: { token_autocomplete_target: 'input', action: 'input->token-autocomplete#updateOptions' } %>
           <datalist id="marine-strategy-options">
-            <% @strategy_filter_options.each do |option| %>
+            <% @report[:filter_options].each do |option| %>
               <option data-token-autocomplete-target="option" data-token="<%= option %>" value="<%= option %>"></option>
             <% end %>
           </datalist>
@@ -46,42 +46,42 @@
         <%= label_tag :result_limit, 'Results:' %>
         <%= select_tag :result_limit,
                        options_for_select(
-                         @result_limit_options.map { |n| ["top #{n}", n] } +
+                         @report[:result_limit_options].map { |n| ["top #{n}", n] } +
                            [['all qualifying', MarineTechPathQuery::UNCAPPED_RESULT_LIMIT]],
-                         @selected_result_limit || MarineTechPathQuery::UNCAPPED_RESULT_LIMIT
+                         @report[:selected_result_limit] || MarineTechPathQuery::UNCAPPED_RESULT_LIMIT
                        ),
                        onchange: 'this.form.requestSubmit()' %>
       </span>
     </p>
   <% end %>
 
-  <% if @tech_paths.empty? %>
+  <% if @report[:tech_paths].empty? %>
     <p>
-      Among the <%= number_with_delimiter(@paths_found) %> <%= @individual_techs ? 'research choices' : 'opening paths' %> at this setting, none
-      was used in <%= @selected_min_rounds %> or more rounds. Try a lower minimum.
+      Among the <%= number_with_delimiter(@report[:paths_found]) %> <%= @report[:individual_techs] ? 'research choices' : 'opening paths' %> at this setting, none
+      was used in <%= @report[:selected_min_rounds] %> or more rounds. Try a lower minimum.
     </p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@rounds_analysed) %> finished rounds; showing <%= number_with_delimiter(@tech_paths.size) %> of <%= number_with_delimiter(@paths_found) %> <%= @individual_techs ? 'research choices' : 'opening research orders' %>.
+      Based on <%= number_with_delimiter(@report[:rounds_analysed]) %> finished rounds; showing <%= number_with_delimiter(@report[:tech_paths].size) %> of <%= number_with_delimiter(@report[:paths_found]) %> <%= @report[:individual_techs] ? 'research choices' : 'opening research orders' %>.
     </p>
 
     <%= sortable_table(
       id: 'marine-tech-paths',
       columns: [
-        { key: :path, label: @individual_techs ? 'Research' : 'Tech path', type: :string,
+        { key: :path, label: @report[:individual_techs] ? 'Research' : 'Tech path', type: :string,
           sort_value: ->(path) { tech_path_label(path) },
           format: ->(path) { tech_path_display(path) } },
         { key: :rounds, label: 'Rounds', type: :number,
-          tooltip: @individual_techs ? 'How many rounds started this research.' : 'How many rounds started with this research order.' },
+          tooltip: @report[:individual_techs] ? 'How many rounds started this research.' : 'How many rounds started with this research order.' },
         { key: :reach_rate, label: 'Reach %', type: :number,
-          tooltip: @individual_techs ? 'The percentage of analysed rounds which started this research.' : 'The percentage of analysed rounds which started with this research order.',
+          tooltip: @report[:individual_techs] ? 'The percentage of analysed rounds which started this research.' : 'The percentage of analysed rounds which started with this research order.',
           format: ->(value) { "#{number_with_precision(value, precision: 1)}%" } },
         { key: :wins, label: 'Wins', type: :number },
         { key: :losses, label: 'Losses', type: :number },
         { key: :win_ratio, label: 'Win %', type: :number,
           format: ->(value) { "#{number_with_precision(value, precision: 1)}%" } }
       ],
-      rows: @tech_paths
+      rows: @report[:tech_paths]
     ) %>
   <% end %>
 </div>

@@ -15,13 +15,26 @@ class PickOrderRankingQuery
   MIN_GAMES_OPTIONS = [5, 10, 25, 50].freeze
   DEFAULT_MIN_GAMES = 25
 
+  def self.from_params(params)
+    # Keep reading min_picks for old bookmarks; min_games is the current name.
+    new(game: 'NS1', min_games: normalize_min_games(params[:min_games] || params[:min_picks]))
+  end
+
   def self.call(game: 'NS1', min_games: nil)
     new(game: game, min_games: min_games).call
   end
 
+  def self.normalize_min_games(value)
+    numeric = Integer(value, exception: false)
+    return DEFAULT_MIN_GAMES unless numeric
+    return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)
+
+    numeric
+  end
+
   def initialize(game: 'NS1', min_games: nil)
     @game = game
-    @min_games = normalize_min_games(min_games)
+    @min_games = self.class.normalize_min_games(min_games)
   end
 
   # Returns an array of hashes with pick-order stats + a dedicated OpenSkill
@@ -51,6 +64,12 @@ class PickOrderRankingQuery
     rows.sort_by do |row|
       [-row[:pick_openskill], -row[:games_count], row[:average_pick_order], row[:user].to_s.downcase]
     end
+  end
+
+  def report
+    rankings = call
+    { min_games_options: MIN_GAMES_OPTIONS, selected_min_games: @min_games, rankings: rankings,
+      played_gathers: played_gathers, matched_users: rankings.size, available_users: available_users }
   end
 
   def played_gathers
@@ -151,15 +170,5 @@ class PickOrderRankingQuery
     gather_picks.each_with_index do |(user_id, _pick_order), index|
       record_for(user_id)[:rating] = updated[index][0]
     end
-  end
-
-  def normalize_min_games(value)
-    return DEFAULT_MIN_GAMES if value.nil?
-
-    numeric = Integer(value, exception: false)
-    return DEFAULT_MIN_GAMES unless numeric
-    return DEFAULT_MIN_GAMES unless MIN_GAMES_OPTIONS.include?(numeric)
-
-    numeric
   end
 end

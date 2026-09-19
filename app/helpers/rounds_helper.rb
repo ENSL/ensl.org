@@ -185,15 +185,6 @@ module RoundsHelper
     names
   end
 
-  # Display name for a Rounder in the Players tables -- a linked ENSL user
-  # (clickable, via the existing namelink helper) wins over the raw in-game
-  # nickname, which wins over falling all the way back to the steamid.
-  def round_player_name(rounder, names_by_steamid)
-    return namelink(rounder.user) if rounder.user
-
-    names_by_steamid[rounder.steamid] || rounder.steamid
-  end
-
   # Per-player totals shown above the timeline. Costs are recorded from each
   # alien lifeform role_change; structure events are deliberately excluded.
   def round_player_stats(rounders, log_lines)
