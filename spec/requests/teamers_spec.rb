@@ -60,7 +60,7 @@ RSpec.describe 'TeamersController', type: :request do
       end.not_to change(Teamer, :count)
 
       expect(response).to redirect_to(team_path(team))
-      expect(flash[:error]).to be_present
+      expect(flash[:error]).to include(I18n.t(:teams_join_twice))
     end
 
     it 'redirects turbo-stream requests to the team page after success' do
