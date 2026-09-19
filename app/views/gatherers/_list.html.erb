@@ -3,7 +3,10 @@
 <% gatherers = gather.gatherers.for_pick_list(team) %>
 <% current_gatherer = gatherer %>
 
-<%= form_tag(pick_gatherers_path, authenticity_token: false, data: { turbo_stream: true }) do %>
+<%= form_tag(pick_gatherers_path, authenticity_token: false,
+             data: { turbo_stream: true, controller: 'gather-pick',
+                     gather_pick_gather_id_value: gather.id,
+                     action: 'change->gather-pick#rememberSelection submit->gather-pick#clearSelection' }) do %>
   <ul class="gatherers" id="<%= team.nil? ? 'lobby-gatherers' : "team-#{team}-gatherers" %>">
     <% gatherers.each_with_index do |gatherer, index| %>
       <% user = gatherer.user %>

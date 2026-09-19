@@ -140,13 +140,13 @@ export default class extends Controller {
   // Reload just the gather frame when possible, otherwise fall back to a full reload.
   reloadFrameOrPage() {
     // Prefer reloading only the gather frame; fallback to full page reload.
-    const frame = document.getElementById(`gather_${this.gatherIdValue}_frame`)
-    if (frame && typeof frame.reload === "function") {
-      frame.reload()
-      return
-    }
+    const frame = document.getElementById(`frame_gather_${this.gatherIdValue}`)
     if (frame && frame.dataset && frame.dataset.src) {
       frame.src = frame.dataset.src
+      return
+    }
+    if (frame && typeof frame.reload === "function") {
+      frame.reload()
       return
     }
     if (frame && frame.src) {

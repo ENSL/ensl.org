@@ -1,5 +1,6 @@
 import { application } from "controllers/application"
 import GatherSyncController from "controllers/gather_sync"
+import GatherPickController from "controllers/gather_pick"
 import EmojiAutocompleteController from "controllers/emoji_autocomplete"
 import TwemojiController from "controllers/twemoji"
 import ServerTableController from "controllers/server_table"
@@ -25,6 +26,7 @@ import ShoutFormController from "controllers/shout_form_controller"
 
 // Register the controller classes that the app wires up through data-controller.
 application.register("gather-sync", GatherSyncController)
+application.register("gather-pick", GatherPickController)
 application.register("emoji-autocomplete", EmojiAutocompleteController)
 application.register("twemoji", TwemojiController)
 application.register("server-table", ServerTableController)
