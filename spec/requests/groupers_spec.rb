@@ -49,6 +49,19 @@ RSpec.describe 'GroupersController', type: :request do
       expect(response).to render_template('groups/edit')
     end
 
+    it 'creates a membership for a user with a legacy invalid primary team' do
+      invalid_team = create(:team)
+      user.update_column(:team_id, invalid_team.id)
+      login_as(admin)
+
+      expect do
+        post '/groupers', params: { grouper: { group_id: group.id, username: user.username } }
+      end.to change(Grouper, :count).by(1)
+
+      expect(response).to redirect_to(edit_group_path(group, anchor: 'members'))
+      expect(Grouper.last.user).to eq(user)
+    end
+
     it 'returns 403 for non-admins' do
       target_user = create(:user)
       login_as(user)
