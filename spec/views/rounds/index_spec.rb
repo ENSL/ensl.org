@@ -51,4 +51,3 @@ RSpec.describe 'rounds/index', type: :view do
     expect(rendered).to include('n/a')
   end
 end
-

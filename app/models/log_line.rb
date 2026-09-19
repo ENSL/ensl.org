@@ -228,4 +228,3 @@ end
 #     log.save
 #   end
 # end
-

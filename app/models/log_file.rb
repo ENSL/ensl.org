@@ -112,4 +112,3 @@ end
 #     DETAIL_MATCHERS.any? { |matcher| log.public_send(matcher, vars) }
 #   end
 # end
-

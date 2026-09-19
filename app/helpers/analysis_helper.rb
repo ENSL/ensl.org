@@ -120,9 +120,7 @@ module AnalysisHelper
     paths.each do |row|
       win_rate = "#{number_with_precision(row[:win_ratio], precision: 1)}%"
       lines << %(#{node_ids[row[:path]]}["#{win_rate}"])
-    end
 
-    paths.each do |row|
       path = row[:path]
       source = path.length == 1 ? 'start' : node_ids[path.first(path.length - 1)]
       lines << "#{source} --> #{node_ids[path]}"

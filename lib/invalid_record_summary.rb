@@ -96,9 +96,7 @@ class InvalidRecordSummary
     if @model_names.empty?
       all_models
     else
-      selected = @model_names.map do |model_name|
-        model_name.safe_constantize
-      end.compact
+      selected = @model_names.map(&:safe_constantize).compact
       selected.select { |model| all_models.include?(model) }
     end
   end
