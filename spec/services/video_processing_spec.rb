@@ -21,7 +21,7 @@ RSpec.describe VideoProcessing, type: :service do
       expect(result).to include(:oneliner, :web_friendly, :reasons, :metadata)
       expect(result[:oneliner]).to be_a(String)
       expect(result[:oneliner]).not_to be_empty
-      expect(result[:web_friendly]).to eq(true).or eq(false)
+      expect(result[:web_friendly]).to be(true).or be(false)
       expect(result[:reasons]).to be_an(Array)
       expect(result[:metadata]).to be_a(Hash)
 

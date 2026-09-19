@@ -13,22 +13,22 @@ RSpec.configure do |config|
     )
   end
 
-  config.before(:each) do
+  config.before do
     # Use transaction because it's faster
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, js: true) do
+  config.before(:each, :js) do
     # Use deletion for JS tests because transaction doesn't work
     # with Capybara's JS driver
     DatabaseCleaner.strategy = :deletion
   end
 
-  config.before(:each) do
+  config.before do
     DatabaseCleaner.start
   end
 
-  config.append_after(:each) do
+  config.append_after do
     DatabaseCleaner.clean
   end
 end

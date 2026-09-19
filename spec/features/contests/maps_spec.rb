@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Maps management for contests', type: :feature, js: true do
+RSpec.feature 'Maps management for contests', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
   let!(:map1) { create(:map) }

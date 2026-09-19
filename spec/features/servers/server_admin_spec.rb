@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Server Administration', js: true do
+feature 'Server Administration', :js do
   let!(:admin) { create :user, :admin }
 
   background do
@@ -11,22 +11,23 @@ feature 'Server Administration', js: true do
 
   scenario 'creating a server' do
     visit servers_path
-    expect(page).to have_content('Listing Servers')
+    expect(page).to have_text('Listing Servers')
     click_link 'New server'
     test_server_creation_and_editing
     visit servers_path
-    expect(page).to have_content Server.last.name
+    expect(page).to have_text Server.last.name
   end
 
   feature 'Server deletion' do
     let!(:server) { create :server }
+
     scenario 'deleting a server' do
       visit servers_path
-      expect(page).to have_content(server.name)
+      expect(page).to have_text(server.name)
       visit server_path(server)
       click_link 'Delete Server'
       visit servers_path
-      expect(page).to_not have_content(server.name)
+      expect(page).to have_no_text(server.name)
     end
   end
 
@@ -43,12 +44,12 @@ feature 'Server Administration', js: true do
 
       row.find('strong', text: server.name).click
 
-      expect(page).to have_selector("tr.expand-row[aria-expanded='true']", text: server.name)
-      within("##{detail_id}") { expect(page).to have_content('Expand row test description') }
+      expect(page).to have_css("tr.expand-row[aria-expanded='true']", text: server.name)
+      within("##{detail_id}") { expect(page).to have_text('Expand row test description') }
 
       find('tr.expand-row', text: server.name).find('strong', text: server.name).click
 
-      expect(page).to have_selector("tr.expand-row[aria-expanded='false']", text: server.name)
+      expect(page).to have_css("tr.expand-row[aria-expanded='false']", text: server.name)
       expect(page).to have_no_selector("##{detail_id}")
     end
 
@@ -58,7 +59,7 @@ feature 'Server Administration', js: true do
       row = find('tr.expand-row', text: server.name)
       within(row) { click_link 'Connect' }
 
-      expect(page).to have_selector("tr.expand-row[aria-expanded='false']", text: server.name)
+      expect(page).to have_css("tr.expand-row[aria-expanded='false']", text: server.name)
     end
   end
 end

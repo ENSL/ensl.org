@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'XSS Protection in Forum Posts and Comments', js: true do
+feature 'XSS Protection in Forum Posts and Comments', :js do
   let!(:user) { create(:user) }
 
   scenario 'Forum posts prevent script tag injection' do
@@ -11,16 +11,16 @@ feature 'XSS Protection in Forum Posts and Comments', js: true do
     sign_in_as(user)
     visit topic_path(topic)
     first(:link, 'Reply').click
-    expect(page).to have_selector('#post_text', wait: 5)
+    expect(page).to have_css('#post_text', wait: 5)
 
     # Try to inject malicious content
     fill_in 'post_text', with: '[b]Safe post[/b]<script>alert("XSS")</script>'
     click_button 'Save Post'
 
-    expect(page).to have_content('Safe post')
+    expect(page).to have_text('Safe post')
 
     # Verify script tag was stripped
-    expect(page).not_to have_selector('script', text: 'alert', visible: :all)
+    expect(page).to have_no_css('script', text: 'alert', visible: :all)
     expect(page.html).not_to include('<script>alert')
   end
 
@@ -30,13 +30,13 @@ feature 'XSS Protection in Forum Posts and Comments', js: true do
     sign_in_as(user)
     visit topic_path(topic)
     first(:link, 'Reply').click
-    expect(page).to have_selector('#post_text', wait: 5)
+    expect(page).to have_css('#post_text', wait: 5)
 
     fill_in 'post_text', with: '[b]Post[/b]<iframe src="http://evil.com"></iframe>'
     click_button 'Save Post'
 
     # Verify iframe was stripped
-    expect(page).not_to have_selector('iframe', visible: :all)
+    expect(page).to have_no_css('iframe', visible: :all)
     expect(page.html).not_to include('<iframe')
   end
 
@@ -46,14 +46,14 @@ feature 'XSS Protection in Forum Posts and Comments', js: true do
     sign_in_as(user)
     visit topic_path(topic)
     first(:link, 'Reply').click
-    expect(page).to have_selector('#post_text', wait: 5)
+    expect(page).to have_css('#post_text', wait: 5)
 
     fill_in 'post_text', with: '[i]Text[/i]<img src=x onerror="alert(1)">'
     click_button 'Save Post'
 
     # Verify event handler was stripped
     expect(page.html).not_to include('onerror=')
-    expect(page).to have_content('Text')
+    expect(page).to have_text('Text')
   end
 
   scenario 'Comments prevent script tag injection' do
@@ -63,10 +63,10 @@ feature 'XSS Protection in Forum Posts and Comments', js: true do
     sign_in_as(user)
     visit article_path(article)
 
-    expect(page).to have_content('Safe comment')
+    expect(page).to have_text('Safe comment')
 
     # Verify script tag was stripped
-    expect(page).not_to have_selector('script', text: 'alert', visible: :all)
+    expect(page).to have_no_css('script', text: 'alert', visible: :all)
     expect(page.html).not_to include('<script>alert')
   end
 
@@ -80,8 +80,8 @@ feature 'XSS Protection in Forum Posts and Comments', js: true do
 
     # Verify style tag and javascript URL were stripped
     within('#comments-thread') do
-      expect(page).to have_content('Text')
-      expect(page).not_to have_text('javascript:')
+      expect(page).to have_text('Text')
+      expect(page).to have_no_text('javascript:')
     end
   end
 end

@@ -83,7 +83,7 @@ RSpec.describe Articles::VersionHistory, type: :service do
 
       result = service.revert_to!(versions.first)
 
-      expect(result).to eq(true)
+      expect(result).to be(true)
       expect(article.reload.title).to eq('Initial title')
       expect(article.text).to eq('<p>Initial body</p>')
     end
@@ -92,14 +92,14 @@ RSpec.describe Articles::VersionHistory, type: :service do
       versions = create_versioned_states!
       allow(article).to receive(:save).and_return(false)
 
-      expect(service.revert_to!(versions.first)).to eq(false)
+      expect(service.revert_to!(versions.first)).to be(false)
     end
 
     it 'returns false when snapshot restoration raises an error' do
       versions = create_versioned_states!
       allow(article).to receive(:assign_attributes).and_raise(StandardError)
 
-      expect(service.revert_to!(versions.first)).to eq(false)
+      expect(service.revert_to!(versions.first)).to be(false)
     end
   end
 end

@@ -55,7 +55,7 @@ RSpec.describe 'CustomUrlsController', type: :request do
         post '/custom_urls', params: { custom_url: { name: '', article_id: nil } }
       end.not_to change(CustomUrl, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:administrate)
     end
 

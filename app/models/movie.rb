@@ -398,7 +398,7 @@ class Movie < ApplicationRecord
     movies = with_ratings.order(order_sql)
 
     if author_param.present?
-      movies = if author_param.to_s =~ /^\d+$/
+      movies = if /^\d+$/.match?(author_param.to_s)
                  movies.where(movies: { user_id: author_param.to_i })
                else
                  movies.joins('LEFT JOIN users ON users.id = movies.user_id').where('users.username = ?',

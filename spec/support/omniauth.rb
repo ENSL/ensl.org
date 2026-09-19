@@ -9,7 +9,7 @@ RSpec.configure do |config|
     OmniAuth.config.test_mode = true
   end
 
-  config.before(:each) do
+  config.before do
     OmniAuth.config.full_host = nil if Rails.env.test?
 
     # Default mock — tests may override this per-example if needed
@@ -26,7 +26,7 @@ RSpec.configure do |config|
     )
   end
 
-  config.after(:each) do
+  config.after do
     OmniAuth.config.mock_auth[:steam] = nil
   end
 end

@@ -211,7 +211,7 @@ class User < ApplicationRecord
     return nil if sid.respond_to?(:valid?) && !sid.valid?
 
     legacy = sid.id.to_s
-    legacy = legacy.sub(/\ASTEAM_/, '')
+    legacy = legacy.delete_prefix('STEAM_')
     return nil unless legacy.match?(/\A[01]:[01]:\d+\Z/)
 
     legacy

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Gather activity feed', type: :feature, js: true do
+RSpec.feature 'Gather activity feed', :js, type: :feature do
   let!(:gather) { FactoryBot.create(:gather, maps_count: 3, servers_count: 2) }
   let!(:joiner) { FactoryBot.create(:user, raw_password: 'password123') }
   let!(:viewer) { FactoryBot.create(:user, raw_password: 'password123') }
@@ -11,7 +11,7 @@ RSpec.feature 'Gather activity feed', type: :feature, js: true do
     Capybara.using_session('viewer') do
       sign_in_via_session(viewer)
       visit_gather_with_retry(gather)
-      expect(page).to have_no_content("#{joiner.username} joined the gather")
+      expect(page).to have_no_text("#{joiner.username} joined the gather")
 
       # gather_sync.js also polls /version and reloads the frame on a missed broadcast,
       # which would make this assertion pass even if the activity broadcast itself were
@@ -30,7 +30,7 @@ RSpec.feature 'Gather activity feed', type: :feature, js: true do
     sign_in_and_join_gather('joiner', joiner, gather)
 
     Capybara.using_session('viewer') do
-      expect(page).to have_content("#{joiner.username} joined the gather", wait: 5)
+      expect(page).to have_text("#{joiner.username} joined the gather", wait: 5)
     end
   end
 end

@@ -19,14 +19,14 @@ RSpec.describe Rounder do
     end
 
     it 'is valid (in the normal, default validation context) regardless of any mismatch' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
       create_alien_log_lines('STEAM_0:1:1')
 
       expect(rounder).to be_valid
     end
 
     it 'flags a decisive team mismatch only under the :team_check context' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
       create_alien_log_lines('STEAM_0:1:1')
 
       expect(rounder.valid?(:team_check)).to be false
@@ -34,21 +34,21 @@ RSpec.describe Rounder do
     end
 
     it 'does not flag a rounder whose team matches the log lines' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_ALIENS)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_ALIENS)
       create_alien_log_lines('STEAM_0:1:1')
 
       expect(rounder.valid?(:team_check)).to be true
     end
 
     it 'stays quiet below the minimum sample size' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
       create_alien_log_lines('STEAM_0:1:1', count: 2)
 
       expect(rounder.valid?(:team_check)).to be true
     end
 
     it 'stays quiet when the split is not decisive (below MIN_AGREEMENT)' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
       create_alien_log_lines('STEAM_0:1:1', count: 3)
       2.times do |i|
         LogLine.create!(round: round, event_type: 'role_change', param1: 'soldier', actor_steamid: 'STEAM_0:1:1',
@@ -60,7 +60,7 @@ RSpec.describe Rounder do
     end
 
     it 'stays quiet when there is no observed data for this steamid at all' do
-      rounder = Rounder.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
+      rounder = described_class.create!(round: round, steamid: 'STEAM_0:1:1', team: Rounder::TEAM_MARINES)
 
       expect(rounder.valid?(:team_check)).to be true
     end

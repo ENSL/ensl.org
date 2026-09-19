@@ -38,7 +38,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'links to a data file movie when present' do
-      movie = instance_double('Movie', to_s: 'Movie title')
+      movie = instance_double(Movie, to_s: 'Movie title')
       data_file = DataFile.new
       allow(data_file).to receive(:movie).and_return(movie)
       allow(helper).to receive(:link_to).and_return('linked')
@@ -95,8 +95,8 @@ RSpec.describe ApplicationHelper, type: :helper do
 
   describe '#directory_links' do
     it 'adds separators between parent directories only' do
-      root = instance_double('Directory')
-      child = instance_double('Directory')
+      root = instance_double(Directory)
+      child = instance_double(Directory)
       allow(Directory).to receive(:directory_traverse).with(child).and_return([child, root])
       allow(helper).to receive(:namelink).with(root).and_return('ROOT')
       allow(helper).to receive(:namelink).with(child).and_return('CHILD')
@@ -168,9 +168,9 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'builds comment state and renders the comments partial for commentable objects' do
-      comments = instance_double('CommentsRelation')
-      ordered_comments = instance_double('OrderedComments')
-      object = instance_double('Commentable', comments: comments)
+      comments = instance_double(CommentsRelation)
+      ordered_comments = instance_double(OrderedComments)
+      object = instance_double(Commentable, comments: comments)
       new_comment = instance_double(Comment)
 
       allow(Comment).to receive(:new).with(commentable: object).and_return(new_comment)
@@ -334,8 +334,8 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe 'lineup rendering helpers' do
     let(:motm) { instance_double(User, username: 'MOTM', country: 'FI') }
     let(:other_user) { instance_double(User, username: 'Player2', country: 'SE') }
-    let(:teamer1) { instance_double('Teamer', user: motm) }
-    let(:teamer2) { instance_double('Teamer', user: other_user) }
+    let(:teamer1) { instance_double(Teamer, user: motm) }
+    let(:teamer2) { instance_double(Teamer, user: other_user) }
     let(:match) { instance_double(Match, motm: motm) }
 
     before do
@@ -458,8 +458,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
     it 'instantiates without cache when no request env is present' do
       calendar = instance_double(GoogleCalendar)
-      allow(helper).to receive(:request).and_return(nil)
-      allow(helper).to receive(:timezone_offset).and_return('UTC')
+      allow(helper).to receive_messages(request: nil, timezone_offset: 'UTC')
       allow(GoogleCalendar).to receive(:new).and_return(calendar)
 
       expect(helper.calendar).to eq(calendar)
@@ -470,8 +469,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       env = {}
       request = instance_double(ActionDispatch::Request, env: env)
       calendar = instance_double(GoogleCalendar)
-      allow(helper).to receive(:request).and_return(request)
-      allow(helper).to receive(:timezone_offset).and_return('UTC')
+      allow(helper).to receive_messages(request: request, timezone_offset: 'UTC')
       allow(GoogleCalendar).to receive(:new).and_return(calendar)
 
       first = helper.calendar
@@ -486,7 +484,7 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe '#event_start_time' do
     it 'converts event start into current helper timezone' do
       datetime = DateTime.parse('2026-02-03T12:00:00+00:00')
-      event = instance_double('Event', start: instance_double('Start', date_time: datetime))
+      event = instance_double(Event, start: instance_double(Start, date_time: datetime))
       allow(helper).to receive(:timezone_offset).and_return('Europe/Helsinki')
 
       result = helper.event_start_time(event)

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Shoutbox emoji shortcodes', js: true do
+feature 'Shoutbox emoji shortcodes', :js do
   let!(:user) { create :user }
 
   background do
@@ -13,7 +13,7 @@ feature 'Shoutbox emoji shortcodes', js: true do
 
   scenario 'shortcodes are converted and shout input continues working after submit' do
     visit root_path
-    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+    expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
 
     fill_in 'shoutbox_text', with: ':smile:'
     click_button 'Shout!'
@@ -31,7 +31,7 @@ feature 'Shoutbox emoji shortcodes', js: true do
 
   scenario 'autocomplete menu appears and inserts selected shortcode token' do
     visit root_path
-    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+    expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
 
     input = find_field('shoutbox_text')
     input.send_keys(':smi')

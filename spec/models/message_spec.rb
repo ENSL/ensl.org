@@ -34,28 +34,28 @@ describe Message do
     let(:message) { build :message }
 
     it 'creates a new message' do
-      expect(message.valid?).to eq(true)
+      expect(message.valid?).to be(true)
       expect do
         message.save!
-      end.to change(Message, :count).by(1)
+      end.to change(described_class, :count).by(1)
     end
   end
 
   describe 'Permissions' do
-    let(:message) { Message.new }
+    let(:message) { described_class.new }
 
     describe 'can_create?' do
       it 'returns false for nil user' do
-        expect(message.can_create?(nil)).to be_falsey
+        expect(message).not_to be_can_create(nil)
       end
 
       it 'returns true for user' do
-        expect(message.can_create?(user)).to be_truthy
+        expect(message).to be_can_create(user)
       end
 
       it 'returns false if user is banned' do
         create :ban, :mute, user: user
-        expect(message.can_create?(user)).to be_falsey
+        expect(message).not_to be_can_create(user)
       end
     end
 
@@ -63,19 +63,19 @@ describe Message do
       let!(:message) { create :message }
 
       it 'returns false for nil user' do
-        expect(message.can_show?(nil)).to be_falsey
+        expect(message).not_to be_can_show(nil)
       end
 
       it 'returns true if sender' do
-        expect(message.can_show?(message.sender)).to be_truthy
+        expect(message).to be_can_show(message.sender)
       end
 
       it 'returns true if receiver' do
-        expect(message.can_show?(message.recipient)).to be_truthy
+        expect(message).to be_can_show(message.recipient)
       end
 
       it 'returns false if neither sender nor receiver' do
-        expect(message.can_show?(user)).to be_falsey
+        expect(message).not_to be_can_show(user)
       end
     end
   end
@@ -84,13 +84,13 @@ describe Message do
     let(:recipient) { create(:user) }
 
     it 'leaves text_parsed unchanged when text is nil' do
-      message = Message.new(sender: user, recipient: recipient, title: 'Test message', text: nil)
+      message = described_class.new(sender: user, recipient: recipient, title: 'Test message', text: nil)
 
       expect { message.parse_text }.not_to change(message, :text_parsed)
     end
 
     it 'strips script tags from BBCode text' do
-      message = Message.new(
+      message = described_class.new(
         sender: user,
         recipient: recipient,
         title: 'Test message',
@@ -105,7 +105,7 @@ describe Message do
     end
 
     it 'strips iframe tags from text' do
-      message = Message.new(
+      message = described_class.new(
         sender: user,
         recipient: recipient,
         title: 'Test message',
@@ -118,7 +118,7 @@ describe Message do
     end
 
     it 'strips event handlers from text' do
-      message = Message.new(
+      message = described_class.new(
         sender: user,
         recipient: recipient,
         title: 'Test message',

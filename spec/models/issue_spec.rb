@@ -29,7 +29,7 @@ describe Issue do
   describe 'Permissions' do
     let!(:user) { create :user }
     let!(:admin) { create :user, :admin }
-    let(:issue) { Issue.new }
+    let(:issue) { described_class.new }
 
     describe 'can_show?' do
       it 'returns false when current user is nil' do
@@ -38,15 +38,15 @@ describe Issue do
 
       it 'returns true for author' do
         issue.author = user
-        expect(issue.can_show?(user)).to be_truthy
+        expect(issue).to be_can_show(user)
       end
 
       it 'returns true for admin' do
-        expect(issue.can_show?(admin)).to be_truthy
+        expect(issue).to be_can_show(admin)
       end
 
       it 'returns false if neither admin nor author' do
-        expect(issue.can_show?(user)).to be_falsey
+        expect(issue).not_to be_can_show(user)
       end
 
       it 'returns true for gather moderators assigned to allowed categories' do
@@ -54,13 +54,13 @@ describe Issue do
         create(:grouper, user: moderator, group: create(:group, :gather_moderator))
         issue.category_id = Issue::CATEGORY_GATHER
 
-        expect(issue.can_show?(moderator)).to be_truthy
+        expect(issue).to be_can_show(moderator)
       end
     end
 
     describe 'can_create?' do
       it 'returns true' do
-        expect(issue.can_create?(nil)).to be_truthy
+        expect(issue).to be_can_create(nil)
       end
     end
 
@@ -70,11 +70,11 @@ describe Issue do
       end
 
       it 'returns true for admin' do
-        expect(issue.can_update?(admin)).to be_truthy
+        expect(issue).to be_can_update(admin)
       end
 
       it 'returns false for non-admin' do
-        expect(issue.can_update?(user)).to be_falsey
+        expect(issue).not_to be_can_update(user)
       end
 
       it 'allows gather moderators to update gather issues without changing category' do
@@ -82,7 +82,7 @@ describe Issue do
         create(:grouper, user: moderator, group: create(:group, :gather_moderator))
         issue.category_id = Issue::CATEGORY_GATHER
 
-        expect(issue.can_update?(moderator, category_id: Issue::CATEGORY_GATHER.to_s)).to be_truthy
+        expect(issue).to be_can_update(moderator, category_id: Issue::CATEGORY_GATHER.to_s)
       end
 
       it 'rejects category changes from non-admins' do
@@ -90,17 +90,17 @@ describe Issue do
         create(:grouper, user: moderator, group: create(:group, :gather_moderator))
         issue.category_id = Issue::CATEGORY_GATHER
 
-        expect(issue.can_update?(moderator, category_id: Issue::CATEGORY_WEBSITE.to_s)).to be_falsey
+        expect(issue).not_to be_can_update(moderator, category_id: Issue::CATEGORY_WEBSITE.to_s)
       end
     end
 
     describe 'can_destroy?' do
       it 'returns true for admin' do
-        expect(issue.can_destroy?(admin)).to be_truthy
+        expect(issue).to be_can_destroy(admin)
       end
 
       it 'returns false for non-admin' do
-        expect(issue.can_destroy?(user)).to be_falsey
+        expect(issue).not_to be_can_destroy(user)
       end
     end
   end

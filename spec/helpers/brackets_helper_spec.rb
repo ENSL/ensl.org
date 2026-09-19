@@ -5,19 +5,19 @@ require 'rails_helper'
 RSpec.describe BracketsHelper, type: :helper do
   describe '#bracket_cell_class' do
     it 'returns disabled team classes for disabled team cells in view mode' do
-      bracketer = instance_double('Bracketer', disabled: true)
+      bracketer = instance_double(Bracketer, disabled: true)
 
       expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, false)).to eq('team disabled')
     end
 
     it 'returns the result class for enabled team cells in view mode' do
-      bracketer = instance_double('Bracketer', disabled: false, result_class: 'winner')
+      bracketer = instance_double(Bracketer, disabled: false, result_class: 'winner')
 
       expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, false)).to eq('team winner')
     end
 
     it 'returns only team in edit mode' do
-      bracketer = instance_double('Bracketer', disabled: true)
+      bracketer = instance_double(Bracketer, disabled: true)
 
       expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, true)).to eq('team')
     end
@@ -47,18 +47,18 @@ RSpec.describe BracketsHelper, type: :helper do
 
   describe '#bracket_show_content?' do
     it 'shows content for enabled bracketers' do
-      expect(helper.bracket_show_content?(instance_double('Bracketer', disabled: false))).to be(true)
+      expect(helper.bracket_show_content?(instance_double(Bracketer, disabled: false))).to be(true)
     end
 
     it 'hides content for disabled or missing bracketers' do
-      expect(helper.bracket_show_content?(instance_double('Bracketer', disabled: true))).to be(false)
+      expect(helper.bracket_show_content?(instance_double(Bracketer, disabled: true))).to be(false)
       expect(helper.bracket_show_content?(nil)).to be_nil
     end
   end
 
   describe '#render_connector?' do
-    let(:relation) { instance_double('BracketerRelation') }
-    let(:bracket) { instance_double('Bracket', bracketers: relation) }
+    let(:relation) { instance_double(BracketerRelation) }
+    let(:bracket) { instance_double(Bracket, bracketers: relation) }
 
     it 'returns the connector position directly in edit mode' do
       expect(helper.send(:render_connector?, bracket, 2, 0, 3, true)).to be(true)
@@ -70,8 +70,8 @@ RSpec.describe BracketsHelper, type: :helper do
     end
 
     it 'returns true when both adjacent cells exist and are enabled' do
-      above_scope = instance_double('BracketerScope', first: instance_double('Bracketer', disabled: false))
-      below_scope = instance_double('BracketerScope', first: instance_double('Bracketer', disabled: false))
+      above_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
+      below_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
 
       allow(relation).to receive(:pos).with(1, 0).and_return(above_scope)
       allow(relation).to receive(:pos).with(3, 0).and_return(below_scope)
@@ -80,8 +80,8 @@ RSpec.describe BracketsHelper, type: :helper do
     end
 
     it 'returns false when one adjacent cell is disabled' do
-      above_scope = instance_double('BracketerScope', first: instance_double('Bracketer', disabled: true))
-      below_scope = instance_double('BracketerScope', first: instance_double('Bracketer', disabled: false))
+      above_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: true))
+      below_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
 
       allow(relation).to receive(:pos).with(1, 0).and_return(above_scope)
       allow(relation).to receive(:pos).with(3, 0).and_return(below_scope)

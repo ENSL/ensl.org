@@ -51,7 +51,7 @@ describe DirectoryReconciliationService do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)
       sync_filesystem_to_db(filesystem, root_directory)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(result).to be_a(StringIO)
@@ -68,7 +68,7 @@ describe DirectoryReconciliationService do
       new_dirs = add_random_directories(filesystem, 3)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # Verify new directories were added to DB
@@ -83,7 +83,7 @@ describe DirectoryReconciliationService do
     it 'does not emit title fix-up warnings for newly discovered directories' do
       FileUtils.mkdir_p(File.join(@test_root, 'audio'))
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(result.string).to include('New dir:')
@@ -100,7 +100,7 @@ describe DirectoryReconciliationService do
       new_files = add_random_files(filesystem, 3)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # Verify new files were added to DB
@@ -123,7 +123,7 @@ describe DirectoryReconciliationService do
       expect(deleted_dirs).not_to be_empty
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # Verify deleted directories are marked for removal
@@ -150,7 +150,7 @@ describe DirectoryReconciliationService do
       # during recursive directory scans. Files are only deleted when their parent directory
       # is destroyed or when explicitly handled. This is a design choice prioritizing safety.
       # Verify that the reconciliation doesn't crash when encountering missing files
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
     end
 
@@ -165,7 +165,7 @@ describe DirectoryReconciliationService do
       File.delete(file_path)
       expect(File.exist?(file_path)).to be false
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       db_file.reload
@@ -180,7 +180,7 @@ describe DirectoryReconciliationService do
       FileUtils.mkdir_p(File.join(@test_root, 'logs', 'archive'))
       FileUtils.mkdir_p(File.join(@test_root, 'tmp', 'buffer'))
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(Directory.find_by(name: 'uploads')).to be_nil
@@ -205,7 +205,7 @@ describe DirectoryReconciliationService do
       FileUtils.mv(old_path, new_path)
       expect(File.directory?(new_path)).to be true
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       inode_match = Directory.find_by_inode(old_dev, old_ino)
@@ -253,7 +253,7 @@ describe DirectoryReconciliationService do
       expect(record_a).not_to be_nil
       expect(record_b).not_to be_nil
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       expect(DataFile.find_by(id: record_a.id)&.directory_id).to eq(dir_a.id)
@@ -298,7 +298,7 @@ describe DirectoryReconciliationService do
         instance.destroy
       end
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.to raise_error(ActiveRecord::RecordNotDestroyed)
 
       expect(Directory.exists?(orphan.id)).to be true
@@ -314,7 +314,7 @@ describe DirectoryReconciliationService do
       orphan.define_singleton_method(:make_path) {}
       orphan.save!(validate: false)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(result.string).to include('Directories to remove: 1')
@@ -333,7 +333,7 @@ describe DirectoryReconciliationService do
       added_files = add_random_files(filesystem, 2)
 
       # 2. Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # Verify log contains operations and transaction completed
@@ -364,7 +364,7 @@ describe DirectoryReconciliationService do
       File.open(file_path, 'wb') { |f| f.write(new_content) }
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       service.call
 
       # Reload and verify metadata was updated
@@ -384,7 +384,7 @@ describe DirectoryReconciliationService do
                                                                name_pattern: 'b2')
 
       # Run reconciliation on filesystem with multiple branches
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       # Both branches should be represented in the database
@@ -404,7 +404,7 @@ describe DirectoryReconciliationService do
       FileUtils.mkdir_p(empty_dir)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       service.call
 
       # Empty directory should be created in DB
@@ -415,7 +415,7 @@ describe DirectoryReconciliationService do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)
       sync_filesystem_to_db(filesystem, root_directory)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       log_output = result.string
@@ -429,7 +429,7 @@ describe DirectoryReconciliationService do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 2)
       sync_filesystem_to_db(filesystem, root_directory)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(result.string).to include('Reconciliation summary:')
@@ -444,7 +444,7 @@ describe DirectoryReconciliationService do
       filesystem = create_test_filesystem(@test_root, depth: 1, files_per_dir: 1)
       sync_filesystem_to_db(filesystem, root_directory)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(result.string).to include('Progress scanned=')
@@ -492,7 +492,7 @@ describe DirectoryReconciliationService do
       FileUtils.mv(level2, new_level2_path)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # Verify reconciliation completed
@@ -568,7 +568,7 @@ describe DirectoryReconciliationService do
       end
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       # CRITICAL: No new file records should be created (same file, different location)
@@ -632,7 +632,7 @@ describe DirectoryReconciliationService do
       expect(FileUtils).not_to receive(:mv)
       expect(Dir).not_to receive(:unlink)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       db_file.reload
@@ -659,7 +659,7 @@ describe DirectoryReconciliationService do
       expect(FileUtils).not_to receive(:mv)
       expect(Dir).not_to receive(:unlink)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       expect { service.call }.not_to raise_error
 
       db_file = DataFile.find_by(path: disk_path)
@@ -717,7 +717,7 @@ describe DirectoryReconciliationService do
       Movie.create!(file_id: source_file.id)
       movie = Movie.find_by(file_id: source_file.id)
 
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       result = service.call
 
       expect(preview_file.reload.related_id).to eq(source_file.id)
@@ -726,7 +726,7 @@ describe DirectoryReconciliationService do
     end
 
     it 'logs and skips work when another reconciliation already holds the lock' do
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       lock_file = instance_double(File)
 
       allow(FileUtils).to receive(:mkdir_p)
@@ -743,7 +743,7 @@ describe DirectoryReconciliationService do
 
   describe 'private helpers' do
     it 'uses TeeIO when running in a console session' do
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       allow(service).to receive(:console_session?).and_return(true)
 
       expect(service.send(:log_output)).to be_a(DirectoryReconciliationService::TeeIO)
@@ -760,7 +760,7 @@ describe DirectoryReconciliationService do
       expect(DataFile.count).to eq(0)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       service.call
 
       # Everything from disk should now be in DB
@@ -773,7 +773,7 @@ describe DirectoryReconciliationService do
       sync_filesystem_to_db(filesystem, root_directory)
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(root_directory)
+      service = described_class.new(root_directory)
       service.call
 
       # Verify all non-root directories have parents
@@ -864,7 +864,7 @@ describe DirectoryReconciliationService do
       expect(File.directory?(File.join(new_child_path, 'grandchild2'))).to be true
 
       # Run reconciliation
-      service = DirectoryReconciliationService.new(det_root_directory)
+      service = described_class.new(det_root_directory)
       service.call
 
       # Directory count should stay the same (moved, not deleted+created)

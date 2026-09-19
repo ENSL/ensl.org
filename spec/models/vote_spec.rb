@@ -29,7 +29,7 @@ RSpec.describe Vote, type: :model do
 
   describe '#can_create?' do
     it 'returns false without a current user' do
-      expect(Vote.new.can_create?(nil)).to be(false)
+      expect(described_class.new.can_create?(nil)).to be(false)
     end
 
     it 'blocks option votes when the poll already has a vote from the user' do
@@ -65,9 +65,7 @@ RSpec.describe Vote, type: :model do
 
     it 'blocks gatherer votes unless the gather is in the voting state' do
       gatherer_votes = double
-      allow(gatherer_votes).to receive(:where).and_return(gatherer_votes)
-      allow(gatherer_votes).to receive(:exists?).and_return(false)
-      allow(gatherer_votes).to receive(:count).and_return(0)
+      allow(gatherer_votes).to receive_messages(where: gatherer_votes, exists?: false, count: 0)
       users = double(exists?: true)
       gather = double(status: Gather::STATE_RUNNING, users: users, gatherer_votes: gatherer_votes)
       votable = double(gather: gather, id: 1)
@@ -289,27 +287,27 @@ RSpec.describe Vote, type: :model do
 
     expect(gather_server.id).to eq(gather_map.id)
 
-    Vote.create!(user: user, votable: gather_server)
+    described_class.create!(user: user, votable: gather_server)
 
-    map_vote = Vote.new(user: user, votable: gather_map)
+    map_vote = described_class.new(user: user, votable: gather_map)
     expect(map_vote.can_create?(user)).to be true
-    expect { map_vote.save! }.to change(Vote, :count).by(1)
+    expect { map_vote.save! }.to change(described_class, :count).by(1)
   end
 
   it 'prevents duplicate vote on the same map but allows another map' do
     gather_map_one = create_gather_map(name: 'ns_map_one')
     gather_map_two = create_gather_map(name: 'ns_map_two')
 
-    Vote.create!(user: user, votable: gather_map_one)
+    described_class.create!(user: user, votable: gather_map_one)
 
-    duplicate_vote = Vote.new(user: user, votable: gather_map_one)
+    duplicate_vote = described_class.new(user: user, votable: gather_map_one)
     expect(duplicate_vote.can_create?(user)).to be false
     expect(duplicate_vote.valid?).to be false
     expect(duplicate_vote.errors[:user_id]).to be_present
 
-    other_map_vote = Vote.new(user: user, votable: gather_map_two)
+    other_map_vote = described_class.new(user: user, votable: gather_map_two)
     expect(other_map_vote.can_create?(user)).to be true
-    expect { other_map_vote.save! }.to change(Vote, :count).by(1)
+    expect { other_map_vote.save! }.to change(described_class, :count).by(1)
   end
 
   it 'prevents more than two map votes per user per gather' do
@@ -317,11 +315,11 @@ RSpec.describe Vote, type: :model do
     map2 = create_gather_map(name: 'ns_map_b')
     map3 = create_gather_map(name: 'ns_map_c')
 
-    Vote.create!(user: user, votable: map1)
-    Vote.create!(user: user, votable: map2)
+    described_class.create!(user: user, votable: map1)
+    described_class.create!(user: user, votable: map2)
 
-    third_vote = Vote.new(user: user, votable: map3)
+    third_vote = described_class.new(user: user, votable: map3)
     expect(third_vote.can_create?(user)).to be false
-    expect { third_vote.save }.to raise_error(ActiveRecord::RecordInvalid).or change(Vote, :count).by(0)
+    expect { third_vote.save }.to raise_error(ActiveRecord::RecordInvalid).or change(described_class, :count).by(0)
   end
 end

@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe Contest, type: :model do
   describe '#elo_score' do
-    let(:contest) { Contest.new(modulus_base: 30, modulus_even: 1.0, modulus_3to1: 1.5, modulus_4to0: 2.0, weight: 30) }
+    let(:contest) do
+      described_class.new(modulus_base: 30, modulus_even: 1.0, modulus_3to1: 1.5, modulus_4to0: 2.0, weight: 30)
+    end
 
     it 'returns 0 for a draw when diff is 0' do
       expect(contest.elo_score(1, 1, 0)).to eq 0

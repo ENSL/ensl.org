@@ -26,16 +26,16 @@ describe Forumer do
     let(:forumer) { build :forumer, forum: forum, group: group }
 
     it 'creates a new forumer' do
-      expect(forumer.valid?).to eq(true)
+      expect(forumer.valid?).to be(true)
       expect do
         forumer.save!
-      end.to change(Forumer, :count).by(1)
+      end.to change(described_class, :count).by(1)
     end
   end
 
   describe '.accesses' do
     it 'returns a hash of access levels as a class method' do
-      accesses = Forumer.accesses
+      accesses = described_class.accesses
       expect(accesses).to be_a(Hash)
       expect(accesses.keys).to contain_exactly(
         Forumer::ACCESS_READ,
@@ -46,17 +46,17 @@ describe Forumer do
     end
 
     it 'includes READ access with value 0' do
-      expect(Forumer.accesses[Forumer::ACCESS_READ]).to eq('Read')
+      expect(described_class.accesses[Forumer::ACCESS_READ]).to eq('Read')
       expect(Forumer::ACCESS_READ).to eq(0)
     end
 
     it 'includes REPLY access with value 1' do
-      expect(Forumer.accesses[Forumer::ACCESS_REPLY]).to eq('Reply')
+      expect(described_class.accesses[Forumer::ACCESS_REPLY]).to eq('Reply')
       expect(Forumer::ACCESS_REPLY).to eq(1)
     end
 
     it 'includes TOPIC access with value 2' do
-      expect(Forumer.accesses[Forumer::ACCESS_TOPIC]).to eq('Post a Topic')
+      expect(described_class.accesses[Forumer::ACCESS_TOPIC]).to eq('Post a Topic')
       expect(Forumer::ACCESS_TOPIC).to eq(2)
     end
   end

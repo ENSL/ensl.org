@@ -15,7 +15,7 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit root_path
 
-    expect(page).to have_content('Captains are picking teams')
+    expect(page).to have_text('Captains are picking teams')
   end
 
   scenario 'shows the finished badge once both teams are full, even before the status column flips' do
@@ -27,9 +27,9 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit root_path
 
-    expect(page).to have_content("You've signed up for NS2 Gather.")
-    expect(page).to have_content('Just finished, check the results')
-    expect(page).not_to have_content('Captains are picking teams')
+    expect(page).to have_text("You've signed up for NS2 Gather.")
+    expect(page).to have_text('Just finished, check the results')
+    expect(page).to have_no_text('Captains are picking teams')
   end
 
   scenario 'still shows the recently finished gather even though an empty follow-up gather already exists' do
@@ -40,7 +40,7 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit root_path
 
-    expect(page).to have_content("You've signed up for NS2 Gather.")
+    expect(page).to have_text("You've signed up for NS2 Gather.")
   end
 
   scenario 'hides the badge once players have actually started joining the newer gather' do
@@ -52,7 +52,7 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit root_path
 
-    expect(page).not_to have_content("You've signed up for NS2 Gather.")
+    expect(page).to have_no_text("You've signed up for NS2 Gather.")
   end
 
   scenario 'hides the badge while viewing the gather page itself' do
@@ -62,11 +62,10 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit gather_path(gather)
 
-    expect(page).not_to have_content("You've signed up for NS2 Gather.")
+    expect(page).to have_no_text("You've signed up for NS2 Gather.")
   end
 
-  scenario 'shows the signed-up link after really joining via the UI, hidden on the gather page itself',
-           js: true do
+  scenario 'shows the signed-up link after really joining via the UI, hidden on the gather page itself', :js do
     join_category = create(:category, :game, name: 'NS1')
     join_gather = create(:gather, category: join_category, maps_count: 3, servers_count: 2)
     joiner = create(:user, raw_password: 'password123')
@@ -78,7 +77,7 @@ RSpec.feature 'Gather header badge', type: :feature do
       expect(page).to have_link("You've signed up for NS1 Gather.", wait: 5)
 
       visit gather_path(join_gather)
-      expect(page).not_to have_link("You've signed up for NS1 Gather.")
+      expect(page).to have_no_link("You've signed up for NS1 Gather.")
     end
   end
 end

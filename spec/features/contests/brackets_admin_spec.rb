@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
+RSpec.feature 'Bracket Admin Integration test', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
 
   scenario 'Admin edits bracket and assigns teams and matches to cells' do
@@ -14,8 +14,8 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     sign_in_via_session(admin)
     visit edit_bracket_path(bracket)
 
-    expect(page).to have_content('Editing Bracket')
-    expect(page).to have_selector('table.brackets')
+    expect(page).to have_text('Editing Bracket')
+    expect(page).to have_css('table.brackets')
 
     # Change the name
     fill_in 'bracket_name', with: 'Updated Bracket Name'
@@ -39,11 +39,11 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     disabled_pos = extract_cell_position(disabled_select)
 
     # Assign a team to first select
-    team_option = team_select.all('option[value*="contester_"]', wait: false).first
+    team_option = team_select.first('option[value*="contester_"]', wait: false)
     team_option.select_option
 
     # Assign a match to second select
-    match_option = match_select.all('option[value*="match_"]', wait: false).first
+    match_option = match_select.first('option[value*="match_"]', wait: false)
     match_option.select_option
 
     # Mark third select as disabled
@@ -53,11 +53,11 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     click_button 'Update'
 
     # Wait for redirect to complete and verify we're back on edit page
-    expect(page).to have_content('Editing Bracket', wait: 10)
+    expect(page).to have_text('Editing Bracket', wait: 10)
 
     # Verify flash message is displayed
-    expect(page).to have_selector('#notification .message.notice', wait: 5)
-    expect(page).to have_content('successfully updated')
+    expect(page).to have_css('#notification .message.notice', wait: 5)
+    expect(page).to have_text('successfully updated')
 
     # Verify team was actually saved
     bracket.reload
@@ -77,7 +77,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
 
     # Visit bracket view to verify display
     visit bracket_path(bracket)
-    expect(page).to have_content(bracket.name)
+    expect(page).to have_text(bracket.name)
   end
 
   scenario 'Admin can create multiple brackets for tournament rounds' do
@@ -91,7 +91,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     brackets_tab.click
 
     # Wait for the tab content to be visible
-    expect(page).to have_selector('#brackets', visible: true, wait: 5)
+    expect(page).to have_css('#brackets', visible: true, wait: 5)
 
     # Create first bracket for round of 16
     within('#brackets') do
@@ -100,7 +100,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
       click_button 'Add Bracket'
     end
 
-    expect(page).to have_content('Bracket was successfully created', wait: 5)
+    expect(page).to have_text('Bracket was successfully created', wait: 5)
 
     # Navigate back to contest edit page to create another bracket
     visit edit_contest_path(contest)
@@ -110,7 +110,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     brackets_tab.click
 
     # Wait for the tab content to be visible
-    expect(page).to have_selector('#brackets', visible: true, wait: 5)
+    expect(page).to have_css('#brackets', visible: true, wait: 5)
 
     # Create second bracket for finals
     within('#brackets') do
@@ -119,7 +119,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
       click_button 'Add Bracket'
     end
 
-    expect(page).to have_content('Bracket was successfully created', wait: 5)
+    expect(page).to have_text('Bracket was successfully created', wait: 5)
 
     contest.reload
     expect(contest.brackets.count).to eq(2)
@@ -135,8 +135,8 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     sign_in_via_session(admin)
     visit edit_bracket_path(bracket)
 
-    expect(page).to have_content('Editing Bracket')
-    expect(page).to have_selector('table.brackets')
+    expect(page).to have_text('Editing Bracket')
+    expect(page).to have_css('table.brackets')
 
     # Get all cell select dropdowns
     selects = all('select[name*="cell"]')
@@ -175,9 +175,9 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
     click_button 'Update'
 
     # Wait for redirect and verify flash message
-    expect(page).to have_content('Editing Bracket', wait: 10)
-    expect(page).to have_selector('#notification .message.notice', wait: 5)
-    expect(page).to have_content('successfully updated')
+    expect(page).to have_text('Editing Bracket', wait: 10)
+    expect(page).to have_css('#notification .message.notice', wait: 5)
+    expect(page).to have_text('successfully updated')
 
     # Verify disabled cells were set correctly
     bracket.reload
@@ -196,7 +196,7 @@ RSpec.feature 'Bracket Admin Integration test', type: :feature, js: true do
 
     # Visit bracket view to verify display
     visit bracket_path(bracket)
-    expect(page).to have_content(bracket.name)
+    expect(page).to have_text(bracket.name)
   end
 
   private

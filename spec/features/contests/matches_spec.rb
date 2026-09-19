@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Matches management', type: :feature, js: true do
+RSpec.feature 'Matches management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
   let!(:map1) { create(:map) }
@@ -47,8 +47,8 @@ RSpec.feature 'Matches management', type: :feature, js: true do
 
     expect(page).to have_css('#matches table.matches')
     within('#matches') do
-      expect(page).to have_content(contester1_opt[:text])
-      expect(page).to have_content(contester2_opt[:text])
+      expect(page).to have_text(contester1_opt[:text])
+      expect(page).to have_text(contester2_opt[:text])
     end
   end
 
@@ -66,10 +66,10 @@ RSpec.feature 'Matches management', type: :feature, js: true do
     click_button 'Save Match'
 
     expect(page).to have_current_path(match_path(match))
-    expect(page).to have_content(contester1_opt[:text])
-    expect(page).to have_content(contester2_opt[:text])
-    expect(page).to have_content(map1_opt[:text])
-    expect(page).to have_content(map2_opt[:text])
+    expect(page).to have_text(contester1_opt[:text])
+    expect(page).to have_text(contester2_opt[:text])
+    expect(page).to have_text(map1_opt[:text])
+    expect(page).to have_text(map2_opt[:text])
     m = Match.find(match.id)
     expect(m.week_id).to eq(week_opt[:id])
   end
@@ -84,7 +84,7 @@ RSpec.feature 'Matches management', type: :feature, js: true do
     visit edit_contest_path(contest)
     find("a[href='#matches']").click
     expect(page).to have_css('#matches table.matches')
-    expect(page).to have_content(match.contester1.team.name)
+    expect(page).to have_text(match.contester1.team.name)
 
     # Delete from the matches table action link for the created match row
     within('#matches') do
@@ -98,7 +98,7 @@ RSpec.feature 'Matches management', type: :feature, js: true do
       end
     end
 
-    expect(page).to have_content(I18n.t('flash.actions.destroy.notice', resource_name: Match.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.destroy.notice', resource_name: Match.model_name.human))
     expect(page).to have_current_path(edit_contest_path(contest))
   end
 
@@ -108,8 +108,8 @@ RSpec.feature 'Matches management', type: :feature, js: true do
     sign_in_as(referee)
 
     visit ref_match_path(match)
-    expect(page).to have_content('Referee Admin')
-    expect(page).to have_content('Scoring')
+    expect(page).to have_text('Referee Admin')
+    expect(page).to have_text('Scoring')
 
     # Select a server
     select(server.name, from: 'match_server_id')

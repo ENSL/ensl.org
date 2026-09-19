@@ -5,7 +5,7 @@ require 'rails_helper'
 # Match Proposals Feature Spec
 # Tests the match proposal workflow as used in live production
 # Includes team leaders proposing match times, opposing teams confirming/rejecting, etc.
-RSpec.feature 'Match Proposals', type: :feature, js: true do
+RSpec.feature 'Match Proposals', :js, type: :feature do
   let(:contest) { create(:contest) }
   let(:team1_leader) { create(:user_with_team, username: 'team1_leader') }
   let(:team1) { team1_leader.team }
@@ -16,16 +16,13 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
   let(:cont2) { create(:contester, team: team2, contest: contest) }
   let(:match) { create(:match, contest: contest, contester1: cont1, contester2: cont2) }
 
-  before do
-  end
-
   scenario 'team leader views match proposals page' do
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
 
-    expect(page).to have_content('Proposals')
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content(team2.name)
+    expect(page).to have_text('Proposals')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text(team2.name)
     expect(page).to have_link('Propose match time')
     expect(page).to have_link('Back')
   end
@@ -43,7 +40,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
 
     # Should redirect to proposals page and show success
     expect(page).to have_current_path(match_proposals_path(match))
-    expect(page).to have_content('Pending')
+    expect(page).to have_text('Pending')
 
     # Verify the proposal was created correctly
     proposal = MatchProposal.last
@@ -62,7 +59,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
 
     # Verify it shows up on proposals page with correct status
     expect(page).to have_current_path(match_proposals_path(match))
-    expect(page).to have_content('Pending')
+    expect(page).to have_text('Pending')
 
     proposal = MatchProposal.last
     expect(proposal.status).to eq(MatchProposal::STATUS_PENDING)
@@ -75,8 +72,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content('Pending')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text('Pending')
   end
 
   scenario 'opposing team confirms a proposal outside confirmation limit' do
@@ -86,8 +83,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should see the proposal
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content('Pending')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text('Pending')
     # Verify confirm button would be available (via model permission check)
     expect(proposal.status_change_allowed?(team2_leader, MatchProposal::STATUS_CONFIRMED)).to be true
   end
@@ -100,7 +97,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
 
     within('tr', text: team1.name) { click_link 'Confirm' }
 
-    expect(page).to have_content('Confirmed', wait: 5)
+    expect(page).to have_text('Confirmed', wait: 5)
     expect(proposal.reload.status).to eq(MatchProposal::STATUS_CONFIRMED)
   end
 
@@ -111,7 +108,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Team 1 leader should not see confirm action for their own proposal
-    expect(page).not_to have_xpath("//a[@title='Confirm']")
+    expect(page).to have_no_xpath("//a[@title='Confirm']")
   end
 
   scenario 'opposing team rejects a proposal outside confirmation limit' do
@@ -121,8 +118,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should see the proposal and reject should be available
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content('Pending')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text('Pending')
     expect(proposal.status_change_allowed?(team2_leader, MatchProposal::STATUS_REJECTED)).to be true
   end
 
@@ -134,8 +131,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should not see confirm or reject options for pending proposals within time limit
-    expect(page).not_to have_xpath("//a[@title='Confirm']")
-    expect(page).not_to have_xpath("//a[@title='Reject']")
+    expect(page).to have_no_xpath("//a[@title='Confirm']")
+    expect(page).to have_no_xpath("//a[@title='Reject']")
   end
 
   scenario 'team leader can revoke pending proposal' do
@@ -145,7 +142,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should see the proposal and revoke should be allowed
-    expect(page).to have_content('Pending')
+    expect(page).to have_text('Pending')
     expect(proposal.status_change_allowed?(team1_leader, MatchProposal::STATUS_REVOKED)).to be true
   end
 
@@ -156,7 +153,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should see the proposal
-    expect(page).to have_content('Confirmed')
+    expect(page).to have_text('Confirmed')
     # Revoke should be allowed
     expect(proposal.status_change_allowed?(team1_leader, MatchProposal::STATUS_REVOKED)).to be true
   end
@@ -168,7 +165,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Admin should see the proposal
-    expect(page).to have_content('Confirmed')
+    expect(page).to have_text('Confirmed')
     # Delay should be allowed for admin
     expect(proposal.status_change_allowed?(admin, MatchProposal::STATUS_DELAYED)).to be true
   end
@@ -180,8 +177,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should display time-related content
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content('Pending')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text('Pending')
   end
 
   scenario 'cannot create new proposal if confirmed one exists' do
@@ -193,7 +190,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
 
     # Should be redirected and see error message
     expect(page).to have_current_path(match_proposals_path(match))
-    expect(page).to have_content('Cannot create a new proposal')
+    expect(page).to have_text('Cannot create a new proposal')
   end
 
   scenario 'non-team members cannot access proposals page' do
@@ -202,7 +199,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     sign_in_via_session(non_member)
     visit match_proposals_path(match)
 
-    expect(page).to have_content('You are not allowed')
+    expect(page).to have_text('You are not allowed')
   end
 
   scenario 'admin can always access proposals page' do
@@ -211,8 +208,8 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     sign_in_via_session(admin)
     visit match_proposals_path(match)
 
-    expect(page).to have_content('Proposals')
-    expect(page).to have_content(team1.name)
+    expect(page).to have_text('Proposals')
+    expect(page).to have_text(team1.name)
   end
 
   scenario 'team leader cannot propose match without participating in it' do
@@ -225,7 +222,7 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     sign_in_via_session(team1_leader)
     visit new_match_proposal_path(other_match)
 
-    expect(page).to have_content('You are not allowed')
+    expect(page).to have_text('You are not allowed')
   end
 
   scenario 'multiple proposals for same match' do
@@ -237,9 +234,9 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     visit match_proposals_path(match)
 
     # Should see all proposals with their statuses
-    expect(page).to have_content('Pending')
-    expect(page).to have_content('Rejected')
-    expect(page).to have_content('Confirmed')
+    expect(page).to have_text('Pending')
+    expect(page).to have_text('Rejected')
+    expect(page).to have_text('Confirmed')
     expect(MatchProposal.where(match: match).count).to eq(3)
   end
 
@@ -251,11 +248,11 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
 
-    expect(page).to have_content('Pending')
-    expect(page).to have_content('Confirmed')
-    expect(page).to have_content('Rejected')
-    expect(page).to have_content(team1.name)
-    expect(page).to have_content(team2.name)
+    expect(page).to have_text('Pending')
+    expect(page).to have_text('Confirmed')
+    expect(page).to have_text('Rejected')
+    expect(page).to have_text(team1.name)
+    expect(page).to have_text(team2.name)
   end
 
   scenario 'immutable statuses do not show action buttons' do
@@ -269,9 +266,9 @@ RSpec.feature 'Match Proposals', type: :feature, js: true do
     rows = page.all('table tr')
     rejected_row = rows.find { |row| row.text.include?('Rejected') }
     within(rejected_row) do
-      expect(page).not_to have_xpath("//a[@title='Confirm']")
-      expect(page).not_to have_xpath("//a[@title='Reject']")
-      expect(page).not_to have_xpath("//a[@title='Revoke']")
+      expect(page).to have_no_xpath("//a[@title='Confirm']")
+      expect(page).to have_no_xpath("//a[@title='Reject']")
+      expect(page).to have_no_xpath("//a[@title='Revoke']")
     end
   end
 

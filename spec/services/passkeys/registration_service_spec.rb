@@ -3,9 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Passkeys::RegistrationService do
+  subject(:service) { described_class.new(session: session, request: request) }
+
   let(:session) { {} }
   let(:request) { instance_double(ActionDispatch::Request, host: 'ensl.test', base_url: 'https://ensl.test') }
-  subject(:service) { described_class.new(session: session, request: request) }
 
   before do
     allow(Passkeys::Webauthn).to receive(:configure!)
@@ -15,7 +16,7 @@ RSpec.describe Passkeys::RegistrationService do
     it 'creates registration options and stores pending state' do
       user = create(:user)
       user.passkey_credentials.create!(external_id: 'cred-existing', public_key: 'pk', sign_count: 0)
-      options = instance_double('CreateOptions', challenge: 'register-challenge')
+      options = instance_double(CreateOptions, challenge: 'register-challenge')
 
       expect(WebAuthn::Credential).to receive(:options_for_create).with(
         hash_including(

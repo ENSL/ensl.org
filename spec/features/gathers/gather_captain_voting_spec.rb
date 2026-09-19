@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Gather voting phase - find nil:id error when voting', type: :feature, js: true do
+RSpec.feature 'Gather voting phase - find nil:id error when voting', :js, type: :feature do
   before(:all) do
     Capybara.default_max_wait_time = 5
   end

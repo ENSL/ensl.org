@@ -11,7 +11,7 @@ RSpec.describe Contest, type: :model do
     end
 
     it 'requires presence of essential attributes' do
-      c = Contest.new
+      c = described_class.new
       expect(c).not_to be_valid
       expect(c.errors[:name]).to be_present
       expect(c.errors[:start]).to be_present
@@ -127,7 +127,7 @@ RSpec.describe Contest, type: :model do
   describe '.params' do
     it 'permits expected attributes' do
       params = ActionController::Parameters.new(contest: { name: 'A', status: Contest::STATUS_OPEN })
-      permitted = Contest.params(params, nil)
+      permitted = described_class.params(params, nil)
       expect(permitted[:name]).to eq 'A'
       expect(permitted[:status]).to eq Contest::STATUS_OPEN
     end
@@ -139,7 +139,7 @@ RSpec.describe Contest, type: :model do
       night = create(:contest, name: 'Nightwatch Cup')
       other = create(:contest, name: 'Random Cup')
 
-      result = Contest.historical('NS1')
+      result = described_class.historical('NS1')
 
       expect(result).to include(season)
       expect(result).to include(night)
@@ -147,7 +147,7 @@ RSpec.describe Contest, type: :model do
     end
 
     it 'filters to contests with an id greater than 113 for any other key' do
-      expect(Contest.historical('whatever').to_sql).to include('`id` > 113')
+      expect(described_class.historical('whatever').to_sql).to include('`id` > 113')
     end
   end
 

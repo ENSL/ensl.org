@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'User manages forum posts', js: true do
+feature 'User manages forum posts', :js do
   let!(:forum) { create(:forum) }
   let!(:topic) { create(:topic, forum: forum) }
   let!(:user) { create(:user) }
@@ -21,7 +21,7 @@ feature 'User manages forum posts', js: true do
     describe 'creating a new post' do
       it 'displays the new post form' do
         visit new_post_path(id: topic.id)
-        expect(page).to have_content('New Post')
+        expect(page).to have_text('New Post')
         expect(page).to have_field('Text')
       end
 
@@ -29,12 +29,12 @@ feature 'User manages forum posts', js: true do
         initial_count = Post.count
         visit new_post_path(id: topic.id)
 
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set('This is my test post')
 
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t('flash.actions.create.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.create.notice', resource_name: Post.model_name.human)
         expect(Post.count).to eq(initial_count + 1)
         expect(Post.order(:id).last.text).to eq 'This is my test post'
       end
@@ -44,18 +44,18 @@ feature 'User manages forum posts', js: true do
         click_button 'Save Post'
 
         expect(page).to have_css('.errors-block', wait: 5)
-        expect(page).to have_content('Text is too short')
+        expect(page).to have_text('Text is too short')
       end
 
       it 'respects character limit (max 10,000 chars)' do
         visit new_post_path(id: topic.id)
         long_text = 'a' * 10_001
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set(long_text)
         click_button 'Save Post'
 
         expect(page).to have_css('.errors-block', wait: 5)
-        expect(page).to have_content('Text is too long')
+        expect(page).to have_text('Text is too long')
       end
     end
 
@@ -64,7 +64,7 @@ feature 'User manages forum posts', js: true do
 
       it 'displays the post content' do
         visit topic_path(topic)
-        expect(page).to have_content(post.text)
+        expect(page).to have_text(post.text)
       end
 
       it 'displays the post author avatar' do
@@ -74,7 +74,7 @@ feature 'User manages forum posts', js: true do
 
       it 'displays the post number' do
         visit topic_path(topic)
-        expect(page).to have_content('#1')
+        expect(page).to have_text('#1')
       end
 
       it 'displays the post timestamp' do
@@ -101,7 +101,7 @@ feature 'User manages forum posts', js: true do
       it 'displays delete button only for admin' do
         visit topic_path(topic)
         # Regular user should not see delete button
-        expect(page).not_to have_link('Delete', href: post_path(post))
+        expect(page).to have_no_link('Delete', href: post_path(post))
       end
 
       it 'places edit and delete buttons in correct location with flat layout' do
@@ -122,38 +122,38 @@ feature 'User manages forum posts', js: true do
 
       it 'updates the post successfully' do
         visit edit_post_path(post)
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set('Updated text')
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         expect(post.reload.text).to eq 'Updated text'
       end
 
       it 'redirects to topic after successful update' do
         visit edit_post_path(post)
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set('Updated text')
         click_button 'Save Post'
 
         # Should redirect to topic with flash message
-        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         # Check we're on the topic page
-        expect(current_path).to eq(topic_path(post.topic))
+        expect(page).to have_current_path(topic_path(post.topic), ignore_query: true)
       end
 
       it 'redirects to the updated post anchor' do
         visit edit_post_path(post)
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set('Updated text')
         click_button 'Save Post'
 
         # Wait for redirect
-        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         # Check we're on topic page with the updated post visible
-        expect(current_path).to eq(topic_path(post.topic))
+        expect(page).to have_current_path(topic_path(post.topic), ignore_query: true)
         within("#post_#{post.id}") do
-          expect(page).to have_content('Updated text')
+          expect(page).to have_text('Updated text')
         end
       end
     end
@@ -220,7 +220,7 @@ feature 'User manages forum posts', js: true do
           sleep 1 # Wait for AJAX
         end.to change(Post, :count).by(1)
 
-        expect(page).to have_content('Quick reply test message')
+        expect(page).to have_text('Quick reply test message')
       end
 
       it 'clears the reply form after successful post creation' do
@@ -263,7 +263,7 @@ feature 'User manages forum posts', js: true do
 
         # After post creation, the reply form should hide and the button should exist again.
         # Some drivers don't execute the JS response that removes the `invisible` class.
-        expect(page).to have_content('Test message')
+        expect(page).to have_text('Test message')
         expect(page).to have_css('#reply', visible: :hidden)
         expect(page).to have_css('button.fastReply', visible: :all, wait: 5)
       end
@@ -299,8 +299,8 @@ feature 'User manages forum posts', js: true do
         sleep 1
 
         # Should succeed
-        expect(page).to have_content('Fixed message')
-        expect(page).not_to have_css('#reply-errors .errors-block')
+        expect(page).to have_text('Fixed message')
+        expect(page).to have_no_css('#reply-errors .errors-block')
       end
     end
 
@@ -323,20 +323,20 @@ feature 'User manages forum posts', js: true do
       it 'prevents editing other user posts' do
         visit topic_path(topic)
         within("div#post_#{other_post.id}.post") do
-          expect(page).not_to have_link('Edit')
+          expect(page).to have_no_link('Edit')
         end
       end
 
       it 'prevents creating posts in locked topics' do
         Lock.create!(lockable: topic)
         visit new_post_path(id: topic.id)
-        expect(page).to have_content('not allowed to visit')
+        expect(page).to have_text('not allowed to visit')
       end
 
       it 'prevents creating posts when user is muted' do
         create(:ban, :mute, user: user)
         visit new_post_path(id: topic.id)
-        expect(page).to have_content('not allowed to visit')
+        expect(page).to have_text('not allowed to visit')
       end
     end
   end
@@ -363,8 +363,8 @@ feature 'User manages forum posts', js: true do
         end
 
         # Wait for redirect/page update to complete
-        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human),
-                                     wait: 5
+        expect(page).to have_text I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human),
+                                  wait: 5
         # Verify post is deleted
         expect(Post.find_by(id: post.id)).to be_nil
       end
@@ -377,7 +377,7 @@ feature 'User manages forum posts', js: true do
           end
         end
 
-        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
       end
 
       it 'redirects to forum when deleting the last post of a topic' do
@@ -393,18 +393,18 @@ feature 'User manages forum posts', js: true do
         end
 
         # Flash message should appear
-        expect(page).to have_content I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.destroy.notice', resource_name: Post.model_name.human)
         # Post should be deleted
         expect(Post.find_by(id: only_post.id)).to be_nil
       end
 
       it 'can edit any post' do
         visit edit_post_path(post)
-        textarea = find('#post_text')
+        textarea = find_by_id('post_text')
         textarea.set('Admin edited text')
         click_button 'Save Post'
 
-        expect(page).to have_content I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
+        expect(page).to have_text I18n.t('flash.actions.update.notice', resource_name: Post.model_name.human)
         expect(post.reload.text).to eq 'Admin edited text'
       end
     end
@@ -413,7 +413,7 @@ feature 'User manages forum posts', js: true do
   context 'as an unauthenticated user' do
     it 'cannot create a post' do
       visit new_post_path(id: topic.id)
-      expect(page).to have_content('not allowed to visit')
+      expect(page).to have_text('not allowed to visit')
     end
   end
 

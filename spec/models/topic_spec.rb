@@ -31,24 +31,22 @@ describe Topic do
       topic.first_post = 'Foo'
       expect do
         topic.save!
-      end.to change(Topic, :count).by(1)
+      end.to change(described_class, :count).by(1)
     end
   end
 
   describe '.recent_topics' do
     it 'returns 5 unique, most recently posted topics' do
-      10.times do
-        create :topic, first_post: 'Foo'
-      end
+      create_list :topic, 10, first_post: 'Foo'
 
-      recent_topics = Topic.recent_topics
+      recent_topics = described_class.recent_topics
 
       post_max_ids = Post.group(:topic_id).maximum(:id)
       top_topics = post_max_ids.sort_by { |topic_id, max_id| [-max_id, topic_id] }.first(200)
 
       expected_ids = []
       top_topics.each do |topic_id, max_id|
-        topic = Topic.find_by(id: topic_id)
+        topic = described_class.find_by(id: topic_id)
         next unless topic
         next if Forumer.exists?(forum_id: topic.forum_id)
 
@@ -66,7 +64,7 @@ describe Topic do
       restricted_topic = create :topic, title: 'Restricted'
       create :forumer, forum: restricted_topic.forum
       create :post, topic: restricted_topic
-      expect(Topic.recent_topics).to_not include(restricted_topic)
+      expect(described_class.recent_topics).not_to include(restricted_topic)
     end
   end
 
@@ -78,7 +76,7 @@ describe Topic do
       create(:post, topic: newer, user: user, created_at: 1.hour.from_now)
       create(:topic, user: user, forum: other_forum)
 
-      result = Topic.for_forum_overview(forum)
+      result = described_class.for_forum_overview(forum)
 
       expect(result.map(&:id)).to eq([newer.id, older.id])
       expect(result.first.last_post_at).to be_present
@@ -88,7 +86,7 @@ describe Topic do
       old_post = create(:topic, user: user, forum: forum)
       pinned = create(:topic, user: user, forum: forum, state: 1)
 
-      result = Topic.for_forum_overview(forum)
+      result = described_class.for_forum_overview(forum)
 
       expect(result.first.id).to eq(pinned.id)
       expect(result.map(&:id)).to include(old_post.id)
@@ -113,7 +111,7 @@ describe Topic do
       create(:forumer, forum: restricted_topic.forum, group: group, access: Forumer::ACCESS_READ)
       create(:grouper, user: user, group: group)
 
-      expect(restricted_topic.can_show?(user)).to be_truthy
+      expect(restricted_topic).to be_can_show(user)
     end
 
     it 'returns nil when forum is missing instead of raising' do

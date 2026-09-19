@@ -70,7 +70,7 @@ RSpec.describe 'GroupsController', type: :request do
         post '/groups', params: { group: { name: '' } }
       end.not_to change(Group, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
   end
@@ -101,7 +101,7 @@ RSpec.describe 'GroupsController', type: :request do
 
       patch "/groups/#{group.id}", params: { group: { name: '' } }
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(group.reload.name).to eq('Original')
     end

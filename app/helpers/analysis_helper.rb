@@ -77,7 +77,7 @@ module AnalysisHelper
   def tech_path_research_name(research)
     RoundsHelper::ROUND_TIMELINE_RESEARCH_NAMES[research] ||
       RoundsHelper::ROUND_TIMELINE_STRUCTURE_NAMES[research] ||
-      research.to_s.sub(/\Aresearch_/, '').humanize
+      research.to_s.delete_prefix('research_').humanize
   end
 
   # Plain-text version of the same path, used as the client-side sort key.

@@ -28,7 +28,7 @@ require 'rails_helper'
 
 describe Ban do
   let!(:user) { create :user }
-  let(:ban) { Ban.new }
+  let(:ban) { described_class.new }
   let!(:server) { create :server }
 
   describe '#color' do
@@ -132,53 +132,53 @@ describe Ban do
     let!(:user) { create :user }
     let!(:admin) { create :user, :admin }
     let!(:server_user) { create :user }
-    let(:ban) { Ban.new }
+    let(:ban) { described_class.new }
 
     describe 'can_create?' do
       it 'returns false for nil users' do
-        expect(ban.can_create?(nil)).to be_falsey
+        expect(ban).not_to be_can_create(nil)
       end
 
       it 'returns true for admins' do
-        expect(ban.can_create?(admin)).to be_truthy
+        expect(ban).to be_can_create(admin)
       end
 
       it 'returns false for non-admins' do
-        expect(ban.can_create?(user)).to be_falsey
+        expect(ban).not_to be_can_create(user)
       end
     end
 
     describe 'can_destroy?' do
       it 'returns true for admin' do
-        expect(ban.can_destroy?(admin)).to be_truthy
+        expect(ban).to be_can_destroy(admin)
       end
 
       it 'returns true for the creator when they are allowed to ban' do
         moderator = create(:user, :gather_moderator)
         creator_ban = build(:ban, creator: moderator)
 
-        expect(creator_ban.can_destroy?(moderator)).to be_truthy
+        expect(creator_ban).to be_can_destroy(moderator)
       end
 
       it 'returns false for non-admins' do
-        expect(ban.can_destroy?(user)).to be_falsey
+        expect(ban).not_to be_can_destroy(user)
       end
     end
 
     describe 'can_update?' do
       it 'returns true for admin' do
-        expect(ban.can_update?(admin)).to be_truthy
+        expect(ban).to be_can_update(admin)
       end
 
       it 'returns true for the creator when they are allowed to ban' do
         moderator = create(:user, :gather_moderator)
         creator_ban = build(:ban, creator: moderator)
 
-        expect(creator_ban.can_update?(moderator)).to be_truthy
+        expect(creator_ban).to be_can_update(moderator)
       end
 
       it 'returns false for non-admins' do
-        expect(ban.can_update?(user)).to be_falsey
+        expect(ban).not_to be_can_update(user)
       end
     end
   end

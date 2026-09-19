@@ -116,7 +116,7 @@ module RailsLog
 
     stats_array = []
     sort_by_key = 'median' unless !sort_by_key.nil? && stats[0].respond_to?(sort_by_key)
-    stats.sort_by { |s| s.send(sort_by_key) }.reverse.each do |s|
+    stats.sort_by { |s| s.send(sort_by_key) }.reverse_each do |s|
       stats_array << [s.uri, s.count, s.sum, s.max, s.min, s.avg, s.median]
     end
     stats_array = stats_array[0..result_limit - 1] if result_limit.positive?

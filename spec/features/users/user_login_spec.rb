@@ -136,7 +136,7 @@ RSpec.describe 'User login', type: :request do
     expect(reset_password.length).to be >= 8
 
     # Internal message should be created for the user
-    expect(Message.where(recipient_type: 'User', recipient_id: u.id).exists?).to be_truthy
+    expect(Message.where(recipient_type: 'User', recipient_id: u.id)).to exist
   end
 
   it 'does not send reset email for incorrect info' do

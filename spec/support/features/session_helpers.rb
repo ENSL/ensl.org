@@ -18,7 +18,7 @@ module Features
       # Fallback for rare Playwright cookie propagation races in multi-session specs.
       sign_in_as(user)
       visit root_path
-      expect(page).to have_selector('#current_user', text: expected_name, visible: :all)
+      expect(page).to have_css('#current_user', text: expected_name, visible: :all)
     end
 
     def sign_in_as(user)
@@ -31,7 +31,7 @@ module Features
       find('#authentication [name="commit"]').click
       # click_button I18n.t("helpers.submit.user.login")
 
-      expect(page).to have_content(I18n.t('sessions.create.success'))
+      expect(page).to have_text(I18n.t('sessions.create.success'))
     end
 
     def sign_out
@@ -43,8 +43,8 @@ module Features
       visit logout_sessions_path
       # Expect either the flash or the login link to confirm logout succeeded
       expect(page).to(
-        have_content(I18n.t('sessions.destroy.success')).or(
-          have_content(I18n.t('helpers.submit.user.login'))
+        have_text(I18n.t('sessions.destroy.success')).or(
+          have_text(I18n.t('helpers.submit.user.login'))
         )
       )
     end

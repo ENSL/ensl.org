@@ -216,7 +216,7 @@ RSpec.describe Article, type: :model do
 
   describe 'callbacks' do
     it 'parses markdown text into text_parsed before save' do
-      article = Article.new(
+      article = described_class.new(
         user: admin,
         category: category,
         title: 'Markdown article',
@@ -281,7 +281,7 @@ RSpec.describe Article, type: :model do
 
     context 'with Markdown format' do
       it 'escapes raw HTML script tags' do
-        article = Article.new(
+        article = described_class.new(
           user: admin,
           category: category,
           title: 'Markdown XSS test',
@@ -298,7 +298,7 @@ RSpec.describe Article, type: :model do
       end
 
       it 'escapes iframe tags in markdown' do
-        article = Article.new(
+        article = described_class.new(
           user: admin,
           category: category,
           title: 'Markdown iframe test',
@@ -312,7 +312,7 @@ RSpec.describe Article, type: :model do
       end
 
       it 'escapes event handlers in markdown' do
-        article = Article.new(
+        article = described_class.new(
           user: admin,
           category: category,
           title: 'Markdown event handler test',
@@ -328,7 +328,7 @@ RSpec.describe Article, type: :model do
 
     context 'with HTML format' do
       it 'preserves HTML for admin users' do
-        article = Article.new(
+        article = described_class.new(
           user: admin,
           category: category,
           title: 'HTML test',
@@ -343,7 +343,7 @@ RSpec.describe Article, type: :model do
       end
 
       it 'does not process HTML content (stored as-is)' do
-        article = Article.new(
+        article = described_class.new(
           user: admin,
           category: category,
           title: 'HTML raw test',

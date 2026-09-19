@@ -28,7 +28,7 @@ RSpec.feature 'Uploaded file downloads', type: :feature do
 
     created = DataFile.find_by!(title: 'Pipeline upload')
     expect(File.binread(created.location)).to eq('download pipeline content')
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
 
     click_link 'Download'
     expect(page.status_code).to eq(200)
@@ -52,8 +52,8 @@ RSpec.feature 'Uploaded file downloads', type: :feature do
     select @directory.path, from: 'data_file_directory_id'
     click_button 'Create File'
 
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
-    expect(page).to have_content('File uploaded successfully, but its download URL is not currently reachable.')
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
+    expect(page).to have_text('File uploaded successfully, but its download URL is not currently reachable.')
     expect(DataFile.find_by(title: 'Warning upload')).to be_present
   ensure
     upload&.unlink

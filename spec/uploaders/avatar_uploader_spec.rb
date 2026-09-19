@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe AvatarUploader do
   subject(:uploader) { described_class.new(model) }
 
-  let(:model) { instance_double('User', id: 42) }
+  let(:model) { instance_double(User, id: 42) }
 
   describe '#store_dir' do
     it 'stores files in the avatars directory' do

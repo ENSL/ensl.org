@@ -127,9 +127,8 @@ describe DataFileSyncJob do
 
       allow(Net::FTP).to receive(:open).and_yield(ftp)
       allow(ftp).to receive(:passive=)
-      allow(ftp).to receive(:pwd).and_return('/')
       allow(ftp).to receive(:chdir)
-      allow(ftp).to receive(:nlst).and_return(['monthly.log'])
+      allow(ftp).to receive_messages(pwd: '/', nlst: ['monthly.log'])
       allow(ftp).to receive(:size).with('monthly.log').and_return(2048)
       allow(ftp).to receive(:mtime).with('monthly.log').and_return(remote_mtime)
 
@@ -150,9 +149,8 @@ describe DataFileSyncJob do
 
       allow(Net::FTP).to receive(:open).and_yield(ftp)
       allow(ftp).to receive(:passive=)
-      allow(ftp).to receive(:pwd).and_return('/')
       allow(ftp).to receive(:chdir)
-      allow(ftp).to receive(:nlst).and_return(['monthly.log'])
+      allow(ftp).to receive_messages(pwd: '/', nlst: ['monthly.log'])
       allow(ftp).to receive(:size).with('monthly.log').and_return(2048)
       allow(ftp).to receive(:mtime).with('monthly.log').and_return(remote_mtime)
 
@@ -171,9 +169,8 @@ describe DataFileSyncJob do
 
       allow(Net::FTP).to receive(:open).and_yield(ftp)
       allow(ftp).to receive(:passive=)
-      allow(ftp).to receive(:pwd).and_return('/')
       allow(ftp).to receive(:chdir)
-      allow(ftp).to receive(:nlst).and_return(['monthly.log'])
+      allow(ftp).to receive_messages(pwd: '/', nlst: ['monthly.log'])
       allow(ftp).to receive(:size).with('monthly.log').and_return(2048)
       allow(ftp).to receive(:mtime).with('monthly.log').and_return(remote_mtime)
 
@@ -196,9 +193,8 @@ describe DataFileSyncJob do
     it 'ignores planner-less files and tolerates missing size and mtime metadata' do
       allow(Net::FTP).to receive(:open).and_yield(ftp)
       allow(ftp).to receive(:passive=)
-      allow(ftp).to receive(:pwd).and_return('/')
       allow(ftp).to receive(:chdir)
-      allow(ftp).to receive(:nlst).and_return(['.', '..', 'monthly.log'])
+      allow(ftp).to receive_messages(pwd: '/', nlst: ['.', '..', 'monthly.log'])
       allow(ftp).to receive(:size).with('monthly.log').and_raise(Net::FTPPermError)
       allow(ftp).to receive(:mtime).with('monthly.log').and_raise(Net::FTPPermError)
 

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Comments feature', js: true do
+feature 'Comments feature', :js do
   # Needs to be admin to create published articles
   let!(:author) { create(:user, :admin) }
   let!(:commenter) { create(:user) }
@@ -22,8 +22,8 @@ feature 'Comments feature', js: true do
         click_button 'Post Comment'
       end
 
-      expect(page).to have_content('Great article!')
-      expect(page).to have_content(commenter.username)
+      expect(page).to have_text('Great article!')
+      expect(page).to have_text(commenter.username)
     end
   end
 
@@ -41,8 +41,8 @@ feature 'Comments feature', js: true do
         click_button 'Post Comment'
       end
 
-      expect(page).to have_content('Good luck!')
-      expect(page).to have_content(commenter.username)
+      expect(page).to have_text('Good luck!')
+      expect(page).to have_text(commenter.username)
     end
   end
 end

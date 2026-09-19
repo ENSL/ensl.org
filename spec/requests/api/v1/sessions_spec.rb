@@ -17,7 +17,7 @@ RSpec.describe 'Api::V1::SessionsController', type: :request do
         get '/api/v1/sessions/me', headers: json_headers
 
         expect(response).to have_http_status(:success)
-        expect(json['signed_in']).to eq(true)
+        expect(json['signed_in']).to be(true)
         expect(json['user']['id']).to eq(user.id)
         expect(json['user']['email']).to eq(user.email)
       end
@@ -28,7 +28,7 @@ RSpec.describe 'Api::V1::SessionsController', type: :request do
         get '/api/v1/sessions/me', headers: json_headers
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json['signed_in']).to eq(false)
+        expect(json['signed_in']).to be(false)
         expect(json).not_to have_key('user')
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe 'Api::V1::SessionsController', type: :request do
         get '/api/v1/sessions/me', headers: json_headers
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json['signed_in']).to eq(false)
+        expect(json['signed_in']).to be(false)
       end
     end
 

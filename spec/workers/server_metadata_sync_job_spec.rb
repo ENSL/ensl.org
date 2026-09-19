@@ -4,8 +4,8 @@ require 'rails_helper'
 
 describe ServerMetadataSyncJob do
   let(:job) { described_class.new }
-  let(:gold_src_class) { class_double('SteamCondenser::Servers::GoldSrcServer').as_stubbed_const }
-  let(:source_class) { class_double('SteamCondenser::Servers::SourceServer').as_stubbed_const }
+  let(:gold_src_class) { class_double(SteamCondenser::Servers::GoldSrcServer).as_stubbed_const }
+  let(:source_class) { class_double(SteamCondenser::Servers::SourceServer).as_stubbed_const }
 
   before do
     gold_src_class
@@ -103,16 +103,15 @@ describe ServerMetadataSyncJob do
   describe '#fetch_server_snapshot' do
     it 'falls back from GoldSrc to Source for HLDS servers' do
       server = create(:server, :active, domain: Server::DOMAIN_HLDS, ip: '127.0.0.1', port: '27015')
-      gold_query = instance_double('GoldQuery')
-      source_query = instance_double('SourceQuery')
+      gold_query = instance_double(GoldQuery)
+      source_query = instance_double(SourceQuery)
 
       allow(gold_src_class).to receive(:new).with('127.0.0.1', 27_015).and_return(gold_query)
       allow(source_class).to receive(:new).with('127.0.0.1', 27_015).and_return(source_query)
 
       allow(gold_query).to receive(:update_ping).and_raise(StandardError, 'timeout')
       allow(source_query).to receive(:update_ping)
-      allow(source_query).to receive(:server_info).and_return(map_name: 'ns_veil')
-      allow(source_query).to receive(:ping).and_return(14.7)
+      allow(source_query).to receive_messages(server_info: { map_name: 'ns_veil' }, ping: 14.7)
 
       expect(job.send(:fetch_server_snapshot, server)).to eq(
         ping: 14.7,
@@ -122,7 +121,7 @@ describe ServerMetadataSyncJob do
 
     it 'normalizes non-hash server_info to an empty hash' do
       server = create(:server, :active, domain: Server::DOMAIN_NS2, ip: '127.0.0.2', port: '27016')
-      source_query = instance_double('SourceQuery', ping: 16.4)
+      source_query = instance_double(SourceQuery, ping: 16.4)
 
       allow(source_class).to receive(:new).with('127.0.0.2', 27_016).and_return(source_query)
       allow(source_query).to receive(:update_ping)
@@ -133,8 +132,8 @@ describe ServerMetadataSyncJob do
 
     it 'raises combined class-specific errors when all query classes fail' do
       server = create(:server, :active, domain: Server::DOMAIN_HLDS, ip: '127.0.0.3', port: '27017')
-      gold_query = instance_double('GoldQuery')
-      source_query = instance_double('SourceQuery')
+      gold_query = instance_double(GoldQuery)
+      source_query = instance_double(SourceQuery)
 
       allow(gold_src_class).to receive(:new).with('127.0.0.3', 27_017).and_return(gold_query)
       allow(source_class).to receive(:new).with('127.0.0.3', 27_017).and_return(source_query)

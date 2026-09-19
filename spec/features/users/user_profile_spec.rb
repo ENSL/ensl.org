@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'User profile', js: true do
+feature 'User profile', :js do
   def displayed_time(time, timezone = Rails.application.config.time_zone)
     Time.use_zone(timezone) { time.strftime('%d %B %y %H:%M') }
   end
@@ -15,7 +15,7 @@ feature 'User profile', js: true do
 
     visit user_path(registrant)
 
-    expect(page).to have_content(displayed_time(registrant.lastvisit))
+    expect(page).to have_text(displayed_time(registrant.lastvisit))
     expect(registrant.lastvisit).to be_within(5).of(Time.now.utc)
   end
 
@@ -25,7 +25,7 @@ feature 'User profile', js: true do
     old_last_visit_text = displayed_time(registrant.reload.lastvisit)
 
     visit user_path(registrant)
-    expect(page).to have_content(old_last_visit_text)
+    expect(page).to have_text(old_last_visit_text)
 
     sign_in_as(registrant)
     registrant.reload
@@ -33,8 +33,8 @@ feature 'User profile', js: true do
     expect(registrant.lastvisit).to be_within(5).of(Time.now.utc)
 
     visit user_path(registrant)
-    expect(page).to have_content(displayed_time(registrant.lastvisit, registrant.time_zone))
-    expect(page).not_to have_content(old_last_visit_text)
+    expect(page).to have_text(displayed_time(registrant.lastvisit, registrant.time_zone))
+    expect(page).to have_no_text(old_last_visit_text)
   end
 
   scenario 'updates from visiting an unrelated page while idle, not just from logging in' do
@@ -58,8 +58,8 @@ feature 'User profile', js: true do
     expect(registrant.reload.lastvisit).to be_within(5).of(Time.now.utc)
 
     visit user_path(registrant)
-    expect(page).to have_content(displayed_time(registrant.lastvisit, registrant.time_zone))
-    expect(page).not_to have_content(old_last_visit_text)
+    expect(page).to have_text(displayed_time(registrant.lastvisit, registrant.time_zone))
+    expect(page).to have_no_text(old_last_visit_text)
   end
 
   scenario 'updates all editable profile fields through the profile form' do
@@ -105,7 +105,7 @@ feature 'User profile', js: true do
 
     click_button 'Update Profile'
 
-    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: User.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: User.model_name.human))
     attributes = user.reload.attributes.slice(
       'firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone', 'public_email'
     )

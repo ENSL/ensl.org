@@ -81,9 +81,7 @@ describe Gathers::CastVote do
       no_gather_votable = double('NoGatherVotable')
       allow(Vote).to receive(:new).and_wrap_original do |original, *args|
         vote = original.call(*args)
-        allow(vote).to receive(:votable).and_return(no_gather_votable)
-        allow(vote).to receive(:can_create?).and_return(true)
-        allow(vote).to receive(:save!).and_return(true)
+        allow(vote).to receive_messages(votable: no_gather_votable, can_create?: true, save!: true)
         vote
       end
 
@@ -138,9 +136,7 @@ describe Gathers::CastVote do
       no_gather_votable = double('NoGatherVotable')
       allow(Vote).to receive(:new).and_wrap_original do |original, *args|
         vote = original.call(*args)
-        allow(vote).to receive(:votable).and_return(no_gather_votable)
-        allow(vote).to receive(:can_create?).and_return(false)
-        allow(vote).to receive(:save!).and_return(true)
+        allow(vote).to receive_messages(votable: no_gather_votable, can_create?: false, save!: true)
         vote
       end
 

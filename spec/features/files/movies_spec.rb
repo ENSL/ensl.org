@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'timeout'
 
-RSpec.feature 'Movies management', type: :feature, js: true do
+RSpec.feature 'Movies management', :js, type: :feature do
   include Features::VideoSampleHelper
   include MovieTestHelper
 
@@ -16,7 +16,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
   def open_movies_index
     visit movies_path
-    expect(page).to have_content('Movie Archive')
+    expect(page).to have_text('Movie Archive')
   end
 
   describe 'browsing and filtering' do
@@ -83,8 +83,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       expect(page).to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
       expect(page).to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(long_movie_no_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(long_movie_no_rating)}']", visible: :all)
     end
 
     scenario 'filters by size - short movies' do
@@ -94,8 +94,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       expect(page).to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
       expect(page).to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(long_movie_no_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(long_movie_no_rating)}']", visible: :all)
     end
 
     scenario 'filters by size - long movies' do
@@ -105,8 +105,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       expect(page).to have_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
       expect(page).to have_css("a[href='#{movie_path(long_movie_no_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
     end
 
     scenario 'filters by minimum rating' do
@@ -116,7 +116,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       expect(page).to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
       expect(page).to have_css("a[href='#{movie_path(long_movie_medium_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
     end
 
     scenario 'orders by date' do
@@ -159,7 +159,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       expect(page).to have_select('rating', selected: '3 stars')
 
       expect(page).to have_css("a[href='#{movie_path(short_movie_high_rating)}']", visible: :all)
-      expect(page).not_to have_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
+      expect(page).to have_no_css("a[href='#{movie_path(short_movie_low_rating)}']", visible: :all)
     end
 
     scenario 'verifies size filter categories are loaded dynamically from database' do
@@ -190,7 +190,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       open_movies_index
       click_link 'Showcase Movie'
 
-      expect(page).to have_content('Showcase Movie')
+      expect(page).to have_text('Showcase Movie')
       expect(page).to have_css('video')
       expect(page).to have_link(File.basename(movie.file.name.to_s))
     end
@@ -204,7 +204,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(admin)
       visit movies_path
 
-      find("a[href^='/data_files/new?id=']", match: :first).click
+      first("a[href^='/data_files/new?id=']").click
       expect(page).to have_current_path('/data_files/new', ignore_query: true)
 
       attach_file 'data_file_name', src.to_s
@@ -213,7 +213,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Create File'
 
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
 
       uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
@@ -221,7 +221,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       expect(File.exist?(uploaded.location)).to be true
       expect(uploaded.movie).to be_present
       expect(page).to have_current_path(movie_path(uploaded.movie), ignore_query: true)
-      expect(page).to have_content(description)
+      expect(page).to have_text(description)
     end
 
     scenario 'movie maker can navigate from index to new data file and upload' do
@@ -231,7 +231,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(movie_maker)
       visit movies_path
 
-      find("a[href^='/data_files/new?id=']", match: :first).click
+      first("a[href^='/data_files/new?id=']").click
       expect(page).to have_current_path('/data_files/new', ignore_query: true)
 
       attach_file 'data_file_name', src.to_s
@@ -240,7 +240,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Create File'
 
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human))
 
       uploaded = DataFile.find_by(title: description)
       expect(uploaded).to be_present
@@ -256,7 +256,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(admin)
       visit new_movie_path
 
-      expect(page).to have_content('New Movie')
+      expect(page).to have_text('New Movie')
 
       fill_in 'movie_name', with: 'My Created Movie'
       select movie_category.name, from: 'movie_category_id'
@@ -268,8 +268,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
-      expect(page).to have_content('Created in feature spec')
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
+      expect(page).to have_text('Created in feature spec')
       created = Movie.find_by(content: 'Created in feature spec')
       expect(created).to be_present
       expect(created.user_id).to eq(admin.id)
@@ -288,7 +288,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Movie.model_name.human))
       expect(Movie.where(user_id: movie_maker.id).count).to be >= 1
     end
   end
@@ -305,8 +305,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(admin)
       visit admin_movies_path
 
-      expect(page).to have_content('Movies Admin')
-      expect(page).to have_content('Admin Panel Movie')
+      expect(page).to have_text('Movies Admin')
+      expect(page).to have_text('Admin Panel Movie')
     end
 
     scenario 'regular user is blocked from movies admin index' do
@@ -340,8 +340,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
-      expect(page).to have_content('Updated content')
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
+      expect(page).to have_text('Updated content')
       expect(movie.reload.content).to eq('Updated content')
     end
 
@@ -361,7 +361,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       visit movies_path
 
       expect(Movie.find_by(id: movie.id)).to be_nil
-      expect(page).to have_content('Movie Archive')
+      expect(page).to have_text('Movie Archive')
     end
   end
 
@@ -384,8 +384,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       fill_in 'movie_content', with: 'Updated by maker'
       click_button 'Save'
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
-      expect(page).to have_content('Updated by maker')
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Movie.model_name.human))
+      expect(page).to have_text('Updated by maker')
       expect(movie.reload.content).to eq('Updated by maker')
     end
 
@@ -420,7 +420,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(movie_maker)
       visit movie_path(movie)
 
-      expect(page).not_to have_link('Edit')
+      expect(page).to have_no_link('Edit')
     end
 
     scenario 'movie maker cannot destroy movies by other users' do
@@ -436,9 +436,9 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       visit movie_path(movie)
 
       # Should not see edit controls at all since they don't own the movie
-      expect(page).not_to have_link('Edit')
-      expect(page).not_to have_selector('.movie-full__actions')
-      expect(page).not_to have_button('Destroy', exact: true)
+      expect(page).to have_no_link('Edit')
+      expect(page).to have_no_css('.movie-full__actions')
+      expect(page).to have_no_button('Destroy', exact: true)
     end
 
     scenario 'movie maker can make preview for their own movie' do
@@ -481,7 +481,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       fill_in 'secs', with: '5'
       click_button 'Take Snapshot'
 
-      expect(page).to have_content('Snapshot created.')
+      expect(page).to have_text('Snapshot created.')
       expect(File.exist?(movie.reload.snapshot_path)).to be true
     end
 
@@ -502,7 +502,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       fill_in 'secs', with: '5'
       click_button 'Take Snapshot'
 
-      expect(page).to have_content('Snapshot could not be created.')
+      expect(page).to have_text('Snapshot could not be created.')
       expect(File.exist?(movie.reload.snapshot_path)).to be false
     end
   end
@@ -519,8 +519,8 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(regular_user)
       visit movie_path(movie)
 
-      expect(page).not_to have_link('Edit')
-      expect(page).not_to have_link('Destroy')
+      expect(page).to have_no_link('Edit')
+      expect(page).to have_no_link('Destroy')
     end
 
     scenario 'regular user cannot access new movie form' do
@@ -529,7 +529,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       visit new_movie_path
 
       expect(page.status_code).to eq(403)
-      expect(page).to have_content(I18n.t(:user_registration_required))
+      expect(page).to have_text(I18n.t(:user_registration_required))
     end
   end
 
@@ -550,7 +550,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
       sign_in_as(regular_user)
       visit movie_path(movie)
 
-      expect(page).to have_content('Web Friendly Movie')
+      expect(page).to have_text('Web Friendly Movie')
       expect(page).to have_css('video')
       # Preview exists, but player prefers original when it is web-friendly
       expect(movie.preview).to be_present
@@ -602,7 +602,7 @@ RSpec.feature 'Movies management', type: :feature, js: true do
 
       visit movie_path(movie)
 
-      expect(page).to have_content('No Preview Movie')
+      expect(page).to have_text('No Preview Movie')
       # Should still show download link
       expect(page).to have_link(File.basename(movie.file.name.to_s))
     end

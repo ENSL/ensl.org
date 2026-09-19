@@ -33,7 +33,7 @@ RSpec.configure do |config|
     File.write(log_file, '')
   end
 
-  config.before(:each) do
+  config.before do
     Rails.cache.clear
   end
 

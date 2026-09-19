@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ban, class: Ban do
+  factory :ban, class: 'Ban' do
     ban_type { Ban::TYPE_SITE }
     # NOTE: due to time zone difference this causes tests to fail
     # When adding the time, its in previous day and the time is set to 00:00

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
+RSpec.feature 'Ladder contest UI integration', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:maps) { create_list(:map, 3) }
   let(:start_time) { 1.day.ago }
@@ -30,8 +30,8 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     page.execute_script("document.querySelector('form.square').submit()")
 
     expect(page).to(
-      have_content(I18n.t(:contests_join), wait: 5)
-        .or(have_content('You are not allowed to visit the page', wait: 5))
+      have_text(I18n.t(:contests_join), wait: 5)
+        .or(have_text('You are not allowed to visit the page', wait: 5))
     )
 
     visit contest_path(contest)
@@ -63,7 +63,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
 
     click_button 'Save'
 
-    expect(page).to have_content('Contest was successfully created')
+    expect(page).to have_text('Contest was successfully created')
     contest = Contest.find_by(name: 'Integration Ladder Test')
     expect(contest).to be_present
     expect(contest.contest_type).to eq(Contest::TYPE_LADDER)
@@ -83,11 +83,11 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     expect(contest.contesters.count).to eq(4)
 
     visit contest_path(contest)
-    expect(page).to have_content('Ladder')
+    expect(page).to have_text('Ladder')
     expect(page).to have_css('table.contest')
 
     teams.each do |team|
-      expect(page).to have_content(team.name)
+      expect(page).to have_text(team.name)
     end
   end
 
@@ -116,7 +116,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     select map1.name, from: 'challenge_map1_id'
     fill_in 'challenge_details', with: "Challenge from #{teams[0].name}"
     click_button 'Create'
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
 
     accepted_challenge = Challenge.where(contester1: contesters[0], contester2: contesters[1]).last
     expect(accepted_challenge).to be_present
@@ -126,7 +126,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     visit challenge_path(accepted_challenge)
     select map1.name, from: 'challenge_map2_id'
     submit_form_without_turbo(action: challenge_path(accepted_challenge), commit_value: 'Accept')
-    expect(page).to have_content('Accepted', wait: 5)
+    expect(page).to have_text('Accepted', wait: 5)
     expect(page).to have_link('Accepted')
 
     sign_out
@@ -141,7 +141,7 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     select map1.name, from: 'challenge_map1_id'
     fill_in 'challenge_details', with: "Challenge from #{teams[2].name}"
     click_button 'Create'
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Challenge.model_name.human))
 
     declined_challenge = Challenge.where(contester1: contesters[2], contester2: contesters[3]).last
     expect(declined_challenge).to be_present
@@ -151,8 +151,8 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     visit challenge_path(declined_challenge)
     select map1.name, from: 'challenge_map2_id'
     submit_form_without_turbo(action: challenge_path(declined_challenge), commit_value: 'Decline')
-    expect(page).to have_content('Declined', wait: 5)
-    expect(page).not_to have_content('Match details')
+    expect(page).to have_text('Declined', wait: 5)
+    expect(page).to have_no_text('Match details')
   end
 
   scenario 'Admin scores ladder matches through the UI and standings update' do
@@ -175,12 +175,12 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
 
     sign_in_as(admin)
     visit ref_match_path(match)
-    expect(page).to have_content('Scoring')
+    expect(page).to have_text('Scoring')
 
     fill_in 'match_score1', with: '4'
     fill_in 'match_score2', with: '2'
     click_button 'Save Scoring'
-    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human), wait: 5)
+    expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human), wait: 5)
 
     match.reload
     expect(match.score1).to eq(4)
@@ -199,9 +199,9 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
     end
 
     within('#results') do
-      expect(page).to have_content('Matches Played')
-      expect(page).to have_content(teams[0].name)
-      expect(page).to have_content(teams[1].name)
+      expect(page).to have_text('Matches Played')
+      expect(page).to have_text(teams[0].name)
+      expect(page).to have_text(teams[1].name)
     end
   end
 
@@ -259,12 +259,12 @@ RSpec.feature 'Ladder contest UI integration', type: :feature, js: true do
 
     within('table.contest tbody') do
       teams.each do |team|
-        expect(page).to have_content(team.name)
+        expect(page).to have_text(team.name)
       end
     end
 
     within('#results') do
-      expect(page).to have_content('Matches Played')
+      expect(page).to have_text('Matches Played')
     end
   end
 end

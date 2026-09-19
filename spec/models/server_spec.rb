@@ -110,31 +110,31 @@ describe Server do
 
     describe 'can_create?' do
       it 'returns true for non-admins' do
-        expect(server.can_create?(user)).to be_truthy
+        expect(server).to be_can_create(user)
       end
     end
 
     describe 'can_destroy?' do
       it 'returns true for admin' do
-        expect(server.can_destroy?(admin)).to eq(true)
+        expect(server.can_destroy?(admin)).to be(true)
       end
 
       it 'returns false for non-admins' do
-        expect(server.can_destroy?(user)).to eq(false)
+        expect(server.can_destroy?(user)).to be(false)
       end
     end
 
     describe 'can_update?' do
       it 'returns true for admin' do
-        expect(server.can_update?(admin)).to eq(true)
+        expect(server.can_update?(admin)).to be(true)
       end
 
       it 'returns true if server belongs to user' do
-        expect(server.can_update?(server_user)).to eq(true)
+        expect(server.can_update?(server_user)).to be(true)
       end
 
       it 'returns false for non-admins' do
-        expect(server.can_update?(user)).to eq(false)
+        expect(server.can_update?(user)).to be(false)
       end
     end
   end

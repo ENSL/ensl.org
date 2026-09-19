@@ -16,14 +16,11 @@ require 'rails_helper'
 # - The form setup may need debugging with actual controller behavior
 # - See error_wrapper_id_for and error_container_id_for in ApplicationController
 #   for how errors are handled with Turbo
-RSpec.feature 'Admin manages groups', type: :feature, js: true do
+RSpec.feature 'Admin manages groups', :js, type: :feature do
   let(:admin) { FactoryBot.create(:user, :admin) }
   let(:user1) { FactoryBot.create(:user, username: 'testuser1', firstname: 'Test', lastname: 'User One') }
   let(:user2) { FactoryBot.create(:user, username: 'testuser2', firstname: 'Test', lastname: 'User Two') }
   let(:user3) { FactoryBot.create(:user, username: 'testuser3', firstname: 'Test', lastname: 'User Three') }
-
-  before do
-  end
 
   scenario 'admin creates a new custom group' do
     sign_in_via_session(admin)
@@ -32,7 +29,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     fill_in 'group_name', with: 'Content Moderators'
     click_button 'Create'
 
-    expect(page).to have_content('Content Moderators')
+    expect(page).to have_text('Content Moderators')
     expect(Group.find_by(name: 'Content Moderators')).not_to be_nil
   end
 
@@ -45,9 +42,9 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
 
     visit '/groups'
 
-    expect(page).to have_content('Developers')
-    expect(page).to have_content('Moderators')
-    expect(page).to have_content('Content Reviewers')
+    expect(page).to have_text('Developers')
+    expect(page).to have_text('Moderators')
+    expect(page).to have_text('Content Reviewers')
   end
 
   scenario 'admin can see group details with members' do
@@ -58,9 +55,9 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
 
     visit "/groups/#{group.id}"
 
-    expect(page).to have_content('Test Group')
-    expect(page).to have_content(user1.username)
-    expect(page).to have_content(user2.username)
+    expect(page).to have_text('Test Group')
+    expect(page).to have_text(user1.username)
+    expect(page).to have_text(user2.username)
   end
 
   scenario 'admin removes a member from a group' do
@@ -71,8 +68,8 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
 
     visit "/groups/#{group.id}/edit"
 
-    expect(page).to have_content(user1.username)
-    expect(page).to have_content(user2.username)
+    expect(page).to have_text(user1.username)
+    expect(page).to have_text(user2.username)
 
     # Find the row with user1 and click remove
     rows = all('table.roles tr')
@@ -85,8 +82,8 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     sleep 0.5
     visit "/groups/#{group.id}/edit"
 
-    expect(page).not_to have_content(user1.username)
-    expect(page).to have_content(user2.username)
+    expect(page).to have_no_text(user1.username)
+    expect(page).to have_text(user2.username)
     expect(group.reload.users).not_to include(user1)
     expect(group.reload.users).to include(user2)
   end
@@ -109,9 +106,9 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     sleep 0.5
     visit "/groups/#{group.id}/edit"
 
-    expect(page).not_to have_content(user1.username)
-    expect(page).not_to have_content(user2.username)
-    expect(page).not_to have_content(user3.username)
+    expect(page).to have_no_text(user1.username)
+    expect(page).to have_no_text(user2.username)
+    expect(page).to have_no_text(user3.username)
     expect(group.reload.users).to be_empty
   end
 
@@ -124,9 +121,9 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
 
     visit "/groups/#{group.id}/edit"
 
-    expect(page).to have_content('alice')
-    expect(page).to have_content('Alice')
-    expect(page).to have_content('Smith')
+    expect(page).to have_text('alice')
+    expect(page).to have_text('Alice')
+    expect(page).to have_text('Smith')
   end
 
   scenario 'admin can see group protection status' do
@@ -171,7 +168,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
       click_button 'Add Member'
     end
 
-    expect(page).to have_content('Username User not found')
+    expect(page).to have_text('Username User not found')
     expect(group.reload.users).to be_empty
   end
 
@@ -192,8 +189,8 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     end
 
     # Wait for redirect and page to show the new member
-    expect(page).to have_content(user1.username)
-    expect(page).to have_content('Group member added')
+    expect(page).to have_text(user1.username)
+    expect(page).to have_text('Group member added')
 
     # Check the database
     group.reload
@@ -215,7 +212,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     end
 
     # Wait for redirect and success message
-    expect(page).to have_content('Group was successfully updated')
+    expect(page).to have_text('Group was successfully updated')
 
     # Check the database
     expect(group.reload.name).to eq('NewName')
@@ -239,7 +236,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
     end
 
     # Wait for redirect and success message
-    expect(page).to have_content('Group member updated')
+    expect(page).to have_text('Group member updated')
 
     # Check the database for the update
     grouper.reload
@@ -258,7 +255,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
       fill_in 'grouper[task]', with: 'Senior Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_content(user1.username)
+    expect(page).to have_text(user1.username)
 
     # Add second member
     within('div.add') do
@@ -266,7 +263,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
       fill_in 'grouper[task]', with: 'Junior Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_content(user2.username)
+    expect(page).to have_text(user2.username)
 
     # Add third member
     within('div.add') do
@@ -274,7 +271,7 @@ RSpec.feature 'Admin manages groups', type: :feature, js: true do
       fill_in 'grouper[task]', with: 'Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_content(user3.username)
+    expect(page).to have_text(user3.username)
 
     # Check the database
     group.reload

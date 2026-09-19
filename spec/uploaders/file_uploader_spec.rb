@@ -6,8 +6,8 @@ RSpec.describe FileUploader do
   subject(:uploader) { described_class.new(model) }
 
   let(:relative_path) { 'unused' }
-  let(:model) { instance_double('UploadModel', directory: directory) }
-  let(:directory) { instance_double('Directory', relative_path: relative_path) }
+  let(:model) { instance_double(UploadModel, directory: directory) }
+  let(:directory) { instance_double(Directory, relative_path: relative_path) }
 
   around do |example|
     # This spec manipulates ENV directly to verify Directory.files_root's fallback and override behavior.

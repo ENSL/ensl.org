@@ -31,7 +31,7 @@ describe Post do
       post.topic = create :topic
       expect do
         post.save!
-      end.to change(Post, :count).by(1)
+      end.to change(described_class, :count).by(1)
     end
   end
 
@@ -39,13 +39,13 @@ describe Post do
     let(:topic) { create(:topic) }
 
     it 'leaves text_parsed unchanged when text is nil' do
-      post = Post.new(user: user, topic: topic, text: nil)
+      post = described_class.new(user: user, topic: topic, text: nil)
 
       expect { post.parse_text }.not_to change(post, :text_parsed)
     end
 
     it 'strips script tags from BBCode text' do
-      post = Post.new(
+      post = described_class.new(
         user: user,
         topic: topic,
         text: '[b]bold[/b]<script>alert("xss")</script>'
@@ -59,7 +59,7 @@ describe Post do
     end
 
     it 'strips iframe tags from text' do
-      post = Post.new(
+      post = described_class.new(
         user: user,
         topic: topic,
         text: '[i]text[/i]<iframe src="evil.com"></iframe>'
@@ -71,7 +71,7 @@ describe Post do
     end
 
     it 'strips event handlers from text' do
-      post = Post.new(
+      post = described_class.new(
         user: user,
         topic: topic,
         text: '[url]link[/url]<img src=x onerror="alert(1)">'
@@ -161,7 +161,7 @@ describe Post do
 
         expect(post.can_destroy?(admin)).to be true
         expect(post.can_destroy?(user)).to be false
-        expect(post.can_destroy?(nil)).to be_falsey
+        expect(post).not_to be_can_destroy(nil)
       end
     end
   end

@@ -132,7 +132,7 @@ module ApplicationHelper
                         model[key].to_formatted_s(:long_ordinal)
                       elsif element.instance_of?(Symbol)
                         namelink(str)
-                      elsif key.to_s.match(/^(.*)_b$/)
+                      elsif /^(.*)_b$/.match?(key.to_s)
                         sanitize(str.bbcode_to_html.to_s)
                       else
                         h(str)
@@ -140,7 +140,7 @@ module ApplicationHelper
 
       safe_join([
                   content_tag(:dt) do
-                    name.to_s.capitalize.gsub(/_s/, '').gsub(/_/, ' ')
+                    name.to_s.capitalize.gsub(/_s/, '').tr('_', ' ')
                   end,
                   content_tag(:dd) do
                     safe_join(result_parts)

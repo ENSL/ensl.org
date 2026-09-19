@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Google Calendar widget', js: true do
+feature 'Google Calendar widget', :js do
   let(:timezone_name) { Time.zone.name }
   let(:events_data_file) { Rails.root.join('spec/fixtures/google_calendar.json') }
   let(:events_list_data) { JSON.parse(File.read(events_data_file)) }
@@ -18,7 +18,7 @@ feature 'Google Calendar widget', js: true do
     Timecop.travel(time) do
       visit root_path
 
-      expect(first_event).to have_content("Div 2B: el'pheer vs. RadicaL")
+      expect(first_event).to have_text("Div 2B: el'pheer vs. RadicaL")
     end
   end
 
@@ -29,7 +29,7 @@ feature 'Google Calendar widget', js: true do
       Timecop.travel(time) do
         visit root_path
 
-        expect(first_event).to have_content('20:30 CEST')
+        expect(first_event).to have_text('20:30 CEST')
       end
     end
 
@@ -39,7 +39,7 @@ feature 'Google Calendar widget', js: true do
       Timecop.travel(time) do
         visit root_path
 
-        expect(first_event).to have_content('Div 3B: Mister vs. HBZ')
+        expect(first_event).to have_text('Div 3B: Mister vs. HBZ')
       end
     end
 
@@ -49,8 +49,8 @@ feature 'Google Calendar widget', js: true do
       Timecop.travel(time) do
         visit root_path
 
-        expect(first_event).not_to have_content('Div 3B: Mister vs. HBZ')
-        expect(first_event).to have_content('Div 3B: OMNOM vs. Mister')
+        expect(first_event).to have_no_text('Div 3B: Mister vs. HBZ')
+        expect(first_event).to have_text('Div 3B: OMNOM vs. Mister')
       end
     end
 
@@ -70,7 +70,7 @@ feature 'Google Calendar widget', js: true do
         Timecop.travel(time) do
           visit root_path
 
-          expect(first_event).to have_content(timezone_adjusted)
+          expect(first_event).to have_text(timezone_adjusted)
         end
       end
     end

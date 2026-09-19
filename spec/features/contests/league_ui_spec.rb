@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'League contest UI integration', type: :feature, js: true do
+RSpec.feature 'League contest UI integration', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:team_leader1) { create(:user, username: 'leader1') }
   let!(:team_leader2) { create(:user, username: 'leader2') }
@@ -30,7 +30,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     click_button 'Save'
 
     # Validate contest creation
-    expect(page).to have_content('Contest was successfully created')
+    expect(page).to have_text('Contest was successfully created')
     contest = Contest.find_by(name: 'Integration League Test')
     expect(contest).to be_present
     expect(contest.contest_type).to eq(Contest::TYPE_LEAGUE)
@@ -42,7 +42,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     end
     click_link 'Integration League Test'
     click_link 'Edit Contest'
-    expect(page).to have_content('Editing Contest')
+    expect(page).to have_text('Editing Contest')
 
     # Navigate to contest edit page and add maps via UI
     click_link(href: '#maps', wait: 5)
@@ -63,7 +63,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
     expect(page).to have_field('week_name', wait: 5)
     fill_in 'week_name', with: 'Week 1'
     click_button 'Save Week'
-    expect(page).to have_content('Week 1', wait: 5)
+    expect(page).to have_text('Week 1', wait: 5)
 
     # STEP 3: Team leaders create their teams
     team_names = ['Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta']
@@ -81,7 +81,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
       click_button 'Create'
 
-      expect(page).to have_content(team_name)
+      expect(page).to have_text(team_name)
       teams << Team.find_by(name: team_name)
     end
 
@@ -118,21 +118,21 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
       click_link 'New Match'
 
       # Select contesters using direct option selection (more reliable than select helper)
-      find('#match_contester1_id').find('option', text: c1.team.name).select_option
-      find('#match_contester2_id').find('option', text: c2.team.name).select_option
+      find_by_id('match_contester1_id').find('option', text: c1.team.name).select_option
+      find_by_id('match_contester2_id').find('option', text: c2.team.name).select_option
 
       # Select match time (2 days from now)
       select_match_datetime(Time.current + 2.days)
 
       # Select maps using direct option selection
-      find('#match_map1_id').find('option', text: map1.name).select_option
-      find('#match_map2_id').find('option', text: map2.name).select_option
+      find_by_id('match_map1_id').find('option', text: map1.name).select_option
+      find_by_id('match_map2_id').find('option', text: map2.name).select_option
 
       click_button 'Save Match'
 
       # Check for form errors
       if page.has_css?('#errors')
-        error_text = page.find('#errors').text
+        error_text = page.find_by_id('errors').text
         raise "Match creation failed: #{error_text}"
       end
 
@@ -158,7 +158,7 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
       score2 = rng.rand(0..5)
 
       # Make sure we're on the right page
-      expect(page).to have_content('Scoring')
+      expect(page).to have_text('Scoring')
 
       # Fill in the score fields
       fill_in 'match_score1', with: score1.to_s
@@ -170,8 +170,8 @@ RSpec.feature 'League contest UI integration', type: :feature, js: true do
 
       # Submit the form
       click_button 'Save Scoring'
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human),
-                                   wait: 5)
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Match.model_name.human),
+                                wait: 5)
 
       # Reload the match to verify scores were saved
       match.reload

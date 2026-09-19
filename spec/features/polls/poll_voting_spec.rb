@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Poll voting', type: :feature, js: true do
+RSpec.feature 'Poll voting', :js, type: :feature do
   let!(:category) { FactoryBot.create(:category, :news) }
   let!(:author) { FactoryBot.create(:user) }
   let!(:poll) do
@@ -20,14 +20,14 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
     # Visit front page where poll widget appears
     visit '/'
 
-    expect(page).to have_content('Which?')
+    expect(page).to have_text('Which?')
 
     # Click the vote link (JS submits hidden form). This should create a Vote.
     expect do
-      find('a.vote-link', match: :first).click
+      first('a.vote-link').click
       # wait for redirect/flash
-      expect(page).to have_content('Voted successfully.').or have_content('Vote recorded')
-    end.to change { Vote.count }.by(1)
+      expect(page).to have_text('Voted successfully.').or have_text('Vote recorded')
+    end.to change(Vote, :count).by(1)
   end
 
   scenario 'user cannot vote twice and options are disabled after voting' do
@@ -41,20 +41,18 @@ RSpec.feature 'Poll voting', type: :feature, js: true do
 
     visit '/'
 
-    expect(page).to have_content('Which?')
+    expect(page).to have_text('Which?')
 
     # Cast a vote
-    find('a.vote-link', match: :first).click
-    expect(page).to have_content('Voted successfully.').or have_content('Vote recorded')
+    first('a.vote-link').click
+    expect(page).to have_text('Voted successfully.').or have_text('Vote recorded')
 
     # After voting, options should be disabled/greyed out (have .disabled class or no active vote-link)
     expect(page).to have_no_selector('a.vote-link:not(.disabled)', visible: :all)
 
     # Confirm a second click does not create another Vote
     count = Vote.count
-    if page.has_selector?('a.vote-link:not(.disabled)', visible: :all)
-      find('a.vote-link:not(.disabled)', match: :first).click
-    end
+    first('a.vote-link:not(.disabled)').click if page.has_selector?('a.vote-link:not(.disabled)', visible: :all)
     expect(Vote.count).to eq(count)
   end
 end

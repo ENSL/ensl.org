@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
+RSpec.feature 'CustomUrls administrate', :js, type: :feature do
   let!(:category) { FactoryBot.create(:category, :news) }
   let!(:author) { FactoryBot.create(:user) }
   let!(:article) { FactoryBot.create(:article, title: 'Test Article', user: author, category: category) }
@@ -16,7 +16,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
     sign_in_via_session(admin)
 
     visit '/custom_urls'
-    expect(page).to have_content('Custom URLs - Admin Panel')
+    expect(page).to have_text('Custom URLs - Admin Panel')
 
     fill_in 'custom_url_name', with: 'test-slug'
     select article.title, from: 'custom_url_article_id'
@@ -30,7 +30,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
     expect(page).to have_select("custom_url_#{created.id}_form_article_id", selected: 'Test Article')
 
     visit '/test-slug'
-    expect(page).to have_content('Test Article')
+    expect(page).to have_text('Test Article')
   end
 
   scenario 'admin sees validation errors and article dropdown stays visible' do
@@ -45,7 +45,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
     click_button 'Add'
 
     expect(page).to have_css('.errors-block')
-    expect(page).to have_selector('#custom_url_article_id', visible: :visible)
+    expect(page).to have_css('#custom_url_article_id', visible: :visible)
   end
 
   scenario 'admin updates a custom url inline in name and article columns' do
@@ -65,7 +65,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
     expect(page).to have_select("custom_url_#{custom_url.id}_form_article_id", selected: replacement_article.title)
 
     visit '/new-slug'
-    expect(page).to have_content(replacement_article.title)
+    expect(page).to have_text(replacement_article.title)
   end
 
   scenario 'admin sees an error when updating a custom url with an invalid name' do
@@ -91,7 +91,7 @@ RSpec.feature 'CustomUrls administrate', type: :feature, js: true do
 
     visit '/custom_urls'
 
-    expect(page).to have_selector("tr#custom_url_#{protected_url.id}")
+    expect(page).to have_css("tr#custom_url_#{protected_url.id}")
     expect(page).to have_no_selector("tr#custom_url_#{protected_url.id} a[title='Delete custom URL']")
   end
 end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Categories Management', type: :feature, js: true do
+RSpec.feature 'Categories Management', :js, type: :feature do
   let(:admin) { create(:user, :admin) }
 
   before do
@@ -11,14 +11,14 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     find_field('login_username').set(admin.username)
     fill_in 'login_password', with: admin.raw_password
     find('#authentication [name="commit"]').click
-    expect(page).to have_content(I18n.t('sessions.create.success'))
+    expect(page).to have_text(I18n.t('sessions.create.success'))
   end
 
   feature 'Navigation' do
     scenario 'admin can access categories from index' do
       visit categories_path
 
-      expect(page).to have_content('Listing Categories')
+      expect(page).to have_text('Listing Categories')
     end
 
     scenario 'admin can click new category button' do
@@ -27,8 +27,8 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       expect(page).to have_link('New Category')
       click_link 'New Category'
 
-      expect(page).to have_content('New Category')
-      expect(page).to have_selector('form')
+      expect(page).to have_text('New Category')
+      expect(page).to have_css('form')
     end
   end
 
@@ -40,8 +40,8 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       select 'News', from: 'category_domain'
       click_button 'Create Category'
 
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Category.model_name.human))
-      expect(page).to have_content('Breaking News')
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Category.model_name.human))
+      expect(page).to have_text('Breaking News')
     end
 
     scenario 'with blank name shows validation error' do
@@ -50,7 +50,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       select 'News', from: 'category_domain'
       click_button 'Create Category'
 
-      expect(page).to have_content('Name is too short')
+      expect(page).to have_text('Name is too short')
     end
 
     scenario 'with name too long shows validation error' do
@@ -60,7 +60,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       select 'News', from: 'category_domain'
       click_button 'Create Category'
 
-      expect(page).to have_content('Name is too long')
+      expect(page).to have_text('Name is too long')
     end
 
     scenario 'with missing domain shows validation error' do
@@ -74,7 +74,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
 
       # Either it fails validation or uses a default
       # Just verify we handled the submission
-      expect(page).to have_content('Test Category') or expect(page).to have_content('invalid domain')
+      expect(page).to have_text('Test Category') or expect(page).to have_text('invalid domain')
     end
   end
 
@@ -87,15 +87,15 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       # Find and click the edit link (pencil icon)
       find("a[href='#{edit_category_path(category)}']").click
 
-      expect(page).to have_content('Editing Category')
+      expect(page).to have_text('Editing Category')
       expect(page).to have_field('category_name', with: 'Original News')
 
       fill_in 'category_name', with: 'Updated News'
       click_button 'Update Category'
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Category.model_name.human))
-      expect(page).to have_content('Updated News')
-      expect(page).not_to have_content('Original News')
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Category.model_name.human))
+      expect(page).to have_text('Updated News')
+      expect(page).to have_no_text('Original News')
     end
 
     scenario 'shows validation error when clearing name' do
@@ -106,7 +106,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
 
       # Should still be on edit page with the form visible
       # Error message will be displayed by shared/errors partial
-      expect(page).to have_content('Editing Category')
+      expect(page).to have_text('Editing Category')
     end
 
     scenario 'shows validation error for name too long' do
@@ -116,7 +116,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       click_button 'Update Category'
 
       # Should still be on edit page with the form visible
-      expect(page).to have_content('Editing Category')
+      expect(page).to have_text('Editing Category')
     end
   end
 
@@ -132,8 +132,8 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       find("a[href='#{up_category_path(category2)}']").click
 
       # Should redirect to categories page
-      expect(page).to have_content('Listing Categories')
-      expect(page).to have_content('Second News')
+      expect(page).to have_text('Listing Categories')
+      expect(page).to have_text('Second News')
 
       # Verify order changed
       category1.reload
@@ -149,7 +149,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       find("a[href='#{down_category_path(category1)}']").click
 
       # Should redirect to categories page
-      expect(page).to have_content('Listing Categories')
+      expect(page).to have_text('Listing Categories')
 
       # Verify order changed
       category1.reload
@@ -195,7 +195,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     scenario 'admin can delete a category' do
       visit categories_path
 
-      expect(page).to have_content('To Be Deleted')
+      expect(page).to have_text('To Be Deleted')
 
       # Click delete link
       find("a[href='#{category_path(category)}'][data-method='delete']").click
@@ -206,7 +206,7 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
 
       # Verify it's deleted from database
       expect(Category.find_by(id: category.id)).to be_nil
-      expect(page).to have_content('Listing Categories')
+      expect(page).to have_text('Listing Categories')
     end
   end
 
@@ -220,23 +220,23 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
       visit categories_path
 
       # Each domain should have its own section
-      expect(page).to have_content('News')
-      expect(page).to have_content('Articles')
-      expect(page).to have_content('Forums')
-      expect(page).to have_content('Games')
+      expect(page).to have_text('News')
+      expect(page).to have_text('Articles')
+      expect(page).to have_text('Forums')
+      expect(page).to have_text('Games')
 
       # Each category should appear under its domain
-      expect(page).to have_content('News Item')
-      expect(page).to have_content('Article Item')
-      expect(page).to have_content('Forum Item')
-      expect(page).to have_content('Game Item')
+      expect(page).to have_text('News Item')
+      expect(page).to have_text('Article Item')
+      expect(page).to have_text('Forum Item')
+      expect(page).to have_text('Game Item')
     end
 
     scenario 'only shows control buttons for categories' do
       visit categories_path
 
       # Categories should have action links
-      expect(page).to have_selector('td.actions a', minimum: 4)
+      expect(page).to have_css('td.actions a', minimum: 4)
     end
   end
 
@@ -246,15 +246,15 @@ RSpec.feature 'Categories Management', type: :feature, js: true do
     scenario 'non-admin cannot create categories' do
       # Log out and log in as regular user
       visit logout_sessions_path
-      expect(page).to have_content(I18n.t('sessions.destroy.success'))
-        .or have_content(I18n.t('helpers.submit.user.login'))
+      expect(page).to have_text(I18n.t('sessions.destroy.success'))
+        .or have_text(I18n.t('helpers.submit.user.login'))
 
       # Try to visit new category page as non-admin
       visit new_category_path
 
       # Should render a 403 Forbidden error (AccessError is rendered as errors/403)
       # The error page displays "You are not allowed to visit the page you were looking for."
-      expect(page).to have_content('not allowed') or expect(page).to have_content('denied')
+      expect(page).to have_text('not allowed') or expect(page).to have_text('denied')
     end
   end
 end

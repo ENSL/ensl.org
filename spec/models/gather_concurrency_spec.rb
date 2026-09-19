@@ -106,8 +106,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       # Simulate voting timeout having just expired
       # The voting_start_time is set to when the 12th gatherer joined
       # But we only have 3 gatherers here, so we manually manipulate timing
-      allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
-      allow(gather).to receive(:voting_timeout).and_return(1) # timeout is 1 second old
+      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 1) # timeout is 1 second old
 
       gather.status
 
@@ -128,8 +127,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       gather.gatherers.create!(user: user)
 
       # Simulate voting timeout
-      allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
-      allow(gather).to receive(:voting_timeout).and_return(1)
+      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 1)
 
       # Verify with_lock is called (pessimistic locking) - use at_least since refresh might call it multiple times
       expect(gather).to receive(:with_lock).at_least(:once).and_call_original
@@ -145,8 +143,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       user = create(:user)
       gather.gatherers.create!(user: user)
 
-      allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
-      allow(gather).to receive(:voting_timeout).and_return(1)
+      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 1)
 
       # Call refresh - should transition
       gather.refresh(nil)
@@ -167,8 +164,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       gather.gatherers.create!(user: user)
 
       # Voting started recently, timeout not expired
-      allow(gather).to receive(:voting_start_time).and_return(5.seconds.ago)
-      allow(gather).to receive(:voting_timeout).and_return(100) # 100 seconds timeout, only 5 passed
+      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 100) # 100 seconds timeout, only 5 passed
 
       gather.refresh(nil)
 

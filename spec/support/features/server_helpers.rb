@@ -20,10 +20,10 @@ module Features
       page.execute_script("document.getElementById('server_official').checked = true;")
       click_button 'Save'
 
-      expect(page).to have_content(dns)
-      expect(page).to have_content("#{ip}:#{port}")
-      expect(page).to have_content(password)
-      expect(page).to have_content(description)
+      expect(page).to have_text(dns)
+      expect(page).to have_text("#{ip}:#{port}")
+      expect(page).to have_text(password)
+      expect(page).to have_text(description)
 
       click_link 'Edit Server'
 
@@ -36,10 +36,10 @@ module Features
       page.execute_script("document.getElementById('server_official').checked = true;")
       click_button 'Save'
 
-      expect(page).to have_content('192.168.1.2:8001')
-      expect(page).to have_content("#{dns}2")
-      expect(page).to have_content("#{password}2")
-      expect(page).to have_content("#{description}2")
+      expect(page).to have_text('192.168.1.2:8001')
+      expect(page).to have_text("#{dns}2")
+      expect(page).to have_text("#{password}2")
+      expect(page).to have_text("#{description}2")
     end
   end
 end

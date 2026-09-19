@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Issues reCAPTCHA', type: :feature, js: true do
+RSpec.feature 'Issues reCAPTCHA', :js, type: :feature do
   let!(:category) { create(:category, domain: Category::DOMAIN_ISSUES, name: 'TestIssues') }
 
   scenario 'anonymous user submits issue with valid reCAPTCHA' do
@@ -14,9 +14,9 @@ RSpec.feature 'Issues reCAPTCHA', type: :feature, js: true do
     fill_in 'Text', with: 'This is a test issue body'
     expect do
       click_button 'Submit'
-      expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Issue.model_name.human),
-                                   wait: 5)
-    end.to change { Issue.count }.by(1)
+      expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Issue.model_name.human),
+                                wait: 5)
+    end.to change(Issue, :count).by(1)
   end
 
   scenario 'anonymous user submits issue with invalid reCAPTCHA' do
@@ -28,9 +28,9 @@ RSpec.feature 'Issues reCAPTCHA', type: :feature, js: true do
     fill_in 'Text', with: 'This is a test issue body'
     expect do
       click_button 'Submit'
-    end.to_not(change { Issue.count })
+    end.not_to(change(Issue, :count))
 
     # form re-rendered with errors (render :new keeps the POST path)
-    expect(page).to have_selector('form')
+    expect(page).to have_css('form')
   end
 end

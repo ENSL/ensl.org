@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Teams management', type: :feature, js: true do
+RSpec.feature 'Teams management', :js, type: :feature do
   let!(:user) { create(:user) }
   let!(:admin) { create(:user, :admin) }
 
@@ -15,7 +15,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     fill_in 'team_irc', with: '#specteam'
     click_button 'Create'
 
-    expect(page).to have_content('Spec Team')
+    expect(page).to have_text('Spec Team')
     expect(Team.where(name: 'Spec Team').exists?).to be true
   end
 
@@ -39,7 +39,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     click_button 'Request To Join'
     expect(page).to have_current_path(team_path(team))
 
-    expect(page).to have_content(I18n.t('applying_team') + team.name)
+    expect(page).to have_text(I18n.t('applying_team') + team.name)
   end
 
   scenario 'Leader can edit their team' do
@@ -54,7 +54,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
       click_button 'Update'
     end
 
-    expect(page).to have_content('Team was successfully updated.')
+    expect(page).to have_text('Team was successfully updated.')
     expect(page).to have_field('team_name', with: new_name)
   end
 
@@ -70,7 +70,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
 
     within('table') do
       row = find('tr', text: team.name)
-      link = row.find("a[data-method='delete']", match: :first)
+      link = row.first("a[data-method='delete']")
       page.execute_script('window.confirm = function(){return true};')
       link.click
     end
@@ -84,8 +84,8 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     # perform recovery directly to avoid driver/ujs timing issues
     visit recover_team_path(team)
 
-    expect(page).to have_content(I18n.t('flash.actions.update.notice',
-                                        resource_name: Team.model_name.human).to_s).or have_content(team.name)
+    expect(page).to have_text(I18n.t('flash.actions.update.notice',
+                                     resource_name: Team.model_name.human).to_s).or have_text(team.name)
   end
 
   scenario 'Leader accepts joiners, updates role/comment and can kick members' do
@@ -117,7 +117,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     find("a[href='#members']").click
     within('#members', visible: :all) do
       row = find('tr', text: member.user.username)
-      link = row.find('a.button.tiny', match: :first)
+      link = row.first('a.button.tiny')
       if link[:'data-confirm'].present?
         accept_confirm { link.click }
       else
@@ -134,7 +134,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
         visit edit_team_path(team)
       end
 
-      expect(page).not_to have_text(member.user.username)
+      expect(page).to have_no_text(member.user.username)
     end
   end
 
@@ -186,7 +186,7 @@ RSpec.feature 'Teams management', type: :feature, js: true do
       click_button 'Add Member'
     end
 
-    expect(page).to have_content(I18n.t(:teams_member_add))
+    expect(page).to have_text(I18n.t(:teams_member_add))
     membership = team.teamers.find_by(user: new_member)
     expect(membership).to be_present
     expect(membership.rank).to eq(Teamer::RANK_MEMBER)
@@ -198,8 +198,8 @@ RSpec.feature 'Teams management', type: :feature, js: true do
     visit edit_team_path(team)
 
     within('#members', visible: :all) do
-      expect(page).not_to have_button('Add Member')
-      expect(page).not_to have_field('teamer[username]')
+      expect(page).to have_no_button('Add Member')
+      expect(page).to have_no_field('teamer[username]')
     end
   end
 

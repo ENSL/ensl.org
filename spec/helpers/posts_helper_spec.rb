@@ -44,8 +44,7 @@ RSpec.describe PostsHelper, type: :helper do
 
     it 'prefers staff group entry for staff users' do
       user = create(:user)
-      allow(user).to receive(:staff?).and_return(true)
-      allow(user).to receive(:admin?).and_return(false)
+      allow(user).to receive_messages(staff?: true, admin?: false)
       staff_group = create(:group, id: Group::STAFF, name: 'Staff', founder: user)
       fallback_group = create(:group, name: 'Other', founder: user)
       create(:grouper, user: user, group: fallback_group, task: 'Other task')
@@ -82,10 +81,9 @@ RSpec.describe PostsHelper, type: :helper do
     end
 
     it 'returns nil when no target group id can be resolved from first grouper' do
-      groupers = instance_double('Groupers')
+      groupers = instance_double(Groupers)
       user = instance_double(User, groupers: groupers, admin?: false, staff?: false, caster?: false, ref?: false)
-      allow(groupers).to receive(:exists?).and_return(true)
-      allow(groupers).to receive(:first).and_return(nil)
+      allow(groupers).to receive_messages(exists?: true, first: nil)
 
       expect(helper.post_primary_group_entry(user)).to be_nil
     end

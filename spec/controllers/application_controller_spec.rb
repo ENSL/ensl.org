@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ApplicationController, type: :controller do
-  controller(ApplicationController) do
+  controller(described_class) do
     def index
       render plain: cuser&.username || 'guest'
     end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Exception checker', type: :request, order: :defined do
+RSpec.describe 'Exception checker', order: :defined, type: :request do
   it 'detects logged exceptions', :expect_log_error do
     # Intentionally append a matching error line without failing the example itself.
     log_file = Rails.root.join('log/test.log')

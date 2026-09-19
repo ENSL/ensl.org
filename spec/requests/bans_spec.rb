@@ -104,7 +104,7 @@ RSpec.describe 'BansController', type: :request do
         }
       end.not_to change(Ban, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
 
@@ -157,7 +157,7 @@ RSpec.describe 'BansController', type: :request do
         }
       }
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(ban.reload.reason).to eq('Original reason')
     end

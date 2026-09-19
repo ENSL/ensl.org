@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Gathers', js: true do
+feature 'Gathers', :js do
   let!(:user) { create :user }
   let!(:gather) { create :gather, :running }
 
@@ -19,25 +19,25 @@ feature 'Gathers', js: true do
       # Run ActiveJob inline so Turbo Stream broadcasts are delivered in-process
       ActiveJob::Base.queue_adapter = :inline
       visit gather_path(gather)
-      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+      expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
       shout = rand(100_000).to_s
       within("#new_shout_Gather_#{gather.id}") do
         fill_in "shout_Gather_#{gather.id}_text", with: shout
         click_button 'Shout!'
       end
-      expect(page).to have_content(shout, wait: 5)
+      expect(page).to have_text(shout, wait: 5)
       expect(Shoutmsg.where(text: shout).count).to eq(1)
       expect(page).to have_field("shout_Gather_#{gather.id}_text", with: '')
     end
 
     scenario 'enter more than 100 characters' do
-      valid_shout = 100.times.map { 'a' }.join
-      invalid_shout = 101.times.map { 'a' }.join
+      valid_shout = Array.new(100) { 'a' }.join
+      invalid_shout = Array.new(101) { 'a' }.join
       # Run ActiveJob inline so Turbo Stream broadcasts are delivered in-process
       ActiveJob::Base.queue_adapter = :inline
       visit gather_path(gather)
-      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
-      expect(page).to_not have_content('Maximum shout length exceeded')
+      expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+      expect(page).to have_no_text('Maximum shout length exceeded')
       before_count = Shoutmsg.count
       within("#new_shout_Gather_#{gather.id}") do
         fill_in "shout_Gather_#{gather.id}_text", with: invalid_shout
@@ -46,18 +46,18 @@ feature 'Gathers', js: true do
       # invalid shouts should not create records and the input should remain populated
       expect(page).to have_field("shout_Gather_#{gather.id}_text", with: invalid_shout)
       expect(Shoutmsg.count).to eq(before_count)
-      expect(page).to have_no_content(invalid_shout, wait: 2)
+      expect(page).to have_no_text(invalid_shout, wait: 2)
       within("#new_shout_Gather_#{gather.id}") do
         fill_in "shout_Gather_#{gather.id}_text", with: valid_shout
         click_button 'Shout!'
       end
-      expect(page).to have_content(valid_shout, wait: 5)
+      expect(page).to have_text(valid_shout, wait: 5)
       expect(Shoutmsg.where(text: valid_shout).count).to eq(1)
     end
 
     scenario 'emoji autocomplete popup appears in gather shout input' do
       visit gather_path(gather)
-      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+      expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
 
       input = find_field("shout_Gather_#{gather.id}_text")
       input.send_keys(':smi')
@@ -71,7 +71,7 @@ feature 'Gathers', js: true do
     scenario 'creating shout while banned' do
       Ban.create! ban_type: Ban::TYPE_MUTE, expiry: Time.zone.now + 10.days, user_name: user.username
       visit root_path
-      expect(find('#sidebar')).to have_content 'You have been muted.'
+      expect(find_by_id('sidebar')).to have_text 'You have been muted.'
     end
 
     scenario 'dates older gather messages without changing the main shoutbox' do
@@ -90,7 +90,7 @@ feature 'Gathers', js: true do
 
       within('#shoutbox') do
         expect(page).to have_css('time[data-format="%H:%M"]')
-        expect(page).not_to have_css('time[data-format="%b %d, %H:%M"]')
+        expect(page).to have_no_css('time[data-format="%b %d, %H:%M"]')
       end
     end
 
@@ -115,7 +115,7 @@ feature 'Gathers', js: true do
 
       visit root_path
       within('#shoutbox') do
-        expect(page).not_to have_content('Updated gather settings')
+        expect(page).to have_no_text('Updated gather settings')
       end
     end
 
@@ -124,7 +124,7 @@ feature 'Gathers', js: true do
       12.times { |n| create(:shoutmsg, shoutable: gather, user: user, text: "#{prefix}-#{n}") }
 
       visit gather_path(gather)
-      expect(page).to have_selector("#{gather_selector} .shoutmsg", minimum: 1)
+      expect(page).to have_css("#{gather_selector} .shoutmsg", minimum: 1)
 
       overflow_y = page.evaluate_script(
         "window.getComputedStyle(document.querySelector('#{gather_selector}')).overflowY"
@@ -139,7 +139,7 @@ feature 'Gathers', js: true do
       expect(texts).to include("#{prefix}-0")
       expect(texts).to include("#{prefix}-11")
 
-      first_text = all("#{gather_selector} .shoutmsg .contents", minimum: 12).first.text
+      first_text = first("#{gather_selector} .shoutmsg .contents", minimum: 12).text
       last_text = all("#{gather_selector} .shoutmsg .contents", minimum: 12).last.text
       expect(first_text).to include("#{prefix}-0")
       expect(last_text).to include("#{prefix}-11")

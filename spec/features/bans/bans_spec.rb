@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Bans management', js: true do
+feature 'Bans management', :js do
   let!(:ban)   { create :ban }
   let!(:admin) { create :user, :admin }
   let!(:user)  { create :user }
@@ -20,19 +20,19 @@ feature 'Bans management', js: true do
     sign_in_as user
     visit bans_path
 
-    expect(page).to have_content('Active Bans')
-    expect(page).to have_content(ban.user.username)
+    expect(page).to have_text('Active Bans')
+    expect(page).to have_text(ban.user.username)
 
     click_link ban.user.username
-    expect(page).to have_content("Ban: #{ban.user}")
-    expect(page).to have_content(ban.reason)
+    expect(page).to have_text("Ban: #{ban.user}")
+    expect(page).to have_text(ban.reason)
   end
 
   scenario 'Non-admin cannot access new ban' do
     sign_in_as user
     visit new_ban_path
 
-    expect(page).to have_content('You are not allowed to visit the page you were looking for.')
+    expect(page).to have_text('You are not allowed to visit the page you were looking for.')
   end
 
   # Admi can create a ban
@@ -44,9 +44,9 @@ feature 'Bans management', js: true do
     fill_in 'Reason', with: 'Violation of rules'
     click_button 'Create'
 
-    expect(page).to have_content('Ban was successfully created.')
-    expect(page).to have_content("Ban: #{user.username}")
-    expect(page).to have_content('Violation of rules')
+    expect(page).to have_text('Ban was successfully created.')
+    expect(page).to have_text("Ban: #{user.username}")
+    expect(page).to have_text('Violation of rules')
   end
 
   scenario 'Admin sees error for unknown username' do
@@ -57,8 +57,8 @@ feature 'Bans management', js: true do
     fill_in 'Reason', with: 'Some reason'
     click_button 'Create'
 
-    expect(page).to have_content('User not found')
-    expect(page).to have_content('New Ban')
+    expect(page).to have_text('User not found')
+    expect(page).to have_text('New Ban')
   end
 
   # Admin sees error for empty username for non-server ban
@@ -68,8 +68,8 @@ feature 'Bans management', js: true do
     select 'Website Logon', from: 'ban_ban_type'
     fill_in 'Reason', with: 'Some reason'
     click_button 'Create'
-    expect(page).to have_content('User or server must be specified for this ban type')
-    expect(page).to have_content('New Ban')
+    expect(page).to have_text('User or server must be specified for this ban type')
+    expect(page).to have_text('New Ban')
   end
 
   scenario 'Admin can edit a ban' do
@@ -77,21 +77,21 @@ feature 'Bans management', js: true do
 
     sign_in_as admin
     visit edit_ban_path(ban)
-    expect(page).to have_content('Editing Ban')
+    expect(page).to have_text('Editing Ban')
 
     # Check the username is pre-filled
     expect(find_field('ban_user_name').value).to eq(ban.user.username)
 
     fill_in 'Reason', with: 'Updated reason'
     click_button 'Update'
-    expect(page).to have_content('Ban was successfully updated.')
-    expect(page).to have_content('Updated reason')
+    expect(page).to have_text('Ban was successfully updated.')
+    expect(page).to have_text('Updated reason')
   end
 
   scenario 'Non-admin cannot edit a ban they did not create' do
     sign_in_as user
     visit edit_ban_path(ban)
 
-    expect(page).to have_content('You are not allowed to visit the page you were looking for.')
+    expect(page).to have_text('You are not allowed to visit the page you were looking for.')
   end
 end

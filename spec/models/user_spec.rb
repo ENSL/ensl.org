@@ -180,7 +180,7 @@ describe User do
 
   describe '#banned?' do
     it 'returns false if user is not banned' do
-      expect(user.banned?).to be_falsey
+      expect(user).not_to be_banned
     end
 
     it 'returns true if user is banned' do
@@ -188,7 +188,7 @@ describe User do
                   expiry: Time.now.utc + 10.days,
                   user_name: user.username)
 
-      expect(user.banned?).to be_truthy
+      expect(user).to be_banned
     end
 
     it 'returns true for specific bans' do
@@ -196,7 +196,7 @@ describe User do
                   expiry: Time.now.utc + 10.days,
                   user_name: user.username)
 
-      expect(user.banned?(Ban::TYPE_MUTE)).to be_truthy
+      expect(user).to be_banned(Ban::TYPE_MUTE)
     end
   end
 
@@ -205,10 +205,11 @@ describe User do
 
     it 'returns true if gather moderator' do
       create :grouper, group: group, user: user
-      expect(user.gather_moderator?).to eq(true)
+      expect(user.gather_moderator?).to be(true)
     end
+
     it 'returns false if not gather moderator' do
-      expect(user.gather_moderator?).to eq(false)
+      expect(user.gather_moderator?).to be(false)
     end
   end
 
@@ -310,7 +311,7 @@ describe User do
     it 'send_new_password saves and creates a Message' do
       u = create(:user)
       u.raw_password = 'SecretPass123!'
-      expect { u.send_new_password }.to change { Message.count }.by(1)
+      expect { u.send_new_password }.to change(Message, :count).by(1)
 
       msg = Message.last
       expect(msg.recipient).to eq(u)
@@ -335,10 +336,10 @@ describe User do
 
     it '.reset_password_for_identity resets only matching username/email pairs' do
       u = create(:user)
-      allow_any_instance_of(User).to receive(:send_new_password).and_return(true)
+      allow_any_instance_of(described_class).to receive(:send_new_password).and_return(true)
 
-      expect(User.reset_password_for_identity(username: u.username, email: u.email)).to be true
-      expect(User.reset_password_for_identity(username: u.username, email: 'wrong@example.com')).to be false
+      expect(described_class.reset_password_for_identity(username: u.username, email: u.email)).to be true
+      expect(described_class.reset_password_for_identity(username: u.username, email: 'wrong@example.com')).to be false
     end
   end
 
@@ -443,15 +444,15 @@ describe User do
     it 'authenticates MD5 password and upgrades to scrypt' do
       username = 'md5user'
       raw = 'letmein123'
-      u = User.new(username: username, email: 'md5@example.com')
+      u = described_class.new(username: username, email: 'md5@example.com')
       u.password_hash = User::PASSWORD_MD5
       u.password = Digest::MD5.hexdigest(raw)
       u.raw_password = nil
       u.save!(validate: false)
 
-      auth = User.authenticate(username: username, password: raw)
+      auth = described_class.authenticate(username: username, password: raw)
       expect(auth).to be_present
-      expect(auth).to be_a(User)
+      expect(auth).to be_a(described_class)
       # should have been upgraded to scrypt-based storage
       expect([User::PASSWORD_SCRYPT, User::PASSWORD_MD5_SCRYPT]).to include(auth.password_hash)
     end
@@ -459,14 +460,14 @@ describe User do
     it 'migrates MD5 to MD5_SCRYPT without plaintext, then upgrades on login' do
       username = 'md5wrap'
       raw = 'wizardpw123!'
-      u = User.new(username: username, email: 'md5wrap@example.com')
+      u = described_class.new(username: username, email: 'md5wrap@example.com')
       u.password_hash = User::PASSWORD_MD5
       u.password = Digest::MD5.hexdigest(raw)
       u.raw_password = nil
       u.save!(validate: false)
 
       # Confirm DB has the MD5 hash stored (no plaintext)
-      u_db = User.find_by(username: username)
+      u_db = described_class.find_by(username: username)
       expect(u_db).to be_present
       expect(u_db.password_hash).to eq(User::PASSWORD_MD5)
       expect(u_db.password).to eq(Digest::MD5.hexdigest(raw))
@@ -479,7 +480,7 @@ describe User do
       expect(SCrypt::Password.new(u.password)).to eq(Digest::MD5.hexdigest(raw))
 
       # Login should verify and upgrade to full scrypt(plaintext)
-      auth = User.authenticate(username: username, password: raw)
+      auth = described_class.authenticate(username: username, password: raw)
       expect(auth).to be_present
       expect(auth.password_hash).to eq(User::PASSWORD_SCRYPT)
       expect(SCrypt::Password.new(auth.password)).to eq(raw)
@@ -490,14 +491,14 @@ describe User do
       raw = 'legacyPass123'
 
       # Create a legacy MD5 user with duplicate username and bypass validations
-      legacy = User.new(username: username, email: 'dup1@example.com')
+      legacy = described_class.new(username: username, email: 'dup1@example.com')
       legacy.password_hash = User::PASSWORD_MD5
       legacy.password = Digest::MD5.hexdigest(raw)
       legacy.raw_password = nil
       legacy.save!(validate: false)
 
       # Create a duplicate username entry to make legacy record invalid
-      dup_user = User.new(username: username, email: 'dup2@example.com')
+      dup_user = described_class.new(username: username, email: 'dup2@example.com')
       dup_user.password_hash = User::PASSWORD_SCRYPT
       dup_user.password = SCrypt::Password.create('otherpass')
       dup_user.raw_password = nil
@@ -505,7 +506,7 @@ describe User do
 
       auth = nil
       expect do
-        auth = User.authenticate(username: username, password: raw)
+        auth = described_class.authenticate(username: username, password: raw)
       end.not_to raise_error
 
       expect(auth).to be_present
@@ -516,7 +517,7 @@ describe User do
 
   describe 'additional safety checks' do
     it 'returns nil for wrong password' do
-      res = User.authenticate(username: user.username, password: 'wrongpassword')
+      res = described_class.authenticate(username: user.username, password: 'wrongpassword')
       expect(res).to be_nil
     end
 
@@ -652,7 +653,7 @@ describe User do
         built = described_class.build_for_registration(raw_params: raw, actor: nil, remote_ip: '10.9.8.7')
         built.valid?
 
-        expect(built).to be_a(User)
+        expect(built).to be_a(described_class)
         expect(built).to be_new_record
         expect(built.lastip).to eq('10.9.8.7')
         expect(built.username).to eq('reg_user')
@@ -804,8 +805,8 @@ describe User do
       subject = create(:user, steamid: '0:1:777')
       subject.update!(steamid: '0:1:888')
 
-      expect(User.historic('0:1:777')).to eq(subject)
-      expect(User.historic('0:1:888')).to eq(subject)
+      expect(described_class.historic('0:1:777')).to eq(subject)
+      expect(described_class.historic('0:1:888')).to eq(subject)
     end
   end
 
@@ -815,14 +816,14 @@ describe User do
       allow(invalid_sid).to receive(:id).and_return('STEAM_0:1:123')
       allow(SteamID).to receive(:from_string).and_return(invalid_sid)
 
-      expect(User.normalize_steamid('STEAM_0:1:123')).to be_nil
+      expect(described_class.normalize_steamid('STEAM_0:1:123')).to be_nil
     end
 
     it 'returns nil when normalized legacy format does not match expected pattern' do
       bad_sid = double('SteamID', valid?: true, id: 'NOT_A_STEAMID')
       allow(SteamID).to receive(:from_string).and_return(bad_sid)
 
-      expect(User.normalize_steamid('steam_weird')).to be_nil
+      expect(described_class.normalize_steamid('steam_weird')).to be_nil
     end
 
     it 'returns nil avatar_url when user has no profile avatar' do
@@ -961,25 +962,25 @@ describe User do
 
     it 'returns nil for md5_scrypt users when password mismatches' do
       username = 'md5scrypt_mismatch'
-      user = User.new(username: username, email: 'mismatch@example.com')
+      user = described_class.new(username: username, email: 'mismatch@example.com')
       user.password_hash = User::PASSWORD_MD5_SCRYPT
       user.password = SCrypt::Password.create(Digest::MD5.hexdigest('goodpass'))
       user.save!(validate: false)
 
-      expect(User.authenticate(username: username, password: 'badpass')).to be_nil
+      expect(described_class.authenticate(username: username, password: 'badpass')).to be_nil
     end
 
     it 'returns nil for unknown find_for_api format' do
       subject = create(:user)
 
-      expect(User.find_for_api(subject.id, 'unknown')).to be_nil
+      expect(described_class.find_for_api(subject.id, 'unknown')).to be_nil
     end
 
     it 'returns banned plugin response when server ban is active' do
       ban = instance_double(Ban, expiry: 1.day.from_now, reason: 'abuse')
       allow(Ban).to receive(:active_server_ban_for).with('0:1:555').and_return(ban)
 
-      response = User.plugin_response(steamid: '0:1:555', channel: 'pub')
+      response = described_class.plugin_response(steamid: '0:1:555', channel: 'pub')
 
       expect(response[0]).to eq('#USER#')
       expect(response[1]).to eq('BANNED')
@@ -989,19 +990,19 @@ describe User do
     it 'returns the record from User.get when id is present' do
       subject = create(:user)
 
-      expect(User.get(subject.id)).to eq(subject)
+      expect(described_class.get(subject.id)).to eq(subject)
     end
 
     it 'returns nil from find_or_build without provider or without steam uid' do
-      expect(User.find_or_build(nil, '1.1.1.1')).to be_nil
-      expect(User.find_or_build({ provider: 'steam' }, '1.1.1.1')).to be_nil
+      expect(described_class.find_or_build(nil, '1.1.1.1')).to be_nil
+      expect(described_class.find_or_build({ provider: 'steam' }, '1.1.1.1')).to be_nil
     end
 
     it 'returns an existing user from find_or_build for known steam uid' do
       subject = create(:user, steamid: '0:1:321')
       auth_hash = { provider: 'steam', uid: 'STEAM_0:1:321', info: { nickname: 'Nick', name: 'Nick Name' } }
 
-      expect(User.find_or_build(auth_hash, '9.9.9.9')).to eq(subject)
+      expect(described_class.find_or_build(auth_hash, '9.9.9.9')).to eq(subject)
     end
 
     it 'builds a new user from steam auth when steam uid is unknown' do
@@ -1017,9 +1018,9 @@ describe User do
         extra: { raw_info: { loccountrycode: 'de' } }
       }
 
-      result = User.find_or_build(auth_hash, '8.8.8.8')
+      result = described_class.find_or_build(auth_hash, '8.8.8.8')
 
-      expect(result).to be_a(User)
+      expect(result).to be_a(described_class)
       expect(result).to be_new_record
       expect(result.username).to start_with('FreshNick')
       expect(result.lastip).to eq('8.8.8.8')

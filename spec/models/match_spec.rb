@@ -8,8 +8,8 @@ RSpec.describe Match, type: :model do
       m1 = create(:match)
       m2 = create(:match)
       m2.update(referee: create(:user))
-      expect(Match.unreffed).to include(m1)
-      expect(Match.unreffed).not_to include(m2)
+      expect(described_class.unreffed).to include(m1)
+      expect(described_class.unreffed).not_to include(m2)
     end
 
     it 'of_team returns matches for a team' do
@@ -19,12 +19,12 @@ RSpec.describe Match, type: :model do
       other_team = create(:team)
       c2 = create(:contester, team: other_team, contest: contest)
       m = create(:match, contest: contest, contester1: c1, contester2: c2)
-      expect(Match.of_team(team)).to include(m)
+      expect(described_class.of_team(team)).to include(m)
     end
 
     it 'params permits server_id' do
       params = ActionController::Parameters.new(match: { server_id: 5 })
-      permitted = Match.params(params, nil)
+      permitted = described_class.params(params, nil)
       expect(permitted[:server_id]).to eq 5
     end
 
@@ -38,7 +38,7 @@ RSpec.describe Match, type: :model do
         }
       )
 
-      Match.normalize_matchers_attributes!(match_params)
+      described_class.normalize_matchers_attributes!(match_params)
 
       expect(match_params[:matchers_attributes]).not_to have_key('0')
       expect(match_params[:matchers_attributes]['1']['user_id']).to eq(replacement_user.id)
@@ -48,11 +48,11 @@ RSpec.describe Match, type: :model do
     end
 
     it 'ignores missing and malformed matcher payloads' do
-      expect(Match.normalize_matchers_attributes!(nil)).to be_nil
-      expect(Match.normalize_matchers_attributes!({ report: 'none' })).to be_nil
+      expect(described_class.normalize_matchers_attributes!(nil)).to be_nil
+      expect(described_class.normalize_matchers_attributes!({ report: 'none' })).to be_nil
 
       payload = { matchers_attributes: { '0' => 'not-a-hash' } }
-      expect { Match.normalize_matchers_attributes!(payload) }.not_to raise_error
+      expect { described_class.normalize_matchers_attributes!(payload) }.not_to raise_error
       expect(payload[:matchers_attributes]['0']).to eq('not-a-hash')
     end
   end
@@ -348,8 +348,7 @@ RSpec.describe Match, type: :model do
     end
 
     it 'raises when no hltv server is available' do
-      allow(match).to receive(:hltv).and_return(nil)
-      allow(match).to receive(:ensure_hltv).and_return(nil)
+      allow(match).to receive_messages(hltv: nil, ensure_hltv: nil)
 
       expect { match.hltv_record('addr', 'pwd') }
         .to raise_error(Match::Error, I18n.t(:hltv_notavailable))
@@ -357,9 +356,7 @@ RSpec.describe Match, type: :model do
 
     it 'stores reservation details when recording is possible' do
       hltv = instance_double(Server, recording: nil)
-      allow(match).to receive(:hltv).and_return(hltv)
-      allow(match).to receive(:ensure_hltv).and_return(hltv)
-      allow(match).to receive(:save!).and_return(true)
+      allow(match).to receive_messages(hltv: hltv, ensure_hltv: hltv, save!: true)
       allow(hltv).to receive(:reservation=).with('addr')
       allow(hltv).to receive(:pwd=).with('pwd')
       allow(hltv).to receive(:recordable=).with(match)
@@ -421,9 +418,7 @@ RSpec.describe Match, type: :model do
     let(:match) { build(:match) }
 
     before do
-      allow(match).to receive(:contest).and_return(contest)
-      allow(match).to receive(:contester1).and_return(contester1)
-      allow(match).to receive(:contester2).and_return(contester2)
+      allow(match).to receive_messages(contest: contest, contester1: contester1, contester2: contester2)
 
       allow(contester1).to receive_messages(draw: 2, win: 3, loss: 4, score: 10, trend: nil)
       allow(contester2).to receive_messages(draw: 5, win: 6, loss: 7, score: 11, trend: nil)
@@ -479,8 +474,7 @@ RSpec.describe Match, type: :model do
     end
 
     it 'reset_contest decrements draw records when prior score was draw' do
-      allow(match).to receive(:score1_was).and_return(2)
-      allow(match).to receive(:score2_was).and_return(2)
+      allow(match).to receive_messages(score1_was: 2, score2_was: 2)
 
       match.reset_contest
 
@@ -489,8 +483,7 @@ RSpec.describe Match, type: :model do
     end
 
     it 'reset_contest decrements win and loss records when prior score favored contester1' do
-      allow(match).to receive(:score1_was).and_return(3)
-      allow(match).to receive(:score2_was).and_return(1)
+      allow(match).to receive_messages(score1_was: 3, score2_was: 1)
 
       match.reset_contest
 
@@ -499,8 +492,7 @@ RSpec.describe Match, type: :model do
     end
 
     it 'reset_contest decrements win and loss records when prior score favored contester2' do
-      allow(match).to receive(:score1_was).and_return(1)
-      allow(match).to receive(:score2_was).and_return(3)
+      allow(match).to receive_messages(score1_was: 1, score2_was: 3)
 
       match.reset_contest
 

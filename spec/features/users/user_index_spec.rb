@@ -15,7 +15,7 @@ RSpec.feature 'User index', type: :feature do
     expect(page.current_url).to include('search=searchable')
     within '#users' do
       expect(page).to have_link(matching_user.username, href: user_path(matching_user))
-      expect(page).not_to have_content('AnotherPlayer')
+      expect(page).to have_no_text('AnotherPlayer')
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.feature 'User index', type: :feature do
     click_link 'Show them'
 
     expect(page).to have_current_path(users_path(filter: 'lately'), ignore_query: false)
-    expect(page).to have_content(recent_user.username)
-    expect(page).not_to have_content('StaleUser')
+    expect(page).to have_text(recent_user.username)
+    expect(page).to have_no_text('StaleUser')
   end
 end

@@ -37,7 +37,7 @@ module Features
     def safe_expect_text(text, wait: Capybara.default_max_wait_time)
       attempts = 0
       begin
-        expect(page).to have_content(text, wait: wait)
+        expect(page).to have_text(text, wait: wait)
       rescue Capybara::Playwright::Node::NotActionableError, Capybara::Playwright::Node::StaleReferenceError
         # Playwright-specific errors for stale or non-actionable elements
         attempts += 1

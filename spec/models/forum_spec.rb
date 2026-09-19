@@ -31,10 +31,10 @@ describe Forum do
     let(:forum) { build :forum }
 
     it 'creates a new forum' do
-      expect(forum.valid?).to eq(true)
+      expect(forum.valid?).to be(true)
       expect do
         forum.save!
-      end.to change(Forum, :count).by(1)
+      end.to change(described_class, :count).by(1)
     end
   end
 
@@ -44,8 +44,8 @@ describe Forum do
       restricted_forum = create(:forum)
       create(:forumer, forum: restricted_forum, group: create(:group), access: Forumer::ACCESS_READ)
 
-      expect(Forum.public_forums).to include(public_forum)
-      expect(Forum.public_forums).not_to include(restricted_forum)
+      expect(described_class.public_forums).to include(public_forum)
+      expect(described_class.public_forums).not_to include(restricted_forum)
     end
   end
 
@@ -59,7 +59,7 @@ describe Forum do
       create(:grouper, user: member, group: group)
       create(:forumer, forum: restricted_forum, group: group, access: Forumer::ACCESS_READ)
 
-      forums = Forum.available_to(member, Forumer::ACCESS_READ)
+      forums = described_class.available_to(member, Forumer::ACCESS_READ)
 
       expect(forums).to include(public_forum)
       expect(forums).to include(restricted_forum)
@@ -69,7 +69,7 @@ describe Forum do
       restricted_forum = create(:forum)
       create(:forumer, forum: restricted_forum, group: create(:group), access: Forumer::ACCESS_READ)
 
-      expect(Forum.available_to(admin, Forumer::ACCESS_READ)).to include(restricted_forum)
+      expect(described_class.available_to(admin, Forumer::ACCESS_READ)).to include(restricted_forum)
     end
   end
 
@@ -108,10 +108,10 @@ describe Forum do
 
     it 'blocks non-admin users from managing forums' do
       expect(forum.can_create?(user)).to be false
-      expect(forum.can_create?(nil)).to be_falsey
-      expect(forum.can_update?(nil)).to be_falsey
+      expect(forum).not_to be_can_create(nil)
+      expect(forum).not_to be_can_update(nil)
       expect(forum.can_destroy?(user)).to be false
-      expect(forum.can_destroy?(nil)).to be_falsey
+      expect(forum).not_to be_can_destroy(nil)
     end
   end
 end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
+RSpec.feature 'Contesters (teams) management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
   let!(:team) { create(:team) }
@@ -113,7 +113,7 @@ RSpec.feature 'Contesters (teams) management', type: :feature, js: true do
     # ensure we have a fresh rendering of the contest edit page (avoid stale client DOM)
     visit edit_contest_path(contest, anchor: 'teams')
     within('#teams table.teams') do
-      expect(page).not_to have_text(contester.team.name)
+      expect(page).to have_no_text(contester.team.name)
     end
   end
 end

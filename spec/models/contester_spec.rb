@@ -7,7 +7,7 @@ RSpec.describe Contester, type: :model do
     let(:contester) { create(:contester) }
 
     it 'initializes variables with init_variables' do
-      c = Contester.new
+      c = described_class.new
       c.init_variables
       expect(c.active).to be true
       expect(c.trend).to eq Contester::TREND_FLAT
@@ -254,7 +254,7 @@ RSpec.describe Contester, type: :model do
     it 'assigns contiguous 1-based ranks to teams joining a ladder' do
       ladder = create(:contest, contest_type: Contest::TYPE_LADDER)
 
-      contesters = Array.new(3) { create(:contester, contest: ladder) }
+      contesters = create_list(:contester, 3, contest: ladder)
 
       expect(contesters.map(&:score)).to eq([1, 2, 3])
     end
@@ -292,7 +292,7 @@ RSpec.describe Contester, type: :model do
     it 'permits expected params' do
       params = ActionController::Parameters.new(contester: { team_id: 1, contest_id: 2, ignored: 'x' })
 
-      expect(Contester.params(params, nil).to_h).to eq('team_id' => 1, 'contest_id' => 2)
+      expect(described_class.params(params, nil).to_h).to eq('team_id' => 1, 'contest_id' => 2)
     end
   end
 

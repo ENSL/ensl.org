@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Shoutbox (Turbo Streams)', js: true do
+feature 'Shoutbox (Turbo Streams)', :js do
   let!(:user) { create :user }
   let!(:other_user) { create :user }
 
@@ -19,13 +19,13 @@ feature 'Shoutbox (Turbo Streams)', js: true do
 
   scenario 'creating a valid shout broadcasts and resets the form' do
     visit root_path
-    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+    expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
     first_shout = SecureRandom.hex(6)
     fill_in 'shoutbox_text', with: first_shout
     # submit using a real user action so Turbo/JS handlers run as in the browser
     click_button 'Shout!'
     within('#shoutbox') do
-      expect(page).to have_content(first_shout, wait: 5)
+      expect(page).to have_text(first_shout, wait: 5)
     end
     expect(Shoutmsg.where(text: first_shout).count).to eq(1)
     expect(page).to have_field('shoutbox_text', with: '')
@@ -35,8 +35,8 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     click_button 'Shout!'
 
     within('#shoutbox') do
-      expect(page).to have_content(second_shout, wait: 5)
-      expect(page).to have_content(first_shout)
+      expect(page).to have_text(second_shout, wait: 5)
+      expect(page).to have_text(first_shout)
       expect(page).to have_text(/#{Regexp.escape(second_shout)}.*#{Regexp.escape(first_shout)}/m)
     end
     expect(Shoutmsg.where(text: second_shout).count).to eq(1)
@@ -47,8 +47,8 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     invalid_shout = 'a' * 101
 
     visit root_path
-    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
-    expect(page).to_not have_content('Maximum shout length exceeded')
+    expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+    expect(page).to have_no_text('Maximum shout length exceeded')
 
     before_count = Shoutmsg.count
     fill_in 'shoutbox_text', with: invalid_shout
@@ -57,13 +57,13 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     # invalid shouts should not create records and the input should remain populated
     expect(page).to have_field('shoutbox_text', with: invalid_shout)
     expect(Shoutmsg.count).to eq(before_count)
-    expect(page).to have_no_content(invalid_shout, wait: 2)
+    expect(page).to have_no_text(invalid_shout, wait: 2)
 
     safe_click { find_field('shoutbox_text').set(valid_shout) }
     click_button 'Shout!'
 
     within('#shoutbox') do
-      expect(page).to have_content(valid_shout, wait: 5)
+      expect(page).to have_text(valid_shout, wait: 5)
     end
     expect(Shoutmsg.where(text: valid_shout).count).to eq(1)
   end
@@ -71,21 +71,21 @@ feature 'Shoutbox (Turbo Streams)', js: true do
   scenario 'creating shout while banned' do
     Ban.create!(ban_type: Ban::TYPE_MUTE, expiry: Time.now.utc + 10.days, user_name: user.username)
     visit root_path
-    expect(page).to have_selector('#sidebar', text: 'You have been muted.')
+    expect(page).to have_css('#sidebar', text: 'You have been muted.')
   end
 
   scenario 'another user sees shout without reload' do
     Capybara.using_session(:sender) do
       sign_in_via_session(user)
       visit root_path
-      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+      expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
     end
 
     Capybara.using_session(:receiver) do
       sign_in_via_session(other_user)
       visit root_path
-      expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
-      expect(page).to have_selector('#shoutbox')
+      expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+      expect(page).to have_css('#shoutbox')
     end
 
     shout = SecureRandom.hex(6)
@@ -94,13 +94,13 @@ feature 'Shoutbox (Turbo Streams)', js: true do
       fill_in 'shoutbox_text', with: shout
       click_button 'Shout!'
       within('#shoutbox') do
-        expect(page).to have_content(shout, wait: 5)
+        expect(page).to have_text(shout, wait: 5)
       end
     end
 
     Capybara.using_session(:receiver) do
       within('#shoutbox') do
-        expect(page).to have_content(shout, wait: 5)
+        expect(page).to have_text(shout, wait: 5)
       end
     end
   end
@@ -108,7 +108,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
   scenario 'gather shoutbox maintains chronological order' do
     gather = create(:gather, :running)
     visit gather_path(gather)
-    expect(page).to have_selector('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
+    expect(page).to have_css('turbo-cable-stream-source[connected]', visible: :all, wait: 10)
 
     first_shout = SecureRandom.hex(6)
     within("#new_shout_Gather_#{gather.id}") do
@@ -117,7 +117,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     end
 
     within("#shout_Gather_#{gather.id}") do
-      expect(page).to have_content(first_shout, wait: 5)
+      expect(page).to have_text(first_shout, wait: 5)
     end
     expect(page).to have_field("shout_Gather_#{gather.id}_text", with: '', wait: 5)
 
@@ -128,8 +128,8 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     end
 
     within("#shout_Gather_#{gather.id}") do
-      expect(page).to have_content(second_shout, wait: 5)
-      expect(page).to have_content(first_shout)
+      expect(page).to have_text(second_shout, wait: 5)
+      expect(page).to have_text(first_shout)
       expect(page).to have_text(/#{Regexp.escape(first_shout)}.*#{Regexp.escape(second_shout)}/m)
     end
   end
@@ -139,7 +139,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     12.times { |n| create(:shoutmsg, text: "#{prefix}-#{n}") }
 
     visit root_path
-    expect(page).to have_selector('#shoutbox .shoutmsg', minimum: 1)
+    expect(page).to have_css('#shoutbox .shoutmsg', minimum: 1)
 
     overflow_y = page.evaluate_script("window.getComputedStyle(document.querySelector('#shoutbox')).overflowY")
     max_height = page.evaluate_script("window.getComputedStyle(document.querySelector('#shoutbox')).maxHeight")
@@ -152,7 +152,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     expect(texts).not_to include("#{prefix}-3")
     expect(texts).not_to include("#{prefix}-0")
 
-    first_text = all('#shoutbox .shoutmsg .contents', minimum: 1).first.text
+    first_text = first('#shoutbox .shoutmsg .contents', minimum: 1).text
     expect(first_text).to include("#{prefix}-11")
   end
 
@@ -160,7 +160,7 @@ feature 'Shoutbox (Turbo Streams)', js: true do
     20.times { |n| create(:shoutmsg, text: "wheel-main-#{n}-#{SecureRandom.hex(2)}") }
 
     visit root_path
-    expect(page).to have_selector('#shoutbox .shoutmsg', minimum: 1)
+    expect(page).to have_css('#shoutbox .shoutmsg', minimum: 1)
 
     page.execute_script("document.querySelector('#shoutbox').scrollTop = 100;")
     before = page.evaluate_script("document.querySelector('#shoutbox').scrollTop")

@@ -97,11 +97,11 @@ module Features
       if base_id.present? && !base_id.include?('[')
         begin
           # Try to find the actual field by label
-          label = page.find('label', text: base_id, match: :first)
+          label = page.first('label', text: base_id)
           base_id = label[:for].gsub(/_1i$/, '') if label[:for]
         rescue Capybara::ElementNotFound
           # If label not found, assume it's already a field name
-          base_id = base_id.downcase.gsub(' ', '_')
+          base_id = base_id.downcase.tr(' ', '_')
         end
       end
 

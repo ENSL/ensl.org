@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'User creates new article', js: true do
+feature 'User creates new article', :js do
   let!(:category) { create(:category, domain: Category::DOMAIN_NEWS) }
   let(:article) { attributes_for(:article) }
 
@@ -16,22 +16,22 @@ feature 'User creates new article', js: true do
 
       it 'creates an article successfully' do
         visit new_article_path
-        expect(page).to have_selector('#article_title', wait: 5)
+        expect(page).to have_css('#article_title', wait: 5)
         fill_in 'article_title', with: article[:title]
         fill_in 'article_text', with: article[:text]
         click_button I18n.t('helpers.submit.post.create')
 
-        expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
+        expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
       end
 
       it 'creates an article with a text length greater than 65535 bytes' do
         visit new_article_path
-        expect(page).to have_selector('#article_title', wait: 5)
+        expect(page).to have_css('#article_title', wait: 5)
         fill_in 'article_title', with: article[:title]
         fill_in 'article_text', with: long_text
         click_button I18n.t('helpers.submit.post.create')
 
-        expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
+        expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
       end
 
       it 'groups categories by alphabetized domain and category name' do
@@ -61,7 +61,7 @@ feature 'User creates new article', js: true do
 
         select 'Plain HTML', from: 'article_text_coding'
 
-        expect(page).to have_selector('.tox-tinymce', wait: 5)
+        expect(page).to have_css('.tox-tinymce', wait: 5)
         expect(page).to have_select('article_text_coding', selected: 'Plain HTML', disabled: false)
       end
 
@@ -69,7 +69,7 @@ feature 'User creates new article', js: true do
         visit new_article_path
         fill_in 'article_title', with: article[:title]
         select 'Plain HTML', from: 'article_text_coding'
-        expect(page).to have_selector('.tox-tinymce', wait: 5)
+        expect(page).to have_css('.tox-tinymce', wait: 5)
 
         page.execute_script(<<~JAVASCRIPT)
           const editor = tinymce.get('article_text')
@@ -116,7 +116,7 @@ feature 'User creates new article', js: true do
       it 'returns to the Markdown textarea when changed back before editing' do
         visit new_article_path
         select 'Plain HTML', from: 'article_text_coding'
-        expect(page).to have_selector('.tox-tinymce', wait: 5)
+        expect(page).to have_css('.tox-tinymce', wait: 5)
 
         select 'Markdown (recommended)', from: 'article_text_coding'
 
@@ -149,14 +149,14 @@ feature 'User creates new article', js: true do
         visit new_article_path
         fill_in 'article_title', with: article[:title]
         select 'Plain HTML', from: 'article_text_coding'
-        expect(page).to have_selector('.tox-tinymce', wait: 5)
+        expect(page).to have_css('.tox-tinymce', wait: 5)
 
         fill_tinymce 'article_text', '<p>Started in HTML</p>'
         page.execute_script("tinymce.get('article_text').fire('input')")
 
         expect(page).to have_select('article_text_coding', selected: 'Plain HTML', disabled: true)
         click_button I18n.t('helpers.submit.post.create')
-        expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
+        expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
         created = Article.order(:id).last
         expect(created.text_coding).to eq(Article::CODING_HTML)
         expect(created.text).to include('Started in HTML')
@@ -175,15 +175,15 @@ feature 'User creates new article', js: true do
     before do
       sign_in_as(admin)
       visit edit_article_path(html_article)
-      expect(page).to have_selector('.tox-tinymce', wait: 5)
+      expect(page).to have_css('.tox-tinymce', wait: 5)
     end
 
     it 'uses the full layout and provides link, image, and table controls' do
       expect(page).to have_no_selector('#sidebar')
       expect(page).to have_no_selector('.article-editor-status', visible: true)
-      expect(page).to have_selector('button[data-mce-name="link"]')
-      expect(page).to have_selector('button[data-mce-name="image"]')
-      expect(page).to have_selector('button[data-mce-name="table"]')
+      expect(page).to have_css('button[data-mce-name="link"]')
+      expect(page).to have_css('button[data-mce-name="image"]')
+      expect(page).to have_css('button[data-mce-name="table"]')
 
       submit_bottom = page.evaluate_script(
         "document.querySelector('form.article input[type=submit]').getBoundingClientRect().bottom"
@@ -193,7 +193,7 @@ feature 'User creates new article', js: true do
     end
 
     it 'converts HTML to Markdown immediately after confirmation' do
-      expect(page).to have_selector("form.article[action='#{article_path(html_article)}'] #article_text_coding")
+      expect(page).to have_css("form.article[action='#{article_path(html_article)}'] #article_text_coding")
       expect(page).to have_no_selector('form.article-format-conversion')
 
       accept_confirm(/irreversible/) do
@@ -236,10 +236,10 @@ feature 'User creates new article', js: true do
       end
 
       notice = I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human)
-      expect(page).to have_content(notice, wait: 5)
+      expect(page).to have_text(notice, wait: 5)
       created_file = DataFile.order(:id).last
       expect(page).to have_current_path(edit_article_path(html_article))
-      expect(page).to have_selector("#data_file_#{created_file.id}", wait: 5)
+      expect(page).to have_css("#data_file_#{created_file.id}", wait: 5)
       expect(page.evaluate_script("tinymce.get('article_text').getContent()"))
         .to include("<img src=\"#{created_file.url}\"")
     ensure
@@ -263,7 +263,7 @@ feature 'User creates new article', js: true do
 
       expect(page).to have_current_path(edit_article_path(html_article))
       expect(page.evaluate_script('window.articleTurboNavigation')).to be(true)
-      expect(page).to have_selector('.tox-tinymce', wait: 5)
+      expect(page).to have_css('.tox-tinymce', wait: 5)
       expect(page).to have_no_selector('.article-editor-status', visible: true)
     end
   end
@@ -302,7 +302,7 @@ feature 'User creates new article', js: true do
       visit edit_article_path(markdown_article)
 
       within 'form.article' do
-        expect(page).to have_content('Markdown')
+        expect(page).to have_text('Markdown')
         expect(page).to have_link('Markdown guide', href: 'https://www.markdownguide.org/basic-syntax/')
         expect(page).to have_no_select('article_text_coding')
       end
@@ -323,10 +323,10 @@ feature 'User creates new article', js: true do
       end
 
       notice = I18n.t('flash.actions.create.notice', resource_name: DataFile.model_name.human)
-      expect(page).to have_content(notice, wait: 5)
+      expect(page).to have_text(notice, wait: 5)
       created_file = DataFile.order(:id).last
       expect(page).to have_current_path(edit_article_path(markdown_article))
-      expect(page).to have_selector("#data_file_#{created_file.id}", wait: 5)
+      expect(page).to have_css("#data_file_#{created_file.id}", wait: 5)
       expect(find_field('article_text').value).to include("![#{created_file}](#{created_file.url})")
     ensure
       FileUtils.rm_f(created_file.location) if created_file&.location

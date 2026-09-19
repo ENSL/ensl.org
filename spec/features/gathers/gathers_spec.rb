@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Gather multi-user flow', type: :feature, js: true do
+RSpec.feature 'Gather multi-user flow', :js, type: :feature do
   # Create a gather with maps and servers, and 12 users
   let!(:gather) { FactoryBot.create(:gather, maps_count: 10, servers_count: 5) }
   let!(:users) { FactoryBot.create_list(:user, 12, raw_password: 'password123') }

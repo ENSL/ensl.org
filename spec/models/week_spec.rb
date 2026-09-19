@@ -10,7 +10,7 @@ RSpec.describe Week, type: :model do
     end
 
     it 'requires contest, map1 and map2' do
-      w = Week.new(name: 'NoRelations')
+      w = described_class.new(name: 'NoRelations')
       w.validate
       expect(w.errors[:contest]).not_to be_empty
       expect(w.errors[:map1]).not_to be_empty
@@ -33,7 +33,7 @@ RSpec.describe Week, type: :model do
     it 'ordered scope sorts by start_date ascending' do
       create(:week, start_date: Time.zone.today + 2)
       b = create(:week, start_date: Time.zone.today - 2)
-      expect(Week.ordered.first).to eq b
+      expect(described_class.ordered.first).to eq b
     end
 
     it 'permission helpers require admin' do

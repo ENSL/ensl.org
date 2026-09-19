@@ -15,7 +15,7 @@ RSpec.describe Gather, type: :model do
 
   describe 'initialization' do
     it 'sets status to STATE_RUNNING on init' do
-      g = Gather.new
+      g = described_class.new
       g.send(:initialize_state)
       expect(g.status).to eq(Gather::STATE_RUNNING)
     end
@@ -206,13 +206,13 @@ RSpec.describe Gather, type: :model do
       gather = create(:gather)
       create_list(:gatherer, 12, gather: gather)
 
-      stale_copy_one = Gather.find(gather.id)
-      stale_copy_two = Gather.find(gather.id)
+      stale_copy_one = described_class.find(gather.id)
+      stale_copy_two = described_class.find(gather.id)
 
       expect do
         stale_copy_one.send(:complete_voting!)
         stale_copy_two.send(:complete_voting!)
-      end.to change { Gather.where(category_id: gather.category_id).count }.by(1)
+      end.to change { described_class.where(category_id: gather.category_id).count }.by(1)
     end
   end
 
@@ -418,13 +418,9 @@ RSpec.describe Gather, type: :model do
       active_scope = double('active_scope')
       ordered_scope = [build_stubbed(:server)]
 
-      allow(gather).to receive(:category).and_return(category)
-      allow(gather).to receive(:maps).and_return([])
-      allow(gather).to receive(:servers).and_return([])
-      allow(category).to receive(:maps).and_return(maps_scope)
-      allow(maps_scope).to receive(:basic).and_return(maps_scope)
-      allow(maps_scope).to receive(:classic).and_return([])
-      allow(category).to receive(:servers).and_return(servers_scope)
+      allow(gather).to receive_messages(category: category, maps: [], servers: [])
+      allow(maps_scope).to receive_messages(basic: maps_scope, classic: [])
+      allow(category).to receive_messages(maps: maps_scope, servers: servers_scope)
       allow(servers_scope).to receive(:hlds).and_return(hlds_scope)
       allow(hlds_scope).to receive(:active).and_return(active_scope)
       allow(active_scope).to receive(:ordered).and_return(ordered_scope)

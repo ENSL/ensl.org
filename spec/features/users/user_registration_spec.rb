@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Visitor signs up', js: true do
+feature 'Visitor signs up', :js do
   let(:user) { attributes_for(:user) }
 
   before do
@@ -16,7 +16,7 @@ feature 'Visitor signs up', js: true do
     end
 
     within user_status do
-      expect(page).to have_content('ACCOUNT')
+      expect(page).to have_text('ACCOUNT')
     end
   end
 
@@ -26,7 +26,7 @@ feature 'Visitor signs up', js: true do
       click_button submit(:user, :create)
     end
 
-    expect(page).to have_content(error_message('email.invalid'))
+    expect(page).to have_text(error_message('email.invalid'))
   end
 
   scenario 'with blank Password' do
@@ -35,7 +35,7 @@ feature 'Visitor signs up', js: true do
       click_button submit(:user, :create)
     end
 
-    expect(page).to have_content(error_message('raw_password.blank'))
+    expect(page).to have_text(error_message('raw_password.blank'))
   end
 
   scenario 'with invalid Steam ID' do
@@ -44,7 +44,7 @@ feature 'Visitor signs up', js: true do
       click_button submit(:user, :create)
     end
 
-    expect(page).to have_content(error_message('steamid.invalid'))
+    expect(page).to have_text(error_message('steamid.invalid'))
   end
 
   scenario 'with missing Email' do
@@ -53,7 +53,7 @@ feature 'Visitor signs up', js: true do
       click_button submit(:user, :create)
     end
 
-    expect(page).to have_content("Email can't be blank")
+    expect(page).to have_text("Email can't be blank")
   end
 
   scenario 'with missing Steam ID' do
@@ -63,7 +63,7 @@ feature 'Visitor signs up', js: true do
     end
 
     within user_status do
-      expect(page).to have_content('ACCOUNT')
+      expect(page).to have_text('ACCOUNT')
     end
   end
 
@@ -74,7 +74,7 @@ feature 'Visitor signs up', js: true do
       click_button submit(:user, :create)
     end
 
-    expect(page).to have_content(error_message('steamid.invalid'))
+    expect(page).to have_text(error_message('steamid.invalid'))
   end
 
   def sign_up_attributes

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Gather leave', type: :feature, js: true do
+RSpec.feature 'Gather leave', :js, type: :feature do
   let!(:gather) { FactoryBot.create(:gather, maps_count: 3, servers_count: 2) }
   let!(:user) { FactoryBot.create(:user, raw_password: 'password123') }
 
@@ -36,7 +36,7 @@ RSpec.feature 'Gather leave', type: :feature, js: true do
       sign_in_via_session(viewer)
       visit gather_path(gather)
 
-      expect(page).to have_content('( 0 m )')
+      expect(page).to have_text('( 0 m )')
 
       # Advance the clock without the idle player making any request of their own,
       # so their lastvisit stays frozen - only the viewer's page reload moves.
@@ -45,7 +45,7 @@ RSpec.feature 'Gather leave', type: :feature, js: true do
 
         expected_idle_minutes = ((Time.now.utc - idle_player.reload.lastvisit) / 60).floor
         expect(expected_idle_minutes).to eq(5)
-        expect(page).to have_content("( #{expected_idle_minutes} m )")
+        expect(page).to have_text("( #{expected_idle_minutes} m )")
       end
     end
   end
@@ -65,7 +65,7 @@ RSpec.feature 'Gather leave', type: :feature, js: true do
         sign_in_via_session(viewer)
         visit gather_path(gather)
 
-        expect(page).to have_content(idle_player.username)
+        expect(page).to have_text(idle_player.username)
       end
 
       expect(Gatherer.exists?(gatherer.id)).to be(true)
@@ -91,8 +91,8 @@ RSpec.feature 'Gather leave', type: :feature, js: true do
           visit gather_path(gather)
 
           within('#gatherers') do
-            expect(page).to have_content(active_player.username)
-            expect(page).not_to have_content(idle_player.username)
+            expect(page).to have_text(active_player.username)
+            expect(page).to have_no_text(idle_player.username)
           end
         end
       ensure

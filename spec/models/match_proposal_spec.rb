@@ -28,37 +28,37 @@ RSpec.describe MatchProposal, type: :model do
 
   describe 'associations' do
     it 'belongs to match' do
-      proposal = MatchProposal.new
+      proposal = described_class.new
       expect(proposal.respond_to?(:match)).to be true
     end
 
     it 'belongs to team' do
-      proposal = MatchProposal.new
+      proposal = described_class.new
       expect(proposal.respond_to?(:team)).to be true
     end
   end
 
   describe 'validations' do
     it 'requires match presence' do
-      proposal = MatchProposal.new(team: team1, proposed_time: 1.day.from_now)
+      proposal = described_class.new(team: team1, proposed_time: 1.day.from_now)
       expect(proposal).not_to be_valid
       expect(proposal.errors[:match]).to be_present
     end
 
     it 'requires team presence' do
-      proposal = MatchProposal.new(match: match, proposed_time: 1.day.from_now)
+      proposal = described_class.new(match: match, proposed_time: 1.day.from_now)
       expect(proposal).not_to be_valid
       expect(proposal.errors[:team]).to be_present
     end
 
     it 'requires proposed_time presence' do
-      proposal = MatchProposal.new(match: match, team: team1)
+      proposal = described_class.new(match: match, team: team1)
       expect(proposal).not_to be_valid
       expect(proposal.errors[:proposed_time]).to be_present
     end
 
     it 'is valid with all required attributes' do
-      proposal = MatchProposal.new(match: match, team: team1, proposed_time: 1.day.from_now)
+      proposal = described_class.new(match: match, team: team1, proposed_time: 1.day.from_now)
       expect(proposal).to be_valid
     end
   end
@@ -79,7 +79,7 @@ RSpec.describe MatchProposal, type: :model do
       end
 
       it 'returns only confirmed proposals for specific match' do
-        results = MatchProposal.confirmed_for_match(match)
+        results = described_class.confirmed_for_match(match)
         expect(results).to include(confirmed_proposal)
         expect(results).not_to include(pending_proposal)
       end
@@ -98,7 +98,7 @@ RSpec.describe MatchProposal, type: :model do
       end
 
       it 'returns only confirmed proposals for specific contest' do
-        results = MatchProposal.confirmed_for_contest(contest)
+        results = described_class.confirmed_for_contest(contest)
         expect(results).to include(confirmed_for_contest)
         expect(results).not_to include(confirmed_other_contest)
       end
@@ -107,7 +107,7 @@ RSpec.describe MatchProposal, type: :model do
 
   describe '.status_strings' do
     it 'returns hash of status strings' do
-      strings = MatchProposal.status_strings
+      strings = described_class.status_strings
       expect(strings[MatchProposal::STATUS_PENDING]).to eq('Pending')
       expect(strings[MatchProposal::STATUS_REVOKED]).to eq('Revoked')
       expect(strings[MatchProposal::STATUS_REJECTED]).to eq('Rejected')
@@ -117,7 +117,7 @@ RSpec.describe MatchProposal, type: :model do
   end
 
   describe '#can_create?' do
-    let(:proposal) { MatchProposal.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
 
     it 'allows team leaders to create proposals' do
       expect(proposal.can_create?(user1)).to be true
@@ -133,7 +133,7 @@ RSpec.describe MatchProposal, type: :model do
     end
 
     context 'when match is nil' do
-      let(:proposal) { MatchProposal.new(team: team1, proposed_time: 1.day.from_now) }
+      let(:proposal) { described_class.new(team: team1, proposed_time: 1.day.from_now) }
 
       it 'denies creation' do
         expect(proposal.can_create?(user1)).to be false
@@ -173,18 +173,18 @@ RSpec.describe MatchProposal, type: :model do
   end
 
   describe '#can_destroy?' do
-    let(:proposal) { MatchProposal.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
 
     it 'requires admin permissions' do
       admin = create(:user, :admin)
       expect(proposal.can_destroy?(admin)).to be true
       expect(proposal.can_destroy?(user1)).to be false
-      expect(proposal.can_destroy?(nil)).to be_falsey
+      expect(proposal).not_to be_can_destroy(nil)
     end
   end
 
   describe '#state_immutable?' do
-    let(:proposal) { MatchProposal.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
 
     it 'returns true for rejected status' do
       proposal.status = MatchProposal::STATUS_REJECTED
@@ -352,7 +352,7 @@ RSpec.describe MatchProposal, type: :model do
           proposed_time: Time.now.utc
         }
       )
-      permitted = MatchProposal.params(params, user1)
+      permitted = described_class.params(params, user1)
       expect(permitted[:match_id]).to eq(match.id)
       expect(permitted[:team_id]).to eq(team1.id)
       expect(permitted[:status]).to eq(MatchProposal::STATUS_PENDING)
@@ -369,7 +369,7 @@ RSpec.describe MatchProposal, type: :model do
           unauthorized_param: 'should not be permitted'
         }
       )
-      permitted = MatchProposal.params(params, user1)
+      permitted = described_class.params(params, user1)
       expect(permitted.key?(:unauthorized_param)).to be false
     end
   end

@@ -310,8 +310,8 @@ RSpec.describe Bracket, type: :model do
   end
 
   describe 'permission methods' do
-    let(:admin_user) { instance_double('User', admin?: true) }
-    let(:regular_user) { instance_double('User', admin?: false) }
+    let(:admin_user) { instance_double(User, admin?: true) }
+    let(:regular_user) { instance_double(User, admin?: false) }
 
     it 'allows admin users and rejects non-admin users for create/update/destroy' do
       expect(bracket.can_create?(admin_user)).to be(true)
@@ -338,14 +338,14 @@ RSpec.describe Bracket, type: :model do
     end
 
     it 'permits contest_id, slots, and name' do
-      permitted_params = Bracket.params(params_hash, nil)
+      permitted_params = described_class.params(params_hash, nil)
       expect(permitted_params[:contest_id]).to eq(contest.id)
       expect(permitted_params[:slots]).to eq(16)
       expect(permitted_params[:name]).to eq('Tournament Bracket')
     end
 
     it 'filters out unpermitted attributes' do
-      permitted_params = Bracket.params(params_hash, nil)
+      permitted_params = described_class.params(params_hash, nil)
       expect(permitted_params.key?(:malicious)).to be false
     end
   end

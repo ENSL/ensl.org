@@ -213,7 +213,7 @@ class Article < ApplicationRecord
   end
 
   def can_update?(cuser, params = {})
-    cuser and !cuser.banned?(Ban::TYPE_MUTE) and (cuser.admin? or (user == cuser and !params.keys.include? 'status'))
+    cuser and !cuser.banned?(Ban::TYPE_MUTE) and (cuser.admin? or (user == cuser and !params.key?('status')))
   end
 
   def can_destroy?(cuser)

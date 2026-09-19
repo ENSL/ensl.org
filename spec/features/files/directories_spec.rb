@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Directories management', type: :feature, js: true do
+RSpec.feature 'Directories management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
 
   def ensure_root_directory!
@@ -30,17 +30,17 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     open_directory_tab(parent)
 
     within("#dir_#{parent.id}") do
-      expect(page).to have_content('Directory intro')
+      expect(page).to have_text('Directory intro')
       expect(page).to have_link(child.title)
       list_style = page.evaluate_script(
         "getComputedStyle(document.querySelector('#dir_#{parent.id} .subdirectories ul')).listStyleType"
       )
       expect(list_style).to eq('disc')
-      expect(page).to have_content(file.title)
-      expect(page).to have_content('Release notes text')
-      expect(page).not_to have_link('Edit Directory')
-      expect(page).not_to have_link('Delete Directory')
-      expect(page).not_to have_link('New Directory')
+      expect(page).to have_text(file.title)
+      expect(page).to have_text('Release notes text')
+      expect(page).to have_no_link('Edit Directory')
+      expect(page).to have_no_link('Delete Directory')
+      expect(page).to have_no_link('New Directory')
     end
   end
 
@@ -57,19 +57,19 @@ RSpec.feature 'Directories management', type: :feature, js: true do
       click_link 'New Directory'
     end
 
-    expect(page).to have_content('New directory')
+    expect(page).to have_text('New directory')
 
     fill_in 'directory_name', with: name
     fill_in 'directory_title', with: 'Created via UI'
     fill_in 'directory_description', with: 'Created from feature spec'
     click_button 'Create Directory'
 
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Directory.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Directory.model_name.human))
 
     created = Directory.find_by(name: name)
     expect(created).to be_present
     expect(created.parent_id).to eq(parent.id)
-    expect(created.hidden).to eq(false)
+    expect(created.hidden).to be(false)
     expect(File.directory?(created.full_path)).to be true
   end
 
@@ -85,12 +85,12 @@ RSpec.feature 'Directories management', type: :feature, js: true do
       click_link 'Edit Directory'
     end
 
-    expect(page).to have_content('Editing directory')
+    expect(page).to have_text('Editing directory')
     fill_in 'directory_title', with: 'After Title'
     fill_in 'directory_description', with: 'After description'
     click_button 'Update Directory'
 
-    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
 
     directory.reload
     expect(directory.title).to eq('After Title')
@@ -126,7 +126,7 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     end
 
     expect(page).to have_current_path(directory_path(directory))
-    expect(page).not_to have_css("#file_#{file.id}")
+    expect(page).to have_no_css("#file_#{file.id}")
     expect(DataFile.exists?(file.id)).to be false
   end
 
@@ -162,8 +162,8 @@ RSpec.feature 'Directories management', type: :feature, js: true do
 
     click_link 'Recreate Root'
 
-    expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
-    expect(page).to have_content('Reconciled from feature spec')
+    expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: Directory.model_name.human))
+    expect(page).to have_text('Reconciled from feature spec')
     expect(DirectoryReconciliationService).to have_received(:new).with(root)
   end
 end

@@ -89,8 +89,7 @@ RSpec.describe Safety::DatabaseGuard do
   describe '.abort_if_test_db_matches_development!' do
     it 'aborts when test and development database names are identical' do
       output = StringIO.new
-      allow(described_class).to receive(:db_name_for).and_return('ensl_shared_db')
-      allow(described_class).to receive(:declared_env_value).and_return('ensl_shared_db')
+      allow(described_class).to receive_messages(db_name_for: 'ensl_shared_db', declared_env_value: 'ensl_shared_db')
 
       expect do
         described_class.abort_if_test_db_matches_development!(output: output)
@@ -101,8 +100,7 @@ RSpec.describe Safety::DatabaseGuard do
     end
 
     it 'does not abort when names are different' do
-      allow(described_class).to receive(:db_name_for).and_return('ensl_test_db')
-      allow(described_class).to receive(:declared_env_value).and_return('ensl_dev_db')
+      allow(described_class).to receive_messages(db_name_for: 'ensl_test_db', declared_env_value: 'ensl_dev_db')
 
       expect do
         described_class.abort_if_test_db_matches_development!(output: StringIO.new)

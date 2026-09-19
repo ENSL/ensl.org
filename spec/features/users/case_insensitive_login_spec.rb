@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Case insensitive login', js: true do
+feature 'Case insensitive login', :js do
   let(:username) { 'CaSe_InSeNsItIvE' }
   let(:password) { 'passwordABC123' }
   let!(:user) { create(:user, username: username, raw_password: password) }
@@ -16,10 +16,10 @@ feature 'Case insensitive login', js: true do
       fill_login_form(username)
       find('#authentication [name="commit"]').click
 
-      expect(page).to have_content(I18n.t('sessions.create.success'))
+      expect(page).to have_text(I18n.t('sessions.create.success'))
 
       within user_status do
-        expect(page).to have_content(account_link)
+        expect(page).to have_text(account_link)
       end
     end
 
@@ -29,7 +29,7 @@ feature 'Case insensitive login', js: true do
 
       # When username case does not match, authentication is case-sensitive
       # and login should fail.
-      expect(page).to have_content(I18n.t('sessions.create.failure'))
+      expect(page).to have_text(I18n.t('sessions.create.failure'))
     end
   end
 

@@ -98,11 +98,11 @@ RSpec.describe Shoutmsg, type: :model do
     describe '#can_create?' do
       it 'returns false when current user is nil' do
         shout = described_class.new(user: user, text: 'x')
-        expect(shout.can_create?(nil)).to be_falsey
+        expect(shout).not_to be_can_create(nil)
       end
 
       it 'returns false when user is muted' do
-        cuser = instance_double('User')
+        cuser = instance_double(User)
         allow(cuser).to receive(:banned?).with(Ban::TYPE_MUTE).and_return(true)
         allow(cuser).to receive(:verified?).and_return(true)
 
@@ -111,7 +111,7 @@ RSpec.describe Shoutmsg, type: :model do
       end
 
       it 'returns false when user is not verified' do
-        cuser = instance_double('User')
+        cuser = instance_double(User)
         allow(cuser).to receive(:banned?).with(Ban::TYPE_MUTE).and_return(false)
         allow(cuser).to receive(:verified?).and_return(false)
 
@@ -120,7 +120,7 @@ RSpec.describe Shoutmsg, type: :model do
       end
 
       it 'returns true when user is not muted and verified' do
-        cuser = instance_double('User')
+        cuser = instance_double(User)
         allow(cuser).to receive(:banned?).with(Ban::TYPE_MUTE).and_return(false)
         allow(cuser).to receive(:verified?).and_return(true)
 
@@ -143,7 +143,7 @@ RSpec.describe Shoutmsg, type: :model do
 
       it 'returns false when current user is nil' do
         shout = described_class.new(user: user, text: 'x')
-        expect(shout.can_destroy?(nil)).to be_falsey
+        expect(shout).not_to be_can_destroy(nil)
       end
     end
   end

@@ -22,7 +22,7 @@ module Features
       Capybara.using_session(session_name) do
         visit_gather_with_retry(gather)
 
-        expect(page).to have_content('Join')
+        expect(page).to have_text('Join')
 
         safe_click { check 'gatherer[confirm]' } if page.has_field?('gatherer[confirm]', visible: :all)
         safe_click { click_button 'Click to join gather!' }

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Match predictions', type: :feature, js: true do
+RSpec.feature 'Match predictions', :js, type: :feature do
   let!(:user1) { create(:user, raw_password: 'TestPassword123') }
   let!(:user2) { create(:user) }
   let!(:contest) { create(:contest) }
@@ -33,7 +33,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Verify success message and redirect
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(page).to have_current_path(match_path(match))
 
     # Verify prediction was created
@@ -51,7 +51,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     visit match_path(match)
 
     # Verify the prediction form is NOT visible
-    expect(page).not_to have_button('Add Prediction')
+    expect(page).to have_no_button('Add Prediction')
   end
 
   scenario 'User cannot create two predictions for the same match' do
@@ -65,7 +65,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     visit match_path(match)
 
     # Verify the prediction form is NOT visible (user already predicted)
-    expect(page).not_to have_button('Add Prediction')
+    expect(page).to have_no_button('Add Prediction')
   end
 
   scenario 'User gets error when submitting invalid scores', :aggregate_failures do
@@ -81,7 +81,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Error message shows "Invalid score" in the page
-    expect(page).to have_content('Invalid score')
+    expect(page).to have_text('Invalid score')
   end
 
   scenario 'User gets error when submitting both scores as blank' do
@@ -95,7 +95,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Empty scores fail validation and show error messages
-    expect(page).to have_content('Invalid score')
+    expect(page).to have_text('Invalid score')
     expect(Prediction.where(user: user1, match: match).exists?).to be false
   end
 
@@ -109,7 +109,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score1', with: '3'
     fill_in 'prediction_score2', with: '2'
     click_button 'Add Prediction'
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
 
     # User 2 predicts
     sign_out
@@ -118,7 +118,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score1', with: '2'
     fill_in 'prediction_score2', with: '1'
     click_button 'Add Prediction'
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
 
     # Verify both predictions exist
     expect(Prediction.where(match: match).count).to eq(2)
@@ -137,7 +137,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     visit match_path(match)
 
     # Should show prediction count
-    expect(page).to have_content('Predictions (3)')
+    expect(page).to have_text('Predictions (3)')
   end
 
   scenario 'User can view their predictions on their profile' do
@@ -160,13 +160,13 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     visit user_path(user1)
 
     # Click on predictions tab using the element's id
-    find('#predictions').click
+    find_by_id('predictions').click
 
     # Verify predictions are displayed
     expect(page).to have_css('table.predictions')
-    expect(page).to have_content('2 - 1')
-    expect(page).to have_content('3 - 0')
-    expect(page).to have_content('1 - 1')
+    expect(page).to have_text('2 - 1')
+    expect(page).to have_text('3 - 0')
+    expect(page).to have_text('1 - 1')
 
     # Verify contest links are present
     expect(page).to have_link(contest.name)
@@ -221,7 +221,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
 
     # Verify leaderboard is displayed (should show users with correct predictions)
     # This depends on the contest page having a predictions leaderboard section
-    expect(page).to have_content(contest.name)
+    expect(page).to have_text(contest.name)
   end
 
   scenario 'Boundary score values work correctly (0 and 99)' do
@@ -236,7 +236,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score2', with: '0'
     click_button 'Add Prediction'
 
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(Prediction.find_by(user: user1, match: match).score1).to eq(0)
     expect(Prediction.find_by(user: user1, match: match).score2).to eq(0)
 
@@ -256,7 +256,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score2', with: '99'
     click_button 'Add Prediction'
 
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(Prediction.find_by(user: user1, match: match2).score1).to eq(99)
     expect(Prediction.find_by(user: user1, match: match2).score2).to eq(99)
   end
@@ -273,7 +273,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     click_button 'Add Prediction'
 
     # Verify the page indicates success
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     expect(page).to have_current_path(match_path(match))
 
     # Verify in database
@@ -299,7 +299,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
 
     # Non-numeric strings are cast to 0 by Rails, which is valid
     # This creates a prediction with score1=0, score2=1
-    expect(page).to have_content(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
+    expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
     pred = Prediction.find_by(user: user1, match: match)
     expect(pred.score1).to eq(0) # 'abc' is converted to 0
     expect(pred.score2).to eq(1)
@@ -312,10 +312,10 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     visit match_path(match)
 
     # Should not see the prediction form
-    expect(page).not_to have_button('Add Prediction')
+    expect(page).to have_no_button('Add Prediction')
 
     # Should see the statistics view
-    expect(page).not_to have_css('input#prediction_score1')
+    expect(page).to have_no_css('input#prediction_score1')
   end
 
   scenario 'Prediction with score one set higher than 100 is rejected' do
@@ -329,7 +329,7 @@ RSpec.feature 'Match predictions', type: :feature, js: true do
     fill_in 'prediction_score2', with: '1'
     click_button 'Add Prediction'
 
-    expect(page).to have_content('Invalid score')
+    expect(page).to have_text('Invalid score')
     expect(Prediction.where(user: user1, match: match).exists?).to be false
   end
 end

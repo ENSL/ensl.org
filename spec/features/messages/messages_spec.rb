@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Message creation', js: true do
+feature 'Message creation', :js do
   let!(:sender) { create :user }
   let!(:recipient) { create :user }
 
@@ -17,12 +17,12 @@ feature 'Message creation', js: true do
       click_link 'Messages'
     end
 
-    expect(page).to have_content('Sent (0)')
+    expect(page).to have_text('Sent (0)')
     visit user_path(recipient)
-    expect(page).to have_content(recipient.username)
+    expect(page).to have_text(recipient.username)
 
     click_link 'Send PM'
-    expect(page).to have_content('New Message')
+    expect(page).to have_text('New Message')
 
     title = 'This is my title'
     message = 'This is my message'
@@ -30,21 +30,21 @@ feature 'Message creation', js: true do
     fill_in 'Text', with: message
     click_button 'Send Message'
 
-    expect(page).to have_content('Message was successfully sent.')
-    expect(page).to have_content(title)
-    expect(page).to have_content(message)
+    expect(page).to have_text('Message was successfully sent.')
+    expect(page).to have_text(title)
+    expect(page).to have_text(message)
 
     within '.links' do
       click_link 'Messages'
     end
 
-    expect(page).to have_content('Sent (1)')
+    expect(page).to have_text('Sent (1)')
 
     within '#sent' do
-      expect(page).to have_content(title)
-      expect(page).to have_content(message)
-      expect(page).to have_content(sender.username)
-      expect(page).to have_content(recipient.username)
+      expect(page).to have_text(title)
+      expect(page).to have_text(message)
+      expect(page).to have_text(sender.username)
+      expect(page).to have_text(recipient.username)
     end
   end
 end
@@ -60,12 +60,12 @@ feature 'Message receiving' do
     visit root_path
 
     within '.links' do
-      expect(page).to have_content('(1)')
+      expect(page).to have_text('(1)')
       click_link 'Messages'
     end
 
-    expect(page).to have_content(message.title)
-    expect(page).to have_content(message.text)
-    expect(page).to have_content(message.sender.username)
+    expect(page).to have_text(message.title)
+    expect(page).to have_text(message.text)
+    expect(page).to have_text(message.sender.username)
   end
 end

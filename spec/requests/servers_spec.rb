@@ -88,7 +88,7 @@ RSpec.describe 'ServersController', type: :request do
         post '/servers', params: { server: server_params.merge(name: '', ip: 'bad-ip') }
       end.not_to change(Server, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
 
@@ -119,7 +119,7 @@ RSpec.describe 'ServersController', type: :request do
 
       patch "/servers/#{server.id}", params: { server: { name: '', dns: server.dns, ip: 'invalid', port: server.port } }
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(server.reload.name).to eq('Original name')
     end

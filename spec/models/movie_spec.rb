@@ -4,14 +4,14 @@ require 'rails_helper'
 require 'tmpdir'
 
 RSpec.describe Movie, type: :model do
-  let(:user) { instance_double('User', id: 1, username: 'alice') }
+  let(:user) { instance_double(User, id: 1, username: 'alice') }
   let(:data_file) do
-    instance_double('DataFile', id: 2, location: '/tmp/video.mp4', full_path: '/var/media/video.mp4',
-                                url: '/uploads/video.mp4', file_exists?: true)
+    instance_double(DataFile, id: 2, location: '/tmp/video.mp4', full_path: '/var/media/video.mp4',
+                              url: '/uploads/video.mp4', file_exists?: true)
   end
   let(:preview_file) do
-    instance_double('DataFile', id: 3, location: '/tmp/video_preview.mp4', url: '/uploads/video_preview.mp4',
-                                file_exists?: true)
+    instance_double(DataFile, id: 3, location: '/tmp/video_preview.mp4', url: '/uploads/video_preview.mp4',
+                              file_exists?: true)
   end
 
   before do
@@ -36,12 +36,14 @@ RSpec.describe Movie, type: :model do
 
     it { is_expected.to validate_length_of(:content).is_at_most(200).allow_blank }
     it { is_expected.to validate_length_of(:format).is_at_most(200).allow_blank }
+
     it {
-      is_expected.to validate_numericality_of(:length).only_integer
-                                                      .is_greater_than_or_equal_to(0)
-                                                      .is_less_than_or_equal_to(50_000)
-                                                      .allow_nil
+      expect(subject).to validate_numericality_of(:length).only_integer
+                                                          .is_greater_than_or_equal_to(0)
+                                                          .is_less_than_or_equal_to(50_000)
+                                                          .allow_nil
     }
+
     it 'allows file to be blank' do
       m = described_class.new
       expect(m).to be_valid
@@ -74,10 +76,8 @@ RSpec.describe Movie, type: :model do
 
     before do
       # Stub VideoProcessing to avoid running external binaries
-      allow(VideoProcessing).to receive(:probe_web_compat).and_return({ metadata: { foo: 'bar' }, web_friendly: true,
-                                                                        oneliner: 'h264' })
-      allow(VideoProcessing).to receive(:probe_duration_seconds!).and_return(123)
-      allow(VideoProcessing).to receive(:random_snapshot!).and_return(true)
+      allow(VideoProcessing).to receive_messages(probe_web_compat: { metadata: { foo: 'bar' }, web_friendly: true,
+                                                                     oneliner: 'h264' }, probe_duration_seconds!: 123, random_snapshot!: true)
       allow(movie).to receive(:processable_source_path).and_return(data_file.location)
 
       # Stub filesystem helpers
@@ -183,13 +183,11 @@ RSpec.describe Movie, type: :model do
         )
 
         source_file = DataFile.find_by(path: source_path)
-        Movie.create!(file_id: source_file.id)
-        persisted_movie = Movie.find_by(file_id: source_file.id)
+        described_class.create!(file_id: source_file.id)
+        persisted_movie = described_class.find_by(file_id: source_file.id)
 
-        allow(source_file).to receive(:location).and_return(source_path)
-        allow(source_file).to receive(:full_path).and_return(source_path)
-        allow(persisted_movie).to receive(:file).and_return(source_file)
-        allow(persisted_movie).to receive(:preview_path).and_return(File.join(dir, 'clip_preview.mp4'))
+        allow(source_file).to receive_messages(location: source_path, full_path: source_path)
+        allow(persisted_movie).to receive_messages(file: source_file, preview_path: File.join(dir, 'clip_preview.mp4'))
 
         allow(VideoProcessing).to receive(:transcode_for_web!) do |input_path:, output_path:|
           expect(input_path).to eq(source_path)
@@ -207,7 +205,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#length_s' do
+    describe '#length_s' do
       it 'formats seconds into M:SS' do
         movie.length = 65
         expect(movie.length_s).to eq('1:05')
@@ -219,9 +217,9 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#all_files' do
+    describe '#all_files' do
       it 'returns file and related files when present' do
-        related = [instance_double('DataFile')]
+        related = [instance_double(DataFile)]
         allow(data_file).to receive(:related_files).and_return(related)
         movie.file = data_file
         expect(movie.all_files).to eq([data_file] + related)
@@ -233,7 +231,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#view_count and #record_view_count' do
+    describe '#view_count and #record_view_count' do
       it 'creates a view_count record when recording a new ip' do
         vc_relation = double('vc_relation')
         allow(movie).to receive(:view_counts).and_return(vc_relation)
@@ -242,7 +240,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#assign_user_from_user_name' do
+    describe '#assign_user_from_user_name' do
       it 'assigns user when username matches' do
         allow(User).to receive(:find_by).with(username: 'bob').and_return(user)
         movie.user_name = 'bob'
@@ -283,7 +281,7 @@ RSpec.describe Movie, type: :model do
 
       it 'reloads file when preview_path is called on a new record' do
         fresh_movie = described_class.new
-        file_with_reload = instance_double('DataFile', location: '/tmp/new_movie.mp4')
+        file_with_reload = instance_double(DataFile, location: '/tmp/new_movie.mp4')
         allow(file_with_reload).to receive(:respond_to?).with(:reload).and_return(true)
         allow(file_with_reload).to receive(:reload)
         allow(file_with_reload).to receive(:location).and_return('/tmp/new_movie.mp4')
@@ -322,7 +320,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#playback_url' do
+    describe '#playback_url' do
       it 'prefers original file URL when original is web-friendly' do
         movie.file = data_file
         movie.preview = preview_file
@@ -340,7 +338,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#preview_exists?' do
+    describe '#preview_exists?' do
       it 'returns true when preview data file exists' do
         movie.preview = preview_file
 
@@ -355,7 +353,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#original_url' do
+    describe '#original_url' do
       it 'returns nil when original file is not web friendly' do
         movie.file = data_file
         movie.web_friendly = false
@@ -372,7 +370,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#processable_source_path' do
+    describe '#processable_source_path' do
       it 'returns nil when file location is blank' do
         allow(movie).to receive(:processable_source_path).and_call_original
         allow(data_file).to receive(:location).and_return(nil)
@@ -392,7 +390,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context '#make_stream' do
+    describe '#make_stream' do
       it 'spawns vlc and stores the detached process id for valid stream settings' do
         movie.file = data_file
         movie.stream_ip = '10.0.0.15'

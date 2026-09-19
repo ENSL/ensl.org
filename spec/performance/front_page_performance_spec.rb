@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'rspec-benchmark'
 
-RSpec.describe 'Front page performance', type: :request, performance: true do
+RSpec.describe 'Front page performance', :performance, type: :request do
   include RSpec::Benchmark::Matchers
 
   let!(:seed_stats) { seed_front_page_performance_data! }

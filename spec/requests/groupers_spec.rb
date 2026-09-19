@@ -33,7 +33,7 @@ RSpec.describe 'GroupersController', type: :request do
         post '/groupers', params: { grouper: { group_id: group.id, username: 'missing-user' } }
       end.not_to change(Grouper, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template('groups/edit')
     end
 
@@ -45,7 +45,7 @@ RSpec.describe 'GroupersController', type: :request do
         post '/groupers', params: { grouper: { group_id: group.id, username: user.username } }
       end.not_to change(Grouper, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template('groups/edit')
     end
 
@@ -93,7 +93,7 @@ RSpec.describe 'GroupersController', type: :request do
 
       patch "/groupers/#{grouper.id}", params: { grouper: { task: 'x' * 26 } }
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template('groups/edit')
       expect(grouper.reload.task).to eq('Initial')
     end

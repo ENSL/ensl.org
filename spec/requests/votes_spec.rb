@@ -69,7 +69,7 @@ RSpec.describe 'VotesController', type: :request do
     end
 
     it 'redirects to the gather on successful gather votes' do
-      result = instance_double('Gathers::Result', success?: true, gather: gather)
+      result = instance_double(Gathers::Result, success?: true, gather: gather)
       allow(Gathers::CastVote).to receive(:call).and_return(result)
 
       post votes_path, params: { vote: { votable_type: 'GatherMap', votable_id: 123 } }
@@ -79,7 +79,7 @@ RSpec.describe 'VotesController', type: :request do
     end
 
     it 'redirects back when a successful gather vote does not return a gather' do
-      result = instance_double('Gathers::Result', success?: true, gather: nil)
+      result = instance_double(Gathers::Result, success?: true, gather: nil)
       allow(Gathers::CastVote).to receive(:call).and_return(result)
 
       post votes_path,
@@ -91,7 +91,7 @@ RSpec.describe 'VotesController', type: :request do
     end
 
     it 'redirects back with an error flash when gather voting fails' do
-      result = instance_double('Gathers::Result', success?: false, gather: nil, error: 'Vote rejected')
+      result = instance_double(Gathers::Result, success?: false, gather: nil, error: 'Vote rejected')
       allow(Gathers::CastVote).to receive(:call).and_return(result)
 
       post votes_path,

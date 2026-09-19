@@ -16,7 +16,7 @@ RSpec.describe 'GatherersController', type: :request do
     it 'redirects after a successful html join' do
       login_as(user)
       gatherer = build(:gatherer, gather: gather, user: user)
-      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: gather, error: nil)
+      result = instance_double(Gathers::Join::Result, success?: true, gatherer: gatherer, gather: gather, error: nil)
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers', params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } }
@@ -29,8 +29,8 @@ RSpec.describe 'GatherersController', type: :request do
       login_as(user)
       gatherer = build(:gatherer, gather: gather, user: user)
       gatherer.errors.add(:base, 'Join failed')
-      result = instance_double('Gathers::Join::Result', success?: false, gatherer: gatherer, gather: gather,
-                                                        error: 'Join failed')
+      result = instance_double(Gathers::Join::Result, success?: false, gatherer: gatherer, gather: gather,
+                                                      error: 'Join failed')
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers', params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } }
@@ -41,8 +41,8 @@ RSpec.describe 'GatherersController', type: :request do
 
     it 'falls back to the service error and redirects to root when no gather is available' do
       login_as(user)
-      result = instance_double('Gathers::Join::Result', success?: false, gatherer: nil, gather: nil,
-                                                        error: 'Join failed')
+      result = instance_double(Gathers::Join::Result, success?: false, gatherer: nil, gather: nil,
+                                                      error: 'Join failed')
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers', params: { gatherer: { gather_id: gather.id, user_id: user.id, confirm: '1' } }
@@ -54,7 +54,7 @@ RSpec.describe 'GatherersController', type: :request do
     it 'renders a turbo-stream response on success' do
       login_as(user)
       gatherer = create(:gatherer, gather: gather, user: user)
-      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: gather, error: nil)
+      result = instance_double(Gathers::Join::Result, success?: true, gatherer: gatherer, gather: gather, error: nil)
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -68,7 +68,7 @@ RSpec.describe 'GatherersController', type: :request do
     it 'does not render duplicate flash markup inside the gather frame after a successful join' do
       login_as(user)
       gatherer = create(:gatherer, gather: gather, user: user)
-      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: gather, error: nil)
+      result = instance_double(Gathers::Join::Result, success?: true, gatherer: gatherer, gather: gather, error: nil)
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -82,7 +82,7 @@ RSpec.describe 'GatherersController', type: :request do
     it 'uses the gather from the returned gatherer in turbo-stream responses' do
       login_as(user)
       gatherer = create(:gatherer, gather: gather, user: user)
-      result = instance_double('Gathers::Join::Result', success?: true, gatherer: gatherer, gather: nil, error: nil)
+      result = instance_double(Gathers::Join::Result, success?: true, gatherer: gatherer, gather: nil, error: nil)
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -97,8 +97,8 @@ RSpec.describe 'GatherersController', type: :request do
       login_as(user)
       gatherer = build(:gatherer, gather: gather, user: user)
       gatherer.errors.add(:base, 'Join failed')
-      result = instance_double('Gathers::Join::Result', success?: false, gatherer: gatherer, gather: gather,
-                                                        error: 'Join failed')
+      result = instance_double(Gathers::Join::Result, success?: false, gatherer: gatherer, gather: gather,
+                                                      error: 'Join failed')
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -112,8 +112,8 @@ RSpec.describe 'GatherersController', type: :request do
     it 'finds the current users gatherer from the gather when turbo-stream result has none' do
       login_as(user)
       existing_gatherer = create(:gatherer, gather: gather, user: user)
-      result = instance_double('Gathers::Join::Result', success?: false, gatherer: nil, gather: gather,
-                                                        error: 'Join failed')
+      result = instance_double(Gathers::Join::Result, success?: false, gatherer: nil, gather: gather,
+                                                      error: 'Join failed')
       allow(Gathers::Join).to receive(:call).and_return(result)
 
       post '/gatherers',
@@ -199,7 +199,7 @@ RSpec.describe 'GatherersController', type: :request do
 
     it 'uses the kick service for admins removing someone else' do
       login_as(admin)
-      result = instance_double('Gathers::Kick::Result', success?: true, gather: gather, error: nil)
+      result = instance_double(Gathers::Kick::Result, success?: true, gather: gather, error: nil)
       allow(Gathers::Kick).to receive(:call).and_return(result)
       allow(Gathers::Leave).to receive(:call)
 
@@ -213,7 +213,7 @@ RSpec.describe 'GatherersController', type: :request do
 
     it 'uses the leave service and reports failures for self-removal' do
       login_as(user)
-      result = instance_double('Gathers::Leave::Result', success?: false, gather: gather, error: 'Cannot leave')
+      result = instance_double(Gathers::Leave::Result, success?: false, gather: gather, error: 'Cannot leave')
       allow(Gathers::Leave).to receive(:call).and_return(result)
       allow(Gathers::Kick).to receive(:call)
 
@@ -230,7 +230,7 @@ RSpec.describe 'GatherersController', type: :request do
     it 'redirects after a successful HTML pick' do
       login_as(user)
       player = create(:gatherer, gather: gather)
-      result = instance_double('Gathers::Result', success?: true, gather: gather, error: nil)
+      result = instance_double(Gathers::Result, success?: true, gather: gather, error: nil)
       allow(Gathers::CaptainPick).to receive(:call).and_return(result)
 
       post pick_gatherers_path, params: { player: player.id }
@@ -243,7 +243,7 @@ RSpec.describe 'GatherersController', type: :request do
       login_as(user)
       create(:gatherer, gather: gather, user: user)
       player = create(:gatherer, gather: gather)
-      result = instance_double('Gathers::Result', success?: true, gather: gather, error: nil)
+      result = instance_double(Gathers::Result, success?: true, gather: gather, error: nil)
       allow(Gathers::CaptainPick).to receive(:call).and_return(result)
 
       post pick_gatherers_path,
@@ -258,7 +258,7 @@ RSpec.describe 'GatherersController', type: :request do
       login_as(user)
       create(:gatherer, gather: gather, user: user)
       player = create(:gatherer, gather: gather)
-      result = instance_double('Gathers::Result', success?: false, gather: gather, error: 'Nope')
+      result = instance_double(Gathers::Result, success?: false, gather: gather, error: 'Nope')
       allow(Gathers::CaptainPick).to receive(:call).and_return(result)
 
       post pick_gatherers_path,

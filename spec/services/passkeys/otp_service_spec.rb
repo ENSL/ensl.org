@@ -3,9 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Passkeys::OtpService do
+  subject(:service) { described_class.new(session: session, request: request) }
+
   let(:session) { {} }
   let(:request) { instance_double(ActionDispatch::Request) }
-  subject(:service) { described_class.new(session: session, request: request) }
 
   describe '#challenge' do
     it 'stores a hashed OTP and sends notification' do

@@ -59,8 +59,8 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_rows' do
-    let(:database) { instance_double('DuckDB::Database') }
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:database) { instance_double(DuckDB::Database) }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     before do
       allow(DuckDB::Database).to receive(:open).and_return(database)
@@ -70,11 +70,8 @@ RSpec.describe AnalysisBatchImportService do
     end
 
     it 'returns flattened rows from all sources and closes resources' do
-      allow(service).to receive(:read_legacy_rows).and_return([{ a: 1 }])
-      allow(service).to receive(:read_skill_model_rows).and_return([{ b: 2 }])
-      allow(service).to receive(:read_player_stat_rows).and_return([])
-      allow(service).to receive(:read_map_balance_rows).and_return([{ c: 3 }])
-      allow(service).to receive(:read_time_of_week_rows).and_return([])
+      allow(service).to receive_messages(read_legacy_rows: [{ a: 1 }], read_skill_model_rows: [{ b: 2 }],
+                                         read_player_stat_rows: [], read_map_balance_rows: [{ c: 3 }], read_time_of_week_rows: [])
 
       rows = service.send(:read_rows)
 
@@ -84,11 +81,8 @@ RSpec.describe AnalysisBatchImportService do
     end
 
     it 'raises when no recognized exports are present and still closes resources' do
-      allow(service).to receive(:read_legacy_rows).and_return([])
-      allow(service).to receive(:read_skill_model_rows).and_return([])
-      allow(service).to receive(:read_player_stat_rows).and_return([])
-      allow(service).to receive(:read_map_balance_rows).and_return([])
-      allow(service).to receive(:read_time_of_week_rows).and_return([])
+      allow(service).to receive_messages(read_legacy_rows: [], read_skill_model_rows: [], read_player_stat_rows: [],
+                                         read_map_balance_rows: [], read_time_of_week_rows: [])
 
       expect { service.send(:read_rows) }.to raise_error(AnalysisBatchImportService::Error, /No recognized exports/)
       expect(connection).to have_received(:close)
@@ -97,7 +91,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_legacy_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
     let(:imported_at) { Time.current }
 
     it 'reads from analysis_results when present' do
@@ -131,7 +125,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_skill_model_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when users export is missing' do
       allow(service).to receive(:existing_glob).with('users').and_return(nil)
@@ -158,7 +152,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_player_stat_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when users export is missing' do
       allow(service).to receive(:existing_glob).with('users').and_return(nil)
@@ -179,7 +173,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_class_stat_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'aggregates class stats across maps and teams under the player and class model' do
       allow(service).to receive(:existing_glob).with('users').and_return('/tmp/users/*.parquet')
@@ -195,7 +189,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_alien_strategy_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'removes redundant role labels so long strategy paths fit the subject column' do
       strategy = Array.new(6) { |index| "r#{index + 1}=#{'x' * 39}" }.join(',')
@@ -211,7 +205,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_map_balance_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when map_balance export is missing' do
       allow(service).to receive(:existing_glob).with('map_balance').and_return(nil)
@@ -233,7 +227,7 @@ RSpec.describe AnalysisBatchImportService do
   end
 
   describe '#read_time_of_week_rows' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when time_of_week export is missing' do
       allow(service).to receive(:existing_glob).with('time_of_week').and_return(nil)

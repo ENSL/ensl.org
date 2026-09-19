@@ -104,8 +104,7 @@ describe Gathers::Kick do
     end
 
     it 'includes error in result on failure' do
-      allow(admin).to receive(:admin?).and_return(false)
-      allow(admin).to receive(:gather_moderator?).and_return(false)
+      allow(admin).to receive_messages(admin?: false, gather_moderator?: false)
       result = described_class.call(actor: admin, gatherer: gatherer)
       expect(result.error).to be_present
     end

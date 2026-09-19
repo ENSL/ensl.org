@@ -14,7 +14,7 @@ RSpec.feature 'Gather pick selection', type: :feature do
     # rubocop:enable Rails/SkipsModelValidations
   end
 
-  scenario 'keeps a selected player checked after a live gather-frame replacement', js: true do
+  scenario 'keeps a selected player checked after a live gather-frame replacement', :js do
     sign_in_via_session(captain)
     visit gather_path(gather)
 
@@ -32,7 +32,7 @@ RSpec.feature 'Gather pick selection', type: :feature do
     expect(page).to have_checked_field(player_field, wait: 5)
   end
 
-  scenario 'sets the gather frame source when sync detects a version change', js: true do
+  scenario 'sets the gather frame source when sync detects a version change', :js do
     sign_in_via_session(captain)
     visit gather_path(gather)
 

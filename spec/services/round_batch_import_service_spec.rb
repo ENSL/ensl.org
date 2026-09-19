@@ -20,13 +20,10 @@ RSpec.describe RoundBatchImportService do
     end
 
     it 'upserts each table and returns row counts' do
-      allow(service).to receive(:read_log_files).and_return([{ sha256: 'abc', filename: 'a.log',
-                                                               server_name: 's', created_at: Time.current }])
-      allow(service).to receive(:read_rounds).and_return([{ server_name: 's', start_time: Time.current,
-                                                            end_time: Time.current, map_name: 'ns_eclipse',
-                                                            result: 1 }])
-      allow(service).to receive(:read_rounders).and_return([{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }])
-      allow(service).to receive(:upsert_log_lines).and_return(ImportRowStat.new(processed: 0, inserted: 0))
+      allow(service).to receive_messages(read_log_files: [{ sha256: 'abc', filename: 'a.log',
+                                                            server_name: 's', created_at: Time.current }], read_rounds: [{ server_name: 's', start_time: Time.current,
+                                                                                                                           end_time: Time.current, map_name: 'ns_eclipse',
+                                                                                                                           result: 1 }], read_rounders: [{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }], upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0))
       allow(LogFile).to receive(:upsert_all)
       allow(Round).to receive(:upsert_all)
       allow(Rounder).to receive(:upsert_all)
@@ -55,7 +52,7 @@ RSpec.describe RoundBatchImportService do
   end
 
   describe '#read_log_files' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when log_files export is missing' do
       allow(service).to receive(:existing_glob).with('log_files').and_return(nil)
@@ -74,7 +71,7 @@ RSpec.describe RoundBatchImportService do
   end
 
   describe '#read_rounds' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when rounds export is missing' do
       allow(service).to receive(:existing_glob).with('rounds').and_return(nil)
@@ -93,7 +90,7 @@ RSpec.describe RoundBatchImportService do
   end
 
   describe '#read_rounders' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns empty array when any sibling export is missing' do
       allow(service).to receive(:existing_glob).with('round_users').and_return('/tmp/round_users/*.parquet')
@@ -120,7 +117,7 @@ RSpec.describe RoundBatchImportService do
   end
 
   describe '#upsert_log_lines' do
-    let(:connection) { instance_double('DuckDB::Connection') }
+    let(:connection) { instance_double(DuckDB::Connection) }
 
     it 'returns 0 unless rounds, log_files, and users are all present' do
       allow(service).to receive(:existing_glob).with('log_lines').and_return('/tmp/log_lines/*.parquet')

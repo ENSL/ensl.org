@@ -72,7 +72,7 @@ describe Directory do
     it 'validates title presence when explicitly nil' do
       # Don't trigger ensure_path_cached by not having a parent and not providing attributes
       # Create directory skipping callbacks to test validation only
-      dir = Directory.new(name: 'test', hidden: false, title: nil)
+      dir = described_class.new(name: 'test', hidden: false, title: nil)
       # Manually set path to avoid the auto-setting triggering title auto-generation
       dir.path = '/some/path'
       dir.validate
@@ -126,7 +126,7 @@ describe Directory do
         create(:directory, name: 'alpha')
         create(:directory, name: 'charlie')
 
-        result = Directory.ordered
+        result = described_class.ordered
         expect(result.pluck(:name)).to eq(%w[alpha bravo charlie])
       end
     end
@@ -137,7 +137,7 @@ describe Directory do
         dir2 = create(:directory, path: "#{@test_root}/apple")
         create(:directory, path: "#{@test_root}/middle")
 
-        result = Directory.path_sorted
+        result = described_class.path_sorted
         expect(result.first).to eq(dir2)
         expect(result.last).to eq(dir1)
       end
@@ -148,7 +148,7 @@ describe Directory do
         visible = create(:directory, hidden: false)
         hidden = create(:directory, hidden: true)
 
-        result = Directory.filtered
+        result = described_class.filtered
         expect(result).to include(visible)
         expect(result).not_to include(hidden)
       end
@@ -273,8 +273,8 @@ describe Directory do
 
   describe '#full_title' do
     it 'returns title for root directory' do
-      dir = Directory.new(id: Directory::ROOT, name: 'test', title: 'Test Directory', path: @test_root, parent: nil,
-                          hidden: false)
+      dir = described_class.new(id: Directory::ROOT, name: 'test', title: 'Test Directory', path: @test_root, parent: nil,
+                                hidden: false)
       dir.save!(validate: false)
       # directory_traverse returns empty list for root
       # So full_title returns empty string for root directories
@@ -291,7 +291,7 @@ describe Directory do
 
     it 'uses name when title is blank' do
       root = create(:directory, id: Directory::ROOT, title: 'Root', path: @test_root, parent: nil)
-      parent = Directory.new(name: 'parent', title: '', parent: root, hidden: false)
+      parent = described_class.new(name: 'parent', title: '', parent: root, hidden: false)
       parent.path = "#{@test_root}/parent"
       parent.save!(validate: false)
 
@@ -303,13 +303,13 @@ describe Directory do
     it 'returns true when directory exists on filesystem' do
       dir_path = "#{@test_root}/existing"
       FileUtils.mkdir_p(dir_path)
-      dir = Directory.new(path: dir_path, name: 'existing', hidden: false)
+      dir = described_class.new(path: dir_path, name: 'existing', hidden: false)
       expect(dir.path_exists?).to be true
     end
 
     it 'returns false when directory does not exist' do
       # Use Directory.new to avoid factory creating the path
-      dir = Directory.new(path: "#{@test_root}/nonexistent", name: 'nonexistent', hidden: false)
+      dir = described_class.new(path: "#{@test_root}/nonexistent", name: 'nonexistent', hidden: false)
       expect(dir.path_exists?).to be false
     end
   end
@@ -317,7 +317,7 @@ describe Directory do
   describe '.directory_traverse' do
     it 'returns empty list for root directory' do
       root = create(:directory, id: Directory::ROOT, path: @test_root)
-      result = Directory.directory_traverse(root)
+      result = described_class.directory_traverse(root)
       expect(result).to eq([])
     end
 
@@ -326,7 +326,7 @@ describe Directory do
       parent = create(:directory, name: 'parent', parent: root)
       child = create(:directory, name: 'child', parent: parent)
 
-      result = Directory.directory_traverse(child)
+      result = described_class.directory_traverse(child)
       expect(result).to include(child, parent)
       expect(result).not_to include(root)
     end
@@ -342,7 +342,7 @@ describe Directory do
       end
 
       it 'capitalizes title from path basename' do
-        dir = Directory.new(path: "#{@test_root}/mytest", name: 'mytest', hidden: false)
+        dir = described_class.new(path: "#{@test_root}/mytest", name: 'mytest', hidden: false)
         dir.valid?
         expect(dir.title).to eq('Mytest')
       end
@@ -403,8 +403,8 @@ describe Directory do
         child2 = create(:directory, parent: parent)
 
         parent.destroy
-        expect(Directory.exists?(child1.id)).to be false
-        expect(Directory.exists?(child2.id)).to be false
+        expect(described_class.exists?(child1.id)).to be false
+        expect(described_class.exists?(child2.id)).to be false
       end
 
       it 'skips removal when preserve_files is true' do
@@ -469,13 +469,13 @@ describe Directory do
 
       expect do
         DirectoryReconciliationService.new(root).call
-      end.to change { Directory.count }.by_at_least(1)
+      end.to change(described_class, :count).by_at_least(1)
     end
 
     it 'removes database records for directories not on disk' do
       root = create(:directory, path: @test_root, parent: nil)
       # Create orphan as a subdir in database only (not on disk)
-      orphan = Directory.new(name: 'orphan', parent_id: root.id, hidden: false)
+      orphan = described_class.new(name: 'orphan', parent_id: root.id, hidden: false)
       orphan.path = "#{@test_root}/orphan"
       orphan.title = 'Orphan'
       # Skip callbacks that would try to create directory
@@ -490,7 +490,7 @@ describe Directory do
 
       expect do
         DirectoryReconciliationService.new(root).call
-      end.to change { Directory.exists?(orphan.id) }.from(true).to(false)
+      end.to change { described_class.exists?(orphan.id) }.from(true).to(false)
     end
   end
 
@@ -502,13 +502,13 @@ describe Directory do
       destroy_dirs = {}
       root.recreate(destroy_dirs)
 
-      expect(Directory.find_by(name: 'scanned')).not_to be_nil
+      expect(described_class.find_by(name: 'scanned')).not_to be_nil
     end
 
     it 'marks subdirs not found on disk for deletion' do
       root = create(:directory, path: @test_root, parent: nil)
       # Create orphan as a subdir in database only (not on disk)
-      orphan = Directory.new(name: 'orphan', parent_id: root.id, hidden: false)
+      orphan = described_class.new(name: 'orphan', parent_id: root.id, hidden: false)
       orphan.path = "#{@test_root}/orphan"
       orphan.title = 'Orphan'
       orphan.define_singleton_method(:make_path) {}
@@ -534,7 +534,7 @@ describe Directory do
     it 'finds orphaned directory with matching name' do
       parent = create(:directory, path: @test_root, parent: nil)
       # Create orphan with path that doesn't exist - skip make_path callback
-      orphan = Directory.new(name: 'orphan', path: '/tmp/nonexist/orphan', hidden: false)
+      orphan = described_class.new(name: 'orphan', path: '/tmp/nonexist/orphan', hidden: false)
       orphan.title = 'Orphan'
       orphan.define_singleton_method(:make_path) {} # Override callback
       orphan.save!(validate: false)
@@ -622,9 +622,9 @@ describe Directory do
     end
 
     it 'returns nil when find_by_inode_and_verify hits an unexpected error', :skip_log_error_check do
-      allow(Directory).to receive(:find_by_inode).and_raise(StandardError, 'boom')
+      allow(described_class).to receive(:find_by_inode).and_raise(StandardError, 'boom')
 
-      result = Directory.find_by_inode_and_verify('/tmp/does-not-matter', 1, 2)
+      result = described_class.find_by_inode_and_verify('/tmp/does-not-matter', 1, 2)
 
       expect(result).to be_nil
     end
@@ -657,7 +657,7 @@ describe Directory do
       root = create(:directory, :root, path: @test_root)
       relation = double('candidate_relation')
       allow(root).to receive(:count_files_in_path).and_return(1)
-      allow(Directory).to receive(:joins).with(:files).and_return(relation)
+      allow(described_class).to receive(:joins).with(:files).and_return(relation)
       allow(relation).to receive(:group).with('directories.id').and_return(relation)
       allow(relation).to receive(:having).with('count(data_files.id) = ?', 1).and_return(relation)
       allow(relation).to receive(:limit).with(Directory::MAX_FILE_COUNT_MATCH_CANDIDATES + 1)
@@ -678,7 +678,7 @@ describe Directory do
       candidate = create(:directory, name: 'candidate', parent: root)
       relation = double('candidate_relation')
       allow(root).to receive(:count_files_in_path).with(disk_path).and_return(1)
-      allow(Directory).to receive(:joins).with(:files).and_return(relation)
+      allow(described_class).to receive(:joins).with(:files).and_return(relation)
       allow(relation).to receive(:group).with('directories.id').and_return(relation)
       allow(relation).to receive(:having).with('count(data_files.id) = ?', 1).and_return(relation)
       allow(relation).to receive(:limit).with(Directory::MAX_FILE_COUNT_MATCH_CANDIDATES + 1).and_return([candidate])
@@ -769,7 +769,7 @@ describe Directory do
         }
       )
 
-      result = Directory.params(params, nil)
+      result = described_class.params(params, nil)
       expect(result.permitted?).to be true
       expect(result.keys).to match_array(%w[description hidden name parent_id])
     end

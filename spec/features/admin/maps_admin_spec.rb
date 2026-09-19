@@ -4,12 +4,9 @@ require 'rails_helper'
 
 # Admin Maps Management Feature Spec
 # Tests map viewing, access control, and core admin functionality via the UI
-RSpec.feature 'Admin manages maps', type: :feature, js: true do
+RSpec.feature 'Admin manages maps', :js, type: :feature do
   let(:admin) { create(:user, :admin) }
   let(:regular_user) { create(:user) }
-
-  before do
-  end
 
   scenario 'regular user can view maps and their details with all fields' do
     sign_in_via_session(regular_user)
@@ -18,12 +15,12 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit '/maps'
 
-    expect(page).to have_content(map.name)
+    expect(page).to have_text(map.name)
 
     click_link map.name
 
-    expect(page).to have_content(map.name)
-    expect(page).to have_content(map.download)
+    expect(page).to have_text(map.name)
+    expect(page).to have_text(map.download)
     expect(page).to have_link(map.download)
   end
 
@@ -36,9 +33,9 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit '/maps'
 
-    expect(page).to have_content('ns_eclipse')
-    expect(page).to have_content('ns_veil')
-    expect(page).to have_content('ns_summit')
+    expect(page).to have_text('ns_eclipse')
+    expect(page).to have_text('ns_veil')
+    expect(page).to have_text('ns_summit')
   end
 
   scenario 'admin can view individual map details' do
@@ -47,8 +44,8 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit "/maps/#{map.id}"
 
-    expect(page).to have_content('ns_caged')
-    expect(page).to have_content('http://example.com/ns_caged.zip')
+    expect(page).to have_text('ns_caged')
+    expect(page).to have_text('http://example.com/ns_caged.zip')
   end
 
   scenario 'admin can access new map form from index' do
@@ -83,8 +80,8 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit '/maps'
 
-    expect(page).to have_content('ns_active')
-    expect(page).not_to have_content('ns_deleted')
+    expect(page).to have_text('ns_active')
+    expect(page).to have_no_text('ns_deleted')
   end
 
   scenario 'maps are sorted by name on index' do
@@ -126,7 +123,7 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit '/maps/new'
 
-    expect(page).to have_content('You are not allowed')
+    expect(page).to have_text('You are not allowed')
   end
 
   scenario 'non-admin user cannot access edit map form' do
@@ -135,7 +132,7 @@ RSpec.feature 'Admin manages maps', type: :feature, js: true do
 
     visit "/maps/#{map.id}/edit"
 
-    expect(page).to have_content('You are not allowed')
+    expect(page).to have_text('You are not allowed')
   end
 
   scenario 'regular user cannot create maps' do

@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Passkey authentication', type: :feature, js: true do
+RSpec.feature 'Passkey authentication', :js, type: :feature do
   let(:password) { 'PasswordABC123!' }
   let(:passkey_user) { create(:user, username: 'passkey_user', raw_password: password) }
 
   scenario 'the login form supports passkey autofill from the username field' do
     visit root_path
 
-    username_input = find('#login_username', visible: :all)
+    username_input = find_by_id('login_username', visible: :all)
     expect(username_input[:autocomplete]).to include('webauthn')
   end
 
@@ -52,7 +52,7 @@ RSpec.feature 'Passkey authentication', type: :feature, js: true do
     fill_in 'login_otp_code', with: otp_code
     submit_login_form
 
-    expect(page).to have_content('LOGOUT', wait: 10)
+    expect(page).to have_text('LOGOUT', wait: 10)
   end
 
   private

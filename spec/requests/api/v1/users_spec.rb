@@ -20,9 +20,9 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
     expect(user_json['steam']).to have_key('id')
     expect(user_json['steam']).to have_key('url')
     expect(user_json['steam']).to have_key('nickname')
-    expect(user_json['bans']['mute']).to eq(false)
-    expect(user_json['bans']['gather']).to eq(false)
-    expect(user_json['bans']['site']).to eq(false)
+    expect(user_json['bans']['mute']).to be(false)
+    expect(user_json['bans']['gather']).to be(false)
+    expect(user_json['bans']['site']).to be(false)
     expect(user_json['team']).to be_nil
   end
 
@@ -80,7 +80,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
 
       get "/api/v1/users/#{user.id}", headers: json_headers
 
-      expect(json['moderator']).to eq(true)
+      expect(json['moderator']).to be(true)
     end
 
     it 'returns 404 if the user does not exist' do
@@ -115,7 +115,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
       get "/api/v1/users/#{user.id}", headers: json_headers
 
       expect(response).to have_http_status(:success)
-      expect(json['bans']['mute']).to eq(true)
+      expect(json['bans']['mute']).to be(true)
     end
 
     it 'returns correct ban if the user is site banned' do
@@ -124,7 +124,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
       get "/api/v1/users/#{user.id}", headers: json_headers
 
       expect(response).to have_http_status(:success)
-      expect(json['bans']['site']).to eq(true)
+      expect(json['bans']['site']).to be(true)
     end
 
     it 'returns team information' do
@@ -141,7 +141,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
 
   describe 'GET /api/v1/users' do
     before do
-      5.times { create(:user_with_team) }
+      create_list(:user_with_team, 5)
     end
 
     it 'returns all users and associated teams' do

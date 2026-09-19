@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Data files management', type: :feature, js: true do
+RSpec.feature 'Data files management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:user) { create(:user) }
 
@@ -13,10 +13,10 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file)
 
-      expect(page).to have_content('ImportantDoc')
-      expect(page).to have_content('Long file description')
-      expect(page).to have_content('with two lines')
-      expect(page).to have_content(file.md5_s)
+      expect(page).to have_text('ImportantDoc')
+      expect(page).to have_text('Long file description')
+      expect(page).to have_text('with two lines')
+      expect(page).to have_text(file.md5_s)
     end
 
     it 'shows related files when present' do
@@ -26,7 +26,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file2)
 
-      expect(page).to have_content('Part2')
+      expect(page).to have_text('Part2')
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       fill_in 'data_file_description', with: 'New long description for this file'
       click_button 'Update'
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
 
       file.reload
       expect(file.title).to eq('NewTitle')
@@ -58,8 +58,8 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit directory_path(root)
 
-      expect(page).to have_content(file.title)
-      expect(page).to have_content('Listed description')
+      expect(page).to have_text(file.title)
+      expect(page).to have_text('Listed description')
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       sign_in_via_session(user)
       visit data_file_path(file)
 
-      expect(page).not_to have_link('Delete')
+      expect(page).to have_no_link('Delete')
     end
   end
 
@@ -81,7 +81,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       sign_in_via_session(user)
       visit data_file_path(file)
 
-      expect(page).to have_content('ViewableFile')
+      expect(page).to have_text('ViewableFile')
     end
 
     it 'allows unauthenticated users to view files' do
@@ -89,7 +89,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file)
 
-      expect(page).to have_content('PublicFile')
+      expect(page).to have_text('PublicFile')
     end
   end
 
@@ -103,7 +103,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(demo_file)
 
-      expect(page).to have_content('MatchDemo')
+      expect(page).to have_text('MatchDemo')
     end
   end
 
@@ -113,7 +113,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file)
 
-      expect(page).to have_content('5.0 MB')
+      expect(page).to have_text('5.0 MB')
     end
 
     it 'displays MD5 hash in uppercase' do
@@ -121,7 +121,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file)
 
-      expect(page).to have_content('ABC123DEF456')
+      expect(page).to have_text('ABC123DEF456')
     end
 
     it 'displays file creation timestamp' do
@@ -129,7 +129,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
 
       visit data_file_path(file)
 
-      expect(page).to have_content(file.created_at.strftime('%Y'))
+      expect(page).to have_text(file.created_at.strftime('%Y'))
     end
   end
 
@@ -230,7 +230,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       select 'Candidate', from: 'add_related_candidate_id'
       click_button 'Add'
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
       expect(candidate.reload.related).to eq(main_file)
     end
 
@@ -242,13 +242,13 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       sign_in_via_session(admin)
       visit edit_data_file_path(main_file)
 
-      within(all('table.striped').first) do
+      within(first('table.striped')) do
         within('tr', text: 'Related') do
           find('a[title="Remove related file"]').click
         end
       end
 
-      expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
+      expect(page).to have_text(I18n.t('flash.actions.update.notice', resource_name: DataFile.model_name.human))
       expect(related_file.reload.related).to be_nil
     end
   end
@@ -260,7 +260,7 @@ RSpec.feature 'Data files management', type: :feature, js: true do
       sign_in_via_session(user)
       visit new_data_file_path(id: dir.id)
 
-      expect(page).to have_content('You are not allowed to visit the page')
+      expect(page).to have_text('You are not allowed to visit the page')
     end
   end
 end

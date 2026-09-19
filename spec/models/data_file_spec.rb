@@ -41,6 +41,10 @@ describe DataFile do
     # Set up test root environment
     # Direct ENV assignment is required to override the helper's configured root.
     ENV['FILES_ROOT'] = @test_root
+    allow_any_instance_of(described_class).to receive(:location) do |instance|
+      # Return the path attribute which factory sets correctly
+      instance.path.to_s
+    end
   end
 
   after do
@@ -51,12 +55,6 @@ describe DataFile do
 
   # Stub location for all DataFile instances
   # This makes location return path for compatibility with tests that set path explicitly
-  before do
-    allow_any_instance_of(DataFile).to receive(:location) do |instance|
-      # Return the path attribute which factory sets correctly
-      instance.path.to_s
-    end
-  end
 
   describe 'associations' do
     subject { build(:data_file) }
@@ -82,18 +80,18 @@ describe DataFile do
     describe '.recent' do
       it 'returns recent files ordered by created_at DESC limited to 8' do
         create_list(:data_file, 10)
-        expect(DataFile.recent.count).to eq(8)
+        expect(described_class.recent.count).to eq(8)
       end
     end
 
     describe '.ordered' do
       it 'returns files ordered by created_at DESC' do
-        DataFile.delete_all # Clear all existing files
+        described_class.delete_all # Clear all existing files
         create(:data_file, created_at: 2.days.ago)
         sleep(0.01) # Ensure different timestamps
         create(:data_file, created_at: 1.day.ago)
 
-        result = DataFile.ordered
+        result = described_class.ordered
         expect(result.first.created_at).to be >= result.last.created_at
       end
     end
@@ -103,7 +101,7 @@ describe DataFile do
         file1 = create(:data_file)
         file2 = create(:data_file)
 
-        result = DataFile.except_file(file1)
+        result = described_class.except_file(file1)
         expect(result).to include(file2)
         expect(result).not_to include(file1)
       end
@@ -116,7 +114,7 @@ describe DataFile do
         same_dir = create(:data_file, directory: directory)
         other_dir = create(:data_file, directory: create(:directory))
 
-        result = DataFile.for_related_selection(target)
+        result = described_class.for_related_selection(target)
 
         expect(result).to include(same_dir)
         expect(result).not_to include(target)
@@ -129,23 +127,23 @@ describe DataFile do
         unrelated = create(:data_file, related_id: nil)
         related = create(:data_file, :with_related)
 
-        expect(DataFile.unrelated).to include(unrelated)
-        expect(DataFile.unrelated).not_to include(related)
+        expect(described_class.unrelated).to include(unrelated)
+        expect(described_class.unrelated).not_to include(related)
       end
     end
 
     describe '.movies' do
       it 'returns files from movies directory' do
-        DataFile.delete_all # Clear test data
+        described_class.delete_all # Clear test data
 
         # Temporarily stub create_movie to prevent it from being called
-        allow_any_instance_of(DataFile).to receive(:create_movie)
+        allow_any_instance_of(described_class).to receive(:create_movie)
 
         movie = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/movie_scope.mp4')
         non_movie = create(:data_file, directory_id: nil, path: '/tmp/test_dirs/nonmovie_scope.txt')
 
-        expect(DataFile.movies).to include(movie)
-        expect(DataFile.movies).not_to include(non_movie)
+        expect(described_class.movies).to include(movie)
+        expect(described_class.movies).not_to include(non_movie)
       end
     end
   end
@@ -158,7 +156,7 @@ describe DataFile do
       File.write(existing_path, 'ok')
       existing = create(:data_file, directory: directory, path: existing_path)
 
-      result = DataFile.missing
+      result = described_class.missing
 
       expect(result).to include(missing)
       expect(result).not_to include(existing)
@@ -166,14 +164,14 @@ describe DataFile do
   end
 
   describe '.movies_without_video' do
-    before { allow_any_instance_of(DataFile).to receive(:create_movie) }
+    before { allow_any_instance_of(described_class).to receive(:create_movie) }
 
     it 'returns movie files lacking an own, preview, or related movie' do
       without_video = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/no_video.mp4')
       with_video = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/has_video.mp4')
       create(:movie, file: with_video)
 
-      result = DataFile.movies_without_video
+      result = described_class.movies_without_video
 
       expect(result).to include(without_video)
       expect(result).not_to include(with_video)
@@ -185,7 +183,7 @@ describe DataFile do
       file = create(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/child_video.mp4',
                                 related: related)
 
-      expect(DataFile.movies_without_video).not_to include(file)
+      expect(described_class.movies_without_video).not_to include(file)
     end
   end
 
@@ -197,7 +195,7 @@ describe DataFile do
       create(:data_file, directory: directory, related: candidate)
       plain = create(:data_file, directory: directory, title: 'Plain')
 
-      options = DataFile.related_selection_options(target)
+      options = described_class.related_selection_options(target)
 
       expect(options).to include(['Candidate (+1 related files)', candidate.id])
       expect(options).to include(['Plain', plain.id])
@@ -207,7 +205,7 @@ describe DataFile do
     it 'returns an empty array when the file has no directory' do
       file = build(:data_file, directory: nil)
 
-      expect(DataFile.related_selection_options(file)).to eq([])
+      expect(described_class.related_selection_options(file)).to eq([])
     end
   end
 
@@ -453,7 +451,7 @@ describe DataFile do
 
     it 'does not update metadata if file does not exist' do
       # Use DataFile.new to avoid factory's file creation hooks
-      file = DataFile.new(path: '/tmp/test_dirs/nonexist.txt', md5: 'original_hash')
+      file = described_class.new(path: '/tmp/test_dirs/nonexist.txt', md5: 'original_hash')
       original_md5 = file.md5
       file.send(:sync_file_metadata)
       expect(file.md5).to eq(original_md5)
@@ -494,7 +492,7 @@ describe DataFile do
 
     it 'returns false when a movie already exists' do
       file = build(:data_file, directory_id: Directory::MOVIES, path: '/tmp/test_dirs/movie.mp4')
-      allow(file).to receive(:movie).and_return(instance_double('Movie'))
+      allow(file).to receive(:movie).and_return(instance_double(Movie))
 
       expect(file.should_create_movie?).to be false
     end
@@ -563,7 +561,7 @@ describe DataFile do
       # Manually set the path to the test file location for find_existing to work
       existing.update!(path: file_path)
 
-      result = DataFile.find_existing(file_path, 'findexist_123.txt')
+      result = described_class.find_existing(file_path, 'findexist_123.txt')
       expect(result).to eq(existing)
     end
 
@@ -580,12 +578,12 @@ describe DataFile do
       existing.save!(validate: false)
 
       # Since no record exists at hashfind_456.txt, it falls back to MD5 lookup
-      result = DataFile.find_existing(file_path, 'hashfind_456.txt')
+      result = described_class.find_existing(file_path, 'hashfind_456.txt')
       expect(result).to eq(existing)
     end
 
     it 'returns nil when file does not exist on disk' do
-      result = DataFile.find_existing('/nonexistent/file.txt', 'file.txt')
+      result = described_class.find_existing('/nonexistent/file.txt', 'file.txt')
       expect(result).to be_nil
     end
   end
@@ -595,12 +593,12 @@ describe DataFile do
       file_path = '/tmp/test_dirs/hash_test.txt'
       File.write(file_path, 'test content')
       expected_hash = Digest::MD5.hexdigest('test content')
-      result = DataFile.compute_file_hash(file_path)
+      result = described_class.compute_file_hash(file_path)
       expect(result).to eq(expected_hash)
     end
 
     it 'returns nil when file is unreadable' do
-      result = DataFile.compute_file_hash('/nonexistent/unreadable.txt')
+      result = described_class.compute_file_hash('/nonexistent/unreadable.txt')
       expect(result).to be_nil
     end
   end
@@ -664,10 +662,8 @@ describe DataFile do
       File.write(old_path, 'move me')
 
       file = build(:data_file, path: old_path)
-      allow(file).to receive(:location).and_return(old_path)
-      allow(file).to receive(:directory).and_return(instance_double(Directory, full_path: '/tmp/test_dirs/moved'))
-      allow(file).to receive(:carrierwave_store_absolute_path).and_return(new_path)
-      allow(file).to receive(:name).and_return(instance_double('Uploader', identifier: nil))
+      allow(file).to receive_messages(location: old_path,
+                                      directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'), carrierwave_store_absolute_path: new_path, name: instance_double(Uploader, identifier: nil))
 
       file.send(:move_file_between_directories)
 
@@ -681,10 +677,8 @@ describe DataFile do
       File.write(old_path, 'move me')
 
       file = build(:data_file, path: old_path)
-      allow(file).to receive(:location).and_return(old_path)
-      allow(file).to receive(:directory).and_return(instance_double(Directory, full_path: '/tmp/test_dirs/moved'))
-      allow(file).to receive(:carrierwave_store_absolute_path).and_return('/tmp/test_dirs/moved/move_fail_to.txt')
-      allow(file).to receive(:name).and_return(instance_double('Uploader', identifier: nil))
+      allow(file).to receive_messages(location: old_path,
+                                      directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'), carrierwave_store_absolute_path: '/tmp/test_dirs/moved/move_fail_to.txt', name: instance_double(Uploader, identifier: nil))
       allow(FileUtils).to receive(:mv).and_raise(StandardError, 'cannot move')
 
       expect { file.send(:move_file_between_directories) }.to raise_error(ActiveRecord::RecordInvalid)
@@ -1014,7 +1008,7 @@ describe DataFile do
         }
       )
 
-      result = DataFile.params(params, nil)
+      result = described_class.params(params, nil)
       expect(result.permitted?).to be true
       expect(result.keys).to match_array(%w[title description name article_id related_id directory_id])
     end
@@ -1045,7 +1039,7 @@ describe DataFile do
   describe 'callbacks' do
     describe 'before_save :sync_file_metadata' do
       it 'is configured as a before_save callback' do
-        callbacks = DataFile._save_callbacks.select { |cb| cb.filter == :sync_file_metadata }
+        callbacks = described_class._save_callbacks.select { |cb| cb.filter == :sync_file_metadata }
         expect(callbacks).not_to be_empty
         expect(callbacks.first.kind).to eq(:before)
       end
@@ -1053,21 +1047,21 @@ describe DataFile do
 
     describe 'after_create :create_movie' do
       it 'is configured as an after_create callback' do
-        callbacks = DataFile._create_callbacks.select { |cb| cb.filter == :create_movie }
+        callbacks = described_class._create_callbacks.select { |cb| cb.filter == :create_movie }
         expect(callbacks).not_to be_empty
       end
     end
 
     describe 'after_save :update_relations' do
       it 'is configured as an after_save callback' do
-        callbacks = DataFile._save_callbacks.select { |cb| cb.filter == :update_relations }
+        callbacks = described_class._save_callbacks.select { |cb| cb.filter == :update_relations }
         expect(callbacks).not_to be_empty
       end
     end
 
     describe 'after_commit :sync_preview_links' do
       it 'is configured as an after_commit callback' do
-        callbacks = DataFile._commit_callbacks.select { |cb| cb.filter == :sync_preview_links }
+        callbacks = described_class._commit_callbacks.select { |cb| cb.filter == :sync_preview_links }
         expect(callbacks).not_to be_empty
       end
     end

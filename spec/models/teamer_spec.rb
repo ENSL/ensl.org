@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Teamer, type: :model do
   describe 'init_variables' do
     it 'sets default rank to RANK_JOINER' do
-      t = Teamer.new
+      t = described_class.new
       t.send(:init_variables)
       expect(t.rank).to eq(Teamer::RANK_JOINER)
     end
@@ -16,7 +16,7 @@ RSpec.describe Teamer, type: :model do
       user = create(:user)
       team = create(:team)
       create(:teamer, user: user, team: team)
-      t2 = Teamer.new(user: user, team: team)
+      t2 = described_class.new(user: user, team: team)
       expect(t2.valid?).to be false
       expect(t2.errors[:team]).not_to be_empty
     end
@@ -33,14 +33,14 @@ RSpec.describe Teamer, type: :model do
 
       request.destroy
 
-      expect(Teamer.where(id: request.id)).to be_empty
+      expect(described_class.where(id: request.id)).to be_empty
       expect(user.reload.team).to eq(primary_team)
     end
 
     it 'marks rank REMOVED for non-joiner' do
       user = create(:user)
       team = create(:team)
-      t = Teamer.create!(user: user, team: team, rank: Teamer::RANK_MEMBER)
+      t = described_class.create!(user: user, team: team, rank: Teamer::RANK_MEMBER)
       t.destroy
       expect(t.reload.rank).to eq(Teamer::RANK_REMOVED)
     end
@@ -52,8 +52,8 @@ RSpec.describe Teamer, type: :model do
       leader = create(:user)
       admin = create(:user, :admin)
       team = create(:team)
-      te = Teamer.create!(user: owner, team: team, rank: Teamer::RANK_MEMBER)
-      Teamer.create!(user: leader, team: team, rank: Teamer::RANK_LEADER)
+      te = described_class.create!(user: owner, team: team, rank: Teamer::RANK_MEMBER)
+      described_class.create!(user: leader, team: team, rank: Teamer::RANK_LEADER)
 
       expect(te.can_destroy?(owner)).to be true
       expect(te.can_destroy?(leader)).to be true
@@ -65,7 +65,7 @@ end
 RSpec.describe Teamer, type: :model do
   describe 'basic helpers' do
     it 'init_variables sets joiner rank by default' do
-      t = Teamer.new
+      t = described_class.new
       t.init_variables
       expect(t.rank).to eq Teamer::RANK_JOINER
     end
@@ -81,7 +81,7 @@ RSpec.describe Teamer, type: :model do
       user = create(:user)
       team = create(:team)
       create(:teamer, user: user, team: team)
-      t2 = Teamer.new(user: user, team: team)
+      t2 = described_class.new(user: user, team: team)
       t2.validate
       expect(t2.errors[:team]).not_to be_empty
     end
@@ -91,7 +91,7 @@ RSpec.describe Teamer, type: :model do
       team = create(:team)
       create(:teamer, user: user, team: team, rank: Teamer::RANK_REMOVED)
 
-      t2 = Teamer.new(user: user, team: team, rank: Teamer::RANK_JOINER)
+      t2 = described_class.new(user: user, team: team, rank: Teamer::RANK_JOINER)
 
       expect(t2).to be_valid
     end
@@ -102,7 +102,7 @@ RSpec.describe Teamer, type: :model do
       t = create(:teamer, rank: Teamer::RANK_JOINER)
       id = t.id
       t.destroy
-      expect(Teamer.exists?(id)).to be false
+      expect(described_class.exists?(id)).to be false
     end
 
     it 'marks removed when rank is not joiner' do
@@ -141,13 +141,13 @@ RSpec.describe Teamer, type: :model do
     let(:user) { create(:user) }
 
     it 'can_create? requires verification params' do
-      t = Teamer.new(user: user, team: team)
+      t = described_class.new(user: user, team: team)
       allow(Verification).to receive(:contain).and_return(true)
       expect(t.can_create?(user, user_id: user.id, team_id: team.id)).to be true
     end
 
     it 'allows only admins to create a membership by username' do
-      teamer = Teamer.new(username: user.username, team: team)
+      teamer = described_class.new(username: user.username, team: team)
       admin = create(:user, :admin)
 
       expect(teamer.can_create?(admin, username: user.username, team_id: team.id)).to be true
@@ -189,14 +189,14 @@ RSpec.describe Teamer, type: :model do
 
     it 'resolves an existing user before validation' do
       user = create(:user)
-      teamer = Teamer.new(username: user.username, team: team, rank: Teamer::RANK_MEMBER)
+      teamer = described_class.new(username: user.username, team: team, rank: Teamer::RANK_MEMBER)
 
       expect(teamer).to be_valid
       expect(teamer.user).to eq(user)
     end
 
     it 'adds an error for an unknown username' do
-      teamer = Teamer.new(username: 'missing-user', team: team, rank: Teamer::RANK_MEMBER)
+      teamer = described_class.new(username: 'missing-user', team: team, rank: Teamer::RANK_MEMBER)
 
       expect(teamer).not_to be_valid
       expect(teamer.errors[:username]).to include('User not found')
@@ -216,7 +216,7 @@ RSpec.describe Teamer, type: :model do
       expect(result).to be true
       expect(teamer.user).to eq(actor)
       expect(teamer).to be_persisted
-      expect(Teamer.exists?(old_application.id)).to be false
+      expect(described_class.exists?(old_application.id)).to be false
     end
 
     it 'does not override the teamer user when actor is admin' do

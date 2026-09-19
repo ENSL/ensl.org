@@ -17,9 +17,9 @@ RSpec.describe Lock, type: :model do
       user = create(:user)
 
       expect(lock.can_create?(user)).to be false
-      expect(lock.can_create?(nil)).to be_falsey
+      expect(lock).not_to be_can_create(nil)
       expect(lock.can_destroy?(user)).to be false
-      expect(lock.can_destroy?(nil)).to be_falsey
+      expect(lock).not_to be_can_destroy(nil)
     end
   end
 

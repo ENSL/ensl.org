@@ -23,9 +23,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#pm' do
-    let(:pm) { instance_double('PrivateMessage') }
-
     subject(:deliver) { mailer.pm(user, pm) }
+
+    let(:pm) { instance_double(PrivateMessage) }
 
     it 'builds the private message notification' do
       expect(deliver).to eq(:message)
@@ -36,9 +36,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#gather' do
-    let(:gather) { instance_double('Gather') }
-
     subject(:deliver) { mailer.gather(user, gather) }
+
+    let(:gather) { instance_double(Gather) }
 
     it 'builds the gather notification' do
       expect(deliver).to eq(:message)
@@ -49,9 +49,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#comments' do
-    let(:commentable) { instance_double('Commentable') }
-
     subject(:deliver) { mailer.comments(user, commentable) }
+
+    let(:commentable) { instance_double(Commentable) }
 
     it 'builds the comments notification' do
       expect(deliver).to eq(:message)
@@ -61,9 +61,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#challenge' do
-    let(:challenge) { instance_double('Challenge') }
-
     subject(:deliver) { mailer.challenge(user, challenge) }
+
+    let(:challenge) { instance_double(Challenge) }
 
     it 'builds the challenge notification' do
       expect(deliver).to eq(:message)
@@ -73,9 +73,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#match' do
-    let(:match_record) { instance_double('Match') }
-
     subject(:deliver) { mailer.match(user, match_record) }
+
+    let(:match_record) { instance_double(Match) }
 
     it 'builds the match notification' do
       expect(deliver).to eq(:message)
@@ -85,9 +85,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#news' do
-    let(:news) { instance_double('News', title: 'Weekly update') }
-
     subject(:deliver) { mailer.news(user, news) }
+
+    let(:news) { instance_double(News, title: 'Weekly update') }
 
     it 'includes the news title in the subject' do
       expect(deliver).to eq(:message)
@@ -98,9 +98,9 @@ RSpec.describe Notifications, type: :mailer do
   end
 
   describe '#article' do
-    let(:article) { instance_double(Article, title: 'Feature article') }
-
     subject(:deliver) { mailer.article(user, article) }
+
+    let(:article) { instance_double(Article, title: 'Feature article') }
 
     it 'includes the article title in the subject' do
       expect(deliver).to eq(:message)

@@ -96,7 +96,7 @@ RSpec.describe 'CategoriesController', type: :request do
         post '/categories', params: { category: { name: '', domain: -1, sort: 0 } }
       end.not_to change(Category, :count)
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
 
@@ -129,7 +129,7 @@ RSpec.describe 'CategoriesController', type: :request do
 
       patch "/categories/#{category.id}", params: { category: { name: '', domain: -1, sort: category.sort } }
 
-      expect(response).to have_http_status(422)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
       expect(category.reload.name).to eq('Original category')
     end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Analysis map balance page', type: :feature, js: true do
+RSpec.feature 'Analysis map balance page', :js, type: :feature do
   def seed_map_metric(map, metric, value)
     create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
                              steamid: map, model: 'map_balance', metric: metric, value: value)
@@ -34,7 +34,7 @@ RSpec.feature 'Analysis map balance page', type: :feature, js: true do
   scenario 'renders the balance chart from the current snapshot' do
     visit '/analysis/maps'
 
-    expect(page).to have_selector('canvas')
+    expect(page).to have_css('canvas')
 
     chart_labels = evaluate_script(<<~JS)
       (() => {

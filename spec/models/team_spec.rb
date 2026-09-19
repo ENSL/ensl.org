@@ -29,8 +29,8 @@ RSpec.describe Team, type: :model do
         create(:teamer, team: team)
         create(:contester, team: team)
 
-        expect { team.destroy }.to change(Team, :count).by(-1)
-        expect(Team.where(id: team.id)).to be_empty
+        expect { team.destroy }.to change(described_class, :count).by(-1)
+        expect(described_class.where(id: team.id)).to be_empty
       end
     end
 
@@ -45,7 +45,7 @@ RSpec.describe Team, type: :model do
 
         team.destroy
 
-        expect(Team.exists?(team.id)).to be true
+        expect(described_class.exists?(team.id)).to be true
         expect(team.reload.active).to be false
         expect(team.teamers.reload.pluck(:rank)).to include(Teamer::RANK_REMOVED)
       end
@@ -120,11 +120,11 @@ RSpec.describe Team, type: :model do
   describe '.search' do
     it 'finds by name case-insensitively' do
       t = create(:team, name: 'Alpha Team')
-      expect(Team.search('alpha')).to include(t)
+      expect(described_class.search('alpha')).to include(t)
     end
 
     it 'returns all when search is nil' do
-      expect(Team.search(nil)).to match_array(Team.all.to_a)
+      expect(described_class.search(nil)).to match_array(described_class.all.to_a)
     end
   end
 
@@ -135,7 +135,7 @@ RSpec.describe Team, type: :model do
       excluded_team = create(:team)
       create(:contester, contest: contest, team: excluded_team)
 
-      teams = Team.not_in_contest(contest)
+      teams = described_class.not_in_contest(contest)
 
       expect(teams).to include(included_team)
       expect(teams).not_to include(excluded_team)
@@ -146,13 +146,13 @@ RSpec.describe Team, type: :model do
       excluded_team = create(:team)
       create(:contester, contest: contest, team: excluded_team)
 
-      expect(Team.not_in_contest(contest.id)).not_to include(excluded_team)
+      expect(described_class.not_in_contest(contest.id)).not_to include(excluded_team)
     end
   end
 
   describe '#init_variables' do
     it 'preserves teamers_count when already set' do
-      team = Team.new(teamers_count: 4)
+      team = described_class.new(teamers_count: 4)
 
       team.init_variables
 
@@ -170,13 +170,13 @@ RSpec.describe Team, type: :model do
 
   describe '.params' do
     it 'returns an empty hash when params are nil' do
-      expect(Team.params(nil, nil)).to eq({})
+      expect(described_class.params(nil, nil)).to eq({})
     end
 
     it 'returns an empty hash when the team payload is missing' do
       params = ActionController::Parameters.new(other: { name: 'Ignored' })
 
-      expect(Team.params(params, nil)).to eq({})
+      expect(described_class.params(params, nil)).to eq({})
     end
 
     it 'permits team params and strips protected attributes' do
@@ -194,7 +194,7 @@ RSpec.describe Team, type: :model do
         }
       )
 
-      permitted = Team.params(params, nil)
+      permitted = described_class.params(params, nil)
 
       expect(permitted.to_h).to include('name' => 'Allowed', 'tag' => 'TAG', 'comment' => 'Hello')
       expect(permitted.to_h).not_to have_key('id')
@@ -208,7 +208,7 @@ end
 RSpec.describe Team, type: :model do
   describe 'init and leader assignment' do
     it 'initializes active and recruiting' do
-      t = Team.new
+      t = described_class.new
       t.send(:init_variables)
       expect(t.active).to be true
       expect(t.recruiting).to be_nil
@@ -216,7 +216,7 @@ RSpec.describe Team, type: :model do
 
     it 'adds founder as leader on create' do
       user = create(:user)
-      team = Team.create!(name: 'TeamX', tag: 'TX', founder: user)
+      team = described_class.create!(name: 'TeamX', tag: 'TX', founder: user)
       expect(team.leaders.count).to eq(1)
       expect(user.reload.team_id).to eq(team.id)
     end
@@ -271,7 +271,7 @@ end
 RSpec.describe Team, type: :model do
   describe 'basic methods' do
     it 'initializes variables with init_variables' do
-      t = Team.new
+      t = described_class.new
       t.init_variables
       expect(t.active).to be true
       expect(t.recruiting).to be_nil
@@ -279,7 +279,7 @@ RSpec.describe Team, type: :model do
 
     it 'search finds by name' do
       t = create(:team, name: 'UniqueSearchName')
-      expect(Team.search('UniqueSearchName')).to include t
+      expect(described_class.search('UniqueSearchName')).to include t
     end
 
     it 'to_s returns name' do
@@ -341,7 +341,7 @@ RSpec.describe Team, type: :model do
       team = create(:team)
       id = team.id
       team.destroy
-      expect(Team.exists?(id)).to be false
+      expect(described_class.exists?(id)).to be false
     end
 
     it 'recover sets active true' do

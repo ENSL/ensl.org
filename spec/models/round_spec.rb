@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe Round do
   describe '#observed_teams' do
-    let(:round) { Round.create!(server_name: 'ENSL Server One', start_time: Time.zone.parse('2026-01-01 12:00:00')) }
+    let(:round) do
+      described_class.create!(server_name: 'ENSL Server One', start_time: Time.zone.parse('2026-01-01 12:00:00'))
+    end
 
     def player_raw(name, steamid, team)
       "\"#{name}<1><#{steamid}><#{team}>\""

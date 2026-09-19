@@ -209,7 +209,7 @@ RSpec.describe Gatherer, type: :model do
       let(:raw_params) { ActionController::Parameters.new(gatherer: { team: 1 }) }
 
       before do
-        allow(Gatherer).to receive(:params).and_return(team: 1)
+        allow(described_class).to receive(:params).and_return(team: 1)
         allow(Gathers::Broadcaster).to receive(:call)
       end
 
@@ -223,8 +223,7 @@ RSpec.describe Gatherer, type: :model do
       end
 
       it 'updates and broadcasts when actor is authorized and update succeeds' do
-        allow(gatherer).to receive(:can_update?).and_return(true)
-        allow(gatherer).to receive(:update).and_return(true)
+        allow(gatherer).to receive_messages(can_update?: true, update: true)
 
         result = gatherer.update_for_actor(raw_params, actor)
 
@@ -239,7 +238,7 @@ RSpec.describe Gatherer, type: :model do
         raw_params = ActionController::Parameters.new(
           gatherer: { id: gatherer.id, username: replacement_user.username }
         )
-        allow(Gatherer).to receive(:params).and_call_original
+        allow(described_class).to receive(:params).and_call_original
         allow(Gathers::ActivityBroadcaster).to receive(:call)
 
         result = gatherer.update_for_actor(raw_params, actor)
@@ -256,7 +255,7 @@ RSpec.describe Gatherer, type: :model do
         raw_params = ActionController::Parameters.new(
           gatherer: { id: gatherer.id, username: gatherer.user.username }
         )
-        allow(Gatherer).to receive(:params).and_call_original
+        allow(described_class).to receive(:params).and_call_original
 
         expect { gatherer.update_for_actor(raw_params, actor) }.not_to(
           change { gather.activities.where(key: 'gather.player_substituted').count }

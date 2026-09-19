@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'timeout'
 
-RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
+RSpec.feature 'Gather sync watchdog', :js, type: :feature do
   let!(:gather) { create(:gather, maps_count: 3, servers_count: 2) }
   let!(:user) { create(:user, raw_password: 'password123') }
   let!(:admin) { create(:user, :admin, raw_password: 'password123') }
@@ -12,7 +12,7 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     sign_in_via_session(user)
     visit gather_path(gather)
 
-    expect(page).to have_selector('#gather', wait: 5)
+    expect(page).to have_css('#gather', wait: 5)
 
     execute_script <<~JS
       localStorage.removeItem('gather_sync_force_reload')
@@ -42,7 +42,7 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     sign_in_via_session(user)
     visit gather_path(gather)
 
-    expect(page).to have_selector('#gather', wait: 5)
+    expect(page).to have_css('#gather', wait: 5)
     initial_version = gather.version
 
     gather.bump_version!
@@ -55,8 +55,8 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     sign_in_via_session(user)
     visit gather_path(gather)
 
-    expect(page).to have_selector('#gather-info', wait: 5)
-    find('#gather-info-hide').click
+    expect(page).to have_css('#gather-info', wait: 5)
+    find_by_id('gather-info-hide').click
 
     expect(page).to have_no_selector('#gather-info', wait: 5)
   end
@@ -78,9 +78,9 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     sign_in_via_session(admin)
     visit gather_path(gather)
 
-    expect(page).to have_selector('#gather-stats .gather-controls #gather-music.gather-audio', wait: 5, visible: :all)
-    expect(page).to have_selector('#gather-stats .gather-controls #mute.button', text: 'Mute', wait: 5)
-    expect(page).to have_selector('#gather-stats .gather-controls a.admin.button', text: 'Admin Page', wait: 5)
+    expect(page).to have_css('#gather-stats .gather-controls #gather-music.gather-audio', wait: 5, visible: :all)
+    expect(page).to have_css('#gather-stats .gather-controls #mute.button', text: 'Mute', wait: 5)
+    expect(page).to have_css('#gather-stats .gather-controls a.admin.button', text: 'Admin Page', wait: 5)
 
     controls_order = evaluate_script(
       "Array.from(document.querySelectorAll('#gather-stats .gather-controls > *')).map((el) => el.id || el.className)"
@@ -106,7 +106,7 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     sign_in_via_session(user)
     visit gather_path(gather)
 
-    expect(page).to have_selector('.vote-link', wait: 5)
+    expect(page).to have_css('.vote-link', wait: 5)
 
     execute_script <<~JS
       const audio = document.getElementById('gather-music')
@@ -145,11 +145,11 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     visit gather_path(gather)
 
     click_button 'Mute'
-    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(true)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to be(true)
     expect(page).to have_button('Unmute', id: 'mute')
 
     click_button 'Unmute'
-    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(false)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to be(false)
     expect(page).to have_button('Mute', id: 'mute')
   end
 
@@ -160,11 +160,11 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     visit gather_path(gather)
 
     click_button 'Mute'
-    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(true)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to be(true)
     expect(page).to have_button('Unmute', id: 'mute')
 
     click_button 'Unmute'
-    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(false)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to be(false)
     expect(page).to have_button('Mute', id: 'mute')
   end
 
@@ -180,6 +180,6 @@ RSpec.feature 'Gather sync watchdog', type: :feature, js: true do
     visit gather_path(gather)
 
     expect(page).to have_button('Unmute', id: 'mute', wait: 5)
-    expect(evaluate_script("document.getElementById('gather-music').muted")).to eq(true)
+    expect(evaluate_script("document.getElementById('gather-music').muted")).to be(true)
   end
 end

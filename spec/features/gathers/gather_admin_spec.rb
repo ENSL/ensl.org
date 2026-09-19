@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Gather admin actions', type: :feature, js: true do
+RSpec.feature 'Gather admin actions', :js, type: :feature do
   before(:all) do
     Capybara.default_max_wait_time = 5
   end
@@ -34,7 +34,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       visit edit_gather_path(gather)
 
       # Wait for the form to load
-      expect(page).to have_selector('select#gather_turn', wait: 5)
+      expect(page).to have_css('select#gather_turn', wait: 5)
 
       find('select#gather_turn').select('Team 2')
 
@@ -42,7 +42,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       click_button 'Change Turn'
 
       # Wait for the redirect/update to complete
-      expect(page).to have_selector('div#gather', wait: 10)
+      expect(page).to have_css('div#gather', wait: 10)
 
       gather.reload
       expect(gather.turn).to eq(2)
@@ -60,12 +60,12 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     Capybara.using_session('observer') do
       sign_in_via_session(users.first)
       visit gather_path(gather)
-      expect(page).to have_content(original_maps.first.to_s)
-      expect(page).to have_content(original_maps.second.to_s)
-      expect(page).to have_content(original_server.to_s)
-      expect(page).to have_no_content(selected_maps.first.to_s)
-      expect(page).to have_no_content(selected_maps.second.to_s)
-      expect(page).to have_no_content(selected_server.to_s)
+      expect(page).to have_text(original_maps.first.to_s)
+      expect(page).to have_text(original_maps.second.to_s)
+      expect(page).to have_text(original_server.to_s)
+      expect(page).to have_no_text(selected_maps.first.to_s)
+      expect(page).to have_no_text(selected_maps.second.to_s)
+      expect(page).to have_no_text(selected_server.to_s)
     end
 
     Capybara.using_session('admin') do
@@ -77,7 +77,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       select selected_server.to_s, from: 'gather_server_id'
       click_button 'Change Maps and Server'
 
-      expect(page).to have_selector('div#gather', wait: 10)
+      expect(page).to have_css('div#gather', wait: 10)
     end
 
     gather.reload
@@ -86,9 +86,9 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     expect(gather.server).to eq(selected_server)
 
     Capybara.using_session('observer') do
-      expect(page).to have_content(selected_maps.first.to_s, wait: 10)
-      expect(page).to have_content(selected_maps.second.to_s)
-      expect(page).to have_content(selected_server.to_s)
+      expect(page).to have_text(selected_maps.first.to_s, wait: 10)
+      expect(page).to have_text(selected_maps.second.to_s)
+      expect(page).to have_text(selected_server.to_s)
     end
   end
 
@@ -116,7 +116,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       click_button 'Restart Gather'
 
       # edits navigate to the new gather page; wait for it to load
-      expect(page).to have_selector('div#gather')
+      expect(page).to have_css('div#gather')
 
       gather.reload
       expect(gather.status).to eq(Gather::STATE_PICKING)
@@ -138,7 +138,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       click_button 'Replace Player'
 
       # the UI should show the replacement username when the action completes
-      expect(page).to have_content(replacement_user.username)
+      expect(page).to have_text(replacement_user.username)
 
       gather.reload
       expect(gather.users.map(&:id)).to include(replacement_user.id)
@@ -159,7 +159,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       fill_in 'gatherer_username', with: 'missing-player'
       click_button 'Replace Player'
 
-      expect(page).to have_content('Username User not found')
+      expect(page).to have_text('Username User not found')
       expect(gather.reload.users.ids).to match_array(original_user_ids)
     end
   end
@@ -187,7 +187,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
     Capybara.using_session('observer') do
       sign_in_via_session(joined_users.first)
       visit gather_path(open_gather)
-      expect(page).to have_content('1 more needed')
+      expect(page).to have_text('1 more needed')
     end
 
     Capybara.using_session('admin') do
@@ -195,15 +195,15 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       visit edit_gather_path(open_gather)
       fill_in 'Username', with: added_user.username
       click_button 'Add Player'
-      expect(page).to have_content(I18n.t('gathers.join'))
+      expect(page).to have_text(I18n.t('gathers.join'))
     end
 
     expect(open_gather.reload.status).to eq(Gather::STATE_VOTING)
     expect(open_gather.gatherers.of_user(added_user)).to exist
 
     Capybara.using_session('observer') do
-      expect(page).to have_content('Please vote captains and maps.', wait: 10)
-      expect(page).to have_content(added_user.username)
+      expect(page).to have_text('Please vote captains and maps.', wait: 10)
+      expect(page).to have_text(added_user.username)
     end
   end
 
@@ -216,7 +216,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
       fill_in 'Username', with: 'missing-player'
       click_button 'Add Player'
 
-      expect(page).to have_content('Username User not found')
+      expect(page).to have_text('Username User not found')
       expect(open_gather.reload.gatherers).to be_empty
     end
   end
@@ -242,7 +242,7 @@ RSpec.feature 'Gather admin actions', type: :feature, js: true do
 
       # submit the new gather form, wait for the flash notification, then assert DB change
       find('form.new_gather input[type=submit]').click
-      expect(page).to have_selector('#notification .message', text: I18n.t('gathers.create'))
+      expect(page).to have_css('#notification .message', text: I18n.t('gathers.create'))
       expect(Gather.count).to eq(gather_count + 1)
 
       new_gather = Gather.where(category: gather.category).order('id DESC').first

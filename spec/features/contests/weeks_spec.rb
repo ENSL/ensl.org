@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Weeks management', type: :feature, js: true do
+RSpec.feature 'Weeks management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
   let!(:map1) { create(:map) }
@@ -30,7 +30,7 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
 
     expect(page).to have_current_path(/weeks|contests/)
     open_weeks_tab
-    expect(page).to have_content('Spec Week')
+    expect(page).to have_text('Spec Week')
   end
 
   scenario 'Update a week via the edit view with JS', :aggregate_failures do
@@ -40,7 +40,7 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
     fill_in 'week_name', with: 'Updated Week Name'
     click_button 'Save Week'
 
-    expect(page).to have_content('Updated Week Name')
+    expect(page).to have_text('Updated Week Name')
   end
 
   scenario 'Delete a week from the contest edit view', :aggregate_failures do
@@ -57,6 +57,6 @@ RSpec.feature 'Weeks management', type: :feature, js: true do
       end
     end
 
-    expect(page).not_to have_content(week.name, wait: 5)
+    expect(page).to have_no_text(week.name, wait: 5)
   end
 end
