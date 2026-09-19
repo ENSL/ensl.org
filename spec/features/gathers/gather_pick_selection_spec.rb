@@ -9,7 +9,9 @@ RSpec.feature 'Gather pick selection', type: :feature do
   let!(:candidate) { create(:gatherer, gather: gather) }
 
   before do
+    # rubocop:disable Rails/SkipsModelValidations -- Arrange the in-progress picking state without transition callbacks.
     gather.update_columns(status: Gather::STATE_PICKING, captain1_id: captain_gatherer.id, turn: 1)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   scenario 'keeps a selected player checked after a live gather-frame replacement', js: true do

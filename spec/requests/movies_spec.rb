@@ -60,7 +60,9 @@ RSpec.describe 'MoviesController', type: :request do
       FileUtils.mkdir_p(File.dirname(preview.path))
       File.write(preview.path, 'preview-bytes')
       # Simulate a broken/orphaned directory association while `path` still resolves.
+      # rubocop:disable Rails/SkipsModelValidations -- Deliberately create the corrupted association under test.
       preview.update_columns(directory_id: nil)
+      # rubocop:enable Rails/SkipsModelValidations
       movie.update!(preview: preview)
       login_as(admin)
 
@@ -231,7 +233,9 @@ RSpec.describe 'MoviesController', type: :request do
       File.write(preview.path, 'preview-bytes')
       # Simulate a broken/orphaned directory association (e.g. reorganized outside Rails)
       # while the cached `path` column still points at the real file.
+      # rubocop:disable Rails/SkipsModelValidations -- Deliberately create the corrupted association under test.
       preview.update_columns(directory_id: nil)
+      # rubocop:enable Rails/SkipsModelValidations
 
       get "/movies/#{movie.id}"
 

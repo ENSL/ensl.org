@@ -25,10 +25,12 @@ RSpec.describe 'Analysis::TechPathsController', type: :request do
       get '/analysis/tech_paths', params: { path_length: 'all', min_rounds: 5 }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(*%w[grenades armor_upgrade_1 armor_upgrade_2 armor_upgrade_3 weapon_upgrade_1
-                                           weapon_upgrade_2 weapon_upgrade_3].map do |icon|
+      icon_paths = %w[
+        grenades armor_upgrade_1 armor_upgrade_2 armor_upgrade_3 weapon_upgrade_1 weapon_upgrade_2 weapon_upgrade_3
+      ].map do |icon|
         "/images/ns1/#{icon}.png"
-      end)
+      end
+      expect(response.body).to include(*icon_paths)
       expect(response.body).not_to include('/images/ns1/grenade_launcher.gif')
       expect(response.body).not_to include('/images/ns1/armor_upgrades.gif')
       expect(response.body).not_to include('/images/ns1/damage_upgrades.gif')

@@ -33,14 +33,8 @@ class RoundsController < ApplicationController
                           .group(Arel.sql('YEAR(start_time)'), Arel.sql('MONTH(start_time)')).count
     @total_rounds = monthly_counts.values.sum
     @months = monthly_buckets(monthly_counts)
-    @years = @months.group_by { |month| month[:date].year }
-                    .map { |year, months| { year: year, count: months.sum { |month| month[:count] } } }
-                    .sort_by { |year| year[:year] }
-    @quarters = @months.group_by { |month| [month[:date].year, ((month[:date].month - 1) / 3) + 1] }
-                       .map do |(year, quarter), months|
-                         { year: year, quarter: quarter, count: months.sum { |month| month[:count] } }
-                       end
-                       .sort_by { |quarter| [quarter[:year], quarter[:quarter]] }
+    @years = year_summaries(@months)
+    @quarters = quarter_summaries(@months)
     @peak_monthly_count = @months.map { |month| month[:count] }.max || 0
     render layout: 'full'
   end
@@ -81,5 +75,19 @@ class RoundsController < ApplicationController
     (first_date..last_date).select { |date| date.day == 1 }.map do |date|
       { date: date, count: monthly_counts.fetch([date.year, date.month], 0) }
     end
+  end
+
+  def year_summaries(months)
+    years = months.group_by { |month| month[:date].year }
+    summaries = years.map { |year, entries| { year: year, count: entries.sum { |month| month[:count] } } }
+    summaries.sort_by { |year| year[:year] }
+  end
+
+  def quarter_summaries(months)
+    quarters = months.group_by { |month| [month[:date].year, ((month[:date].month - 1) / 3) + 1] }
+    summaries = quarters.map do |(year, quarter), entries|
+      { year: year, quarter: quarter, count: entries.sum { |month| month[:count] } }
+    end
+    summaries.sort_by { |quarter| [quarter[:year], quarter[:quarter]] }
   end
 end

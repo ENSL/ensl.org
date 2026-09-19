@@ -106,17 +106,19 @@ feature 'User profile', js: true do
     click_button 'Update Profile'
 
     expect(page).to have_content(I18n.t('flash.actions.update.notice', resource_name: User.model_name.human))
-    expect(user.reload.attributes.slice('firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone',
-                                        'public_email')).to eq(
-                                          'firstname' => 'Updated',
-                                          'lastname' => 'Member',
-                                          'email' => 'updated@example.com',
-                                          'steamid' => '0:1:123456789',
-                                          'birthdate' => Date.new(1990, 1, 2),
-                                          'country' => 'NO',
-                                          'time_zone' => 'London',
-                                          'public_email' => true
-                                        )
+    attributes = user.reload.attributes.slice(
+      'firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone', 'public_email'
+    )
+    expect(attributes).to eq(
+      'firstname' => 'Updated',
+      'lastname' => 'Member',
+      'email' => 'updated@example.com',
+      'steamid' => '0:1:123456789',
+      'birthdate' => Date.new(1990, 1, 2),
+      'country' => 'NO',
+      'time_zone' => 'London',
+      'public_email' => true
+    )
     expect(user.profile).to have_attributes(
       id: profile_id,
       steam_profile: 'updated_player',

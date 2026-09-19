@@ -303,17 +303,19 @@ RSpec.describe 'UsersController', type: :request do
       }
 
       expect(response).to redirect_to(user_path(user))
-      expect(user.reload.attributes.slice('firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone',
-                                          'public_email')).to eq(
-                                            'firstname' => 'Updated',
-                                            'lastname' => 'Member',
-                                            'email' => 'updated@example.com',
-                                            'steamid' => '0:1:123456789',
-                                            'birthdate' => Date.new(1990, 1, 2),
-                                            'country' => 'NO',
-                                            'time_zone' => 'Europe/Oslo',
-                                            'public_email' => true
-                                          )
+      attributes = user.reload.attributes.slice(
+        'firstname', 'lastname', 'email', 'steamid', 'birthdate', 'country', 'time_zone', 'public_email'
+      )
+      expect(attributes).to eq(
+        'firstname' => 'Updated',
+        'lastname' => 'Member',
+        'email' => 'updated@example.com',
+        'steamid' => '0:1:123456789',
+        'birthdate' => Date.new(1990, 1, 2),
+        'country' => 'NO',
+        'time_zone' => 'Europe/Oslo',
+        'public_email' => true
+      )
       expect(user.profile.attributes.slice('steam_profile', 'web', 'achievements', 'signature', 'stream', 'town',
                                            'notify_news', 'notify_articles', 'notify_movies', 'notify_gather',
                                            'notify_push_gather', 'notify_own_match', 'notify_any_match',

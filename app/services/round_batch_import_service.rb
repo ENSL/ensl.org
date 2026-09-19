@@ -44,12 +44,12 @@ class RoundBatchImportService
     connection = database.connect
 
     stats = {
-      log_files: upsert(LogFile, read_log_files(connection)),
-      rounds: upsert(Round, read_rounds(connection))
+      log_files: bulk_upsert(LogFile, read_log_files(connection)),
+      rounds: bulk_upsert(Round, read_rounds(connection))
     }
     # Rounders/log_lines resolve their round_id/log_file_id against what was
     # just imported above, so the id maps must be rebuilt after that upsert.
-    stats[:rounders] = upsert(Rounder, read_rounders(connection))
+    stats[:rounders] = bulk_upsert(Rounder, read_rounders(connection))
     stats[:log_lines] = upsert_log_lines(connection)
 
     if stats.values.sum(&:processed).zero?
@@ -72,7 +72,7 @@ class RoundBatchImportService
     end
   end
 
-  def upsert(model, rows)
+  def bulk_upsert(model, rows)
     return ImportRowStat.new(processed: 0, inserted: 0) if rows.empty?
 
     max_id_before = model.maximum(:id) || 0

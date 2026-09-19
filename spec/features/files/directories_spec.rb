@@ -32,7 +32,10 @@ RSpec.feature 'Directories management', type: :feature, js: true do
     within("#dir_#{parent.id}") do
       expect(page).to have_content('Directory intro')
       expect(page).to have_link(child.title)
-      expect(page.evaluate_script("getComputedStyle(document.querySelector('#dir_#{parent.id} .subdirectories ul')).listStyleType")).to eq('disc')
+      list_style = page.evaluate_script(
+        "getComputedStyle(document.querySelector('#dir_#{parent.id} .subdirectories ul')).listStyleType"
+      )
+      expect(list_style).to eq('disc')
       expect(page).to have_content(file.title)
       expect(page).to have_content('Release notes text')
       expect(page).not_to have_link('Edit Directory')

@@ -94,8 +94,13 @@ module AnalysisHelper
       count = tag.sup("x#{group.size}", class: 'alien-strategy-action__count') if group.size > 1
       next tag.span(safe_join([action.upcase, count].compact), class: 'alien-strategy-action__fallback') unless details
 
-      tag.span(safe_join([image_tag(tech_icon_path(details[:icon]), class: 'alien-strategy-action__icon', alt: details[:label],
-                                                                    title: details[:label]), count].compact),
+      image = image_tag(
+        tech_icon_path(details[:icon]),
+        class: 'alien-strategy-action__icon',
+        alt: details[:label],
+        title: details[:label]
+      )
+      tag.span(safe_join([image, count].compact),
                class: 'alien-strategy-action', title: details[:label])
     end
     safe_join(actions, tag.span('›', class: 'alien-strategy-role__arrow', aria: { hidden: true }))
@@ -155,7 +160,12 @@ module AnalysisHelper
     lines << 'classDef research fill:transparent,stroke:transparent,color:transparent'
     lines << 'class start start'
     lines << 'class arms_lab,observatory,armory,proto_lab,turret_factory building'
-    lines << 'class research_armorl1,research_armorl2,research_armorl3,research_weaponsl1,research_weaponsl2,research_weaponsl3,research_catalysts,research_motiontracking,research_phasetech,research_grenades,research_jetpacks,research_heavyarmor,research_electrical,research_advturretfactory,research_advarmory research'
+    research_nodes = %w[
+      research_armorl1 research_armorl2 research_armorl3 research_weaponsl1 research_weaponsl2 research_weaponsl3
+      research_catalysts research_motiontracking research_phasetech research_grenades research_jetpacks
+      research_heavyarmor research_electrical research_advturretfactory research_advarmory
+    ].join(',')
+    lines << "class #{research_nodes} research"
     lines.join("\n")
   end
 
@@ -187,15 +197,21 @@ module AnalysisHelper
       tech_requirement_tree_result(rows, rounds_analysed, position, min_rounds: min_rounds)
     end
     overall_rows = paths.select { |row| row[:path].last == research }
-    next_choices = paths.select { |row| row[:path].length > 1 && row[:path][-2] == research }
-                        .group_by { |row| row[:path].last }
-                        .filter_map do |next_research, rows|
-      result = tech_requirement_tree_result(rows, rounds_analysed, min_rounds: min_rounds)
-      result&.merge(key: tech_requirement_tree_node_id(next_research), label: tech_path_research_name(next_research))
-    end.max_by(5) { |result| [result[:win_ratio], result[:rounds]] }
+    next_choices = tech_requirement_next_choices(paths, research, rounds_analysed, min_rounds)
 
-    { overall: tech_requirement_tree_result(overall_rows, rounds_analysed, min_rounds: min_rounds), positions: positions,
+    { overall: tech_requirement_tree_result(overall_rows, rounds_analysed, min_rounds: min_rounds),
+      positions: positions,
       next_choices: next_choices }
+  end
+
+  def tech_requirement_next_choices(paths, research, rounds_analysed, min_rounds)
+    rows = paths.select { |row| row[:path].length > 1 && row[:path][-2] == research }
+    groups = rows.group_by { |row| row[:path].last }
+    results = groups.filter_map do |next_research, next_rows|
+      result = tech_requirement_tree_result(next_rows, rounds_analysed, min_rounds: min_rounds)
+      result&.merge(key: tech_requirement_tree_node_id(next_research), label: tech_path_research_name(next_research))
+    end
+    results.max_by(5) { |result| [result[:win_ratio], result[:rounds]] }
   end
 
   def tech_requirement_tree_result(rows, rounds_analysed, position = nil, min_rounds:)

@@ -214,7 +214,11 @@ RSpec.describe 'rounds/show', type: :view do
     render
 
     expect(strip_tags(rendered)).to include('MarineOne killed AlienOne with LMG')
-    expect(rendered).to match(%r{MarineOne<img[^>]+src="/images/ns1/lmg.gif"[^>]*> killed AlienOne<img[^>]+src="/images/ns1/fade.gif"[^>]*> with LMG}m)
+    timeline_kill = %r{
+      MarineOne<img[^>]+src="/images/ns1/lmg.gif"[^>]*>\ killed\ AlienOne
+      <img[^>]+src="/images/ns1/fade.gif"[^>]*>\ with\ LMG
+    }mx
+    expect(rendered).to match(timeline_kill)
   end
 
   it 'shows "scanned the area" instead of "built a Scan"' do

@@ -51,7 +51,9 @@ RSpec.describe 'GroupersController', type: :request do
 
     it 'creates a membership for a user with a legacy invalid primary team' do
       invalid_team = create(:team)
+      # rubocop:disable Rails/SkipsModelValidations -- Simulate the legacy invalid association this request must tolerate.
       user.update_column(:team_id, invalid_team.id)
+      # rubocop:enable Rails/SkipsModelValidations
       login_as(admin)
 
       expect do
