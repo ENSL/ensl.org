@@ -175,6 +175,18 @@ RSpec/StubbedMock:
 RSpec/VerifiedDoubles:
   Enabled: false
 
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 Capybara/RSpec/NegationMatcherAfterVisit:
   Enabled: false
 
