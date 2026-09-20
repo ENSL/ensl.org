@@ -66,19 +66,20 @@
         <h2>Downloads</h2>
         <div class="movie-full__downloads">
             <% @movie.all_files.compact.each do |movie_file| %>
+                <% download_url = movie_download_url(movie_file) %>
                 <article class="movie-full__download">
                     <div class="movie-full__file-icon"><%= fa_icon('file-video-o') %></div>
                     <div class="movie-full__file-info">
-                        <% if movie_file.file_exists? %>
-                            <%= link_to File.basename(movie_file.name.to_s), movie_file.url, class: 'movie-full__file-name' %>
+                        <% if movie_file.file_exists? && download_url %>
+                            <%= link_to File.basename(movie_file.name.to_s), download_url, class: 'movie-full__file-name' %>
                         <% else %>
                             <span class="movie-full__file-name muted"><%= File.basename(movie_file.name.to_s) %></span>
                             <span class="movie-full__missing">File missing</span>
                         <% end %>
                         <span class="movie-full__file-meta"><%= movie_file.size_s %> MB &middot; MD5 <%= movie_file.md5_s %></span>
                     </div>
-                    <% if movie_file.file_exists? %>
-                        <%= link_to movie_file.url, class: 'movie-full__download-link', title: 'Download file', 'aria-label': "Download #{File.basename(movie_file.name.to_s)}" do %>
+                    <% if movie_file.file_exists? && download_url %>
+                        <%= link_to download_url, class: 'movie-full__download-link', title: 'Download file', 'aria-label': "Download #{File.basename(movie_file.name.to_s)}" do %>
                             <%= fa_icon('download') %>
                         <% end %>
                     <% end %>
