@@ -43,7 +43,7 @@ RSpec.feature 'Matches management', :js, type: :feature do
     expect(page).to have_current_path(/matches|contests/) # redirected to match or contest edit
 
     # Not necessary
-    find("a[href='#matches']").click
+    click_link(href: '#matches')
 
     expect(page).to have_css('#matches table.matches')
     within('#matches') do
@@ -82,7 +82,7 @@ RSpec.feature 'Matches management', :js, type: :feature do
     expect(Match.where(contest: contest).count).to eq(1)
 
     visit edit_contest_path(contest)
-    find("a[href='#matches']").click
+    click_link(href: '#matches')
     expect(page).to have_css('#matches table.matches')
     expect(page).to have_text(match.contester1.team.name)
 

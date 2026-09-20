@@ -80,8 +80,8 @@ RSpec.describe GoogleCalendar do
       allow(CALENDAR::CalendarService).to receive(:new).and_return(service)
       calendar = described_class.new('calendar-id', 'UTC')
 
-      expect('[nsltv] event').to match(calendar.nsltv_regex)
-      expect('regular event').not_to match(calendar.nsltv_regex)
+      expect(calendar.nsltv_regex.match?('[nsltv] event')).to be(true)
+      expect(calendar.nsltv_regex.match?('regular event')).to be(false)
     end
   end
 end

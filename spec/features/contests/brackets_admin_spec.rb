@@ -15,7 +15,7 @@ RSpec.feature 'Bracket Admin Integration test', :js, type: :feature do
     visit edit_bracket_path(bracket)
 
     expect(page).to have_text('Editing Bracket')
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # Change the name
     fill_in 'bracket_name', with: 'Updated Bracket Name'
@@ -91,7 +91,7 @@ RSpec.feature 'Bracket Admin Integration test', :js, type: :feature do
     brackets_tab.click
 
     # Wait for the tab content to be visible
-    expect(page).to have_css('#brackets', visible: true, wait: 5)
+    expect(page).to have_css('#brackets', visible: :visible, wait: 5)
 
     # Create first bracket for round of 16
     within('#brackets') do
@@ -110,7 +110,7 @@ RSpec.feature 'Bracket Admin Integration test', :js, type: :feature do
     brackets_tab.click
 
     # Wait for the tab content to be visible
-    expect(page).to have_css('#brackets', visible: true, wait: 5)
+    expect(page).to have_css('#brackets', visible: :visible, wait: 5)
 
     # Create second bracket for finals
     within('#brackets') do
@@ -136,7 +136,7 @@ RSpec.feature 'Bracket Admin Integration test', :js, type: :feature do
     visit edit_bracket_path(bracket)
 
     expect(page).to have_text('Editing Bracket')
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # Get all cell select dropdowns
     selects = all('select[name*="cell"]')

@@ -130,7 +130,7 @@ RSpec.describe SessionBloatGuard do
   # writes the 'OpenID::*'/'omniauth.*' keys, and GET /auth/steam/callback reads them back.
   # Pruning those keys on either side of that pair breaks Steam login outright, which is
   # exactly the regression this guards against.
-  context 'during the Steam OmniAuth handshake' do
+  context 'when handling the Steam OmniAuth handshake' do
     it 'preserves discovery keys written during the begin request so they reach the browser' do
       inner_app_that_discovers = lambda do |env|
         env['rack.session'].merge!(build_session(logged_in: false))

@@ -32,16 +32,16 @@ RSpec.describe Movie, type: :model do
   end
 
   describe 'validations' do
-    subject { described_class.new(file: data_file) }
+    subject(:movie) { described_class.new(file: data_file) }
 
     it { is_expected.to validate_length_of(:content).is_at_most(200).allow_blank }
     it { is_expected.to validate_length_of(:format).is_at_most(200).allow_blank }
 
     it {
-      expect(subject).to validate_numericality_of(:length).only_integer
-                                                          .is_greater_than_or_equal_to(0)
-                                                          .is_less_than_or_equal_to(50_000)
-                                                          .allow_nil
+      expect(movie).to validate_numericality_of(:length).only_integer
+                                                        .is_greater_than_or_equal_to(0)
+                                                        .is_less_than_or_equal_to(50_000)
+                                                        .allow_nil
     }
 
     it 'allows file to be blank' do
@@ -76,8 +76,11 @@ RSpec.describe Movie, type: :model do
 
     before do
       # Stub VideoProcessing to avoid running external binaries
-      allow(VideoProcessing).to receive_messages(probe_web_compat: { metadata: { foo: 'bar' }, web_friendly: true,
-                                                                     oneliner: 'h264' }, probe_duration_seconds!: 123, random_snapshot!: true)
+      allow(VideoProcessing).to receive_messages(
+        probe_web_compat: { metadata: { foo: 'bar' }, web_friendly: true, oneliner: 'h264' },
+        probe_duration_seconds!: 123,
+        random_snapshot!: true
+      )
       allow(movie).to receive(:processable_source_path).and_return(data_file.location)
 
       # Stub filesystem helpers
@@ -265,7 +268,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context 'preview_path and preview_url' do
+    context 'with preview paths and URLs' do
       it 'builds preview_path from file location' do
         allow(data_file).to receive(:location).and_return('/var/www/public/uploads/video.mp4')
         movie.file = data_file
@@ -428,7 +431,7 @@ RSpec.describe Movie, type: :model do
       end
     end
 
-    context 'private helpers and permissions' do
+    context 'with private helpers and permissions' do
       it 'creates snapshot directory when missing before writing snapshot' do
         movie.file = data_file
         dir = File.dirname(movie.snapshot_path)

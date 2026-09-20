@@ -57,9 +57,10 @@ describe GithubReleaseAssetSyncJob do
     end
 
     it 'falls back to default repo when options are not a hash' do
-      allow(job).to receive(:fetch_tags).with('ENSL/NS').and_return([])
-      allow(job).to receive(:fetch_release_assets).with('ENSL/NS').and_return({})
+      expect(job).to receive(:fetch_tags).with('ENSL/NS').and_return([])
       allow(Directory).to receive(:find_by).with(id: Directory::ROOT).and_return(nil)
+
+      expect(DirectoryReconciliationService).not_to receive(:new)
 
       job.perform('invalid-options')
     end

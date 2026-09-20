@@ -85,7 +85,7 @@ RSpec.describe 'CommentsController', type: :request do
       { comment: { text: 'Great article!', commentable_type: 'Article', commentable_id: article.id } }
     end
 
-    context 'JS format (the normal in-page create flow)' do
+    context 'with JS format for the normal in-page create flow' do
       it 'creates a comment and renders the JS response for an authenticated user' do
         login_as(user)
         expect do
@@ -111,7 +111,7 @@ RSpec.describe 'CommentsController', type: :request do
       end
     end
 
-    context 'HTML format' do
+    context 'with HTML format' do
       it 'returns 403 when a guest (not logged in) tries to create a comment' do
         expect do
           post '/comments', params: valid_params

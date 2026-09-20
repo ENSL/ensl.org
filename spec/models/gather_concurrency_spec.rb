@@ -164,7 +164,7 @@ RSpec.describe 'Gather Concurrency Protection', type: :model do
       gather.gatherers.create!(user: user)
 
       # Voting started recently, timeout not expired
-      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 100) # 100 seconds timeout, only 5 passed
+      allow(gather).to receive_messages(voting_start_time: 5.seconds.ago, voting_timeout: 100)
 
       gather.refresh(nil)
 

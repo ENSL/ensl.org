@@ -34,7 +34,7 @@ RSpec.feature 'Gather admin actions', :js, type: :feature do
       visit edit_gather_path(gather)
 
       # Wait for the form to load
-      expect(page).to have_css('select#gather_turn', wait: 5)
+      expect(page).to have_select('gather_turn', wait: 5)
 
       find('select#gather_turn').select('Team 2')
 

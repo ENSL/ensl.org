@@ -48,7 +48,7 @@ RSpec.feature 'Teams management', :js, type: :feature do
     visit edit_team_path(team)
 
     new_name = "Team #{team.id} Edit"
-    find("a[href='#details']").click
+    click_link(href: '#details')
     within('#details') do
       fill_in 'team_name', with: new_name
       click_button 'Update'
@@ -96,7 +96,7 @@ RSpec.feature 'Teams management', :js, type: :feature do
     sign_in_as(user)
     visit edit_team_path(team)
     # show members tab (tabs are JS-controlled)
-    find("a[href='#members']").click
+    click_link(href: '#members')
 
     within('#members', visible: :all) do
       # Promote joiner to member and set a comment
@@ -114,7 +114,7 @@ RSpec.feature 'Teams management', :js, type: :feature do
     end
 
     visit edit_team_path(team)
-    find("a[href='#members']").click
+    click_link(href: '#members')
     within('#members', visible: :all) do
       row = find('tr', text: member.user.username)
       link = row.first('a.button.tiny')
@@ -158,7 +158,7 @@ RSpec.feature 'Teams management', :js, type: :feature do
     expect(find_field('team_name').value).to include('Admin Edited')
 
     # Admin accepts the joiner and sets comment
-    find("a[href='#members']").click
+    click_link(href: '#members')
     within('#members', visible: :all) do
       find("input[name='comment[#{member.id}]']").set('Invited')
       find("select[name='rank[#{member.id}]']").find(:option, 'Member').select_option
@@ -180,7 +180,7 @@ RSpec.feature 'Teams management', :js, type: :feature do
     sign_in_as(admin)
     visit edit_team_path(team)
 
-    find("a[href='#members']").click
+    click_link(href: '#members')
     within('#members', visible: :all) do
       fill_in 'teamer[username]', with: new_member.username
       click_button 'Add Member'

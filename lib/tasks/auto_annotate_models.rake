@@ -5,6 +5,8 @@
 # NOTE: to have a dev-mode tool do its thing in production.
 if Rails.env.development? && defined?(Annotate)
   require 'annotate'
+
+  desc 'Configure model annotation defaults'
   task set_annotation_options: :environment do
     # You can override any of these by setting an environment variable of the
     # same name.

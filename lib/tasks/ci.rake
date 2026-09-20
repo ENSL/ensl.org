@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 namespace :ci do
+  desc 'Deploy the current CI branch to its configured environment'
   task deploy: :environment do
     require 'rubygems'
     require 'capistrano/all'

@@ -70,8 +70,13 @@ RSpec.describe AnalysisBatchImportService do
     end
 
     it 'returns flattened rows from all sources and closes resources' do
-      allow(service).to receive_messages(read_legacy_rows: [{ a: 1 }], read_skill_model_rows: [{ b: 2 }],
-                                         read_player_stat_rows: [], read_map_balance_rows: [{ c: 3 }], read_time_of_week_rows: [])
+      allow(service).to receive_messages(
+        read_legacy_rows: [{ a: 1 }],
+        read_skill_model_rows: [{ b: 2 }],
+        read_player_stat_rows: [],
+        read_map_balance_rows: [{ c: 3 }],
+        read_time_of_week_rows: []
+      )
 
       rows = service.send(:read_rows)
 

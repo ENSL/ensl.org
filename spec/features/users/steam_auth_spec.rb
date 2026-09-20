@@ -7,7 +7,7 @@ RSpec.describe 'Steam authentication link', :js, type: :feature do
     visit root_path
 
     expect(page).to have_css('a.steam-login')
-    expect(page).to have_css('form#steam-auth-form[style*="display:none"]', visible: false)
+    expect(page).to have_css('form#steam-auth-form[style*="display:none"]', visible: :all)
   end
 
   it 'user creates a new account via Steam', :js do
@@ -28,7 +28,7 @@ RSpec.describe 'Steam authentication link', :js, type: :feature do
 
     # Verify the steam login components exist
     expect(page).to have_css('a.steam-login')
-    expect(page).to have_css('form#steam-auth-form[style*="display:none"]', visible: false)
+    expect(page).to have_css('form#steam-auth-form[style*="display:none"]', visible: :all)
 
     # click the steam image inside the link so Capybara can interact reliably
     find('a.steam-login img').click

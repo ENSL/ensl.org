@@ -10,12 +10,13 @@ RSpec.describe 'Exception checker', order: :defined, type: :request do
     File.open(log_file, 'a') do |file|
       file.puts('ERROR -- : NoMethodError: exception checker test')
     end
-    expect(true).to be(true)
+
+    expect(log_file.read).to include('NoMethodError: exception checker test')
   end
 
   it 'ignores old log errors from previous tests' do
     # Should not fail: no new log entries are written in this example.
-    expect(true).to be(true)
+    expect { assert_no_log_errors }.not_to raise_error
   end
 
   it 'ignores messages processed after a WebSocket closes' do

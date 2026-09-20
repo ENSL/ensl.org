@@ -7,7 +7,7 @@ feature 'User creates new article', :js do
   let(:article) { attributes_for(:article) }
 
   describe 'with valid Title, Content, Category' do
-    context 'as a basic user' do
+    context 'when signed in as a basic user' do
       let!(:user) { create(:user) }
 
       before do
@@ -121,7 +121,7 @@ feature 'User creates new article', :js do
         select 'Markdown (recommended)', from: 'article_text_coding'
 
         expect(page).to have_no_selector('.tox-tinymce', wait: 5)
-        expect(page).to have_field('article_text', visible: true)
+        expect(page).to have_field('article_text', visible: :visible)
         expect(page).to have_select('article_text_coding', selected: 'Markdown (recommended)', disabled: false)
       end
 
@@ -180,7 +180,7 @@ feature 'User creates new article', :js do
 
     it 'uses the full layout and provides link, image, and table controls' do
       expect(page).to have_no_selector('#sidebar')
-      expect(page).to have_no_selector('.article-editor-status', visible: true)
+      expect(page).to have_no_selector('.article-editor-status', visible: :visible)
       expect(page).to have_css('button[data-mce-name="link"]')
       expect(page).to have_css('button[data-mce-name="image"]')
       expect(page).to have_css('button[data-mce-name="table"]')
@@ -264,7 +264,7 @@ feature 'User creates new article', :js do
       expect(page).to have_current_path(edit_article_path(html_article))
       expect(page.evaluate_script('window.articleTurboNavigation')).to be(true)
       expect(page).to have_css('.tox-tinymce', wait: 5)
-      expect(page).to have_no_selector('.article-editor-status', visible: true)
+      expect(page).to have_no_selector('.article-editor-status', visible: :visible)
     end
   end
 

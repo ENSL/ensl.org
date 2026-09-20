@@ -662,8 +662,12 @@ describe DataFile do
       File.write(old_path, 'move me')
 
       file = build(:data_file, path: old_path)
-      allow(file).to receive_messages(location: old_path,
-                                      directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'), carrierwave_store_absolute_path: new_path, name: instance_double(Uploader, identifier: nil))
+      allow(file).to receive_messages(
+        location: old_path,
+        directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'),
+        carrierwave_store_absolute_path: new_path,
+        name: instance_double(FileUploader, identifier: nil)
+      )
 
       file.send(:move_file_between_directories)
 
@@ -677,8 +681,12 @@ describe DataFile do
       File.write(old_path, 'move me')
 
       file = build(:data_file, path: old_path)
-      allow(file).to receive_messages(location: old_path,
-                                      directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'), carrierwave_store_absolute_path: '/tmp/test_dirs/moved/move_fail_to.txt', name: instance_double(Uploader, identifier: nil))
+      allow(file).to receive_messages(
+        location: old_path,
+        directory: instance_double(Directory, full_path: '/tmp/test_dirs/moved'),
+        carrierwave_store_absolute_path: '/tmp/test_dirs/moved/move_fail_to.txt',
+        name: instance_double(FileUploader, identifier: nil)
+      )
       allow(FileUtils).to receive(:mv).and_raise(StandardError, 'cannot move')
 
       expect { file.send(:move_file_between_directories) }.to raise_error(ActiveRecord::RecordInvalid)

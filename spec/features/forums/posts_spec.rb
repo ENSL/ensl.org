@@ -15,7 +15,7 @@ feature 'User manages forum posts', :js do
     create(:forumer, forum: forum, group: reply_group, access: Forumer::ACCESS_REPLY)
   end
 
-  context 'as a basic user' do
+  context 'when signed in as a basic user' do
     before { sign_in_as(user) }
 
     describe 'creating a new post' do
@@ -204,7 +204,7 @@ feature 'User manages forum posts', :js do
         # Form becomes visible
         expect(page).to have_css('#reply', visible: :visible)
         # Textarea should be visible
-        expect(page).to have_css('#reply textarea', visible: true)
+        expect(page).to have_css('#reply textarea', visible: :visible)
       end
 
       it 'creates a post via AJAX' do
@@ -265,7 +265,7 @@ feature 'User manages forum posts', :js do
         # Some drivers don't execute the JS response that removes the `invisible` class.
         expect(page).to have_text('Test message')
         expect(page).to have_css('#reply', visible: :hidden)
-        expect(page).to have_css('button.fastReply', visible: :all, wait: 5)
+        expect(page).to have_button(class: 'fastReply', visible: :all, wait: 5)
       end
 
       it 'displays validation errors without closing form' do
@@ -341,7 +341,7 @@ feature 'User manages forum posts', :js do
     end
   end
 
-  context 'as an admin user' do
+  context 'when signed in as an admin user' do
     before { sign_in_as(admin) }
 
     describe 'admin post management' do
@@ -410,7 +410,7 @@ feature 'User manages forum posts', :js do
     end
   end
 
-  context 'as an unauthenticated user' do
+  context 'when unauthenticated' do
     it 'cannot create a post' do
       visit new_post_path(id: topic.id)
       expect(page).to have_text('not allowed to visit')

@@ -390,7 +390,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
     end
 
     scenario 'movie maker can destroy their own movie', js: false do
-      skip
+      skip 'Movie deletion by its creator is not supported by the current UI flow.'
       movie = create_movie_with_file(
         name: 'Maker Destroy Own',
         user: movie_maker,
@@ -556,7 +556,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
       expect(movie.preview).to be_present
       expect(movie.preview_url).to be_present
       expect(movie.original_url).to be_present
-      expect(page).to have_css("video source[src='#{movie.original_url}']", visible: false)
+      expect(page).to have_css("video source[src='#{movie.original_url}']", visible: :all)
     end
 
     scenario 'movie with rails-made preview (not web_friendly initially) shows preview after generation' do

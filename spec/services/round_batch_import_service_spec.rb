@@ -13,17 +13,29 @@ RSpec.describe RoundBatchImportService do
 
   describe '#call' do
     it 'raises when nothing was imported' do
-      allow(service).to receive_messages(read_log_files: [], read_rounds: [], read_rounders: [],
-                                         upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0))
+      allow(service).to receive_messages(
+        read_log_files: [],
+        read_rounds: [],
+        read_rounders: [],
+        upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0)
+      )
 
       expect { service.call }.to raise_error(RoundBatchImportService::Error, /No recognized exports/)
     end
 
     it 'upserts each table and returns row counts' do
-      allow(service).to receive_messages(read_log_files: [{ sha256: 'abc', filename: 'a.log',
-                                                            server_name: 's', created_at: Time.current }], read_rounds: [{ server_name: 's', start_time: Time.current,
-                                                                                                                           end_time: Time.current, map_name: 'ns_eclipse',
-                                                                                                                           result: 1 }], read_rounders: [{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }], upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0))
+      allow(service).to receive_messages(
+        read_log_files: [{ sha256: 'abc', filename: 'a.log', server_name: 's', created_at: Time.current }],
+        read_rounds: [{
+          server_name: 's',
+          start_time: Time.current,
+          end_time: Time.current,
+          map_name: 'ns_eclipse',
+          result: 1
+        }],
+        read_rounders: [{ round_id: 1, steamid: '1:2:3', team: 1, share: 1.0 }],
+        upsert_log_lines: ImportRowStat.new(processed: 0, inserted: 0)
+      )
       allow(LogFile).to receive(:upsert_all)
       allow(Round).to receive(:upsert_all)
       allow(Rounder).to receive(:upsert_all)

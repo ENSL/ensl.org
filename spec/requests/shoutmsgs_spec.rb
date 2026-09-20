@@ -44,7 +44,7 @@ RSpec.describe 'Shoutmsgs', type: :request do
   end
 
   describe 'POST /shoutmsgs' do
-    context 'turbo stream' do
+    context 'with a Turbo Stream response' do
       it 'creates main shout and resets the main shout form' do
         login_as(user)
 
@@ -127,7 +127,7 @@ RSpec.describe 'Shoutmsgs', type: :request do
       end
     end
 
-    context 'html' do
+    context 'with an HTML response' do
       it 'redirects back after successful create' do
         login_as(user)
 

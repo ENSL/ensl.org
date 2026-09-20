@@ -163,7 +163,7 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     find_by_id('predictions').click
 
     # Verify predictions are displayed
-    expect(page).to have_css('table.predictions')
+    expect(page).to have_table(class: 'predictions')
     expect(page).to have_text('2 - 1')
     expect(page).to have_text('3 - 0')
     expect(page).to have_text('1 - 1')
@@ -315,7 +315,7 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     expect(page).to have_no_button('Add Prediction')
 
     # Should see the statistics view
-    expect(page).to have_no_css('input#prediction_score1')
+    expect(page).to have_no_field('prediction_score1')
   end
 
   scenario 'Prediction with score one set higher than 100 is rejected' do

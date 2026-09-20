@@ -273,8 +273,14 @@ describe Directory do
 
   describe '#full_title' do
     it 'returns title for root directory' do
-      dir = described_class.new(id: Directory::ROOT, name: 'test', title: 'Test Directory', path: @test_root, parent: nil,
-                                hidden: false)
+      dir = described_class.new(
+        id: Directory::ROOT,
+        name: 'test',
+        title: 'Test Directory',
+        path: @test_root,
+        parent: nil,
+        hidden: false
+      )
       dir.save!(validate: false)
       # directory_traverse returns empty list for root
       # So full_title returns empty string for root directories

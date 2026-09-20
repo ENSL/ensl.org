@@ -35,7 +35,7 @@ RSpec.feature 'Ladder contest UI integration', :js, type: :feature do
     )
 
     visit contest_path(contest)
-    expect(page).to have_css('table.contest', text: team.name)
+    expect(page).to have_table(class: 'contest', text: team.name)
   end
 
   def submit_form_without_turbo(action:, commit_value:)
@@ -84,7 +84,7 @@ RSpec.feature 'Ladder contest UI integration', :js, type: :feature do
 
     visit contest_path(contest)
     expect(page).to have_text('Ladder')
-    expect(page).to have_css('table.contest')
+    expect(page).to have_table(class: 'contest')
 
     teams.each do |team|
       expect(page).to have_text(team.name)
@@ -187,7 +187,7 @@ RSpec.feature 'Ladder contest UI integration', :js, type: :feature do
     expect(match.score2).to eq(2)
 
     visit contest_path(contest)
-    expect(page).to have_css('table.contest')
+    expect(page).to have_table(class: 'contest')
 
     within('table.contest tbody') do
       row = find('tr', text: teams[0].name)
@@ -237,7 +237,7 @@ RSpec.feature 'Ladder contest UI integration', :js, type: :feature do
     end
 
     visit contest_path(contest)
-    expect(page).to have_css('table.contest')
+    expect(page).to have_table(class: 'contest')
 
     within('table.contest tbody') do
       teams.each do |team|

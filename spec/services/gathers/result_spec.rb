@@ -108,7 +108,7 @@ describe Gathers::Result do
   end
 
   describe 'usage in services' do
-    context 'successful operation' do
+    context 'when the operation succeeds' do
       let(:gather) { create(:gather) }
       let(:gatherer) { create(:gatherer, gather: gather) }
 
@@ -118,7 +118,7 @@ describe Gathers::Result do
       end
     end
 
-    context 'failed operation' do
+    context 'when the operation fails' do
       let(:gather) { create(:gather) }
       let(:error) { Exceptions::AccessError.new('Not allowed') }
 

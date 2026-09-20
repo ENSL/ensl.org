@@ -112,12 +112,12 @@ RSpec.describe Bracketer, type: :model do
 
     it 'compares a next-round team slot directly' do
       allow(bracketer).to receive_messages(disabled: false, effective_contester_id: 10)
-      allow(bracketer).to receive(:next_round_cell).and_return(instance_double(described_class, disabled: false, team_id: 10,
-                                                                                                match_id: nil))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: 10, match_id: nil)
+      allow(bracketer).to receive(:next_round_cell).and_return(next_round_cell)
       expect(bracketer.result_class).to eq('win1')
 
-      allow(bracketer).to receive(:next_round_cell).and_return(instance_double(described_class, disabled: false, team_id: 11,
-                                                                                                match_id: nil))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: 11, match_id: nil)
+      allow(bracketer).to receive(:next_round_cell).and_return(next_round_cell)
       expect(bracketer.result_class).to eq('win2')
     end
 
@@ -126,19 +126,23 @@ RSpec.describe Bracketer, type: :model do
       allow(bracketer).to receive(:next_round_cell).and_return(nil)
       expect(bracketer.result_class).to be_nil
 
-      allow(bracketer).to receive(:next_round_cell).and_return(instance_double(described_class, disabled: true, team_id: nil,
-                                                                                                match_id: nil))
+      next_round_cell = instance_double(described_class, disabled: true, team_id: nil, match_id: nil)
+      allow(bracketer).to receive(:next_round_cell).and_return(next_round_cell)
       expect(bracketer.result_class).to be_nil
 
-      allow(bracketer).to receive(:next_round_cell).and_return(instance_double(described_class, disabled: false,
-                                                                                                team_id: nil, match_id: nil))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: nil, match_id: nil)
+      allow(bracketer).to receive(:next_round_cell).and_return(next_round_cell)
       expect(bracketer.result_class).to be_nil
     end
 
     it 'derives the result from the next-round match when the advancing team is contester1' do
       next_match = instance_double(Match, score1: 3, score2: 1, contester1_id: 10, contester2_id: 20)
-      allow(bracketer).to receive_messages(disabled: false, effective_contester_id: 10, next_round_cell: instance_double(described_class, disabled: false,
-                                                                                                                                          team_id: nil, match_id: 99))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: nil, match_id: 99)
+      allow(bracketer).to receive_messages(
+        disabled: false,
+        effective_contester_id: 10,
+        next_round_cell: next_round_cell
+      )
       allow(Match).to receive(:find_by).with(id: 99).and_return(next_match)
       expect(bracketer.result_class).to eq('win1')
 
@@ -153,8 +157,12 @@ RSpec.describe Bracketer, type: :model do
 
     it 'derives the result from the next-round match when the advancing team is contester2' do
       next_match = instance_double(Match, score1: 1, score2: 3, contester1_id: 20, contester2_id: 10)
-      allow(bracketer).to receive_messages(disabled: false, effective_contester_id: 10, next_round_cell: instance_double(described_class, disabled: false,
-                                                                                                                                          team_id: nil, match_id: 100))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: nil, match_id: 100)
+      allow(bracketer).to receive_messages(
+        disabled: false,
+        effective_contester_id: 10,
+        next_round_cell: next_round_cell
+      )
       allow(Match).to receive(:find_by).with(id: 100).and_return(next_match)
       expect(bracketer.result_class).to eq('win1')
 
@@ -164,8 +172,12 @@ RSpec.describe Bracketer, type: :model do
 
     it 'returns nil when the next-round match cannot resolve the advancing team' do
       unresolved_match = instance_double(Match, score1: nil, score2: nil, contester1_id: 20, contester2_id: 30)
-      allow(bracketer).to receive_messages(disabled: false, effective_contester_id: 10, next_round_cell: instance_double(described_class, disabled: false,
-                                                                                                                                          team_id: nil, match_id: 101))
+      next_round_cell = instance_double(described_class, disabled: false, team_id: nil, match_id: 101)
+      allow(bracketer).to receive_messages(
+        disabled: false,
+        effective_contester_id: 10,
+        next_round_cell: next_round_cell
+      )
       allow(Match).to receive(:find_by).with(id: 101).and_return(unresolved_match)
       expect(bracketer.result_class).to be_nil
 

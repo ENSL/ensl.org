@@ -15,7 +15,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
 
     # Verify bracket page loads and displays basic information
     expect(page).to have_text('Main Tournament')
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # Verify all appointed teams are rendered by content
     bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
@@ -37,7 +37,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
     visit bracket_path(bracket)
 
     expect(page).to have_text('Teams Only')
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # All bracketers should be teams, none should be matches
     bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
@@ -56,7 +56,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
     visit bracket_path(bracket)
 
     expect(page).to have_text('Mixed Bracket')
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # Check that disabled cells have proper disabled styling
     disabled_cells = all('td.team.disabled')
@@ -78,7 +78,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
     sign_in_via_session(user)
     visit bracket_path(bracket)
 
-    expect(page).to have_css('table.brackets')
+    expect(page).to have_table(class: 'brackets')
 
     # Bracket should have rendered cells even with orphans and mismatches
     all_cells = all('td.team')
@@ -104,7 +104,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
 
       # Verify bracket renders and shows correct slot count
       expect(page).to have_text("#{slot_count} Slot")
-      expect(page).to have_css('table.brackets')
+      expect(page).to have_table(class: 'brackets')
 
       # Verify all team cells and match cells are rendered by checking their content
       bracket.bracketers.where.not(team_id: nil).find_each do |bracketer|
@@ -159,7 +159,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
       end
     else
       # If mixed factory didn't create any non-disabled custom text, just verify page renders
-      expect(page).to have_css('table.brackets')
+      expect(page).to have_table(class: 'brackets')
     end
   end
 
@@ -173,12 +173,11 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
     disabled_cells = all('td.team.disabled')
 
     # Disabled cells should not contain team names or match links
-    disabled_cells.each do |cell|
-      # Cell should not have links or team content
-      expect(cell).to have_no_css('.team-content')
-      expect(cell).to have_no_css('a[href*="/matches/"]')
-      expect(cell).to have_no_css('a[href*="/contesters/"]')
-    end
+    expect(disabled_cells).to all(
+      have_no_css('.team-content')
+        .and(have_no_css('a[href*="/matches/"]'))
+        .and(have_no_css('a[href*="/contesters/"]'))
+    )
   end
 
   scenario 'Result classes are properly applied without duplicates' do
@@ -220,7 +219,7 @@ RSpec.feature 'Bracket rendering', :js, type: :feature do
     if connector_cells.empty?
       # No connectors rendered for this configuration (may happen if cells are disabled);
       # ensure bracket still renders rather than failing.
-      expect(page).to have_css('table.brackets')
+      expect(page).to have_table(class: 'brackets')
     else
       expect(connector_cells.length).to be_positive
 

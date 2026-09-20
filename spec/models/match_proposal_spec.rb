@@ -213,7 +213,7 @@ RSpec.describe MatchProposal, type: :model do
   end
 
   describe '#status_change_allowed?' do
-    context 'changing to STATUS_PENDING' do
+    context 'when changing to STATUS_PENDING' do
       let(:proposal) do
         create(:match_proposal, match: match, team: team1,
                                 proposed_time: 1.day.from_now, status: MatchProposal::STATUS_CONFIRMED)
@@ -226,7 +226,7 @@ RSpec.describe MatchProposal, type: :model do
       end
     end
 
-    context 'changing to STATUS_DELAYED' do
+    context 'when changing to STATUS_DELAYED' do
       it 'allows admin to delay confirmed match within time limit' do
         admin = create(:user, :admin)
         proposal = create(:match_proposal, match: match, team: team1,
@@ -255,7 +255,7 @@ RSpec.describe MatchProposal, type: :model do
       end
     end
 
-    context 'changing to STATUS_REVOKED' do
+    context 'when changing to STATUS_REVOKED' do
       it 'allows proposing team to revoke pending proposal' do
         proposal = create(:match_proposal, match: match, team: team1,
                                            proposed_time: 1.day.from_now, status: MatchProposal::STATUS_PENDING)
@@ -281,7 +281,7 @@ RSpec.describe MatchProposal, type: :model do
       end
     end
 
-    context 'changing to STATUS_CONFIRMED' do
+    context 'when changing to STATUS_CONFIRMED' do
       it 'allows opposing team to confirm pending proposal outside time limit' do
         proposal = create(:match_proposal, match: match, team: team1,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
@@ -307,7 +307,7 @@ RSpec.describe MatchProposal, type: :model do
       end
     end
 
-    context 'changing to STATUS_REJECTED' do
+    context 'when changing to STATUS_REJECTED' do
       it 'allows opposing team to reject pending proposal outside time limit' do
         proposal = create(:match_proposal, match: match, team: team1,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
@@ -333,7 +333,7 @@ RSpec.describe MatchProposal, type: :model do
       end
     end
 
-    context 'changing to invalid status' do
+    context 'when changing to an invalid status' do
       it 'denies change to invalid status' do
         proposal = create(:match_proposal, match: match, team: team1,
                                            proposed_time: 1.day.from_now, status: MatchProposal::STATUS_PENDING)

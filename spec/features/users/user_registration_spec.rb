@@ -68,7 +68,7 @@ feature 'Visitor signs up', :js do
   end
 
   scenario 'with out of range Steam ID' do
-    skip
+    skip 'Out-of-range Steam ID validation is not currently enforced.'
     within registration_form do
       fill_form(:user, user.slice(*sign_up_attributes).merge(steamid: '0:0:2147483648'))
       click_button submit(:user, :create)

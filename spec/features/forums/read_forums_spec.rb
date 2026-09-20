@@ -7,7 +7,7 @@ feature 'User reads forums', :js do
     create_list(:forum, 5, :with_content)
   end
 
-  context 'as a basic user' do
+  context 'when signed in as a basic user' do
     let!(:user) { create(:user) }
 
     before do

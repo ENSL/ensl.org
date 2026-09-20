@@ -116,7 +116,7 @@ RSpec.feature 'Directories management', :js, type: :feature do
     click_link 'Back to directory'
 
     expect(page).to have_current_path(directory_path(directory))
-    expect(page).to have_css("#dir_#{directory.id}", visible: true)
+    expect(page).to have_css("#dir_#{directory.id}", visible: :visible)
     expect(page).to have_link(child.title)
 
     within("#file_#{file.id}") do
