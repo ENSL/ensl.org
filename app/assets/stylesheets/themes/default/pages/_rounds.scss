@@ -9,10 +9,18 @@
   margin: 8px 0 20px;
 
   h1 { margin: 0; }
-  p { margin: 5px 0 0; color: $medium-gray; }
+
+  p {
+    margin: 5px 0 0;
+    color: $medium-gray;
+  }
 }
 
-.rounds-archive__calendar-link { float: none; margin: 0; white-space: nowrap; }
+.rounds-archive__calendar-link {
+  float: none;
+  margin: 0;
+  white-space: nowrap;
+}
 
 .rounds-archive__filters {
   padding: 18px 20px 1px;
@@ -27,9 +35,22 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px 16px;
 
-  .fields { display: flex; flex-direction: column; margin: 0; }
-  label { padding: 0 0 4px; color: $medium-gray; font-size: 0.8rem; }
-  input, select { box-sizing: border-box; width: 100%; }
+  .fields {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  label {
+    padding: 0 0 4px;
+    color: $medium-gray;
+    font-size: 0.8rem;
+  }
+
+  input, select {
+    box-sizing: border-box;
+    width: 100%;
+  }
 }
 
 .rounds-archive__filter-actions {
@@ -37,10 +58,16 @@
   align-items: end;
   gap: 10px;
 
-  input[type=submit], .button { float: none; margin: 0; }
+  input[type="submit"], .button {
+    float: none;
+    margin: 0;
+  }
 }
 
-.rounds-archive__count { margin: 22px 0 0; color: $medium-gray; }
+.rounds-archive__count {
+  margin: 22px 0 0;
+  color: $medium-gray;
+}
 .rounds-archive__table td:last-child { text-align: right; }
 
 #rounds-statistics {
@@ -206,7 +233,10 @@
   gap: 12px;
   margin: 20px 0 26px;
 
-  .button { float: none; margin: 0; }
+  .button {
+    float: none;
+    margin: 0;
+  }
 }
 
 .rounds-calendar__year-form {
@@ -215,8 +245,13 @@
   gap: 8px;
   margin: 0;
 
-  input { width: 7ch; height: 35px; box-sizing: border-box; }
-  input[type=submit] { margin: 0; }
+  input {
+    width: 7ch;
+    height: 35px;
+    box-sizing: border-box;
+  }
+
+  input[type="submit"] { margin: 0; }
 }
 
 .rounds-calendar__months {
@@ -233,7 +268,11 @@
   border-radius: 6px;
   box-shadow: $light-shadow;
 
-  h2 { margin: 0 0 10px; color: $blue; font-size: 1rem; }
+  h2 {
+    margin: 0 0 10px;
+    color: $blue;
+    font-size: 1rem;
+  }
 }
 
 .rounds-calendar__weekdays,
@@ -260,13 +299,20 @@
   font-size: 0.7rem;
   text-decoration: none;
 
-  strong { align-self: end; color: $blue; font-size: 0.75rem; }
+  strong {
+    align-self: end;
+    color: $blue;
+    font-size: 0.75rem;
+  }
   &--empty { pointer-events: none; }
   &--1 { background: color.adjust($light-blue, $alpha: -0.78); }
   &--2 { background: color.adjust($light-blue, $alpha: -0.58); }
   &--3 { background: color.adjust($light-blue, $alpha: -0.35); }
   &--4 { background: $light-blue; }
-  &:not(&--empty):hover { outline: 2px solid $blue; outline-offset: -2px; }
+  &:not(&--empty):hover {
+    outline: 2px solid $blue;
+    outline-offset: -2px;
+  }
 }
 
 @media (width <= 760px) {
@@ -280,9 +326,15 @@
 }
 
 @media (width <= 500px) {
-  .rounds-archive__header { align-items: start; flex-direction: column; }
+  .rounds-archive__header {
+    align-items: start;
+    flex-direction: column;
+  }
   .rounds-archive__filter-grid { grid-template-columns: 1fr; }
-  .rounds-calendar__year-nav { align-items: stretch; flex-direction: column; }
+  .rounds-calendar__year-nav {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .rounds-calendar__year-nav .button { text-align: center; }
   .rounds-calendar__year-form { justify-content: center; }
   .rounds-calendar__months { grid-template-columns: 1fr; }
@@ -332,7 +384,10 @@
     justify-content: space-between;
     margin: 0 0 20px;
 
-    .button { float: none; margin: 0; }
+    .button {
+      float: none;
+      margin: 0;
+    }
     .next { text-align: right; }
     .previous i { margin-right: 10px; }
     .next i { margin-left: 10px; }

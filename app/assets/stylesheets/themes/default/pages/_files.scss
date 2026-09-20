@@ -304,7 +304,7 @@ table.movie {
     gap: 7px;
   }
 
-  @media (max-width: 680px) {
+  @media (width <= 680px) {
     &__header h1 { font-size: 1.65rem; }
     &__meta { grid-template-columns: repeat(2, 1fr); }
   }
