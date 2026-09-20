@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Run using bin/ci
+# Run using bin/static-checks
 
 CI.run do
   step 'Setup', 'bin/setup --skip-server'
@@ -8,15 +8,10 @@ CI.run do
   step 'Static analysis: Rails design', 'bundle exec rails_best_practices --without-color .'
   step 'Static analysis: Brakeman', 'bundle exec brakeman --quiet --no-pager'
   step 'Static analysis: Gem audit', 'bin/bundler-audit'
+  step 'Static analysis: Gem updates', 'bundle outdated'
   step 'Static analysis: Importmap audit', 'bin/importmap audit'
+  step 'Static analysis: JavaScript vulnerabilities', 'yarn audit --level moderate'
   step 'Static analysis: CSS', 'yarn lint:css'
   step 'Static analysis: Zeitwerk compliance', 'bin/rails zeitwerk:check'
-
-  # Optional: set a green GitHub commit status to unblock PR merge.
-  # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.
-  # if success?
-  #   step "Signoff: All systems go. Ready for merge and deploy.", "gh signoff"
-  # else
-  #   failure "Signoff: CI failed. Do not merge or deploy.", "Fix the issues and try again."
-  # end
+  step 'Static analysis: Leaked secrets', 'gitleaks detect --redact --no-banner'
 end

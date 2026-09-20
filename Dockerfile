@@ -35,6 +35,8 @@ RUN \
             #   general fetch/debug utility retained for runtime/admin scripts.
             # - ffmpeg:
             #   required by app/services/video_processing.rb and app/models/movie.rb for transcode/thumbnail work.
+            # - gitleaks:
+            #   scans repository history for exposed secrets during manual static checks.
             # - imagemagick, libmagickwand-dev:
             #   required by carrierwave + rmagick (app/uploaders/image_uploader.rb includes CarrierWave::RMagick).
             # - libimage-exiftool-perl:
@@ -51,7 +53,7 @@ RUN \
             #   required to unpack the downloaded DuckDB C API archive.
             # - vlc:
             #   required by app/models/movie.rb (VLC binary invocation for legacy conversion paths).
-            build-essential clang curl ffmpeg imagemagick libclang-dev \
+            build-essential clang curl ffmpeg gitleaks imagemagick libclang-dev \
             libimage-exiftool-perl libmariadb-dev libmariadb-dev-compat \
             libmagickwand-dev libreadline-dev libssl-dev libxml2-dev \
             libxslt1-dev libyaml-dev screen unzip vlc zlib1g-dev && \
