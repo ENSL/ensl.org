@@ -175,6 +175,11 @@ RSpec/StubbedMock:
 RSpec/VerifiedDoubles:
   Enabled: false
 
+Capybara/RSpec/NegationMatcherAfterVisit:
+  Enabled: false
+
+# More like metrics
+
 RSpec/ExampleLength:
   Enabled: false
 
@@ -187,8 +192,6 @@ RSpec/NestedGroups:
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
-Capybara/RSpec/NegationMatcherAfterVisit:
-  Enabled: false
 
 # This legacy calendar scenario is intentionally disabled while the widget is
 # redesigned; it remains as a feature fixture and is not named as an active spec.
