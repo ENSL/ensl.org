@@ -63,16 +63,6 @@ class Round < ApplicationRecord
   scope :for_length, ->(bucket) { Round.apply_length_filter(self, bucket) }
   scope :between_dates, ->(from, to) { Round.apply_date_filter(self, from, to) }
 
-  ARCHIVE_FILTER_SCOPES = {
-    steamid: :for_steamid,
-    username: :for_username,
-    nickname: :for_nickname,
-    map: :for_map,
-    server: :for_server,
-    result: :for_result,
-    length: :for_length
-  }.freeze
-
   def self.present_map_names
     where.not(map_name: [nil, '']).distinct.order(:map_name).pluck(:map_name)
   end
@@ -86,9 +76,15 @@ class Round < ApplicationRecord
   end
 
   def self.filtered(filters)
-    ARCHIVE_FILTER_SCOPES.reduce(all) do |scope, (filter, scope_name)|
-      scope.public_send(scope_name, filters[filter])
-    end.between_dates(filters[:from], filters[:to]).distinct
+    all.for_steamid(filters[:steamid])
+       .for_username(filters[:username])
+       .for_nickname(filters[:nickname])
+       .for_map(filters[:map])
+       .for_server(filters[:server])
+       .for_result(filters[:result])
+       .for_length(filters[:length])
+       .between_dates(filters[:from], filters[:to])
+       .distinct
   end
 
   def winner_s

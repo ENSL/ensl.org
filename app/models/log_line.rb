@@ -114,7 +114,7 @@ end
 #     vars[:round].server = server
 #     vars[:round].start = created_at
 #     vars[:round].map_name = vars[:map]
-#     vars[:round].map = Map.with_name(vars[:map]).first
+#     vars[:round].map = Map.find_by(name: vars[:map])
 #     vars[:round].save
 #     vars[:lifeforms] = {}
 #     self.details = LogEvent.get 'start'

@@ -27,7 +27,6 @@ class Map < ApplicationRecord
   }, dependent: :nullify, inverse_of: :map1
 
   scope :basic, -> { where(deleted: false).order('name') }
-  scope :with_name, ->(name) { where(name: name) }
   scope :classic, -> { where("name LIKE 'ns_%'") }
 
   validates :name, length: { maximum: 20 }

@@ -3,7 +3,7 @@
         <p class="movie-full__eyebrow">Movie archive</p>
         <h1><%= @movie %></h1>
         <% if @movie.user %>
-            <p class="movie-full__byline">Submitted by <%= link_to @movie.user.username, movies_url(author: @movie.user_id) %></p>
+            <p class="movie-full__byline">Submitted by <%= link_to @movie.user_username, movies_url(author: @movie.user_id) %></p>
         <% end %>
 
         <% if cuser && @movie.can_update?(cuser) %>
@@ -47,15 +47,15 @@
             <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.length_s %></span><span class="movie-full__stat-label">Length</span></div>
         <% end %>
         <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.view_count %></span><span class="movie-full__stat-label">Views</span></div>
-        <% if @movie.format.present? %>
+        <% if @movie.format? %>
             <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.format %></span><span class="movie-full__stat-label">Format</span></div>
         <% end %>
         <% if @movie.file %>
-            <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.file.created_at.strftime('%b %-d, %Y') %></span><span class="movie-full__stat-label">Added</span></div>
+            <div class="movie-full__stat"><span class="movie-full__stat-value"><%= @movie.file_created_at.strftime('%b %-d, %Y') %></span><span class="movie-full__stat-label">Added</span></div>
         <% end %>
     </div>
 
-    <% if @movie.content.present? %>
+    <% if @movie.content? %>
         <section class="movie-full__card">
             <h2>About this movie</h2>
             <div class="movie-full__description"><%= simple_format @movie.content %></div>

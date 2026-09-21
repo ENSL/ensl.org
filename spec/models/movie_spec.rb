@@ -89,6 +89,14 @@ RSpec.describe Movie, type: :model do
       allow(FileUtils).to receive(:rm)
     end
 
+    it 'delegates submitter username and file creation time' do
+      file_created_at = Time.zone.parse('2026-09-21 12:00:00')
+      allow(data_file).to receive(:created_at).and_return(file_created_at)
+
+      expect(movie.user_username).to eq('alice')
+      expect(movie.file_created_at).to eq(file_created_at)
+    end
+
     it 'sets metadata and web_friendly and format on probe_metadata' do
       movie.file = data_file
       movie.probe_metadata

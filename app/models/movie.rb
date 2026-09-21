@@ -83,6 +83,8 @@ class Movie < ApplicationRecord
   # after_save :make_preview, unless: :web_friendly
 
   delegate :to_s, to: :file
+  delegate :username, to: :user, prefix: true, allow_nil: true
+  delegate :created_at, to: :file, prefix: true, allow_nil: true
 
   def file=(value)
     if value.nil? || value.is_a?(DataFile)

@@ -160,16 +160,6 @@ RSpec.feature 'Admin manages maps', :js, type: :feature do
     expect(Map.classic).not_to include(custom)
   end
 
-  scenario 'with_name scope filters by exact name' do
-    target_map = create(:map, name: 'ns_specific')
-    other_map = create(:map, name: 'ns_other')
-
-    result = Map.with_name('ns_specific')
-
-    expect(result).to include(target_map)
-    expect(result).not_to include(other_map)
-  end
-
   scenario 'map to_s returns the map name' do
     map = create(:map, name: 'ns_toString')
     expect(map.to_s).to eq('ns_toString')
