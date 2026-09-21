@@ -103,8 +103,8 @@ describe ServerMetadataSyncJob do
   describe '#fetch_server_snapshot' do
     it 'falls back from GoldSrc to Source for HLDS servers' do
       server = create(:server, :active, domain: Server::DOMAIN_HLDS, ip: '127.0.0.1', port: '27015')
-      gold_query = instance_double(GoldQuery)
-      source_query = instance_double(SourceQuery)
+      gold_query = instance_double('GoldQuery')
+      source_query = instance_double('SourceQuery')
 
       allow(gold_src_class).to receive(:new).with('127.0.0.1', 27_015).and_return(gold_query)
       allow(source_class).to receive(:new).with('127.0.0.1', 27_015).and_return(source_query)
@@ -121,7 +121,7 @@ describe ServerMetadataSyncJob do
 
     it 'normalizes non-hash server_info to an empty hash' do
       server = create(:server, :active, domain: Server::DOMAIN_NS2, ip: '127.0.0.2', port: '27016')
-      source_query = instance_double(SourceQuery, ping: 16.4)
+      source_query = instance_double('SourceQuery', ping: 16.4)
 
       allow(source_class).to receive(:new).with('127.0.0.2', 27_016).and_return(source_query)
       allow(source_query).to receive(:update_ping)
@@ -132,8 +132,8 @@ describe ServerMetadataSyncJob do
 
     it 'raises combined class-specific errors when all query classes fail' do
       server = create(:server, :active, domain: Server::DOMAIN_HLDS, ip: '127.0.0.3', port: '27017')
-      gold_query = instance_double(GoldQuery)
-      source_query = instance_double(SourceQuery)
+      gold_query = instance_double('GoldQuery')
+      source_query = instance_double('SourceQuery')
 
       allow(gold_src_class).to receive(:new).with('127.0.0.3', 27_017).and_return(gold_query)
       allow(source_class).to receive(:new).with('127.0.0.3', 27_017).and_return(source_query)

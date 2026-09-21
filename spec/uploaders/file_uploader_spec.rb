@@ -6,7 +6,7 @@ RSpec.describe FileUploader do
   subject(:uploader) { described_class.new(model) }
 
   let(:relative_path) { 'unused' }
-  let(:model) { instance_double(UploadModel, directory: directory) }
+  let(:model) { instance_double('UploadModel', directory: directory) }
   let(:directory) { instance_double(Directory, relative_path: relative_path) }
 
   around do |example|

@@ -57,7 +57,7 @@ RSpec.describe BracketsHelper, type: :helper do
   end
 
   describe '#render_connector?' do
-    let(:relation) { instance_double(BracketerRelation) }
+    let(:relation) { instance_double('BracketerRelation') }
     let(:bracket) { instance_double(Bracket, bracketers: relation) }
 
     it 'returns the connector position directly in edit mode' do
@@ -70,8 +70,8 @@ RSpec.describe BracketsHelper, type: :helper do
     end
 
     it 'returns true when both adjacent cells exist and are enabled' do
-      above_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
-      below_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
+      above_scope = instance_double('BracketerScope', first: instance_double(Bracketer, disabled: false))
+      below_scope = instance_double('BracketerScope', first: instance_double(Bracketer, disabled: false))
 
       allow(relation).to receive(:pos).with(1, 0).and_return(above_scope)
       allow(relation).to receive(:pos).with(3, 0).and_return(below_scope)
@@ -80,8 +80,8 @@ RSpec.describe BracketsHelper, type: :helper do
     end
 
     it 'returns false when one adjacent cell is disabled' do
-      above_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: true))
-      below_scope = instance_double(BracketerScope, first: instance_double(Bracketer, disabled: false))
+      above_scope = instance_double('BracketerScope', first: instance_double(Bracketer, disabled: true))
+      below_scope = instance_double('BracketerScope', first: instance_double(Bracketer, disabled: false))
 
       allow(relation).to receive(:pos).with(1, 0).and_return(above_scope)
       allow(relation).to receive(:pos).with(3, 0).and_return(below_scope)

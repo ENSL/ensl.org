@@ -77,14 +77,14 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'marks voting gathers as voted when the current user has voted' do
-      votes_relation = instance_double(VotesRelation)
+      votes_relation = instance_double('VotesRelation')
       gather = instance_double(Gather, status: Gather::STATE_VOTING, gatherer_votes: votes_relation)
       current_user = instance_double(User, id: 9)
       gatherer = instance_double(Gatherer)
 
       allow(helper).to receive_messages(gather_from_context: gather, gatherer_from_context: gatherer)
       helper.define_singleton_method(:cuser) { current_user }
-      allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double(FilteredVotes, any?: true))
+      allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double('FilteredVotes', any?: true))
 
       helper.render_gather
 
@@ -95,13 +95,13 @@ RSpec.describe GathersHelper, type: :helper do
     end
 
     it 'marks voting gathers as voting when the current user has not voted' do
-      votes_relation = instance_double(VotesRelation)
+      votes_relation = instance_double('VotesRelation')
       gather = instance_double(Gather, status: Gather::STATE_VOTING, gatherer_votes: votes_relation)
       current_user = instance_double(User, id: 9)
 
       allow(helper).to receive_messages(gather_from_context: gather, gatherer_from_context: nil)
       helper.define_singleton_method(:cuser) { current_user }
-      allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double(FilteredVotes,
+      allow(votes_relation).to receive(:where).with(user_id: 9).and_return(instance_double('FilteredVotes',
                                                                                            any?: false))
 
       helper.render_gather
@@ -136,10 +136,10 @@ RSpec.describe GathersHelper, type: :helper do
 
   describe '#gather_music_should_play?' do
     let(:user) { instance_double(User, id: 5) }
-    let(:gather_users) { instance_double(GatherUsers) }
-    let(:gatherer_votes) { instance_double(VoteScope) }
-    let(:map_votes) { instance_double(VoteScope) }
-    let(:server_votes) { instance_double(VoteScope) }
+    let(:gather_users) { instance_double('GatherUsers') }
+    let(:gatherer_votes) { instance_double('VoteScope') }
+    let(:map_votes) { instance_double('VoteScope') }
+    let(:server_votes) { instance_double('VoteScope') }
     let(:gather) do
       instance_double(
         Gather,
@@ -182,7 +182,7 @@ RSpec.describe GathersHelper, type: :helper do
 
     it 'returns false when any vote has already been cast' do
       allow(gather_users).to receive(:exists?).with(5).and_return(true)
-      allow(gatherer_votes).to receive(:where).with(user_id: 5).and_return(instance_double(GathererVoteQuery,
+      allow(gatherer_votes).to receive(:where).with(user_id: 5).and_return(instance_double('GathererVoteQuery',
                                                                                            exists?: true))
 
       expect(helper.gather_music_should_play?).to be(false)
@@ -190,10 +190,10 @@ RSpec.describe GathersHelper, type: :helper do
 
     it 'returns true when the user can still vote on all categories' do
       allow(gather_users).to receive(:exists?).with(5).and_return(true)
-      allow(gatherer_votes).to receive(:where).with(user_id: 5).and_return(instance_double(GathererVoteQuery,
+      allow(gatherer_votes).to receive(:where).with(user_id: 5).and_return(instance_double('GathererVoteQuery',
                                                                                            exists?: false))
-      allow(map_votes).to receive(:where).with(user_id: 5).and_return(instance_double(MapVoteQuery, exists?: false))
-      allow(server_votes).to receive(:where).with(user_id: 5).and_return(instance_double(ServerVoteQuery,
+      allow(map_votes).to receive(:where).with(user_id: 5).and_return(instance_double('MapVoteQuery', exists?: false))
+      allow(server_votes).to receive(:where).with(user_id: 5).and_return(instance_double('ServerVoteQuery',
                                                                                          exists?: false))
 
       expect(helper.gather_music_should_play?).to be(true)

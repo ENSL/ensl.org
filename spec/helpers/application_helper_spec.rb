@@ -168,9 +168,9 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'builds comment state and renders the comments partial for commentable objects' do
-      comments = instance_double(CommentsRelation)
-      ordered_comments = instance_double(OrderedComments)
-      object = instance_double(Commentable, comments: comments)
+      comments = instance_double('CommentsRelation')
+      ordered_comments = instance_double('OrderedComments')
+      object = instance_double('Commentable', comments: comments)
       new_comment = instance_double(Comment)
 
       allow(Comment).to receive(:new).with(commentable: object).and_return(new_comment)
@@ -484,7 +484,7 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe '#event_start_time' do
     it 'converts event start into current helper timezone' do
       datetime = DateTime.parse('2026-02-03T12:00:00+00:00')
-      event = instance_double(Event, start: instance_double(Start, date_time: datetime))
+      event = instance_double('Event', start: instance_double('Start', date_time: datetime))
       allow(helper).to receive(:timezone_offset).and_return('Europe/Helsinki')
 
       result = helper.event_start_time(event)

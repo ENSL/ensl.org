@@ -16,7 +16,7 @@ RSpec.describe Passkeys::RegistrationService do
     it 'creates registration options and stores pending state' do
       user = create(:user)
       user.passkey_credentials.create!(external_id: 'cred-existing', public_key: 'pk', sign_count: 0)
-      options = instance_double(CreateOptions, challenge: 'register-challenge')
+      options = instance_double('CreateOptions', challenge: 'register-challenge')
 
       expect(WebAuthn::Credential).to receive(:options_for_create).with(
         hash_including(
