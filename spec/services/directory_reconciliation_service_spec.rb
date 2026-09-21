@@ -3,26 +3,7 @@
 require 'rails_helper'
 
 describe DirectoryReconciliationService do
-  before(:all) do
-    @test_root = '/tmp/test_reconciliation'
-    FileUtils.mkdir_p(@test_root)
-  end
-
-  after(:all) do
-    FileUtils.rm_rf(@test_root)
-  end
-
-  before do
-    # This spec must override the process-level root for isolated reconciliation behavior.
-    ENV['FILES_ROOT'] = @test_root
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-    FileUtils.mkdir_p(@test_root)
-  end
-
-  after do
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-    FileUtils.mkdir_p(@test_root)
-  end
+  include_context 'isolated filesystem root', '/tmp/test_reconciliation'
 
   let(:root_directory) do
     Directory.find_or_create_by(id: Directory::ROOT) do |dir|

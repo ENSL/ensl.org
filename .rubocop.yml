@@ -133,8 +133,11 @@ Rails/Exit:
 RSpec/AnyInstance:
   Enabled: false
 
+# Rake task definitions register globally and must be loaded once. Reloading
+# them before each example is unnecessary and can duplicate task registration.
 RSpec/BeforeAfterAll:
-  Enabled: false
+  Exclude:
+    - 'spec/lib/tasks/parquet_imports_spec.rb'
 
 RSpec/ChangeByZero:
   Enabled: false

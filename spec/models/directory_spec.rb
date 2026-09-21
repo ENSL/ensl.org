@@ -23,26 +23,7 @@ require 'rails_helper'
 
 describe Directory do
   # Setup and cleanup test filesystem
-  before(:all) do
-    @test_root = '/tmp/test_directories'
-    FileUtils.mkdir_p(@test_root)
-  end
-
-  after(:all) do
-    FileUtils.rm_rf(@test_root)
-  end
-
-  before do
-    # Set up test root environment
-    # Direct ENV assignment is required to override the helper's configured root.
-    ENV['FILES_ROOT'] = @test_root
-  end
-
-  after do
-    # Clean up test directories
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-    FileUtils.mkdir_p(@test_root)
-  end
+  include_context 'isolated filesystem root', '/tmp/test_directories'
 
   describe 'associations' do
     subject { build(:directory) }

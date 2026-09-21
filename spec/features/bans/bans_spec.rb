@@ -12,8 +12,12 @@ feature 'Bans management', :js do
     ban
   end
 
-  before(:all) do
+  around do |example|
+    previous_max_wait_time = Capybara.default_max_wait_time
     Capybara.default_max_wait_time = 5
+    example.run
+  ensure
+    Capybara.default_max_wait_time = previous_max_wait_time
   end
 
   scenario 'Index lists bans and show displays details' do

@@ -3,8 +3,12 @@
 require 'rails_helper'
 
 RSpec.feature 'Gather admin actions', :js, type: :feature do
-  before(:all) do
+  around do |example|
+    previous_max_wait_time = Capybara.default_max_wait_time
     Capybara.default_max_wait_time = 5
+    example.run
+  ensure
+    Capybara.default_max_wait_time = previous_max_wait_time
   end
 
   let!(:gather) { FactoryBot.create(:gather, maps_count: 4, servers_count: 2) }

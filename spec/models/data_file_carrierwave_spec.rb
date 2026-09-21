@@ -3,20 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFile do
-  before(:all) do
-    @test_root = '/tmp/test_carrierwave_files'
-  end
-
-  before do
-    FileUtils.rm_rf(@test_root)
-    FileUtils.mkdir_p(@test_root)
-    # This spec must override the process-level root to exercise CarrierWave storage.
-    ENV['FILES_ROOT'] = @test_root
-  end
-
-  after do
-    FileUtils.rm_rf(@test_root)
-  end
+  include_context 'isolated filesystem root', '/tmp/test_carrierwave_files'
 
   def upload_tempfile(filename:, content:)
     tmp = Tempfile.new(filename)

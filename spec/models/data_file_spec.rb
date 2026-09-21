@@ -28,29 +28,13 @@ require 'rails_helper'
 
 describe DataFile do
   # Setup and cleanup test filesystem
-  before(:all) do
-    @test_root = '/tmp/test_dirs'
-    FileUtils.mkdir_p(@test_root)
-  end
-
-  after(:all) do
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-  end
+  include_context 'isolated filesystem root', '/tmp/test_dirs'
 
   before do
-    # Set up test root environment
-    # Direct ENV assignment is required to override the helper's configured root.
-    ENV['FILES_ROOT'] = @test_root
     allow_any_instance_of(described_class).to receive(:location) do |instance|
       # Return the path attribute which factory sets correctly
       instance.path.to_s
     end
-  end
-
-  after do
-    # Clean up any test files created during the test
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-    FileUtils.mkdir_p(@test_root)
   end
 
   # Stub location for all DataFile instances

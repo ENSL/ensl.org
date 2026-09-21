@@ -3,8 +3,12 @@
 require 'rails_helper'
 
 RSpec.feature 'Gather voting phase - find nil:id error when voting', :js, type: :feature do
-  before(:all) do
+  around do |example|
+    previous_max_wait_time = Capybara.default_max_wait_time
     Capybara.default_max_wait_time = 5
+    example.run
+  ensure
+    Capybara.default_max_wait_time = previous_max_wait_time
   end
 
   # Create a gather with maps and servers; voting starts after 12 users join

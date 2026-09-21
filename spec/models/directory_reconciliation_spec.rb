@@ -3,20 +3,9 @@
 require 'rails_helper'
 
 describe 'Directory reconciliation behavior' do
-  before(:all) do
-    @test_root = '/tmp/test_dir_reconciliation'
-    FileUtils.mkdir_p(@test_root)
-  end
-
-  after(:all) do
-    FileUtils.rm_rf(@test_root)
-  end
+  include_context 'isolated filesystem root', '/tmp/test_dir_reconciliation'
 
   before do
-    # This spec must override the process-level root for isolated reconciliation behavior.
-    ENV['FILES_ROOT'] = @test_root
-    FileUtils.mkdir_p(@test_root)
-
     # Ensure ROOT directory exists
     @root = Directory.find_or_create_by!(id: Directory::ROOT) do |dir|
       dir.name = 'root'
@@ -25,11 +14,6 @@ describe 'Directory reconciliation behavior' do
       dir.hidden = false
     end
     @root.sync_inode_info if @root.st_dev.nil?
-  end
-
-  after do
-    FileUtils.rm_rf(@test_root) if Dir.exist?(@test_root)
-    FileUtils.mkdir_p(@test_root)
   end
 
   let(:root_directory) { @root }

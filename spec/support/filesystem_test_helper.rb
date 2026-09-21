@@ -187,6 +187,20 @@ module FilesystemTestHelper
   end
 end
 
+RSpec.shared_context 'isolated filesystem root' do |root_path|
+  around do |example|
+    previous_files_root = ENV['FILES_ROOT']
+    @test_root = root_path
+    FileUtils.rm_rf(@test_root)
+    FileUtils.mkdir_p(@test_root)
+    ENV['FILES_ROOT'] = @test_root
+    example.run
+  ensure
+    FileUtils.rm_rf(@test_root)
+    ENV['FILES_ROOT'] = previous_files_root
+  end
+end
+
 RSpec.configure do |config|
   config.include FilesystemTestHelper
 end
