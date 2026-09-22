@@ -7,12 +7,11 @@
 # and its views haven't been reworked for the new Round/Rounder schema yet --
 # kept minimal (just enough to boot) rather than wired up for real display.
 class RoundsController < ApplicationController
+  helper RoundsHelper
+
   def index
     archive = RoundArchiveQuery.call(filters: round_filters, page: params[:page])
-    @filters = archive.filters
-    @maps = archive.maps
-    @servers = archive.servers
-    @rounds = archive.rounds
+    @filters, @maps, @servers, @rounds = archive.to_a
     render layout: 'full'
   end
 

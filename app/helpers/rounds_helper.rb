@@ -11,6 +11,15 @@
 # fixed enum anywhere in Ruby (they come from the ensl_analysis Python
 # pipeline) -- see /memories/repo/round-timeline.md for the raw samples.
 module RoundsHelper
+  def round_result_options
+    [['Any winner', ''], ['Marines', Round::RESULT_MARINE_WIN], ['Aliens', Round::RESULT_ALIEN_WIN]]
+  end
+
+  def round_length_options
+    [['Any length', ''], ['Under 5 min', 'under_5'], ['5-10 min', '5_to_10'], ['10-20 min', '10_to_20'],
+     ['20-30 min', '20_to_30'], ['30+ min', 'over_30']]
+  end
+
   # Ballpark total height (px) the whole timeline aims for, regardless of how
   # long the round actually ran -- the per-second scale is derived from this
   # so a 5-minute round and a 40-minute round both render at a readable size.
