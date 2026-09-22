@@ -5,27 +5,27 @@ require 'rails_helper'
 RSpec.feature 'Matches management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
-  let!(:map1) { create(:map) }
-  let!(:map2) { create(:map) }
-  let!(:map3) { create(:map) }
-  let!(:map4) { create(:map) }
-  let!(:week) { create(:week, contest: contest, map1: map1, map2: map2) }
-  let!(:team1) { create(:team) }
-  let!(:team2) { create(:team) }
-  let!(:team3) { create(:team) }
-  let!(:contester1) { create(:contester, team: team1, contest: contest) }
-  let!(:contester2) { create(:contester, team: team2, contest: contest) }
-  let!(:contester3) { create(:contester, team: team3, contest: contest) }
+  let!(:home_map) { create(:map) }
+  let!(:away_map) { create(:map) }
+  let!(:reserve_home_map) { create(:map) }
+  let!(:reserve_away_map) { create(:map) }
+  let!(:week) { create(:week, contest: contest, map1: home_map, map2: away_map) }
+  let!(:home_team) { create(:team) }
+  let!(:away_team) { create(:team) }
+  let!(:alternate_team) { create(:team) }
+  let!(:home_contester) { create(:contester, team: home_team, contest: contest) }
+  let!(:away_contester) { create(:contester, team: away_team, contest: contest) }
+  let!(:alternate_contester) { create(:contester, team: alternate_team, contest: contest) }
   let!(:referee) { create(:user, :ref) }
   let!(:server) { create(:server) }
   let!(:match) do
-    create(:match, contest: contest, contester1: contester1, contester2: contester2, map1: map1, map2: map2,
+    create(:match, contest: contest, contester1: home_contester, contester2: away_contester, map1: home_map, map2: away_map,
                    week: week, referee: referee, server: server)
   end
 
   before do
     # sign in as admin to have full permissions
-    contest.maps << [map1, map2, map3, map4]
+    contest.maps << [home_map, away_map, reserve_home_map, reserve_away_map]
     sign_in_as(admin)
   end
 

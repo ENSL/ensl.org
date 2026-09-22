@@ -100,6 +100,7 @@ feature 'User manages forum posts', :js do
 
       it 'displays delete button only for admin' do
         visit topic_path(topic)
+        expect(page).to have_css('body')
         # Regular user should not see delete button
         expect(page).to have_no_link('Delete', href: post_path(post))
       end

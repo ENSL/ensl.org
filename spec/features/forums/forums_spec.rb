@@ -5,16 +5,11 @@ require 'rails_helper'
 RSpec.feature 'Forums Management', :js, type: :feature do
   let(:admin) { create(:user, :admin) }
   let!(:forum) { create(:forum) }
-  let!(:group1) { create(:group, name: 'Moderators') }
-  let!(:group2) { create(:group, name: 'VIP Users') }
+  let!(:moderator_group) { create(:group, name: 'Moderators') }
+  let!(:vip_group) { create(:group, name: 'VIP Users') }
 
   before do
-    # Login as admin
-    visit root_path
-    find_field('login_username').set(admin.username)
-    fill_in 'login_password', with: admin.raw_password
-    find('#authentication [name="commit"]').click
-    expect(page).to have_text(I18n.t('sessions.create.success'))
+    sign_in_as(admin)
   end
 
   feature 'Editing forums' do
@@ -44,7 +39,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Find the "Grant Access" section
       within('.add-acl') do
-        select group1.name, from: 'forumer_group_id'
+        select moderator_group.name, from: 'forumer_group_id'
         select 'Read', from: 'forumer_access'
         click_button 'Add'
       end
@@ -53,7 +48,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Verify the group appears in the access list
       within('#acl') do
-        expect(page).to have_text(group1.name)
+        expect(page).to have_text(moderator_group.name)
         expect(page).to have_select('forumer_access', selected: 'Read')
       end
     end
@@ -62,7 +57,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
       visit edit_forum_path(forum)
 
       within('.add-acl') do
-        select group1.name, from: 'forumer_group_id'
+        select moderator_group.name, from: 'forumer_group_id'
         select 'Reply', from: 'forumer_access'
         click_button 'Add'
       end
@@ -70,7 +65,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
       expect(page).to have_text(I18n.t('groups.added'))
 
       within('#acl') do
-        expect(page).to have_text(group1.name)
+        expect(page).to have_text(moderator_group.name)
         expect(page).to have_select('forumer_access', selected: 'Reply')
       end
     end
@@ -79,7 +74,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
       visit edit_forum_path(forum)
 
       within('.add-acl') do
-        select group1.name, from: 'forumer_group_id'
+        select moderator_group.name, from: 'forumer_group_id'
         select 'Post a Topic', from: 'forumer_access'
         click_button 'Add'
       end
@@ -87,19 +82,19 @@ RSpec.feature 'Forums Management', :js, type: :feature do
       expect(page).to have_text(I18n.t('groups.added'))
 
       within('#acl') do
-        expect(page).to have_text(group1.name)
+        expect(page).to have_text(moderator_group.name)
         expect(page).to have_select('forumer_access', selected: 'Post a Topic')
       end
     end
 
     scenario 'admin can update existing group access level' do
       # Create a forumer with read access
-      forumer = create(:forumer, forum: forum, group: group1, access: Forumer::ACCESS_READ)
+      forumer = create(:forumer, forum: forum, group: moderator_group, access: Forumer::ACCESS_READ)
 
       visit edit_forum_path(forum)
 
       # Find the row for this group and update its access using XPath
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         select 'Reply', from: 'forumer_access'
         click_link 'Update'
       end
@@ -113,23 +108,23 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
     scenario 'admin can remove group access' do
       # Create a forumer
-      forumer = create(:forumer, forum: forum, group: group1, access: Forumer::ACCESS_READ)
+      forumer = create(:forumer, forum: forum, group: moderator_group, access: Forumer::ACCESS_READ)
 
       visit edit_forum_path(forum)
 
       # Verify the group is present in the access list
       within('#acl') do
-        expect(page).to have_text(group1.name)
+        expect(page).to have_text(moderator_group.name)
       end
 
       # Remove the group using XPath
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         click_link 'Remove'
       end
 
       # Wait for page to reload and verify the group is no longer in the ACL table
       within('#acl', wait: 5) do
-        expect(page).to have_no_text(group1.name)
+        expect(page).to have_no_text(moderator_group.name)
       end
 
       # Verify forumer was deleted
@@ -141,7 +136,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Add first group with read access
       within('.add-acl') do
-        select group1.name, from: 'forumer_group_id'
+        select moderator_group.name, from: 'forumer_group_id'
         select 'Read', from: 'forumer_access'
         click_button 'Add'
       end
@@ -150,7 +145,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Add second group with topic access
       within('.add-acl') do
-        select group2.name, from: 'forumer_group_id'
+        select vip_group.name, from: 'forumer_group_id'
         select 'Post a Topic', from: 'forumer_access'
         click_button 'Add'
       end
@@ -159,8 +154,8 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Verify both groups appear in the list
       within('#acl') do
-        expect(page).to have_text(group1.name)
-        expect(page).to have_text(group2.name)
+        expect(page).to have_text(moderator_group.name)
+        expect(page).to have_text(vip_group.name)
 
         # Check we have the right number of rows (header + 2 data rows)
         expect(page).to have_css('tr', count: 3)
@@ -182,7 +177,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
 
       # Add a group
       within('.add-acl') do
-        select group1.name, from: 'forumer_group_id'
+        select moderator_group.name, from: 'forumer_group_id'
         select 'Read', from: 'forumer_access'
         click_button 'Add'
       end
@@ -190,7 +185,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
       expect(page).to have_text(I18n.t('groups.added'))
 
       # Check the dropdown in the edit form for the added group using XPath
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         access_options = find('select[name="forumer[access]"]').all('option').map(&:text)
         expect(access_options).to contain_exactly('Read', 'Reply', 'Post a Topic')
         expect(page).to have_select('forumer_access', selected: 'Read')
@@ -199,12 +194,12 @@ RSpec.feature 'Forums Management', :js, type: :feature do
   end
 
   feature 'Access level dropdown behavior' do
-    let!(:forumer_read) { create(:forumer, forum: forum, group: group1, access: Forumer::ACCESS_READ) }
+    let!(:forumer_read) { create(:forumer, forum: forum, group: moderator_group, access: Forumer::ACCESS_READ) }
 
     scenario 'dropdown is not a multi-select box' do
       visit edit_forum_path(forum)
 
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         select_element = find('select[name="forumer[access]"]')
 
         # Verify it's not a multi-select (should be "false" or nil, not "true")
@@ -220,7 +215,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
     scenario 'dropdown shows currently selected access level' do
       visit edit_forum_path(forum)
 
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         expect(page).to have_select('forumer_access', selected: 'Read')
       end
     end
@@ -228,7 +223,7 @@ RSpec.feature 'Forums Management', :js, type: :feature do
     scenario 'can change dropdown selection' do
       visit edit_forum_path(forum)
 
-      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{group1.name}')]]") do
+      within(:xpath, "//table[@id='acl']//tr[td[contains(., '#{moderator_group.name}')]]") do
         # Change from Read to Reply
         select 'Reply', from: 'forumer_access'
 

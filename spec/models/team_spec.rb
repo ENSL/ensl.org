@@ -3,7 +3,7 @@
 # rubocop:disable Rails/SkipsModelValidations
 require 'rails_helper'
 
-RSpec.describe Team, type: :model do
+RSpec.describe Team, 'lifecycle', type: :model do
   describe 'callbacks and helpers' do
     it 'initializes default attributes on create' do
       team = create(:team)
@@ -205,7 +205,7 @@ RSpec.describe Team, type: :model do
   end
 end
 
-RSpec.describe Team, type: :model do
+RSpec.describe Team, 'lifecycle edge cases', type: :model do
   describe 'init and leader assignment' do
     it 'initializes active and recruiting' do
       t = described_class.new
@@ -308,7 +308,7 @@ RSpec.describe Team, type: :model do
     let(:team) { create(:team) }
 
     it 'can_create? returns false for banned user, true otherwise' do
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:banned?).with(Ban::TYPE_MUTE).and_return(true)
       expect(team.can_create?(user)).to be false
       allow(user).to receive(:banned?).with(Ban::TYPE_MUTE).and_return(false)
@@ -320,17 +320,17 @@ RSpec.describe Team, type: :model do
       allow(team).to receive(:is_leader?).with(user).and_return(true)
       expect(team.can_update?(user)).to be true
 
-      admin = double('User')
+      admin = instance_double(User)
       allow(admin).to receive(:admin?).and_return(true)
       allow(team).to receive(:is_leader?).with(admin).and_return(false)
       expect(team.can_update?(admin)).to be true
     end
 
     it 'can_destroy? returns true only for admin' do
-      admin = double('User')
+      admin = instance_double(User)
       allow(admin).to receive(:admin?).and_return(true)
       expect(team.can_destroy?(admin)).to be true
-      other = double('User')
+      other = instance_double(User)
       allow(other).to receive(:admin?).and_return(false)
       expect(team.can_destroy?(other)).to be false
     end

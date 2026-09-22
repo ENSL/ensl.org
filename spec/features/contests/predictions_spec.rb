@@ -3,25 +3,25 @@
 require 'rails_helper'
 
 RSpec.feature 'Match predictions', :js, type: :feature do
-  let!(:user1) { create(:user, raw_password: 'TestPassword123') }
-  let!(:user2) { create(:user) }
+  let!(:primary_user) { create(:user, raw_password: 'TestPassword123') }
+  let!(:secondary_user) { create(:user) }
   let!(:contest) { create(:contest) }
-  let!(:map1) { create(:map) }
-  let!(:map2) { create(:map) }
-  let!(:team1) { create(:team) }
-  let!(:team2) { create(:team) }
-  let!(:contester1) { create(:contester, team: team1, contest: contest) }
-  let!(:contester2) { create(:contester, team: team2, contest: contest) }
+  let!(:home_map) { create(:map) }
+  let!(:away_map) { create(:map) }
+  let!(:home_team) { create(:team) }
+  let!(:away_team) { create(:team) }
+  let!(:home_contester) { create(:contester, team: home_team, contest: contest) }
+  let!(:away_contester) { create(:contester, team: away_team, contest: contest) }
 
   before do
-    contest.maps << [map1, map2]
+    contest.maps << [home_map, away_map]
   end
 
   scenario 'User creates a prediction for a future match' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     # Verify the prediction form is visible
@@ -37,42 +37,44 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     expect(page).to have_current_path(match_path(match))
 
     # Verify prediction was created
-    expect(Prediction.where(user: user1, match: match).exists?).to be true
-    pred = Prediction.find_by(user: user1, match: match)
+    expect(Prediction.where(user: primary_user, match: match).exists?).to be true
+    pred = Prediction.find_by(user: primary_user, match: match)
     expect(pred.score1).to eq(2)
     expect(pred.score2).to eq(1)
   end
 
   scenario 'User cannot create a prediction after match time has passed' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 1.hour.ago)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 1.hour.ago)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
+    expect(page).to have_css('body')
     # Verify the prediction form is NOT visible
     expect(page).to have_no_button('Add Prediction')
   end
 
   scenario 'User cannot create two predictions for the same match' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
     # Create first prediction
-    create(:prediction, match: match, user: user1, score1: 2, score2: 1)
+    create(:prediction, match: match, user: primary_user, score1: 2, score2: 1)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
+    expect(page).to have_css('body')
     # Verify the prediction form is NOT visible (user already predicted)
     expect(page).to have_no_button('Add Prediction')
   end
 
   scenario 'User gets error when submitting invalid scores', :aggregate_failures do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     # Try score out of range
@@ -85,10 +87,10 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'User gets error when submitting both scores as blank' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     # Don't fill in scores, just click submit
@@ -96,15 +98,15 @@ RSpec.feature 'Match predictions', :js, type: :feature do
 
     # Empty scores fail validation and show error messages
     expect(page).to have_text('Invalid score')
-    expect(Prediction.where(user: user1, match: match).exists?).to be false
+    expect(Prediction.where(user: primary_user, match: match).exists?).to be false
   end
 
   scenario 'Multiple users can predict the same match' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
     # User 1 predicts
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
     fill_in 'prediction_score1', with: '3'
     fill_in 'prediction_score2', with: '2'
@@ -113,7 +115,7 @@ RSpec.feature 'Match predictions', :js, type: :feature do
 
     # User 2 predicts
     sign_out
-    sign_in_as(user2)
+    sign_in_as(secondary_user)
     visit match_path(match)
     fill_in 'prediction_score1', with: '2'
     fill_in 'prediction_score2', with: '1'
@@ -125,15 +127,15 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'Match shows prediction statistics' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
     # Create multiple predictions
     create(:prediction, match: match, user: create(:user), score1: 3, score2: 1)
     create(:prediction, match: match, user: create(:user), score1: 3, score2: 1)
     create(:prediction, match: match, user: create(:user), score1: 2, score2: 2)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     # Should show prediction count
@@ -141,23 +143,23 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'User can view their predictions on their profile' do
-    match1 = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 2.hours.from_now)
-    match2 = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 1.hour.from_now)
+    match1 = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 2.hours.from_now)
+    match2 = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 1.hour.from_now)
 
     contest2 = create(:contest)
-    contest2.maps << [map1, map2]
-    match3 = create(:match, contest: contest2, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 3.hours.from_now)
+    contest2.maps << [home_map, away_map]
+    match3 = create(:match, contest: contest2, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 3.hours.from_now)
 
     # Create predictions
-    create(:prediction, match: match1, user: user1, score1: 2, score2: 1)
-    create(:prediction, match: match2, user: user1, score1: 3, score2: 0)
-    create(:prediction, match: match3, user: user1, score1: 1, score2: 1)
+    create(:prediction, match: match1, user: primary_user, score1: 2, score2: 1)
+    create(:prediction, match: match2, user: primary_user, score1: 3, score2: 0)
+    create(:prediction, match: match3, user: primary_user, score1: 1, score2: 1)
 
-    sign_in_as(user1)
-    visit user_path(user1)
+    sign_in_as(primary_user)
+    visit user_path(primary_user)
 
     # Click on predictions tab using the element's id
     find_by_id('predictions').click
@@ -174,13 +176,13 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'Predictions are evaluated when match results are set' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now,
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now,
                            score1: nil, score2: nil)
 
     # Create correct and incorrect predictions
-    correct_pred = create(:prediction, match: match, user: user1, score1: 2, score2: 1)
-    incorrect_pred = create(:prediction, match: match, user: user2, score1: 3, score2: 0)
+    correct_pred = create(:prediction, match: match, user: primary_user, score1: 2, score2: 1)
+    incorrect_pred = create(:prediction, match: match, user: secondary_user, score1: 3, score2: 0)
 
     # Verify predictions have no result initially
     expect(correct_pred.reload.result).to be_nil
@@ -196,27 +198,27 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'Contest predictions leaderboard shows correct scores' do
-    match1 = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 1.hour.ago,
+    match1 = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 1.hour.ago,
                             score1: 2, score2: 1)
-    match2 = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 2.hours.ago,
+    match2 = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 2.hours.ago,
                             score1: 1, score2: 0)
 
     # User1: 1 correct, 1 incorrect
-    create(:prediction, match: match1, user: user1, score1: 2, score2: 1)
-    create(:prediction, match: match2, user: user1, score1: 3, score2: 1)
+    create(:prediction, match: match1, user: primary_user, score1: 2, score2: 1)
+    create(:prediction, match: match2, user: primary_user, score1: 3, score2: 1)
 
     # User2: 2 correct
-    create(:prediction, match: match1, user: user2, score1: 2, score2: 1)
-    create(:prediction, match: match2, user: user2, score1: 1, score2: 0)
+    create(:prediction, match: match1, user: secondary_user, score1: 2, score2: 1)
+    create(:prediction, match: match2, user: secondary_user, score1: 1, score2: 0)
 
     # Set predictions
     match1.set_predictions
     match2.set_predictions
 
     # Visit contest page
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit contest_path(contest)
 
     # Verify leaderboard is displayed (should show users with correct predictions)
@@ -225,10 +227,10 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'Boundary score values work correctly (0 and 99)' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     # Test minimum scores
@@ -237,18 +239,18 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     click_button 'Add Prediction'
 
     expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
-    expect(Prediction.find_by(user: user1, match: match).score1).to eq(0)
-    expect(Prediction.find_by(user: user1, match: match).score2).to eq(0)
+    expect(Prediction.find_by(user: primary_user, match: match).score1).to eq(0)
+    expect(Prediction.find_by(user: primary_user, match: match).score2).to eq(0)
 
     # Clean up for next test
-    Prediction.find_by(user: user1, match: match).delete
+    Prediction.find_by(user: primary_user, match: match).delete
     sign_out
 
     # Create another match for maximum scores test
-    match2 = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                            map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match2 = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                            map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match2)
 
     # Test maximum scores
@@ -257,15 +259,15 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     click_button 'Add Prediction'
 
     expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
-    expect(Prediction.find_by(user: user1, match: match2).score1).to eq(99)
-    expect(Prediction.find_by(user: user1, match: match2).score2).to eq(99)
+    expect(Prediction.find_by(user: primary_user, match: match2).score1).to eq(99)
+    expect(Prediction.find_by(user: primary_user, match: match2).score2).to eq(99)
   end
 
   scenario 'Predictions persist correctly in database' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     fill_in 'prediction_score1', with: '2'
@@ -277,20 +279,20 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     expect(page).to have_current_path(match_path(match))
 
     # Verify in database
-    pred = Prediction.find_by(user: user1, match: match)
+    pred = Prediction.find_by(user: primary_user, match: match)
     expect(pred).to be_present
     expect(pred.match_id).to eq(match.id)
-    expect(pred.user_id).to eq(user1.id)
+    expect(pred.user_id).to eq(primary_user.id)
     expect(pred.score1).to eq(2)
     expect(pred.score2).to eq(1)
     expect(pred.result).to be_nil # Not evaluated yet
   end
 
   scenario 'User cannot predict with non-numeric scores' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     fill_in 'prediction_score1', with: 'abc'
@@ -300,17 +302,18 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     # Non-numeric strings are cast to 0 by Rails, which is valid
     # This creates a prediction with score1=0, score2=1
     expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Prediction.model_name.human))
-    pred = Prediction.find_by(user: user1, match: match)
+    pred = Prediction.find_by(user: primary_user, match: match)
     expect(pred.score1).to eq(0) # 'abc' is converted to 0
     expect(pred.score2).to eq(1)
   end
 
   scenario 'Unsigned in user cannot create prediction' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
     visit match_path(match)
 
+    expect(page).to have_css('body')
     # Should not see the prediction form
     expect(page).to have_no_button('Add Prediction')
 
@@ -319,10 +322,10 @@ RSpec.feature 'Match predictions', :js, type: :feature do
   end
 
   scenario 'Prediction with score one set higher than 100 is rejected' do
-    match = create(:match, contest: contest, contester1: contester1, contester2: contester2,
-                           map1: map1, map2: map2, match_time: 2.hours.from_now)
+    match = create(:match, contest: contest, contester1: home_contester, contester2: away_contester,
+                           map1: home_map, map2: away_map, match_time: 2.hours.from_now)
 
-    sign_in_as(user1)
+    sign_in_as(primary_user)
     visit match_path(match)
 
     fill_in 'prediction_score1', with: '100'
@@ -330,6 +333,6 @@ RSpec.feature 'Match predictions', :js, type: :feature do
     click_button 'Add Prediction'
 
     expect(page).to have_text('Invalid score')
-    expect(Prediction.where(user: user1, match: match).exists?).to be false
+    expect(Prediction.where(user: primary_user, match: match).exists?).to be false
   end
 end

@@ -6,12 +6,7 @@ RSpec.feature 'Categories Management', :js, type: :feature do
   let(:admin) { create(:user, :admin) }
 
   before do
-    # Use form-based login instead of session injection
-    visit root_path
-    find_field('login_username').set(admin.username)
-    fill_in 'login_password', with: admin.raw_password
-    find('#authentication [name="commit"]').click
-    expect(page).to have_text(I18n.t('sessions.create.success'))
+    sign_in_as(admin)
   end
 
   feature 'Navigation' do
@@ -121,71 +116,71 @@ RSpec.feature 'Categories Management', :js, type: :feature do
   end
 
   feature 'Moving categories within domain' do
-    let!(:category1) { create(:category, :news, name: 'First News', sort: 1) }
-    let!(:category2) { create(:category, :news, name: 'Second News', sort: 2) }
-    let!(:category3) { create(:category, :news, name: 'Third News', sort: 3) }
+    let!(:first_position_category) { create(:category, :news, name: 'First News', sort: 1) }
+    let!(:second_position_category) { create(:category, :news, name: 'Second News', sort: 2) }
+    let!(:last_position_category) { create(:category, :news, name: 'Third News', sort: 3) }
 
     scenario 'moves category up one position' do
       visit categories_path
 
       # Find and click the up button for the second category
-      find("a[href='#{up_category_path(category2)}']").click
+      find("a[href='#{up_category_path(second_position_category)}']").click
 
       # Should redirect to categories page
       expect(page).to have_text('Listing Categories')
       expect(page).to have_text('Second News')
 
       # Verify order changed
-      category1.reload
-      category2.reload
+      first_position_category.reload
+      second_position_category.reload
 
-      expect(category2.sort < category1.sort).to be true
+      expect(second_position_category.sort < first_position_category.sort).to be true
     end
 
     scenario 'moves category down one position' do
       visit categories_path
 
       # Find and click the down button for the first category
-      find("a[href='#{down_category_path(category1)}']").click
+      find("a[href='#{down_category_path(first_position_category)}']").click
 
       # Should redirect to categories page
       expect(page).to have_text('Listing Categories')
 
       # Verify order changed
-      category1.reload
-      category2.reload
+      first_position_category.reload
+      second_position_category.reload
 
-      expect(category1.sort > category2.sort).to be true
+      expect(first_position_category.sort > second_position_category.sort).to be true
     end
 
     scenario 'first item cannot move further up' do
       visit categories_path
 
       # Click up on already-first item
-      find("a[href='#{up_category_path(category1)}']").click
+      find("a[href='#{up_category_path(first_position_category)}']").click
 
       # Should remain first
-      category1.reload
-      category2.reload
-      category3.reload
+      first_position_category.reload
+      second_position_category.reload
+      last_position_category.reload
 
-      expect(category1.sort < category2.sort).to be true
-      expect(category2.sort < category3.sort).to be true
+      expect(first_position_category.sort < second_position_category.sort).to be true
+      expect(second_position_category.sort < last_position_category.sort).to be true
     end
 
     scenario 'last item cannot move further down' do
       visit categories_path
 
       # Click down on already-last item
-      find("a[href='#{down_category_path(category3)}']").click
+      find("a[href='#{down_category_path(last_position_category)}']").click
 
       # Should remain last
-      category1.reload
-      category2.reload
-      category3.reload
+      first_position_category.reload
+      second_position_category.reload
+      last_position_category.reload
 
-      expect(category1.sort < category2.sort).to be true
-      expect(category2.sort < category3.sort).to be true
+      expect(first_position_category.sort < second_position_category.sort).to be true
+      expect(second_position_category.sort < last_position_category.sort).to be true
     end
   end
 

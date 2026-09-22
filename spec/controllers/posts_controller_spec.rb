@@ -54,7 +54,7 @@ RSpec.describe PostsController, type: :controller do
     it 'returns 403 when the user cannot trash the post' do
       session[:user] = admin.id
       topic = instance_double(Topic, persisted?: true)
-      post_record = double('Post', can_destroy?: false, topic: topic)
+      post_record = instance_double(Post, can_destroy?: false, topic: topic)
       allow(Post).to receive(:find).and_return(post_record)
 
       post :trash, params: { id: '1' }

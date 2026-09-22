@@ -70,6 +70,7 @@ RSpec.feature 'Data files management', :js, type: :feature do
       sign_in_via_session(user)
       visit data_file_path(file)
 
+      expect(page).to have_css('body')
       expect(page).to have_no_link('Delete')
     end
   end

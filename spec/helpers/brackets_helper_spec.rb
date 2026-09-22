@@ -7,31 +7,31 @@ RSpec.describe BracketsHelper, type: :helper do
     it 'returns disabled team classes for disabled team cells in view mode' do
       bracketer = instance_double(Bracketer, disabled: true)
 
-      expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, false)).to eq('team disabled')
+      expect(helper.bracket_cell_class(instance_double(Bracket), bracketer, 1, 0, 3, false)).to eq('team disabled')
     end
 
     it 'returns the result class for enabled team cells in view mode' do
       bracketer = instance_double(Bracketer, disabled: false, result_class: 'winner')
 
-      expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, false)).to eq('team winner')
+      expect(helper.bracket_cell_class(instance_double(Bracket), bracketer, 1, 0, 3, false)).to eq('team winner')
     end
 
     it 'returns only team in edit mode' do
       bracketer = instance_double(Bracketer, disabled: true)
 
-      expect(helper.bracket_cell_class(double('Bracket'), bracketer, 1, 0, 3, true)).to eq('team')
+      expect(helper.bracket_cell_class(instance_double(Bracket), bracketer, 1, 0, 3, true)).to eq('team')
     end
 
     it 'returns connector for connector cells' do
       allow(helper).to receive(:render_connector?).and_return(true)
 
-      expect(helper.bracket_cell_class(double('Bracket'), nil, 0, 0, 3, false)).to eq('connector')
+      expect(helper.bracket_cell_class(instance_double(Bracket), nil, 0, 0, 3, false)).to eq('connector')
     end
 
     it 'returns empty for cells with no content or connector' do
       allow(helper).to receive(:render_connector?).and_return(false)
 
-      expect(helper.bracket_cell_class(double('Bracket'), nil, 0, 0, 3, false)).to eq('empty')
+      expect(helper.bracket_cell_class(instance_double(Bracket), nil, 0, 0, 3, false)).to eq('empty')
     end
   end
 

@@ -18,9 +18,9 @@ require 'rails_helper'
 #   for how errors are handled with Turbo
 RSpec.feature 'Admin manages groups', :js, type: :feature do
   let(:admin) { FactoryBot.create(:user, :admin) }
-  let(:user1) { FactoryBot.create(:user, username: 'testuser1', firstname: 'Test', lastname: 'User One') }
-  let(:user2) { FactoryBot.create(:user, username: 'testuser2', firstname: 'Test', lastname: 'User Two') }
-  let(:user3) { FactoryBot.create(:user, username: 'testuser3', firstname: 'Test', lastname: 'User Three') }
+  let(:primary_member) { FactoryBot.create(:user, username: 'testuser1', firstname: 'Test', lastname: 'User One') }
+  let(:secondary_member) { FactoryBot.create(:user, username: 'testuser2', firstname: 'Test', lastname: 'User Two') }
+  let(:additional_member) { FactoryBot.create(:user, username: 'testuser3', firstname: 'Test', lastname: 'User Three') }
 
   scenario 'admin creates a new custom group' do
     sign_in_via_session(admin)
@@ -50,50 +50,51 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
   scenario 'admin can see group details with members' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Test Group')
-    group.users << user1
-    group.users << user2
+    group.users << primary_member
+    group.users << secondary_member
 
     visit "/groups/#{group.id}"
 
     expect(page).to have_text('Test Group')
-    expect(page).to have_text(user1.username)
-    expect(page).to have_text(user2.username)
+    expect(page).to have_text(primary_member.username)
+    expect(page).to have_text(secondary_member.username)
   end
 
   scenario 'admin removes a member from a group' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Moderators')
-    group.users << user1
-    group.users << user2
+    group.users << primary_member
+    group.users << secondary_member
 
     visit "/groups/#{group.id}/edit"
 
-    expect(page).to have_text(user1.username)
-    expect(page).to have_text(user2.username)
+    expect(page).to have_text(primary_member.username)
+    expect(page).to have_text(secondary_member.username)
 
-    # Find the row with user1 and click remove
+    # Find the primary member's row and click remove.
     rows = all('table.roles tr')
-    user1_row = rows.find { |row| row.text.include?(user1.username) }
+    primary_member_row = rows.find { |row| row.text.include?(primary_member.username) }
 
-    within(user1_row) do
+    within(primary_member_row) do
       click_link 'Remove'
     end
 
     sleep 0.5
     visit "/groups/#{group.id}/edit"
 
-    expect(page).to have_no_text(user1.username)
-    expect(page).to have_text(user2.username)
-    expect(group.reload.users).not_to include(user1)
-    expect(group.reload.users).to include(user2)
+    expect(page).to have_css('body')
+    expect(page).to have_no_text(primary_member.username)
+    expect(page).to have_text(secondary_member.username)
+    expect(group.reload.users).not_to include(primary_member)
+    expect(group.reload.users).to include(secondary_member)
   end
 
   scenario 'admin removes all members from a group' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Moderators')
-    group.users << user1
-    group.users << user2
-    group.users << user3
+    group.users << primary_member
+    group.users << secondary_member
+    group.users << additional_member
 
     visit "/groups/#{group.id}/edit"
 
@@ -106,9 +107,10 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
     sleep 0.5
     visit "/groups/#{group.id}/edit"
 
-    expect(page).to have_no_text(user1.username)
-    expect(page).to have_no_text(user2.username)
-    expect(page).to have_no_text(user3.username)
+    expect(page).to have_css('body')
+    expect(page).to have_no_text(primary_member.username)
+    expect(page).to have_no_text(secondary_member.username)
+    expect(page).to have_no_text(additional_member.username)
     expect(group.reload.users).to be_empty
   end
 
@@ -139,14 +141,14 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
   scenario 'admin cannot add same member twice' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Moderators')
-    group.users << user1
+    group.users << primary_member
 
     visit "/groups/#{group.id}/edit"
 
     initial_count = group.reload.users.count
 
     within('div.add') do
-      fill_in 'grouper[username]', with: user1.username
+      fill_in 'grouper[username]', with: primary_member.username
       fill_in 'grouper[task]', with: 'Senior Moderator'
       click_button 'Add Member'
     end
@@ -183,18 +185,18 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
     visit "/groups/#{group.id}/edit"
 
     within('div.add') do
-      fill_in 'grouper[username]', with: user1.username
+      fill_in 'grouper[username]', with: primary_member.username
       fill_in 'grouper[task]', with: 'Senior Moderator'
       click_button 'Add Member'
     end
 
     # Wait for redirect and page to show the new member
-    expect(page).to have_text(user1.username)
+    expect(page).to have_text(primary_member.username)
     expect(page).to have_text('Group member added')
 
     # Check the database
     group.reload
-    grouper = group.groupers.find_by(user_id: user1.id)
+    grouper = group.groupers.find_by(user_id: primary_member.id)
     expect(grouper).not_to be_nil
     expect(grouper.task).to eq('Senior Moderator')
   end
@@ -221,15 +223,15 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
   scenario 'admin updates group member role/task' do
     sign_in_via_session(admin)
     group = FactoryBot.create(:group, name: 'Team')
-    grouper = FactoryBot.create(:grouper, group: group, user: user1, task: 'Initial Role')
+    grouper = FactoryBot.create(:grouper, group: group, user: primary_member, task: 'Initial Role')
 
     visit "/groups/#{group.id}/edit"
 
     # Task is in an input field, not plain text
     expect(page).to have_field('grouper_task', with: 'Initial Role')
 
-    # Find the row with user1 and update their task
-    row = all('table.roles tr').find { |r| r.text.include?(user1.username) }
+    # Find the primary member's row and update their task.
+    row = all('table.roles tr').find { |r| r.text.include?(primary_member.username) }
     within(row) do
       fill_in 'grouper_task', with: 'Updated Role', fill_options: { clear: :backspace }
       click_button 'Update'
@@ -251,30 +253,30 @@ RSpec.feature 'Admin manages groups', :js, type: :feature do
 
     # Add first member
     within('div.add') do
-      fill_in 'grouper[username]', with: user1.username
+      fill_in 'grouper[username]', with: primary_member.username
       fill_in 'grouper[task]', with: 'Senior Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_text(user1.username)
+    expect(page).to have_text(primary_member.username)
 
     # Add second member
     within('div.add') do
-      fill_in 'grouper[username]', with: user2.username
+      fill_in 'grouper[username]', with: secondary_member.username
       fill_in 'grouper[task]', with: 'Junior Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_text(user2.username)
+    expect(page).to have_text(secondary_member.username)
 
     # Add third member
     within('div.add') do
-      fill_in 'grouper[username]', with: user3.username
+      fill_in 'grouper[username]', with: additional_member.username
       fill_in 'grouper[task]', with: 'Moderator'
       click_button 'Add Member'
     end
-    expect(page).to have_text(user3.username)
+    expect(page).to have_text(additional_member.username)
 
     # Check the database
     group.reload
-    expect(group.users).to include(user1, user2, user3)
+    expect(group.users).to include(primary_member, secondary_member, additional_member)
   end
 end

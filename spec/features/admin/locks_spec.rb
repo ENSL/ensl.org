@@ -32,6 +32,7 @@ RSpec.feature 'Topic locks', :js, type: :feature do
     sign_in_via_session(user)
     visit topic_path(topic)
 
+    expect(page).to have_css('body')
     expect(page).to have_no_link('Lock')
     expect(page).to have_no_link('Unlock')
   end

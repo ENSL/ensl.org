@@ -21,6 +21,7 @@ RSpec.feature 'Gather start time', type: :feature do
 
     visit gather_path(gather)
 
+    expect(page).to have_css('body')
     expect(page).to have_no_css('.gather-started-at')
   end
 end

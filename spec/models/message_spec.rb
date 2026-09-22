@@ -196,7 +196,7 @@ describe Message do
       message = build(:message, sender: user, recipient: team)
       active_teamers = [double(user: subscribed_user), double(user: muted_user)]
 
-      allow(team).to receive_message_chain(:teamers, :active).and_return(active_teamers)
+      allow(team).to receive(:teamers).and_return(double('Teamers', active: active_teamers))
 
       message.send_notifications
 

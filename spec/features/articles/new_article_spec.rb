@@ -175,7 +175,7 @@ feature 'User creates new article', :js do
     before do
       sign_in_as(admin)
       visit edit_article_path(html_article)
-      expect(page).to have_css('.tox-tinymce', wait: 5)
+      find('.tox-tinymce', wait: 5)
     end
 
     it 'uses the full layout and provides link, image, and table controls' do

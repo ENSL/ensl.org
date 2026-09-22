@@ -19,7 +19,7 @@ RSpec.describe ChallengesController, type: :controller do
 
   describe '#update' do
     it 'renders show without reloading when the challenge is not persisted' do
-      challenge = double('Challenge', can_update?: true, update: false, persisted?: false)
+      challenge = instance_double(Challenge, can_update?: true, update: false, persisted?: false)
       allow(Challenge).to receive(:find).with('1').and_return(challenge)
       allow(Challenge).to receive(:params).and_return(ActionController::Parameters.new(response: 'No change'))
       allow(challenge).to receive(:apply_commit_status).with('Unexpected')

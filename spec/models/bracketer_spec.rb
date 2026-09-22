@@ -10,13 +10,13 @@ RSpec.describe Bracketer, type: :model do
   end
 
   describe 'scopes' do
-    let!(:bracketer1) { create(:bracketer, row: 1, column: 1) }
-    let!(:bracketer2) { create(:bracketer, row: 1, column: 2) }
-    let!(:bracketer3) { create(:bracketer, row: 2, column: 1) }
+    let!(:top_left_bracketer) { create(:bracketer, row: 1, column: 1) }
+    let!(:top_right_bracketer) { create(:bracketer, row: 1, column: 2) }
+    let!(:bottom_left_bracketer) { create(:bracketer, row: 2, column: 1) }
 
     describe '.pos' do
       it 'returns bracketers at the specified row and column' do
-        expect(described_class.pos(1, 1)).to contain_exactly(bracketer1)
+        expect(described_class.pos(1, 1)).to contain_exactly(top_left_bracketer)
       end
 
       it 'returns empty if no bracketers match the position' do

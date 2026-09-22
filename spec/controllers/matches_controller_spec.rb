@@ -6,9 +6,11 @@ RSpec.describe MatchesController, type: :controller do
   let(:admin) { create(:user, :admin) }
   let(:user) { create(:user) }
   let(:contest) { create(:contest) }
-  let(:contester1) { create(:contester, contest: contest) }
-  let(:contester2) { create(:contester, contest: contest) }
-  let(:match_record) { create(:match, contest: contest, contester1: contester1, contester2: contester2) }
+  let(:primary_contester) { create(:contester, contest: contest) }
+  let(:secondary_contester) { create(:contester, contest: contest) }
+  let(:match_record) do
+    create(:match, contest: contest, contester1: primary_contester, contester2: secondary_contester)
+  end
 
   before do
     routes.draw do

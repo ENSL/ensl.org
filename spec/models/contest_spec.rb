@@ -68,7 +68,8 @@ RSpec.describe Contest, type: :model do
 
       cuser = instance_double(User)
       allow(cuser).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
-      allow(cuser).to receive_message_chain(:lead_teams, :not_in_contest, :exists?).and_return(false)
+      lead_teams = double('LeadTeams', not_in_contest: double('EligibleTeams', exists?: false))
+      allow(cuser).to receive(:lead_teams).and_return(lead_teams)
 
       expect(contest.can_join?(cuser)).to be false
     end
@@ -76,7 +77,8 @@ RSpec.describe Contest, type: :model do
     it 'allows a valid user to join when contest is joinable' do
       cuser = double('user')
       allow(cuser).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
-      allow(cuser).to receive_message_chain(:lead_teams, :not_in_contest, :exists?).and_return(true)
+      lead_teams = double('LeadTeams', not_in_contest: double('EligibleTeams', exists?: true))
+      allow(cuser).to receive(:lead_teams).and_return(lead_teams)
 
       expect(contest.can_join?(cuser)).to be true
     end
@@ -84,7 +86,8 @@ RSpec.describe Contest, type: :model do
     it 'denies banned users' do
       cuser = double('user')
       allow(cuser).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(true)
-      allow(cuser).to receive_message_chain(:lead_teams, :not_in_contest, :exists?).and_return(true)
+      lead_teams = double('LeadTeams', not_in_contest: double('EligibleTeams', exists?: true))
+      allow(cuser).to receive(:lead_teams).and_return(lead_teams)
 
       expect(contest.can_join?(cuser)).to be false
     end
@@ -93,7 +96,8 @@ RSpec.describe Contest, type: :model do
       contest.update!(status: Contest::STATUS_CLOSED)
       cuser = double('user')
       allow(cuser).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
-      allow(cuser).to receive_message_chain(:lead_teams, :not_in_contest, :exists?).and_return(true)
+      lead_teams = double('LeadTeams', not_in_contest: double('EligibleTeams', exists?: true))
+      allow(cuser).to receive(:lead_teams).and_return(lead_teams)
 
       expect(contest.can_join?(cuser)).to be(false)
     end

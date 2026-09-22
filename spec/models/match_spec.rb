@@ -411,30 +411,30 @@ RSpec.describe Match, type: :model do
 
   describe 'score bookkeeping branches' do
     let(:contest) { instance_double(Contest, contest_type: Contest::TYPE_LEAGUE) }
-    let(:team1) { instance_double(Team) }
-    let(:team2) { instance_double(Team) }
-    let(:contester1) { instance_double(Contester, team: team1, active: true) }
-    let(:contester2) { instance_double(Contester, team: team2, active: true) }
+    let(:home_team) { instance_double(Team) }
+    let(:away_team) { instance_double(Team) }
+    let(:home_contester) { instance_double(Contester, team: home_team, active: true) }
+    let(:away_contester) { instance_double(Contester, team: away_team, active: true) }
     let(:match) { build(:match) }
 
     before do
-      allow(match).to receive_messages(contest: contest, contester1: contester1, contester2: contester2)
+      allow(match).to receive_messages(contest: contest, contester1: home_contester, contester2: away_contester)
 
-      allow(contester1).to receive_messages(draw: 2, win: 3, loss: 4, score: 10, trend: nil)
-      allow(contester2).to receive_messages(draw: 5, win: 6, loss: 7, score: 11, trend: nil)
+      allow(home_contester).to receive_messages(draw: 2, win: 3, loss: 4, score: 10, trend: nil)
+      allow(away_contester).to receive_messages(draw: 5, win: 6, loss: 7, score: 11, trend: nil)
 
-      allow(contester1).to receive(:draw=)
-      allow(contester2).to receive(:draw=)
-      allow(contester1).to receive(:win=)
-      allow(contester2).to receive(:win=)
-      allow(contester1).to receive(:loss=)
-      allow(contester2).to receive(:loss=)
-      allow(contester1).to receive(:score=)
-      allow(contester2).to receive(:score=)
-      allow(contester1).to receive(:trend=)
-      allow(contester2).to receive(:trend=)
-      allow(contester1).to receive(:save!).and_return(true)
-      allow(contester2).to receive(:save!).and_return(true)
+      allow(home_contester).to receive(:draw=)
+      allow(away_contester).to receive(:draw=)
+      allow(home_contester).to receive(:win=)
+      allow(away_contester).to receive(:win=)
+      allow(home_contester).to receive(:loss=)
+      allow(away_contester).to receive(:loss=)
+      allow(home_contester).to receive(:score=)
+      allow(away_contester).to receive(:score=)
+      allow(home_contester).to receive(:trend=)
+      allow(away_contester).to receive(:trend=)
+      allow(home_contester).to receive(:save!).and_return(true)
+      allow(away_contester).to receive(:save!).and_return(true)
     end
 
     it 'recalculate updates draw counts and trends on draw' do
@@ -443,34 +443,34 @@ RSpec.describe Match, type: :model do
 
       match.recalculate
 
-      expect(contester1).to have_received(:draw=).with(3)
-      expect(contester2).to have_received(:draw=).with(6)
-      expect(contester1).to have_received(:trend=).with(Contester::TREND_FLAT)
-      expect(contester2).to have_received(:trend=).with(Contester::TREND_FLAT)
+      expect(home_contester).to have_received(:draw=).with(3)
+      expect(away_contester).to have_received(:draw=).with(6)
+      expect(home_contester).to have_received(:trend=).with(Contester::TREND_FLAT)
+      expect(away_contester).to have_received(:trend=).with(Contester::TREND_FLAT)
     end
 
-    it 'recalculate updates win and loss counts when contester1 wins' do
+    it 'recalculate updates win and loss counts when home_contester wins' do
       match.score1 = 4
       match.score2 = 1
 
       match.recalculate
 
-      expect(contester1).to have_received(:win=).with(4)
-      expect(contester2).to have_received(:loss=).with(8)
-      expect(contester1).to have_received(:trend=).with(Contester::TREND_UP)
-      expect(contester2).to have_received(:trend=).with(Contester::TREND_DOWN)
+      expect(home_contester).to have_received(:win=).with(4)
+      expect(away_contester).to have_received(:loss=).with(8)
+      expect(home_contester).to have_received(:trend=).with(Contester::TREND_UP)
+      expect(away_contester).to have_received(:trend=).with(Contester::TREND_DOWN)
     end
 
-    it 'recalculate updates win and loss counts when contester2 wins' do
+    it 'recalculate updates win and loss counts when away_contester wins' do
       match.score1 = 1
       match.score2 = 3
 
       match.recalculate
 
-      expect(contester1).to have_received(:loss=).with(5)
-      expect(contester2).to have_received(:win=).with(7)
-      expect(contester1).to have_received(:trend=).with(Contester::TREND_DOWN)
-      expect(contester2).to have_received(:trend=).with(Contester::TREND_UP)
+      expect(home_contester).to have_received(:loss=).with(5)
+      expect(away_contester).to have_received(:win=).with(7)
+      expect(home_contester).to have_received(:trend=).with(Contester::TREND_DOWN)
+      expect(away_contester).to have_received(:trend=).with(Contester::TREND_UP)
     end
 
     it 'reset_contest decrements draw records when prior score was draw' do
@@ -478,26 +478,26 @@ RSpec.describe Match, type: :model do
 
       match.reset_contest
 
-      expect(contester1).to have_received(:draw=).with(1)
-      expect(contester2).to have_received(:draw=).with(4)
+      expect(home_contester).to have_received(:draw=).with(1)
+      expect(away_contester).to have_received(:draw=).with(4)
     end
 
-    it 'reset_contest decrements win and loss records when prior score favored contester1' do
+    it 'reset_contest decrements win and loss records when prior score favored home_contester' do
       allow(match).to receive_messages(score1_was: 3, score2_was: 1)
 
       match.reset_contest
 
-      expect(contester1).to have_received(:win=).with(2)
-      expect(contester2).to have_received(:loss=).with(6)
+      expect(home_contester).to have_received(:win=).with(2)
+      expect(away_contester).to have_received(:loss=).with(6)
     end
 
-    it 'reset_contest decrements win and loss records when prior score favored contester2' do
+    it 'reset_contest decrements win and loss records when prior score favored away_contester' do
       allow(match).to receive_messages(score1_was: 1, score2_was: 3)
 
       match.reset_contest
 
-      expect(contester1).to have_received(:loss=).with(3)
-      expect(contester2).to have_received(:win=).with(5)
+      expect(home_contester).to have_received(:loss=).with(3)
+      expect(away_contester).to have_received(:win=).with(5)
     end
   end
 end

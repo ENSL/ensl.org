@@ -420,6 +420,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
       sign_in_as(movie_maker)
       visit movie_path(movie)
 
+      expect(page).to have_css('body')
       expect(page).to have_no_link('Edit')
     end
 
@@ -435,6 +436,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
       sign_in_as(movie_maker)
       visit movie_path(movie)
 
+      expect(page).to have_css('body')
       # Should not see edit controls at all since they don't own the movie
       expect(page).to have_no_link('Edit')
       expect(page).to have_no_css('.movie-full__actions')
@@ -519,6 +521,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
       sign_in_as(regular_user)
       visit movie_path(movie)
 
+      expect(page).to have_css('body')
       expect(page).to have_no_link('Edit')
       expect(page).to have_no_link('Destroy')
     end
@@ -528,6 +531,7 @@ RSpec.feature 'Movies management', :js, type: :feature do
 
       visit new_movie_path
 
+      expect(page).to have_css('body')
       expect(page.status_code).to eq(403)
       expect(page).to have_text(I18n.t(:user_registration_required))
     end

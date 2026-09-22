@@ -38,7 +38,7 @@ RSpec.describe Week, type: :model do
 
     it 'permission helpers require admin' do
       w = build(:week)
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:admin?).and_return(false)
       expect(w.can_create?(user)).to be false
       allow(user).to receive(:admin?).and_return(true)

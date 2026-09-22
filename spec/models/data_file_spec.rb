@@ -496,7 +496,7 @@ describe DataFile do
     it 'returns true when related_id changed and has related_files' do
       file = build(:data_file)
       allow(file).to receive(:saved_change_to_related_id?).and_return(true)
-      allow(file).to receive_message_chain(:related_files, :any?).and_return(true)
+      allow(file).to receive(:related_files).and_return(double('RelatedFiles', any?: true))
 
       expect(file.should_update_relations?).to be true
     end

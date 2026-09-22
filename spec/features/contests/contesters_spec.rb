@@ -10,7 +10,7 @@ RSpec.feature 'Contesters (teams) management', :js, type: :feature do
   before do
     sign_in_as(admin)
     visit edit_contest_path(contest, anchor: 'teams')
-    expect(page).to have_css('#teams')
+    find_by_id('teams')
   end
 
   scenario 'Add a contester (team) to contest', :aggregate_failures do

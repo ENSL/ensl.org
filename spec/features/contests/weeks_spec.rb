@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.feature 'Weeks management', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
   let!(:contest) { create(:contest) }
-  let!(:map1) { create(:map) }
-  let!(:map2) { create(:map) }
+  let!(:home_map) { create(:map) }
+  let!(:away_map) { create(:map) }
 
   before do
-    contest.maps << [map1, map2]
+    contest.maps << [home_map, away_map]
     sign_in_as(admin)
   end
 
@@ -22,8 +22,8 @@ RSpec.feature 'Weeks management', :js, type: :feature do
     visit new_week_path(id: contest.id)
 
     fill_in 'week_name', with: 'Spec Week'
-    select map1.name, from: 'week_map1_id'
-    select map2.name, from: 'week_map2_id'
+    select home_map.name, from: 'week_map1_id'
+    select away_map.name, from: 'week_map2_id'
     select (Time.zone.today + 7).day.to_s, from: 'week_start_date_3i'
 
     click_button 'Save Week'
@@ -34,7 +34,7 @@ RSpec.feature 'Weeks management', :js, type: :feature do
   end
 
   scenario 'Update a week via the edit view with JS', :aggregate_failures do
-    week = create(:week, contest: contest, map1: map1, map2: map2)
+    week = create(:week, contest: contest, map1: home_map, map2: away_map)
     visit edit_week_path(week)
 
     fill_in 'week_name', with: 'Updated Week Name'
@@ -44,7 +44,7 @@ RSpec.feature 'Weeks management', :js, type: :feature do
   end
 
   scenario 'Delete a week from the contest edit view', :aggregate_failures do
-    week = create(:week, contest: contest, map1: map1, map2: map2)
+    week = create(:week, contest: contest, map1: home_map, map2: away_map)
     open_weeks_tab
 
     # Find the row for our week and use the form-backed delete link

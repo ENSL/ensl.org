@@ -103,6 +103,7 @@ RSpec.feature 'Gather admin actions', :js, type: :feature do
       sign_in_via_session(admin)
       visit edit_gather_path(gather)
 
+      expect(page).to have_css('body')
       expect(page).to have_no_button('Change Maps and Server')
     end
   end
@@ -175,6 +176,7 @@ RSpec.feature 'Gather admin actions', :js, type: :feature do
       sign_in_via_session(admin)
       visit edit_gather_path(gather)
 
+      expect(page).to have_css('body')
       expect(page).to have_button('Start New Gather')
       expect(page).to have_no_button('Restart Gather')
       expect(page).to have_no_button('Change Turn')
@@ -232,6 +234,7 @@ RSpec.feature 'Gather admin actions', :js, type: :feature do
       sign_in_via_session(admin)
       visit edit_gather_path(gather)
 
+      expect(page).to have_css('body')
       expect(page).to have_no_button('Add Player')
     end
   end

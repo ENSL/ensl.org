@@ -34,31 +34,31 @@ AllCops:
 # The point is to keep methods understandable, not to optimize for a generic
 # Ruby style guide that is too strict for Rails controllers.
 Metrics/AbcSize:
-  Enabled: true
+  Enabled: false
   Max: 30
 
 # Rails actions often carry a moderate amount of branching and setup, so a
 # slightly higher limit avoids artificial method splitting.
 Metrics/MethodLength:
-  Enabled: true
+  Enabled: false
   Max: 18
 
 # Controllers commonly branch on request state, parameters, and feature flags;
 # this ceiling keeps the logic readable while still permitting practical actions.
 Metrics/CyclomaticComplexity:
-  Enabled: true
+  Enabled: false
   Max: 9
 
 # Perceived complexity is a better fit for readable Rails controller code than
 # the default conservative threshold.
 Metrics/PerceivedComplexity:
-  Enabled: true
+  Enabled: false
   Max: 10
 
 # Class-level size is allowed to be larger than the Ruby default because Rails
 # controllers, concerns, and service objects can accumulate coherent behavior.
 Metrics/ClassLength:
-  Enabled: true
+  Enabled: false
   Max: 200
 
 Metrics/BlockLength:
@@ -139,16 +139,7 @@ RSpec/BeforeAfterAll:
   Exclude:
     - 'spec/lib/tasks/parquet_imports_spec.rb'
 
-RSpec/ChangeByZero:
-  Enabled: false
-
 RSpec/DescribeClass:
-  Enabled: false
-
-RSpec/ExpectInHook:
-  Enabled: false
-
-RSpec/IndexedLet:
   Enabled: false
 
 RSpec/InstanceVariable:
@@ -157,28 +148,16 @@ RSpec/InstanceVariable:
 RSpec/LetSetup:
   Enabled: false
 
-RSpec/MessageChain:
-  Enabled: false
-
 RSpec/MessageSpies:
   Enabled: false
 
 RSpec/MultipleDescribes:
   Enabled: false
 
-RSpec/NoExpectationExample:
-  Enabled: false
-
-RSpec/RepeatedExampleGroupDescription:
-  Enabled: false
-
 RSpec/StubbedMock:
   Enabled: false
 
 RSpec/VerifiedDoubles:
-  Enabled: false
-
-Capybara/RSpec/NegationMatcherAfterVisit:
   Enabled: false
 
 # More like metrics

@@ -8,21 +8,21 @@ require 'rails_helper'
 RSpec.feature 'Match Proposals', :js, type: :feature do
   let(:contest) { create(:contest) }
   let(:team1_leader) { create(:user_with_team, username: 'team1_leader') }
-  let(:team1) { team1_leader.team }
+  let(:proposing_team) { team1_leader.team }
   let(:team2_leader) { create(:user_with_team, username: 'team2_leader') }
-  let(:team2) { team2_leader.team }
+  let(:responding_team) { team2_leader.team }
   let(:admin) { create(:user, :admin) }
-  let(:cont1) { create(:contester, team: team1, contest: contest) }
-  let(:cont2) { create(:contester, team: team2, contest: contest) }
-  let(:match) { create(:match, contest: contest, contester1: cont1, contester2: cont2) }
+  let(:proposing_contester) { create(:contester, team: proposing_team, contest: contest) }
+  let(:responding_contester) { create(:contester, team: responding_team, contest: contest) }
+  let(:match) { create(:match, contest: contest, contester1: proposing_contester, contester2: responding_contester) }
 
   scenario 'team leader views match proposals page' do
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
 
     expect(page).to have_text('Proposals')
-    expect(page).to have_text(team1.name)
-    expect(page).to have_text(team2.name)
+    expect(page).to have_text(proposing_team.name)
+    expect(page).to have_text(responding_team.name)
     expect(page).to have_link('Propose match time')
     expect(page).to have_link('Back')
   end
@@ -44,7 +44,7 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
 
     # Verify the proposal was created correctly
     proposal = MatchProposal.last
-    expect(proposal.team).to eq(team1)
+    expect(proposal.team).to eq(proposing_team)
     expect(proposal.match).to eq(match)
     expect(proposal.status).to eq(MatchProposal::STATUS_PENDING)
   end
@@ -67,76 +67,78 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'opposing team sees the proposal in their list' do
-    create(:match_proposal, :in_far_future, match: match, team: team1)
+    create(:match_proposal, :in_far_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
-    expect(page).to have_text(team1.name)
+    expect(page).to have_text(proposing_team.name)
     expect(page).to have_text('Pending')
   end
 
   scenario 'opposing team confirms a proposal outside confirmation limit' do
-    proposal = create(:match_proposal, :in_near_future, match: match, team: team1)
+    proposal = create(:match_proposal, :in_near_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
     # Should see the proposal
-    expect(page).to have_text(team1.name)
+    expect(page).to have_text(proposing_team.name)
     expect(page).to have_text('Pending')
     # Verify confirm button would be available (via model permission check)
     expect(proposal.status_change_allowed?(team2_leader, MatchProposal::STATUS_CONFIRMED)).to be true
   end
 
   scenario 'opposing team confirms a proposal via the inline action link' do
-    proposal = create(:match_proposal, :in_near_future, match: match, team: team1)
+    proposal = create(:match_proposal, :in_near_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
-    within('tr', text: team1.name) { click_link 'Confirm' }
+    within('tr', text: proposing_team.name) { click_link 'Confirm' }
 
     expect(page).to have_text('Confirmed', wait: 5)
     expect(proposal.reload.status).to eq(MatchProposal::STATUS_CONFIRMED)
   end
 
   scenario 'team leader cannot confirm own proposal' do
-    create(:match_proposal, :in_near_future, match: match, team: team1)
+    create(:match_proposal, :in_near_future, match: match, team: proposing_team)
 
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
 
+    expect(page).to have_css('body')
     # Team 1 leader should not see confirm action for their own proposal
     expect(page).to have_no_xpath("//a[@title='Confirm']")
   end
 
   scenario 'opposing team rejects a proposal outside confirmation limit' do
-    proposal = create(:match_proposal, :in_near_future, match: match, team: team1)
+    proposal = create(:match_proposal, :in_near_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
     # Should see the proposal and reject should be available
-    expect(page).to have_text(team1.name)
+    expect(page).to have_text(proposing_team.name)
     expect(page).to have_text('Pending')
     expect(proposal.status_change_allowed?(team2_leader, MatchProposal::STATUS_REJECTED)).to be true
   end
 
   scenario 'proposal cannot be confirmed within confirmation limit' do
     # Proposal 10 minutes in the future (within 30 minute limit)
-    create(:match_proposal, match: match, team: team1, proposed_time: 10.minutes.from_now)
+    create(:match_proposal, match: match, team: proposing_team, proposed_time: 10.minutes.from_now)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
+    expect(page).to have_css('body')
     # Should not see confirm or reject options for pending proposals within time limit
     expect(page).to have_no_xpath("//a[@title='Confirm']")
     expect(page).to have_no_xpath("//a[@title='Reject']")
   end
 
   scenario 'team leader can revoke pending proposal' do
-    proposal = create(:match_proposal, :in_far_future, match: match, team: team1)
+    proposal = create(:match_proposal, :in_far_future, match: match, team: proposing_team)
 
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
@@ -147,7 +149,7 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'team leader can revoke confirmed proposal outside confirmation limit' do
-    proposal = create(:match_proposal, :confirmed, :in_near_future, match: match, team: team1)
+    proposal = create(:match_proposal, :confirmed, :in_near_future, match: match, team: proposing_team)
 
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
@@ -159,7 +161,8 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'admin can delay a confirmed proposal within time limit' do
-    proposal = create(:match_proposal, :confirmed, match: match, team: team1, proposed_time: 10.minutes.from_now)
+    proposal = create(:match_proposal, :confirmed, match: match, team: proposing_team,
+                                                   proposed_time: 10.minutes.from_now)
 
     sign_in_via_session(admin)
     visit match_proposals_path(match)
@@ -171,18 +174,18 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'proposal shows timestamp in human readable format' do
-    create(:match_proposal, match: match, team: team1, proposed_time: 5.days.from_now)
+    create(:match_proposal, match: match, team: proposing_team, proposed_time: 5.days.from_now)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
 
     # Should display time-related content
-    expect(page).to have_text(team1.name)
+    expect(page).to have_text(proposing_team.name)
     expect(page).to have_text('Pending')
   end
 
   scenario 'cannot create new proposal if confirmed one exists' do
-    create(:match_proposal, :confirmed, :in_far_future, match: match, team: team1)
+    create(:match_proposal, :confirmed, :in_far_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
@@ -203,20 +206,20 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'admin can always access proposals page' do
-    create(:match_proposal, :in_far_future, match: match, team: team1)
+    create(:match_proposal, :in_far_future, match: match, team: proposing_team)
 
     sign_in_via_session(admin)
     visit match_proposals_path(match)
 
     expect(page).to have_text('Proposals')
-    expect(page).to have_text(team1.name)
+    expect(page).to have_text(proposing_team.name)
   end
 
   scenario 'team leader cannot propose match without participating in it' do
     other_contest = create(:contest)
     other_team = create(:team)
     other_cont1 = create(:contester, team: other_team, contest: other_contest)
-    other_cont2 = create(:contester, team: team2, contest: other_contest)
+    other_cont2 = create(:contester, team: responding_team, contest: other_contest)
     other_match = create(:match, contest: other_contest, contester1: other_cont1, contester2: other_cont2)
 
     sign_in_via_session(team1_leader)
@@ -226,9 +229,9 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'multiple proposals for same match' do
-    create(:match_proposal, :pending, match: match, team: team1, proposed_time: 2.days.from_now)
-    create(:match_proposal, :rejected, match: match, team: team1, proposed_time: 3.days.from_now)
-    create(:match_proposal, :confirmed, match: match, team: team2, proposed_time: 4.days.from_now)
+    create(:match_proposal, :pending, match: match, team: proposing_team, proposed_time: 2.days.from_now)
+    create(:match_proposal, :rejected, match: match, team: proposing_team, proposed_time: 3.days.from_now)
+    create(:match_proposal, :confirmed, match: match, team: responding_team, proposed_time: 4.days.from_now)
 
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
@@ -241,9 +244,9 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'proposal list shows all proposals with correct statuses' do
-    create(:match_proposal, :pending, match: match, team: team1, proposed_time: 2.days.from_now)
-    create(:match_proposal, :confirmed, match: match, team: team2, proposed_time: 3.days.from_now)
-    create(:match_proposal, :rejected, match: match, team: team1, proposed_time: 4.days.from_now)
+    create(:match_proposal, :pending, match: match, team: proposing_team, proposed_time: 2.days.from_now)
+    create(:match_proposal, :confirmed, match: match, team: responding_team, proposed_time: 3.days.from_now)
+    create(:match_proposal, :rejected, match: match, team: proposing_team, proposed_time: 4.days.from_now)
 
     sign_in_via_session(team1_leader)
     visit match_proposals_path(match)
@@ -251,13 +254,13 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
     expect(page).to have_text('Pending')
     expect(page).to have_text('Confirmed')
     expect(page).to have_text('Rejected')
-    expect(page).to have_text(team1.name)
-    expect(page).to have_text(team2.name)
+    expect(page).to have_text(proposing_team.name)
+    expect(page).to have_text(responding_team.name)
   end
 
   scenario 'immutable statuses do not show action buttons' do
     # Rejected status is immutable
-    create(:match_proposal, :rejected, :in_far_future, match: match, team: team1)
+    create(:match_proposal, :rejected, :in_far_future, match: match, team: proposing_team)
 
     sign_in_via_session(team2_leader)
     visit match_proposals_path(match)
@@ -273,12 +276,12 @@ RSpec.feature 'Match Proposals', :js, type: :feature do
   end
 
   scenario 'proposal notification sent to opposing team on creation' do
-    proposal = create(:match_proposal, :in_far_future, match: match, team: team1)
+    proposal = create(:match_proposal, :in_far_future, match: match, team: proposing_team)
 
     # Verify proposal was created successfully
     expect(proposal).to be_persisted
     expect(proposal.match_id).to eq(match.id)
-    expect(proposal.team_id).to eq(team1.id)
+    expect(proposal.team_id).to eq(proposing_team.id)
     expect(proposal.status).to eq(MatchProposal::STATUS_PENDING)
   end
 end

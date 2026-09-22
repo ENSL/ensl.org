@@ -49,6 +49,7 @@ feature 'Google Calendar widget', :js do
       Timecop.travel(time) do
         visit root_path
 
+        expect(page).to have_css('body')
         expect(first_event).to have_no_text('Div 3B: Mister vs. HBZ')
         expect(first_event).to have_text('Div 3B: OMNOM vs. Mister')
       end

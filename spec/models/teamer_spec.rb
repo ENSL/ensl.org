@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Teamer, type: :model do
+RSpec.describe Teamer, 'basic behavior', type: :model do
   describe 'init_variables' do
     it 'sets default rank to RANK_JOINER' do
       t = described_class.new
@@ -156,7 +156,7 @@ RSpec.describe Teamer, type: :model do
 
     it 'can_update? requires admin' do
       t = build(:teamer)
-      admin = double('User')
+      admin = instance_double(User)
       allow(admin).to receive(:admin?).and_return(true)
       expect(t.can_update?(admin)).to be true
     end
@@ -172,7 +172,7 @@ RSpec.describe Teamer, type: :model do
       allow(team).to receive(:is_leader?).with(leader).and_return(true)
       expect(t.can_destroy?(leader)).to be true
 
-      admin = double('User')
+      admin = instance_double(User)
       allow(admin).to receive(:admin?).and_return(true)
       allow(team).to receive(:is_leader?).with(admin).and_return(false)
       expect(t.can_destroy?(admin)).to be true

@@ -8,9 +8,11 @@ RSpec.describe 'MatchProposalsController', type: :request do
   let(:admin) { create(:user, :admin) }
   let(:outsider) { create(:user) }
   let(:contest) { create(:contest) }
-  let(:contester1) { create(:contester, contest: contest, team: team1_leader.team) }
-  let(:contester2) { create(:contester, contest: contest, team: team2_leader.team) }
-  let(:match) { create(:match, contest: contest, contester1: contester1, contester2: contester2) }
+  let(:proposing_contester) { create(:contester, contest: contest, team: team1_leader.team) }
+  let(:responding_contester) { create(:contester, contest: contest, team: team2_leader.team) }
+  let(:match) do
+    create(:match, contest: contest, contester1: proposing_contester, contester2: responding_contester)
+  end
 
   def login_as(user)
     post '/sessions/login', params: { login: { username: user.username, password: user.raw_password } }

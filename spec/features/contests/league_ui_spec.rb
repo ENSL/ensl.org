@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.feature 'League contest UI integration', :js, type: :feature do
   let!(:admin) { create(:user, :admin) }
-  let!(:team_leader1) { create(:user, username: 'leader1') }
-  let!(:team_leader2) { create(:user, username: 'leader2') }
-  let!(:team_leader3) { create(:user, username: 'leader3') }
-  let!(:team_leader4) { create(:user, username: 'leader4') }
+  let!(:alpha_team_leader) { create(:user, username: 'leader1') }
+  let!(:beta_team_leader) { create(:user, username: 'leader2') }
+  let!(:gamma_team_leader) { create(:user, username: 'leader3') }
+  let!(:delta_team_leader) { create(:user, username: 'leader4') }
 
   scenario 'Admin creates a league, team leaders create teams, matches created and scores recorded through UI' do
     # Create maps beforehand
@@ -70,7 +70,7 @@ RSpec.feature 'League contest UI integration', :js, type: :feature do
     teams = []
 
     team_names.each_with_index do |team_name, index|
-      leader = [team_leader1, team_leader2, team_leader3, team_leader4][index]
+      leader = [alpha_team_leader, beta_team_leader, gamma_team_leader, delta_team_leader][index]
       sign_out
       sign_in_as(leader)
 

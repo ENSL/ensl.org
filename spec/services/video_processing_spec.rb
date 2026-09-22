@@ -39,7 +39,7 @@ RSpec.describe VideoProcessing, type: :service do
     end
   end
 
-  describe '.probe_duration_seconds!' do
+  describe '.probe_duration_seconds! missing-duration handling' do
     it 'returns duration close to helper-provided expected value for a real sample file' do
       duration = described_class.probe_duration_seconds!(input_path)
       expected_duration = test_video_expected_duration(fixture_name)

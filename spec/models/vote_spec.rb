@@ -320,6 +320,10 @@ RSpec.describe Vote, type: :model do
 
     third_vote = described_class.new(user: user, votable: map3)
     expect(third_vote.can_create?(user)).to be false
-    expect { third_vote.save }.to raise_error(ActiveRecord::RecordInvalid).or change(described_class, :count).by(0)
+    expect do
+      third_vote.save
+    rescue ActiveRecord::RecordInvalid
+      nil
+    end.not_to change(described_class, :count)
   end
 end

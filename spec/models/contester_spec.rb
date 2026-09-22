@@ -31,8 +31,8 @@ RSpec.describe Contester, type: :model do
     it 'returns the correct lineup relation for open and closed contests' do
       open_relation = double('open_lineup')
       closed_relation = double('closed_lineup')
-      allow(contester.team).to receive_message_chain(:teamers, :active).and_return(open_relation)
-      allow(contester.team).to receive_message_chain(:teamers, :distinct).and_return(closed_relation)
+      teamers = double('Teamers', active: open_relation, distinct: closed_relation)
+      allow(contester.team).to receive(:teamers).and_return(teamers)
 
       allow(contester.contest).to receive(:status).and_return(Contest::STATUS_OPEN)
       expect(contester.lineup).to eq(open_relation)
@@ -144,7 +144,8 @@ RSpec.describe Contester, type: :model do
 
     it 'requires at least six active players' do
       contester = build(:contester)
-      allow(contester.team).to receive_message_chain(:teamers, :active, :unique_by_team, :count).and_return(5)
+      active_teamers = double('ActiveTeamers', unique_by_team: double('UniqueTeamers', count: 5))
+      allow(contester.team).to receive(:teamers).and_return(double('Teamers', active: active_teamers))
 
       contester.validate_playernumber
 
@@ -153,7 +154,8 @@ RSpec.describe Contester, type: :model do
 
     it 'allows teams with at least six active players' do
       contester = build(:contester)
-      allow(contester.team).to receive_message_chain(:teamers, :active, :unique_by_team, :count).and_return(6)
+      active_teamers = double('ActiveTeamers', unique_by_team: double('UniqueTeamers', count: 6))
+      allow(contester.team).to receive(:teamers).and_return(double('Teamers', active: active_teamers))
 
       contester.validate_playernumber
 
@@ -170,20 +172,20 @@ RSpec.describe Contester, type: :model do
     end
 
     it 'returns false for banned users' do
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(true)
       expect(contester.can_create?(user)).to be false
     end
 
     it 'returns true for admin users' do
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
       allow(user).to receive(:admin?).and_return(true)
       expect(contester.can_create?(user)).to be true
     end
 
     it 'returns true for team leader with valid params' do
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
       allow(user).to receive(:admin?).and_return(false)
       allow(team).to receive(:is_leader?).with(user).and_return(true)
@@ -192,7 +194,7 @@ RSpec.describe Contester, type: :model do
     end
 
     it 'returns false for a leader when params are not allowed' do
-      user = double('User')
+      user = instance_double(User)
       allow(user).to receive(:banned?).with(Ban::TYPE_LEAGUE).and_return(false)
       allow(user).to receive(:admin?).and_return(false)
       allow(team).to receive(:is_leader?).with(user).and_return(true)
@@ -202,7 +204,7 @@ RSpec.describe Contester, type: :model do
     end
 
     it 'can_destroy? true for admin or leader, false otherwise' do
-      admin = double('User')
+      admin = instance_double(User)
       allow(admin).to receive(:admin?).and_return(true)
       allow(team).to receive(:is_leader?).with(admin).and_return(false)
       expect(contester.can_destroy?(admin)).to be true

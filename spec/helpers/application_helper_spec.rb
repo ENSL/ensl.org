@@ -334,8 +334,8 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe 'lineup rendering helpers' do
     let(:motm) { instance_double(User, username: 'MOTM', country: 'FI') }
     let(:other_user) { instance_double(User, username: 'Player2', country: 'SE') }
-    let(:teamer1) { instance_double(Teamer, user: motm) }
-    let(:teamer2) { instance_double(Teamer, user: other_user) }
+    let(:motm_teamer) { instance_double(Teamer, user: motm) }
+    let(:other_teamer) { instance_double(Teamer, user: other_user) }
     let(:match) { instance_double(Match, motm: motm) }
 
     before do
@@ -343,7 +343,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'renders normal lineup order with star marker for motm' do
-      html = helper.match_lineup_display(match, [teamer1], 'team-1')
+      html = helper.match_lineup_display(match, [motm_teamer], 'team-1')
 
       expect(html).to include('team-1')
       expect(html).to include('MOTM')
@@ -351,7 +351,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'renders reversed lineup order' do
-      html = helper.match_lineup_display(match, [teamer2], 'team-2', reverse: true)
+      html = helper.match_lineup_display(match, [other_teamer], 'team-2', reverse: true)
 
       expect(html).to include('team-2')
       expect(html).to include('Player2')
@@ -363,21 +363,21 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     it 'adds shift class when only team2 lineup exists' do
-      html = helper.match_lineups_display(match, [], [teamer2])
+      html = helper.match_lineups_display(match, [], [other_teamer])
 
       expect(html).to include('lineups shift')
       expect(html).to include('team-2')
     end
 
     it 'does not add shift class when team1 lineup exists' do
-      html = helper.match_lineups_display(match, [teamer1], [teamer2])
+      html = helper.match_lineups_display(match, [motm_teamer], [other_teamer])
 
       expect(html).to include('lineups')
       expect(html).not_to include('lineups shift')
     end
 
     it 'does not include a star for non-motm in reverse lineup' do
-      html = helper.match_lineup_display(match, [teamer2], 'team-2', reverse: true)
+      html = helper.match_lineup_display(match, [other_teamer], 'team-2', reverse: true)
 
       expect(html).not_to include('star')
     end

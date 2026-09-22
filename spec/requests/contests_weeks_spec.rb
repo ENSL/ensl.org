@@ -349,11 +349,11 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
 
   describe 'WeeksController' do
     let(:contest) { create(:contest) }
-    let(:map1) { create(:map) }
-    let(:map2) { create(:map) }
+    let(:home_map) { create(:map) }
+    let(:away_map) { create(:map) }
 
     before do
-      contest.maps << [map1, map2]
+      contest.maps << [home_map, away_map]
     end
 
     it 'allows an admin to load the new form' do
@@ -381,8 +381,8 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
             contest_id: contest.id,
             name: 'Request Week',
             start_date: Time.zone.today,
-            map1_id: map1.id,
-            map2_id: map2.id
+            map1_id: home_map.id,
+            map2_id: away_map.id
           }
         }
       end.to change(Week, :count).by(1)
@@ -398,7 +398,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
           contest_id: contest.id,
           name: '',
           start_date: Time.zone.today,
-          map1_id: map1.id,
+          map1_id: home_map.id,
           map2_id: nil
         }
       }
@@ -407,14 +407,14 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
     end
 
     it 'returns 422 when week update is invalid' do
-      week = create(:week, contest: contest, map1: map1, map2: map2)
+      week = create(:week, contest: contest, map1: home_map, map2: away_map)
       login_as(admin)
 
       patch "/weeks/#{week.id}", params: {
         week: {
           name: '',
-          map1_id: map1.id,
-          map2_id: map2.id,
+          map1_id: home_map.id,
+          map2_id: away_map.id,
           contest_id: contest.id
         }
       }
@@ -423,7 +423,7 @@ RSpec.describe 'Contests and Weeks controllers', type: :request do
     end
 
     it 'destroys a week and redirects to the contest weeks tab' do
-      week = create(:week, contest: contest, map1: map1, map2: map2)
+      week = create(:week, contest: contest, map1: home_map, map2: away_map)
       login_as(admin)
 
       expect do

@@ -52,6 +52,7 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit root_path
 
+    expect(page).to have_css('body')
     expect(page).to have_no_text("You've signed up for NS2 Gather.")
   end
 
@@ -62,6 +63,7 @@ RSpec.feature 'Gather header badge', type: :feature do
     sign_in_as(user)
     visit gather_path(gather)
 
+    expect(page).to have_css('body')
     expect(page).to have_no_text("You've signed up for NS2 Gather.")
   end
 
@@ -77,6 +79,7 @@ RSpec.feature 'Gather header badge', type: :feature do
       expect(page).to have_link("You've signed up for NS1 Gather.", wait: 5)
 
       visit gather_path(join_gather)
+      expect(page).to have_css('body')
       expect(page).to have_no_link("You've signed up for NS1 Gather.")
     end
   end

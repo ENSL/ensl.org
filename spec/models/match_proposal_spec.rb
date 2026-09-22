@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe MatchProposal, type: :model do
   let(:contest) { create(:contest) }
-  let(:user1) { create(:user_with_team) }
-  let(:team1) { user1.team }
-  let(:user2) { create(:user_with_team) }
-  let(:team2) { user2.team }
-  let(:cont1) { create(:contester, team: team1, contest: contest) }
-  let(:cont2) { create(:contester, team: team2, contest: contest) }
-  let(:match) { create(:match, contest: contest, contester1: cont1, contester2: cont2) }
+  let(:proposing_user) { create(:user_with_team) }
+  let(:proposing_team) { proposing_user.team }
+  let(:responding_user) { create(:user_with_team) }
+  let(:responding_team) { responding_user.team }
+  let(:proposing_contester) { create(:contester, team: proposing_team, contest: contest) }
+  let(:responding_contester) { create(:contester, team: responding_team, contest: contest) }
+  let(:match) { create(:match, contest: contest, contester1: proposing_contester, contester2: responding_contester) }
 
   describe 'constants' do
     it 'defines status constants' do
@@ -40,7 +40,7 @@ RSpec.describe MatchProposal, type: :model do
 
   describe 'validations' do
     it 'requires match presence' do
-      proposal = described_class.new(team: team1, proposed_time: 1.day.from_now)
+      proposal = described_class.new(team: proposing_team, proposed_time: 1.day.from_now)
       expect(proposal).not_to be_valid
       expect(proposal.errors[:match]).to be_present
     end
@@ -52,29 +52,29 @@ RSpec.describe MatchProposal, type: :model do
     end
 
     it 'requires proposed_time presence' do
-      proposal = described_class.new(match: match, team: team1)
+      proposal = described_class.new(match: match, team: proposing_team)
       expect(proposal).not_to be_valid
       expect(proposal.errors[:proposed_time]).to be_present
     end
 
     it 'is valid with all required attributes' do
-      proposal = described_class.new(match: match, team: team1, proposed_time: 1.day.from_now)
+      proposal = described_class.new(match: match, team: proposing_team, proposed_time: 1.day.from_now)
       expect(proposal).to be_valid
     end
   end
 
   describe 'scopes' do
-    let!(:proposal1) { create(:match_proposal, match: match, team: team1, proposed_time: 1.day.from_now) }
+    let!(:matching_proposal) { create(:match_proposal, match: match, team: proposing_team, proposed_time: 1.day.from_now) }
     let!(:other_match) { create(:match, contest: contest) }
-    let!(:proposal2) { create(:match_proposal, match: other_match, team: team1, proposed_time: 1.day.from_now) }
+    let!(:other_match_proposal) { create(:match_proposal, match: other_match, team: proposing_team, proposed_time: 1.day.from_now) }
 
     describe '.confirmed_for_match' do
       let!(:confirmed_proposal) do
-        create(:match_proposal, match: match, team: team1,
+        create(:match_proposal, match: match, team: proposing_team,
                                 proposed_time: 1.day.from_now, status: MatchProposal::STATUS_CONFIRMED)
       end
       let!(:pending_proposal) do
-        create(:match_proposal, match: match, team: team2,
+        create(:match_proposal, match: match, team: responding_team,
                                 proposed_time: 2.days.from_now, status: MatchProposal::STATUS_PENDING)
       end
 
@@ -87,13 +87,13 @@ RSpec.describe MatchProposal, type: :model do
 
     describe '.confirmed_for_contest' do
       let!(:confirmed_for_contest) do
-        create(:match_proposal, match: match, team: team1,
+        create(:match_proposal, match: match, team: proposing_team,
                                 proposed_time: 1.day.from_now, status: MatchProposal::STATUS_CONFIRMED)
       end
       let!(:other_contest) { create(:contest) }
       let!(:other_contest_match) { create(:match, contest: other_contest) }
       let!(:confirmed_other_contest) do
-        create(:match_proposal, match: other_contest_match, team: team1,
+        create(:match_proposal, match: other_contest_match, team: proposing_team,
                                 proposed_time: 1.day.from_now, status: MatchProposal::STATUS_CONFIRMED)
       end
 
@@ -117,10 +117,10 @@ RSpec.describe MatchProposal, type: :model do
   end
 
   describe '#can_create?' do
-    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: proposing_team, proposed_time: 1.day.from_now) }
 
     it 'allows team leaders to create proposals' do
-      expect(proposal.can_create?(user1)).to be true
+      expect(proposal.can_create?(proposing_user)).to be true
     end
 
     it 'allows admins to create proposals' do
@@ -133,17 +133,17 @@ RSpec.describe MatchProposal, type: :model do
     end
 
     context 'when match is nil' do
-      let(:proposal) { described_class.new(team: team1, proposed_time: 1.day.from_now) }
+      let(:proposal) { described_class.new(team: proposing_team, proposed_time: 1.day.from_now) }
 
       it 'denies creation' do
-        expect(proposal.can_create?(user1)).to be false
+        expect(proposal.can_create?(proposing_user)).to be false
       end
     end
   end
 
   describe '#can_update?' do
     context 'with nil user' do
-      let(:proposal) { create(:match_proposal, match: match, team: team1, proposed_time: 1.day.from_now) }
+      let(:proposal) { create(:match_proposal, match: match, team: proposing_team, proposed_time: 1.day.from_now) }
 
       it 'denies update' do
         expect(proposal.can_update?(nil)).to be false
@@ -151,10 +151,10 @@ RSpec.describe MatchProposal, type: :model do
     end
 
     context 'when not changing status' do
-      let(:proposal) { create(:match_proposal, match: match, team: team1, proposed_time: 1.day.from_now) }
+      let(:proposal) { create(:match_proposal, match: match, team: proposing_team, proposed_time: 1.day.from_now) }
 
       it 'allows updates by authorized users' do
-        expect(proposal.can_update?(user1)).to be true
+        expect(proposal.can_update?(proposing_user)).to be true
       end
 
       it 'allows updates by admins' do
@@ -165,26 +165,26 @@ RSpec.describe MatchProposal, type: :model do
 
     context 'when changing status' do
       it 'validates status change permissions' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.can_update?(user2, status: MatchProposal::STATUS_CONFIRMED)).to be true
+        expect(proposal.can_update?(responding_user, status: MatchProposal::STATUS_CONFIRMED)).to be true
       end
     end
   end
 
   describe '#can_destroy?' do
-    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: proposing_team, proposed_time: 1.day.from_now) }
 
     it 'requires admin permissions' do
       admin = create(:user, :admin)
       expect(proposal.can_destroy?(admin)).to be true
-      expect(proposal.can_destroy?(user1)).to be false
+      expect(proposal.can_destroy?(proposing_user)).to be false
       expect(proposal).not_to be_can_destroy(nil)
     end
   end
 
   describe '#state_immutable?' do
-    let(:proposal) { described_class.new(match: match, team: team1, proposed_time: 1.day.from_now) }
+    let(:proposal) { described_class.new(match: match, team: proposing_team, proposed_time: 1.day.from_now) }
 
     it 'returns true for rejected status' do
       proposal.status = MatchProposal::STATUS_REJECTED
@@ -215,12 +215,12 @@ RSpec.describe MatchProposal, type: :model do
   describe '#status_change_allowed?' do
     context 'when changing to STATUS_PENDING' do
       let(:proposal) do
-        create(:match_proposal, match: match, team: team1,
+        create(:match_proposal, match: match, team: proposing_team,
                                 proposed_time: 1.day.from_now, status: MatchProposal::STATUS_CONFIRMED)
       end
 
       it 'never allows going back to pending' do
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_PENDING)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_PENDING)).to be false
         admin = create(:user, :admin)
         expect(proposal.status_change_allowed?(admin, MatchProposal::STATUS_PENDING)).to be false
       end
@@ -229,27 +229,27 @@ RSpec.describe MatchProposal, type: :model do
     context 'when changing to STATUS_DELAYED' do
       it 'allows admin to delay confirmed match within time limit' do
         admin = create(:user, :admin)
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_CONFIRMED)
         expect(proposal.status_change_allowed?(admin, MatchProposal::STATUS_DELAYED)).to be true
       end
 
       it 'denies delay if not confirmed' do
         admin = create(:user, :admin)
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_PENDING)
         expect(proposal.status_change_allowed?(admin, MatchProposal::STATUS_DELAYED)).to be false
       end
 
       it 'denies delay if not admin' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_CONFIRMED)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_DELAYED)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_DELAYED)).to be false
       end
 
       it 'denies delay if too far in the future' do
         admin = create(:user, :admin)
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_CONFIRMED)
         expect(proposal.status_change_allowed?(admin, MatchProposal::STATUS_DELAYED)).to be false
       end
@@ -257,87 +257,87 @@ RSpec.describe MatchProposal, type: :model do
 
     context 'when changing to STATUS_REVOKED' do
       it 'allows proposing team to revoke pending proposal' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.day.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_REVOKED)).to be true
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_REVOKED)).to be true
       end
 
       it 'denies revoke if not proposing team' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.day.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_REVOKED)).to be false
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_REVOKED)).to be false
       end
 
       it 'allows revoke of confirmed proposal if beyond confirmation limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_CONFIRMED)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_REVOKED)).to be true
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_REVOKED)).to be true
       end
 
       it 'denies revoke of confirmed proposal within confirmation limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_CONFIRMED)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_REVOKED)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_REVOKED)).to be false
       end
     end
 
     context 'when changing to STATUS_CONFIRMED' do
       it 'allows opposing team to confirm pending proposal outside time limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_CONFIRMED)).to be true
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_CONFIRMED)).to be true
       end
 
       it 'denies confirm if same team' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_CONFIRMED)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_CONFIRMED)).to be false
       end
 
       it 'denies confirm if not pending' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_CONFIRMED)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_CONFIRMED)).to be false
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_CONFIRMED)).to be false
       end
 
       it 'denies confirm if within confirmation limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_CONFIRMED)).to be false
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_CONFIRMED)).to be false
       end
     end
 
     context 'when changing to STATUS_REJECTED' do
       it 'allows opposing team to reject pending proposal outside time limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_REJECTED)).to be true
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_REJECTED)).to be true
       end
 
       it 'denies reject if same team' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user1, MatchProposal::STATUS_REJECTED)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, MatchProposal::STATUS_REJECTED)).to be false
       end
 
       it 'denies reject if not pending' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.hour.from_now, status: MatchProposal::STATUS_CONFIRMED)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_REJECTED)).to be false
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_REJECTED)).to be false
       end
 
       it 'denies reject if within confirmation limit' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 10.minutes.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user2, MatchProposal::STATUS_REJECTED)).to be false
+        expect(proposal.status_change_allowed?(responding_user, MatchProposal::STATUS_REJECTED)).to be false
       end
     end
 
     context 'when changing to an invalid status' do
       it 'denies change to invalid status' do
-        proposal = create(:match_proposal, match: match, team: team1,
+        proposal = create(:match_proposal, match: match, team: proposing_team,
                                            proposed_time: 1.day.from_now, status: MatchProposal::STATUS_PENDING)
-        expect(proposal.status_change_allowed?(user1, 999)).to be false
+        expect(proposal.status_change_allowed?(proposing_user, 999)).to be false
       end
     end
   end
@@ -348,13 +348,13 @@ RSpec.describe MatchProposal, type: :model do
         match_proposal: {
           status: MatchProposal::STATUS_PENDING,
           match_id: match.id,
-          team_id: team1.id,
+          team_id: proposing_team.id,
           proposed_time: Time.now.utc
         }
       )
-      permitted = described_class.params(params, user1)
+      permitted = described_class.params(params, proposing_user)
       expect(permitted[:match_id]).to eq(match.id)
-      expect(permitted[:team_id]).to eq(team1.id)
+      expect(permitted[:team_id]).to eq(proposing_team.id)
       expect(permitted[:status]).to eq(MatchProposal::STATUS_PENDING)
       expect(permitted[:proposed_time]).to be_present
     end
@@ -364,34 +364,34 @@ RSpec.describe MatchProposal, type: :model do
         match_proposal: {
           status: MatchProposal::STATUS_PENDING,
           match_id: match.id,
-          team_id: team1.id,
+          team_id: proposing_team.id,
           proposed_time: Time.now.utc,
           unauthorized_param: 'should not be permitted'
         }
       )
-      permitted = described_class.params(params, user1)
+      permitted = described_class.params(params, proposing_user)
       expect(permitted.key?(:unauthorized_param)).to be false
     end
   end
 
   describe 'status change notifications' do
     it 'messages the opposing team when an actor changes the status' do
-      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
-      proposal.actor = user2
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: proposing_team)
+      proposal.actor = responding_user
 
       expect { proposal.update(status: MatchProposal::STATUS_CONFIRMED) }.to change(Message, :count).by(1)
       expect(proposal.reload.status).to eq(MatchProposal::STATUS_CONFIRMED)
     end
 
     it 'does not message when there is no actor' do
-      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: proposing_team)
 
       expect { proposal.update(status: MatchProposal::STATUS_CONFIRMED) }.not_to change(Message, :count)
     end
 
     it 'does not message when the status is unchanged' do
-      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: team1)
-      proposal.actor = user2
+      proposal = create(:match_proposal, :pending, :in_far_future, match: match, team: proposing_team)
+      proposal.actor = responding_user
 
       expect { proposal.update(status: MatchProposal::STATUS_PENDING) }.not_to change(Message, :count)
     end

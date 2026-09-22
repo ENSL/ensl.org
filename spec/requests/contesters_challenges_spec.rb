@@ -195,43 +195,43 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
     let(:outsider) { create(:user) }
     let(:contest) { create(:contest) }
     let(:map) { create(:map) }
-    let(:contester1) { create(:contester, contest: contest, team: team1_leader.team) }
-    let(:contester2) { create(:contester, contest: contest, team: team2_leader.team) }
+    let(:challenging_contester) { create(:contester, contest: contest, team: team1_leader.team) }
+    let(:challenged_contester) { create(:contester, contest: contest, team: team2_leader.team) }
 
     before do
       contest.maps << map
     end
 
     it 'allows the challenging leader to load the new form' do
-      contester1
-      contester2
+      challenging_contester
+      challenged_contester
       login_as(team1_leader)
 
-      get '/challenges/new', params: { id: contester2.id }
+      get '/challenges/new', params: { id: challenged_contester.id }
 
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns 403 when a non-participant tries to load the new form' do
-      contester1
-      contester2
+      challenging_contester
+      challenged_contester
       login_as(outsider)
 
-      get '/challenges/new', params: { id: contester2.id }
+      get '/challenges/new', params: { id: challenged_contester.id }
 
       expect(response).to have_http_status(:forbidden)
     end
 
     it 'creates a challenge and redirects to the show page' do
-      contester1
-      contester2
+      challenging_contester
+      challenged_contester
       login_as(team1_leader)
 
       expect do
         post '/challenges', params: {
           challenge: {
-            contester1_id: contester1.id,
-            contester2_id: contester2.id,
+            contester1_id: challenging_contester.id,
+            contester2_id: challenged_contester.id,
             match_time: 2.days.from_now,
             mandatory: false,
             details: 'Request spec challenge'
@@ -243,15 +243,15 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
     end
 
     it 're-renders new when a challenge is invalid after access is allowed' do
-      contester1
-      contester2
+      challenging_contester
+      challenged_contester
       login_as(team1_leader)
 
       expect do
         post '/challenges', params: {
           challenge: {
-            contester1_id: contester1.id,
-            contester2_id: contester2.id,
+            contester1_id: challenging_contester.id,
+            contester2_id: challenged_contester.id,
             match_time: 2.days.from_now,
             mandatory: false,
             details: 'x' * 256
@@ -264,15 +264,15 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
     end
 
     it 'returns 403 when a non-participant tries to create a challenge' do
-      contester1
-      contester2
+      challenging_contester
+      challenged_contester
       login_as(outsider)
 
       expect do
         post '/challenges', params: {
           challenge: {
-            contester1_id: contester1.id,
-            contester2_id: contester2.id,
+            contester1_id: challenging_contester.id,
+            contester2_id: challenged_contester.id,
             match_time: 2.days.from_now,
             mandatory: false,
             details: 'Blocked challenge'
@@ -285,8 +285,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'accepts a pending challenge and creates a match' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -307,8 +307,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'marks a pending challenge as default time' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -327,8 +327,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'marks a pending challenge as forfeit' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -347,8 +347,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'declines a pending challenge without creating a match' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -369,8 +369,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'returns 403 when a non-recipient tries to update a challenge' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -389,8 +389,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'renders show without updating when a decline is invalid' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -410,8 +410,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'destroys a pending challenge for the challenging leader' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -428,8 +428,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'returns a plain-text success response for non-html requests' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,
@@ -446,8 +446,8 @@ RSpec.describe 'Contesters and Challenges controllers', type: :request do
 
     it 'returns 403 when a non-participant tries to destroy a pending challenge' do
       challenge = Challenge.create!(
-        contester1: contester1,
-        contester2: contester2,
+        contester1: challenging_contester,
+        contester2: challenged_contester,
         user: team1_leader,
         match_time: 2.days.from_now,
         mandatory: false,

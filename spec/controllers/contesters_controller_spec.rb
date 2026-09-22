@@ -23,11 +23,13 @@ RSpec.describe ContestersController, type: :controller do
 
   describe '#show' do
     it 'returns 403 when the contester is missing required associations' do
-      broken = double('Contester', contest: nil, team: nil)
+      broken = instance_double(Contester, contest: nil, team: nil)
       future_scope = double('FutureMatchScope', of_contester: [])
       finished_scope = double('FinishedMatchScope', of_contester: [])
-      allow(Match).to receive_message_chain(:future, :unfinished, :ordered).and_return(future_scope)
-      allow(Match).to receive_message_chain(:finished, :ordered).and_return(finished_scope)
+      future_matches = double('FutureMatches', unfinished: double('UnfinishedMatches', ordered: future_scope))
+      finished_matches = double('FinishedMatches', ordered: finished_scope)
+      allow(Match).to receive(:future).and_return(future_matches)
+      allow(Match).to receive(:finished).and_return(finished_matches)
       allow(Contester).to receive(:find).with('1').and_return(broken)
 
       get :show, params: { id: '1' }
@@ -72,7 +74,7 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'returns 500 when the new ladder rank exceeds the active contester count' do
       session[:user] = admin.id
-      contester = double('Contester', can_update?: true)
+      contester = instance_double(Contester, can_update?: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       allow(contester).to receive(:rebalance_ladder_rank!).and_raise(Exceptions::Error, I18n.t(:rank_invalid))
 
@@ -90,7 +92,7 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'does not rebalance ladder ranks when the rank stays the same' do
       session[:user] = admin.id
-      contester = double('Contester', can_update?: true, contest_id: 1, update: true)
+      contester = instance_double(Contester, can_update?: true, contest_id: 1, update: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       allow(Contester).to receive(:params).and_return(ActionController::Parameters.new(score: '1'))
       expect(contester).to receive(:rebalance_ladder_rank!).with('1')
@@ -109,7 +111,7 @@ RSpec.describe ContestersController, type: :controller do
 
     it 'rebalances ladder ranks when the rank changes' do
       session[:user] = admin.id
-      contester = double('Contester', can_update?: true, contest_id: 1, update: true)
+      contester = instance_double(Contester, can_update?: true, contest_id: 1, update: true)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       allow(Contester).to receive(:params).and_return(ActionController::Parameters.new(score: '2'))
       expect(contester).to receive(:rebalance_ladder_rank!).with('2')
@@ -140,7 +142,7 @@ RSpec.describe ContestersController, type: :controller do
     end
 
     it 'returns 403 when the user cannot recover the contester' do
-      contester = double('Contester', can_destroy?: false)
+      contester = instance_double(Contester, can_destroy?: false)
       allow(Contester).to receive(:find).with('1').and_return(contester)
       session[:user] = outsider.id
 

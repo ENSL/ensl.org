@@ -138,9 +138,11 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
 
   describe 'MatchesController' do
     let(:contest) { create(:contest) }
-    let(:contester1) { create(:contester, contest: contest) }
-    let(:contester2) { create(:contester, contest: contest) }
-    let(:match_record) { create(:match, contest: contest, contester1: contester1, contester2: contester2) }
+    let(:primary_contester) { create(:contester, contest: contest) }
+    let(:secondary_contester) { create(:contester, contest: contest) }
+    let(:match_record) do
+      create(:match, contest: contest, contester1: primary_contester, contester2: secondary_contester)
+    end
 
     it 'renders the show page for guests' do
       get "/matches/#{match_record.id}"
@@ -240,8 +242,8 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
         post '/matches', params: {
           match: {
             contest_id: contest.id,
-            contester1_id: contester1.id,
-            contester2_id: contester2.id,
+            contester1_id: primary_contester.id,
+            contester2_id: secondary_contester.id,
             match_time: 1.day.from_now
           }
         }
@@ -257,7 +259,7 @@ RSpec.describe 'Brackets and Matches controllers', type: :request do
         match: {
           contest_id: contest.id,
           contester1_id: nil,
-          contester2_id: contester2.id
+          contester2_id: secondary_contester.id
         }
       }
 

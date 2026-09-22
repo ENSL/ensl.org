@@ -59,7 +59,13 @@ RSpec.describe Movie, type: :model do
 
     describe '.submitter_options' do
       it 'delegates to User join and returns username/id pairs' do
-        expect(User).to receive_message_chain(:joins, :distinct, :order, :pluck)
+        ordered_users = double('OrderedUsers')
+        distinct_users = double('DistinctUsers', order: ordered_users)
+        joined_users = double('JoinedUsers', distinct: distinct_users)
+        expect(User).to receive(:joins).and_return(joined_users)
+        expect(joined_users).to receive(:distinct).and_return(distinct_users)
+        expect(distinct_users).to receive(:order).and_return(ordered_users)
+        expect(ordered_users).to receive(:pluck)
         described_class.submitter_options
       end
     end

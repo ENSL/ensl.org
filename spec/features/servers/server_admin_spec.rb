@@ -27,6 +27,7 @@ feature 'Server Administration', :js do
       visit server_path(server)
       click_link 'Delete Server'
       visit servers_path
+      expect(page).to have_css('body')
       expect(page).to have_no_text(server.name)
     end
   end

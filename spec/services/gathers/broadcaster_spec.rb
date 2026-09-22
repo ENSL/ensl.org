@@ -5,14 +5,14 @@ require 'rails_helper'
 describe Gathers::Broadcaster do
   describe '.call' do
     let(:gather) { create(:gather) }
-    let(:user1) { create(:user) }
-    let(:user2) { create(:user) }
-    let(:gatherer1) { create(:gatherer, gather: gather, user: user1) }
-    let(:gatherer2) { create(:gatherer, gather: gather, user: user2) }
+    let(:primary_user) { create(:user) }
+    let(:secondary_user) { create(:user) }
+    let(:primary_gatherer) { create(:gatherer, gather: gather, user: primary_user) }
+    let(:secondary_gatherer) { create(:gatherer, gather: gather, user: secondary_user) }
 
     before do
-      gatherer1
-      gatherer2
+      primary_gatherer
+      secondary_gatherer
       allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
     end
 
@@ -30,9 +30,9 @@ describe Gathers::Broadcaster do
     end
 
     it 'skips specified user IDs' do
-      described_class.call(gather, skip_user_ids: [user1.id])
+      described_class.call(gather, skip_user_ids: [primary_user.id])
 
-      # Should broadcast to guest and user2, but not user1
+      # Should broadcast to guest and the secondary user, but not the primary user.
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).at_least(2).times
     end
 
@@ -52,12 +52,12 @@ describe Gathers::Broadcaster do
     end
 
     it 'accepts skip_user_ids as an array' do
-      expect { described_class.call(gather, skip_user_ids: [user1.id, user2.id]) }
+      expect { described_class.call(gather, skip_user_ids: [primary_user.id, secondary_user.id]) }
         .not_to raise_error
     end
 
     it 'compacts skip_user_ids' do
-      expect { described_class.call(gather, skip_user_ids: [user1.id, nil, user2.id]) }
+      expect { described_class.call(gather, skip_user_ids: [primary_user.id, nil, secondary_user.id]) }
         .not_to raise_error
     end
 
