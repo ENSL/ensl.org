@@ -130,6 +130,10 @@ Rails/Exit:
 # brittle controller implementation stubs in these existing feature/request
 # tests. Keep the broader RSpec/Rails cops enabled while accepting these
 # established, readable conventions.
+# Rails actions often instantiate their own records, so some request/controller
+# failure-path specs must intercept behavior on those internally created
+# instances. Replacing these globally scoped stubs needs explicit injection
+# seams in the application, not a mechanical test rewrite.
 RSpec/AnyInstance:
   Enabled: false
 
@@ -139,28 +143,54 @@ RSpec/BeforeAfterAll:
   Exclude:
     - 'spec/lib/tasks/parquet_imports_spec.rb'
 
+# Feature and request specs describe user workflows, routes, and externally
+# visible behavior rather than one Ruby class. Requiring a class/module as the
+# first description would make those examples less accurate.
 RSpec/DescribeClass:
   Enabled: false
 
+# Long-running feature scenarios sometimes share browser/session state through
+# instance variables. Replacing it with lazy helpers would obscure execution
+# order and make the narrative setup harder to follow.
 RSpec/InstanceVariable:
   Enabled: false
 
+# Integration specs deliberately create records before navigation or requests;
+# eager `let!` keeps that prerequisite close to its name and avoids repetitive
+# before hooks in each scenario.
 RSpec/LetSetup:
   Enabled: false
 
+# Pre-action message expectations remain useful for interactions that must
+# occur exactly once. The suite permits both that style and post-action spies
+# instead of forcing every collaborator test into one form.
 RSpec/MessageSpies:
   Enabled: false
 
+# A feature file can contain several independent top-level workflows. Forcing
+# them under one artificial parent makes the descriptions and failure output
+# less useful to someone reading the feature as a user journey.
 RSpec/MultipleDescribes:
   Enabled: false
 
+# Some tests deliberately combine an interaction assertion with its configured
+# return value. Replacing each one with allow/have_received is a behavior-aware
+# migration and would add noise unless the separate interaction assertion adds
+# real value to that example.
 RSpec/StubbedMock:
   Enabled: false
 
+# Many remaining doubles model dynamic Active Record relations or lightweight
+# roles, not a concrete Ruby class with a stable public interface to verify.
+# A few controller specs also exercise legacy action collaborators whose called
+# methods are not model instance methods. Keep these plain until those boundaries
+# are given explicit interfaces; do not invent a verifying class merely for lint.
 RSpec/VerifiedDoubles:
   Enabled: false
 
-# More like metrics
+# These cops measure test structure, not correctness. Feature scenarios often
+# need several observable assertions, nested contexts, and setup helpers to
+# express a complete workflow without splitting it into opaque micro-examples.
 
 RSpec/ExampleLength:
   Enabled: false
