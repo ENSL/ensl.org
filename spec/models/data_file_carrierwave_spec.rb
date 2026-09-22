@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFile do
-  include_context 'isolated filesystem root', '/tmp/test_carrierwave_files'
+  include_context 'with isolated filesystem root', '/tmp/test_carrierwave_files'
 
   def upload_tempfile(filename:, content:)
     tmp = Tempfile.new(filename)

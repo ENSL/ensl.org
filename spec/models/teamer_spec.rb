@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Teamer, 'basic behavior', type: :model do
+RSpec.describe Teamer, '#basic behavior', type: :model do
   describe 'init_variables' do
     it 'sets default rank to RANK_JOINER' do
       t = described_class.new

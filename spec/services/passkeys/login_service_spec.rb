@@ -23,7 +23,7 @@ RSpec.describe Passkeys::LoginService do
     it 'creates challenge state for known passkey users' do
       user = create(:user)
       user.passkey_credentials.create!(external_id: 'cred-1', public_key: 'pk', sign_count: 0)
-      options = instance_double('GetOptions', challenge: 'challenge-1')
+      options = double('GetOptions', challenge: 'challenge-1')
       allow(WebAuthn::Credential).to receive(:options_for_get).and_return(options)
 
       result = service.challenge(username: user.username)
@@ -35,7 +35,7 @@ RSpec.describe Passkeys::LoginService do
     end
 
     it 'supports discoverable challenge flow when username is blank' do
-      options = instance_double('GetOptions', challenge: 'challenge-2')
+      options = double('GetOptions', challenge: 'challenge-2')
       expect(WebAuthn::Credential).to receive(:options_for_get)
         .with(hash_including(allow: [], user_verification: 'preferred'))
         .and_return(options)

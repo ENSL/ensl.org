@@ -19,8 +19,17 @@ RSpec.feature 'Matches management', :js, type: :feature do
   let!(:referee) { create(:user, :ref) }
   let!(:server) { create(:server) }
   let!(:match) do
-    create(:match, contest: contest, contester1: home_contester, contester2: away_contester, map1: home_map, map2: away_map,
-                   week: week, referee: referee, server: server)
+    create(
+      :match,
+      contest: contest,
+      contester1: home_contester,
+      contester2: away_contester,
+      map1: home_map,
+      map2: away_map,
+      week: week,
+      referee: referee,
+      server: server
+    )
   end
 
   before do

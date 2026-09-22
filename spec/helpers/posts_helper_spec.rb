@@ -81,7 +81,7 @@ RSpec.describe PostsHelper, type: :helper do
     end
 
     it 'returns nil when no target group id can be resolved from first grouper' do
-      groupers = instance_double('Groupers')
+      groupers = double('Groupers')
       user = instance_double(User, groupers: groupers, admin?: false, staff?: false, caster?: false, ref?: false)
       allow(groupers).to receive_messages(exists?: true, first: nil)
 

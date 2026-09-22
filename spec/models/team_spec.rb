@@ -3,7 +3,7 @@
 # rubocop:disable Rails/SkipsModelValidations
 require 'rails_helper'
 
-RSpec.describe Team, 'lifecycle', type: :model do
+RSpec.describe Team, '#lifecycle', type: :model do
   describe 'callbacks and helpers' do
     it 'initializes default attributes on create' do
       team = create(:team)
@@ -205,7 +205,7 @@ RSpec.describe Team, 'lifecycle', type: :model do
   end
 end
 
-RSpec.describe Team, 'lifecycle edge cases', type: :model do
+RSpec.describe Team, '#lifecycle edge cases', type: :model do
   describe 'init and leader assignment' do
     it 'initializes active and recruiting' do
       t = described_class.new

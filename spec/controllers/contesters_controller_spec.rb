@@ -28,8 +28,7 @@ RSpec.describe ContestersController, type: :controller do
       finished_scope = double('FinishedMatchScope', of_contester: [])
       future_matches = double('FutureMatches', unfinished: double('UnfinishedMatches', ordered: future_scope))
       finished_matches = double('FinishedMatches', ordered: finished_scope)
-      allow(Match).to receive(:future).and_return(future_matches)
-      allow(Match).to receive(:finished).and_return(finished_matches)
+      allow(Match).to receive_messages(future: future_matches, finished: finished_matches)
       allow(Contester).to receive(:find).with('1').and_return(broken)
 
       get :show, params: { id: '1' }

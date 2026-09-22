@@ -25,7 +25,7 @@ RSpec.describe Notifications, type: :mailer do
   describe '#pm' do
     subject(:deliver) { mailer.pm(user, pm) }
 
-    let(:pm) { instance_double('PrivateMessage') }
+    let(:pm) { double('PrivateMessage') }
 
     it 'builds the private message notification' do
       expect(deliver).to eq(:message)
@@ -51,7 +51,7 @@ RSpec.describe Notifications, type: :mailer do
   describe '#comments' do
     subject(:deliver) { mailer.comments(user, commentable) }
 
-    let(:commentable) { instance_double('Commentable') }
+    let(:commentable) { double('Commentable') }
 
     it 'builds the comments notification' do
       expect(deliver).to eq(:message)
@@ -87,7 +87,7 @@ RSpec.describe Notifications, type: :mailer do
   describe '#news' do
     subject(:deliver) { mailer.news(user, news) }
 
-    let(:news) { instance_double('News', title: 'Weekly update') }
+    let(:news) { double('News', title: 'Weekly update') }
 
     it 'includes the news title in the subject' do
       expect(deliver).to eq(:message)

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe 'Directory reconciliation behavior' do
-  include_context 'isolated filesystem root', '/tmp/test_dir_reconciliation'
+  include_context 'with isolated filesystem root', '/tmp/test_dir_reconciliation'
 
   before do
     # Ensure ROOT directory exists

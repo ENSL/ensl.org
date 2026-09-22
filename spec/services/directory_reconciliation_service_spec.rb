@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe DirectoryReconciliationService do
-  include_context 'isolated filesystem root', '/tmp/test_reconciliation'
+  include_context 'with isolated filesystem root', '/tmp/test_reconciliation'
 
   let(:root_directory) do
     Directory.find_or_create_by(id: Directory::ROOT) do |dir|

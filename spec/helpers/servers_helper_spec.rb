@@ -29,10 +29,10 @@ RSpec.describe ServersHelper, type: :helper do
 
   describe '#server_offline_since' do
     let(:server) { instance_double(Server, status: status, versions: versions) }
-    let(:versions) { instance_double('VersionRelation') }
-    let(:filtered) { instance_double('FilteredVersions') }
-    let(:ordered) { instance_double('OrderedVersions') }
-    let(:limited) { instance_double('LimitedVersions') }
+    let(:versions) { double('VersionRelation') }
+    let(:filtered) { double('FilteredVersions') }
+    let(:ordered) { double('OrderedVersions') }
+    let(:limited) { double('LimitedVersions') }
     let(:status) { Server::STATUS_OFFLINE }
 
     it 'returns nil unless the server is offline' do

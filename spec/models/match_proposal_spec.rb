@@ -64,9 +64,13 @@ RSpec.describe MatchProposal, type: :model do
   end
 
   describe 'scopes' do
-    let!(:matching_proposal) { create(:match_proposal, match: match, team: proposing_team, proposed_time: 1.day.from_now) }
+    let!(:matching_proposal) do
+      create(:match_proposal, match: match, team: proposing_team, proposed_time: 1.day.from_now)
+    end
     let!(:other_match) { create(:match, contest: contest) }
-    let!(:other_match_proposal) { create(:match_proposal, match: other_match, team: proposing_team, proposed_time: 1.day.from_now) }
+    let!(:other_match_proposal) do
+      create(:match_proposal, match: other_match, team: proposing_team, proposed_time: 1.day.from_now)
+    end
 
     describe '.confirmed_for_match' do
       let!(:confirmed_proposal) do

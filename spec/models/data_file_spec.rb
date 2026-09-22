@@ -28,7 +28,7 @@ require 'rails_helper'
 
 describe DataFile do
   # Setup and cleanup test filesystem
-  include_context 'isolated filesystem root', '/tmp/test_dirs'
+  include_context 'with isolated filesystem root', '/tmp/test_dirs'
 
   before do
     allow_any_instance_of(described_class).to receive(:location) do |instance|
@@ -495,8 +495,10 @@ describe DataFile do
   describe '#should_update_relations?' do
     it 'returns true when related_id changed and has related_files' do
       file = build(:data_file)
-      allow(file).to receive(:saved_change_to_related_id?).and_return(true)
-      allow(file).to receive(:related_files).and_return(double('RelatedFiles', any?: true))
+      allow(file).to receive_messages(
+        saved_change_to_related_id?: true,
+        related_files: double('RelatedFiles', any?: true)
+      )
 
       expect(file.should_update_relations?).to be true
     end

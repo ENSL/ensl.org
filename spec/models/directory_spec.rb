@@ -23,7 +23,7 @@ require 'rails_helper'
 
 describe Directory do
   # Setup and cleanup test filesystem
-  include_context 'isolated filesystem root', '/tmp/test_directories'
+  include_context 'with isolated filesystem root', '/tmp/test_directories'
 
   describe 'associations' do
     subject { build(:directory) }

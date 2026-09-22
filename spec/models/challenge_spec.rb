@@ -133,18 +133,19 @@ RSpec.describe Challenge, type: :model do
       pending_scope = double('PendingChallengeScope')
       first_where_scope = double('FirstChallengeWhereScope')
       final_where_scope = double('FinalChallengeWhereScope', exists?: true)
-      allow(described_class).to receive(:pending).and_return(pending_scope)
       allow(pending_scope).to receive(:where).and_return(first_where_scope)
       allow(first_where_scope).to receive(:where).and_return(final_where_scope)
 
       match_scope = double('MatchScope')
       allow(Match).to receive(:of_contester).and_return(match_scope)
-      allow(match_scope).to receive(:on_week).and_return(double('WeeklyMatchScope', exists?: true))
-      allow(match_scope).to receive(:around).and_return(double('NearbyMatchScope', exists?: true))
+      allow(match_scope).to receive_messages(
+        on_week: double('WeeklyMatchScope', exists?: true),
+        around: double('NearbyMatchScope', exists?: true)
+      )
 
       challenge_scope = double('ChallengeScope')
       mandatory_scope = double('MandatoryChallengeScope', on_week: double('WeeklyMandatoryScope', exists?: true))
-      allow(described_class).to receive(:of_contester).and_return(challenge_scope)
+      allow(described_class).to receive_messages(pending: pending_scope, of_contester: challenge_scope)
       allow(challenge_scope).to receive(:mandatory).and_return(mandatory_scope)
 
       challenge.send(:validate_mandatory)
@@ -177,12 +178,21 @@ RSpec.describe Challenge, type: :model do
     end
 
     it 'rejects conflicting pending challenges and matches around the selected time' do
-      existing = described_class.new(contester1: challenged_contester, contester2: challenging_contester, match_time: match_time,
-                                     default_time: match_time.end_of_week)
+      existing = described_class.new(
+        contester1: challenged_contester,
+        contester2: challenging_contester,
+        match_time: match_time,
+        default_time: match_time.end_of_week
+      )
       existing.status = described_class::STATUS_PENDING
       existing.save!(validate: false)
-      create(:match, contest: contest, contester1: challenged_contester, contester2: create(:contester, contest: contest),
-                     match_time: match_time)
+      create(
+        :match,
+        contest: contest,
+        contester1: challenged_contester,
+        contester2: create(:contester, contest: contest),
+        match_time: match_time
+      )
 
       challenge = described_class.new(contester1: challenging_contester, contester2: challenged_contester,
                                       match_time: match_time)
@@ -220,8 +230,13 @@ RSpec.describe Challenge, type: :model do
       allow(server).to receive(:is_free).with(match_time).and_return(true)
       allow(server).to receive(:is_free).with(default_time).and_return(false)
 
-      challenge = described_class.new(contester1: challenging_contester, contester2: challenged_contester, match_time: match_time,
-                                      default_time: default_time, server: server)
+      challenge = described_class.new(
+        contester1: challenging_contester,
+        contester2: challenged_contester,
+        match_time: match_time,
+        default_time: default_time,
+        server: server
+      )
       challenge.send(:validate_server)
 
       expect(challenge.errors[:base]).to include(I18n.t(:servers_notfree_defaulttime))
@@ -251,8 +266,12 @@ RSpec.describe Challenge, type: :model do
     end
 
     it 'rejects invalid status changes and non-mandatory status values outside the map' do
-      mandatory_challenge = described_class.new(contester1: challenging_contester, contester2: challenged_contester, mandatory: true,
-                                                status: described_class::STATUS_DECLINED)
+      mandatory_challenge = described_class.new(
+        contester1: challenging_contester,
+        contester2: challenged_contester,
+        mandatory: true,
+        status: described_class::STATUS_DECLINED
+      )
 
       mandatory_challenge.send(:validate_status)
       expect(mandatory_challenge.errors[:base]).not_to be_empty

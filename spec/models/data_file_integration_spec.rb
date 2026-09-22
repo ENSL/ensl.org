@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe 'DataFile CarrierWave integration behavior' do
-  include_context 'isolated filesystem root', '/tmp/test_data_file_carrierwave'
+  include_context 'with isolated filesystem root', '/tmp/test_data_file_carrierwave'
 
   before do
     # Ensure ROOT directory exists
