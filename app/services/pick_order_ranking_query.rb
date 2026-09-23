@@ -12,8 +12,8 @@
 # Doesn't use AnalysisResult / the ensl_analysis pipeline at all; everything
 # comes straight from the gathers/gatherers tables.
 class PickOrderRankingQuery
-  MIN_GAMES_OPTIONS = [5, 10, 25, 50].freeze
-  DEFAULT_MIN_GAMES = 25
+  MIN_GAMES_OPTIONS = PlayerRankingQuery::MIN_GAMES_OPTIONS
+  DEFAULT_MIN_GAMES = PlayerRankingQuery::DEFAULT_MIN_GAMES
 
   def self.from_params(params)
     # Keep reading min_picks for old bookmarks; min_games is the current name.
@@ -38,7 +38,7 @@ class PickOrderRankingQuery
   end
 
   # Returns an array of hashes with pick-order stats + a dedicated OpenSkill
-  # score replayed only from gather draft order (not match outcomes).
+  # score replayed only from gather pick order (not match outcomes).
   # Rows are sorted by best (highest) pick-order OpenSkill score first.
   def call
     replay_pick_orders!
@@ -91,7 +91,7 @@ class PickOrderRankingQuery
     @model ||= OpenSkill::Models::PlackettLuce.new
   end
 
-  # Gatherer rows that were actually drafted onto a team.
+  # Gatherer rows that were actually picked onto a team.
   def played_gatherers_scope
     Gatherer
       .joins(:gather)

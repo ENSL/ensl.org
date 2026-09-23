@@ -7,8 +7,8 @@ class ClassPerformanceQuery
   METRICS = %w[kills deaths damage minutes_played resources_spent wins losses sample_size].freeze
   MODEL_PREFIX = 'class_stats:'
   EXCLUDED_CLASSES = %w[heavy jetpack].freeze
-  MIN_GAMES_OPTIONS = [25, 50, 100].freeze
-  DEFAULT_MIN_GAMES = MIN_GAMES_OPTIONS.first
+  MIN_GAMES_OPTIONS = PlayerRankingQuery::MIN_GAMES_OPTIONS
+  DEFAULT_MIN_GAMES = PlayerRankingQuery::DEFAULT_MIN_GAMES
 
   def self.call(class_name: nil, min_games: nil)
     new(class_name: class_name, min_games: min_games).call

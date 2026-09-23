@@ -78,4 +78,9 @@ RSpec.describe ClassPerformanceQuery do
 
     expect(described_class.class_names).to eq(['skulk'])
   end
+
+  it 'uses the same minimum-games settings as player rankings' do
+    expect(described_class::MIN_GAMES_OPTIONS).to equal(PlayerRankingQuery::MIN_GAMES_OPTIONS)
+    expect(described_class::DEFAULT_MIN_GAMES).to eq(PlayerRankingQuery::DEFAULT_MIN_GAMES)
+  end
 end

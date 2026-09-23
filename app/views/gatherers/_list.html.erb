@@ -12,28 +12,20 @@
       <% user = gatherer.user %>
       <% turn = gather.turn %>
       <% team_pick_position = team.nil? ? nil : (index + 1) %>
+      <% captain_flag = if gatherer == gather.captain1 then 1 elsif gatherer == gather.captain2 then 2 end %>
+      <% pick_order_badge = tag.span(team_pick_position, class: 'pick-order-badge', title: 'Team pick order') if team_pick_position %>
       <li>
           <% if current_gatherer and gatherer.can_update? gather_current_user, { team: current_gatherer.team } %>
           <% pick = true %>
           <%= radio_button_tag :player, gatherer.id %>
-          <%= flag user.country %>
-          <% captain_flag = if gatherer == gather.captain1 then 1 elsif gatherer == gather.captain2 then 2 end %>
-          <% if team_pick_position %>
-            <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
-          <% end %>
-          <%= link_to user.to_s, user, class: 'user', data: (captain_flag ? { captain: captain_flag, turbo_frame: '_top' } : { turbo_frame: '_top' }) %>
+          <%= user_identity_link(user, data: (captain_flag ? { captain: captain_flag } : {}), after_flag: pick_order_badge) %>
 
         <% else %>
-          <%= flag(user&.country) %>
-
-          <% captain_flag = if gatherer == gather.captain1 then 1 elsif gatherer == gather.captain2 then 2 end %>
-          <% if team_pick_position %>
-            <span class="pick-order-badge" title="Team pick order"><%= team_pick_position %></span>
-          <% end %>
+          <% identity_detail = [pick_order_badge] %>
           <% if gather.status != Gather::STATE_FINISHED && gatherer == captain and gatherer.team == turn %>
-            <%= fa_icon 'chevron-right' %>
+            <% identity_detail << fa_icon('chevron-right') %>
           <% end %>
-          <%= link_to user.to_s, user, class: 'user', data: (captain_flag ? { captain: captain_flag, turbo_frame: '_top' } : { turbo_frame: '_top' }) %>
+          <%= user_identity_link(user, data: (captain_flag ? { captain: captain_flag } : {}), after_flag: safe_join(identity_detail.compact, ' ')) %>
 
           <% if gatherer == captain %>
             <span class="captain">

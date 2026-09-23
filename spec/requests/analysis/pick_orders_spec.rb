@@ -8,15 +8,16 @@ RSpec.describe 'Analysis::PickOrdersController', type: :request do
       ns1 = create(:category, :game, name: 'NS1')
       captain_user = create(:user)
       fast_pick_user = create(:user, username: 'FastPick')
+      minimum_games = PlayerRankingQuery::MIN_GAMES_OPTIONS.first
 
-      5.times do
+      minimum_games.times do
         gather = create(:gather, category: ns1)
         captain = create(:gatherer, gather: gather, user: captain_user, team: 1, pick_order: 1)
         gather.update!(captain1_id: captain.id)
         create(:gatherer, gather: gather, user: fast_pick_user, team: 2, pick_order: 3)
       end
 
-      get '/analysis/pick_orders', params: { min_games: 5 }
+      get '/analysis/pick_orders', params: { min_games: minimum_games }
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('NS1 Gather Rankings')
@@ -28,15 +29,18 @@ RSpec.describe 'Analysis::PickOrdersController', type: :request do
       get '/analysis/pick_orders'
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('No NS1 gather draft data is available yet.')
+      expect(response.body).to include('No NS1 gather pick data is available yet.')
     end
 
     it 'keeps supporting the legacy min_picks parameter' do
-      get '/analysis/pick_orders', params: { min_picks: 5 }
+      minimum_games = PlayerRankingQuery::MIN_GAMES_OPTIONS.first
+      get '/analysis/pick_orders', params: { min_picks: minimum_games }
 
       document = Nokogiri::HTML(response.body)
       expect(response).to have_http_status(:ok)
-      expect(document.at_css('#min_games option[selected]')['value']).to eq('5')
+      expect(document.at_css('#min_games option[selected]')['value']).to eq(minimum_games.to_s)
+      expect(document.css('#min_games option').map { |option| option['value'] })
+        .to eq(PlayerRankingQuery::MIN_GAMES_OPTIONS.map(&:to_s))
     end
   end
 end

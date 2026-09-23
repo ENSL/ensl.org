@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe PickOrderRankingQuery do
   let(:ns1) { create(:category, :game, name: 'NS1') }
+  let(:minimum_games) { PlayerRankingQuery::MIN_GAMES_OPTIONS.first }
 
   def make_gather(category: ns1)
     create(:gather, category: category)
@@ -15,7 +16,7 @@ RSpec.describe PickOrderRankingQuery do
     fast_pick_user = create(:user)
     slow_pick_user = create(:user)
 
-    5.times do
+    minimum_games.times do
       gather = make_gather
       captain1 = create(:gatherer, gather: gather, user: captain1_user, team: 1, pick_order: 1)
       captain2 = create(:gatherer, gather: gather, user: captain2_user, team: 2, pick_order: 2)
@@ -25,7 +26,7 @@ RSpec.describe PickOrderRankingQuery do
       create(:gatherer, gather: gather, user: slow_pick_user, team: 2, pick_order: 4)
     end
 
-    rankings = described_class.call(game: 'NS1', min_games: 5)
+    rankings = described_class.call(game: 'NS1', min_games: minimum_games)
 
     users = rankings.map { |row| row[:user] }
     expect(users).to include(fast_pick_user, slow_pick_user)
@@ -42,18 +43,18 @@ RSpec.describe PickOrderRankingQuery do
     gather1.update!(captain1_id: captain.id)
     create(:gatherer, gather: gather1, team: 2, pick_order: 3)
 
-    4.times do
+    (minimum_games - 1).times do
       gather = make_gather
       create(:gatherer, gather: gather, user: captain.user, team: 1, pick_order: 3)
       create(:gatherer, gather: gather, team: 2, pick_order: 4)
     end
 
-    rankings = described_class.call(game: 'NS1', min_games: 5)
+    rankings = described_class.call(game: 'NS1', min_games: minimum_games)
     captain_row = rankings.find { |row| row[:user] == captain.user }
 
     expect(captain_row[:average_pick_order]).to eq(3.0)
-    expect(captain_row[:games_count]).to eq(5)
-    expect(captain_row[:captain_percentage]).to eq(20.0)
+    expect(captain_row[:games_count]).to eq(minimum_games)
+    expect(captain_row[:captain_percentage]).to eq(100.0 / minimum_games)
   end
 
   it 'excludes gathers for other games' do
@@ -76,7 +77,7 @@ RSpec.describe PickOrderRankingQuery do
     picked = create(:gatherer, gather: gather, team: 1, pick_order: 1)
     create(:gatherer, gather: gather, team: 2, pick_order: 2)
 
-    rankings = described_class.call(game: 'NS1', min_games: 5)
+    rankings = described_class.call(game: 'NS1', min_games: minimum_games)
 
     expect(rankings.map { |row| row[:user] }).not_to include(picked.user)
   end
@@ -85,13 +86,13 @@ RSpec.describe PickOrderRankingQuery do
     strong_user = create(:user)
     weak_user = create(:user)
 
-    5.times do
+    minimum_games.times do
       gather = make_gather
       create(:gatherer, gather: gather, user: strong_user, team: 1, pick_order: 3)
       create(:gatherer, gather: gather, user: weak_user, team: 2, pick_order: 4)
     end
 
-    rankings = described_class.call(game: 'NS1', min_games: 5)
+    rankings = described_class.call(game: 'NS1', min_games: minimum_games)
     strong_row = rankings.find { |row| row[:user] == strong_user }
     weak_row = rankings.find { |row| row[:user] == weak_user }
 
@@ -99,7 +100,7 @@ RSpec.describe PickOrderRankingQuery do
     expect(strong_row[:pick_openskill]).to be > weak_row[:pick_openskill]
   end
 
-  it 'uses default minimum games of 25 when no threshold is provided' do
+  it 'uses the player rankings default minimum games when no threshold is provided' do
     gather = make_gather
     picked = create(:gatherer, gather: gather, team: 1, pick_order: 3)
     create(:gatherer, gather: gather, team: 2, pick_order: 4)
@@ -125,16 +126,21 @@ RSpec.describe PickOrderRankingQuery do
       create(:gatherer, gather: gather, user: create(:user), team: 2, pick_order: 3)
     end
 
-    3.times do
+    (minimum_games - 2).times do
       gather = make_gather
       create(:gatherer, gather: gather, user: target_user, team: 1, pick_order: 3)
       create(:gatherer, gather: gather, user: create(:user), team: 2, pick_order: 4)
     end
 
-    rankings = described_class.call(game: 'NS1', min_games: 5)
+    rankings = described_class.call(game: 'NS1', min_games: minimum_games)
     row = rankings.find { |entry| entry[:user] == target_user }
 
-    expect(row[:games_count]).to eq(5)
-    expect(row[:captain_percentage]).to eq(40.0)
+    expect(row[:games_count]).to eq(minimum_games)
+    expect(row[:captain_percentage]).to eq((2.0 / minimum_games) * 100)
+  end
+
+  it 'uses the same minimum-games settings as player rankings' do
+    expect(described_class::MIN_GAMES_OPTIONS).to equal(PlayerRankingQuery::MIN_GAMES_OPTIONS)
+    expect(described_class::DEFAULT_MIN_GAMES).to eq(PlayerRankingQuery::DEFAULT_MIN_GAMES)
   end
 end

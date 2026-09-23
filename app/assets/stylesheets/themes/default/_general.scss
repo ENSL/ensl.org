@@ -115,17 +115,33 @@
     color: #126734;
   }
 
-  th.player-rankings-model--openskill {
-    border-bottom: 3px solid #16758f;
-    background: rgb(22 117 143 / 12%);
-    color: #0d6076;
-  }
-
   th.player-rankings-model--moulton {
     border-bottom: 3px solid #9a5b16;
     background: rgb(154 91 22 / 12%);
     color: #7a4610;
   }
+}
+
+th.analysis-model--openskill {
+  border-bottom: 3px solid #16758f;
+  background: rgb(22 117 143 / 12%);
+  color: #0d6076;
+}
+
+// Class performance has nine compact metrics. Reserve room for player
+// identities and give the longer Win rate header a little extra width.
+#class-performance {
+  th.sortable-table-number { text-align: right; }
+
+  th:nth-child(1) { width: 27%; }
+  th:nth-child(2),
+  th:nth-child(3),
+  th:nth-child(4),
+  th:nth-child(5),
+  th:nth-child(6),
+  th:nth-child(7),
+  th:nth-child(8) { width: 9%; }
+  th:nth-child(9) { width: 10%; }
 }
 
 .stats-page__faction-icon {

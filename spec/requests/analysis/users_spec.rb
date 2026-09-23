@@ -5,13 +5,14 @@ require 'rails_helper'
 RSpec.describe 'Analysis::UsersController', type: :request do
   describe 'GET /analysis/users' do
     it 'renders the ranking table for known players' do
-      user = create(:user, username: 'RankedPlayer')
+      user = create(:user, username: 'RankedPlayer', country: 'FI')
       create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'os', metric: 'skill', value: 25.5)
 
       get '/analysis/users'
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('RankedPlayer')
+      expect(response.body).to include('flag-fi')
     end
 
     it 'renders without error when there is no analysis data yet' do

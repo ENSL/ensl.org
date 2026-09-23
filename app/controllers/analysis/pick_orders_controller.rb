@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analysis
-  # /analysis/pick_orders -- NS1 gather rankings from draft pick behaviour.
+  # /analysis/pick_orders -- NS1 gather rankings from player pick behaviour.
   # Includes pick-order stats plus a separate pick-order-only OpenSkill score.
   # Doesn't touch
   # AnalysisResult at all; built straight from gathers/gatherers.

@@ -3,11 +3,12 @@
 
 <div class="box wide">
   <p>
-    NS1 gather rankings from draft behavior only. The OpenSkill ranking here is replayed
-    entirely from pick order history (not from match outcomes), so getting picked early in
-    stronger drafts is worth more than the same pick in weaker drafts. Captain appearances
-    are excluded from pick-order calculations because captains are voted in. Click a column
-    header to sort, or hover a column heading for an explanation.
+    NS1 gather rankings based only on player pick order. The OpenSkill ranking here is
+    replayed from pick history, not match outcomes, so being picked early in gathers with
+    stronger players counts more than the same pick in weaker gathers. Captain appearances
+    are excluded because captain voting can aim for balanced teams, rather than choosing the
+    two best players. When teams are picked, players are usually selected in perceived skill
+    order. Click a column header to sort, or hover a column heading for an explanation.
   </p>
 
   <%= form_with url: analysis_pick_orders_path, method: :get, local: true do %>
@@ -20,10 +21,10 @@
   <% end %>
 
   <% if @report[:rankings].empty? %>
-    <p>No NS1 gather draft data is available yet.</p>
+    <p>No NS1 gather pick data is available yet.</p>
   <% else %>
     <p class="text-sm text-gray-600">
-      Based on <%= number_with_delimiter(@report[:played_gathers]) %> drafted NS1 gathers; showing <%= number_with_delimiter(@report[:matched_users]) %> of <%= number_with_delimiter(@report[:available_users]) %> player records.
+      Based on <%= number_with_delimiter(@report[:played_gathers]) %> NS1 gathers; showing <%= number_with_delimiter(@report[:matched_users]) %> of <%= number_with_delimiter(@report[:available_users]) %> player records.
     </p>
     <%
       columns = [
@@ -32,30 +33,31 @@
           label: 'Player',
           type: :string,
           sort_value: ->(user) { user.to_s.downcase },
-          format: ->(user) { namelink(user) }
+          format: ->(user) { user_identity_link(user) }
         },
         {
           key: :pick_openskill,
           label: 'OpenSkill ranking',
           type: :number,
-          tooltip: 'A Bayesian OpenSkill rating replayed only from draft pick order, not round or match results. Being picked earlier raises it, and captain selections are excluded because captains are voted in rather than drafted. It estimates perceived draft strength, not in-game skill.',
+          tooltip: 'A Bayesian OpenSkill rating replayed only from gather pick order, not round or match results. Being picked earlier raises it. Captain selections are excluded because captain voting can aim for balanced teams rather than rank the two best players. It estimates perceived pick strength, not in-game skill.',
+          css_class: 'analysis-model--openskill',
           format: ->(value) { number_with_precision(value, precision: 3) }
         },
         {
           key: :average_pick_order,
           label: 'Average pick #',
           type: :number,
-          tooltip: 'Average draft position in gathers where this player was not a captain. Lower is earlier, but it does not adjust for the strength of the draft pool or account for match results.',
+          tooltip: 'Average pick position in gathers where this player was not a captain. Lower is earlier, but it does not adjust for the strength of the players being picked or account for match results.',
           format: ->(value) { number_with_precision(value, precision: 2) }
         },
         {
           key: :captain_percentage,
           label: '% captain',
           type: :number,
-          tooltip: 'Share of all counted gathers in which the player was selected as captain. Captains are excluded from pick-order scoring, so this is context for interpreting the other draft metrics.',
+          tooltip: 'Share of all counted gathers in which the player was selected as captain. Captains are excluded from pick-order scoring, so this is context for interpreting the other pick metrics.',
           format: ->(value) { number_with_precision(value, precision: 1) + '%' }
         },
-        { key: :games_count, label: 'Games', type: :number, tooltip: 'Drafted NS1 gathers played, including captain appearances. A larger sample makes the ranking more representative, but it remains a draft-behaviour measure.', format: ->(value) { value.to_i } }
+        { key: :games_count, label: 'Games', type: :number, tooltip: 'NS1 gathers played, including captain appearances. A larger sample makes the ranking more representative, but it remains a pick-order measure.', format: ->(value) { value.to_i } }
       ]
     %>
 

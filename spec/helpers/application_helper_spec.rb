@@ -152,6 +152,16 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe '#user_identity_link' do
+    it 'renders a country flag and a profile link' do
+      user = build_stubbed(:user, username: 'FlaggedUser', country: 'FI')
+
+      result = helper.user_identity_link(user)
+
+      expect(result).to include('flag-fi', 'FlaggedUser', 'data-turbo-frame')
+    end
+  end
+
   describe '#add_comments' do
     it 'returns empty safe string for nil object' do
       result = helper.add_comments(nil)

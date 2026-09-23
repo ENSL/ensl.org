@@ -50,6 +50,13 @@ module ApplicationHelper
     end
   end
 
+  def user_identity_link(user, data: {}, after_flag: nil)
+    return if user.nil?
+
+    link = link_to(user.to_s, user, class: 'user', data: { turbo_frame: '_top' }.merge(data))
+    safe_join([flag(user.country), after_flag.presence, link].compact, ' ')
+  end
+
   def directory_links(directory)
     links = []
     Directory.directory_traverse(directory).reverse_each do |dir|
