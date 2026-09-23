@@ -28,7 +28,9 @@
 class Round < ApplicationRecord
   RESULT_MARINE_WIN = 1
   RESULT_ALIEN_WIN = 0
+  DEFAULT_LENGTH_FILTER = 'at_least_30_seconds'
   LENGTH_BUCKETS = {
+    DEFAULT_LENGTH_FILTER => [30, nil],
     'under_5' => [0, 5 * 60],
     '5_to_10' => [5 * 60, 10 * 60],
     '10_to_20' => [10 * 60, 20 * 60],

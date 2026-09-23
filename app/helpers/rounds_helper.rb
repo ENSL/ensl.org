@@ -16,7 +16,8 @@ module RoundsHelper
   end
 
   def round_length_options
-    [['Any length', ''], ['Under 5 min', 'under_5'], ['5-10 min', '5_to_10'], ['10-20 min', '10_to_20'],
+    [['30 sec or more', Round::DEFAULT_LENGTH_FILTER], ['Any length', ''], ['Under 5 min', 'under_5'],
+     ['5-10 min', '5_to_10'], ['10-20 min', '10_to_20'],
      ['20-30 min', '20_to_30'], ['30+ min', 'over_30']]
   end
 

@@ -18,7 +18,7 @@
       <div class="fields"><%= label_tag :length, 'Round length' %><%= select_tag :length, options_for_select(round_length_options, @filters[:length]) %></div>
       <div class="fields"><%= label_tag :from, 'From' %><%= date_field_tag :from, @filters[:from] %></div>
       <div class="fields"><%= label_tag :to, 'To' %><%= date_field_tag :to, @filters[:to] %></div>
-      <div class="rounds-archive__filter-actions"><%= submit_tag 'Filter' %><%= link_to 'Clear', rounds_path, class: 'button' %></div>
+      <div class="rounds-archive__filter-actions"><%= submit_tag 'Filter', class: 'button' %><%= link_to 'Clear', rounds_path, class: 'button' %></div>
     </div>
   <% end %>
 

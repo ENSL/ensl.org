@@ -14,6 +14,10 @@ RSpec.describe 'RoundsController', type: :request do
       Round.create!(server_name: 'ENSL Two', map_name: 'ns_veil', start_time: Time.zone.parse('2026-03-15 12:00'),
                     end_time: Time.zone.parse('2026-03-15 12:35'), result: Round::RESULT_ALIEN_WIN)
     end
+    let!(:short_round) do
+      Round.create!(server_name: 'ENSL Three', map_name: 'ns_origin', start_time: Time.zone.parse('2026-03-16 12:00'),
+                    end_time: Time.zone.parse('2026-03-16 12:00:29'), result: Round::RESULT_MARINE_WIN)
+    end
 
     before do
       user = create(:user, username: 'ArchivePlayer', steamid: '0:1:12345')
@@ -30,12 +34,20 @@ RSpec.describe 'RoundsController', type: :request do
       expect(response.body).to include('50')
     end
 
-    it 'lists rounds in chronological order and exposes map and server options' do
+    it 'excludes rounds shorter than 30 seconds by default' do
       get '/rounds'
 
       expect(response).to have_http_status(:ok)
       expect(controller.instance_variable_get(:@rounds).map(&:id)).to eq([matching_round.id, other_round.id])
-      expect(response.body).to include('Any map', 'ns_eclipse', 'Any server', 'ENSL One')
+      expect(response.body).to include('30 sec or more', 'Any map', 'ns_eclipse', 'Any server', 'ENSL One')
+    end
+
+    it 'includes short rounds when Any length is selected' do
+      get '/rounds', params: { length: '' }
+
+      expect(response).to have_http_status(:ok)
+      expect(controller.instance_variable_get(:@rounds).map(&:id)).to eq([matching_round.id, other_round.id,
+                                                                          short_round.id])
     end
   end
 

@@ -43,6 +43,8 @@ class RoundsController < ApplicationController
   private
 
   def round_filters
-    params.permit(:username, :nickname, :steamid, :map, :server, :result, :length, :from, :to)
+    filters = params.permit(:username, :nickname, :steamid, :map, :server, :result, :length, :from, :to)
+    filters[:length] = Round::DEFAULT_LENGTH_FILTER unless filters.key?(:length)
+    filters
   end
 end
