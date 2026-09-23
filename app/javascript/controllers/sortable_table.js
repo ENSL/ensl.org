@@ -1,13 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Makes any <table data-controller="sortable-table"> sortable by clicking
-// its column headers, entirely client-side (no server round-trip). Mark
-// each sortable <th> with a `data-sort-type` ("string" or "number")
-// attribute, and give every <td> in that column a matching
-// `data-sort-value` holding the raw comparable value -- see
+// its column headers. The selected column is stored in the URL so it survives
+// reloads and filter changes. Mark each sortable <th> with a `data-sort-type`
+// ("string" or "number") attribute, and give every <td> in that column a
+// matching `data-sort-value` holding the raw comparable value -- see
 // AnalysisHelper#sortable_table, which generates both. Rows with a blank
 // data-sort-value always sort last, regardless of direction.
 export default class extends Controller {
+  static values = {
+    defaultKey: String,
+    defaultDirection: { type: String, default: "ascending" }
+  }
+
   connect() {
     this.handlers = new Map()
 
@@ -25,7 +30,10 @@ export default class extends Controller {
     })
 
     const defaultHeader = this.headers.find((header) => header.dataset.sortKey === this.defaultKeyValue)
-    if (defaultHeader) this.sortBy(defaultHeader, this.defaultDirectionValue)
+    if (defaultHeader) {
+      this.sortBy(defaultHeader, this.defaultDirectionValue, false)
+      this.syncFilterForms(defaultHeader.dataset.sortKey, this.defaultDirectionValue)
+    }
   }
 
   disconnect() {
@@ -36,7 +44,7 @@ export default class extends Controller {
     return Array.from(this.element.querySelectorAll("thead th[data-sort-type]"))
   }
 
-  sortBy(header, direction = null) {
+  sortBy(header, direction = null, updateUrl = true) {
     direction ||= header.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending"
     const columnIndex = Array.from(header.parentElement.children).indexOf(header)
     const type = header.dataset.sortType || "string"
@@ -52,6 +60,39 @@ export default class extends Controller {
     const rows = Array.from(tbody.rows)
     rows.sort((rowA, rowB) => this.compareCells(rowA.cells[columnIndex], rowB.cells[columnIndex], type, direction))
     rows.forEach((row) => tbody.append(row))
+
+    if (updateUrl) this.updateQueryParams(header.dataset.sortKey, direction)
+  }
+
+  updateQueryParams(sort, direction) {
+    const url = new URL(window.location)
+    url.searchParams.set("sort", sort)
+    url.searchParams.set("direction", direction)
+    window.history.replaceState({}, "", url)
+
+    this.syncFilterForms(sort, direction)
+  }
+
+  syncFilterForms(sort, direction) {
+    this.filterForms.forEach((form) => {
+      this.setHiddenInput(form, "sort", sort)
+      this.setHiddenInput(form, "direction", direction)
+    })
+  }
+
+  get filterForms() {
+    return Array.from(this.element.closest(".box")?.querySelectorAll('form[method="get"]') || [])
+  }
+
+  setHiddenInput(form, name, value) {
+    let input = form.querySelector(`input[type="hidden"][name="${name}"]`)
+    if (!input) {
+      input = document.createElement("input")
+      input.type = "hidden"
+      input.name = name
+      form.append(input)
+    }
+    input.value = value
   }
 
   compareCells(cellA, cellB, type, direction) {

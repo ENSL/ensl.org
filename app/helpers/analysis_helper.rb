@@ -52,10 +52,17 @@ module AnalysisHelper
   #   tooltip     - optional plain-text explanation shown when hovering the header
   #   sort_value  - optional proc(raw_value) -> comparable value (defaults to raw_value)
   #   format      - optional proc(raw_value) -> displayed value (defaults to raw_value)
+  #   css_class   - optional CSS class applied to the column header and cells
   # rows: array of hashes, each keyed by every column's :key
   def sortable_table(columns:, rows:, id: nil, default_sort: nil, default_direction: :ascending)
-    locals = { columns: columns, rows: rows, id: id, default_sort: default_sort,
-               default_direction: default_direction }
+    column_keys = columns.pluck(:key).map(&:to_s)
+    requested_sort = params[:sort].to_s
+    requested_direction = params[:direction].to_s
+    sort_key = column_keys.include?(requested_sort) ? requested_sort : default_sort
+    direction = %w[ascending descending].include?(requested_direction) ? requested_direction : default_direction
+
+    locals = { columns: columns, rows: rows, id: id, default_sort: sort_key,
+               default_direction: direction }
     render partial: 'analysis/sortable_table', locals: locals
   end
 

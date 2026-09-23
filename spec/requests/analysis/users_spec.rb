@@ -27,5 +27,17 @@ RSpec.describe 'Analysis::UsersController', type: :request do
       document = Nokogiri::HTML(response.body)
       expect(document.at_css('#min_games option[selected]')['value']).to eq('70')
     end
+
+    it 'uses the requested sort in the table defaults' do
+      user = create(:user, username: 'RankedPlayer')
+      create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'os', metric: 'skill', value: 25.5)
+
+      get '/analysis/users', params: { min_games: 25, sort: 'wins', direction: 'descending' }
+
+      document = Nokogiri::HTML(response.body)
+      table = document.at_css('#player-rankings')
+      expect(table['data-sortable-table-default-key-value']).to eq('wins')
+      expect(table['data-sortable-table-default-direction-value']).to eq('descending')
+    end
   end
 end

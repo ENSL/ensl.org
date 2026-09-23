@@ -5,7 +5,7 @@
         <% column_type = (column[:type] || :string).to_sym %>
         <% tooltip = column[:tooltip] %>
         <th
-          class="<%= 'sortable-table-number' if column_type == :number %><%= ' sortable-table-tip' if tooltip %>"
+          class="<%= [column_type == :number ? 'sortable-table-number' : nil, tooltip ? 'sortable-table-tip' : nil, column[:css_class]].compact.join(' ') %>"
           data-sort-type="<%= column_type %>"
           data-sort-key="<%= column[:key] %>"
           <% if tooltip %>data-tooltip="<%= tooltip %>" aria-label="<%= column[:label] %>: <%= tooltip %>"<% end %>
@@ -22,7 +22,7 @@
           <% column_type = (column[:type] || :string).to_sym %>
           <% raw_value = row[column[:key]] %>
           <% sort_value = column[:sort_value] ? column[:sort_value].call(raw_value) : raw_value %>
-          <td class="<%= 'sortable-table-number' if column_type == :number %>" data-sort-value="<%= sort_value %>">
+          <td class="<%= [column_type == :number ? 'sortable-table-number' : nil, column[:css_class]].compact.join(' ') %>" data-sort-value="<%= sort_value %>">
             <%= column[:format] ? column[:format].call(raw_value) : raw_value %>
           </td>
         <% end %>

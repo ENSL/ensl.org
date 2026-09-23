@@ -9,14 +9,14 @@ module Analysis
   class HomeController < Analysis::BaseController
     PAGES = [
       {
-        title: 'NS1 Rankings',
-        description: 'NS1 skill ratings and win/loss records for every tracked player. Sort by any column.',
+        title: 'NS1 Player Rankings',
+        description: 'NS1 skill ratings and win/loss records for players. Data is based on game server logs.',
         icon: 'trophy',
         path_helper: :analysis_users_path
       },
       {
         title: 'NS1 Gather Rankings',
-        description: 'Pick-order-based NS1 gather rankings, including a draft-only OpenSkill score.',
+        description: 'Pick-order-based NS1 gather rankings, including an OpenSkill score. No game data is used.',
         icon: 'sort-numeric-down',
         path_helper: :analysis_pick_orders_path
       },

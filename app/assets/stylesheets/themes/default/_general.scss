@@ -107,6 +107,27 @@
   min-width: 220px;
 }
 
+// Distinguish the player-rating models without competing with the values.
+#player-rankings {
+  th.player-rankings-model--dl {
+    border-bottom: 3px solid #16803d;
+    background: rgb(22 128 61 / 12%);
+    color: #126734;
+  }
+
+  th.player-rankings-model--openskill {
+    border-bottom: 3px solid #16758f;
+    background: rgb(22 117 143 / 12%);
+    color: #0d6076;
+  }
+
+  th.player-rankings-model--moulton {
+    border-bottom: 3px solid #9a5b16;
+    background: rgb(154 91 22 / 12%);
+    color: #7a4610;
+  }
+}
+
 .stats-page__faction-icon {
   width: 32px;
   height: 32px;

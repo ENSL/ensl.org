@@ -60,6 +60,9 @@
           sort_value: ->(user) { user.to_s.downcase },
           format: ->(user) { namelink(user) }
         },
+        skill_column.call(:skill_dl, 'DL model', 'A custom Deep Learning skill-ranking model. This is currently the most accurate player-skill estimate available here, using the imported NS1 analysis data.').merge(css_class: 'player-rankings-model--dl'),
+        skill_column.call(:skill_os_btf, 'OpenSkill', 'A Bayesian rating system which updates a player estimate from match outcomes while accounting for uncertainty. It is roughly the second most accurate model here, but ratings are less reliable for players with few analysed rounds.').merge(css_class: 'player-rankings-model--openskill'),
+        skill_column.call(:skill_mlt, 'Moulton model', 'Moulton\'s NS2 rating model, applied here to NS1 data as a comparison. It estimates skill from match outcomes but is roughly the third most accurate model here; treat it as historical context rather than the primary ranking.').merge(css_class: 'player-rankings-model--moulton'),
         { key: :wins, label: 'Wins', type: :number, format: ->(value) { value&.to_i } },
         { key: :losses, label: 'Losses', type: :number, format: ->(value) { value&.to_i } },
         {
@@ -69,10 +72,7 @@
           tooltip: 'Wins divided by wins plus losses. It does not account for opponent strength or team balance, so a healthy competitive player pool should tend towards 50%, not treat a higher ratio as a complete skill measure.',
           sort_value: ->(value) { value.nil? ? nil : (value * 100) },
           format: ->(value) { value.nil? ? '–' : format_number.call(value * 100, precision: 0) }
-        },
-        skill_column.call(:skill_dl, 'DL model', 'A custom Deep Learning skill-ranking model. This is currently the most accurate player-skill estimate available here, using the imported NS1 analysis data.'),
-        skill_column.call(:skill_os_btf, 'OpenSkill', 'A Bayesian rating system which updates a player estimate from match outcomes while accounting for uncertainty. It is roughly the second most accurate model here, but ratings are less reliable for players with few analysed rounds.'),
-        skill_column.call(:skill_mlt, 'Moulton model', 'Moulton\'s NS2 rating model, applied here to NS1 data as a comparison. It estimates skill from match outcomes but is roughly the third most accurate model here; treat it as historical context rather than the primary ranking.')
+        }
       ]
     %>
 
