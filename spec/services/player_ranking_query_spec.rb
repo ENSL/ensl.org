@@ -3,6 +3,14 @@
 require 'rails_helper'
 
 describe PlayerRankingQuery do
+  def add_player(batch_id:, source_steamid:, user_id:, skills: {}, wins: nil, losses: nil, win_ratio: nil)
+    values = { wins: wins, losses: losses, win_ratio: win_ratio }.compact
+    create_analysis_user(batch_id: batch_id, user_id: user_id, steam_id: source_steamid, **values)
+    skills.each do |model, skill|
+      create_analysis_skill(batch_id: batch_id, model: model, user_id: user_id, skill: skill)
+    end
+  end
+
   describe '#call' do
     it 'returns an empty array when there are no historical batches' do
       expect(described_class.call).to eq([])
@@ -11,18 +19,10 @@ describe PlayerRankingQuery do
     it 'pivots the latest batch into one row per known player' do
       user = create(:user, steamid: '0:1:11111')
 
-      # Older batch -- should be ignored in favour of the latest one.
-      create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'os', metric: 'skill', value: 10.0)
-
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'os', metric: 'skill', value: 25.5)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'dl', metric: 'skill', value: 30.0)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 12)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 4)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'player_stats', metric: 'win_ratio',
-                               value: 0.75)
-
-      # No matching User -- should be skipped.
-      create(:analysis_result, batch_id: 2, steamid: '0:1:99999', model: 'os', metric: 'skill', value: 5.0)
+      add_player(batch_id: 1, source_steamid: user.steamid, user_id: 1, skills: { os: 10.0 })
+      add_player(batch_id: 2, source_steamid: user.steamid, user_id: 1, skills: { os: 25.5, dl: 30.0 },
+                 wins: 12, losses: 4, win_ratio: 0.75)
+      add_player(batch_id: 2, source_steamid: '0:1:99999', user_id: 2, skills: { os: 5.0 })
 
       rankings = described_class.call
 
@@ -40,9 +40,7 @@ describe PlayerRankingQuery do
     it 'matches analysis steamids in STEAM_ format to normalized users and handles mixed-case models' do
       user = create(:user, steamid: '0:1:33333')
 
-      create(:analysis_result, batch_id: 3, steamid: 'STEAM_0:1:33333', model: 'os', metric: 'skill', value: 22.0)
-      create(:analysis_result, batch_id: 3, steamid: 'STEAM_0:1:33333', model: 'DL', metric: 'skill', value: 28.5)
-      create(:analysis_result, batch_id: 3, steamid: 'STEAM_0:1:33333', model: 'player_stats', metric: 'wins', value: 9)
+      add_player(batch_id: 3, source_steamid: 'STEAM_0:1:33333', user_id: 3, skills: { os: 22.0, dl: 28.5 }, wins: 9)
 
       ranking = described_class.call.find { |row| row[:user] == user }
 
@@ -54,25 +52,23 @@ describe PlayerRankingQuery do
 
     it 'excludes current-state snapshot rows (batch_id 0)' do
       user = create(:user, steamid: '0:1:22222')
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, steamid: user.steamid,
-                               model: 'os', metric: 'skill', value: 99.0)
+      add_player(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, source_steamid: user.steamid,
+                 user_id: 4, skills: { os: 99.0 })
 
       expect(described_class.call).to eq([])
     end
 
     it 'filters players below the configured min_games threshold' do
       user = create(:user, steamid: '0:1:77777')
-      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 5)
-      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 10)
-      create(:analysis_result, batch_id: 10, steamid: user.steamid, model: 'os', metric: 'skill', value: 12.5)
+      add_player(batch_id: 10, source_steamid: user.steamid, user_id: 10, skills: { os: 12.5 }, wins: 5, losses: 10)
 
       expect(described_class.call(min_games: 25)).to eq([])
     end
 
     it 'keeps explicit os_btf skill instead of backfilling from os' do
       user = create(:user, steamid: '0:1:88888')
-      create(:analysis_result, batch_id: 11, steamid: user.steamid, model: 'os', metric: 'skill', value: 50.0)
-      create(:analysis_result, batch_id: 11, steamid: user.steamid, model: 'os_btf', metric: 'skill', value: 40.0)
+      add_player(batch_id: 11, source_steamid: user.steamid, user_id: 11,
+                 skills: { os: 50.0, os_btf: 40.0 })
 
       ranking = described_class.call.find { |row| row[:user] == user }
 
@@ -81,16 +77,15 @@ describe PlayerRankingQuery do
     end
 
     it 'skips rows with un-normalizable steamids' do
-      create(:analysis_result, batch_id: 12, steamid: 'not-a-steamid', model: 'os', metric: 'skill', value: 1.0)
+      add_player(batch_id: 12, source_steamid: 'not-a-steamid', user_id: 12, skills: { os: 1.0 })
 
       expect(described_class.call).to eq([])
     end
 
     it 'falls back to default min_games for invalid values' do
       user = create(:user, steamid: '0:1:99998')
-      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'wins', value: 50)
-      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'player_stats', metric: 'losses', value: 30)
-      create(:analysis_result, batch_id: 13, steamid: user.steamid, model: 'os', metric: 'skill', value: 2.0)
+      add_player(batch_id: 13, source_steamid: user.steamid, user_id: 13,
+                 skills: { os: 2.0 }, wins: 50, losses: 30)
 
       expect(described_class.call(min_games: 'invalid').map { |row| row[:user] }).to include(user)
       expect(described_class.call(min_games: 13).map { |row| row[:user] }).to include(user)

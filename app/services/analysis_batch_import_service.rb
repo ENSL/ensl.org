@@ -1,96 +1,54 @@
 # frozen_string_literal: true
 
 require 'duckdb'
+require 'digest'
 
-# Imports one export batch of ensl_analysis Python output into
-# `analysis_results`. Everything lands in that one table (see AnalysisResult)
-# -- there's no per-source model, just different (model, metric) values on
-# the same row shape. A batch is a directory of sub-directories, each holding
-# one or more Spark part-*.parquet files:
-#
-#   <exports_dir>/<batch_id>/analysis_results/*.parquet  (legacy WIP layout)
-#   <exports_dir>/<batch_id>/metrics/*.parquet           (per-model aggregates)
-#   <exports_dir>/<batch_id>/skill_<model>/*.parquet     (per-player model output)
-#   <exports_dir>/<batch_id>/users/*.parquet             (player stats + steamid lookup)
-#   <exports_dir>/<batch_id>/class_stats/*.parquet       (per-player class totals)
-#   <exports_dir>/<batch_id>/alien_strategies/*.parquet  (per-round alien strategies)
-#   <exports_dir>/<batch_id>/map_balance/*.parquet       (per-map win rates)
-#   <exports_dir>/<batch_id>/time_of_week/*.parquet      (round counts per hour-of-week)
-#
-# All sub-directories are optional -- a batch only needs to contain whichever
-# of these the exporter produced that run -- except the whole thing raises if
-# NONE of them are present (almost certainly a bad batch_id/exports_dir).
-#
-# Two very different storage semantics share this table, distinguished by
-# batch_id (see AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID):
-#
-# * Historical (append-only): player stats and per-model skill values. Each
-#   batch's rows are additional history, never overwritten -- that's the
-#   existing behaviour, keyed on the real batch_id.
-# * Overwritable (current-state snapshot): map balance and time-of-week
-#   activity aren't per-player history, they're "what does the world look
-#   like right now" aggregates recomputed from the full dataset on every
-#   run. Re-importing must replace the old numbers, not pile up near-dupes,
-#   so these rows are upserted under the fixed CURRENT_SNAPSHOT_BATCH_ID
-#   instead of the batch's own id.
+# Imports every analytical Parquet relation as generic, typed cells. The raw
+# round/log exports remain exclusively owned by RoundBatchImportService.
 class AnalysisBatchImportService
   Error = Class.new(StandardError)
 
   DEFAULT_EXPORTS_DIR = Rails.root.join('storage/analysis_exports').to_s
   UPSERT_SLICE_SIZE = 1000
-
-  # Per-player skill/rating model directories (`skill_<key>/*.parquet`), each
-  # keyed by `user_id`, mapped to the (metric => column) pairs we pull out of
-  # them. `model` in analysis_results is the hash key below.
-  SKILL_MODEL_METRIC_COLUMNS = {
-    'dl' => { 'skill' => 'skill_dl' },
-    'mlt' => { 'skill' => 'skill_mlt' },
-    'os' => { 'mu' => 'mu_os', 'sigma' => 'sigma_os', 'skill' => 'skill_os' },
-    'os_btf' => { 'mu' => 'mu_os_btf', 'sigma' => 'sigma_os_btf', 'skill' => 'skill_os_btf' },
-    'os_btp' => { 'mu' => 'mu_os_btp', 'sigma' => 'sigma_os_btp', 'skill' => 'skill_os_btp' },
-    'os_tmf' => { 'mu' => 'mu_os_tmf', 'sigma' => 'sigma_os_tmf', 'skill' => 'skill_os_tmf' }
+  RAW_DATASETS = %w[log_files log_lines round_users rounds].freeze
+  SNAPSHOT_MODELS = %w[map_balance time_of_week].freeze
+  IDENTITY_FIELDS = {
+    'alien_strategies' => %w[round_id],
+    'class_stats' => %w[user_id team class_name map_name],
+    'map_balance' => %w[map_name],
+    'metrics' => %w[model_name],
+    'resource_spending' => %w[team category bucket_start_minutes bucket_end_minutes],
+    'round_duration' => %w[bucket_start_minutes bucket_end_minutes],
+    'scenario_metrics' => %w[metric kill_rate],
+    'tech_metrics' => %w[kind path map],
+    'time_of_week' => %w[day_of_week hour_of_day],
+    'users' => %w[id]
   }.freeze
-
-  # Columns pulled from `users/*.parquet` as historical per-player stats.
-  # `skill` is intentionally excluded -- it's not used yet, and the real
-  # per-model skill values are covered by SKILL_MODEL_METRIC_COLUMNS above.
-  PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
-
-  # Per-player class totals. Source rows are split by map and team, so these
-  # are summed for each player/class before being stored.
-  CLASS_STAT_METRICS = %w[kills deaths damage minutes_played resources_spent wins losses sample_size].freeze
-
-  # Columns pulled from `map_balance/*.parquet`, one analysis_results row per
-  # (map, metric).
-  MAP_BALANCE_METRICS = %w[marine_wins alien_wins total_games marine_win_percentage alien_win_percentage].freeze
 
   def initialize(batch_id, exports_dir: nil)
     @batch_id = Integer(batch_id)
     @exports_dir = File.expand_path(exports_dir || ENV.fetch('ANALYSIS_EXPORTS_DIR', DEFAULT_EXPORTS_DIR))
   end
 
-  # Returns an ImportRowStat for `analysis_results`: how many rows this batch
-  # wrote, and how many of those were new rather than overwrites.
   def call
-    rows = read_rows
-    return ImportRowStat.new(processed: 0, inserted: 0) if rows.empty?
+    sources = analysis_sources
+    raise Error, "No recognized analysis exports found for batch #{@batch_id} under #{batch_dir}" if sources.empty?
 
-    validate_row_lengths!(rows)
+    database = DuckDB::Database.open
+    connection = database.connect
     max_id_before = AnalysisResult.maximum(:id) || 0
-    rows.each_slice(UPSERT_SLICE_SIZE) do |slice|
-      # unique_by is intentionally omitted: MySQL doesn't support it (Rails
-      # raises if you pass it) and instead upserts against whichever unique
-      # index the row collides with -- here that's
-      # index_analysis_results_on_batch_and_subject.
-      # rubocop:disable Rails/SkipsModelValidations -- bulk import of already-validated
-      # analysis output; per-row callbacks/validations would be prohibitively slow here.
-      AnalysisResult.upsert_all(slice, record_timestamps: false)
-      # rubocop:enable Rails/SkipsModelValidations
+    imported_at = Time.current
+    @source_counts = sources.to_h do |dataset, glob|
+      [dataset, import_dataset(connection, dataset, glob, imported_at)]
     end
+    processed = @source_counts.values.sum
 
-    stat = ImportRowStat.measure(AnalysisResult, processed: rows.size, max_id_before: max_id_before)
+    stat = ImportRowStat.measure(AnalysisResult, processed: processed, max_id_before: max_id_before)
     log_stat(stat)
     stat
+  ensure
+    connection&.close
+    database&.close
   end
 
   private
@@ -103,217 +61,121 @@ class AnalysisBatchImportService
     end
   end
 
-  def read_rows
-    database = DuckDB::Database.open
-    connection = database.connect
-    imported_at = Time.current
+  def import_dataset(connection, dataset, glob, imported_at)
+    model = model_for(dataset)
+    batch_id = snapshot_model?(model) ? AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID : @batch_id
+    AnalysisResult.where(batch_id: batch_id, model: model).delete_all if snapshot_model?(model)
 
-    # Kept per source as well as flattened, so a run can report which export
-    # each chunk of the single-table import came from.
-    by_source = source_rows(connection, imported_at)
-    @source_counts = by_source.transform_values(&:size)
-    rows = by_source.values.flatten(1)
+    fields = parquet_fields(connection, glob)
+    identity_fields = identity_fields_for(dataset, fields)
+    validate_metadata!(model, fields)
+    rows = []
+    processed = 0
 
-    return rows if rows.any?
+    connection.query("SELECT * FROM #{parquet_relation(glob)}").each do |source_row|
+      digest = digest_for(model, identity_fields, fields.zip(source_row).to_h)
+      fields.zip(source_row).each do |field, source_value|
+        next if source_value.nil?
 
-    raise Error, "No recognized exports found for batch #{@batch_id} under #{batch_dir}"
-  ensure
-    connection&.close
-    database&.close
-  end
-
-  def source_rows(connection, imported_at)
-    {
-      legacy: read_legacy_rows(connection, imported_at),
-      skill_models: read_skill_model_rows(connection, imported_at),
-      player_stats: read_player_stat_rows(connection, imported_at),
-      class_stats: read_class_stat_rows(connection, imported_at),
-      alien_strategies: read_alien_strategy_rows(connection, imported_at),
-      map_balance: read_map_balance_rows(connection, imported_at),
-      time_of_week: read_time_of_week_rows(connection, imported_at)
-    }
-  end
-
-  # Legacy/aggregate sources: an older WIP layout wrote a single
-  # `analysis_results` directory with the final column shape already; the
-  # current exporter instead writes per-model aggregate metrics (no
-  # steamid) under `metrics`. Both are historical, keyed on the real
-  # batch_id, same as before this importer grew the sources below.
-  def read_legacy_rows(connection, imported_at)
-    if (glob = existing_glob('analysis_results'))
-      sql = "SELECT steamid, model, metric, value, milestone FROM read_parquet('#{glob}')"
-    elsif (glob = existing_glob('metrics'))
-      sql = "SELECT NULL::VARCHAR AS steamid, name AS model, metric, value, milestone FROM read_parquet('#{glob}')"
-    else
-      return []
-    end
-
-    connection.query(sql).map do |(steamid, model, metric, value, milestone)|
-      historical_row(imported_at, steamid: steamid, model: model, metric: metric, value: value, milestone: milestone)
-    end
-  end
-
-  # Per-player skill/rating output, one directory per model. `user_id` only
-  # means something inside this export batch's own `users` table, so we
-  # join it there to resolve the steamid we actually key on.
-  def read_skill_model_rows(connection, imported_at)
-    users_glob = existing_glob('users')
-    return [] unless users_glob
-
-    SKILL_MODEL_METRIC_COLUMNS.flat_map do |model, metric_columns|
-      skill_glob = existing_glob("skill_#{model}")
-      next [] unless skill_glob
-
-      metric_columns.flat_map do |metric, column|
-        sql = <<~SQL.squish
-          SELECT u.steam_id, s.#{column}
-          FROM read_parquet('#{skill_glob}') s
-          JOIN read_parquet('#{users_glob}') u ON s.user_id = u.id
-          WHERE s.#{column} IS NOT NULL
-        SQL
-
-        connection.query(sql).map do |(steamid, value)|
-          historical_row(imported_at, steamid: steamid, model: model, metric: metric, value: value, milestone: nil)
-        end
+        rows << cell(batch_id, model, digest, field, source_value, imported_at)
+        processed += 1
+        flush(rows) if rows.size >= UPSERT_SLICE_SIZE
       end
     end
+    flush(rows)
+    processed
   end
 
-  # Historical per-player stats (skill excluded -- not used yet).
-  def read_player_stat_rows(connection, imported_at)
-    users_glob = existing_glob('users')
-    return [] unless users_glob
+  def analysis_sources
+    return [] unless Dir.exist?(batch_dir)
 
-    read_metric_columns(connection, users_glob, 'steam_id', PLAYER_STAT_METRICS) do |steamid, metric, value|
-      historical_row(imported_at, steamid: steamid, model: 'player_stats', metric: metric, value: value,
-                                  milestone: nil)
+    Dir.children(batch_dir).sort.filter_map do |dataset|
+      next if RAW_DATASETS.include?(dataset)
+
+      glob = existing_glob(dataset)
+      [dataset, glob] if glob
     end
   end
 
-  # Aggregate source rows across maps and teams so each stored result is for
-  # one player playing one class, regardless of map or side.
-  def read_class_stat_rows(connection, imported_at)
-    users_glob = existing_glob('users')
-    class_stats_glob = existing_glob('class_stats')
-    return [] unless users_glob && class_stats_glob
+  def parquet_fields(connection, glob)
+    connection.query("DESCRIBE SELECT * FROM #{parquet_relation(glob)}").map(&:first)
+  end
 
-    CLASS_STAT_METRICS.flat_map do |metric|
-      sql = <<~SQL.squish
-        SELECT u.steam_id, c.class_name, SUM(c.#{metric})
-        FROM read_parquet('#{class_stats_glob}') c
-        JOIN read_parquet('#{users_glob}') u ON c.user_id = u.id
-        WHERE c.class_name IS NOT NULL AND c.#{metric} IS NOT NULL
-        GROUP BY u.steam_id, c.class_name
-      SQL
+  def parquet_relation(glob)
+    "read_parquet('#{glob.gsub("'", "''")}')"
+  end
 
-      connection.query(sql).map do |(steamid, class_name, value)|
-        historical_row(imported_at, steamid: steamid, model: "class_stats:#{class_name}", metric: metric,
-                                    value: value, milestone: nil)
-      end
+  def model_for(dataset)
+    dataset.start_with?('skill_') ? dataset.delete_prefix('skill_') : dataset
+  end
+
+  def snapshot_model?(model)
+    SNAPSHOT_MODELS.include?(model)
+  end
+
+  def identity_fields_for(dataset, fields)
+    configured = dataset.start_with?('skill_') ? %w[user_id] : IDENTITY_FIELDS[dataset]
+    configured&.all? { |field| fields.include?(field) } ? configured : fields
+  end
+
+  def digest_for(model, identity_fields, attributes)
+    payload = ''.b
+    append_digest_part(payload, 'analysis-result-v1')
+    append_digest_part(payload, model)
+    identity_fields.each do |field|
+      append_digest_part(payload, field)
+      append_digest_part(payload, canonical_value(attributes[field]))
+    end
+    Digest::SHA256.digest(payload).byteslice(0, 16)
+  end
+
+  def append_digest_part(payload, value)
+    bytes = value.to_s.b
+    payload << [bytes.bytesize].pack('N') << bytes
+  end
+
+  def canonical_value(value)
+    case value
+    when nil then "null\0"
+    when Integer then "integer\0#{value}"
+    when Float then "float\0#{[value].pack('G')}"
+    when Numeric then "number\0#{value}"
+    when Time then "time\0#{value.utc.iso8601(6)}"
+    when TrueClass, FalseClass then "boolean\0#{value ? 1 : 0}"
+    else "string\0#{value}"
     end
   end
 
-  def read_alien_strategy_rows(connection, imported_at)
-    glob = existing_glob('alien_strategies')
-    return [] unless glob
-
-    sql = <<~SQL.squish
-      SELECT round_id, result, duration_seconds, strategy
-      FROM read_parquet('#{glob}')
-      WHERE strategy IS NOT NULL AND result IN (0, 1)
-    SQL
-
-    connection.query(sql).map do |(round_id, result, duration_seconds, strategy)|
-      historical_row(imported_at, steamid: compact_alien_strategy(strategy), model: 'alien_strategy',
-                                  metric: result.zero? ? 'alien_win' : 'marine_win',
-                                  value: duration_seconds || 0, milestone: round_id)
-    end
+  def cell(batch_id, model, digest, field, source_value, imported_at)
+    value, text_value = case source_value
+                        when Numeric then [source_value.to_f, nil]
+                        when TrueClass then [1.0, nil]
+                        when FalseClass then [0.0, nil]
+                        when Time then [nil, source_value.utc.iso8601(6)]
+                        else [nil, source_value.to_s]
+                        end
+    { batch_id: batch_id, model: model, digest: digest, field: field, value: value,
+      text_value: text_value, created_at: imported_at }
   end
 
-  # Overwritable: per-map win rates, keyed on map_name (reusing `steamid` as
-  # the generic subject column, same as `metrics` already does for
-  # model-level aggregates).
-  def read_map_balance_rows(connection, imported_at)
-    glob = existing_glob('map_balance')
-    return [] unless glob
+  def flush(rows)
+    return if rows.empty?
 
-    read_metric_columns(connection, glob, 'map_name', MAP_BALANCE_METRICS) do |map_name, metric, value|
-      current_snapshot_row(imported_at, steamid: map_name, model: 'map_balance', metric: metric, value: value,
-                                        milestone: nil)
-    end
+    # rubocop:disable Rails/SkipsModelValidations -- validated Parquet output is bulk imported for performance.
+    AnalysisResult.upsert_all(rows, record_timestamps: false)
+    # rubocop:enable Rails/SkipsModelValidations
+    rows.clear
   end
 
-  def read_metric_columns(connection, glob, subject_column, metrics)
-    metrics.flat_map do |metric|
-      sql = <<~SQL.squish
-        SELECT #{subject_column}, #{metric}
-        FROM read_parquet('#{glob}')
-        WHERE #{metric} IS NOT NULL
-      SQL
+  def validate_metadata!(model, fields)
+    model_limit = AnalysisResult.columns_hash.fetch('model').limit
+    field_limit = AnalysisResult.columns_hash.fetch('field').limit
+    raise Error, "Analysis model #{model.inspect} exceeds #{model_limit} characters" if model.length > model_limit
 
-      connection.query(sql).map do |(subject, value)|
-        yield(subject, metric, value)
-      end
-    end
-  end
+    fields.each do |field|
+      next unless field.length > field_limit
 
-  # Overwritable: round counts per hour-of-week. day_of_week (0-6) reuses
-  # `steamid` as the generic subject column; hour_of_day (0-23) fits the
-  # existing `milestone` bucket column.
-  def read_time_of_week_rows(connection, imported_at)
-    glob = existing_glob('time_of_week')
-    return [] unless glob
-
-    sql = <<~SQL.squish
-      SELECT day_of_week, hour_of_day, round_count
-      FROM read_parquet('#{glob}')
-      WHERE round_count IS NOT NULL
-    SQL
-
-    connection.query(sql).map do |(day_of_week, hour_of_day, round_count)|
-      current_snapshot_row(imported_at, steamid: day_of_week.to_s, model: 'time_of_week', metric: 'round_count',
-                                        value: round_count, milestone: hour_of_day)
-    end
-  end
-
-  # `attrs` is {steamid:, model:, metric:, value:, milestone:} -- bundled into
-  # one hash (rather than five keyword params) to keep this under RuboCop's
-  # parameter-count limit without losing the self-documenting call sites.
-  def historical_row(imported_at, attrs)
-    {
-      batch_id: @batch_id,
-      # NULL is deliberately never written here -- see
-      # AnalysisResult::NO_STEAMID/NO_MILESTONE for why.
-      steamid: attrs[:steamid] || AnalysisResult::NO_STEAMID,
-      model: attrs[:model],
-      metric: attrs[:metric],
-      value: attrs[:value],
-      milestone: attrs[:milestone] || AnalysisResult::NO_MILESTONE,
-      created_at: imported_at
-    }
-  end
-
-  def current_snapshot_row(imported_at, attrs)
-    historical_row(imported_at, attrs).merge(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID)
-  end
-
-  def compact_alien_strategy(strategy)
-    strategy.to_s.split(',').map { |assignment| assignment.sub(/\Ar\d+=/, '') }.join(',')
-  end
-
-  def validate_row_lengths!(rows)
-    string_limits = AnalysisResult.columns_hash.filter_map do |column, definition|
-      [column, definition.limit] if definition.type == :string && definition.limit
-    end.to_h
-
-    rows.each_with_index do |row, index|
-      string_limits.each do |column, limit|
-        value = row[column.to_sym]
-        next unless value.is_a?(String) && value.length > limit
-
-        raise Error,
-              "Invalid analysis result at row #{index + 1}: #{column}=#{value.inspect} exceeds #{limit} characters"
-      end
+      raise Error, "Analysis field #{field.inspect} exceeds #{field_limit} characters"
     end
   end
 

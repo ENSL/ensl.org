@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-# Pivots the newest historical class-stat result batch into one row per
-# (player, class). Class source rows were aggregated across maps and teams at
-# import time; derived rates here exist only for the class-performance page.
+# Pivots the newest historical class-stat cells into one row per (player,
+# class). Derived rates exist only for the class-performance page.
 class ClassPerformanceQuery
   METRICS = %w[kills deaths damage minutes_played resources_spent wins losses sample_size].freeze
-  MODEL_PREFIX = 'class_stats:'
   EXCLUDED_CLASSES = %w[heavy jetpack].freeze
   MIN_GAMES_OPTIONS = PlayerRankingQuery::MIN_GAMES_OPTIONS
   DEFAULT_MIN_GAMES = PlayerRankingQuery::DEFAULT_MIN_GAMES
@@ -18,14 +16,10 @@ class ClassPerformanceQuery
     latest_batch_id = AnalysisResult.historical.maximum(:batch_id)
     return [] unless latest_batch_id
 
-    AnalysisResult.historical
-                  .where(batch_id: latest_batch_id)
-                  .where('model LIKE ?', "#{MODEL_PREFIX}%")
-                  .distinct
-                  .pluck(:model)
-                  .map { |model| model.delete_prefix(MODEL_PREFIX) }
-                  .reject { |class_name| EXCLUDED_CLASSES.include?(class_name) }
-                  .sort
+    AnalysisResult.rows_from(
+      AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'class_stats').where(field: 'class_name')
+    ).filter_map { |row| row['class_name'] }
+     .reject { |class_name| EXCLUDED_CLASSES.include?(class_name) }.uniq.sort
   end
 
   def initialize(class_name: nil, min_games: nil)
@@ -59,18 +53,26 @@ class ClassPerformanceQuery
     @latest_batch_id ||= AnalysisResult.historical.maximum(:batch_id)
   end
 
-  def relevant_results
-    AnalysisResult.historical
-                  .where(batch_id: latest_batch_id)
-                  .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
-                  .where('model LIKE ?', "#{MODEL_PREFIX}%")
-                  .where(metric: METRICS)
+  def metrics_by_subject
+    initial_metrics = Hash.new { |hash, key| hash[key] = Hash.new(0) }
+    @metrics_by_subject ||= class_stat_rows.each_with_object(initial_metrics) do |row, memo|
+      steamid = steamids_by_user_id[row['user_id'].to_i]
+      class_name = row['class_name'].presence
+      next unless steamid && class_name
+
+      METRICS.each { |field| memo[[steamid, class_name]][field] += row[field].to_f if row[field] }
+    end
   end
 
-  def metrics_by_subject
-    @metrics_by_subject ||= relevant_results.each_with_object(Hash.new { |hash, key| hash[key] = {} }) do |result, memo|
-      memo[[result.steamid, result.model]][result.metric] = result.value
-    end
+  def class_stat_rows
+    @class_stat_rows ||= AnalysisResult.rows_from(
+      AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'class_stats')
+                    .where(field: %w[user_id class_name] + METRICS)
+    )
+  end
+
+  def steamids_by_user_id
+    @steamids_by_user_id ||= AnalysisResult.user_steamids(latest_batch_id)
   end
 
   def users_by_steamid
@@ -86,14 +88,14 @@ class ClassPerformanceQuery
   end
 
   def grouped_metrics
-    selected_metrics = metrics_by_subject.select do |(_steamid, model), _metrics|
-      @class_name.nil? || model == "#{MODEL_PREFIX}#{@class_name}"
+    selected_metrics = metrics_by_subject.select do |(_steamid, class_name), _metrics|
+      @class_name.nil? || class_name == @class_name
     end
     return selected_metrics.transform_keys(&:first) if @class_name
 
     empty_metrics = Hash.new { |hash, key| hash[key] = Hash.new(0) }
-    selected_metrics.each_with_object(empty_metrics) do |((steamid, model), metrics), totals|
-      next if EXCLUDED_CLASSES.include?(model.delete_prefix(MODEL_PREFIX))
+    selected_metrics.each_with_object(empty_metrics) do |((steamid, class_name), metrics), totals|
+      next if EXCLUDED_CLASSES.include?(class_name)
 
       metrics.each { |metric, value| totals[steamid][metric] += value.to_f }
     end

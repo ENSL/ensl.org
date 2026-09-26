@@ -6,50 +6,44 @@
 #
 #  id         :integer          not null, primary key
 #  batch_id   :integer          not null
-#  steamid    :string(255)
 #  model      :string(255)      not null
-#  metric     :string(255)      not null
-#  value      :float            not null
-#  milestone  :integer
+#  digest     :binary(16)       not null
+#  field      :string(255)      not null
+#  value      :float(53)
+#  text_value :text(65535)
 #  created_at :datetime         not null
 #
 # Indexes
 #
-#  index_analysis_results_on_steamid                     (steamid)
-#  index_analysis_results_on_model_and_metric             (model, metric)
 #  index_analysis_results_on_batch_id                     (batch_id)
-#  index_analysis_results_on_batch_and_subject             (batch_id, model, metric, steamid, milestone) UNIQUE
+#  index_analysis_results_on_batch_model_digest_field     (batch_id, model, digest, field) UNIQUE
+#  index_analysis_results_on_batch_model_field_digest     (batch_id, model, field, digest)
 #
 
-# Historical, append-only output from the ensl_analysis Python pipeline
-# (per-player skill/rating values plus per-model aggregate metrics). See the
-# CreateAnalysisResults migration for the full rationale.
-#
-# WIP: intentionally barebones.
+# Generic typed cells from the non-raw analysis exports. A digest identifies
+# one source row; each source column is persisted as a separate field cell.
 class AnalysisResult < ApplicationRecord
-  belongs_to :user, primary_key: 'steamid', foreign_key: 'steamid', optional: true, inverse_of: false
-
-  # Reserved batch_id for overwritable "current state" snapshots (map
-  # balance, time-of-week activity, etc.) that aren't tied to a specific
-  # export batch and aren't per-player history. Real export batches always
-  # get their own (positive) batch_id from the Python exporter, so rows
-  # imported under this sentinel upsert in place via
-  # index_analysis_results_on_batch_and_subject on every re-import instead
-  # of accumulating like the rest of this table. See
-  # AnalysisBatchImportService for what gets imported under which scope.
   CURRENT_SNAPSHOT_BATCH_ID = 0
-
-  # Sentinel values for the two other nullable columns in the unique index
-  # (index_analysis_results_on_batch_and_subject). NULL is deliberately never
-  # written for either: MySQL never treats two NULLs as equal for unique-index
-  # purposes, so rows with a real NULL here would silently bypass upsert
-  # dedup and accumulate duplicates on every re-import instead of being
-  # updated in place. AnalysisBatchImportService normalizes both before
-  # writing; use these same sentinels when querying "no subject"/"no
-  # milestone" rows (e.g. the model-level aggregates under `metrics`).
-  NO_STEAMID = ''
-  NO_MILESTONE = -1
 
   scope :current_snapshot, -> { where(batch_id: CURRENT_SNAPSHOT_BATCH_ID) }
   scope :historical, -> { where.not(batch_id: CURRENT_SNAPSHOT_BATCH_ID) }
+
+  def stored_value
+    text_value.nil? ? value : text_value
+  end
+
+  def self.rows_from(scope)
+    scope.find_each.each_with_object({}) do |cell, rows|
+      (rows[cell.digest] ||= {})[cell.field] = cell.stored_value
+    end.values
+  end
+
+  def self.user_steamids(batch_id)
+    rows_from(historical.where(batch_id: batch_id, model: 'users').where(field: %w[id steam_id]))
+      .each_with_object({}) do |row, steamids|
+      user_id = row['id']
+      steam_id = row['steam_id']
+      steamids[user_id.to_i] = steam_id if user_id && steam_id.present?
+    end
+  end
 end

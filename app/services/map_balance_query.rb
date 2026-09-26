@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
-# Pivots the current map_balance snapshot of AnalysisResult rows -- one row
-# per (map_name, metric) -- into one hash per map. Used by
-# Analysis::MapsController#index. Unlike PlayerRankingQuery this reads from
-# the overwritable CURRENT_SNAPSHOT_BATCH_ID scope (see AnalysisResult),
-# since map balance is a single upserted-in-place snapshot, not per-batch
-# history. `steamid` is reused as the generic subject column here and holds
-# the map name (see AnalysisBatchImportService#read_map_balance_rows).
+# Pivots the current map_balance cells into one hash per map. Used by
+# Analysis::MapsController#index.
 class MapBalanceQuery
   METRICS = %w[marine_wins alien_wins total_games marine_win_percentage alien_win_percentage].freeze
 
@@ -41,13 +36,15 @@ class MapBalanceQuery
 
   def relevant_results
     AnalysisResult.current_snapshot
-                  .where(model: 'map_balance', metric: METRICS)
-                  .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
+                  .where(model: 'map_balance', field: ['map_name'] + METRICS)
   end
 
   def metrics_by_map
-    relevant_results.each_with_object(Hash.new { |h, k| h[k] = {} }) do |result, memo|
-      memo[result.steamid][result.metric] = result.value
+    AnalysisResult.rows_from(relevant_results).each_with_object({}) do |row, maps|
+      map_name = row['map_name'].presence
+      next unless map_name
+
+      maps[map_name] = row.slice(*METRICS)
     end
   end
 end

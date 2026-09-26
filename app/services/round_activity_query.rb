@@ -37,15 +37,18 @@ class RoundActivityQuery
   private
 
   def tally
-    results.each_with_object(Hash.new(0)) do |result, memo|
-      memo[[monday_first_index(result.steamid.to_i), result.milestone]] += result.value.to_i
+    AnalysisResult.rows_from(results).each_with_object(Hash.new(0)) do |row, counts|
+      day_of_week = row['day_of_week']
+      hour_of_day = row['hour_of_day']
+      round_count = row['round_count']
+      next unless day_of_week && hour_of_day && round_count && HOURS.include?(hour_of_day.to_i)
+
+      counts[[monday_first_index(day_of_week.to_i), hour_of_day.to_i]] += round_count.to_i
     end
   end
 
   def results
-    AnalysisResult.current_snapshot.where(model: 'time_of_week', metric: 'round_count')
-                  .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
-                  .where(milestone: HOURS)
+    AnalysisResult.current_snapshot.where(model: 'time_of_week', field: %w[day_of_week hour_of_day round_count])
   end
 
   # Exported day_of_week is Sunday-first (0..6); display is Monday-first.

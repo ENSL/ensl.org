@@ -3,6 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe CountryStatisticsQuery do
+  def create_dl_skill(batch_id:, user:, skill:, source_steam_id: user.steamid)
+    create_analysis_skill_for_user(batch_id: batch_id, user: user, model: 'dl', skill: skill,
+                                   source_steam_id: source_steam_id)
+  end
+
   describe '.call' do
     it 'keeps countries with more than ten accounts and combines the rest into Other countries' do
       11.times { create(:user, country: 'US') }
@@ -34,15 +39,13 @@ RSpec.describe CountryStatisticsQuery do
         Rounder.create!(round: round, steamid: "STEAM_#{player.steamid}", team: 1, share: 1.0)
       end
 
-      create(:analysis_result, batch_id: 1, steamid: united_states_player.steamid, model: 'dl', metric: 'skill',
-                               value: 10.0)
-      create(:analysis_result, batch_id: 1, steamid: second_united_states_player.steamid, model: 'dl', metric: 'skill',
-                               value: 30.0)
-      create(:analysis_result, batch_id: 1, steamid: canadian_player.steamid, model: 'dl', metric: 'skill', value: 50.0)
-      create(:analysis_result, batch_id: 2, steamid: "STEAM_#{united_states_player.steamid}", model: 'DL',
-                               metric: 'skill', value: 20.0)
-      create(:analysis_result, batch_id: 2, steamid: "STEAM_#{second_united_states_player.steamid}", model: 'DL',
-                               metric: 'skill', value: 40.0)
+      create_dl_skill(batch_id: 1, user: united_states_player, skill: 10.0)
+      create_dl_skill(batch_id: 1, user: second_united_states_player, skill: 30.0)
+      create_dl_skill(batch_id: 1, user: canadian_player, skill: 50.0)
+      create_dl_skill(batch_id: 2, user: united_states_player, source_steam_id: "STEAM_#{united_states_player.steamid}",
+                      skill: 20.0)
+      create_dl_skill(batch_id: 2, user: second_united_states_player,
+                      source_steam_id: "STEAM_#{second_united_states_player.steamid}", skill: 40.0)
 
       rows = described_class.call[:round_skill_players].index_by { |row| row[:country] }
       per_player_rows = described_class.call[:skill_per_player_players].index_by { |row| row[:country] }
@@ -58,7 +61,7 @@ RSpec.describe CountryStatisticsQuery do
       players = (1..11).map do |number|
         player = create(:user, steamid: "0:1:3#{number}", country: 'DE')
         Rounder.create!(round: round, steamid: "STEAM_#{player.steamid}", team: 1, share: 1.0)
-        create(:analysis_result, batch_id: 1, steamid: player.steamid, model: 'dl', metric: 'skill', value: number.to_f)
+        create_dl_skill(batch_id: 1, user: player, skill: number.to_f)
         player
       end
 
@@ -75,7 +78,7 @@ RSpec.describe CountryStatisticsQuery do
         player_count.times do |number|
           player = create(:user, steamid: "0:1:#{country == 'DE' ? 4 : 5}#{number}", country: country)
           Rounder.create!(round: round, steamid: "STEAM_#{player.steamid}", team: 1, share: 1.0)
-          create(:analysis_result, batch_id: 1, steamid: player.steamid, model: 'dl', metric: 'skill', value: skill)
+          create_dl_skill(batch_id: 1, user: player, skill: skill)
         end
       end
 

@@ -3,28 +3,17 @@
 require 'rails_helper'
 
 RSpec.describe MapBalanceQuery do
+  def map_balance_row(map_name, values)
+    create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'map_balance',
+                        values: { 'map_name' => map_name }.merge(values))
+  end
+
   describe '.call' do
     it 'returns maps with positive total games sorted by marine win rate descending' do
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'total_games', value: 12)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'marine_wins', value: 7)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'alien_wins', value: 5)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'marine_win_percentage', value: 58.3)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'alien_win_percentage', value: 41.7)
-
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_veil', model: 'map_balance', metric: 'total_games', value: 20)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_veil', model: 'map_balance', metric: 'marine_wins', value: 10)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_veil', model: 'map_balance', metric: 'alien_wins', value: 10)
-
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_unused', model: 'map_balance', metric: 'total_games', value: 0)
+      map_balance_row('ns_tram', 'total_games' => 12, 'marine_wins' => 7, 'alien_wins' => 5,
+                                 'marine_win_percentage' => 58.3, 'alien_win_percentage' => 41.7)
+      map_balance_row('ns_veil', 'total_games' => 20, 'marine_wins' => 10, 'alien_wins' => 10)
+      map_balance_row('ns_unused', 'total_games' => 0)
 
       rows = described_class.call
 
@@ -33,12 +22,9 @@ RSpec.describe MapBalanceQuery do
       expect(rows.first[:alien_win_percentage]).to eq(41.7)
     end
 
-    it 'ignores rows with nil or sentinel steamid values' do
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: AnalysisResult::NO_STEAMID, model: 'map_balance',
-                               metric: 'total_games', value: 50)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: nil, model: 'map_balance', metric: 'total_games', value: 20)
+    it 'ignores incomplete rows without a map name' do
+      create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'map_balance',
+                          values: { 'total_games' => 50 })
 
       expect(described_class.call).to eq([])
     end

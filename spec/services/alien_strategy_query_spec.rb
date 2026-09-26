@@ -4,8 +4,9 @@ require 'rails_helper'
 
 RSpec.describe AlienStrategyQuery do
   def create_strategy_result(strategy:, metric:, value:, milestone:, batch_id: 1)
-    create(:analysis_result, batch_id: batch_id, model: 'alien_strategy', steamid: strategy,
-                             metric: metric, value: value, milestone: milestone)
+    create_analysis_row(batch_id: batch_id, model: 'alien_strategies',
+                        values: { 'round_id' => milestone, 'result' => metric == 'alien_win' ? 0 : 1,
+                                  'duration_seconds' => value, 'strategy' => strategy })
   end
 
   describe '#canonical_roles' do

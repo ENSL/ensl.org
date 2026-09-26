@@ -4,9 +4,8 @@ require 'rails_helper'
 
 describe RoundActivityQuery do
   def activity(day:, hour:, rounds:)
-    create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                             steamid: day.to_s, model: 'time_of_week', metric: 'round_count',
-                             milestone: hour, value: rounds)
+    create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'time_of_week',
+                        values: { 'day_of_week' => day, 'hour_of_day' => hour, 'round_count' => rounds })
   end
 
   describe '#call' do
@@ -58,8 +57,8 @@ describe RoundActivityQuery do
 
     it 'uses only the current imported snapshot' do
       activity(day: 6, hour: 20, rounds: 2)
-      create(:analysis_result, batch_id: 99, steamid: '6', model: 'time_of_week',
-                               metric: 'round_count', milestone: 20, value: 10)
+      create_analysis_row(batch_id: 99, model: 'time_of_week',
+                          values: { 'day_of_week' => 6, 'hour_of_day' => 20, 'round_count' => 10 })
 
       expect(described_class.call[:total_rounds]).to eq(2)
     end

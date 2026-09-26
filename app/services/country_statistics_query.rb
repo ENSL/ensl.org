@@ -70,7 +70,7 @@ class CountryStatisticsQuery
         players: players.size,
         average_skill: average_skill,
         top_ten_average_skill: top_skills.empty? ? nil : top_skills.sum.fdiv(top_skills.size),
-        skill_per_player: average_skill.nil? ? nil : average_skill.fdiv(players.size)
+        skill_per_player: average_skill&.fdiv(players.size)
       }
     end
   end
@@ -89,12 +89,12 @@ class CountryStatisticsQuery
     latest_batch_id = AnalysisResult.historical.maximum(:batch_id)
     return {} unless latest_batch_id
 
-    AnalysisResult.historical
-                  .where(batch_id: latest_batch_id)
-                  .where('LOWER(model) = ? AND LOWER(metric) = ?', 'dl', 'skill')
-                  .each_with_object({}) do |result, skills|
-      steamid = User.normalize_steamid(result.steamid)
-      skills[steamid] = result.value if steamid
+    steamids_by_user_id = AnalysisResult.user_steamids(latest_batch_id)
+    scope = AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'dl')
+                          .where(field: %w[user_id skill_dl])
+    AnalysisResult.rows_from(scope).each_with_object({}) do |row, skills|
+      steamid = User.normalize_steamid(steamids_by_user_id[row['user_id'].to_i])
+      skills[steamid] = row['skill_dl'] if steamid && row['skill_dl']
     end
   end
 

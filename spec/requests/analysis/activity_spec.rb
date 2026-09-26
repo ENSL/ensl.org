@@ -4,9 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Analysis::ActivityController', type: :request do
   def activity(day:, hour:, rounds:)
-    create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                             steamid: day.to_s, model: 'time_of_week', metric: 'round_count',
-                             milestone: hour, value: rounds)
+    create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'time_of_week',
+                        values: { 'day_of_week' => day, 'hour_of_day' => hour, 'round_count' => rounds })
   end
 
   describe 'GET /analysis/activity' do

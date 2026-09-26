@@ -252,14 +252,17 @@ class TeamRankingQuery
     batch_id = AnalysisResult.historical.maximum(:batch_id)
     return {} unless batch_id
 
+    steamids_by_user_id = AnalysisResult.user_steamids(batch_id)
     by_model = Hash.new { |hash, key| hash[key] = {} }
-    AnalysisResult.historical
-                  .where(batch_id: batch_id, model: PLAYER_SKILL_MODELS, metric: 'skill')
-                  .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
-                  .pluck(:model, :steamid, :value)
-                  .each do |model_name, steamid, value|
-      normalized = User.normalize_steamid(steamid)
-      by_model[model_name][normalized] = value if normalized
+    PLAYER_SKILL_MODELS.each do |model_name|
+      scope = AnalysisResult.historical.where(batch_id: batch_id, model: model_name)
+                            .where(field: %w[user_id] + ["skill_#{model_name}"])
+      AnalysisResult.rows_from(scope).each do |row|
+        steamid = steamids_by_user_id[row['user_id'].to_i]
+        normalized = User.normalize_steamid(steamid)
+        value = row["skill_#{model_name}"]
+        by_model[model_name][normalized] = value if normalized && value
+      end
     end
 
     # Later models win, so the preferred model overwrites the legacy fallback.

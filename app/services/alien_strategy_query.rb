@@ -106,13 +106,13 @@ class AlienStrategyQuery
   end
 
   def latest_batch_id
-    @latest_batch_id ||= AnalysisResult.historical.where(model: 'alien_strategy').maximum(:batch_id)
+    @latest_batch_id ||= AnalysisResult.historical.where(model: 'alien_strategies').maximum(:batch_id)
   end
 
   # Tokens accepted by the Contains filter, after applying the selected chamber
   # coalescing rule so suggestions always match the displayed strategies.
   def filter_options
-    strategy_results.flat_map { |result| canonical_roles(result.steamid).flatten }.uniq.sort
+    strategy_results.flat_map { |result| canonical_roles(result[:strategy]).flatten }.uniq.sort
   end
 
   private
@@ -178,10 +178,10 @@ class AlienStrategyQuery
     empty_counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0, win_times: [] } }
     @tallies ||= {}
     @tallies[action_limit] ||= strategy_results.each_with_object(empty_counts) do |row, counts|
-      outcome = row.metric == 'alien_win' ? :wins : :losses
-      strategy_counts = counts[canonical_roles(row.steamid, action_limit)]
+      outcome = row[:result].zero? ? :wins : :losses
+      strategy_counts = counts[canonical_roles(row[:strategy], action_limit)]
       strategy_counts[outcome] += 1
-      strategy_counts[:win_times] << row.value if outcome == :wins && row.value.positive?
+      strategy_counts[:win_times] << row[:duration_seconds] if outcome == :wins && row[:duration_seconds].positive?
     end
   end
 
@@ -189,11 +189,11 @@ class AlienStrategyQuery
     empty_counts = Hash.new { |hash, key| hash[key] = { wins: 0, losses: 0, win_times: [] } }
     @role_action_tallies ||= {}
     @role_action_tallies[action_limit] ||= strategy_results.each_with_object(empty_counts) do |row, counts|
-      outcome = row.metric == 'alien_win' ? :wins : :losses
-      canonical_roles(row.steamid, action_limit).uniq.each do |role|
+      outcome = row[:result].zero? ? :wins : :losses
+      canonical_roles(row[:strategy], action_limit).uniq.each do |role|
         role_counts = counts[role]
         role_counts[outcome] += 1
-        role_counts[:win_times] << row.value if outcome == :wins && row.value.positive?
+        role_counts[:win_times] << row[:duration_seconds] if outcome == :wins && row[:duration_seconds].positive?
       end
     end
   end
@@ -208,10 +208,17 @@ class AlienStrategyQuery
 
   def strategy_results
     @strategy_results ||= if latest_batch_id
-                            AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'alien_strategy')
-                                          .where(metric: %w[alien_win marine_win])
-                                          .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
-                                          .then { |scope| filter_strategy_results(scope) }.to_a
+                            scope = AnalysisResult.historical
+                                                  .where(batch_id: latest_batch_id, model: 'alien_strategies')
+                                                  .where(field: %w[round_id result duration_seconds strategy])
+                            AnalysisResult.rows_from(scope).filter_map do |row|
+                              result = row['result']
+                              strategy = row['strategy'].presence
+                              next unless strategy && [0, 1].include?(result.to_i)
+
+                              { result: result.to_i, strategy: strategy,
+                                duration_seconds: row['duration_seconds'].to_f }
+                            end
                           else
                             []
                           end

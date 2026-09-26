@@ -12,7 +12,7 @@ RSpec.describe 'Analysis::CountriesController', type: :request do
         player = create(:user, steamid: "0:1:20#{number + 2}", country: 'US')
         Rounder.create!(round: round, steamid: "STEAM_#{player.steamid}", team: 1, share: 1.0)
       end
-      create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'dl', metric: 'skill', value: 25.0)
+      create_analysis_skill_for_user(batch_id: 1, user: user, model: 'dl', skill: 25.0)
 
       get '/analysis/countries'
 

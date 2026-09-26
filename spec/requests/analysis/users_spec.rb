@@ -6,7 +6,7 @@ RSpec.describe 'Analysis::UsersController', type: :request do
   describe 'GET /analysis/users' do
     it 'renders the ranking table for known players' do
       user = create(:user, username: 'RankedPlayer', country: 'FI')
-      create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'os', metric: 'skill', value: 25.5)
+      create_analysis_skill_for_user(batch_id: 1, user: user, model: 'os', skill: 25.5)
 
       get '/analysis/users'
 
@@ -31,7 +31,7 @@ RSpec.describe 'Analysis::UsersController', type: :request do
 
     it 'uses the requested sort in the table defaults' do
       user = create(:user, username: 'RankedPlayer')
-      create(:analysis_result, batch_id: 1, steamid: user.steamid, model: 'os', metric: 'skill', value: 25.5)
+      create_analysis_skill_for_user(batch_id: 1, user: user, model: 'os', skill: 25.5)
 
       get '/analysis/users', params: { min_games: 25, sort: 'wins', direction: 'descending' }
 

@@ -3,28 +3,17 @@
 require 'rails_helper'
 
 RSpec.feature 'Analysis map balance page', :js, type: :feature do
-  def seed_map_metric(map, metric, value)
-    create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                             steamid: map, model: 'map_balance', metric: metric, value: value)
+  def seed_map(map, values)
+    create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'map_balance',
+                        values: { 'map_name' => map }.merge(values))
   end
 
   before do
-    seed_map_metric('ns_altair', 'total_games', 20)
-    seed_map_metric('ns_altair', 'marine_wins', 8)
-    seed_map_metric('ns_altair', 'alien_wins', 12)
-    seed_map_metric('ns_altair', 'marine_win_percentage', 40.0)
-    seed_map_metric('ns_altair', 'alien_win_percentage', 60.0)
-
-    seed_map_metric('ns_tanith', 'total_games', 12)
-    seed_map_metric('ns_tanith', 'marine_wins', 9)
-    seed_map_metric('ns_tanith', 'alien_wins', 3)
-    seed_map_metric('ns_tanith', 'marine_win_percentage', 75.0)
-    seed_map_metric('ns_tanith', 'alien_win_percentage', 25.0)
-
-    # No win-percentage rows recorded for this map -- exercises the "blanks sort last" rule.
-    seed_map_metric('ns_hera', 'total_games', 5)
-    seed_map_metric('ns_hera', 'marine_wins', 2)
-    seed_map_metric('ns_hera', 'alien_wins', 3)
+    seed_map('ns_altair', 'total_games' => 20, 'marine_wins' => 8, 'alien_wins' => 12,
+                          'marine_win_percentage' => 40.0, 'alien_win_percentage' => 60.0)
+    seed_map('ns_tanith', 'total_games' => 12, 'marine_wins' => 9, 'alien_wins' => 3,
+                          'marine_win_percentage' => 75.0, 'alien_win_percentage' => 25.0)
+    seed_map('ns_hera', 'total_games' => 5, 'marine_wins' => 2, 'alien_wins' => 3)
   end
 
   def map_names

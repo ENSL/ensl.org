@@ -5,12 +5,9 @@ require 'rails_helper'
 RSpec.describe 'Analysis::MapsController', type: :request do
   describe 'GET /analysis/maps' do
     it 'renders map balance rows from current snapshot data' do
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'total_games', value: 12)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'marine_wins', value: 7)
-      create(:analysis_result, batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID,
-                               steamid: 'ns_tram', model: 'map_balance', metric: 'alien_wins', value: 5)
+      create_analysis_row(batch_id: AnalysisResult::CURRENT_SNAPSHOT_BATCH_ID, model: 'map_balance',
+                          values: { 'map_name' => 'ns_tram', 'total_games' => 12, 'marine_wins' => 7,
+                                    'alien_wins' => 5 })
 
       get '/analysis/maps'
 

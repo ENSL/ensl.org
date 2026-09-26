@@ -6,12 +6,9 @@ RSpec.describe 'Analysis::ClassesController', type: :request do
   describe 'GET /analysis/classes' do
     it 'renders the class-performance table from the latest historical batch' do
       user = create(:user, username: 'ClassExpert')
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'class_stats:fade', metric: 'damage',
-                               value: 500)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'class_stats:fade',
-                               metric: 'resources_spent', value: 25)
-      create(:analysis_result, batch_id: 2, steamid: user.steamid, model: 'class_stats:fade',
-                               metric: 'sample_size', value: 25)
+      create_analysis_user(batch_id: 2, user_id: user.id, steam_id: user.steamid)
+      create_analysis_class_stat(batch_id: 2, user_id: user.id, class_name: 'fade', damage: 500,
+                                 resources_spent: 25, sample_size: 25)
 
       get '/analysis/classes', params: { class_name: 'fade', min_games: 25 }
 

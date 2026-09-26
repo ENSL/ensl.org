@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
   create_table "activities", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -28,17 +28,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
   end
 
   create_table "analysis_results", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "batch_id"
+    t.integer "batch_id", null: false
     t.datetime "created_at", precision: nil, null: false
-    t.string "metric", null: false
-    t.integer "milestone"
+    t.binary "digest", limit: 16, null: false
+    t.string "field", null: false
     t.string "model", null: false
-    t.string "steamid"
-    t.float "value", null: false
-    t.index ["batch_id", "model", "metric", "steamid", "milestone"], name: "index_analysis_results_on_batch_and_subject", unique: true
+    t.text "text_value"
+    t.float "value", limit: 53
+    t.index ["batch_id", "model", "digest", "field"], name: "index_analysis_results_on_batch_model_digest_field", unique: true
+    t.index ["batch_id", "model", "field", "digest"], name: "index_analysis_results_on_batch_model_field_digest"
     t.index ["batch_id"], name: "index_analysis_results_on_batch_id"
-    t.index ["model", "metric"], name: "index_analysis_results_on_model_and_metric"
-    t.index ["steamid"], name: "index_analysis_results_on_steamid"
   end
 
   create_table "articles", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|

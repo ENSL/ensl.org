@@ -1,19 +1,16 @@
 # frozen_string_literal: true
 
-# Pivots the latest batch of AnalysisResult rows -- one row per
-# (steamid, model, metric) -- into one ranking hash per player, joined with
-# the matching User for display. Used by Analysis::UsersController#index.
+# Pivots the latest batch of generic analysis cells into one ranking hash per
+# player, joined with the matching User for display. Used by
+# Analysis::UsersController#index.
 #
 # "Latest batch" means the highest historical batch_id: each ensl_analysis
 # run recomputes skill ratings for the whole player base from all rounds to
 # date, so the newest batch is a full snapshot, not a delta.
 class PlayerRankingQuery
-  # Skill rating models from ensl_analysis; each contributes its 'skill'
-  # metric as a `:"skill_#{model}"` column on the returned rows.
   SKILL_MODELS = %w[dl mlt os os_btf].freeze
-
-  # Historical per-player stats, stored under model 'player_stats'.
   PLAYER_STAT_METRICS = %w[wins losses win_ratio].freeze
+  SKILL_FIELDS = SKILL_MODELS.index_with { |model| "skill_#{model}" }.freeze
 
   MIN_GAMES_OPTIONS = [25, 50, 70, 100].freeze
   DEFAULT_MIN_GAMES = 70
@@ -57,9 +54,7 @@ class PlayerRankingQuery
       {
         steamid: steamid,
         user: user,
-        wins: wins,
-        losses: losses,
-        win_ratio: metrics['player_stats.win_ratio']
+        wins: wins, losses: losses, win_ratio: metrics['player_stats.win_ratio']
       }.merge(skill_columns(metrics))
     end
     rankings.sort_by { |row| [-row[:skill_dl].to_f, row[:user].to_s.downcase] }
@@ -100,18 +95,43 @@ class PlayerRankingQuery
     @latest_batch_id ||= AnalysisResult.historical.maximum(:batch_id)
   end
 
-  def relevant_results
-    AnalysisResult.historical
-                  .where(batch_id: latest_batch_id)
-                  .where.not(steamid: [AnalysisResult::NO_STEAMID, nil])
-                  .where(model: SKILL_MODELS + ['player_stats'])
-                  .where(metric: %w[skill] + PLAYER_STAT_METRICS)
+  def metrics_by_steamid
+    @metrics_by_steamid ||= begin
+      metrics = Hash.new { |hash, key| hash[key] = {} }
+      user_rows.each do |row|
+        steamid = row['steam_id'].presence
+        next unless steamid
+
+        PLAYER_STAT_METRICS.each { |field| metrics[steamid]["player_stats.#{field}"] = row[field] }
+      end
+
+      SKILL_MODELS.each do |model|
+        skill_rows(model).each do |row|
+          steamid = steamids_by_user_id[row['user_id'].to_i]
+          skill = row[SKILL_FIELDS.fetch(model)]
+          metrics[steamid]["#{model}.skill"] = skill if steamid && skill
+        end
+      end
+      metrics
+    end
   end
 
-  def metrics_by_steamid
-    @metrics_by_steamid ||= relevant_results.each_with_object(Hash.new { |h, k| h[k] = {} }) do |result, memo|
-      memo[result.steamid]["#{result.model.to_s.downcase}.#{result.metric}"] = result.value
-    end
+  def user_rows
+    @user_rows ||= AnalysisResult.rows_from(
+      AnalysisResult.historical.where(batch_id: latest_batch_id, model: 'users')
+                    .where(field: %w[id steam_id] + PLAYER_STAT_METRICS)
+    )
+  end
+
+  def skill_rows(model)
+    AnalysisResult.rows_from(
+      AnalysisResult.historical.where(batch_id: latest_batch_id, model: model)
+                    .where(field: %w[user_id] + [SKILL_FIELDS.fetch(model)])
+    )
+  end
+
+  def steamids_by_user_id
+    @steamids_by_user_id ||= AnalysisResult.user_steamids(latest_batch_id)
   end
 
   def users_by_steamid

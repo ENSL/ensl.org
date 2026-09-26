@@ -4,8 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'Analysis::AlienStrategiesController', type: :request do
   def create_strategy_result(strategy:, metric:, value:, milestone:)
-    create(:analysis_result, batch_id: 8, model: 'alien_strategy', steamid: strategy,
-                             metric: metric, value: value, milestone: milestone)
+    create_analysis_row(batch_id: 8, model: 'alien_strategies',
+                        values: { 'round_id' => milestone, 'result' => metric == 'alien_win' ? 0 : 1,
+                                  'duration_seconds' => value, 'strategy' => strategy })
   end
 
   it 'defaults to the top twenty-five qualifying six-player strategies with ten rounds' do

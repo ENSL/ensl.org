@@ -98,7 +98,7 @@ describe TeamRankingQuery do
       skills.each_with_index do |skill, index|
         user = create(:user, steamid: "0:1:#{1000 + index}")
         create(:teamer, team: rated.team, user: user, rank: Teamer::RANK_MEMBER)
-        create(:analysis_result, batch_id: 3, steamid: user.steamid, model: 'os_btf', metric: 'skill', value: skill)
+        create_analysis_skill_for_user(batch_id: 3, user: user, model: 'os_btf', skill: skill)
       end
 
       row = described_class.call(game: 'NS2').find { |candidate| candidate[:team] == rated.team }
@@ -130,7 +130,7 @@ describe TeamRankingQuery do
       departed = create(:user, steamid: '0:1:4242')
       create(:teamer, team: contester.team, user: departed, rank: Teamer::RANK_REMOVED)
       Matcher.create!(match: match, user: departed, contester: contester, merc: false)
-      create(:analysis_result, batch_id: 4, steamid: departed.steamid, model: 'os_btf', metric: 'skill', value: 9.0)
+      create_analysis_skill_for_user(batch_id: 4, user: departed, model: 'os_btf', skill: 9.0)
 
       row = described_class.call(game: 'NS2').find { |candidate| candidate[:team] == contester.team }
 
@@ -148,7 +148,7 @@ describe TeamRankingQuery do
 
       merc = create(:user, steamid: '0:1:5252')
       Matcher.create!(match: match, user: merc, contester: contester, merc: true)
-      create(:analysis_result, batch_id: 4, steamid: merc.steamid, model: 'os_btf', metric: 'skill', value: 9.0)
+      create_analysis_skill_for_user(batch_id: 4, user: merc, model: 'os_btf', skill: 9.0)
 
       row = described_class.call(game: 'NS2').find { |candidate| candidate[:team] == contester.team }
 

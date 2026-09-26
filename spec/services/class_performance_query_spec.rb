@@ -4,8 +4,14 @@ require 'rails_helper'
 
 RSpec.describe ClassPerformanceQuery do
   def create_result(batch_id:, steamid:, class_name:, metric:, value:)
-    create(:analysis_result, batch_id: batch_id, steamid: steamid, model: "class_stats:#{class_name}",
-                             metric: metric, value: value)
+    @analysis_user_ids ||= {}
+    user_id = (@analysis_user_ids[[batch_id, steamid]] ||= @analysis_user_ids.size + 1)
+    create_analysis_user(batch_id: batch_id, user_id: user_id, steam_id: steamid) unless @analysis_users&.include?([
+                                                                                                                     batch_id, steamid
+                                                                                                                   ])
+    @analysis_users ||= []
+    @analysis_users << [batch_id, steamid]
+    create_analysis_class_stat(batch_id: batch_id, user_id: user_id, class_name: class_name, metric => value)
   end
 
   it 'pivots only the latest batch into map-independent player rows' do
