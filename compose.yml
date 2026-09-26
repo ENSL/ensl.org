@@ -113,7 +113,7 @@ services:
     command: ["redis-server", "--loglevel", "warning"]
 
   db:
-    image: mariadb:10.7
+    image: mariadb:13.0.2
     user: "mysql:mysql"
     volumes:
       - "./db/data:/var/lib/mysql"
