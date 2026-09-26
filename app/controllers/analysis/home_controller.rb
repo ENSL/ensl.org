@@ -33,6 +33,12 @@ module Analysis
         path_helper: :analysis_maps_path
       },
       {
+        title: 'Country analysis',
+        description: 'Where ENSL players and NS1 round participants are located, with DL skill comparisons.',
+        icon: 'globe',
+        path_helper: :analysis_countries_path
+      },
+      {
         title: 'NS1 Class performance',
         description: 'Compare each player with every NS1 class, independent of map, team, and side.',
         icon: 'crosshairs',

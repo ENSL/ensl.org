@@ -10,6 +10,7 @@ import PasskeyAuthController from "controllers/passkey_auth"
 import SortableTableController from "controllers/sortable_table"
 import TokenAutocompleteController from "controllers/token_autocomplete"
 import MapBalanceChartController from "controllers/map_balance_chart"
+import CountryStatisticsChartController from "controllers/country_statistics_chart"
 import ActivityChartController from "controllers/activity_chart"
 import RoundLengthChartController from "controllers/round_length_chart"
 import TechTreeController from "controllers/tech_tree"
@@ -36,6 +37,7 @@ application.register("passkey-auth", PasskeyAuthController)
 application.register("sortable-table", SortableTableController)
 application.register("token-autocomplete", TokenAutocompleteController)
 application.register("map-balance-chart", MapBalanceChartController)
+application.register("country-statistics-chart", CountryStatisticsChartController)
 application.register("activity-chart", ActivityChartController)
 application.register("round-length-chart", RoundLengthChartController)
 application.register("tech-tree", TechTreeController)

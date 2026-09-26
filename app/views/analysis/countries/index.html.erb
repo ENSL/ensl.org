@@ -1,0 +1,53 @@
+<%= link_to 'Back', analysis_root_path, class: 'analysis-back' %>
+<h1 class="title">Country analysis</h1>
+
+<div class="box wide">
+  <p>
+    ENSL player accounts and NS1 round participants grouped by country. The round-based charts include only
+    players found in imported rounds; accounts without a country are shown only in the first chart.
+  </p>
+
+  <% if @report[:all_players].empty? %>
+    <p>No player accounts are available yet.</p>
+  <% else %>
+    <p class="text-sm text-gray-600">
+      <%= number_with_delimiter(@report[:all_players].sum { |row| row[:players] }) %> player accounts across
+      <%= number_with_delimiter(@report[:all_players].size) %> country buckets.
+    </p>
+
+    <div
+      data-controller="country-statistics-chart"
+      data-country-statistics-chart-accounts-value="<%= @report[:all_players].to_json %>"
+      data-country-statistics-chart-round-skill-value="<%= @report[:round_skill_players].to_json %>"
+      data-country-statistics-chart-skill-per-player-value="<%= @report[:skill_per_player_players].to_json %>"
+    >
+      <h2 class="mt-8 text-lg font-semibold">ENSL players by country</h2>
+      <div style="height: <%= [@report[:all_players].size * 30 + 70, 180].max %>px;">
+        <canvas data-country-statistics-chart-target="accountsCanvas"></canvas>
+      </div>
+
+      <% if @report[:round_skill_players].empty? %>
+        <p class="mt-8">No countries with at least five round participants and current DL skill data are available yet.</p>
+      <% else %>
+        <h2 class="mt-10 text-lg font-semibold">DL skill by country</h2>
+        <p class="text-sm text-gray-600">
+          Countries are sorted by average DL skill. The line shows the average among each country's ten highest-rated
+          players (or all rated players when there are fewer than ten). Only countries with at least five round
+          participants are included.
+        </p>
+        <div style="height: <%= [@report[:round_skill_players].size * 34 + 100, 220].max %>px;">
+          <canvas data-country-statistics-chart-target="roundsCanvas"></canvas>
+        </div>
+
+        <h2 class="mt-10 text-lg font-semibold">Average DL skill divided by players</h2>
+        <p class="text-sm text-gray-600">
+          Uses the round-participant count as the denominator and is sorted highest to lowest. Only countries with at
+          least five round participants and current DL skill data are included.
+        </p>
+        <div style="height: <%= [@report[:skill_per_player_players].size * 30 + 70, 180].max %>px;">
+          <canvas data-country-statistics-chart-target="skillPerPlayerCanvas"></canvas>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

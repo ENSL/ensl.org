@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     resources :classes, only: [:index]
     resources :teams, only: [:index]
     resources :maps, only: [:index]
+    resources :countries, only: [:index]
     resources :pick_orders, only: [:index]
     resources :tech_paths, only: [:index]
     resources :alien_strategies, only: [:index]
