@@ -22,10 +22,7 @@
     <% if !user.steamid.blank? %>
       <dt>SteamID</dt>
       <dd>
-        <p><%= user.steamid %></p>
-        <div id="steam-search" data-user-id="<%= user.id %>">
-          <%= link_to "Search for Steam Account" %>
-        </div>
+        <p><%= link_to user.steamid, user.steam_community_url %></p>
       </dd>
     <% end %>
 

@@ -39,6 +39,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
 
       expect(response).to have_http_status(:success)
       user_expectation(json, user)
+      expect(json['steam']['url']).to eq('https://steamcommunity.com/profiles/76561198076460617')
     end
 
     it 'returns user data for query with id specified as format' do
@@ -97,7 +98,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
       expect(json['error']).to eq('User not found')
     end
 
-    it 'returns nil steam metadata for invalid steam community lookups' do
+    it 'returns a Steam Community URL when the Steam lookup fails' do
       user.update!(steamid: '0:0:0')
 
       get "/api/v1/users/#{user.id}", headers: json_headers
@@ -105,7 +106,7 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
       expect(response).to have_http_status(:success)
       expect(json['steam']).not_to be_nil
       expect(json['steam']['id']).to eq(user.steamid)
-      expect(json['steam']['url']).to be_nil
+      expect(json['steam']['url']).to eq('https://steamcommunity.com/profiles/76561197960265728')
       expect(json['steam']['nickname']).to be_nil
     end
 

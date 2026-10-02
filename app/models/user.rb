@@ -258,6 +258,14 @@ class User < ApplicationRecord
     }
   end
 
+  def steam_community_url
+    match = steamid.to_s.match(/\A0:([01]):(\d+)\z/)
+    return unless match
+
+    account_id = (match[2].to_i * 2) + match[1].to_i
+    "https://steamcommunity.com/profiles/#{76_561_197_960_265_728 + account_id}"
+  end
+
   def api_v1_payload(steam_profile: nil)
     {
       id: id,
@@ -270,7 +278,7 @@ class User < ApplicationRecord
       caster: caster?,
       moderator: gather_moderator?,
       contributor: contributor?,
-      steam: steamid? ? { id: steamid, url: steam_profile&.base_url, nickname: steam_profile&.nickname } : nil,
+      steam: steamid? ? { id: steamid, url: steam_community_url, nickname: steam_profile&.nickname } : nil,
       bans: {
         gather: banned?(Ban::TYPE_GATHER).present?,
         mute: banned?(Ban::TYPE_MUTE).present?,

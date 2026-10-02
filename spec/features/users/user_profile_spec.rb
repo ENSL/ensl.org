@@ -19,6 +19,15 @@ feature 'User profile', :js do
     expect(registrant.lastvisit).to be_within(5).of(Time.now.utc)
   end
 
+  scenario 'links the SteamID directly to the Steam Community profile' do
+    user = create(:user, steamid: '0:1:58097444')
+
+    visit user_path(user)
+
+    expect(page).to have_link('0:1:58097444', href: 'https://steamcommunity.com/profiles/76561198076460617')
+    expect(page).to have_no_link('Search for Steam Account')
+  end
+
   scenario 'reflects the moment a player logged back in after a period of inactivity' do
     registrant = create(:user, raw_password: 'password123')
     registrant.update!(lastvisit: 3.days.ago.change(usec: 0))

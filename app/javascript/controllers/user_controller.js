@@ -12,9 +12,6 @@ export default class extends Controller {
     this.handleClick = (event) => {
       const tabLink = event.target.closest("#user-profile li a")
       if (tabLink) return this.switchTab(tabLink)
-
-      const steamLink = event.target.closest("#steam-search a")
-      if (steamLink) this.searchSteam(event)
     }
     document.addEventListener("click", this.handleClick)
   }
@@ -47,19 +44,5 @@ export default class extends Controller {
     })
   }
 
-  // Replaces placeholder with fetched Steam profile link for the viewed user.
-  async searchSteam(event) {
-    event.preventDefault()
-
-    const container = document.getElementById("steam-search")
-    if (!container) return
-
-    const userId = container.dataset.userId
-    container.innerHTML = "<p>Searching...</p>"
-
-    const response = await fetch(`/api/v1/users/${userId}`)
-    const data = await response.json()
-    container.innerHTML = `<a href='${data.steam.url}'>Steam Profile: ${data.steam.nickname}</a>`
-  }
 }
 
