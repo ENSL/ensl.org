@@ -23,7 +23,8 @@ module AnalysisCellHelpers
 
   def create_analysis_class_stat(batch_id:, user_id:, class_name:, **values)
     create_analysis_row(batch_id: batch_id, model: 'class_stats',
-                        values: { 'user_id' => user_id, 'class_name' => class_name }.merge(values.transform_keys(&:to_s)))
+                        values: { 'user_id' => user_id, 'class_name' => class_name }
+                          .merge(values.transform_keys(&:to_s)))
   end
 
   def create_analysis_skill_for_user(batch_id:, user:, model:, skill:, source_steam_id: user.steamid)

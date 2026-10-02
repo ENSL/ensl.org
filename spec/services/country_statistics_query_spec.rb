@@ -10,7 +10,7 @@ RSpec.describe CountryStatisticsQuery do
 
   describe '.call' do
     it 'keeps countries with more than ten accounts and combines the rest into Other countries' do
-      11.times { create(:user, country: 'US') }
+      create_list(:user, 11, country: 'US')
       create(:user, country: 'CA')
       create(:user, country: '')
       create(:user, country: nil)
