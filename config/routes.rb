@@ -217,6 +217,7 @@ Rails.application.routes.draw do
     collection do
       get :admin
       get :trash
+      delete :destroy_missing
     end
   end
 

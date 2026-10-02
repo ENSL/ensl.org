@@ -60,6 +60,8 @@ RSpec.describe 'DataFilesController', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template(layout: 'full')
       expect(response.body).to include('class="file-path"')
+      expect(response.body).to include('name="file_ids[]"')
+      expect(response.body).to include('>Remove checked files</button>')
       expect(response.body).not_to include('<th>Description</th>')
       expect(response.body).to include('Broken file')
       expect(response.body).to include('Unrelated movie file')
@@ -77,6 +79,30 @@ RSpec.describe 'DataFilesController', type: :request do
 
     it 'returns 403 when not logged in' do
       get '/data_files/admin'
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'DELETE /data_files/destroy_missing' do
+    it 'removes only the selected missing files for admins' do
+      directory = create(:directory, parent: ensure_root_directory)
+      selected_file = create(:data_file, directory: directory, path: File.join(directory.full_path, 'selected.txt'))
+      unselected_file = create(:data_file, directory: directory, path: File.join(directory.full_path, 'unselected.txt'))
+
+      login_as(admin)
+
+      delete '/data_files/destroy_missing', params: { file_ids: [selected_file.id] }
+
+      expect(response).to redirect_to('/data_files/admin')
+      expect(DataFile.exists?(selected_file.id)).to be(false)
+      expect(DataFile.exists?(unselected_file.id)).to be(true)
+    end
+
+    it 'returns 403 for non-admin users' do
+      login_as(user)
+
+      delete '/data_files/destroy_missing'
 
       expect(response).to have_http_status(:forbidden)
     end

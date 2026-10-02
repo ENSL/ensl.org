@@ -4,15 +4,43 @@
 
 @use "../variables" as *;
 
+.files-list-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  width: 100%;
+}
+
 table.files-list {
   margin: 20px 0;
+  max-width: 100%;
+  min-width: 52rem;
+  table-layout: fixed;
+  width: 100%;
+
+  th,
+  td {
+    padding-left: .5rem;
+    padding-right: .5rem;
+  }
+
+  .file-select {
+    width: 2.5rem;
+    text-align: center;
+  }
 
   .file-name {
-    width: 28%;
+    width: 24%;
+    overflow-wrap: anywhere;
   }
 
   .file-path {
+    width: auto;
     overflow-wrap: anywhere;
+  }
+
+  .file-modified {
+    overflow-wrap: anywhere;
+    width: 9rem;
   }
 
   .file-size {
@@ -23,7 +51,15 @@ table.files-list {
 
   .actions {
     white-space: nowrap;
-    width: 1%;
+    width: 3.5rem;
+  }
+}
+
+.files-list-actions {
+  margin: 10px 0;
+
+  .remove-file {
+    cursor: pointer;
   }
 }
 

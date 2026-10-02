@@ -2,10 +2,18 @@
   Broken files
 </h1>
 
-<%= render "list", files: @files %>
+<%= form_with url: destroy_missing_data_files_path, method: :delete do %>
+  <div class="files-list-actions">
+    <%= button_tag 'Remove checked files', class: 'button remove-file', data: { turbo_confirm: 'Remove the checked broken files?' } %>
+  </div>
+  <%= render "list", files: @files, selectable: true %>
+  <div class="files-list-actions">
+    <%= button_tag 'Remove checked files', class: 'button remove-file', data: { turbo_confirm: 'Remove the checked broken files?' } %>
+  </div>
+<% end %>
 
 <h1>
   Unrelated Movie Files
 </h1>
 
-<%= render "list", files: @movies %>
+<%= render "list", files: @movies, selectable: false %>

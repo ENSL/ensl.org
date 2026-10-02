@@ -75,6 +75,18 @@ class DataFilesController < ApplicationController
     render html: helpers.safe_join(deleted_files, helpers.tag.br), layout: true
   end
 
+  def destroy_missing
+    raise AccessError unless cuser&.admin?
+
+    selected_ids = Array(params[:file_ids]).map(&:to_i)
+    deleted_count = DataFile.missing.count do |file|
+      file.destroy if selected_ids.include?(file.id)
+    end
+
+    flash[:notice] = "Removed #{helpers.pluralize(deleted_count, 'broken file')}."
+    redirect_to admin_data_files_path
+  end
+
   private
 
   def respond_to_successful_create
