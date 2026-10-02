@@ -92,4 +92,8 @@ pickle-email-*.html
 _*.md
 _*.txt
 
+# Analysis exports mostly
 storage
+
+# Gitleaks
+.gitleaksignore
