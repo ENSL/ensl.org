@@ -1,4 +1,4 @@
-FROM ruby:3.4.8 AS ensl_base
+FROM ruby:3.4.11 AS ensl_base
 ARG TARGETARCH
 
 ENV APP_PATH=/var/www

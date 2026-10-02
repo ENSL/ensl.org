@@ -4,7 +4,7 @@
 # Version data is in Gemfile.lock, running bundle update will fix it.
 
 source 'https://rubygems.org'
-ruby '3.4.8'
+ruby '3.4.11'
 
 # Rails core
 gem 'msgpack', '>= 1.7.0'
