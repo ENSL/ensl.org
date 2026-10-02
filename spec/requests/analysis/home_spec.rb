@@ -15,7 +15,7 @@ RSpec.describe 'Analysis::HomeController', type: :request do
       expect(response.body).to include(analysis_tech_paths_path)
       expect(response.body).to include(analysis_alien_tech_tree_path)
       expect(response.body).to include(statistics_rounds_path)
-      expect(response.body).to include('NS1 Rankings')
+      expect(response.body).to include('NS1 Player Rankings')
       expect(response.body).to include('NS1 Map balance')
       expect(response.body).to include('NS1 Gather Rankings')
       expect(response.body).to include('NS1 Marine tech paths')
