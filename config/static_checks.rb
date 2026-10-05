@@ -10,7 +10,7 @@ CI.run do
   step 'Static analysis: Gem audit', 'bin/bundler-audit'
   step 'Static analysis: Gem updates', 'bundle outdated'
   step 'Static analysis: Importmap audit', 'bin/importmap audit'
-  step 'Static analysis: JavaScript vulnerabilities', 'yarn audit --level moderate'
+  step 'Static analysis: JavaScript vulnerabilities', 'bin/yarn-audit'
   step 'Static analysis: CSS', 'yarn lint:css'
   step 'Static analysis: Zeitwerk compliance', 'bin/rails zeitwerk:check'
   step 'Static analysis: Leaked secrets', 'gitleaks detect --redact --no-banner'

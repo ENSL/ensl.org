@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require 'open3'
+
+UNPATCHED_STYLELINT_ADVISORY = 1_240_992
+
+output, status = Open3.capture2e('yarn', 'audit', '--level', 'moderate', '--json')
+events = output.each_line.filter_map do |line|
+  JSON.parse(line)
+rescue JSON::ParserError
+  nil
+end
+
+summary = events.find { |event| event['type'] == 'auditSummary' }
+advisories = events.select { |event| event['type'] == 'auditAdvisory' }
+unexpected_advisories = advisories.reject do |event|
+  data = event.fetch('data')
+  data.dig('advisory', 'id') == UNPATCHED_STYLELINT_ADVISORY &&
+    data.dig('resolution', 'path')&.start_with?('stylelint>')
+end
+
+unless summary && unexpected_advisories.empty?
+  print output
+  exit(status.success? ? 1 : status.exitstatus)
+end
+
+if advisories.empty?
+  puts 'yarn audit: 0 vulnerabilities found'
+else
+  puts 'yarn audit: accepted CVE-2026-93687 from development-only stylelint; no upstream patch is available.'
+end
