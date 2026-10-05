@@ -80,7 +80,7 @@
     <h4>Files</h4>
 
     <div id="article_files">
-      <%= render partial: "data_files/list", locals: { files: article.files } %>
+      <%= render partial: "data_files/list", locals: { files: article.files, selectable: false } %>
     </div>
 
     <% if file && file.can_create?(cuser) %>
