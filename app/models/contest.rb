@@ -252,6 +252,16 @@ class Contest < ApplicationRecord
     ordered.includes(:contesters).for_game(key)
   end
 
+  def self.won_by(user)
+    joins(winner: { team: :teamers })
+      .where(teamers: { user_id: user.id })
+      .where('teamers.created_at < contests.end')
+      .where('(teamers.updated_at > contests.end AND teamers.rank = ?) OR teamers.rank >= ?',
+             Teamer::RANK_REMOVED, Teamer::RANK_MEMBER)
+      .distinct
+      .ordered
+  end
+
   def self.params(params, _cuser)
     params.require(:contest).permit(:name, :start, :end, :status, :default_time,
                                     :contest_type, :winner_id, :demos_id, :short_name,

@@ -57,10 +57,18 @@
     <% end %>
   </dl>
 
-  <% if profile.achievements and !profile.achievements.empty? %>
+  <% won_contests = Contest.won_by(user) %>
+  <% if profile.achievements.present? || won_contests.any? %>
     <h4>Achievements</h4>
     <div class="achievements">
-      <%= sanitize(profile.achievements_parsed) %>
+      <%= sanitize(profile.achievements_parsed) if profile.achievements.present? %>
+      <% if won_contests.any? %>
+        <ul class="won-contests">
+          <% won_contests.each do |contest| %>
+            <li><%= fa_icon 'trophy' %> <%= link_to(h(contest.name), contest) %></li>
+          <% end %>
+        </ul>
+      <% end %>
     </div>
   <% end %>
 

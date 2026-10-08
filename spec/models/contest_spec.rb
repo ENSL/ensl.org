@@ -155,6 +155,32 @@ RSpec.describe Contest, type: :model do
     end
   end
 
+  describe '.won_by' do
+    it 'returns contests won by a team the user belonged to when the contest ended' do
+      user = create(:user)
+      winning_team = create(:team)
+      contest = create(:contest)
+      winner = create(:contester, contest: contest, team: winning_team)
+      contest.update!(winner: winner, start: 2.months.ago, end: 1.month.ago)
+      create(:teamer, user: user, team: winning_team, rank: Teamer::RANK_MEMBER,
+                      created_at: 3.months.ago)
+
+      expect(described_class.won_by(user)).to contain_exactly(contest)
+    end
+
+    it 'excludes contests when the user joined the winning team after it ended' do
+      user = create(:user)
+      winning_team = create(:team)
+      contest = create(:contest)
+      winner = create(:contester, contest: contest, team: winning_team)
+      contest.update!(winner: winner, start: 2.months.ago, end: 1.month.ago)
+      create(:teamer, user: user, team: winning_team, rank: Teamer::RANK_MEMBER,
+                      created_at: 2.weeks.ago)
+
+      expect(described_class.won_by(user)).to be_empty
+    end
+  end
+
   describe 'association mutation helpers' do
     it 'adds and removes maps by id' do
       map = create(:map)

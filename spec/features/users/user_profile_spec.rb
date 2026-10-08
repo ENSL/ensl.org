@@ -28,6 +28,23 @@ feature 'User profile', :js do
     expect(page).to have_no_link('Search for Steam Account')
   end
 
+  scenario 'lists contests won while the player was a member of the winning team' do
+    user = create(:user)
+    winning_team = create(:team)
+    contest = create(:contest, name: 'Autumn Cup')
+    winner = create(:contester, contest: contest, team: winning_team)
+    contest.update!(winner: winner, start: 2.months.ago, end: 1.month.ago)
+    create(:teamer, user: user, team: winning_team, rank: Teamer::RANK_MEMBER,
+                    created_at: 3.months.ago)
+
+    visit user_path(user)
+
+    within('.achievements') do
+      expect(page).to have_css('.fa-trophy')
+      expect(page).to have_link('Autumn Cup', href: contest_path(contest))
+    end
+  end
+
   scenario 'reflects the moment a player logged back in after a period of inactivity' do
     registrant = create(:user, raw_password: 'password123')
     registrant.update!(lastvisit: 3.days.ago.change(usec: 0))
