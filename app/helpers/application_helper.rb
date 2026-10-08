@@ -97,7 +97,7 @@ module ApplicationHelper
     return unless time
 
     content_tag(:span, style: 'font-style: italic') do
-      Time.use_zone(timezone_offset) { time.strftime(format) }
+      time.in_time_zone(timezone_offset).strftime(format)
     end
   end
 

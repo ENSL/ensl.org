@@ -133,6 +133,13 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(result).to include('<span')
       expect(result).to include('01 May 24')
     end
+
+    it 'converts the time to the current user timezone before formatting' do
+      user = instance_double(User, time_zone: 'Amsterdam')
+      helper.define_singleton_method(:cuser) { user }
+
+      expect(helper.printtime(Time.utc(2024, 5, 1, 10, 30), '%H:%M')).to include('12:30')
+    end
   end
 
   describe '#flag' do

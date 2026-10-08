@@ -4,7 +4,7 @@ require 'rails_helper'
 
 feature 'User profile', :js do
   def displayed_time(time, timezone = Rails.application.config.time_zone)
-    Time.use_zone(timezone) { time.strftime('%d %B %y %H:%M') }
+    time.in_time_zone(timezone).strftime('%d %B %y %H:%M')
   end
 
   scenario "shows a freshly created user's current last-visit time, not a stale frozen default" do

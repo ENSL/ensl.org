@@ -28,7 +28,7 @@ feature 'User creates new article', :js do
         visit new_article_path
         expect(page).to have_css('#article_title', wait: 5)
         fill_in 'article_title', with: article[:title]
-        fill_in 'article_text', with: long_text
+        page.execute_script('document.getElementById("article_text").value = arguments[0]', long_text)
         click_button I18n.t('helpers.submit.post.create')
 
         expect(page).to have_text(I18n.t('flash.actions.create.notice', resource_name: Article.model_name.human))
