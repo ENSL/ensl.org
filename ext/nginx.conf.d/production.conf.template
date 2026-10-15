@@ -9,7 +9,8 @@ upstream ensl_production {
 
 upstream gathers {
   #  server unix:/srv/ensl/puma.production.sock fail_timeout=0;
-  server ensl_gather_production:6500;
+  # server ensl_gather_production:6500;
+  server 127.0.0.1:6500 down;
 }
 
 # root-level -> www redirect
